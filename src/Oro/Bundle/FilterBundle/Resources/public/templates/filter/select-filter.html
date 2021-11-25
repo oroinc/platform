@@ -3,7 +3,7 @@
         <% if (showLabel) { %><%- label %><% } %><span class="filter-item-hint"></span>
         <select>
             <% _.each(options, function (option) { %>
-            <option value="<%= option.value %>" title="<%- option.label %>"
+            <option value="<%- option.value %>" title="<%- option.label %>"
             <% if (option.value == selected.value) { %> selected="selected"<% } %>>
             <%- option.label %>
             </option>

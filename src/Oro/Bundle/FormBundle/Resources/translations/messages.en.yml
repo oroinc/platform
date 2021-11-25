@@ -267,8 +267,9 @@ oro:
                     tooltip: 'Enables WYSIWYG editor for all text fields'
         oro_duration.tooltip: >
             Encodings supported:<ul>
-            <li>#:#:# (e.g. '1:30:0' or '90:00')
-            <li>#h #m #s (e.g. '1h 30m' or '1.5h' or '90m')
+            <li>#:#:# (e.g. '1:30:0' or '90:00')</li>
+            <li>#h #m #s (e.g. '1h 30m' or '1.5h' or '90m')</li>
+            </ul>
         link_target:
             label: Target Window
             tooltip: 'Set how to open the linked document or URI. Select "Same Window" to open it in the current browser window. Select "New Window" to open it in a new browser tab.'

@@ -44,7 +44,7 @@
         {% set togglerId = 'dropdown-'|uniqid %}
 
         <script type="text/template" id="multi-grid-item">
-            <li id="<%= entity.get('entityAlias') %>" class="dropdown-item" data-cid="<%= entity.cid %>">
+            <li id="<%- entity.get('entityAlias') %>" class="dropdown-item" data-cid="<%- entity.cid %>">
                 <%- entity.get('label') %>
             </li>
         </script>

@@ -140,8 +140,8 @@ class OroNotificationBundleInstaller implements Installation
         $table->addColumn('resource_type', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
-        $table->addColumn('operation', 'string', ['length' => 20, 'notnull' => false]);
-        $table->addColumn('step', 'string', ['length' => 20, 'notnull' => false]);
+        $table->addColumn('operation', 'string', ['length' => 50, 'notnull' => false]);
+        $table->addColumn('step', 'string', ['length' => 50, 'notnull' => false]);
         $table->addColumn('item_id', 'integer', ['notnull' => false]);
         $table->addColumn('external_id', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('is_resolved', 'boolean', ['default' => false, 'notnull' => true]);

@@ -3,19 +3,19 @@
         <select class="item-select filter-select-oro">
             <option></option>
             <% items.each(function (item) { %>
-                <option value="<%= item.get('id') %>"><%= item.get('label') %></option>
+                <option value="<%- item.get('id') %>"><%= item.get('label') %></option>
             <% }); %>
         </select>
     </div>
 </script>
 
 <script id="widget-items-item-template" type="text/template">
-    <tr class="widget-items-item-row" data-cid="<%= cid %>">
+    <tr class="widget-items-item-row" data-cid="<%- cid %>">
         <td><%= label %></td>
         <td class="action-cell">
-            <input type="hidden" name="<%= namePrefix %>[id]" value="<%= id %>">
-            <input data-name="order" type="hidden" class="order" name="<%= namePrefix %>[order]" value="<%= order %>">
-            <input class="hide" data-name="show" type="checkbox" name="<%= namePrefix %>[show]" <%= show ? 'checked' : '' %>>
+            <input type="hidden" name="<%- namePrefix %>[id]" value="<%- id %>">
+            <input data-name="order" type="hidden" class="order" name="<%- namePrefix %>[order]" value="<%- order %>">
+            <input class="hide" data-name="show" type="checkbox" name="<%- namePrefix %>[show]" <%- show ? 'checked' : '' %>>
             <% if (_.isMobile()) { %>
             <span class="btn btn-icon delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}" aria-hidden="true">
                 <i class="fa-trash-o"></i>

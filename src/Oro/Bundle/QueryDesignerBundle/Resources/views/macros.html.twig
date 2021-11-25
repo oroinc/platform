@@ -95,7 +95,7 @@
 
 {% macro query_designer_column_template(id, showItems = ['column', 'label', 'function', 'sorting', 'action']) %}
     <script type="text/html" id="{{ id }}">
-        <tr data-cid="<%= cid %>">
+        <tr data-cid="<%- cid %>">
             {% if ('column' in showItems) %}
             <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             {% endif %}
@@ -131,7 +131,7 @@
 
 {% macro query_designer_grouping_item_template(id) %}
     <script type="text/html" id="{{ id }}">
-        <tr data-cid="<%= cid %>">
+        <tr data-cid="<%- cid %>">
             <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             <td class="action-cell">
                 {% apply spaceless %}
@@ -283,12 +283,12 @@
         <span class="entity-field-path">
         <% _.each(obj, function (item, index, list) { %>
             <% if (index === 0) { %>
-                <span><%= _.escape(item.entity.label) %></span>
+                <span><%- item.entity.label %></span>
             <% }  else { %>
                 <% if (index !== list.length - 1) { %>
-                    <span><%= _.escape(item.field.label) %></span>
+                    <span><%- item.field.label %></span>
                 <% } else { %>
-                    <b><%= _.escape(item.field.label) %></b>
+                    <b><%- item.field.label %></b>
                 <% } %>
             <% } %>
         <% }) %>

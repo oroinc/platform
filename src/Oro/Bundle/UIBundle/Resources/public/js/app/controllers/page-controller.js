@@ -372,7 +372,8 @@ define(function(require, exports, module) {
 
             if (additionalData) {
                 additionalData = '<div class="alert alert-info fade in top-messages alert-dismissible " role="alert">' +
-                    '<button type="button" class="close" data-dismiss="alert" aria-label="' + __('Close') + '">' +
+                    '<button type="button" class="close" ' +
+                    'data-dismiss="alert" aria-label="' + _.escape(__('Close')) + '">' +
                     '<span aria-hidden="true">&times;</span>' +
                     '</button>' +
                     '<div class="message">' + additionalData + '</div>' +

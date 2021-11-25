@@ -60,7 +60,7 @@
             <li>
                 <a href="#"
                    class="variable"
-                   title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
+                   title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
                 <span>&ndash; <%= variable.label %></span>
             </li>
             <% }); %>
@@ -70,7 +70,7 @@
         <li>
             <a href="#"
                class="variable"
-               title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
+               title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
             >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
             <span>&ndash;</span>
             <ul class="caption">
@@ -95,7 +95,7 @@
                 <% if (i !== breadcrumbs.length - 1) { %>
                 <a href="#"
                    class="reference"
-                   data-path="<%= breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
+                   data-path="<%- breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
                 <span class="divider">/&nbsp;</span>
                 <% } else { %>
                     <%= breadcrumbItemLabel %>
@@ -108,7 +108,7 @@
         <ul class="nav groups">
             <% if (!_.isEmpty(fields)) { %>
             <li>
-                <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
+                <div class="group-label"><%- _.__('oro.entity.field_choice.fields') %></div>
                 <ul class="nav">
                 <% var variableTemplate =  _.template($('#oro-email-template-variables-entity-variable-template').html()) %>
                 <% _.each(fields, function(variable, varName) { %>
@@ -154,14 +154,14 @@
             <% } %>
             <% if (!_.isEmpty(relations)) { %>
             <li>
-                <div class="group-label"><%= _.__('oro.entity.field_choice.relations') %></div>
+                <div class="group-label"><%- _.__('oro.entity.field_choice.relations') %></div>
                 <ul class="nav">
                     <% _.each(relations, function(variable, varName) { %>
                     <li>
                         <a href="#"
                            class="reference"
                            data-path="<%= path + '/' + varName %>"
-                           title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
+                           title="<%- _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
                         <span>&ndash; <%= variable.label %></span>
                     </li>
                     <% }); %>

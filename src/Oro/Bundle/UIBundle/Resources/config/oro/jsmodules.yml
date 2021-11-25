@@ -40,8 +40,6 @@ aliases:
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
     jquery.timepicker$: timepicker/jquery.timepicker
     jquery.uniform$: "@oroinc/jquery.uniform/src/js/jquery.uniform"
-    lightgallery$: lightgallery/dist/js/lightgallery
-    lightgallery.print$: oroui/js/lightgallery/lg-print
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oro/buttons-widget$: oroui/js/widget/buttons-widget
@@ -53,6 +51,7 @@ aliases:
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: underscore/underscore
     whatwg-fetch$: whatwg-fetch/fetch
+    slick$: slick-carousel/slick/slick
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/color-util
@@ -61,7 +60,7 @@ app-modules:
     - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
     - oroui/js/app/modules/init-layout
-    - oroui/js/app/modules/init-lightgallery
+    - oroui/js/app/modules/init-image-preview
     - oroui/js/app/modules/input-widgets
     - oroui/js/app/modules/jstree-actions-module
     - oroui/js/app/modules/layout-module

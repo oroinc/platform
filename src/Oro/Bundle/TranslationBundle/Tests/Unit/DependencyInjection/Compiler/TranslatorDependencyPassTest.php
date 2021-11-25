@@ -46,6 +46,7 @@ class TranslatorDependencyPassTest extends \PHPUnit\Framework\TestCase
                 ['setEventDispatcher', [new Reference('event_dispatcher')]],
                 ['setLogger', [new Reference('logger')]],
                 ['setApplicationState', [new Reference('oro_distribution.handler.application_status')]],
+                ['setMessageCatalogueSanitizer', [new Reference('oro_translation.message_catalogue_sanitizer')]],
             ],
             $translator->getMethodCalls()
         );

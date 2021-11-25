@@ -1,5 +1,5 @@
 <td class="title-cell" title="<%- label %>">
-    <label for="column-<%= cid  %>"><%= label %></label>
+    <label for="column-<%- cid  %>"><%= label %></label>
 </td>
 <% if (addSorting) { %>
 <td class="sort-cell">
@@ -12,7 +12,7 @@
 </td>
 <% } %>
 <td class="visibility-cell" title="<%- label %>">
-    <input id="column-<%= cid  %>" type="checkbox" data-role="renderable"
+    <input id="column-<%- cid  %>" type="checkbox" data-role="renderable"
     <% if (disabledVisibilityChange) {%>disabled<% } %>
     <% if (renderable) {%>checked<% } %>/>
 </td>

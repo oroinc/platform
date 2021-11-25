@@ -7,8 +7,8 @@ define(function(require) {
     const NewEmailMessageComponent = require('oroemail/js/app/components/new-email-message-component');
 
     const NewEmailFlashMessageComponent = NewEmailMessageComponent.extend({
-        messageTpl: _.template('<%=_.__("oro.email.notification.new_email")%>' +
-            '<span class="separator">|</span><a href="<%=url %>"><%=_.__("Read") %></a>'),
+        messageTpl: _.template('<%- _.__("oro.email.notification.new_email")%>' +
+            '<span class="separator">|</span><a href="<%-url %>"><%- _.__("Read") %></a>'),
 
         /**
          * @inheritdoc

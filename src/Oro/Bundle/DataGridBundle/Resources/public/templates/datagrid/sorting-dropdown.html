@@ -8,11 +8,11 @@
 <select class="oro-select2 oro-select2--size-s input-widget" data-skip-input-widgets aria-labelledby="<%- labelId %>">
     <% if (disableNotSelectedOption === false || currentDirection === null) { %>
         <option value="not-selected" <% if (currentDirection === null) { %>selected="selected"<% } %>>
-            <%= _.__('oro.datagrid.sorters.not_selected') %>
+            <%- _.__('oro.datagrid.sorters.not_selected') %>
         </option>
     <% } %>
     <% for(var i = 0; i < columns.length; i++) { %>
-    <option value="<%= columns[i].value %>"<% if (selectedValue === columns[i].value) { %> selected="selected"<% } %>><%- columns[i].label %><% if (!hasSortingOrderButton) { %>&nbsp(<%=_.__('oro.datagrid.sorters.' + columns[i].sortingType + '.' + columns[i].directionValue) %>)<% } %></option>
+    <option value="<%- columns[i].value %>"<% if (selectedValue === columns[i].value) { %> selected="selected"<% } %>><%- columns[i].label %><% if (!hasSortingOrderButton) { %>&nbsp(<%- _.__('oro.datagrid.sorters.' + columns[i].sortingType + '.' + columns[i].directionValue) %>)<% } %></option>
     <% } %>
 </select>
 <% if (hasSortingOrderButton) { %>

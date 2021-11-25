@@ -95,10 +95,9 @@ class HtmlTagHelper implements TranslatorAwareInterface
     /**
      * @param string $value
      * @param string $scope
-     * @param bool   $collectErrors
+     * @param bool $collectErrors
      *
      * @return string
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function sanitize($value, string $scope = 'default', bool $collectErrors = true)
     {
@@ -108,69 +107,11 @@ class HtmlTagHelper implements TranslatorAwareInterface
             return $value;
         }
 
-        if (!array_key_exists($scope, $this->htmlPurifiers)) {
-            $html5Config = \HTMLPurifier_HTML5Config::createDefault();
-            $config = \HTMLPurifier_Config::create($html5Config);
+        $purifier = $this->getPurifier($scope, $collectErrors);
 
-            $config->set('Core.CollectErrors', $collectErrors);
-
-            $config->set('HTML.DefinitionID', __CLASS__);
-            $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
-
-            // Disabled `rel` attribute transformer.
-            $config->set('HTML.TargetNoopener', false);
-            $config->set('HTML.TargetNoreferrer', false);
-            $config->set('Attr.AllowedRel', $this->htmlTagProvider->getAllowedRel($scope));
-
-            // add inline data support
-            $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));
-            $config->set('Attr.EnableID', true);
-            $config->set('Attr.AllowedFrameTargets', ['_blank']);
-            $config->set('Filter.ExtractStyleBlocks.TidyImpl', false);
-            $config->set('CSS.AllowImportant', true);
-            $config->set('CSS.AllowTricky', true);
-            $config->set('CSS.Proprietary', true);
-            $config->set('CSS.Trusted', true);
-
-            $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
-            if (str_contains($allowedTags, '<iframe>')) {
-                $config->set('HTML.SafeIframe', true);
-                $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
-            }
-
-            $this->fillAllowedElementsConfig($config, $scope);
-            $this->fillCacheConfig($config);
-
-            $def = $config->maybeGetRawHTMLDefinition();
-            if ($def) {
-                foreach ($this->additionalElements as $elementName => $data) {
-                    $element = $def->addElement(
-                        $elementName,
-                        $data['type'],
-                        $data['contents'],
-                        $data['attribute_collections']
-                    );
-
-                    if ($data['excludeSameElement'] === true) {
-                        $element->excludes = [$elementName => true];
-                    }
-                }
-
-                foreach ($this->additionalAttributes as $elementName => $attributeData) {
-                    foreach ($attributeData as $attributeName => $attributeType) {
-                        $def->addAttribute($elementName, $attributeName, $attributeType);
-                    }
-                }
-            }
-
-            $purifier = new HTMLPurifier($config);
-            $purifier->setTranslator($this->translator);
-            $this->htmlPurifiers[$scope] = $purifier;
-        }
-
-        $result = $this->htmlPurifiers[$scope]->purify($value);
+        $result = $purifier->purify($value);
         if ($collectErrors) {
-            $this->lastErrorCollector = $this->htmlPurifiers[$scope]->context->get('ErrorCollector', true);
+            $this->lastErrorCollector = $purifier->context->get('ErrorCollector', true);
         }
 
         return $result;
@@ -231,14 +172,13 @@ class HtmlTagHelper implements TranslatorAwareInterface
     /**
      * Filter HTML with HTMLPurifier, allow embedded tags
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     public function escape($string)
     {
         $config = \HTMLPurifier_HTML5Config::createDefault();
-        $config->set('Cache.SerializerPath', $this->cacheDir);
-        $config->set('Cache.SerializerPermissions', 0775);
+        $this->fillCacheConfig($config, '_escape');
         $config->set('Attr.EnableID', true);
         $config->set('Core.EscapeInvalidTags', true);
 
@@ -263,14 +203,14 @@ class HtmlTagHelper implements TranslatorAwareInterface
 
     /**
      * Configure cache
-     *
-     * @param \HTMLPurifier_Config $config
      */
-    private function fillCacheConfig($config)
+    private function fillCacheConfig(\HTMLPurifier_Config $config, string $definitionId): void
     {
         if ($this->cacheDir) {
             $cacheDir = $this->cacheDir . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . self::SUB_DIR;
             $this->touchCacheDir($cacheDir);
+            $config->set('HTML.DefinitionID', __CLASS__ . ':' . $definitionId);
+            $config->set('HTML.DefinitionRev', self::HTMLPURIFIER_CONFIG_REVISION);
             $config->set('Cache.SerializerPath', $cacheDir);
             $config->set('Cache.SerializerPermissions', self::MODE);
         } else {
@@ -280,11 +220,8 @@ class HtmlTagHelper implements TranslatorAwareInterface
 
     /**
      * Configure allowed tags
-     *
-     * @param \HTMLPurifier_Config $config
-     * @param string $scope
      */
-    private function fillAllowedElementsConfig($config, $scope)
+    private function fillAllowedElementsConfig(\HTMLPurifier_Config $config, string $scope): void
     {
         $converter = new TagDefinitionConverter();
         $allowedElements = implode(',', $this->htmlTagProvider->getAllowedElements($scope));
@@ -297,15 +234,90 @@ class HtmlTagHelper implements TranslatorAwareInterface
     }
 
     /**
-     * Create cache dir if need
+     * Configure iframe tag allowance.
+     */
+    private function fillIframeSupportConfig(string $scope, \HTMLPurifier_Config $config): void
+    {
+        $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
+        if (str_contains($allowedTags, '<iframe>')) {
+            $config->set('HTML.SafeIframe', true);
+            $config->set('URI.SafeIframeRegexp', $this->htmlTagProvider->getIframeRegexp($scope));
+        }
+    }
+
+    /**
+     * Create cache dir if it is needed
      *
      * @param string $cacheDir
      */
-    private function touchCacheDir($cacheDir)
+    private function touchCacheDir(string $cacheDir): void
     {
         $fs = new Filesystem();
         if (!$fs->exists($cacheDir)) {
             $fs->mkdir($cacheDir, self::MODE);
         }
+    }
+
+    private function getPurifier(string $scope, bool $collectErrors): HTMLPurifier
+    {
+        if (!array_key_exists($scope, $this->htmlPurifiers)) {
+            $this->htmlPurifiers[$scope] = $this->buildPurifier($scope, $collectErrors);
+        }
+
+        return $this->htmlPurifiers[$scope];
+    }
+
+    private function buildPurifier(string $scope, bool $collectErrors): HTMLPurifier
+    {
+        $html5Config = \HTMLPurifier_HTML5Config::createDefault();
+        $config = \HTMLPurifier_Config::create($html5Config);
+
+        $config->set('Core.CollectErrors', $collectErrors);
+
+        // Disabled `rel` attribute transformer.
+        $config->set('HTML.TargetNoopener', false);
+        $config->set('HTML.TargetNoreferrer', false);
+        $config->set('Attr.AllowedRel', $this->htmlTagProvider->getAllowedRel($scope));
+
+        // add inline data support
+        $config->set('URI.AllowedSchemes', $this->htmlTagProvider->getUriSchemes($scope));
+        $config->set('Attr.EnableID', true);
+        $config->set('Attr.AllowedFrameTargets', ['_blank']);
+        $config->set('Filter.ExtractStyleBlocks.TidyImpl', false);
+        $config->set('CSS.AllowImportant', true);
+        $config->set('CSS.AllowTricky', true);
+        $config->set('CSS.Proprietary', true);
+        $config->set('CSS.Trusted', true);
+
+        $this->fillIframeSupportConfig($scope, $config);
+        $this->fillAllowedElementsConfig($config, $scope);
+        $this->fillCacheConfig($config, $scope);
+
+        $def = $config->maybeGetRawHTMLDefinition();
+        if ($def) {
+            foreach ($this->additionalElements as $elementName => $data) {
+                $element = $def->addElement(
+                    $elementName,
+                    $data['type'],
+                    $data['contents'],
+                    $data['attribute_collections']
+                );
+
+                if ($data['excludeSameElement'] === true) {
+                    $element->excludes = [$elementName => true];
+                }
+            }
+
+            foreach ($this->additionalAttributes as $elementName => $attributeData) {
+                foreach ($attributeData as $attributeName => $attributeType) {
+                    $def->addAttribute($elementName, $attributeName, $attributeType);
+                }
+            }
+        }
+
+        $purifier = new HTMLPurifier($config);
+        $purifier->setTranslator($this->translator);
+
+        return $purifier;
     }
 }

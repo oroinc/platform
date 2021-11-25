@@ -1,1 +1,1 @@
-"sync.message.content.outdated": "Content of {{ title }} page is outdated, please <a href='#' data-action='page-refresh'>refresh the page</a>"
+"sync.message.content.outdated": 'Content of {{ title }} page is outdated, please <a href="#" data-action="page-refresh">refresh the page</a>'

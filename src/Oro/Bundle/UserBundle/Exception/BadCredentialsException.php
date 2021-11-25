@@ -40,5 +40,7 @@ class BadCredentialsException extends BaseBadCredentialsException
     {
         $this->setMessageKey($data[0]);
         parent::__unserialize($data[1]);
+
+        unset($this->serialized);
     }
 }

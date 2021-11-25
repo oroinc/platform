@@ -108,6 +108,12 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+### Removed
+
+#### UIBundle
+
+Third party dependence [lightGallery](https://www.lightgalleryjs.com/) has removed.
+
 ## 5.0.0
 
 ### Added

@@ -49,6 +49,10 @@ class TranslatorDependencyPass implements CompilerPassInterface
             'setApplicationState',
             [new Reference('oro_distribution.handler.application_status')]
         );
+        $translatorDef->addMethodCall(
+            'setMessageCatalogueSanitizer',
+            [new Reference('oro_translation.message_catalogue_sanitizer')]
+        );
         $translatorDef->setPublic(true);
     }
 }
