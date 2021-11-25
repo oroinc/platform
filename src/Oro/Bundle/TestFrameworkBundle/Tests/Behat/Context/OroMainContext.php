@@ -865,7 +865,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeLargeImage()
     {
-        $largeImage = $this->getSession()->getPage()->find('css', '.lg-image');
+        $largeImage = $this->getSession()->getPage()->find('css', '.images-list__item');
         self::assertNotNull($largeImage, 'Large image not visible');
     }
 
@@ -875,8 +875,8 @@ class OroMainContext extends MinkContext implements
     public function closeLargeImagePreview()
     {
         $page = $this->getSession()->getPage();
-        $page->find('css', '.lg-image')->mouseOver();
-        $page->find('css', 'button.lg-close')->click();
+        $page->find('css', '.images-list__item')->mouseOver();
+        $page->find('css', '.oro-modal-image-preview button.close')->click();
     }
 
     /**

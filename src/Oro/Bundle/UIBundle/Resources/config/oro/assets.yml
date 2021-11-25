@@ -12,12 +12,11 @@ css:
         - 'bundles/oroui/css/scss/bootstrap/bootstrap.scss'
 
         # Libraries styles
+        - '~slick-carousel/slick/slick.scss'
         - 'bundles/oroui/css/scss/font-awesome/core.scss'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.css'
         - 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker-fontawesome.css'
         - 'bundles/oroui/lib/minicolors/jquery.minicolors.css'
-        - '~lightgallery/dist/css/lg-transitions.css'
-        - '~lightgallery/dist/css/lightgallery.css'
         - '~overlayscrollbars/css/OverlayScrollbars.css'
         - '~jquery-ui-multiselect-widget/jquery.multiselect.css'
         - '~jquery-ui-multiselect-widget/jquery.multiselect.filter.css'
@@ -25,7 +24,6 @@ css:
         # customized libraries' styles
         - 'bundles/oroui/css/jquery-ui.grid.css'
         - 'bundles/oroui/css/jquery-ui.custom.css'
-        - 'bundles/oroui/css/lightgallery/lightgallery.scss'
 
         # custom styles
         - 'bundles/oroui/css/scss/main.scss'
