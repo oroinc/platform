@@ -366,14 +366,12 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                "SELECT COUNT(alert.id) as notificationAlertCount"
-                . " FROM oro_notification_alert AS alert"
-                . " WHERE"
+                "SELECT COUNT(alert.id) as notificationAlertCount FROM oro_notification_alert AS alert WHERE"
                 . " alert.source_type = :source_type"
                 . " AND alert.resource_type = :resource_type"
-                . " AND alert.user_id = :user_id"
                 . " AND alert.organization_id = :organization_id"
-                . " AND alert.is_resolved = :is_resolved",
+                . " AND alert.is_resolved = :is_resolved"
+                . " AND alert.user_id = :user_id",
                 [
                     'source_type'     => 'test_integration',
                     'resource_type'   => 'test_resource',
@@ -430,15 +428,13 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->connection->expects(self::once())
             ->method('fetchOne')
             ->with(
-                'SELECT COUNT(alert.id) as notificationAlertCount'
-                . ' FROM oro_notification_alert AS alert'
-                . ' WHERE'
-                . ' alert.source_type = :source_type'
-                . ' AND alert.resource_type = :resource_type'
-                . ' AND alert.alert_type = :alert_type'
-                . ' AND alert.user_id = :user_id'
-                . ' AND alert.organization_id = :organization_id'
-                . ' AND alert.is_resolved = :is_resolved',
+                "SELECT COUNT(alert.id) as notificationAlertCount FROM oro_notification_alert AS alert WHERE"
+                . " alert.source_type = :source_type"
+                . " AND alert.resource_type = :resource_type"
+                . " AND alert.organization_id = :organization_id"
+                . " AND alert.is_resolved = :is_resolved"
+                . " AND alert.alert_type = :alert_type"
+                . " AND alert.user_id = :user_id",
                 [
                     'source_type'     => 'test_integration',
                     'resource_type'   => 'test_resource',

@@ -142,6 +142,18 @@ class NotificationAlertManager
         ]);
     }
 
+    public function resolveNotificationAlertByOperationAndItemIdForCurrentUser(string $operation, string $itemId): void
+    {
+        $this->doResolveNotificationAlert([
+            self::SOURCE_TYPE   => $this->getSourceType(),
+            self::RESOURCE_TYPE => $this->getResourceType(),
+            self::USER          => $this->tokenAccessor->getUserId(),
+            self::ORGANIZATION  => $this->tokenAccessor->getOrganizationId(),
+            self::OPERATION     => $operation,
+            self::ITEM_ID       => $itemId
+        ]);
+    }
+
     public function resolveNotificationAlertByItemIdForUserAndOrganization(
         int  $itemId,
         ?int $userId,
@@ -220,16 +232,31 @@ class NotificationAlertManager
 
     public function hasNotificationAlertsByType(string $alertType): bool
     {
-        $hasNotificationAlertsByType = $this->doCheckHasNotificationAlertsByType([
+        $hasNotificationAlertsByType = $this->doCheckHasNotificationAlerts([
             self::SOURCE_TYPE   => $this->getSourceType(),
             self::RESOURCE_TYPE => $this->getResourceType(),
-            self::ALERT_TYPE    => $alertType,
             self::USER          => $this->tokenAccessor->getUserId(),
             self::ORGANIZATION  => $this->tokenAccessor->getOrganizationId(),
-            self::RESOLVED      => false
+            self::RESOLVED      => false,
+            self::ALERT_TYPE    => $alertType
         ]);
 
         return (bool) $hasNotificationAlertsByType;
+    }
+
+    public function hasNotificationAlertsByOperationAndItemId(string $operation, int $itemId): bool
+    {
+        $hasNotificationAlerts = $this->doCheckHasNotificationAlerts([
+            self::SOURCE_TYPE   => $this->getSourceType(),
+            self::RESOURCE_TYPE => $this->getResourceType(),
+            self::USER          => $this->tokenAccessor->getUserId(),
+            self::ORGANIZATION  => $this->tokenAccessor->getOrganizationId(),
+            self::RESOLVED      => false,
+            self::OPERATION     => $operation,
+            self::ITEM_ID       => $itemId
+        ]);
+
+        return (bool) $hasNotificationAlerts;
     }
 
     /**
@@ -269,67 +296,9 @@ class NotificationAlertManager
         return $result;
     }
 
-    private function doCheckHasNotificationAlerts(array $fields): bool
-    {
-        if (null === $fields[self::USER]) {
-            $userCondition = ' AND alert.user_id is null';
-            unset($fields[self::USER]);
-        } else {
-            $userCondition = ' AND alert.user_id = :user_id';
-        }
-
-        [$data, $types] = $this->prepareDbalCriteria($fields);
-        $em = $this->getEntityManager();
-        try {
-            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount'
-                . ' FROM %s AS alert'
-                . ' WHERE'
-                . ' alert.source_type = :source_type'
-                . ' AND alert.resource_type = :resource_type'
-                . $userCondition
-                . ' AND alert.organization_id = :organization_id'
-                . ' AND alert.is_resolved = :is_resolved';
-            $sql = sprintf($sql, $this->getTableName());
-            $hasNotificationAlerts = $em->getConnection()->fetchOne($sql, $data, $types);
-        } catch (\Exception $e) {
-            throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
-        }
-
-        return (bool) $hasNotificationAlerts;
-    }
-
-    private function doCheckHasNotificationAlertsByType(array $fields): bool
-    {
-        if (null === $fields[self::USER]) {
-            $userCondition = ' AND alert.user_id is null';
-            unset($fields[self::USER]);
-        } else {
-            $userCondition = ' AND alert.user_id = :user_id';
-        }
-
-        [$data, $types] = $this->prepareDbalCriteria($fields);
-        $em = $this->getEntityManager();
-        try {
-            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount'
-                . ' FROM %s AS alert'
-                . ' WHERE'
-                . ' alert.source_type = :source_type'
-                . ' AND alert.resource_type = :resource_type'
-                . ' AND alert.alert_type = :alert_type'
-                . $userCondition
-                . ' AND alert.organization_id = :organization_id'
-                . ' AND alert.is_resolved = :is_resolved';
-            $sql = sprintf($sql, $this->getTableName());
-            $hasNotificationAlertsByType = $em->getConnection()->fetchOne($sql, $data, $types);
-        } catch (\Exception $e) {
-            throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
-        }
-
-        return (bool) $hasNotificationAlertsByType;
-    }
-
     /**
      * @param array $fields
+     *
      * @return array [[alertType, notificationAlertCount], ...]
      */
     private function doGetNotificationAlertsCount(array $fields): array
@@ -363,6 +332,37 @@ class NotificationAlertManager
                 $e
             );
         }
+    }
+
+    private function doCheckHasNotificationAlerts(array $fields): bool
+    {
+        if (null === $fields[self::USER]) {
+            $userCondition = ' AND alert.user_id is null';
+            unset($fields[self::USER]);
+        } else {
+            $userCondition = ' AND alert.user_id = :user_id';
+        }
+
+        [$data, $types] = $this->prepareDbalCriteria($fields);
+        $em = $this->getEntityManager();
+        try {
+            $sql = 'SELECT COUNT(alert.id) as notificationAlertCount FROM %s AS alert WHERE %s';
+            $criteria = [];
+            foreach (array_keys($data) as $columnName) {
+                if ($columnName !== 'user_id') {
+                    $criteria[] = 'alert.' . $columnName . ' = :' . $columnName;
+                }
+            }
+            $criteria = implode(' AND ', $criteria);
+            $criteria .= $userCondition;
+
+            $sql = sprintf($sql, $this->getEntityMetadata($em)->getTableName(), $criteria);
+            $hasNotificationAlerts = $em->getConnection()->fetchOne($sql, $data, $types);
+        } catch (\Exception $e) {
+            throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
+        }
+
+        return (bool) $hasNotificationAlerts;
     }
 
     /**
