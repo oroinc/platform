@@ -60,7 +60,7 @@ class OwnerTreeListenerTest extends OrmTestCase
     {
         $this->connection->expects($this->once())
             ->method('prepare')
-            ->willReturn($this->createMock(StatementMock::class));
+            ->willReturn(new StatementMock());
     }
 
     private function findUser(int $userId, string $userName, ?int $ownerId): TestUser

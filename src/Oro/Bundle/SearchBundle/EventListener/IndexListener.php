@@ -98,7 +98,8 @@ class IndexListener implements OptionalListenerInterface
     private function scheduleSavedEntities(EntityManager $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        $this->savedEntities = array_merge(
+
+        $this->savedEntities = array_replace(
             $this->savedEntities,
             $this->getEntitiesToReindex($uow),
             $this->getEntitiesWithUpdatedIndexedFields($uow),
@@ -115,9 +116,9 @@ class IndexListener implements OptionalListenerInterface
     private function scheduleDeletedEntities(EntityManager $entityManager): void
     {
         $uow = $entityManager->getUnitOfWork();
-        foreach ($uow->getScheduledEntityDeletions() as $hash => $entity) {
-            if (empty($this->deletedEntities[$hash]) && $this->isSupported($entity)) {
-                $this->deletedEntities[$hash] = $entityManager->getReference(
+        foreach ($uow->getScheduledEntityDeletions() as $objId => $entity) {
+            if (empty($this->deletedEntities[$objId]) && $this->isSupported($entity)) {
+                $this->deletedEntities[$objId] = $entityManager->getReference(
                     $this->doctrineHelper->getEntityClass($entity),
                     $this->doctrineHelper->getSingleEntityIdentifier($entity)
                 );
@@ -144,7 +145,7 @@ class IndexListener implements OptionalListenerInterface
                     [$collection->getMapping()['fieldName']]
                 );
                 if ($changedFields) {
-                    $entities[spl_object_hash($owner)] = $owner;
+                    $entities[spl_object_id($owner)] = $owner;
                 }
                 return $entities;
             },
@@ -161,14 +162,14 @@ class IndexListener implements OptionalListenerInterface
     {
         $entitiesToReindex = [];
 
-        foreach ($uow->getScheduledEntityUpdates() as $hash => $entity) {
+        foreach ($uow->getScheduledEntityUpdates() as $objId => $entity) {
             $className = ClassUtils::getClass($entity);
             $changedIndexedFields = $this->getIntersectChangedIndexedFields(
                 $className,
                 array_keys($uow->getEntityChangeSet($entity))
             );
             if ($changedIndexedFields) {
-                $entitiesToReindex[$hash] = $entity;
+                $entitiesToReindex[$objId] = $entity;
             }
         }
 
@@ -181,7 +182,7 @@ class IndexListener implements OptionalListenerInterface
 
         foreach ($uow->getScheduledEntityInsertions() as $entity) {
             if ($this->isInsertSupported($entity)) {
-                $entitiesToReindex[spl_object_hash($entity)] = $entity;
+                $entitiesToReindex[spl_object_id($entity)] = $entity;
             }
         }
 
@@ -207,10 +208,10 @@ class IndexListener implements OptionalListenerInterface
                 if (null !== $associationValue) {
                     if ($associationValue instanceof Collection) {
                         foreach ($associationValue->toArray() as $value) {
-                            $entitiesToReindex[spl_object_hash($value)] = $value;
+                            $entitiesToReindex[spl_object_id($value)] = $value;
                         }
                     } else {
-                        $entitiesToReindex[spl_object_hash($associationValue)] = $associationValue;
+                        $entitiesToReindex[spl_object_id($associationValue)] = $associationValue;
                     }
                 }
             }
@@ -269,9 +270,9 @@ class IndexListener implements OptionalListenerInterface
      */
     protected function indexEntities()
     {
-        foreach ($this->deletedEntities as $hash => $entity) {
-            if (array_key_exists($hash, $this->savedEntities)) {
-                unset($this->savedEntities[$hash]);
+        foreach ($this->deletedEntities as $objId => $entity) {
+            if (array_key_exists($objId, $this->savedEntities)) {
+                unset($this->savedEntities[$objId]);
             }
         }
 
