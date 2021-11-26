@@ -89,10 +89,11 @@ define(function(require, exports, module) {
                     ? $container : $('<div/>').prependTo(filterContainer);
             }
 
+            options.filterContainer = filterContainer;
             const filtersList = new FiltersManager(options);
+            this.grid.filterManager = filtersList;
             this.grid.trigger('filters:beforeRender');
             filtersList.render();
-            filtersList.$el.prependTo(filterContainer);
 
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
@@ -100,7 +101,6 @@ define(function(require, exports, module) {
                 filtersList.$el.hide();
             }
 
-            this.grid.filterManager = filtersList;
             this.grid.trigger('filterManager:connected');
 
             const {enableFiltersNavigation = true} = options;

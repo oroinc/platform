@@ -15,8 +15,7 @@ define(function(require, exports, module) {
             itemHint: '.filter-item-hint',
             itemsHint: '.filter-items-hint',
             hint: '.filter-criteria-hint',
-            reset: '.reset-filter-button',
-            outerHintContainer: null
+            reset: '.reset-filter-button'
         }
     }, config);
 
@@ -80,21 +79,24 @@ define(function(require, exports, module) {
 
             this._defineTemplate();
 
+            this.listenTo(this.filter, 'rendered', this.render);
+
             FilterHint.__super__.initialize.call(this, options);
         },
 
         render: function() {
+            // Avoid duplicate HTML
+            if (document.contains(this.el)) {
+                this.el.remove();
+            }
+
             this.setElement(this.template({
                 label: this.inline ? null : this.label,
                 allowClear: this.filter.allowClear
             }));
 
-            if (this.filter.selectWidget) {
-                this.filter.selectWidget.multiselect('getButton').hide().attr('aria-hidden', true);
-            }
-
-            if (this.selectors.outerHintContainer) {
-                $(this.selectors.outerHintContainer).find(this.selectors.itemsHint).prepend(this.$el);
+            if (this.filter.outerHintContainer) {
+                $(this.filter.outerHintContainer).find(this.selectors.itemsHint).prepend(this.$el);
             } else if (this.inline) {
                 this.filter.$el.find(this.selectors.itemHint).append(this.$el);
             } else {

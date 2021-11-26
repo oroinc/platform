@@ -106,7 +106,15 @@ define(function(require) {
             ChoiceFilter.__super__.dispose.call(this);
         },
 
+        resetFlags() {
+            this.popupCriteriaShowed = false;
+            this.selectDropdownOpened = false;
+            this._criteriaRenderd = false;
+            this._isRenderingInProgress = false;
+        },
+
         render: function() {
+            this.resetFlags();
             // render only wrapper (a button and a dropdown container e.g.)
             this._wrap('');
             // if there's no any wrapper, means it's embedded filter

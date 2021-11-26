@@ -20,7 +20,7 @@ define([
             let templateFunc = null;
 
             // If templateSelector is set in a extended view
-            if (this[templateKey + 'Selector']) {
+            if (this[templateKey + 'Selector'] && $(this[templateKey + 'Selector']).length) {
                 templateFunc = _.template($(this[templateKey + 'Selector']).html());
             } else if (typeof template === 'string') {
                 templateFunc = _.template(template);
@@ -28,6 +28,10 @@ define([
                 this.constructor.prototype[templateKey] = templateFunc;
             } else {
                 templateFunc = template;
+            }
+
+            if (typeof templateFunc === 'function') {
+                return data => templateFunc(data).trim();
             }
 
             return templateFunc;

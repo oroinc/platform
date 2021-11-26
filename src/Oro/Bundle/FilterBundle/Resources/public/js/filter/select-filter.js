@@ -131,6 +131,8 @@ define(function(require, exports, module) {
          */
         loadedMetadata: true,
 
+        noWrap: true,
+
         /**
          * Filter events
          *
@@ -198,10 +200,7 @@ define(function(require, exports, module) {
                 return;
             }
             delete this.choices;
-            if (this.selectWidget) {
-                this.selectWidget.dispose();
-                delete this.selectWidget;
-            }
+            this._disposeSelectWidget();
             SelectFilter.__super__.dispose.call(this);
         },
 
@@ -227,21 +226,31 @@ define(function(require, exports, module) {
             };
         },
 
+        resetFlags() {
+            this.selectDropdownOpened = false;
+        },
+
         /**
          * Render filter template
          *
          * @return {*}
          */
         render: function() {
-            const html = this.template(this.getTemplateData());
+            let toShowCriteria = false;
 
-            if (!this.selectWidget) {
-                this.setElement(html);
-                this._initializeSelectWidget();
-            } else {
-                const selectOptions = $(html).find('select').html();
+            // Just update filter options
+            if (this.isRendered() && this.selectWidget) {
+                toShowCriteria = this.selectWidget.multiselect('isOpen');
+
+                const $content = $(this.template(this.getTemplateData()));
+                const selectOptions = $content.find('select').html();
+
                 this.$('select').html(selectOptions);
                 this.selectWidget.multiselect('refresh');
+            } else {
+                this.resetFlags();
+                SelectFilter.__super__.render.call(this);
+                this._initializeSelectWidget();
             }
 
             if (!this.loadedMetadata && !this.subview('loading')) {
@@ -250,8 +259,14 @@ define(function(require, exports, module) {
                 }));
                 this.subview('loading').show();
             }
-            if (this.initiallyOpened) {
-                this.selectWidget.multiselect('open');
+
+            if (this.initiallyOpened || toShowCriteria) {
+                this._showCriteria();
+            }
+
+            // Hide a filer after re-rendering if it was hidden before
+            if (!this.visible) {
+                this.hide();
             }
 
             return this;
@@ -279,15 +294,27 @@ define(function(require, exports, module) {
             return SelectFilter.__super__.hide.call(this);
         },
 
+        _disposeSelectWidget() {
+            if (this.selectWidget) {
+                this.$(this.inputSelector).off(`remove${this.eventNamespace()}`);
+                this.selectWidget.dispose();
+                delete this.selectWidget;
+            }
+        },
+
         /**
          * Initialize multiselect widget
          *
          * @protected
          */
         _initializeSelectWidget: function() {
+            this._disposeSelectWidget();
+
             const position = this._getSelectWidgetPosition();
             const {selectOptionsListAriaLabel} = this.getTemplateDataProps();
 
+            this.selectDropdownOpened = false;
+            this.$(this.inputSelector).on(`remove${this.eventNamespace()}`, this._disposeSelectWidget.bind(this));
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
@@ -335,6 +362,7 @@ define(function(require, exports, module) {
                 contextSearch: this.contextSearch,
                 filterLabel: this.label
             });
+            this.selectWidget.multiselect('getButton').addClass('select-widget-trigger');
             this.selectWidget.setViewDesign(this);
             this.selectWidget.getWidget().on('keyup', e => {
                 if (e.keyCode === 27 && this.autoClose !== false) {

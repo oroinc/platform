@@ -41,6 +41,7 @@ define(function(require) {
                 .map(eventName => eventName + this._eventNamespace())
                 .join(' ');
 
+            $(document).off(this._eventNamespace());
             $(document).on(events, e => {
                 if (this.popupCriteriaShowed && this.autoClose !== false) {
                     this._onClickOutsideCriteria(e);
@@ -48,7 +49,7 @@ define(function(require) {
             });
 
             // will be automatically unbound in backbone view's undelegateEvents() method
-            this.$el.on('keydown' + this._eventNamespace(), '.dropdown-menu.filter-criteria', e => {
+            this.$el.on(`keydown${this._eventNamespace()}`, '.dropdown-menu.filter-criteria', e => {
                 if (e.keyCode === KEYBOARD_CODES.ESCAPE) {
                     this._hideCriteria();
                     this.focusCriteriaToggler();

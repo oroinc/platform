@@ -264,6 +264,8 @@ define(function(require, exports, module) {
             delete this.dateParts;
             delete this.emptyPart;
             delete this.emptyValue;
+            // Remove event handlers from a part of the template
+            this.$(`[data-cid="filter-${this.cid}"]`).off(this.eventNamespace());
             DateFilter.__super__.dispose.call(this);
         },
 
@@ -283,6 +285,12 @@ define(function(require, exports, module) {
             const select = this.$el.find(e.currentTarget);
             const value = select.val();
             this.changeFilterType(value);
+        },
+
+        onFilterRemove(e) {
+            this.removeSubview('start');
+            this.removeSubview('end');
+            this._criteriaRenderd = false;
         },
 
         /**
@@ -372,6 +380,10 @@ define(function(require, exports, module) {
             );
 
             this._appendFilter($filter);
+
+            $filter.attr('data-cid', `filter-${this.cid}`);
+            $filter.one(`remove${this.eventNamespace()}`, this.onFilterRemove.bind(this));
+
             this.$(this.criteriaSelector).attr('tabindex', '0');
 
             this._renderSubViews();
@@ -391,6 +403,7 @@ define(function(require, exports, module) {
             this.$el.inputWidget('seekAndCreate');
 
             this._criteriaRenderd = true;
+            this._isRenderingInProgress = false;
         },
 
         _getParts: function() {
