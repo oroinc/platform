@@ -35,7 +35,8 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
             'image_placeholders' => ['placeholder' => '/path/to/test.img'],
             'rtl_support'        => true,
             'logo'               => 'test_logo.jpg',
-            'screenshot'         => 'test_screenshot.jpg'
+            'screenshot'         => 'test_screenshot.jpg',
+            'extra_js_builds'    => []
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
         self::assertSame($themeConfig, $result['test_theme']);

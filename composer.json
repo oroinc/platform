@@ -79,7 +79,7 @@
         "symfony/security-acl": "~3.2.0",
         "symfony/acl-bundle": "~2.2.0",
         "twig/twig": "~3.3.3",
-        "doctrine/orm": "2.9.6",
+        "doctrine/orm": "2.10.2",
         "doctrine/doctrine-bundle": "~2.5.0",
         "doctrine/dbal": "~2.13.5",
         "doctrine/annotations": "~1.13.2",
@@ -97,7 +97,7 @@
         "oro/api-doc-bundle": "2.x-dev",
         "nelmio/security-bundle": "~2.10.2",
         "ass/xmlsecurity": "1.1.1",
-        "stof/doctrine-extensions-bundle": "~1.6.0",
+        "stof/doctrine-extensions-bundle": "~1.7.0",
         "liip/imagine-bundle": "~2.7.2",
         "laminas/laminas-mail": "^2.12.0",
         "dragonmantank/cron-expression": "~3.1.0",
@@ -124,7 +124,7 @@
         "myclabs/deep-copy": "1.10.*",
         "oro/redis-config": "5.0.*",
         "symfony/requirements-checker": "^2.0.0",
-        "gedmo/doctrine-extensions": "3.2.0"
+        "gedmo/doctrine-extensions": "3.3.1"
     },
     "require-dev": {
         "behat/behat": "~3.10.0",
@@ -211,9 +211,8 @@
             "@oroinc/autobahnjs": "0.8.0",
             "@oroinc/backbone.pageable": "1.2.3-oro1",
             "@oroinc/jquery.nicescroll": "3.6.6",
-            "@babel/runtime": "^7.10.4",
-            "core-js": "3.18.*",
-            "whatwg-fetch": "3.6.2"
+            "@babel/runtime": "^7.16.3",
+            "core-js": "3.19.*"
         },
         "symfony": {
             "require": "5.3.*"

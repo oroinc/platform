@@ -162,6 +162,10 @@ Third party dependence [lightGallery](https://www.lightgalleryjs.com/) has remov
 #### InstallBundle
 * The composer's assets version set script`Oro\Bundle\InstallerBundle\Composer\ScriptHandler::setAssetsVersion` was changed to store time base hash value into `public/build/build_version.txt` application file.
 
+#### LayoutBundle
+
+* Provided way to create separate JS builds only with essential modules for landing pages, see article [How to Create Extra JS Build for a Landing Page](https://doc.oroinc.com/master/frontend/storefront/how-to/how-to-create-extra-js-build-for-landing-page/).
+
 ### Removed
 * `installed` container parameter was removed from all application distributions. You can get the installation state by calling the `isInstalled` method of the `Oro\Bundle\DistributionBundle\Handler\ApplicationState` service.
 * `assets_version` and `assets_version_strategy` container parameters were removed from all application distributions.

@@ -126,4 +126,9 @@ class DatabasePlatformMock extends AbstractPlatform
     {
         return true;
     }
+
+    public function supportsIdentityColumns(): bool
+    {
+        return $this->prefersIdentityColumns;
+    }
 }

@@ -1,7 +1,8 @@
-{% set roles = [] %}
-{% for role in app.user.userRoles %}
-    {% set roles = roles|merge([role.role]) %}
-{% endfor %}
+{% if check_ws() %}
+    {% set roles = [] %}
+    {% for role in app.user.userRoles %}
+        {% set roles = roles|merge([role.role]) %}
+    {% endfor %}
 <script>
     loadModules(['orosync/js/sync', 'oroui/js/modal', 'oroui/js/mediator', 'oroui/js/messenger', 'orotranslation/js/translator'],
     function(sync, Modal, mediator, messenger, __) {
@@ -33,3 +34,4 @@
         });
     });
 </script>
+{% endif %}

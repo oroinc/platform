@@ -101,6 +101,22 @@ class ThemeConfiguration implements ConfigurationInterface
                         ->prototype('scalar')->end()
                         ->requiresAtLeastOneElement()
                     ->end()
+                    ->arrayNode('extra_js_builds')
+                        ->info('Additional js builds that can be used for certain pages')
+                        ->example('[home, landing, product]')
+                        ->prototype('scalar')
+                            ->cannotBeEmpty()
+                            ->validate()
+                                ->always(function ($name) {
+                                    if (str_contains($name, '-')) {
+                                        $message = sprintf('cannot contain "-" in the value, but got "%s".', $name);
+                                        throw new \Exception($message);
+                                    }
+                                    return $name;
+                                })
+                            ->end()
+                        ->end()
+                    ->end()
                     ->append($configNode)
                 ->end()
             ->end();

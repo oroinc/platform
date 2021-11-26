@@ -4,5 +4,5 @@ icon: bundles/oroui/themes/oro/images/favicon.ico
 styles:
     css:
         inputs:
-            - bundles/oroui/themes/demo/css/scss/main.scss
+            - bundles/oroui/themes/demo/css/scss/settings/primary-settings
         output: css/oro.css
