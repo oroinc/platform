@@ -173,6 +173,7 @@ define(function(require) {
             }
 
             this.menu.attr('tabindex', '-1');
+            this._trigger('opened');
         },
 
         /**
