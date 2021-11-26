@@ -50,7 +50,6 @@ aliases:
     scriptjs$: scriptjs/dist/script
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: underscore/underscore
-    whatwg-fetch$: whatwg-fetch/fetch
     slick$: slick-carousel/slick/slick
 app-modules:
     - oroui/js/app/modules/ajax-error-module
@@ -150,7 +149,6 @@ dynamic-imports:
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
         - underscore
-        - whatwg-fetch
     jstree:
         - oroui/js/app/views/jstree/base-tree-view
 entry:

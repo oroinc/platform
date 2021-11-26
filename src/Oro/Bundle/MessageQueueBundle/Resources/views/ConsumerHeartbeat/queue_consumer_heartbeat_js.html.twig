@@ -1,3 +1,4 @@
+{% if check_ws() %}
 <script>
     loadModules(['orosync/js/sync', 'oroui/js/messenger'],
         function (sync, messenger) {
@@ -11,3 +12,4 @@
             });
         });
 </script>
+{% endif %}

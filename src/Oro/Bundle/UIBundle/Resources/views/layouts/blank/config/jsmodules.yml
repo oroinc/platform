@@ -38,7 +38,6 @@ aliases:
     scriptjs$: scriptjs/dist/script
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: underscore/underscore
-    whatwg-fetch$: whatwg-fetch/fetch
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/component-shortcuts-module
@@ -112,7 +111,6 @@ dynamic-imports:
         - oroui/js/tools/api-accessor
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
-        - whatwg-fetch
 map:
     "*":
         alert.js: bootstrap-alert

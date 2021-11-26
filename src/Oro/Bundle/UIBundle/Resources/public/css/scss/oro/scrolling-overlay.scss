@@ -18,23 +18,12 @@
         -webkit-overflow-scrolling: touch;
 
         // Hide platform native scroll bar
-        -ms-overflow-style: none;
         scrollbar-width: none;
 
         &::-webkit-scrollbar,
         &::-webkit-scrollbar-corner {
             width: 0;
             height: 0;
-        }
-
-        // Return native scroll behavior for child elements in IE and Edge
-        > div,
-        > aside,
-        > section,
-        > ul,
-        > ol,
-        > nav {
-            -ms-overflow-style: scrollbar;
         }
     }
 
