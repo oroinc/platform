@@ -324,3 +324,8 @@ services:
             - '@oro_imap.manager.checker.imap_settings'
         tags:
             - { name: validator.constraint_validator }
+
+    oro_imap.async.message_filter.folders_filter:
+        class: Oro\Bundle\ImapBundle\Async\MessageFilter\ClearInactiveMailboxMessageFilter
+        tags:
+            - { name: oro_message_queue.message_filter, topic: !php/const Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX }
