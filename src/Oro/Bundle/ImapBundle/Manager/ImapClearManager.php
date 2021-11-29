@@ -9,7 +9,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailBodyRepository;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailThreadRepository;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
@@ -109,6 +108,7 @@ class ImapClearManager implements LoggerAwareInterface
 
             $imapFolders = $repo->getFoldersByOrigin($origin, true, EmailFolder::SYNC_ENABLED_FALSE);
             foreach ($imapFolders as $imapFolder) {
+                $imapFolder->setLastUid(0);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
             }
         }
@@ -123,12 +123,15 @@ class ImapClearManager implements LoggerAwareInterface
      */
     protected function clearEmails(UserEmailOrigin $origin, $syncEnabled = null)
     {
-        /** @var EmailUserRepository $emailUserRepo */
-        $emailUserRepo = $this->doctrineHelper->getEntityRepositoryForClass(EmailUser::class);
-        $emailUserIdsForReindexation = $emailUserRepo->getIdsFromOrigin($origin);
-
         /** @var UserEmailOriginRepository $userEmailOriginRepo */
         $userEmailOriginRepo = $this->doctrineHelper->getEntityRepositoryForClass(UserEmailOrigin::class);
+
+        $emailUserIdsForReindexation = [];
+        $emailUserIdsForReIndexationIterator = $userEmailOriginRepo->getEmailIdsFromDisabledFoldersIterator($origin);
+        foreach ($emailUserIdsForReIndexationIterator as $row) {
+            $emailUserIdsForReindexation[] = $row['id'];
+        }
+
         $userEmailOriginRepo->deleteRelatedEmails($origin, $syncEnabled);
 
         $this->sceduleEmailUsersReindexation($emailUserIdsForReindexation);
