@@ -161,6 +161,8 @@ define(function(require, exports, module) {
             'filters:reset mediator': '_onReset'
         },
 
+        noWrap: true,
+
         /**
          * @inheritdoc
          */
@@ -178,7 +180,8 @@ define(function(require, exports, module) {
         initialize: function(options) {
             _.extend(this, _.pick(options,
                 'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'template', 'renderMode',
-                'autoClose', 'outerHintContainer', 'enableMultiselectWidget', 'multiselectParameters'
+                'autoClose', 'outerHintContainer', 'enableMultiselectWidget', 'multiselectParameters',
+                'filterContainer'
             ));
 
             this.template = this.getTemplateFunction();
@@ -187,8 +190,6 @@ define(function(require, exports, module) {
 
             if (options.forcedViewMode) {
                 this.viewMode = options.forcedViewMode;
-            } else if (this.renderMode === 'toggle-mode') {
-                this.viewMode = FiltersManager.STATE_VIEW_MODE;
             } else {
                 this.viewMode = persistentStorage.getItem(this.storageKey);
 
@@ -268,10 +269,11 @@ define(function(require, exports, module) {
          */
         updateFilters: function(grid) {
             _.each(grid.metadata.filters, function(metadata) {
-                if (this.filters[metadata.name]) {
-                    this.filters[metadata.name]
-                        .trigger('total-records-count-updated', this.collection.state.totalRecords);
-                    this.filters[metadata.name].trigger('metadata-loaded', metadata);
+                const filter = this.filters[metadata.name];
+                if (filter) {
+                    filter.setRenderMode(this.renderMode);
+                    filter.trigger('total-records-count-updated', this.collection.state.totalRecords);
+                    filter.trigger('metadata-loaded', metadata);
                 }
             }, this);
 
@@ -330,10 +332,7 @@ define(function(require, exports, module) {
                 filter.dispose();
             });
             delete this.filters;
-            if (this.selectWidget) {
-                this.selectWidget.dispose();
-                delete this.selectWidget;
-            }
+            this._disposeSelectWidget();
             FiltersManager.__super__.dispose.call(this);
         },
 
@@ -356,8 +355,8 @@ define(function(require, exports, module) {
          * @protected
          */
         _onFilterChanged: function() {
-            this._publishCountChangedFilters();
             this._publishCountSelectedFilters();
+            this._publishCountChangedFilters();
         },
 
         /**
@@ -519,6 +518,7 @@ define(function(require, exports, module) {
         _renderFilter: function(filter) {
             if (!filter.isRendered()) {
                 const oldEl = filter.$el;
+
                 filter.setRenderMode(this.renderMode);
                 // filter rendering process replaces $el
                 filter.render();
@@ -549,9 +549,7 @@ define(function(require, exports, module) {
          * @return {*}
          */
         render: function() {
-            this.setElement(
-                $(this.template(this.getTemplateData()))
-            );
+            FiltersManager.__super__.render.call(this);
 
             this.dropdownContainer = this.$el.find('.filter-container');
             const $filterItems = this.dropdownContainer.find('.filter-items');
@@ -560,6 +558,9 @@ define(function(require, exports, module) {
                 if (_.isFunction(filter.setDropdownContainer)) {
                     filter.setDropdownContainer(this.dropdownContainer);
                 }
+
+                filter.setRenderMode(this.renderMode);
+
                 if (!filter.enabled || !filter.visible) {
                     // append element to reserve space
                     // empty elements are hidden by default
@@ -567,7 +568,6 @@ define(function(require, exports, module) {
                     return;
                 }
 
-                filter.setRenderMode(this.renderMode);
                 filter.render();
                 $filterItems.append(filter.$el);
                 filter.rendered();
@@ -576,7 +576,7 @@ define(function(require, exports, module) {
             this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
-                this.$el.hide();
+                this.hide();
             } else if (this.enableMultiselectWidget) {
                 this._initializeSelectWidget();
             }
@@ -589,18 +589,26 @@ define(function(require, exports, module) {
             }
 
             if (this.viewMode === FiltersManager.STATE_VIEW_MODE) {
-                this.$el.hide();
+                this.hide();
             }
 
+            this.appendToContainer();
             return this;
         },
 
         show: function() {
             this.$el.show();
+            this.trigger('visibility-change', true);
         },
 
         hide: function() {
             this.$el.hide();
+            this.trigger('visibility-change', false);
+        },
+
+        appendToContainer() {
+            this.$el.prependTo(this.filterContainer);
+            this.trigger('visibility-change', true);
         },
 
         /**
@@ -698,12 +706,22 @@ define(function(require, exports, module) {
             this._publishCountSelectedFilters();
         },
 
+        _disposeSelectWidget() {
+            if (this.selectWidget) {
+                this.$(this.filterSelector).off(`remove${this.eventNamespace()}`);
+                this.selectWidget.dispose();
+                delete this.selectWidget;
+            }
+        },
+
         /**
          * Initialize multiselect widget
          *
          * @protected
          */
         _initializeSelectWidget: function() {
+            this._disposeSelectWidget();
+
             const multiselectDefaults = {
                 multiple: true,
                 selectedList: 0,
@@ -741,6 +759,7 @@ define(function(require, exports, module) {
                 this.multiselectParameters
             );
 
+            this.$(this.filterSelector).on(`remove${this.eventNamespace()}`, this._disposeSelectWidget.bind(this));
             this.selectWidget = new this.MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: options

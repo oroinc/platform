@@ -163,10 +163,7 @@ define(function(require, exports, module) {
             AbstractFilter.__super__.initialize.call(this, options);
 
             const hintView = new FilterHint({
-                filter: this,
-                selectors: {
-                    outerHintContainer: this.outerHintContainer
-                }
+                filter: this
             });
 
             this.subview('hint', hintView);
@@ -175,12 +172,12 @@ define(function(require, exports, module) {
         },
 
         isRendered: function() {
-            return this._isRendered;
+            return this._rendereddInMode === this.renderMode;
         },
 
         rendered: function() {
-            this._isRendered = true;
-            this.subview('hint').render();
+            this._rendereddInMode = this.renderMode;
+            this.trigger('rendered');
             return this;
         },
 

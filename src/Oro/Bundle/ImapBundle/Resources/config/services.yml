@@ -342,3 +342,8 @@ services:
             - '%oro_imap.user_email_origin_transport%'
         tags:
             - { name: kernel.event_listener, event: Oro\Bundle\EmailBundle\Event\BeforeMessageEvent, method: onBeforeMessage }
+
+    oro_imap.async.message_filter.folders_filter:
+        class: Oro\Bundle\ImapBundle\Async\MessageFilter\ClearInactiveMailboxMessageFilter
+        tags:
+            - { name: oro_message_queue.message_filter, topic: !php/const Oro\Bundle\ImapBundle\Async\Topics::CLEAR_INACTIVE_MAILBOX }

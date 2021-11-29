@@ -22,6 +22,8 @@ define(function(require, exports, module) {
     }
 
     MultiselectDecorator.prototype = {
+        cidPrefix: 'multiselect',
+
         /**
          * Multiselect widget element container
          *
@@ -63,6 +65,8 @@ define(function(require, exports, module) {
          * Initialize all required properties
          */
         initialize: function(options) {
+            this.cid = _.uniqueId(this.cidPrefix);
+
             if (!options.element) {
                 throw new Error('Select element must be defined');
             }
@@ -141,7 +145,7 @@ define(function(require, exports, module) {
             if (this.element.data('ech-multiselect')) {
                 this.multiselect('destroy');
             }
-            this.element.remove();
+
             delete this.element;
         },
 

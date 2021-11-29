@@ -192,6 +192,12 @@
         }
     }
 
+    .filter-select {
+        .select-filter-widget.select-widget-trigger {
+            display: none;
+        }
+    }
+
     .filter-item {
         margin-right: $filter-box-item-offset-right;
         margin-bottom: $filter-box-item-offset-bottom;

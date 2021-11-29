@@ -142,4 +142,17 @@ class UserEmailOriginRepositoryTest extends WebTestCase
             ]
         ];
     }
+
+    public function testGetEmailIdsFromDisabledFoldersIterator()
+    {
+        $this->loadFixtures([LoadImapEmailData::class]);
+
+        $iterator = $this->doctrineHeler
+            ->getEntityRepositoryForClass(UserEmailOrigin::class)
+            ->getEmailIdsFromDisabledFoldersIterator(
+                $this->getReference(LoadUserEmailOriginData::USER_EMAIL_ORIGIN_3)
+            );
+
+        self::assertEquals(2, $iterator->count());
+    }
 }

@@ -14,7 +14,7 @@ processes:
                     method: 'send'
                     method_parameters:
                         - '$.topic'
-                        - []
+                        - { id: $id }
 
         clear_imap_email_folder_on_sync_enabled_change:
             label: Clear email folder on sync enabled change
@@ -32,7 +32,7 @@ processes:
                     method: 'send'
                     method_parameters:
                         - '$.topic'
-                        - []
+                        - { id: $origin.id }`
 
     triggers:
         clear_user_email_origin_on_deactivation:

@@ -158,6 +158,9 @@ define(function(require, exports, module) {
                 timeInputAttrs: {
                     'aria-label': ariaLabel,
                     ...config.timeInputAttrs
+                },
+                timePickerOptions: {
+                    appendTo: this.$el
                 }
             });
 

@@ -123,10 +123,18 @@ define(function(require) {
             select2element.inputWidget('data', null);
         },
 
+        resetFags() {
+            this.popupCriteriaShowed = false;
+            this.selectDropdownOpened = false;
+            this._criteriaRenderd = false;
+            this._isRenderingInProgress = false;
+        },
+
         /**
          * Init render
          */
         render: function() {
+            this.resetFags();
             this.renderDeferred = $.Deferred();
             this._wrap('');
             if (this.$el.html() === '') {

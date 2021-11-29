@@ -285,12 +285,17 @@ define(function(require, exports, module) {
             }
         },
 
+        resetFlags() {
+            this.popupCriteriaShowed = false;
+        },
+
         /**
          * Render filter view
          *
          * @return {*}
          */
         render: function() {
+            this.resetFlags();
             const $filter = $(this.template({
                 renderMode: this.renderMode
             }));
