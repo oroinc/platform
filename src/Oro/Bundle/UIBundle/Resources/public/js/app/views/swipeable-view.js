@@ -70,6 +70,10 @@ define(function(require) {
          * @private
          */
         _swipeMove: function(event) {
+            if (!this.touchStartCoords) {
+                return;
+            }
+
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
             const touchEndCoords = {
@@ -87,6 +91,10 @@ define(function(require) {
          * @private
          */
         _swipeEnd: function(event) {
+            if (!this.touchStartCoords) {
+                return;
+            }
+
             event = ('changedTouches' in event) ? event.changedTouches[0] : event;
 
             this.touchEndCoords = {
