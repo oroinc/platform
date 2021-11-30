@@ -6,15 +6,14 @@ entity_config:
                 use_dam:
                     options:
                         value_type: boolean
-                        default_value: false
                         allowed_type: [file, image, multiFile, multiImage]
                         create_only: true
                     form:
                         type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                Yes: 1
-                                No: 0
+                                Yes: true
+                                No: false
                             placeholder: false
                             block: general
                             subblock: properties

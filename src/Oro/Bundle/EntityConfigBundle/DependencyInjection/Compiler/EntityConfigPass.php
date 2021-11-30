@@ -25,6 +25,7 @@ class EntityConfigPass implements CompilerPassInterface
     const CONFIG_PROVIDER_BAG_SERVICE    = 'oro_entity_config.provider_bag';
     const CONFIG_PROVIDER_SERVICE_PREFIX = 'oro_entity_config.provider.';
     const CONFIG_CACHE_SERVICE           = 'oro_entity_config.cache';
+    const CONFIG_HANDLER_SERVICE         = 'oro_entity_config.configuration_handler';
 
     const ENTITY_CONFIG_ROOT_NODE = 'entity_config';
 
@@ -65,6 +66,10 @@ class EntityConfigPass implements CompilerPassInterface
         $providerBagRef = new Reference(self::CONFIG_PROVIDER_BAG_SERVICE);
         $configManager->addMethodCall('setProviderBag', [$providerBagRef]);
 
+        // inject the config provider bag into the configuration handler/validator
+        $configHandler = $container->getDefinition(self::CONFIG_HANDLER_SERVICE);
+        $configHandler->addMethodCall('setProviderBag', [$providerBagRef]);
+
         // register the config providers for all scopes
         foreach ($scopes as $scope) {
             $provider = new Definition(ConfigProvider::class, [$scope]);
@@ -89,7 +94,6 @@ class EntityConfigPass implements CompilerPassInterface
             'oro_entity_config',
             new YamlCumulativeFileLoader('Resources/config/oro/entity_config.yml')
         );
-
         $result = [];
         $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {

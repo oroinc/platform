@@ -13,9 +13,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * The event listener class the act after adding email body that updating activity description
+ * and adding attachment to the Email target entities
+ */
 class EmailBodyAddListener
 {
-    const LINK_ATTACHMENT_CONFIG_OPTION = 'auto_link_attachments';
+    private const LINK_ATTACHMENT_CONFIG_OPTION = 'auto_link_attachments';
 
     /** @var ConfigProvider */
     protected $configProvider;
@@ -67,7 +71,8 @@ class EmailBodyAddListener
         $email = $event->getEmail();
         $entities = $this->activityListProvider->getTargetEntities($email);
         foreach ($entities as $entity) {
-            if ((bool)$this->configProvider->getConfig(ClassUtils::getClass($entity))->get('auto_link_attachments')) {
+            if ((bool)$this->configProvider->getConfig(ClassUtils::getClass($entity))
+                ->get(self::LINK_ATTACHMENT_CONFIG_OPTION)) {
                 foreach ($email->getEmailBody()->getAttachments() as $attachment) {
                     $this->attachmentManager->linkEmailAttachmentToTargetEntity($attachment, $entity);
                 }

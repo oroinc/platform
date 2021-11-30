@@ -27,3 +27,9 @@ services:
             - '@oro_entity_config.config_loader'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EntityConfigBundle\Command\OroEntityConfigDumpReferenceCommand:
+        arguments:
+            - '@oro_entity_config.configuration_handler'
+        tags:
+            - { name: console.command }

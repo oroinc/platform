@@ -23,8 +23,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"="",
- *              "field_acl_supported"="true",
- *              "field_acl_enabled"="true"
+ *              "field_acl_supported"=true,
+ *              "field_acl_enabled"=true
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

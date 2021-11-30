@@ -26,9 +26,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @Config(
  *      mode="hidden",
  *      defaultValues={
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

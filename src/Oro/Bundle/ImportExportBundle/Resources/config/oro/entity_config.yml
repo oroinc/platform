@@ -49,8 +49,8 @@ entity_config:
                         options:
                             label:          oro.importexport.entity_config.excluded.label
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             required:       false
                             block:          import_export
@@ -62,8 +62,8 @@ entity_config:
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:
-                                Identity only: 0
-                                All:        1
+                                Identity only: false
+                                All:        true
                             placeholder:    false
                             required:       false
                             block:          import_export
@@ -71,4 +71,3 @@ entity_config:
                 process_as_scalar:
                     options:
                         allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
-                        default_value:      false

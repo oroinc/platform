@@ -29,6 +29,4 @@ entity_config:
                 render_date_type: ~
                 render_time_type: ~
                 render_datetime_pattern: ~
-                autoescape:
-                    options:
-                        default_value:      true
+                autoescape: ~

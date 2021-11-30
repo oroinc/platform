@@ -48,19 +48,6 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getDefaultValuesProvider
-     */
-    public function testGetDefaultValues($type, $fieldType, $config, $expectedValues)
-    {
-        $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getDefaultValues($type, $fieldType);
-
-        $this->assertEquals($expectedValues, $result);
-        // test that a result is cached locally
-        $this->assertEquals($expectedValues, $this->configContainer->getDefaultValues($type, $fieldType));
-    }
-
-    /**
      * @dataProvider getRequiredPropertyValuesProvider
      */
     public function testGetRequiredPropertyValues($type, $config, $expectedValues)
@@ -325,94 +312,6 @@ class PropertyConfigContainerTest extends \PHPUnit\Framework\TestCase
                 new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
                 ['field' => ['items' => ['test' => 'testFieldVal']]],
                 ['test' => 'testFieldVal']
-            ],
-        ];
-    }
-
-    public function getDefaultValuesProvider()
-    {
-        return [
-            'no entity config'                     => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                null,
-                [],
-                [],
-            ],
-            'entity config'                        => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                null,
-                [
-                    'entity' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'entity config (by id)'                => [
-                new EntityConfigId('testScope', 'Test\Cls'),
-                null,
-                [
-                    'entity' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config (no field type)'         => [
-                PropertyConfigContainer::TYPE_FIELD,
-                null,
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config (no field type) (by id)' => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                null,
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item4' => 'value4',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config'                         => [
-                PropertyConfigContainer::TYPE_FIELD,
-                'string',
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item5' => 'value5',
-                ]
-            ],
-            'field config (by id)'                 => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                'string',
-                [
-                    'field' => $this->getItemsForDefaultValuesTest()
-                ],
-                [
-                    'item1' => 'value1',
-                    'item2' => 'value2',
-                    'item5' => 'value5',
-                ]
             ],
         ];
     }

@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * A form type to toggle tags functionality
+ */
 class TagConfigChoiceType extends AbstractConfigType
 {
     /**
@@ -22,8 +25,8 @@ class TagConfigChoiceType extends AbstractConfigType
             [
                 'placeholder' => false,
                 'choices' => [
-                    'No' => 0,
-                    'Yes' => 1,
+                    'No' => false,
+                    'Yes' => true,
                 ],
             ]
         );

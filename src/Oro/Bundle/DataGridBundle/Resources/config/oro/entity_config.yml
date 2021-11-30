@@ -18,5 +18,5 @@ entity_config:
                     constraints:
                         - NotBlank:         ~
                         - Length:
-                            min:            2
-                            max:            60
+                              min:            2
+                              max:            60

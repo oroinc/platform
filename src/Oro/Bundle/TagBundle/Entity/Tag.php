@@ -49,9 +49,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

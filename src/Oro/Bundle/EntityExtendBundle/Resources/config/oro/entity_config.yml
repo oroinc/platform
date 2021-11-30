@@ -27,7 +27,6 @@ entity_config:
                     options:
                         priority:           40
                         auditable:          false
-                        default_value:      'System'
                         indexed:            true
                     grid:
                         type:               string
@@ -42,7 +41,6 @@ entity_config:
                 is_extend:
                     options:
                         priority:           27
-                        default_value:      false
                         auditable:          false
                         indexed:            true
                     grid:
@@ -68,7 +66,6 @@ entity_config:
 
                 is_deleted:
                     options:
-                        default_value:      false
                         auditable:          false
                         indexed:            true
                     grid:
@@ -90,7 +87,6 @@ entity_config:
                 upgradeable:
                     options:
                         auditable:          false
-                        default_value:      true
 
                 relation:
                     options:
@@ -184,7 +180,6 @@ entity_config:
                 owner:
                     options:
                         priority:           20
-                        default_value:      'System'
                         auditable:          false
                         indexed:            true
                     grid:
@@ -207,14 +202,12 @@ entity_config:
 
                 is_extend:
                     options:
-                        default_value:      false
                         auditable:          false
 
                 length:
                     options:
                         require_schema_update: true
                         value_type:         integer
-                        default_value:      255
                         allowed_type:       [string]
                         required_property:
                             config_id:
@@ -224,11 +217,11 @@ entity_config:
                     constraints:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
-                            min:            1
-                            max:            255
+                              min:            1
+                              max:            255
                         - Oro\Bundle\EntityExtendBundle\Validator\Constraints\NotLessThanOriginalValue:
-                            scope:          extend
-                            option:         length
+                              scope:          extend
+                              option:         length
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
@@ -241,7 +234,6 @@ entity_config:
                     options:
                         require_schema_update: true
                         value_type:         integer
-                        default_value:      10
                         allowed_type:       [decimal]
                         required_property:
                             config_id:
@@ -251,7 +243,7 @@ entity_config:
                     constraints:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
-                            min:            0
+                              min:            0
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
@@ -264,7 +256,6 @@ entity_config:
                     options:
                         require_schema_update: true
                         value_type:         integer
-                        default_value:      2
                         allowed_type:       [decimal]
                         required_property:
                             config_id:
@@ -274,9 +265,9 @@ entity_config:
                     constraints:
                         - Regex:            "/^[0-9]*$/"
                         - Range:
-                            min:            0
-                            maxPropertyPath: parent[precision].data
-                            notInRangeMessage: oro.entity_extend.validator.scale.range.not_in_range
+                              min:            0
+                              maxPropertyPath: parent[precision].data
+                              notInRangeMessage: oro.entity_extend.validator.scale.range.not_in_range
                     form:
                         type:               Oro\Bundle\EntityExtendBundle\Form\Type\TextType
                         options:
@@ -287,7 +278,6 @@ entity_config:
 
                 is_deleted:
                     options:
-                        default_value:      false
                         auditable:          false
                     grid:
                         type:               boolean
@@ -358,7 +348,6 @@ entity_config:
                 nullable:
                     options:
                         auditable:          false
-                        default_value:      true
 
     enum:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#enum
@@ -456,8 +445,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
@@ -478,8 +467,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
@@ -497,8 +486,8 @@ entity_config:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field

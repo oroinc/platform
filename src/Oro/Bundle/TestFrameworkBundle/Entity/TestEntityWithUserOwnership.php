@@ -8,6 +8,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
+ * Test entity with user ownership
+ *
  * @ORM\Table(name="test_user_ownership")
  * @ORM\Entity
  * @Config(
@@ -15,8 +17,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"="",
- *              "field_acl_supported"="true",
- *              "field_acl_enabled"="true"
+ *              "field_acl_supported"=true,
+ *              "field_acl_enabled"=true
  *          },
  *          "ownership"={
  *              "owner_type"="USER",

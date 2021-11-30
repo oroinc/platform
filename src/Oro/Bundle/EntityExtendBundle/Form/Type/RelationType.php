@@ -18,6 +18,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * A form type for relations entity configuration
+ */
 class RelationType extends AbstractType
 {
     const ALLOWED_BIDIRECTIONAL_RELATIONS = [
@@ -71,6 +74,10 @@ class RelationType extends AbstractType
 
         if ($this->config->get('owner') === ExtendScope::OWNER_CUSTOM) {
             $this->addBidirectionalField($form, $data);
+            if (isset($data['bidirectional'])) {
+                $data['bidirectional'] = (bool)$data['bidirectional'];
+                $event->setData($data);
+            }
 
             $targetEntity = $this->getArrayValue($data, 'target_entity');
             $relationType = $this->config->getId()->getFieldType();
@@ -188,11 +195,9 @@ class RelationType extends AbstractType
      * @param mixed  $defaultValue
      * @return mixed
      */
-    protected function getArrayValue(array &$data, $key, $defaultValue = null)
+    protected function getArrayValue(array $data, $key, $defaultValue = null)
     {
-        return isset($data[$key])
-            ? $data[$key]
-            : $defaultValue;
+        return $data[$key] ?? $defaultValue;
     }
 
     private function addTargetEntityField(FormBuilderInterface $builder, array $options)
@@ -232,8 +237,8 @@ class RelationType extends AbstractType
         if (in_array($fieldConfigId->getFieldType(), static::ALLOWED_BIDIRECTIONAL_RELATIONS, true)) {
             $options = [
                 'choices' => [
-                    'No' => 0,
-                    'Yes' => 1,
+                    'No' => false,
+                    'Yes' => true,
                 ],
                 'placeholder' => false,
                 'block' => 'general',

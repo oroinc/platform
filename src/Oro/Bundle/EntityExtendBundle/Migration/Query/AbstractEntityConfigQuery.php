@@ -92,6 +92,24 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
     }
 
     /**
+     * Unsafe way to update field config data's values.
+     *
+     * @param array                $fieldData
+     * @param int                  $id
+     * @param LoggerInterface|null $logger
+     */
+    protected function updateFieldConfigData(array $fieldData, $id, LoggerInterface $logger = null)
+    {
+        $query = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
+        $parameters = [$this->connection->convertToDatabaseValue($fieldData, Types::ARRAY), $id];
+
+        if ($logger) {
+            $this->logQuery($logger, $query, $parameters);
+        }
+        $this->connection->executeStatement($query, $parameters);
+    }
+
+    /**
      * @return int
      */
     protected function getEntityConfigCount()

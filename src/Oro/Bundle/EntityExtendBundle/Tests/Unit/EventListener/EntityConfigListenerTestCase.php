@@ -9,6 +9,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderBag;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
@@ -49,7 +50,8 @@ class EntityConfigListenerTestCase extends \PHPUnit\Framework\TestCase
             $this->createMock(MetadataFactory::class),
             $this->createMock(ConfigModelManager::class),
             $this->createMock(AuditManager::class),
-            $this->configCache
+            $this->configCache,
+            ConfigurationHandlerMock::getInstance()
         );
         $this->configManager->setProviderBag($configProviderBag);
     }

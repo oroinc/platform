@@ -29,9 +29,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "category"="account_management",
  *              "permissions"="VIEW,DELETE"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },

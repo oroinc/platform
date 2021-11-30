@@ -60,56 +60,6 @@ class PropertyConfigContainer
 
     /**
      * @param string|ConfigIdInterface $type
-     * @param string|null              $fieldType
-     *
-     * @return array
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    public function getDefaultValues($type = self::TYPE_ENTITY, $fieldType = null)
-    {
-        $type = $this->getConfigType($type);
-
-        if (empty($this->config[$type]['items'])) {
-            return [];
-        }
-
-        if ($fieldType) {
-            if (isset($this->cache['defaults'][$type][$fieldType])) {
-                return $this->cache['defaults'][$type][$fieldType];
-            }
-        } else {
-            if (isset($this->cache['defaults'][$type])) {
-                return $this->cache['defaults'][$type];
-            }
-        }
-
-        $result = [];
-        if ($fieldType) {
-            foreach ($this->config[$type]['items'] as $code => $item) {
-                if (isset($item['options']['default_value'])
-                    && (
-                        !isset($item['options']['allowed_type'])
-                        || in_array($fieldType, $item['options']['allowed_type'], true)
-                    )
-                ) {
-                    $result[$code] = $item['options']['default_value'];
-                }
-            }
-            $this->cache['defaults'][$type][$fieldType] = $result;
-        } else {
-            foreach ($this->config[$type]['items'] as $code => $item) {
-                if (isset($item['options']['default_value'])) {
-                    $result[$code] = $item['options']['default_value'];
-                }
-            }
-            $this->cache['defaults'][$type] = $result;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string|ConfigIdInterface $type
      *
      * @return array
      */

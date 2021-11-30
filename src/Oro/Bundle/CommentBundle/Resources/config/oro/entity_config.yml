@@ -7,7 +7,6 @@ entity_config:
                     options:
                         require_schema_update: true
                         priority:              10
-                        default_value:         false
                     form:
                         type: Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType
                         options:

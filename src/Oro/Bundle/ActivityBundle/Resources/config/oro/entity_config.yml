@@ -39,10 +39,6 @@ entity_config:
                     options:
                         auditable:          false
 
-                show_on_page:
-                    options:
-                        default_value:      '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
-
                 action_link_widget:
                     options:
                         auditable:          false

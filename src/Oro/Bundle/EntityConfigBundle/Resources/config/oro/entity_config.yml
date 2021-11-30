@@ -50,7 +50,6 @@ entity_config:
                     options:
                         require_schema_update: false
                         value_type: boolean
-                        default_value: false
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#attribute
         field:
             form:
@@ -62,7 +61,6 @@ entity_config:
                 is_attribute:
                     options:
                         value_type: boolean
-                        default_value: false
                         indexed: true
                     grid:
                         type: boolean
@@ -73,38 +71,34 @@ entity_config:
                 is_system:
                     options:
                         value_type: boolean
-                        default_value: false
                         indexed: true
                 searchable:
                     options:
                         value_type: boolean
-                        default_value: false
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No: 0
-                                Yes: 1
+                                No: false
+                                Yes: true
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.searchable
                 filterable:
                     options:
                         value_type: boolean
-                        default_value: false
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No: 0
-                                Yes: 1
+                                No: false
+                                Yes: true
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.filterable
                 filter_by:
                     options:
                         value_type: string
-                        default_value: 'exact_value'
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
@@ -118,13 +112,12 @@ entity_config:
                 sortable:
                     options:
                         value_type: boolean
-                        default_value: false
                     form:
                         type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No: 0
-                                Yes: 1
+                                No: false
+                                Yes: true
                             placeholder: false
                             block: attribute
                             label: oro.entity_config.entity_config.attribute.field.items.sortable

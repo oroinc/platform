@@ -7,7 +7,6 @@ entity_config:
                     options:
                         require_schema_update: false
                         priority:              250
-                        default_value:         false
                     form:
                         type:               Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
                         options:
@@ -17,12 +16,3 @@ entity_config:
                 immutable:
                     options:
                         auditable:          false
-                enableGridColumn:
-                    options:
-                        default_value:      true
-                enableGridFilter:
-                    options:
-                        default_value:      true
-                enableDefaultRendering:
-                    options:
-                        default_value:      true

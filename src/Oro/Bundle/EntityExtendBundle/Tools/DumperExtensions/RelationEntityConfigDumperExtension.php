@@ -46,7 +46,6 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             if (!$entityConfig->is('is_extend')) {
                 continue;
             }
-
             $fieldConfigs = $this->configManager->getConfigs('extend', $entityConfig->getId()->getClassName());
             foreach ($fieldConfigs as $fieldConfig) {
                 if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_UPDATE])) {
