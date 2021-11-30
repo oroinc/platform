@@ -32,6 +32,12 @@ class GroupChoiceField extends Element
     {
         $values = true === is_array($values) ? $values : [$values];
 
+        foreach ($this->choices as $label => $element) {
+            if ('checkbox' === strtolower($element->getAttribute('type'))) {
+                $element->uncheck();
+            }
+        }
+
         foreach ($values as $label) {
             $choice = $this->getChoice($label);
 

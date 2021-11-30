@@ -18,6 +18,7 @@ use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerTrait;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -32,6 +33,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  * "Doctrine will only check the owning side of an association for changes."
  * http://doctrine-orm.readthedocs.io/projects/doctrine-orm/en/latest/reference/unitofwork-associations.html
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInterface
 {
@@ -97,7 +99,6 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->auditConfigProvider = $auditConfigProvider;
         $this->logger = $logger;
         $this->auditMessageBodyProvider = $auditMessageBodyProvider;
-
         $this->allInsertions = new \SplObjectStorage;
         $this->allUpdates = new \SplObjectStorage;
         $this->allDeletions = new \SplObjectStorage;
@@ -276,36 +277,28 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         $this->saveChanges($this->allDeletions, $em, $deletions);
     }
 
-    private function findAuditableCollectionUpdates(EntityManager $em)
+    private function findAuditableCollectionUpdates(EntityManager $em): void
     {
         $uow = $em->getUnitOfWork();
-
         $collectionUpdates = new \SplObjectStorage();
-
-        /** @var PersistentCollection[] $scheduledCollectionDeletions */
-        $scheduledCollectionDeletions = $uow->getScheduledCollectionDeletions();
-        foreach ($scheduledCollectionDeletions as $deleteCollection) {
-            if (!$this->auditConfigProvider->isAuditableEntity($deleteCollection->getTypeClass()->getName())) {
-                continue;
-            }
-
-            $collectionUpdates[$deleteCollection] = [
-                'insertDiff' => [],
-                'deleteDiff' => $deleteCollection->toArray(),
-                'changeDiff' => [],
-            ];
-        }
 
         /** @var PersistentCollection[] $scheduledCollectionUpdates */
         $scheduledCollectionUpdates = $uow->getScheduledCollectionUpdates();
+        $collectionDeletions = $this->findAuditableCollectionDeletions($em);
         foreach ($scheduledCollectionUpdates as $updateCollection) {
             if (!$this->auditConfigProvider->isAuditableEntity($updateCollection->getTypeClass()->getName())) {
                 continue;
             }
 
+            $deleteDiff = [];
+            if ($collectionDeletions->offsetExists($updateCollection)) {
+                $deleteDiff = $collectionDeletions[$updateCollection]['deleteDiff'];
+                $collectionDeletions->detach($updateCollection);
+            }
+
             $collectionUpdates[$updateCollection] = [
                 'insertDiff' => $updateCollection->getInsertDiff(),
-                'deleteDiff' => $updateCollection->getDeleteDiff(),
+                'deleteDiff' => array_merge($updateCollection->getDeleteDiff(), $deleteDiff),
                 'changeDiff' => array_filter(
                     $updateCollection->toArray(),
                     function ($entity) use ($uow, $updateCollection) {
@@ -318,6 +311,43 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
         }
 
         $this->saveChanges($this->allCollectionUpdates, $em, $collectionUpdates);
+        $this->saveChanges($this->allCollectionUpdates, $em, $collectionDeletions);
+    }
+
+    private function findAuditableCollectionDeletions(EntityManager $em): \SplObjectStorage
+    {
+        $uow = $em->getUnitOfWork();
+        $collectionDeletions = new \SplObjectStorage();
+
+        /** @var PersistentCollection[] $scheduledCollectionDeletions */
+        $scheduledCollectionDeletions = $uow->getScheduledCollectionDeletions();
+        foreach ($scheduledCollectionDeletions as $collection) {
+            if (!$this->auditConfigProvider->isAuditableEntity($collection->getTypeClass()->getName())) {
+                continue;
+            }
+
+            $mapping = $collection->getMapping();
+            $identityMap = $uow->getIdentityMap();
+            $targetEntityName = $mapping['targetEntity'];
+            $isOwningSide = $mapping['isOwningSide'];
+            if ($isOwningSide && array_key_exists($targetEntityName, $identityMap)) {
+                $deletionEntitiesDiff = array_udiff(
+                    $identityMap[$targetEntityName],
+                    $collection->toArray(),
+                    fn ($obj1, $obj2) => strcmp(spl_object_hash($obj1), spl_object_hash($obj2))
+                );
+            } else {
+                $deletionEntitiesDiff = $collection->toArray();
+            }
+
+            $collectionDeletions[$collection] = [
+                'insertDiff' => [],
+                'deleteDiff' => $deletionEntitiesDiff,
+                'changeDiff' => []
+            ];
+        }
+
+        return $collectionDeletions;
     }
 
     private function saveChanges(\SplObjectStorage $storage, EntityManager $em, \SplObjectStorage $changes)
@@ -449,6 +479,8 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
     }
 
     /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * @param EntityManager $em
      * @param array $insertions
      * @param array $updates
@@ -495,7 +527,10 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
             ];
 
             if ($inserted || $deleted || $changed) {
-                $collectionUpdates[spl_object_hash($collection->getOwner())] = $entityData;
+                $key = spl_object_hash($collection->getOwner());
+                $collectionUpdates[$key] = array_key_exists($key, $collectionUpdates)
+                    ? ArrayUtil::arrayMergeRecursiveDistinct($collectionUpdates[$key], $entityData)
+                    : $entityData;
             }
         }
 
