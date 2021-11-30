@@ -24,30 +24,6 @@ class MenuUpdateUtilsTest extends \PHPUnit\Framework\TestCase
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);
     }
 
-    public function testUpdateMenuUpdate()
-    {
-        $menu = $this->getMenu();
-        $item = $menu->getChild('item-1')
-            ->getChild('item-1-1')
-            ->getChild('item-1-1-1');
-
-        $update = new MenuUpdateStub();
-        $update->setKey('item-1-1-1');
-
-        $expectedUpdate = new MenuUpdateStub();
-        $expectedUpdate->setKey('item-1-1-1');
-        $expectedUpdate->setParentKey('item-1-1');
-        $expectedUpdate->setMenu('menu');
-        $expectedUpdate->setDefaultTitle('item-1-1-1');
-
-        $this->menuUpdateHelper->expects($this->once())
-            ->method('applyLocalizedFallbackValue')
-            ->with($update, 'item-1-1-1', 'title', 'string');
-
-        MenuUpdateUtils::updateMenuUpdate($update, $item, 'menu', $this->menuUpdateHelper);
-        $this->assertEquals($expectedUpdate, $update);
-    }
-
     public function testUpdateMenuItem()
     {
         $menu = $this->getMenu();

@@ -6,6 +6,7 @@ use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class HasPropertyTest extends \PHPUnit\Framework\TestCase
@@ -17,6 +18,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
     {
         $this->condition = new Condition\HasProperty();
         $this->condition->setContextAccessor(new ContextAccessor());
+        $this->condition->setPropertyAccesor(new PropertyAccessor());
     }
 
     public function testGetName()

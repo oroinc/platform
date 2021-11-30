@@ -445,6 +445,7 @@ services:
         class: Oro\Bundle\UserBundle\Validator\UserGridFieldValidator
         arguments:
             - '@oro_security.token_accessor'
+            - '@property_accessor'
         tags:
             - {name: oro_entity.custom_grid_field_validator, entity_name: Oro_Bundle_UserBundle_Entity_User }
 

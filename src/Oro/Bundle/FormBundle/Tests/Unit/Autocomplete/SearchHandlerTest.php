@@ -17,6 +17,7 @@ use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -108,6 +109,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->searchHandler->setAclHelper($this->aclHelper);
         $this->searchHandler->setLogger($this->logger);
+        $this->searchHandler->setPropertyAccessor(new PropertyAccessor());
     }
 
     private function createStdClass(array $properties): \stdClass

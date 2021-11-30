@@ -113,7 +113,7 @@ services:
             - "@oro.cache.serializer.mapping.cache"
 
     oro.cache.serializer.normalizer:
-        class: Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer
+        class: Oro\Bundle\CacheBundle\Serializer\Normalizer\GetSetMethodNormalizer
         arguments:
             - '@oro.cache.serializer.mapping.factory.class_metadata' # Loaded by OroCacheExtension
         tags:

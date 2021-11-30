@@ -5,7 +5,7 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Checks whether the property exists in the context.
@@ -19,6 +19,14 @@ class HasProperty extends AbstractCondition implements ContextAccessorAwareInter
 
     /** @var string */
     protected $property;
+
+    /** @var PropertyAccessorInterface */
+    protected $propertyAccessor;
+
+    public function setPropertyAccesor(PropertyAccessorInterface $propertyAccessor)
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
 
     /**
      * {@inheritdoc}
@@ -45,11 +53,10 @@ class HasProperty extends AbstractCondition implements ContextAccessorAwareInter
     {
         $object = $this->resolveValue($context, $this->object);
         $property = $this->resolveValue($context, $this->property);
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         return (
-            $propertyAccessor->isReadable($object, $property)
-            && $propertyAccessor->isWritable($object, $property)
+            $this->propertyAccessor->isReadable($object, $property)
+            && $this->propertyAccessor->isWritable($object, $property)
         );
     }
 

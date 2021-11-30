@@ -17,6 +17,7 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -45,6 +46,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler = new ParentLocalizationSearchHandler(self::TEST_ENTITY_CLASS, ['name']);
         $this->searchHandler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->searchHandler->initDoctrinePropertiesByManagerRegistry($this->getManagerRegistry());
+        $this->searchHandler->setPropertyAccessor(new PropertyAccessor());
     }
 
     public function testSearchNoDelimiter()

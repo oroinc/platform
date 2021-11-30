@@ -520,6 +520,7 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_entity.form.entity_field.handler.processor.handler_processor'
+            - '@property_accessor'
 
     oro_entity.form.entity_field.handler.processor.handler_processor:
         class: Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor

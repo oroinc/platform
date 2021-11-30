@@ -11,8 +11,7 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * The main implementation of SearchHandlerInterface.
@@ -63,7 +62,7 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
     protected $aclHelper;
 
     /**
-     * @var PropertyAccessor
+     * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
 
@@ -75,7 +74,6 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
     {
         $this->entityName = $entityName;
         $this->properties = $properties;
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -185,6 +183,11 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
     public function setAclHelper(AclHelper $aclHelper)
     {
         $this->aclHelper = $aclHelper;
+    }
+
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor)
+    {
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
