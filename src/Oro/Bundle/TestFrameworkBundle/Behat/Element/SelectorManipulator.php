@@ -17,7 +17,7 @@ class SelectorManipulator extends Manipulator
      */
     public function addContainsSuffix($cssSelector, $text)
     {
-        list($selectorType, $locator) = $this->parseSelector($cssSelector);
+        [$selectorType, $locator] = $this->parseSelector($cssSelector);
 
         if ($selectorType !== 'css') {
             throw new \InvalidArgumentException('Method "addContainsSuffix" support only css selectors');
@@ -52,7 +52,7 @@ class SelectorManipulator extends Manipulator
      */
     public function getSelectorAsXpath(SelectorsHandler $selectorsHandler, $selector)
     {
-        list($selectorType, $locator) = $this->parseSelector($selector);
+        [$selectorType, $locator] = $this->parseSelector($selector);
 
         return $selectorsHandler->selectorToXpath($selectorType, $locator);
     }
@@ -71,6 +71,20 @@ class SelectorManipulator extends Manipulator
             sprintf("contains(%s, '%s')", $this->getToLowerXPathExpr('.'), strtolower($text)),
             $useChildren
         );
+    }
+
+    /**
+     * @param string $xpath
+     * @param string $text
+     *
+     * @return array
+     */
+    public function getExactMatchXPathSelector($xpath, $text)
+    {
+        return [
+            'type' => 'xpath',
+            'locator' => $xpath . sprintf("[%s='%s']", $this->getToLowerXPathExpr('text()'), strtolower($text))
+        ];
     }
 
     /**

@@ -41,7 +41,7 @@ Feature: Create Report with aggregation column filter
     And add the following columns:
       | First name  |       | First Name        |
       | Id          | Count | User Count        |
-      | Login count | Sum   | Total Login Count |
+      | Login Count | Sum   | Total Login Count |
     And add the following grouping columns:
       | First name |
     And add the following filters:

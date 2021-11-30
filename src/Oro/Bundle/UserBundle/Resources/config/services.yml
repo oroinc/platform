@@ -62,19 +62,22 @@ services:
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onLogin }
 
-    oro_user.security.login_attempts_log_subscriber:
-        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsLogSubscriber
+    oro_user.security.login_attempts_log_listener:
+        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsLogListener
         arguments:
             - '@oro_user.security.login_attempts_handler'
         tags:
-            - { name: kernel.event_subscriber }
+            - { name: kernel.event_listener, event: security.interactive_login, method: onInteractiveLogin }
+            - { name: kernel.event_listener, event: security.authentication.failure, method: onAuthenticationFailure }
 
     oro_user.security.login_attempts_handler:
-        class: Oro\Bundle\UserBundle\EventListener\LoginAttemptsHandler
+        class: Oro\Bundle\UserBundle\Security\LoginAttemptsHandler
         arguments:
             - '@oro_user.manager'
             - '@oro_user.provider.user_logging_info_provider'
-            - '@monolog.logger.oro_account_security'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: oro_account_security }
 
     oro_user.user_menu:
         class: Oro\Bundle\UserBundle\Menu\UserMenuBuilder
@@ -510,12 +513,8 @@ services:
     Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider:
         alias: oro_user.provider.user_config_form_provider
 
-    Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider:
-        alias: oro_user.provider.user_logging_info_provider
-
     oro_user.provider.user_logging_info_provider:
         class: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider
-        public: true
         arguments:
             - '@request_stack'
 

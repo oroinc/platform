@@ -14,14 +14,14 @@ Feature: Create Report with chart
       | Entity      | User        |
       | Report Type | Table       |
     And I add the following columns:
-      | Login count        |
-      | Failed login count |
+      | Login Count        |
+      | Failed Login Count |
     And I fill "Report Form" with:
       | Chart Type        | Line Chart         |
-      | Category (X axis) | Login count        |
-      | Value (Y axis)    | Failed login count |
+      | Category (X axis) | Login Count        |
+      | Value (Y axis)    | Failed Login Count |
     And I save and close form
     Then I should see "Report saved" flash message
     And should see following grid:
-      | Login count | Failed login count |
+      | Login Count | Failed Login Count |
       | 1           | 0                  |

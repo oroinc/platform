@@ -15,9 +15,9 @@ Feature: Clone segment
       | Entity       | User             |
       | Segment Type | Manual           |
     And I add the following columns:
-      | First name |
-      | Last name  |
-      | Email      |
+      | First name    |
+      | Last name     |
+      | Primary Email |
     And I add the following filters:
       | Field Condition | Username | contains | test |
     And I save and close form

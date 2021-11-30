@@ -1,7 +1,7 @@
 {% extends '@OroUI/actions/view.html.twig' %}
 {% import '@OroUI/macros.html.twig' as UI %}
 
-{% set fullname = entity|oro_format_name|default('N/A') %}
+{% set fullname = entity|oro_format_name|default('N/A'|trans) %}
 {% oro_title_set({params : {"%username%": fullname }}) %}
 
 {% block navButtons %}
@@ -83,13 +83,14 @@
         {% else %}
             {{ UI.badge(entity.authStatus.name, 'tentatively', 'fa-lock') }}
         {% endif %}
+        {% placeholder view_page_title_status with {entity: entity} %}
     </span>
 {% endblock breadcrumbs %}
 
 {% block stats %}
-    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
-    <li>{{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A' }}</li>
+    <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'|trans }}</li>
+    <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'|trans }}</li>
+    <li>{{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'|trans }}</li>
     <li>{{ 'oro.user.login_count.label'|trans }}: {{ entity.loginCount|default(0) }}</li>
 {% endblock stats %}
 
@@ -101,11 +102,23 @@
             'separateLayout': false
         }) }}
     {% endset %}
+    {% set apiKeyWidget %}
+        {% if isProfileView or app.user.id == entity.id or is_granted('MANAGE_API_KEY', entity) %}
+            {{ oro_widget_render({
+                'widgetType': 'block',
+                'url': path('oro_user_apigen', { id: entity.id }),
+                'alias': 'user-apikey-gen-widget',
+                'elementFirst': true,
+                'separateLayout': false
+            }) }}
+        {% endif %}
+    {% endset %}
     {% set dataBlocks = [
         {
             'title': 'General Information'|trans,
             'subblocks': [
-                {'data' : [userInformationWidget]}
+                {'data' : [userInformationWidget]},
+                {'data' : [apiKeyWidget]},
             ]
         }
     ] %}
