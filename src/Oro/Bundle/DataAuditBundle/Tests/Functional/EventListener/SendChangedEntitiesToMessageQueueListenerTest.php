@@ -1000,6 +1000,74 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
     }
 
+    public function testShouldSendCollectionUpdatesWithDifferentAssociation(): void
+    {
+        $em = $this->getEntityManager();
+        $owner = new TestAuditDataOwner();
+        $em->persist($owner);
+
+        $manyToManyChild = new TestAuditDataChild();
+        $manyToManyChildUnidirectional = new TestAuditDataChild();
+        $em->persist($manyToManyChild);
+        $em->persist($manyToManyChildUnidirectional);
+        $em->flush();
+
+        $owner->getChildrenManyToMany()->add($manyToManyChild);
+        $owner->getChildrenManyToManyUnidirectional()->add($manyToManyChildUnidirectional);
+
+        self::getMessageCollector()->clear();
+        $em->flush();
+
+        self::assertSentChanges(
+            [
+                'entities_inserted' => [],
+                'entities_deleted' => [],
+                'entities_updated' => [
+                    spl_object_hash($owner) => [
+                        'entity_class' => get_class($owner),
+                        'entity_id' => $owner->getId(),
+                    ],
+                ],
+                'collections_updated' => [
+                    spl_object_hash($owner) => [
+                        'entity_class' => get_class($owner),
+                        'entity_id' => $owner->getId(),
+                        'change_set' => [
+                            'childrenManyToMany' => [
+                                [
+                                    'deleted' => [],
+                                ],
+                                [
+                                    'inserted' => [
+                                        spl_object_hash($manyToManyChild) => [
+                                            'entity_class' => get_class($manyToManyChild),
+                                            'entity_id' => $manyToManyChild->getId(),
+                                        ],
+                                    ],
+                                    'changed' => [],
+                                ],
+                            ],
+                            'childrenManyToManyUnidirectional' => [
+                                [
+                                    'deleted' => [],
+                                ],
+                                [
+                                    'inserted' => [
+                                        spl_object_hash($manyToManyChildUnidirectional) => [
+                                            'entity_class' => get_class($manyToManyChildUnidirectional),
+                                            'entity_id' => $manyToManyChildUnidirectional->getId(),
+                                        ],
+                                    ],
+                                    'changed' => [],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
+
     public function testShouldSendEntityChangesWithAdditionalUpdates()
     {
         $em = $this->getEntityManager();
