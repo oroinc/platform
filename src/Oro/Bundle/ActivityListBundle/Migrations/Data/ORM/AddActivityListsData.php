@@ -135,9 +135,15 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
     {
         $tokenStorage = $this->container->get('security.token_storage');
         if ($organization) {
-            $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
+            $token = new UsernamePasswordOrganizationToken(
+                $user,
+                $user->getUsername(),
+                'main',
+                $organization,
+                $user->getUserRoles()
+            );
         } else {
-            $token = new UsernamePasswordToken($user, $user->getUsername(), 'main');
+            $token = new UsernamePasswordToken($user, $user->getUsername(), 'main', $user->getUserRoles());
         }
         $tokenStorage->setToken($token);
     }

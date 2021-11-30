@@ -6,7 +6,6 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -23,8 +22,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 {
     use EntityTrait;
 
-    /** @var FileStrategyEventListener */
-    private $listener;
+    private FileStrategyEventListener $listener;
 
     /**
      * {@inheritdoc}
@@ -180,20 +178,9 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->assertEquals($existingFileUuid, $existingUser->getAvatar()->getUuid());
     }
 
-    private function setToken(User $user): void
-    {
-        $token = new UsernamePasswordOrganizationToken(
-            $user,
-            self::AUTH_PW,
-            'main',
-            $this->getReference('organization')
-        );
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
-    }
-
     public function testWhenFileFieldWhenCloneByUuid(): void
     {
-        $this->setToken($this->getReference('user'));
+        $this->updateUserSecurityToken($this->getReference('user')->getEmail());
 
         $fieldName = 'avatar';
         /** @var File $existingFile */
@@ -478,7 +465,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
     public function testWhenFileWhenFailedToClone(): void
     {
-        $this->setToken($this->getReference('user'));
+        $this->updateUserSecurityToken($this->getReference('user')->getEmail());
 
         $fieldName = 'avatar';
         $existingFileUuid = $this->getReference('user3')->getAvatar()->getUuid();
@@ -511,7 +498,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
     public function testWhenFileWhenFailedToCloneWhenAccessDenied(): void
     {
-        $this->setToken($this->getReference('user1'));
+        $this->updateUserSecurityToken($this->getReference('user1')->getEmail());
 
         $fieldName = 'avatar';
         $existingFileUuid = $this->getReference('user3')->getAvatar()->getUuid();

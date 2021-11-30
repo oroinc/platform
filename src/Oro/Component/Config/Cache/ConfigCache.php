@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Config\Cache;
 
-use Symfony\Component\Config\Resource\SelfCheckingResourceChecker;
+use Oro\Component\Config\Resource\SelfCheckingResourceChecker;
 use Symfony\Component\Config\ResourceCheckerConfigCache;
 
 /**
@@ -12,11 +12,10 @@ use Symfony\Component\Config\ResourceCheckerConfigCache;
  */
 class ConfigCache extends ResourceCheckerConfigCache
 {
-    /** @var bool */
-    private $debug;
+    private bool $debug;
 
-    /** @var ConfigCacheStateInterface[]|null */
-    private $dependencies;
+    /** @var ConfigCacheStateInterface[] */
+    private ?array $dependencies = [];
 
     /**
      * @param string $file  The absolute cache path
@@ -28,7 +27,7 @@ class ConfigCache extends ResourceCheckerConfigCache
 
         $checkers = [];
         if ($this->debug) {
-            $checkers = [new SelfCheckingResourceChecker()];
+            $checkers = [new SelfCheckingResourceChecker($debug)];
         }
 
         parent::__construct($file, $checkers);
@@ -37,7 +36,7 @@ class ConfigCache extends ResourceCheckerConfigCache
     /**
      * {@inheritdoc}
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
         if (!$this->debug && is_file($this->getPath())) {
             return true;
@@ -62,7 +61,7 @@ class ConfigCache extends ResourceCheckerConfigCache
     /**
      * {@inheritdoc}
      */
-    public function write($content, array $metadata = null)
+    public function write($content, array $metadata = null): void
     {
         if (null !== $metadata && !$this->debug) {
             $metadata = null;

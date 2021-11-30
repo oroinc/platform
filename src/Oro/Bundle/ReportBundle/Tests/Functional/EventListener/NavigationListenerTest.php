@@ -8,9 +8,7 @@ use Oro\Bundle\NavigationBundle\Event\ConfigureMenuEvent;
 use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\EventListener\NavigationListener;
 use Oro\Bundle\ReportBundle\Tests\Functional\DataFixtures\LoadReportsData;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
@@ -28,13 +26,7 @@ class NavigationListenerTest extends WebTestCase
             ->createQueryBuilder('report')->delete()->getQuery()->execute();
         $this->loadFixtures([LoadReportsData::class]);
 
-        /** @var User $user */
-        $user = $this->getContainer()->get('doctrine')
-            ->getRepository('OroUserBundle:User')
-            ->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
-
-        $token = new UsernamePasswordOrganizationToken($user, [], 'main', $user->getOrganization());
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
+        $this->updateUserSecurityToken(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
     }
 
     public function testOnNavigationConfigure()

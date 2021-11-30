@@ -8,6 +8,7 @@ use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessa
 use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureFactory;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureIdentifierResolver;
@@ -16,6 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesExecutor;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\DataFixturesLoader;
 use Oro\Bundle\TestFrameworkBundle\Test\Event\DisableListenersForDataFixturesEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\TestEventsLoggerTrait;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\Testing\DbIsolationExtension;
@@ -33,7 +35,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Yaml\Yaml;
 
@@ -361,22 +362,20 @@ abstract class WebTestCase extends BaseWebTestCase
         }
     }
 
-    /**
-     * @param string $email
-     */
     protected function updateUserSecurityToken(string $email): void
     {
         $user = $this->getUser($email);
-        $token = new UsernamePasswordToken($user, false, 'k', $user->getRoles());
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            false,
+            'main',
+            $user->getOrganization(),
+            $user->getRoles()
+        );
         self::getContainer()->get('security.token_storage')->setToken($token);
     }
 
-    /**
-     * @param string $email
-     * @param string $userClass
-     * @return object
-     */
-    private function getUser($email, $userClass = User::class)
+    private function getUser(string $email, string $userClass = User::class): AbstractUser
     {
         return $this->getContainer()->get('doctrine')->getRepository($userClass)->findOneBy(['email' => $email]);
     }

@@ -6,14 +6,13 @@ use Oro\Bundle\EntityBundle\Tools\CheckDatabaseStateManager;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate as SymfonyCacheWarmerAggregate;
-use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 /**
  * Replaces Symfony's CacheWarmerAggregate to not warmup caches if extend caches are not up to date.
  * This class extends {@see \Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerAggregate} for compatibility with
  * {@see \Symfony\Bundle\FrameworkBundle\Command\CacheWarmupCommand::__construct}.
  */
-class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate implements CacheWarmerInterface
+class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
 {
     /** @var ServiceLink */
     private $cacheWarmerLink;
@@ -65,7 +64,7 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate implements CacheW
     /**
      * {@inheritdoc}
      */
-    public function warmUp($cacheDir)
+    public function warmUp($cacheDir): array
     {
         $cacheWarmerLink = $this->cacheWarmerLink;
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
@@ -81,6 +80,7 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate implements CacheW
         } elseif ($this->optionalsEnabled) {
             $cacheWarmer->enableOptionalWarmers();
         }
-        $cacheWarmer->warmUp($cacheDir);
+
+        return $cacheWarmer->warmUp($cacheDir);
     }
 }

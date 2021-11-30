@@ -6,7 +6,6 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadStatusData;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -91,13 +90,7 @@ class ChannelRepositoryTest extends WebTestCase
         $user = $container->get('doctrine')
             ->getRepository(User::class)
             ->findOneByUsername('admin');
-        $token = new UsernamePasswordOrganizationToken(
-            $user,
-            false,
-            'main',
-            $user->getOrganization()
-        );
-        $container->get('security.token_storage')->setToken($token);
+        $this->updateUserSecurityToken($user->getEmail());
 
         $expectedIntegration = $this->getReference('oro_integration:bar_integration');
         $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');

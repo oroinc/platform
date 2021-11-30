@@ -9,7 +9,8 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadStrategyLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\Strategy\TranslationStrategy;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Component\Config\ConfigCacheFactory;
+use Oro\Component\Config\Cache\ConfigCache;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ResourceCheckerConfigCacheFactory;
 use Symfony\Component\Yaml\Yaml;
 
@@ -18,34 +19,30 @@ use Symfony\Component\Yaml\Yaml;
  */
 class TranslatorTest extends WebTestCase
 {
-    /** @var TranslationStrategyProvider */
-    protected $provider;
+    private TranslationStrategyProvider $provider;
 
-    /** @var array */
-    protected $resources;
+    private array $resources = [];
 
-    /** @var TranslationStrategy[] */
-    protected $strategies;
+    private array $strategies = [];
 
-    /** @var Translator */
-    protected $translator;
+    private Translator $translator;
 
     /**
      * {@inheritdoc}
      */
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([LoadStrategyLanguages::class]);
 
-        $this->translator = $this->getContainer()->get('translator.default');
+        $this->translator = self::getContainer()->get('translator.default');
 
         $this->createStrategies();
 
         $this->provider = new TranslationStrategyProvider($this->strategies);
         $this->translator->setStrategyProvider($this->provider);
 
-        $cacheDir = $this->getContainer()->getParameter('kernel.cache_dir') . DIRECTORY_SEPARATOR . 'translations';
+        $cacheDir = self::getContainer()->getParameter('kernel.cache_dir') . DIRECTORY_SEPARATOR . 'translations';
         $this->resources['lang1'] = $cacheDir . DIRECTORY_SEPARATOR . 'messages.lang1.yml';
         $this->resources['lang2'] = $cacheDir . DIRECTORY_SEPARATOR . 'messages.lang2.yml';
     }
@@ -62,10 +59,10 @@ class TranslatorTest extends WebTestCase
         }
     }
 
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         // select dynamic cache factory
-        $this->translator->setConfigCacheFactory(new ConfigCacheFactory(true));
+        $this->translator->setConfigCacheFactory($this->getConfigCacheFactory());
 
         $key = uniqid('TRANSLATION_KEY_', true);
         $val1 = uniqid('TEST_VALUE1_', true);
@@ -112,7 +109,22 @@ class TranslatorTest extends WebTestCase
         $this->assertTranslationEquals($key, ['lang1' => $key, 'lang2' => $key, 'lang3' => $key, 'lang4' => $key]);
     }
 
-    public function testRebuildCache()
+    private function getConfigCacheFactory(): ConfigCacheFactoryInterface
+    {
+        return new class() implements ConfigCacheFactoryInterface {
+            public function cache(string $file, callable $callback): ConfigCache
+            {
+                $cache = new ConfigCache($file, true);
+                if (!$cache->isFresh()) {
+                    $callback($cache);
+                }
+
+                return $cache;
+            }
+        };
+    }
+
+    public function testRebuildCache(): void
     {
         // build initial cache
         $this->translator->rebuildCache();
@@ -123,7 +135,7 @@ class TranslatorTest extends WebTestCase
         $val2 = uniqid('TEST_VALUE2_', true);
 
         /** @var TranslationManager $manager */
-        $manager = $this->getContainer()->get('oro_translation.manager.translation');
+        $manager = self::getContainer()->get('oro_translation.manager.translation');
         $manager->saveTranslation($key, $val1, 'lang1', TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
         $manager->saveTranslation($key, $val2, 'lang2', TranslationManager::DEFAULT_DOMAIN, Translation::SCOPE_UI);
         $manager->flush();
@@ -151,17 +163,13 @@ class TranslatorTest extends WebTestCase
         $this->provider->setStrategy($this->getStrategy('strategy3'));
         $this->assertTranslationEquals($key, ['lang1' => $val1, 'lang2' => $val2, 'lang3' => $key, 'lang4' => $key]);
     }
-
-    /**
-     * @param string $name
-     * @return TranslationStrategy
-     */
-    protected function getStrategy($name)
+    
+    private function getStrategy(string $name): TranslationStrategy
     {
         return $this->strategies[$name];
     }
 
-    protected function createStrategies()
+    protected function createStrategies(): void
     {
         $this->strategies['strategy1'] = new TranslationStrategy('strategy1', [
             'lang1' => [],
@@ -191,12 +199,7 @@ class TranslatorTest extends WebTestCase
         ]);
     }
 
-    /**
-     * @param string $resourceName
-     * @param array $data
-     * @param int|null $timestamp
-     */
-    protected function writeResource($resourceName, array $data, $timestamp = null)
+    private function writeResource(string $resourceName, array $data, int $timestamp = null): void
     {
         $fileName = $this->resources[$resourceName];
 
@@ -204,13 +207,11 @@ class TranslatorTest extends WebTestCase
         touch($fileName, $timestamp ?: time());
     }
 
-    /**
-     * @param string $key
-     * @param array $items
-     * @param string $domain
-     */
-    protected function assertTranslationEquals($key, array $items, $domain = TranslationManager::DEFAULT_DOMAIN)
-    {
+    private function assertTranslationEquals(
+        string $key,
+        array $items,
+        string $domain = TranslationManager::DEFAULT_DOMAIN
+    ): void {
         $actualData = [];
         $expectedData = [];
 

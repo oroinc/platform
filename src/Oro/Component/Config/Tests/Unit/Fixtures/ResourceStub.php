@@ -6,15 +6,22 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
 
 class ResourceStub implements SelfCheckingResourceInterface
 {
-    /** @var bool */
-    private $fresh = true;
+    private string $name;
+
+    private bool $fresh;
+
+    public function __construct(string $name = 'stub', bool $fresh = true)
+    {
+        $this->name = $name;
+        $this->fresh = $fresh;
+    }
 
     /**
      * {@inheritdoc}
      */
     public function __toString(): string
     {
-        return 'stub';
+        return $this->name;
     }
 
     /**

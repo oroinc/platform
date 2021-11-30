@@ -21,8 +21,13 @@ class OrganizationRememberMeFactory extends RememberMeFactory
     /**
      * {@inheritdoc}
      */
-    public function create(ContainerBuilder $container, $id, $config, $userProvider, $defaultEntryPoint)
-    {
+    public function create(
+        ContainerBuilder $container,
+        string $id,
+        array $config,
+        ?string $userProvider,
+        ?string $defaultEntryPoint
+    ): array {
         [$authProviderId, $innerListenerId, $defaultEntryPoint] = parent::create(
             $container,
             $id,
@@ -62,7 +67,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory
     /**
      * {@inheritdoc}
      */
-    public function getKey()
+    public function getKey(): string
     {
         return 'organization-remember-me';
     }

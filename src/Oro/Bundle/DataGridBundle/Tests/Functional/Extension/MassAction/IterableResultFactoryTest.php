@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension\MassAction;
 
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResultInterface;
@@ -14,7 +13,6 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\IterableResultFactory;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadTestEntitiesData;
 use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -235,17 +233,10 @@ class IterableResultFactoryTest extends WebTestCase
 
     private function makeUserViewOnlyOwnEntities()
     {
-        /** @var ObjectManager $entityManager */
-        $entityManager = $this->client->getContainer()->get('doctrine')->getManagerForClass('OroUserBundle:User');
-
-        /** @var User $user */
+        /** @var User $simpleUser */
         $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
-        $organization = $entityManager->getRepository('OroOrganizationBundle:Organization')
-            ->find(self::AUTH_ORGANIZATION);
 
-        $token = new UsernamePasswordOrganizationToken($simpleUser, $simpleUser->getUsername(), 'main', $organization);
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
-
+        $this->updateUserSecurityToken($simpleUser->getEmail());
         $this->updateRolePermission('ROLE_USER', TestEntity::class, AccessLevel::BASIC_LEVEL);
     }
 

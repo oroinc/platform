@@ -71,7 +71,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
     public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
     {
         file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
-        $resource = new ResourceStub();
+        $resource = new ResourceStub(__FUNCTION__);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
 
         $provider = $this->getProvider(['initial'], true);
@@ -85,7 +85,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
     public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
     {
         file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
-        $resource = new ResourceStub();
+        $resource = new ResourceStub(__FUNCTION__);
         $resource->setFresh(false);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
 
@@ -185,7 +185,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $initialConfig = ['initial'];
 
         file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
-        $resource = new ResourceStub();
+        $resource = new ResourceStub(__FUNCTION__);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
 
         $provider = $this->getProvider($initialConfig, true);
@@ -200,7 +200,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $initialConfig = ['initial'];
 
         file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
-        $resource = new ResourceStub();
+        $resource = new ResourceStub(__FUNCTION__);
         $resource->setFresh(false);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
 

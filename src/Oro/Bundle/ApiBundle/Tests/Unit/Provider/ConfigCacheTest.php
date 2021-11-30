@@ -654,7 +654,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
         file_put_contents($cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
-        $resource = new ResourceStub();
+        $resource = new ResourceStub(__FUNCTION__);
         file_put_contents($cacheFile . '.meta', serialize([$resource]));
 
         $this->configCacheFactory->expects(self::once())
@@ -675,7 +675,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
         file_put_contents($cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
-        $resource = new ResourceStub();
+        $resource = new ResourceStub(__FUNCTION__);
         $resource->setFresh(false);
         file_put_contents($cacheFile . '.meta', serialize([$resource]));
 
