@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,6 +19,7 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
 
         $this->searchHandler = new FullNameSearchHandler('FooEntityClass', ['name', 'email']);
+        $this->searchHandler->setPropertyAccessor(new PropertyAccessor());
     }
 
     public function testConvertItem()

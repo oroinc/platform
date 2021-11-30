@@ -21,9 +21,6 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
  * @ORM\HasLifecycleCallbacks()
  * @Config(
  *      defaultValues={
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

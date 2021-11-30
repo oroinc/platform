@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
@@ -34,6 +35,10 @@ class ExtendOptionsManager
      * ]
      */
     protected $options = [];
+
+    public function __construct(private ConfigurationHandler $configurationHandler)
+    {
+    }
 
     /**
      * Sets table options
@@ -192,6 +197,28 @@ class ExtendOptionsManager
             } else {
                 $this->options[$objectKey][$scope] = $values;
             }
+
+            $this->validateOptions($objectKey, $scope, $this->options[$objectKey][$scope]);
+        }
+    }
+
+    /**
+     * @param string $objectKey
+     * @param string $scope
+     * @param $values
+     */
+    private function validateOptions(string $objectKey, string $scope, $values): void
+    {
+        if (is_array($values) && !str_starts_with($scope, '_')) {
+            $table = $objectKey;
+            $type = ConfigurationHandler::CONFIG_ENTITY_TYPE;
+
+            if (str_contains($objectKey, '!')) {
+                $table = explode('!', $objectKey)[0];
+                $type = ConfigurationHandler::CONFIG_FIELD_TYPE;
+            }
+
+            $this->configurationHandler->validate($type, $scope, $values, $table);
         }
     }
 

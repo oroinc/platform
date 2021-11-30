@@ -23,9 +23,6 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },

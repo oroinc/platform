@@ -25,9 +25,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          "entity"={
  *              "icon"="fa-file"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

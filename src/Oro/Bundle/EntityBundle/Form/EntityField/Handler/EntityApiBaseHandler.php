@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Form\EntityField\Handler;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Used to pre-process entity and submit form data
@@ -18,12 +18,17 @@ class EntityApiBaseHandler
     /** @var EntityApiHandlerProcessor */
     protected $processor;
 
+    /** @var PropertyAccessorInterface*/
+    protected $propertyAccessor;
+
     public function __construct(
         Registry $registry,
-        EntityApiHandlerProcessor $processor
+        EntityApiHandlerProcessor $processor,
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->registry = $registry;
         $this->processor = $processor;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -68,12 +73,11 @@ class EntityApiBaseHandler
      */
     protected function initChangeSet($entity, $data)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
         $response = [
             'fields' => $data
         ];
-        if ($accessor->isReadable($entity, 'updatedAt')) {
-            $response['fields']['updatedAt'] = $accessor->getValue($entity, 'updatedAt');
+        if ($this->propertyAccessor->isReadable($entity, 'updatedAt')) {
+            $response['fields']['updatedAt'] = $this->propertyAccessor->getValue($entity, 'updatedAt');
         }
 
         return $response;

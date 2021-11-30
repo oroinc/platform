@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Component\Testing\ReflectionUtil;
@@ -16,7 +17,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->manager = new ExtendOptionsManager();
+        $this->manager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
     }
 
     public function testSetTableMode()

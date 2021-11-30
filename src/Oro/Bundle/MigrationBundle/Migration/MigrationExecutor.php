@@ -18,6 +18,9 @@ use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Migrations query executor
+ */
 class MigrationExecutor
 {
     /**
@@ -40,7 +43,7 @@ class MigrationExecutor
      */
     protected $extensionManager;
 
-    public function __construct(MigrationQueryExecutor $queryExecutor, OroDataCacheManager $cacheManager)
+    public function __construct(MigrationQueryExecutorInterface $queryExecutor, OroDataCacheManager $cacheManager)
     {
         $this->queryExecutor = $queryExecutor;
         $this->cacheManager = $cacheManager;

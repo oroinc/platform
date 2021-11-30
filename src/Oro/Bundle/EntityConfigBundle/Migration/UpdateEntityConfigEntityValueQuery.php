@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -11,7 +12,10 @@ use Psr\Log\LoggerInterface;
 /**
  * Set specific row value in oro_entity_config_index_value table.
  */
-class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAwareInterface
+class UpdateEntityConfigEntityValueQuery implements
+    MigrationQuery,
+    ConnectionAwareInterface,
+    ConfigurationHandlerAwareInterface
 {
     /**
      * @var string
@@ -43,6 +47,8 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
      */
     protected $replaceValue;
 
+    protected ConfigurationHandler $configurationHandler;
+
     /**
      * @param string $entityName
      * @param string $scope
@@ -65,6 +71,11 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
     public function setConnection(Connection $connection)
     {
         $this->connection = $connection;
+    }
+
+    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
+    {
+        $this->configurationHandler = $configurationHandler;
     }
 
     /**
@@ -124,7 +135,19 @@ class UpdateEntityConfigEntityValueQuery implements MigrationQuery, ConnectionAw
         $data = $data ? $this->connection->convertToPHPValue($data, Types::ARRAY) : [];
 
         if ($this->isDoUpdate($data)) {
+            if (!isset($data[$this->scope])) {
+                $data[$this->scope] = [];
+            }
+
             $data[$this->scope][$this->code] = $this->value;
+
+            $data[$this->scope] = $this->configurationHandler->process(
+                ConfigurationHandler::CONFIG_ENTITY_TYPE,
+                $this->scope,
+                $data[$this->scope],
+                $this->entityName
+            );
+
             $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
 
             $sql = 'UPDATE oro_entity_config SET data = ? WHERE class_name = ?';

@@ -23,7 +23,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "field_acl_supported" = "true"
+ *              "field_acl_supported"=true
  *          }
  *      }
  * )

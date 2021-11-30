@@ -921,6 +921,89 @@ class DataAuditTest extends WebTestCase
         );
     }
 
+    public function testMultiEnumClear(): void
+    {
+        $owner = new TestAuditDataOwner();
+        $className = ExtendHelper::buildEnumValueClassName('audit_muenum');
+
+        /** @var EnumValueRepository $enumRepository */
+        $enumRepository = $this->getEntityManager()->getRepository($className);
+
+        $enum1 = $enumRepository->createEnumValue('enum1', 1, true);
+        $enum2 = $enumRepository->createEnumValue('enum2', 2, false);
+        $enumAfterCollectionClear = $enumRepository->createEnumValue('enum3', 3, false);
+        $owner->addMultiEnumProperty($enum1);
+        $owner->addMultiEnumProperty($enum2);
+
+        $em = $this->getEntityManager();
+        $em->persist($enum1);
+        $em->persist($enum2);
+        $em->persist($enumAfterCollectionClear);
+        $em->persist($owner);
+        $em->flush();
+
+        $this->getMessageCollector()->clear();
+        $owner->getMultiEnumProperty()->clear();
+        $owner->addMultiEnumProperty($enumAfterCollectionClear);
+
+        $em->flush();
+        $this->processMessages(true);
+        self::assertData(
+            [
+                TestAuditDataOwner::class => [
+                    $owner->getId() => [
+                        '&quot;enum1&quot; removed',
+                        '&quot;enum2&quot; removed',
+                        '&quot;enum3&quot; added',
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testManyToManyClear(): void
+    {
+        $owner = new TestAuditDataOwner();
+        $child1 = new TestAuditDataChild();
+        $child2 = new TestAuditDataChild();
+        $child3 = new TestAuditDataChild();
+
+        $owner->addChildrenManyToMany($child1);
+        $owner->addChildrenManyToMany($child2);
+
+        $em = $this->getEntityManager();
+        $em->persist($child1);
+        $em->persist($child2);
+        $em->persist($child3);
+        $em->persist($owner);
+        $em->flush();
+
+        $this->getMessageCollector()->clear();
+
+        $owner->getChildrenManyToMany()->clear();
+        $owner->addChildrenManyToMany($child3);
+
+        $em->flush();
+        $this->processMessages(true);
+
+        self::assertData(
+            [
+                TestAuditDataOwner::class => [
+                    $owner->getId() => [
+                        sprintf('Item #%s&quot; added', $child3->getId()),
+                        sprintf('Item #%s&quot; removed', $child1->getId()),
+                        sprintf('Item #%s&quot; removed', $child2->getId()),
+                    ],
+                ],
+                TestAuditDataChild::class => [
+                    $child1->getId() => [sprintf('&quot;%s&quot; removed', $owner->getId())],
+                    $child2->getId() => [sprintf('&quot;%s&quot; removed', $owner->getId())],
+                    $child3->getId() => [sprintf('&quot;%s&quot; added', $owner->getId())]
+                ]
+            ]
+        );
+    }
+
     public function testManyToOne()
     {
         $owner = new TestAuditDataOwner();

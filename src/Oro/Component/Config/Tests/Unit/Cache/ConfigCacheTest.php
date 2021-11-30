@@ -15,8 +15,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $cacheFile;
+    private string $cacheFile = '';
 
     protected function setUp(): void
     {
@@ -29,7 +28,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         return new ConfigCacheStub($this->cacheFile, $debug);
     }
 
-    public function debugModeProvider()
+    public function debugModeProvider(): array
     {
         return [
             'dev'  => [true],
@@ -40,16 +39,16 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider debugModeProvider
      */
-    public function testCacheIsNotValidIfNothingHasBeenCached($debug)
+    public function testCacheIsNotValidIfNothingHasBeenCached($debug): void
     {
         $cache = $this->getConfigCache($debug);
 
         self::assertFalse($cache->isFresh());
     }
 
-    public function testIsAlwaysFreshInProduction()
+    public function testIsAlwaysFreshInProduction(): void
     {
-        $staleResource = new ResourceStub();
+        $staleResource = new ResourceStub(__FUNCTION__);
         $staleResource->setFresh(false);
 
         $cache = $this->getConfigCache(false);
@@ -62,7 +61,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider debugModeProvider
      */
-    public function testIsFreshWhenMetadataIsEmptyArray($debug)
+    public function testIsFreshWhenMetadataIsEmptyArray($debug): void
     {
         $cache = $this->getConfigCache($debug);
         $cache->write('', []);
@@ -74,7 +73,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testIsFreshWhenNoMetadataInDebug()
+    public function testIsFreshWhenNoMetadataInDebug(): void
     {
         $cache = $this->getConfigCache(false);
         $cache->write('');
@@ -82,9 +81,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFileDoesNotExist($cache->getPath() . '.meta');
     }
 
-    public function testFreshResourceInDebug()
+    public function testFreshResourceInDebug(): void
     {
-        $freshResource = new ResourceStub();
+        $freshResource = new ResourceStub(__FUNCTION__);
         $freshResource->setFresh(true);
 
         $cache = $this->getConfigCache(true);
@@ -93,9 +92,23 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($cache->isFresh());
     }
 
-    public function testStaleResourceInDebug()
+    public function testFreshnessIsNotCachedInDebug(): void
     {
-        $staleResource = new ResourceStub();
+        $freshResource = new ResourceStub(__FUNCTION__);
+        $freshResource->setFresh(false);
+
+        $cache = $this->getConfigCache(true);
+        $cache->write('', [$freshResource]);
+        self::assertFalse($cache->isFresh());
+
+        $freshResource->setFresh(true);
+        $cache->write('', [$freshResource]);
+        self::assertTrue($cache->isFresh());
+    }
+
+    public function testStaleResourceInDebug(): void
+    {
+        $staleResource = new ResourceStub(__FUNCTION__);
         $staleResource->setFresh(false);
 
         $cache = $this->getConfigCache(true);
@@ -104,9 +117,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($cache->isFresh());
     }
 
-    public function testFreshResourceInDebugAndHasFreshDependencies()
+    public function testFreshResourceInDebugAndHasFreshDependencies(): void
     {
-        $freshResource = new ResourceStub();
+        $freshResource = new ResourceStub(__FUNCTION__);
         $freshResource->setFresh(true);
 
         $dependency1 = $this->createMock(ConfigCacheStateInterface::class);
@@ -129,9 +142,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($cache->isFresh());
     }
 
-    public function testFreshResourceInDebugAndHasStaleDependencies()
+    public function testFreshResourceInDebugAndHasStaleDependencies(): void
     {
-        $freshResource = new ResourceStub();
+        $freshResource = new ResourceStub(__FUNCTION__);
         $freshResource->setFresh(true);
 
         $dependency1 = $this->createMock(ConfigCacheStateInterface::class);
@@ -152,9 +165,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($cache->isFresh());
     }
 
-    public function testStaleResourceInDebugAndHasDependencies()
+    public function testStaleResourceInDebugAndHasDependencies(): void
     {
-        $staleResource = new ResourceStub();
+        $staleResource = new ResourceStub(__FUNCTION__);
         $staleResource->setFresh(false);
 
         $dependency1 = $this->createMock(ConfigCacheStateInterface::class);
@@ -173,9 +186,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($cache->isFresh());
     }
 
-    public function testEnsureDependenciesWarmedUpInDebugAndMainCacheIsFresh()
+    public function testEnsureDependenciesWarmedUpInDebugAndMainCacheIsFresh(): void
     {
-        $freshResource = new ResourceStub();
+        $freshResource = new ResourceStub(__FUNCTION__);
         $freshResource->setFresh(true);
 
         $dependency1 = $this->createMock(PhpArrayConfigProviderStub::class);
@@ -207,9 +220,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->doEnsureDependenciesWarmedUp();
     }
 
-    public function testEnsureDependenciesWarmedUpInDebugAndMainCacheIsNotFresh()
+    public function testEnsureDependenciesWarmedUpInDebugAndMainCacheIsNotFresh(): void
     {
-        $freshResource = new ResourceStub();
+        $freshResource = new ResourceStub(__FUNCTION__);
         $freshResource->setFresh(false);
 
         $dependency1 = $this->createMock(PhpArrayConfigProviderStub::class);
@@ -241,7 +254,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->doEnsureDependenciesWarmedUp();
     }
 
-    public function testEnsureDependenciesWarmedUpInDebugAndMainCacheDoeNotExist()
+    public function testEnsureDependenciesWarmedUpInDebugAndMainCacheDoeNotExist(): void
     {
         $dependency1 = $this->createMock(PhpArrayConfigProviderStub::class);
         $dependency2 = $this->createMock(PhpArrayConfigProviderStub::class);
@@ -271,7 +284,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $cache->doEnsureDependenciesWarmedUp();
     }
 
-    public function testEnsureDependenciesWarmedUpInProduction()
+    public function testEnsureDependenciesWarmedUpInProduction(): void
     {
         $dependency1 = $this->createMock(PhpArrayConfigProviderStub::class);
         $dependency2 = $this->createMock(PhpArrayConfigProviderStub::class);

@@ -14,9 +14,9 @@ Feature: Create Report with grouping by date
       | Entity      | User        |
       | Report Type | Table       |
     And I add the following columns:
-      | Id       |
-      | Username |
-      | Email    |
+      | Id            |
+      | Username      |
+      | Primary Email |
     And I check "Enable grouping by date"
     And I save and close form
     Then I should see "The date grouping filter requires configuring a grouping column." error message

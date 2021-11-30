@@ -8,6 +8,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
 
 /**
+ * A process entity
  * @ORM\Table("oro_process_definition")
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessDefinitionRepository")
  * @ORM\HasLifecycleCallbacks()
@@ -23,9 +24,6 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *              "type"="ACL",
  *              "group_name"="",
  *              "category"="account_management"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "activity"={
  *              "immutable"=true

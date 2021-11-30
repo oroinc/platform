@@ -23,6 +23,7 @@ use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class EntitySerializerTestCase extends OrmTestCase
 {
@@ -81,7 +82,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
         $this->container = $this->createMock(ContainerInterface::class);
         $doctrineHelper = new DoctrineHelper($doctrine);
-        $dataAccessor = new EntityDataAccessor();
+        $dataAccessor = new EntityDataAccessor(new PropertyAccessor());
         $fieldAccessor = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
         $this->serializer = new EntitySerializer(
             $doctrineHelper,

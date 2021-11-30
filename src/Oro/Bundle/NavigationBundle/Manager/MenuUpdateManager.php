@@ -14,50 +14,27 @@ use Oro\Bundle\NavigationBundle\Menu\Helper\MenuUpdateHelper;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\UIBundle\Model\TreeItem;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * The manager to manipulate menu items using menu updates
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MenuUpdateManager
 {
-    /** @var ManagerRegistry */
-    private $managerRegistry;
-
-    /** @var MenuUpdateHelper */
-    private $menuUpdateHelper;
-
-    /** @var string */
-    private $entityClass;
-
-    /** @var string */
-    private $scopeType;
-
-    /**
-     * @param ManagerRegistry  $managerRegistry
-     * @param MenuUpdateHelper $menuUpdateHelper
-     * @param string           $entityClass
-     * @param string           $scopeType
-     */
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        MenuUpdateHelper $menuUpdateHelper,
-        $entityClass,
-        $scopeType
+        private ManagerRegistry $managerRegistry,
+        private MenuUpdateHelper $menuUpdateHelper,
+        private PropertyAccessorInterface $propertyAccessor,
+        private string $entityClass,
+        private string $scopeType
     ) {
-        $this->managerRegistry = $managerRegistry;
-        $this->menuUpdateHelper = $menuUpdateHelper;
-        $this->entityClass = $entityClass;
-        $this->scopeType = $scopeType;
     }
 
     /**
      * Create menu update entity
-     *
-     * @param ItemInterface $menu
-     * @param array         $options
-     * @return MenuUpdateInterface
      */
-    public function createMenuUpdate(ItemInterface $menu, array $options = [])
+    public function createMenuUpdate(ItemInterface $menu, array $options = []): MenuUpdateInterface
     {
         /** @var MenuUpdateInterface $entity */
         $entity = new $this->entityClass;
@@ -91,12 +68,66 @@ class MenuUpdateManager
         $item = $this->findMenuItem($menu, $entity->getKey());
         if ($item) {
             $entity->setCustom(false);
-            MenuUpdateUtils::updateMenuUpdate($entity, $item, $entity->getMenu(), $this->menuUpdateHelper);
+            $this->updateMenuUpdate($entity, $item, $entity->getMenu());
         } else {
             $entity->setCustom(true);
         }
 
         return $entity;
+    }
+
+    /**
+     * Apply changes from menu item to menu update
+     */
+    public function updateMenuUpdate(
+        MenuUpdateInterface $update,
+        ItemInterface $item,
+        $menuName,
+        array $extrasMapping = ['position' => 'priority']
+    ) {
+        $this->setMenuUpdateFieldValue($update, 'key', $item->getName());
+        $this->setMenuUpdateFieldValue($update, 'uri', $item->getUri());
+
+        $this->menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getLabel(), 'title', 'string');
+
+        if ($update->getTitles()->count() <= 0) {
+            $this->setMenuUpdateFieldValue($update, 'defaultTitle', $item->getLabel());
+        }
+
+        $parent = $item->getParent();
+        if ($parent) {
+            $parentKey = $parent->getName() !== $menuName ? $parent->getName() : null;
+            $this->setMenuUpdateFieldValue($update, 'parentKey', $parentKey);
+        }
+
+        $update->setActive($item->isDisplayed());
+        $update->setMenu($menuName);
+
+        foreach ($item->getExtras() as $key => $value) {
+            if ($key === 'description') {
+                $this->menuUpdateHelper->applyLocalizedFallbackValue($update, $item->getExtra($key), $key, 'text');
+                continue;
+            }
+
+            if (array_key_exists($key, $extrasMapping)) {
+                $key = $extrasMapping[$key];
+            }
+
+            $this->setMenuUpdateFieldValue($update, $key, $value);
+        }
+    }
+
+    private function setMenuUpdateFieldValue(
+        MenuUpdateInterface $update,
+        string $key,
+        $value
+    ) {
+        if ($this->propertyAccessor->isWritable($update, $key)) {
+            $currentValue = $this->propertyAccessor->getValue($update, $key);
+            if ($currentValue === null || is_bool($currentValue)) {
+                $this->propertyAccessor->setValue($update, $key, $value);
+            }
+        }
     }
 
     /**
@@ -381,7 +412,7 @@ class MenuUpdateManager
                 $menu,
                 ['key' => $child->getName(), 'scope' => $scope]
             );
-            MenuUpdateUtils::updateMenuUpdate($update, $child, $menu->getName(), $this->menuUpdateHelper);
+            $this->updateMenuUpdate($update, $child, $menu->getName());
             $update->setPriority($priority);
             $updates[] = $update;
         }

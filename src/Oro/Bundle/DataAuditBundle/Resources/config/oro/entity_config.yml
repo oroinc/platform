@@ -6,7 +6,6 @@ entity_config:
                 auditable:
                     options:
                         priority:           60
-                        default_value:      false
                         indexed:            true
                     grid:
                         type:               boolean
@@ -20,8 +19,8 @@ entity_config:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.entity.items.auditable
@@ -35,7 +34,6 @@ entity_config:
                     options:
                         value_type:         boolean
                         priority:           60
-                        default_value:      false
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, oneToMany, oneToOne, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one]
                     grid:
                         type:               boolean
@@ -46,8 +44,8 @@ entity_config:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.auditable
@@ -58,7 +56,6 @@ entity_config:
                     options:
                         value_type:         boolean
                         priority:           70
-                        default_value:      false
                         allowed_type:       [oneToMany, oneToOne, manyToOne, manyToMany, ref-many, ref-one]
                         required_property:
                             config_id:
@@ -69,8 +66,8 @@ entity_config:
                         type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.dataaudit.entity_config.field.items.propagate

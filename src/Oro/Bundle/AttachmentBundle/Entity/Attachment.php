@@ -33,9 +33,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  *              "type"="ACL",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

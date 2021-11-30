@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
@@ -43,7 +44,7 @@ class ExtendSchemaTest extends \PHPUnit\Framework\TestCase
             ->willReturnMap([
                 ['table1', ['Acme\AcmeBundle\Entity\Entity1']],
             ]);
-        $this->extendOptionsManager = new ExtendOptionsManager();
+        $this->extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
 
         $configManager = $this->createMock(ConfigManager::class);
         $configManager->expects($this->any())

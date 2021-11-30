@@ -6,7 +6,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\AjaxMassAction;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -24,7 +23,7 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
     public function testHandle()
     {
         $userReference = 'user.1';
-        $this->initToken($userReference, 'organization.1');
+        $this->updateUserSecurityToken($this->getReference($userReference)->getEmail());
         $userRepository = $this->getUserRepo();
         $query          = $userRepository->createQueryBuilder('u')->getQuery();//select all
         $resultIterator = new IterableResult($query);
@@ -60,20 +59,5 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
     protected function getUserRepo()
     {
         return self::getContainer()->get('doctrine')->getRepository(User::class);
-    }
-
-    /**
-     * @param string $userReference
-     * @param string $orgReference
-     */
-    protected function initToken($userReference, $orgReference)
-    {
-        $token = new UsernamePasswordOrganizationToken(
-            $this->getReference($userReference),
-            [],
-            'main',
-            $this->getReference($orgReference)
-        );
-        self::getContainer()->get('security.token_storage')->setToken($token);
     }
 }

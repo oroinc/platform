@@ -30,6 +30,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -88,7 +89,8 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
             $this->emailOwnerProvider,
             $this->registry,
             $this->addressHelper,
-            $this->indexer
+            $this->indexer,
+            new PropertyAccessor()
         );
     }
 

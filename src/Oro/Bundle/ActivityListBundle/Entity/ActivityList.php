@@ -33,9 +33,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "owner_field_name"="organization",
  *              "owner_column_name"="organization_id"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

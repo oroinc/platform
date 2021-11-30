@@ -7,7 +7,7 @@ use Oro\Bundle\AddressBundle\Model\ExtendAddress;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
- * Address
+ * Address Entity
  *
  * @ORM\Table("oro_address")
  * @ORM\Entity
@@ -15,9 +15,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *      defaultValues={
  *          "entity"={
  *              "icon"="fa-map-marker"
- *          },
- *          "note"={
- *              "immutable"=true
  *          },
  *          "activity"={
  *              "immutable"=true

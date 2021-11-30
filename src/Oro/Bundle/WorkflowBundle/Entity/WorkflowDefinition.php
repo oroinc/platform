@@ -31,9 +31,6 @@ use Symfony\Component\Security\Acl\Model\DomainObjectInterface;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },

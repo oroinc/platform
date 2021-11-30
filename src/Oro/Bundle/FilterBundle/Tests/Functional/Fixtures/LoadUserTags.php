@@ -73,7 +73,13 @@ class LoadUserTags extends AbstractFixture implements DependentFixtureInterface,
 
         $tokenStorage = $this->container->get('security.token_storage');
         $tokenStorage->setToken(
-            new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization)
+            new UsernamePasswordOrganizationToken(
+                $user,
+                $user->getUsername(),
+                'main',
+                $organization,
+                $user->getUserRoles()
+            )
         );
     }
 

@@ -24,9 +24,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *          "entity"={
  *              "icon"="fa-bell-o"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

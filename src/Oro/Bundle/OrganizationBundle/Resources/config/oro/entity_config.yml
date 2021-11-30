@@ -23,4 +23,3 @@ entity_config:
                             block:          other
                             required:       true
                             label:          'Ownership Type'
-

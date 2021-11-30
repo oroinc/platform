@@ -25,6 +25,7 @@ use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -51,7 +52,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ),
             new DoctrineHelper($doctrine),
             new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
-            new EntityDataAccessor(),
+            new EntityDataAccessor(new PropertyAccessor()),
             new ConfigNormalizer(),
             new DataNormalizer()
         );

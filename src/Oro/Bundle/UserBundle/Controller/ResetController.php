@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Form\Handler\ResetHandler;
 use Oro\Bundle\UserBundle\Form\Handler\SetPasswordHandler;
 use Oro\Bundle\UserBundle\Handler\ResetPasswordHandler;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider;
+use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
 use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -312,7 +313,7 @@ class ResetController extends AbstractController
                 SetPasswordHandler::class,
                 ResetHandler::class,
                 MassActionDispatcher::class,
-                UserLoggingInfoProvider::class,
+                UserLoggingInfoProvider::class => UserLoggingInfoProviderInterface::class,
                 EntityRoutingHelper::class,
                 LoggerInterface::class,
                 ResetPasswordHandler::class,

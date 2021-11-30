@@ -42,17 +42,13 @@ use Oro\Bundle\UserBundle\Entity\Ownership\UserAwareTrait;
  *              "organization_column_name"="organization_id"
  *          },
  *          "security"={
- *              "type"="ACL",
- *              "group"=""
+ *              "type"="ACL"
  *          },
  *          "dataaudit"={
  *              "auditable"=false,
  *              "immutable"=true
  *          },
  *          "attachment"={
- *              "immutable"=true
- *          },
- *          "note"={
  *              "immutable"=true
  *          },
  *          "comment"={
@@ -117,7 +113,7 @@ class DigitalAsset extends ExtendDigitalAsset implements DatesAwareInterface, Or
      * @ConfigField(
      *      defaultValues={
      *          "attachment"={
-     *              "acl_protected"=1,
+     *              "acl_protected"=true,
      *              "file_applications"={"default"}
      *          }
      *      }

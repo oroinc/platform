@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
@@ -10,7 +11,7 @@ use Psr\Log\LoggerInterface;
 /**
  * Set option for entity field in a given scope.
  */
-class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
+class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery implements ConfigurationHandlerAwareInterface
 {
     /**
      * @var string
@@ -42,6 +43,8 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
      */
     protected $replaceValue;
 
+    protected ConfigurationHandler $configurationHandler;
+
     /**
      * @param string $entityName
      * @param string $fieldName
@@ -58,6 +61,14 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
         $this->code         = $code;
         $this->value        = $value;
         $this->replaceValue = $replaceValue;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
+    {
+        $this->configurationHandler = $configurationHandler;
     }
 
     /**
@@ -111,7 +122,15 @@ class UpdateEntityConfigFieldValueQuery extends ParametrizedMigrationQuery
 
             if ($this->isDoUpdate($data)) {
                 $data[$this->scope][$this->code] = $this->value;
-                $data                            = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
+
+                $data[$this->scope] = $this->configurationHandler->process(
+                    ConfigurationHandler::CONFIG_FIELD_TYPE,
+                    $this->scope,
+                    $data[$this->scope],
+                    $this->entityName
+                );
+
+                $data       = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
                 // update field itself
                 $sql        = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
                 $parameters = [$data, $id];

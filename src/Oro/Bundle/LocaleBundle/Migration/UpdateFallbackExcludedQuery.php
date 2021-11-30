@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LocaleBundle\Migration;
 
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
+use Oro\Bundle\EntityConfigBundle\Migration\ConfigurationHandlerAwareInterface;
 use Oro\Bundle\EntityConfigBundle\Migration\UpdateEntityConfigFieldValueQuery;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
@@ -10,13 +12,23 @@ use Psr\Log\LoggerInterface;
 /**
  * Change value for `importexport.excluded` for all AbstractLocalizedFallbackValue#fallback fields.
  */
-class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery
+class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery implements ConfigurationHandlerAwareInterface
 {
+    protected ConfigurationHandler $configurationHandler;
+
     private bool $value = false;
 
     public function __construct(bool $value = false)
     {
         $this->value = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setConfigurationHandler(ConfigurationHandler $configurationHandler): void
+    {
+        $this->configurationHandler = $configurationHandler;
     }
 
     public function getDescription()
@@ -36,6 +48,7 @@ class UpdateFallbackExcludedQuery extends ParametrizedMigrationQuery
     {
         foreach ($this->getQueries() as $query) {
             $query->setConnection($this->connection);
+            $query->setConfigurationHandler($this->configurationHandler);
             $query->execute($logger);
         }
     }

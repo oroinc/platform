@@ -11,6 +11,7 @@ use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigBag;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
@@ -89,7 +90,7 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey(['id']);
 
-        $extendOptionsManager = new ExtendOptionsManager();
+        $extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
         $entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
         $extendExtension = new ExtendExtension($extendOptionsManager, $entityMetadataHelper, new PropertyConfigBag([]));
         $extendExtension->setNameGenerator($this->nameGenerator);

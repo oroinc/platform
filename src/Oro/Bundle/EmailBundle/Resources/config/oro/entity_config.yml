@@ -6,14 +6,13 @@ entity_config:
                 available_in_template:
                     options:
                         value_type:         boolean
-                        default_value:      true
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, ref-one, manyToOne, simple_array, guid]
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
                         options:
                             choices:
-                                No:         0
-                                Yes:        1
+                                No:         false
+                                Yes:        true
                             placeholder:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
@@ -25,7 +24,6 @@ entity_config:
                     options:
                         require_schema_update:  false
                         priority:               100
-                        default_value:          false
                     form:
                         type:                   Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
                         options:

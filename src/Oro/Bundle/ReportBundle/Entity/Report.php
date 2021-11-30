@@ -30,9 +30,6 @@ use Oro\Bundle\ReportBundle\Model\ExtendReport;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },

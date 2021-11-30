@@ -8,6 +8,8 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
+use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
+use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UIBundle\Model\TreeItem;
@@ -68,6 +70,19 @@ class MenuUpdateManagerTest extends WebTestCase
             ->setDivider(false)
             ->setScope($scope);
         $this->assertEquals($expectedMenuUpdate, $actualMenuUpdate);
+    }
+
+    public function testUpdateMenuUpdate()
+    {
+        $menu = $this->getMenu();
+        $item = MenuUpdateUtils::findMenuItem($menu, 'oro_organization_list');
+        $update = new MenuUpdateStub();
+        $update->setKey('oro_organization_list')
+            ->setParentKey('dashboard_tab');
+
+        $this->manager->updateMenuUpdate($update, $item, 'menu');
+        $this->assertEquals('oro_organization_list', $update->getKey());
+        $this->assertEquals('dashboard_tab', $update->getParentKey());
     }
 
     public function testFindOrCreateMenuUpdate()

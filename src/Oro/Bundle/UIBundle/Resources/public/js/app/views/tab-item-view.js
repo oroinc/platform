@@ -24,7 +24,8 @@ define(function(require, exports, module) {
         },
 
         events: {
-            'shown.bs.tab': 'onTabShown'
+            'shown.bs.tab': 'onTabShown',
+            'click': 'onTabClick'
         },
 
         /**
@@ -55,6 +56,10 @@ define(function(require, exports, module) {
         onTabShown: function(e) {
             this.model.set('active', true);
             this.model.trigger('select', this.model);
+        },
+
+        onTabClick: function(e) {
+            this.model.trigger('click', this.model);
         }
     });
 

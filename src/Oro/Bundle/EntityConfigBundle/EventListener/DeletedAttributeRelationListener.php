@@ -5,11 +5,16 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
+/**
+ * Doctrine's listener of 'onFlush', 'postFlush' events
+ * to produce MQ message which processor must delete attribute relations.
+ */
 class DeletedAttributeRelationListener
 {
     /**
@@ -69,7 +74,7 @@ class DeletedAttributeRelationListener
         foreach ($this->deletedAttributes as $attributeFamilyId => $attributeIds) {
             $attributes = $this->deletedAttributeProvider->getAttributesByIds($attributeIds);
             foreach ($attributes as &$attribute) {
-                $attribute = $this->inflector->camelize($attribute->getFieldName());
+                $attribute = $this->getAttributeName($attribute);
             }
 
             $this->deletedAttributes[$attributeFamilyId] = $attributes;
@@ -111,5 +116,14 @@ class DeletedAttributeRelationListener
         }
 
         return true;
+    }
+
+    /**
+     * @param FieldConfigModel $attribute
+     * @return string
+     */
+    protected function getAttributeName(FieldConfigModel $attribute): string
+    {
+        return $this->inflector->camelize($attribute->getFieldName());
     }
 }

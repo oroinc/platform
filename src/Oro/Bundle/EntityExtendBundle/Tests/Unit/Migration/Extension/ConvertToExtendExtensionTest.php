@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ConvertToExtendExtension;
@@ -37,7 +38,7 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
-        $this->extendOptionsManager = new ExtendOptionsManager();
+        $this->extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
         $this->configModelManager = $this->createMock(ConfigModelManager::class);
         $this->queries = $this->createMock(QueryBag::class);
         $this->schema = $this->createMock(Schema::class);

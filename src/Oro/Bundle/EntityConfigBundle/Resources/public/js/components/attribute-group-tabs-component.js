@@ -37,12 +37,17 @@ define(function(require) {
 
             this.listenTo(this.groups, 'change', this.onGroupChange);
             this.listenTo(this.groups, 'select', this.onGroupChange);
+            this.listenTo(this.groups, 'click', this.onGroupClick);
         },
 
         onGroupChange: function(model) {
             if (model.get('active') === true) {
                 this.triggerGroupChange(model);
             }
+        },
+
+        onGroupClick: function(model) {
+            this.triggerGroupClick(model);
         },
 
         /**
@@ -53,6 +58,16 @@ define(function(require) {
          */
         triggerGroupChange: function(model, initialize) {
             mediator.trigger('entity-config:attribute-group:changed', model, initialize);
+        },
+
+        /**
+         * Triggers global event via mediator and pass params to listeners
+         *
+         * @param {Backbone.Model} model
+         * @param {boolean} initialize
+         */
+        triggerGroupClick: function(model, initialize) {
+            mediator.trigger('entity-config:attribute-group:click', model, initialize);
         },
 
         getGroupById: function(id) {

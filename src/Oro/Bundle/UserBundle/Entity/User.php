@@ -51,7 +51,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *              "virtual_fields"={"id"},
  *              "search_fields"={"firstName", "lastName"},
  *              "representation_field"="fullName",
- *              "activity_support"="true"
+ *              "activity_support"=true
  *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",

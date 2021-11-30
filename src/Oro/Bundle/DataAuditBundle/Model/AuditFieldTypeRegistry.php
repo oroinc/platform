@@ -93,7 +93,6 @@ class AuditFieldTypeRegistry
     public static function addType($doctrineType, $auditType)
     {
         static::validateType($doctrineType);
-        static::validateAuditType($auditType);
 
         static::$typeMap[$doctrineType] = $auditType;
     }

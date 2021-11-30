@@ -10,7 +10,6 @@ use Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFi
 use Oro\Bundle\DigitalAssetBundle\Tests\Functional\DataFixtures\LoadUsersAvatarsDigitalAssets;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -150,7 +149,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
     public function testWhenFileWhenReuseFromDigitalAssetSource(): void
     {
-        $this->setToken($this->getReference('user'));
+        $this->updateUserSecurityToken($this->getReference('user')->getEmail());
 
         $this->toggleDam(true);
 
@@ -202,7 +201,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
     public function testWhenFileWhenReuseFromDigitalAssetChild(): void
     {
-        $this->setToken($this->getReference('user'));
+        $this->updateUserSecurityToken($this->getReference('user')->getEmail());
 
         $this->toggleDam(true);
 
@@ -365,16 +364,5 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
             ],
             $context->getErrors()
         );
-    }
-
-    private function setToken(User $user): void
-    {
-        $token = new UsernamePasswordOrganizationToken(
-            $user,
-            self::AUTH_PW,
-            'main',
-            $this->getReference('organization')
-        );
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
     }
 }

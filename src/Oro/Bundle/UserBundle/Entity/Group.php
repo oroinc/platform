@@ -34,9 +34,6 @@ use Oro\Bundle\UserBundle\Model\ExtendGroup;
  *              "group_name"="",
  *              "category"="account_management"
  *          },
- *          "note"={
- *              "immutable"=true
- *          },
  *          "activity"={
  *              "immutable"=true
  *          },

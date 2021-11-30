@@ -20,6 +20,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Displays entity configuration.
@@ -128,6 +130,7 @@ HELP
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
         $entity         = $input->getArgument('entity');
         $field          = $input->getArgument('field');
         $scope          = $input->getOption('scope');
@@ -156,26 +159,26 @@ HELP
             }
             if ($isList) {
                 if (empty($entity)) {
-                    $this->dumpEntityListFromCache($output, $scope);
+                    $this->dumpEntityListFromCache($io, $scope);
                 } else {
-                    $this->dumpFieldListFromCache($output, $entity, $scope);
+                    $this->dumpFieldListFromCache($io, $entity, $scope);
                 }
             } elseif (!empty($entity)) {
                 if (empty($field)) {
-                    $this->dumpEntityConfigFromCache($output, $entity, $scope, $attrName);
+                    $this->dumpEntityConfigFromCache($io, $entity, $scope, $attrName);
                 } else {
-                    $this->dumpFieldConfigFromCache($output, $entity, $field, $scope, $attrName);
+                    $this->dumpFieldConfigFromCache($io, $entity, $field, $scope, $attrName);
                 }
             }
         } else {
             if ($isList) {
                 if (empty($entity)) {
-                    $this->dumpEntityList($output);
+                    $this->dumpEntityList($io);
                 } else {
-                    $this->dumpFieldList($output, $entity);
+                    $this->dumpFieldList($io, $entity);
                 }
             } elseif ($isRefNonConfig) {
-                $this->dumpNonConfigRef($output, $entity);
+                $this->dumpNonConfigRef($io, $entity);
             } elseif (!empty($entity)) {
                 if ($isSet && empty($scope) && empty($attrName) && $attrVal === null) {
                     throw new \RuntimeException(
@@ -189,21 +192,21 @@ HELP
                 }
                 if ($isSet) {
                     if (empty($field)) {
-                        $this->setEntityConfigValue($output, $entity, $scope, $attrName, $attrVal);
+                        $this->setEntityConfigValue($io, $entity, $scope, $attrName, $attrVal);
                     } else {
-                        $this->setFieldConfigValue($output, $entity, $field, $scope, $attrName, $attrVal);
+                        $this->setFieldConfigValue($io, $entity, $field, $scope, $attrName, $attrVal);
                     }
                 } elseif ($isRemove) {
                     if (empty($field)) {
-                        $this->removeEntityConfigScopeOrAttribute($output, $entity, $scope, $attrName);
+                        $this->removeEntityConfigScopeOrAttribute($io, $entity, $scope, $attrName);
                     } else {
-                        $this->removeFieldConfigScopeOrAttribute($output, $entity, $field, $scope, $attrName);
+                        $this->removeFieldConfigScopeOrAttribute($io, $entity, $field, $scope, $attrName);
                     }
                 } else {
                     if (empty($field)) {
-                        $this->dumpEntityConfig($output, $entity, $scope, $attrName);
+                        $this->dumpEntityConfig($io, $entity, $scope, $attrName);
                     } else {
-                        $this->dumpFieldConfig($output, $entity, $field, $scope, $attrName);
+                        $this->dumpFieldConfig($io, $entity, $field, $scope, $attrName);
                     }
                 }
             }
@@ -361,7 +364,7 @@ HELP
     }
 
     protected function dumpEntityConfig(
-        OutputInterface $output,
+        SymfonyStyle $output,
         string $className,
         ?string $scope = null,
         ?string $attrName = null
@@ -380,13 +383,13 @@ HELP
         foreach ($rows as $row) {
             $output->writeln(sprintf('Class: %s', $row['class_name']));
             $output->writeln(sprintf('Mode:  %s', $row['mode']));
-            $output->writeln('Values:');
+            $output->title('Values:');
             $this->dumpData($output, $connection->convertToPHPValue($row['data'], 'array'), $scope, $attrName);
         }
     }
 
     protected function dumpEntityConfigFromCache(
-        OutputInterface $output,
+        SymfonyStyle $output,
         string $className,
         string $scope,
         ?string $attrName = null
@@ -401,12 +404,12 @@ HELP
         $config = $cp->getConfig($className);
 
         $output->writeln(sprintf('Class: %s', $config->getId()->getClassName()));
-        $output->writeln('Values:');
+        $output->title('Values:');
         $this->dumpConfig($output, $config, $attrName);
     }
 
     protected function dumpFieldConfig(
-        OutputInterface $output,
+        SymfonyStyle $output,
         string $className,
         string $fieldName,
         ?string $scope = null,
@@ -430,13 +433,13 @@ HELP
             $output->writeln(sprintf('Field: %s', $row['field_name']));
             $output->writeln(sprintf('Type:  %s', $row['type']));
             $output->writeln(sprintf('Mode:  %s', $row['mode']));
-            $output->writeln('Values:');
+            $output->title('Values:');
             $this->dumpData($output, $connection->convertToPHPValue($row['data'], 'array'), $scope, $attrName);
         }
     }
 
     protected function dumpFieldConfigFromCache(
-        OutputInterface $output,
+        SymfonyStyle $output,
         string $className,
         string $fieldName,
         string $scope,
@@ -454,7 +457,7 @@ HELP
         $output->writeln(sprintf('Class: %s', $config->getId()->getClassName()));
         $output->writeln(sprintf('Field: %s', $config->getId()->getFieldName()));
         $output->writeln(sprintf('Type:  %s', $config->getId()->getFieldType()));
-        $output->writeln('Values:');
+        $output->title('Values:');
         $this->dumpConfig($output, $config, $attrName);
     }
 
@@ -694,22 +697,7 @@ HELP
     {
         $array = $this->sortDataByKeys($array);
 
-        $replace = [
-            false => 'false',
-            true  => 'true',
-            null  => 'NULL',
-        ];
-
-        array_walk_recursive(
-            $array,
-            function (&$item) use ($replace) {
-                if (is_bool($item) || is_null($item)) {
-                    $item = $replace[$item];
-                }
-            }
-        );
-
-        return print_r($array, true);
+        return Yaml::dump($array, 5, 4, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE | Yaml::DUMP_OBJECT);
     }
 
     private function sortDataByKeys(array $array): array

@@ -8,18 +8,14 @@ entity_config:
                         auditable: false
                 permissions: ~
                 group_name: ~
-                field_acl_supported:
-                    options:
-                        default_value: false
                 field_acl_enabled:
                     options:
-                        default_value: false
                         required_properties:
                             -
-                               config_id:
-                                  scope:  security
-                               code:      field_acl_supported
-                               value:     true
+                                config_id:
+                                    scope:  security
+                                code:      field_acl_supported
+                                value:     true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:
@@ -29,13 +25,12 @@ entity_config:
                             tooltip:        oro.security.field_acl.is_enabled.tooltip
                 show_restricted_fields:
                     options:
-                        default_value: false
                         required_properties:
                             -
-                               config_id:
-                                  scope:  security
-                               code:      field_acl_supported
-                               value:     true
+                                config_id:
+                                    scope:  security
+                                code:      field_acl_supported
+                                value:     true
                     form:
                         type:               Symfony\Component\Form\Extension\Core\Type\CheckboxType
                         options:

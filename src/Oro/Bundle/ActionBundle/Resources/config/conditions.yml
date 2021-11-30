@@ -98,6 +98,8 @@ services:
 
     oro_action.expression.has_property:
         class: Oro\Component\ConfigExpression\Condition\HasProperty
+        arguments:
+            - '@property_accessor'
         tags:
             - { name: oro_action.condition, alias: has_property }
 

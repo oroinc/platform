@@ -7,10 +7,11 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
-use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
+class EntityApiBaseHandlerTest extends TestCase
 {
     /** @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
@@ -20,9 +21,6 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
 
     /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
-
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
 
     public function methodsDataProvider(): array
     {
@@ -37,9 +35,8 @@ class EntityApiBaseHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $this->registry = $this->createMock(Registry::class);
         $this->processor = $this->createMock(EntityApiHandlerProcessor::class);
-        $this->entityClassNameHelper = $this->createMock(EntityClassNameHelper::class);
 
-        $this->handler = new EntityApiBaseHandler($this->registry, $this->processor, $this->entityClassNameHelper);
+        $this->handler = new EntityApiBaseHandler($this->registry, $this->processor, new PropertyAccessor());
     }
 
     public function testProcessUnsupportedMethod()

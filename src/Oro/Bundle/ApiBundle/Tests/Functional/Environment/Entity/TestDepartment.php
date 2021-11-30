@@ -24,7 +24,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "field_acl_supported" = "true"
+ *              "field_acl_supported"=true
  *          }
  *      }
  * )

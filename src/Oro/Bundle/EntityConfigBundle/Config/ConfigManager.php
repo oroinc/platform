@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\EntityConfig\ConfigurationHandler;
 use Oro\Bundle\EntityConfigBundle\Event;
 use Oro\Bundle\EntityConfigBundle\Event\Events;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -26,7 +27,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * The main entry point for entity configs.
- * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.
+ * IMPORTANT: A performance of this class is very crucial. Double-check a performance during a refactoring.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
@@ -43,6 +44,9 @@ class ConfigManager
 
     /** @var ConfigCache */
     protected $cache;
+
+    /** @var ConfigurationHandler */
+    protected $configurationHandler;
 
     /** @var AuditManager */
     protected $auditManager;
@@ -67,13 +71,15 @@ class ConfigManager
         MetadataFactory $metadataFactory,
         ConfigModelManager $modelManager,
         AuditManager $auditManager,
-        ConfigCache $cache
+        ConfigCache $cache,
+        ConfigurationHandler $configurationHandler,
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->metadataFactory = $metadataFactory;
         $this->modelManager = $modelManager;
         $this->auditManager = $auditManager;
         $this->cache = $cache;
+        $this->configurationHandler = $configurationHandler;
     }
 
     /**
@@ -108,14 +114,6 @@ class ConfigManager
     public function setProviderBag(ConfigProviderBag $providerBag)
     {
         $this->providerBag = $providerBag;
-    }
-
-    /**
-     * @return EventDispatcherInterface
-     */
-    public function getEventDispatcher()
-    {
-        return $this->eventDispatcher;
     }
 
     /**
@@ -285,7 +283,6 @@ class ConfigManager
                 new EntityConfigId($scope, $className),
                 $this->modelManager->getEntityModel($className)->toArray($scope)
             );
-
             // put to a cache
             $this->cache->saveConfig($config);
         }
@@ -295,7 +292,6 @@ class ConfigManager
         if (!isset($this->originalValues[$configKey])) {
             $this->originalValues[$configKey] = $config->getValues();
         }
-
         return $config;
     }
 
@@ -328,7 +324,6 @@ class ConfigManager
                 new FieldConfigId($scope, $className, $fieldName, $model->getType()),
                 $model->toArray($scope)
             );
-
             // put to a cache
             $this->cache->saveConfig($config);
         }
@@ -338,7 +333,6 @@ class ConfigManager
         if (!isset($this->originalValues[$configKey])) {
             $this->originalValues[$configKey] = $config->getValues();
         }
-
         return $config;
     }
 
@@ -499,6 +493,21 @@ class ConfigManager
      */
     public function persist(ConfigInterface $config)
     {
+        $configType = ConfigurationHandler::CONFIG_ENTITY_TYPE;
+        $fieldType = null;
+
+        if ($config->getId() instanceof FieldConfigId) {
+            $configType = ConfigurationHandler::CONFIG_FIELD_TYPE;
+            $fieldType = $config->getId()->getFieldType();
+        }
+        $values = $this->configurationHandler->process(
+            $configType,
+            $config->getId()->getScope(),
+            $config->getValues(),
+            $config->getId()->getClassName(),
+            $fieldType
+        );
+        $config->setValues($values);
         $configKey = $this->buildConfigKey($config->getId());
 
         $this->persistConfigs[$configKey] = $config;
@@ -775,12 +784,14 @@ class ConfigManager
                 }
                 $entityModel = $this->modelManager->createEntityModel($className, $mode);
                 $providers = $this->getProviders();
+                $this->configurationHandler->validateScopes($metadata, $providers, $className);
                 foreach ($providers as $scope => $provider) {
                     $configKey = $scope . '.' . $className;
                     $config    = new Config(
                         new EntityConfigId($scope, $className),
                         $this->getEntityDefaultValues($scope, $className, $metadata)
                     );
+
                     $this->mergeConfigValues($config, $configKey);
 
                     // put a config to a local cache
@@ -832,12 +843,14 @@ class ConfigManager
             }
             $fieldModel = $this->modelManager->createFieldModel($className, $fieldName, $fieldType, $mode);
             $providers = $this->getProviders();
+            $this->configurationHandler->validateScopes($metadata, $providers, $className);
             foreach ($providers as $scope => $provider) {
                 $configKey = $scope . '.' . $className . '.' . $fieldName;
                 $config    = new Config(
                     new FieldConfigId($scope, $className, $fieldName, $fieldType),
                     $this->getFieldDefaultValues($scope, $className, $fieldName, $fieldType, $metadata)
                 );
+
                 $this->mergeConfigValues($config, $configKey);
 
                 // put a config to a local cache
@@ -884,6 +897,7 @@ class ConfigManager
         $entityModel = $this->createConfigEntityModel($className, $metadata->mode);
         $entityModel->setMode($metadata->mode);
         $providers = $this->getProviders();
+        $this->configurationHandler->validateScopes($metadata, $providers, $className);
         foreach ($providers as $scope => $provider) {
             $config        = $provider->getConfig($className);
             $defaultValues = $this->getEntityDefaultValues($scope, $className, $metadata);
@@ -915,6 +929,7 @@ class ConfigManager
 
         $metadata = $this->getFieldMetadata($className, $fieldName);
         $providers = $this->getProviders();
+        $this->configurationHandler->validateScopes($metadata, $providers, $className);
         foreach ($providers as $scope => $provider) {
             $config = $provider->getConfig($className, $fieldName);
             /** @var FieldConfigId $configId */
@@ -1112,27 +1127,19 @@ class ConfigManager
 
     /**
      * Extracts entity default values from an annotation and config file
-     *
-     * @param string              $scope
-     * @param string|null         $className
-     * @param EntityMetadata|null $metadata
-     *
-     * @return array
      */
-    protected function getEntityDefaultValues($scope, $className = null, $metadata = null)
-    {
+    protected function getEntityDefaultValues(
+        string $scope,
+        string $className = null,
+        EntityMetadata $metadata = null
+    ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
-
-        // try to get default values from an annotation
-        if ($metadata && isset($metadata->defaultValues[$scope])) {
-            // combine them with default values from a config file
-            $defaultValues = array_merge(
-                $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_ENTITY),
-                $metadata->defaultValues[$scope]
-            );
-        } else {
-            $defaultValues = $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_ENTITY);
-        }
+        $defaultValues = $this->configurationHandler->process(
+            ConfigurationHandler::CONFIG_ENTITY_TYPE,
+            $scope,
+            $metadata->defaultValues[$scope] ?? [],
+            $className
+        );
 
         // process translatable values
         if ($className) {
@@ -1150,30 +1157,22 @@ class ConfigManager
 
     /**
      * Extracts field default values from an annotation and config file
-     *
-     * @param string             $scope
-     * @param string             $className
-     * @param string             $fieldName
-     * @param string             $fieldType
-     * @param FieldMetadata|null $metadata
-     *
-     * @return array
      */
-    protected function getFieldDefaultValues($scope, $className, $fieldName, $fieldType, $metadata = null)
-    {
+    protected function getFieldDefaultValues(
+        string $scope,
+        string $className,
+        string $fieldName,
+        string $fieldType,
+        FieldMetadata $metadata = null
+    ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
-
-        // try to get default values from an annotation
-        if ($metadata && isset($metadata->defaultValues[$scope])) {
-            // combine them with default values from a config file
-            $defaultValues = array_merge(
-                $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_FIELD, $fieldType),
-                $metadata->defaultValues[$scope]
-            );
-        } else {
-            $defaultValues = $propertyConfig->getDefaultValues(PropertyConfigContainer::TYPE_FIELD, $fieldType);
-        }
-
+        $defaultValues = $this->configurationHandler->process(
+            ConfigurationHandler::CONFIG_FIELD_TYPE,
+            $scope,
+            $metadata->defaultValues[$scope] ?? [],
+            $className,
+            $fieldType
+        );
         // process translatable values
         $translatablePropertyNames = $propertyConfig->getTranslatableValues(PropertyConfigContainer::TYPE_FIELD);
         foreach ($translatablePropertyNames as $propertyName) {

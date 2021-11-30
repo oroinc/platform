@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Validator;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Validator\UserGridFieldValidator;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,7 +19,7 @@ class UserGridFieldValidatorTest extends \PHPUnit\Framework\TestCase
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->validator = new UserGridFieldValidator($this->tokenAccessor);
+        $this->validator = new UserGridFieldValidator($this->tokenAccessor, new PropertyAccessor());
     }
 
     public function testHasAccessEditFieldWhenValidatedUserIsCurrentUserAndFieldIsInBlackList()

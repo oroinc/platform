@@ -96,7 +96,7 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isActivitySupport
      */
-    public function testIsActivitySupport(array|string|null $dictionaryOptions, bool $expected)
+    public function testIsActivitySupport(bool $dictionaryOptions, bool $expected)
     {
         $className = 'Test\Entity';
 
@@ -129,10 +129,8 @@ class AssociationTypeHelperTest extends \PHPUnit\Framework\TestCase
     public function isActivitySupport(): array
     {
         return [
-            [null, false],
-            [['some'], false],
-            ['true', true],
-            ['false', false],
+            [true, true],
+            [false, false],
         ];
     }
 

@@ -7,7 +7,6 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -63,8 +62,7 @@ class LimitedAccessTest extends WebTestCase
             $userManager->updateUser($user);
         }
 
-        $token = new UsernamePasswordOrganizationToken($user, $user->getUsername(), 'main', $organization);
-        $this->client->getContainer()->get('security.token_storage')->setToken($token);
+        $this->updateUserSecurityToken($user->getEmail());
 
         $this->testEntity = $em->getRepository(TestEntity::class)
             ->createQueryBuilder('e')

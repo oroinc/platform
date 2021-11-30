@@ -53,10 +53,6 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('normalize')
             ->with($entity, null)
             ->willReturn($serializedValue);
-        $serializer->expects(self::once())
-            ->method('encode')
-            ->with($serializedValue, null)
-            ->willReturnArgument(0);
 
         $dataConverter = $this->createMock(DataConverterInterface::class);
         $dataConverter->expects(self::once())
@@ -81,10 +77,6 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('normalize')
             ->with($entity, null)
             ->willReturn($expectedValue);
-        $serializer->expects(self::once())
-            ->method('encode')
-            ->with($expectedValue, null)
-            ->willReturnArgument(0);
 
         $this->processor->setSerializer($serializer);
         $this->processor->setImportExportContext($this->context);

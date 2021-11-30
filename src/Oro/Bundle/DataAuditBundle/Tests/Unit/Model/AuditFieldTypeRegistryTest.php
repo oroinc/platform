@@ -6,7 +6,7 @@ use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 class AuditFieldTypeRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAuditFieldTypeRegistry()
+    public function testAuditFieldTypeRegistry(): void
     {
         $this->assertFalse(AuditFieldTypeRegistry::hasType('newtype'));
 
@@ -20,5 +20,17 @@ class AuditFieldTypeRegistryTest extends \PHPUnit\Framework\TestCase
 
         AuditFieldTypeRegistry::removeType('newtype');
         $this->assertFalse(AuditFieldTypeRegistry::hasType('newtype'));
+    }
+
+    public function testAddingTypeWithExistingAuditType(): void
+    {
+        AuditFieldTypeRegistry::addType('newtype_exist', 'simplearray');
+        $this->assertTrue(AuditFieldTypeRegistry::hasType('newtype_exist'));
+    }
+
+    public function testAddingTypeWithNotExistingAuditType(): void
+    {
+        AuditFieldTypeRegistry::addType('newtype_not_exist', 'testingtype');
+        $this->assertTrue(AuditFieldTypeRegistry::hasType('newtype_not_exist'));
     }
 }

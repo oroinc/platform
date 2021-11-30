@@ -5,6 +5,7 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context;
 use Behat\Gherkin\Node\TableNode;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\SelectorManipulator;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use WebDriver\Key;
 
@@ -119,21 +120,22 @@ class QueryDesignerContext extends OroFeatureContext implements OroPageObjectAwa
      */
     private function selectField(array $path)
     {
+        $selectorManipulator = new SelectorManipulator();
         foreach ($path as $key => $column) {
             $typeTitle = $key === count($path) - 1 ? 'Fields' : 'Related entities';
             $this->getPage()
                 ->find('xpath', "//div[@id='select2-drop']/div/input")
                 ->setValue($column);
-            $this->getPage()
-                ->find(
-                    'xpath',
-                    sprintf(
-                        "//div[@id='select2-drop']//div[contains(.,'%s')]/..//div[contains(.,'%s')]",
-                        $typeTitle,
-                        $column
-                    )
-                )
-                ->click();
+            $selector = $selectorManipulator->getExactMatchXPathSelector(
+                sprintf("//div[@id='select2-drop']//div[text()='%s']/..//div", $typeTitle),
+                $column
+            );
+            $fieldElement = $this->getPage()
+                ->find($selector['type'], $selector['locator']);
+            if (!$fieldElement) {
+                throw new \RuntimeException(sprintf('The field "%s" not found.', $column));
+            }
+            $fieldElement->click();
         }
     }
 

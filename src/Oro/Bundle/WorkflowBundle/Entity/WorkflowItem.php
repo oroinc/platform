@@ -31,9 +31,6 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
  * @ORM\Entity(repositoryClass="Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowItemRepository")
  * @Config(
  *      defaultValues={
- *          "note"={
- *              "immutable"=true
- *          },
  *          "comment"={
  *              "immutable"=true
  *          },

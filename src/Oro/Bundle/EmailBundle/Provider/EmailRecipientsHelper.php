@@ -22,12 +22,12 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Contains methods handling email recipients
+ * Contains methods handling email recipients.
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
 class EmailRecipientsHelper
 {
@@ -49,7 +49,7 @@ class EmailRecipientsHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var PropertyAccessor*/
+    /** @var PropertyAccessorInterface*/
     protected $propertyAccessor;
 
     /** @var EmailOwnerProvider */
@@ -70,7 +70,8 @@ class EmailRecipientsHelper
         EmailOwnerProvider $emailOwnerProvider,
         Registry $registry,
         EmailAddressHelper $addressHelper,
-        Indexer $search
+        Indexer $search,
+        PropertyAccessorInterface $propertyAccessor
     ) {
         $this->aclHelper = $aclHelper;
         $this->dqlNameFormatter = $dqlNameFormatter;
@@ -81,6 +82,7 @@ class EmailRecipientsHelper
         $this->registry = $registry;
         $this->addressHelper = $addressHelper;
         $this->search = $search;
+        $this->propertyAccessor = $propertyAccessor;
     }
 
     /**
@@ -97,8 +99,8 @@ class EmailRecipientsHelper
         }
 
         $organizationName = null;
-        if ($this->getPropertyAccessor()->isReadable($object, static::ORGANIZATION_PROPERTY)) {
-            $organization = $this->getPropertyAccessor()->getValue($object, static::ORGANIZATION_PROPERTY);
+        if ($this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)) {
+            $organization = $this->propertyAccessor->getValue($object, static::ORGANIZATION_PROPERTY);
             if ($organization) {
                 $organizationName = $organization->getName();
             }
@@ -245,12 +247,12 @@ class EmailRecipientsHelper
     {
         if (!$organization ||
             !$object ||
-            !$this->getPropertyAccessor()->isReadable($object, static::ORGANIZATION_PROPERTY)
+            !$this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)
         ) {
             return true;
         }
 
-        $objectOrganization = $this->getPropertyAccessor()->getValue($object, static::ORGANIZATION_PROPERTY);
+        $objectOrganization = $this->propertyAccessor->getValue($object, static::ORGANIZATION_PROPERTY);
         if (!$organization) {
             return true;
         }
@@ -417,17 +419,5 @@ class EmailRecipientsHelper
         $label        = (string) $this->configManager->getConfig($entityConfig)->get('label');
 
         return $this->translator->trans($label);
-    }
-
-    /**
-     * @return PropertyAccessor
-     */
-    protected function getPropertyAccessor()
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 }

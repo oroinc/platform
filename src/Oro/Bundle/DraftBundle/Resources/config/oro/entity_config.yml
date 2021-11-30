@@ -5,7 +5,6 @@ entity_config:
             items:
                 draftable:
                     options:
-                        default_value: false
                         indexed: true
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#draft
         field:
@@ -13,4 +12,3 @@ entity_config:
                 draftable:
                     options:
                         value_type: boolean
-                        default_value: false

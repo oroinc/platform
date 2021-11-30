@@ -36,33 +36,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
     private const DEFAULT_IDENTITY_FIELDS = ['id'];
 
     /**
-     * @var ExtendOptionsManager
-     */
-    protected $extendOptionsManager;
-
-    /**
-     * @var EntityMetadataHelper
-     */
-    protected $entityMetadataHelper;
-
-    /**
      * @var ExtendDbIdentifierNameGenerator
      */
     protected $nameGenerator;
 
-    /**
-     * @var PropertyConfigBag
-     */
-    protected $propertyConfigBag;
-
     public function __construct(
-        ExtendOptionsManager $extendOptionsManager,
-        EntityMetadataHelper $entityMetadataHelper,
-        PropertyConfigBag $propertyConfigBag
+        protected ExtendOptionsManager $extendOptionsManager,
+        protected EntityMetadataHelper $entityMetadataHelper,
+        protected PropertyConfigBag $propertyConfigBag
     ) {
-        $this->extendOptionsManager = $extendOptionsManager;
-        $this->entityMetadataHelper = $entityMetadataHelper;
-        $this->propertyConfigBag = $propertyConfigBag;
     }
 
     /**

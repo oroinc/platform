@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Extension\AbstractExtension;
+use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
@@ -54,6 +55,20 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction('oro_entity_view_link', [$this, 'getViewLink']),
             new TwigFunction('oro_entity_object_view_link', [$this, 'getEntityViewLink']),
         ];
+    }
+
+    public function getFilters()
+    {
+        return [new TwigFilter('render_oro_entity_config_value', [$this, 'renderValue'])];
+    }
+
+    public function renderValue($value)
+    {
+        if (is_bool($value)) {
+            return $value ? 1 : 0;
+        }
+
+        return $value;
     }
 
     /**

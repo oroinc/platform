@@ -89,12 +89,22 @@ class EntityGenerator
     {
         ExtendClassLoadingUtils::ensureDirExists($this->entityCacheDir);
         $iterator = new \DirectoryIterator($this->entityCacheDir);
+        $allowedFileExtension = $this->getClearableFileExtensions();
+
         /** @var \DirectoryIterator $file */
         foreach ($iterator as $file) {
-            if ($file->isFile()) {
+            if ($file->isFile() && in_array($file->getExtension(), $allowedFileExtension)) {
                 @unlink($file->getPathname());
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    private function getClearableFileExtensions(): array
+    {
+        return ['yml'];
     }
 
     /**
@@ -169,7 +179,13 @@ class EntityGenerator
      */
     private function writePhpFile(string $path, string $content): void
     {
+        $oldContentCrc = sprintf("%u", crc32((string)@file_get_contents($path)));
+        $contentCrc = sprintf("%u", crc32($content));
+        if ($oldContentCrc === $contentCrc) {
+            return;
+        }
         file_put_contents($path, $content);
+
         clearstatcache(true, $path);
     }
 

@@ -26,6 +26,7 @@ services:
             - [initDoctrinePropertiesByManagerRegistry, ["@doctrine"]]
             - [setAclHelper,["@oro_security.acl_helper"]]
             - [setLogger,["@logger"]]
+            - [setPropertyAccessor, ['@property_accessor']]
 
     oro_form.autocomplete.full_name.search_handler:
         class: Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler

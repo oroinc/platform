@@ -364,6 +364,7 @@ services:
         arguments:
             - "@doctrine"
             - "@oro_navigation.menu_helper.menu_update"
+            - "@property_accessor"
             - 'Oro\Bundle\NavigationBundle\Entity\MenuUpdate'
             - 'menu_default_visibility'
 
