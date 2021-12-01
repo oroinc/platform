@@ -13,24 +13,23 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class AclAccessRuleTest extends TestCase
+class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AclAccessRule */
-    private $accessRule;
-
-    /** @var MockObject */
+    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $builder;
 
-    /** @var MockObject */
+    /** @var OwnershipMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadataProvider;
+
+    /** @var AclAccessRule */
+    private $accessRule;
 
     protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+
         $this->accessRule = new AclAccessRule($this->builder, $this->ownershipMetadataProvider);
     }
 

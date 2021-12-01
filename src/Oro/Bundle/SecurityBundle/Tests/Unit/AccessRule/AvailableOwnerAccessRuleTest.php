@@ -15,27 +15,21 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsUser;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class AvailableOwnerAccessRuleTest extends TestCase
+class AvailableOwnerAccessRuleTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var AvailableOwnerAccessRule */
-    private $rule;
-
-    /** @var MockObject */
+    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $builder;
 
-    /** @var MockObject */
-    private $ownershipMetadataProvider;
+    /** @var AvailableOwnerAccessRule */
+    private $rule;
 
     protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);
-        $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
-        $this->rule = new AvailableOwnerAccessRule($this->builder, $this->ownershipMetadataProvider);
 
-        $this->ownershipMetadataProvider->expects($this->any())
+        $ownershipMetadataProvider = $this->createMock(OwnershipMetadataProvider::class);
+        $ownershipMetadataProvider->expects($this->any())
             ->method('getMetadata')
             ->with(CmsUser::class)
             ->willReturn(new OwnershipMetadata(
@@ -45,6 +39,8 @@ class AvailableOwnerAccessRuleTest extends TestCase
                 'organization',
                 'organization_id'
             ));
+
+        $this->rule = new AvailableOwnerAccessRule($this->builder, $ownershipMetadataProvider);
     }
 
     public function testIsApplicableWithNotRootEntity()

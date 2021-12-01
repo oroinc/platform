@@ -14,13 +14,13 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 class AvailableOwnerAccessRule implements AccessRuleInterface
 {
     /** The option that allows to enable the rule. Default value is false. */
-    const ENABLE_RULE = 'availableOwnerEnable';
+    public const ENABLE_RULE = 'availableOwnerEnable';
 
     /** The option that contains the target class name whose access level should be used for the check. */
-    const TARGET_ENTITY_CLASS = 'availableOwnerTargetEntityClass';
+    public const TARGET_ENTITY_CLASS = 'availableOwnerTargetEntityClass';
 
     /** The option that contains the ID of owner that should be available even if ACL check denies access. */
-    const CURRENT_OWNER = 'availableOwnerCurrentOwner';
+    public const CURRENT_OWNER = 'availableOwnerCurrentOwner';
 
     /** @var AclConditionDataBuilderInterface */
     private $builder;
@@ -58,7 +58,7 @@ class AvailableOwnerAccessRule implements AccessRuleInterface
             $criteria->getPermission()
         );
         if (!empty($conditionData)) {
-            list(, $ownerValue, , $organizationValue, $ignoreOwner) = $conditionData;
+            [, $ownerValue, , $organizationValue, $ignoreOwner] = $conditionData;
             if (!$ignoreOwner) {
                 if (empty($ownerValue)) {
                     $criteria->andExpression(new AccessDenied());
