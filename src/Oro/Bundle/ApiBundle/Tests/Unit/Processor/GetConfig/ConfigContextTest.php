@@ -30,7 +30,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
-        self::assertEquals('test', $this->context->get(ConfigContext::CLASS_NAME));
+        self::assertEquals('test', $this->context->get('class'));
     }
 
     public function testTargetAction()
@@ -39,7 +39,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setTargetAction('test');
         self::assertEquals('test', $this->context->getTargetAction());
-        self::assertEquals('test', $this->context->get(ConfigContext::TARGET_ACTION));
+        self::assertEquals('test', $this->context->get('targetAction'));
     }
 
     public function testIsCollection()
@@ -48,7 +48,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setIsCollection(true);
         self::assertTrue($this->context->isCollection());
-        self::assertTrue($this->context->get(ConfigContext::COLLECTION));
+        self::assertTrue($this->context->get('collection'));
     }
 
     public function testParentClassName()
@@ -57,7 +57,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setParentClassName('test');
         self::assertEquals('test', $this->context->getParentClassName());
-        self::assertEquals('test', $this->context->get(ConfigContext::PARENT_CLASS_NAME));
+        self::assertEquals('test', $this->context->get('parentClass'));
     }
 
     public function testAssociationName()
@@ -66,7 +66,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setAssociationName('test');
         self::assertEquals('test', $this->context->getAssociationName());
-        self::assertEquals('test', $this->context->get(ConfigContext::ASSOCIATION));
+        self::assertEquals('test', $this->context->get('association'));
     }
 
     public function testMaxRelatedEntities()
@@ -75,11 +75,11 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setMaxRelatedEntities(123);
         self::assertEquals(123, $this->context->getMaxRelatedEntities());
-        self::assertEquals(123, $this->context->get(ConfigContext::MAX_RELATED_ENTITIES));
+        self::assertEquals(123, $this->context->get('maxRelatedEntities'));
 
         $this->context->setMaxRelatedEntities();
         self::assertNull($this->context->getMaxRelatedEntities());
-        self::assertFalse($this->context->has(ConfigContext::MAX_RELATED_ENTITIES));
+        self::assertFalse($this->context->has('maxRelatedEntities'));
     }
 
     public function testRequestedExclusionPolicy()
@@ -123,7 +123,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
     public function testExtras()
     {
         self::assertSame([], $this->context->getExtras());
-        self::assertSame([], $this->context->get(ConfigContext::EXTRA));
+        self::assertSame([], $this->context->get('extra'));
         self::assertFalse($this->context->hasExtra('test'));
         self::assertFalse($this->context->has('test'));
 
@@ -133,21 +133,21 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         ];
         $this->context->setExtras($extras);
         self::assertEquals($extras, $this->context->getExtras());
-        self::assertSame(['test', 'test1'], $this->context->get(ConfigContext::EXTRA));
+        self::assertSame(['test', 'test1'], $this->context->get('extra'));
         self::assertTrue($this->context->hasExtra('test'));
         self::assertTrue($this->context->has('test_attr'));
         self::assertTrue($this->context->hasExtra('test1'));
 
         $this->context->removeExtra('test');
         self::assertEquals([$extras[1]], $this->context->getExtras());
-        self::assertSame(['test1'], $this->context->get(ConfigContext::EXTRA));
+        self::assertSame(['test1'], $this->context->get('extra'));
         self::assertFalse($this->context->hasExtra('test'));
         self::assertTrue($this->context->hasExtra('test1'));
 
         $this->context->setExtras([]);
         self::assertSame([], $this->context->getExtras());
         self::assertFalse($this->context->hasExtra('test'));
-        self::assertSame([], $this->context->get(ConfigContext::EXTRA));
+        self::assertSame([], $this->context->get('extra'));
     }
 
     public function testGetPropagableExtras()

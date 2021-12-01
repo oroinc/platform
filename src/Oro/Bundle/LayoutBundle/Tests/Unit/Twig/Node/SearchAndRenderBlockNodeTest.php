@@ -20,7 +20,7 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    const RENDER_CALL = '$this->env->getRuntime("' . TwigRenderer::class . '")->searchAndRenderBlock';
+    private const RENDER_CALL = '$this->env->getRuntime("' . TwigRenderer::class . '")->searchAndRenderBlock';
 
     /**
      * block_widget(block)
@@ -345,14 +345,8 @@ class SearchAndRenderBlockNodeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getVariableGetter($name)
+    private function getVariableGetter(string $name): string
     {
-        if (PHP_VERSION_ID >= 70000) {
-            return sprintf('($context["%s"] ?? null)', $name);
-        } elseif (PHP_VERSION_ID >= 50400) {
-            return sprintf('(isset($context["%s"]) ? $context["%s"] : null)', $name, $name);
-        } else {
-            return sprintf('$this->getContext($context, "%s")', $name);
-        }
+        return sprintf('($context["%s"] ?? null)', $name);
     }
 }

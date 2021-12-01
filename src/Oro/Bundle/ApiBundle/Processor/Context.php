@@ -41,26 +41,26 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  */
 class Context extends NormalizeResultContext implements ContextInterface
 {
-    /** FQCN of an entity */
-    const CLASS_NAME = 'class';
-
-    /** the response status code */
-    const RESPONSE_STATUS_CODE = 'responseStatusCode';
-
     /**
      * this header can be used to request additional data like "total count"
      * that will be returned in a response headers
      */
-    const INCLUDE_HEADER = 'X-Include';
+    public const INCLUDE_HEADER = 'X-Include';
+
+    /** FQCN of an entity */
+    private const CLASS_NAME = 'class';
+
+    /** the response status code */
+    private const RESPONSE_STATUS_CODE = 'responseStatusCode';
 
     /** indicates whether the current action processes a master API request */
-    const MASTER_REQUEST = 'masterRequest';
+    private const MASTER_REQUEST = 'masterRequest';
 
     /** indicates whether the current request is CORS request */
-    const CORS = 'cors';
+    private const CORS = 'cors';
 
     /** whether HATEOAS is enabled */
-    const HATEOAS = 'hateoas';
+    private const HATEOAS = 'hateoas';
 
     /** not resolved identifiers */
     private const NOT_RESOLVED_IDENTIFIERS = 'not_resolved_identifiers';
@@ -679,14 +679,12 @@ class Context extends NormalizeResultContext implements ContextInterface
      */
     protected function loadEntityConfig($entityClass, array $extras)
     {
-        $config = $this->configProvider->getConfig(
+        return $this->configProvider->getConfig(
             $entityClass,
             $this->getVersion(),
             $this->getRequestType(),
             $extras
         );
-
-        return $config;
     }
 
     /**

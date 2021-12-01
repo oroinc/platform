@@ -13,11 +13,12 @@ use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 
 class TestEmailSynchronizer extends AbstractEmailSynchronizer
 {
-    const EMAIL_ORIGIN_ENTITY = 'AcmeBundle:EmailOrigin';
+    public const EMAIL_ORIGIN_ENTITY = 'AcmeBundle:EmailOrigin';
 
     /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
+    private $emailEntityBuilder;
 
+    /** @var \DateTime|null */
     private $now;
 
     public function __construct(

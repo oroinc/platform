@@ -17,31 +17,31 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 class ConfigContext extends ApiContext
 {
     /** FQCN of an entity */
-    const CLASS_NAME = 'class';
+    private const CLASS_NAME = 'class';
 
     /** the name of the action for which the configuration is built */
-    const TARGET_ACTION = 'targetAction';
+    private const TARGET_ACTION = 'targetAction';
 
     /** a flag indicates whether a configuration is requested for a list of entities or a single entity */
-    const COLLECTION = 'collection';
+    private const COLLECTION = 'collection';
 
     /** FQCN of the parent entity if a configuration is requested for a sub-resource */
-    const PARENT_CLASS_NAME = 'parentClass';
+    private const PARENT_CLASS_NAME = 'parentClass';
 
     /** the association name if a configuration is requested for a sub-resource */
-    const ASSOCIATION = 'association';
+    private const ASSOCIATION = 'association';
 
     /** the maximum number of related entities that can be retrieved */
-    const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
+    private const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
     /** a list of requests for configuration data that should be retrieved */
-    const EXTRA = 'extra';
+    private const EXTRA = 'extra';
 
     /** the exclusion policy that was before CompleteDefinition processor is set it to "all" */
     private const REQUESTED_EXCLUSION_POLICY = 'requested_exclusion_policy';
 
     /** @var ConfigExtraInterface[] */
-    protected $extras = [];
+    private $extras = [];
 
     /** @var string[]|null */
     private $explicitlyConfiguredFieldNames;

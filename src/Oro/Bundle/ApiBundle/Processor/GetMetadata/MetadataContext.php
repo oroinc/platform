@@ -14,22 +14,22 @@ use Oro\Bundle\ApiBundle\Processor\ApiContext;
 class MetadataContext extends ApiContext
 {
     /** FQCN of an entity */
-    const CLASS_NAME = 'class';
+    private const CLASS_NAME = 'class';
 
     /** the name of the action for which the metadata is built */
-    const TARGET_ACTION = 'targetAction';
+    private const TARGET_ACTION = 'targetAction';
 
     /** a list of requests for additional metadata information that should be retrieved */
-    const EXTRA = 'extra';
+    private const EXTRA = 'extra';
 
     /** whether excluded fields and associations should not be removed */
-    const WITH_EXCLUDED_PROPERTIES = 'withExcludedProperties';
+    private const WITH_EXCLUDED_PROPERTIES = 'withExcludedProperties';
 
     /** @var MetadataExtraInterface[] */
-    protected $extras = [];
+    private $extras = [];
 
     /** @var EntityDefinitionConfig */
-    protected $config;
+    private $config;
 
     /**
      * {@inheritdoc}

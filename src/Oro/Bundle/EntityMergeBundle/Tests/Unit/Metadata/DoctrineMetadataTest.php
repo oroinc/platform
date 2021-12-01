@@ -7,17 +7,10 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 
 class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'Namespace\Entity';
+    private const CLASS_NAME = 'Namespace\Entity';
 
-    /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * @var DoctrineMetadata
-     */
-    protected $doctrineMetadata;
+    /** @var DoctrineMetadata */
+    private $doctrineMetadata;
 
     protected function setUp(): void
     {

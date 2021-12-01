@@ -26,6 +26,21 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
  */
 class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 {
+    private const STRING_REQUIREMENT = '.+';
+    private const INTEGER_REQUIREMENT = '-?\d+';
+    private const UNSIGNED_INTEGER_REQUIREMENT = '\d+';
+    private const BIGINT_REQUIREMENT = '-?\d+';
+    private const BOOLEAN_REQUIREMENT = '0|1|true|false|yes|no';
+    private const DECIMAL_REQUIREMENT = '-?\d*\.?\d+';
+    private const NUMBER_REQUIREMENT = '-?\d*\.?\d+';
+    private const PERCENT100_REQUIREMENT = '-?\d*\.?\d+';
+    private const DATETIME_REQUIREMENT =
+        '\d{4}(-\d{2}(-\d{2}([T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?';
+    private const DATE_REQUIREMENT = '\d{4}(-\d{2}(-\d{2}?)?)?';
+    private const TIME_REQUIREMENT = '\d{2}:\d{2}(:\d{2}(\.\d+)?)?';
+    private const GUID_REQUIREMENT = '[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}';
+    private const ORDER_BY_REQUIREMENT = '-?[\w\.]+(,-?[\w\.]+)*';
+
     /** @var ValueNormalizer */
     private $valueNormalizer;
 
@@ -149,46 +164,46 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRequirementProvider
      */
-    public function testGetRequirement($expectedValue, $dataType, $requestType)
+    public function testGetRequirement(string $expectedValue, string $dataType, array $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType));
         self::assertSame($expectedValue, $result);
     }
 
-    public function getRequirementProvider()
+    public function getRequirementProvider(): array
     {
         return [
             [ValueNormalizer::DEFAULT_REQUIREMENT, 'unknownType', [RequestType::REST]],
-            [Processor\NormalizeString::REQUIREMENT, DataType::STRING, [RequestType::REST]],
-            [Processor\NormalizeInteger::REQUIREMENT, DataType::INTEGER, [RequestType::REST]],
-            [Processor\NormalizeInteger::REQUIREMENT, DataType::SMALLINT, [RequestType::REST]],
-            [Processor\NormalizeInteger::REQUIREMENT, DataType::DURATION, [RequestType::REST]],
-            [Processor\NormalizeBigint::REQUIREMENT, DataType::BIGINT, [RequestType::REST]],
-            [Processor\NormalizeUnsignedInteger::REQUIREMENT, DataType::UNSIGNED_INTEGER, [RequestType::REST]],
-            [Processor\NormalizeBoolean::REQUIREMENT, DataType::BOOLEAN, [RequestType::REST]],
-            [Processor\NormalizeDecimal::REQUIREMENT, DataType::DECIMAL, [RequestType::REST]],
-            [Processor\NormalizeDecimal::REQUIREMENT, DataType::MONEY, [RequestType::REST]],
-            [Processor\NormalizeNumber::REQUIREMENT, DataType::FLOAT, [RequestType::REST]],
-            [Processor\NormalizeNumber::REQUIREMENT, DataType::PERCENT, [RequestType::REST]],
-            [Processor\NormalizePercent100::REQUIREMENT, DataType::PERCENT_100, [RequestType::REST]],
-            [Processor\NormalizeGuid::REQUIREMENT, DataType::GUID, [RequestType::REST]],
-            [Processor\Rest\NormalizeDateTime::REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
-            [Processor\Rest\NormalizeDate::REQUIREMENT, DataType::DATE, [RequestType::REST]],
-            [Processor\Rest\NormalizeTime::REQUIREMENT, DataType::TIME, [RequestType::REST]],
-            [Processor\Rest\NormalizeOrderBy::REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]]
+            [self::STRING_REQUIREMENT, DataType::STRING, [RequestType::REST]],
+            [self::INTEGER_REQUIREMENT, DataType::INTEGER, [RequestType::REST]],
+            [self::INTEGER_REQUIREMENT, DataType::SMALLINT, [RequestType::REST]],
+            [self::INTEGER_REQUIREMENT, DataType::DURATION, [RequestType::REST]],
+            [self::BIGINT_REQUIREMENT, DataType::BIGINT, [RequestType::REST]],
+            [self::UNSIGNED_INTEGER_REQUIREMENT, DataType::UNSIGNED_INTEGER, [RequestType::REST]],
+            [self::BOOLEAN_REQUIREMENT, DataType::BOOLEAN, [RequestType::REST]],
+            [self::DECIMAL_REQUIREMENT, DataType::DECIMAL, [RequestType::REST]],
+            [self::DECIMAL_REQUIREMENT, DataType::MONEY, [RequestType::REST]],
+            [self::NUMBER_REQUIREMENT, DataType::FLOAT, [RequestType::REST]],
+            [self::NUMBER_REQUIREMENT, DataType::PERCENT, [RequestType::REST]],
+            [self::PERCENT100_REQUIREMENT, DataType::PERCENT_100, [RequestType::REST]],
+            [self::DATETIME_REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
+            [self::DATE_REQUIREMENT, DataType::DATE, [RequestType::REST]],
+            [self::TIME_REQUIREMENT, DataType::TIME, [RequestType::REST]],
+            [self::GUID_REQUIREMENT, DataType::GUID, [RequestType::REST]],
+            [self::ORDER_BY_REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]]
         ];
     }
 
     /**
      * @dataProvider getArrayRequirementProvider
      */
-    public function testGetArrayRequirement($expectedValue, $dataType, $requestType): void
+    public function testGetArrayRequirement(string $expectedValue, string $dataType, array $requestType): void
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true);
         self::assertSame($expectedValue, $result);
     }
 
-    public function getArrayRequirementProvider()
+    public function getArrayRequirementProvider(): array
     {
         return [
             [
@@ -197,94 +212,94 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                Processor\NormalizeString::REQUIREMENT,
+                self::STRING_REQUIREMENT,
                 DataType::STRING,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getArrayRequirement(self::INTEGER_REQUIREMENT),
                 DataType::INTEGER,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getArrayRequirement(self::INTEGER_REQUIREMENT),
                 DataType::SMALLINT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeBigint::REQUIREMENT),
+                $this->getArrayRequirement(self::BIGINT_REQUIREMENT),
                 DataType::BIGINT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeUnsignedInteger::REQUIREMENT),
+                $this->getArrayRequirement(self::UNSIGNED_INTEGER_REQUIREMENT),
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getArrayRequirement(self::INTEGER_REQUIREMENT),
                 DataType::DURATION,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeBoolean::REQUIREMENT),
+                $this->getArrayRequirement(self::BOOLEAN_REQUIREMENT),
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                $this->getArrayRequirement(self::DECIMAL_REQUIREMENT),
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                $this->getArrayRequirement(self::DECIMAL_REQUIREMENT),
                 DataType::MONEY,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getArrayRequirement(self::NUMBER_REQUIREMENT),
                 DataType::FLOAT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getArrayRequirement(self::NUMBER_REQUIREMENT),
                 DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizePercent100::REQUIREMENT),
+                $this->getArrayRequirement(self::PERCENT100_REQUIREMENT),
                 DataType::PERCENT_100,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                $this->getArrayRequirement(self::DATETIME_REQUIREMENT),
                 DataType::DATETIME,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeDate::REQUIREMENT),
+                $this->getArrayRequirement(self::DATE_REQUIREMENT),
                 DataType::DATE,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\Rest\NormalizeTime::REQUIREMENT),
+                $this->getArrayRequirement(self::TIME_REQUIREMENT),
                 DataType::TIME,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeGuid::REQUIREMENT),
+                $this->getArrayRequirement(self::GUID_REQUIREMENT),
                 DataType::GUID,
                 [RequestType::REST]
             ],
             [
-                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                self::ORDER_BY_REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
             ]
         ];
     }
 
-    protected function getArrayRequirement($requirement)
+    private function getArrayRequirement(string $requirement): string
     {
         return sprintf('%1$s(,%1$s)*', $requirement);
     }
@@ -292,13 +307,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRangeRequirementProvider
      */
-    public function testGetRangeRequirement($expectedValue, $dataType, $requestType)
+    public function testGetRangeRequirement(string $expectedValue, string $dataType, array $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), false, true);
         self::assertSame($expectedValue, $result);
     }
 
-    public function getRangeRequirementProvider()
+    public function getRangeRequirementProvider(): array
     {
         return [
             [
@@ -307,94 +322,94 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                Processor\NormalizeString::REQUIREMENT,
+                self::STRING_REQUIREMENT,
                 DataType::STRING,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getRangeRequirement(self::INTEGER_REQUIREMENT),
                 DataType::INTEGER,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getRangeRequirement(self::INTEGER_REQUIREMENT),
                 DataType::SMALLINT,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeBigint::REQUIREMENT),
+                $this->getRangeRequirement(self::BIGINT_REQUIREMENT),
                 DataType::BIGINT,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeUnsignedInteger::REQUIREMENT),
+                $this->getRangeRequirement(self::UNSIGNED_INTEGER_REQUIREMENT),
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getRangeRequirement(self::INTEGER_REQUIREMENT),
                 DataType::DURATION,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeBoolean::REQUIREMENT),
+                $this->getRangeRequirement(self::BOOLEAN_REQUIREMENT),
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                $this->getRangeRequirement(self::DECIMAL_REQUIREMENT),
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                $this->getRangeRequirement(self::DECIMAL_REQUIREMENT),
                 DataType::MONEY,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getRangeRequirement(self::NUMBER_REQUIREMENT),
                 DataType::FLOAT,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getRangeRequirement(self::NUMBER_REQUIREMENT),
                 DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\NormalizePercent100::REQUIREMENT),
+                $this->getRangeRequirement(self::PERCENT100_REQUIREMENT),
                 DataType::PERCENT_100,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                $this->getRangeRequirement(self::DATETIME_REQUIREMENT),
                 DataType::DATETIME,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\Rest\NormalizeDate::REQUIREMENT),
+                $this->getRangeRequirement(self::DATE_REQUIREMENT),
                 DataType::DATE,
                 [RequestType::REST]
             ],
             [
-                $this->getRangeRequirement(Processor\Rest\NormalizeTime::REQUIREMENT),
+                $this->getRangeRequirement(self::TIME_REQUIREMENT),
                 DataType::TIME,
                 [RequestType::REST]
             ],
             [
-                Processor\NormalizeGuid::REQUIREMENT,
+                self::GUID_REQUIREMENT,
                 DataType::GUID,
                 [RequestType::REST]
             ],
             [
-                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                self::ORDER_BY_REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
             ]
         ];
     }
 
-    protected function getRangeRequirement($requirement)
+    private function getRangeRequirement(string $requirement): string
     {
         return sprintf('%1$s|%1$s..%1$s', $requirement);
     }
@@ -402,13 +417,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getArrayRangeRequirementProvider
      */
-    public function testGetArrayRangeRequirement($expectedValue, $dataType, $requestType)
+    public function testGetArrayRangeRequirement(string $expectedValue, string $dataType, array $requestType)
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true, true);
         self::assertSame($expectedValue, $result);
     }
 
-    public function getArrayRangeRequirementProvider()
+    public function getArrayRangeRequirementProvider(): array
     {
         return [
             [
@@ -417,94 +432,94 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
-                Processor\NormalizeString::REQUIREMENT,
+                self::STRING_REQUIREMENT,
                 DataType::STRING,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::INTEGER_REQUIREMENT),
                 DataType::INTEGER,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::INTEGER_REQUIREMENT),
                 DataType::SMALLINT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeBigint::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::BIGINT_REQUIREMENT),
                 DataType::BIGINT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeUnsignedInteger::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::UNSIGNED_INTEGER_REQUIREMENT),
                 DataType::UNSIGNED_INTEGER,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeInteger::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::INTEGER_REQUIREMENT),
                 DataType::DURATION,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeBoolean::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::BOOLEAN_REQUIREMENT),
                 DataType::BOOLEAN,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::DECIMAL_REQUIREMENT),
                 DataType::DECIMAL,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeDecimal::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::DECIMAL_REQUIREMENT),
                 DataType::MONEY,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::NUMBER_REQUIREMENT),
                 DataType::FLOAT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizeNumber::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::NUMBER_REQUIREMENT),
                 DataType::PERCENT,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\NormalizePercent100::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::PERCENT100_REQUIREMENT),
                 DataType::PERCENT_100,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\Rest\NormalizeDateTime::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::DATETIME_REQUIREMENT),
                 DataType::DATETIME,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\Rest\NormalizeDate::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::DATE_REQUIREMENT),
                 DataType::DATE,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRangeRequirement(Processor\Rest\NormalizeTime::REQUIREMENT),
+                $this->getArrayRangeRequirement(self::TIME_REQUIREMENT),
                 DataType::TIME,
                 [RequestType::REST]
             ],
             [
-                $this->getArrayRequirement(Processor\NormalizeGuid::REQUIREMENT),
+                $this->getArrayRequirement(self::GUID_REQUIREMENT),
                 DataType::GUID,
                 [RequestType::REST]
             ],
             [
-                Processor\Rest\NormalizeOrderBy::REQUIREMENT,
+                self::ORDER_BY_REQUIREMENT,
                 DataType::ORDER_BY,
                 [RequestType::REST]
             ]
         ];
     }
 
-    protected function getArrayRangeRequirement($requirement)
+    private function getArrayRangeRequirement(string $requirement): string
     {
         return sprintf('%1$s|%2$s..%2$s', $this->getArrayRequirement($requirement), $requirement);
     }
@@ -512,8 +527,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeValueProvider
      */
-    public function testNormalizeValue($expectedValue, $value, $dataType, $requestType, $isArrayAllowed = false)
-    {
+    public function testNormalizeValue(
+        mixed $expectedValue,
+        mixed $value,
+        string $dataType,
+        array $requestType,
+        bool $isArrayAllowed = false
+    ) {
         $result = $this->valueNormalizer->normalizeValue(
             $value,
             $dataType,
@@ -525,10 +545,8 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function normalizeValueProvider()
+    public function normalizeValueProvider(): array
     {
         return [
             ['test', 'test', 'unknownType', [RequestType::REST], true],
@@ -1045,10 +1063,8 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function normalizeRangeValueProvider()
+    public function normalizeRangeValueProvider(): array
     {
         return [
             [new Range('test1', 'test2'), new Range('test1', 'test2'), DataType::STRING],
@@ -1178,8 +1194,12 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeInvalidValueProvider
      */
-    public function testNormalizeInvalidValue($expectedExceptionMessage, $value, $dataType, $requestType)
-    {
+    public function testNormalizeInvalidValue(
+        string $expectedExceptionMessage,
+        string $value,
+        string $dataType,
+        array $requestType
+    ) {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true);
@@ -1187,10 +1207,8 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function normalizeInvalidValueProvider()
+    public function normalizeInvalidValueProvider(): array
     {
         return [
             [
@@ -1554,8 +1572,12 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeInvalidRangeValueProvider
      */
-    public function testNormalizeInvalidRangeValue($expectedExceptionMessage, $value, $dataType, $requestType)
-    {
+    public function testNormalizeInvalidRangeValue(
+        string $expectedExceptionMessage,
+        string $value,
+        string $dataType,
+        array $requestType
+    ) {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true, true);
@@ -1563,10 +1585,8 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @return array
      */
-    public function normalizeInvalidRangeValueProvider()
+    public function normalizeInvalidRangeValueProvider(): array
     {
         return [
             [
@@ -1872,20 +1892,12 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param ProcessorBagConfigBuilder $processorBagConfigBuilder
-     * @param string                    $processorId
-     * @param string|null               $dataType
-     * @param string|string[]|null      $requestType
-     *
-     * @return string
-     */
-    protected function addProcessor(
+    private function addProcessor(
         ProcessorBagConfigBuilder $processorBagConfigBuilder,
-        $processorId,
-        $dataType = null,
-        $requestType = null
-    ) {
+        string $processorId,
+        string $dataType = null,
+        string|array|null $requestType = null
+    ): string {
         $attributes = [];
         if (null !== $dataType) {
             $attributes['dataType'] = $dataType;
@@ -1898,12 +1910,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         return $processorId;
     }
 
-    /**
-     * @param mixed  $expected
-     * @param mixed  $actual
-     * @param string $message
-     */
-    private static function assertNormalizedValue($expected, $actual, $message = '')
+    private static function assertNormalizedValue(mixed $expected, mixed $actual, string $message = ''): void
     {
         if (is_object($expected)) {
             self::assertInstanceOf(get_class($expected), $actual, $message);

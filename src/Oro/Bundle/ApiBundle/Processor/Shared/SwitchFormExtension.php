@@ -6,20 +6,20 @@ use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
+/**
+ * The base class for processors that switch to form extensions.
+ */
 abstract class SwitchFormExtension
 {
-    const API_FORM_EXTENSION_ACTIVATED = 'apiFormExtensionActivated';
+    private const API_FORM_EXTENSION_ACTIVATED = 'apiFormExtensionActivated';
 
-    const PREVIOUS_METADATA_ACCESSOR  = 'previousMetadataAccessor';
-    const PREVIOUS_CONFIG_ACCESSOR    = 'previousConfigAccessor';
-    const PREVIOUS_ENTITY_MAPPER      = 'previousEntityMapper';
-    const PREVIOUS_INCLUDED_ENTITIES  = 'previousIncludedEntities';
+    private const PREVIOUS_METADATA_ACCESSOR = 'previousMetadataAccessor';
+    private const PREVIOUS_CONFIG_ACCESSOR = 'previousConfigAccessor';
+    private const PREVIOUS_ENTITY_MAPPER = 'previousEntityMapper';
+    private const PREVIOUS_INCLUDED_ENTITIES = 'previousIncludedEntities';
 
-    /** @var FormExtensionSwitcherInterface */
-    protected $formExtensionSwitcher;
-
-    /** @var MetadataTypeGuesser */
-    protected $metadataTypeGuesser;
+    protected FormExtensionSwitcherInterface $formExtensionSwitcher;
+    protected MetadataTypeGuesser $metadataTypeGuesser;
 
     public function __construct(
         FormExtensionSwitcherInterface $formExtensionSwitcher,

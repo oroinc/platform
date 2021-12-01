@@ -10,8 +10,8 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = 'FooBar';
-    const LOCALE = 'en_US';
+    private const CLASS_NAME = 'FooBar';
+    private const LOCALE = 'en_US';
 
     /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;

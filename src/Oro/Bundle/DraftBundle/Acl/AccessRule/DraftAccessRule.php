@@ -19,24 +19,16 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
  */
 class DraftAccessRule implements AccessRuleInterface
 {
-    /**
-     * @var AclConditionDataBuilderInterface
-     */
+    /** @var AclConditionDataBuilderInterface */
     private $builder;
 
-    /**
-     * @var DraftPermissionHelper
-     */
+    /** @var DraftPermissionHelper */
     private $draftPermissionHelper;
 
-    /**
-     * @var TokenAccessorInterface
-     */
+    /** @var TokenAccessorInterface */
     private $tokenAccessor;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $enabled = false;
 
     public function __construct(

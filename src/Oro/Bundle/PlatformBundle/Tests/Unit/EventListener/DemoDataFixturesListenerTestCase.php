@@ -9,12 +9,12 @@ use Oro\Component\Testing\Unit\EntityTrait;
 
 abstract class DemoDataFixturesListenerTestCase extends \PHPUnit\Framework\TestCase
 {
-    const LISTENERS = [
+    use EntityTrait;
+
+    protected const LISTENERS = [
         'test_listener_1',
         'test_listener_2',
     ];
-
-    use EntityTrait;
 
     /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $listenerManager;

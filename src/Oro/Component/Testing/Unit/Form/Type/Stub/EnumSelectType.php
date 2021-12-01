@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EnumSelectType extends EntityType
 {
-    const NAME = 'oro_enum_select';
+    private const NAME = 'oro_enum_select';
 
     public function __construct(array $choices)
     {

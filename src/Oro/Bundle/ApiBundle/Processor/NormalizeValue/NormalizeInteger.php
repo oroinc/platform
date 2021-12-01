@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
  */
 class NormalizeInteger extends AbstractProcessor
 {
-    const REQUIREMENT = '-?\d+';
+    private const REQUIREMENT = '-?\d+';
 
     /**
      * {@inheritdoc}

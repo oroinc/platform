@@ -17,15 +17,17 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
+    private const ENTITY_CLASS = 'Test\Entity';
+    private const REMOVE_ERROR_MESSAGE = 'error message';
 
-    const REMOVE_ERROR_MESSAGE = 'error message';
+    /** @var ConfigProviderMock */
+    private $extendConfigProvider;
 
-    private ConfigProviderMock $extendConfigProvider;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
 
-    private FieldNameValidationHelper $validationHelper;
-
-    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
+    /** @var FieldNameValidationHelper */
+    private $validationHelper;
 
     protected function setUp(): void
     {
@@ -93,13 +95,11 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with($validationEvent, ValidateBeforeRemoveFieldEvent::NAME)
-            ->willReturnCallback(
-                function (ValidateBeforeRemoveFieldEvent $event, $eventName) {
-                    $event->addValidationMessage(self::REMOVE_ERROR_MESSAGE);
+            ->willReturnCallback(function (ValidateBeforeRemoveFieldEvent $event) {
+                $event->addValidationMessage(self::REMOVE_ERROR_MESSAGE);
 
-                    return $event;
-                }
-            );
+                return $event;
+            });
 
         $result = $this->validationHelper->getRemoveFieldValidationErrors($fieldConfigModel);
 

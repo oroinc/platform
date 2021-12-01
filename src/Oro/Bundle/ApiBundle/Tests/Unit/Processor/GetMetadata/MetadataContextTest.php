@@ -19,10 +19,10 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
     public function testInitialize()
     {
-        self::assertTrue($this->context->has(MetadataContext::REQUEST_TYPE));
+        self::assertTrue($this->context->has('requestType'));
 
-        self::assertTrue($this->context->has(MetadataContext::EXTRA));
-        self::assertEquals([], $this->context->get(MetadataContext::EXTRA));
+        self::assertTrue($this->context->has('extra'));
+        self::assertEquals([], $this->context->get('extra'));
     }
 
     public function testClassName()
@@ -31,7 +31,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
-        self::assertEquals('test', $this->context->get(MetadataContext::CLASS_NAME));
+        self::assertEquals('test', $this->context->get('class'));
     }
 
     public function testTargetAction()
@@ -40,7 +40,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setTargetAction('test');
         self::assertEquals('test', $this->context->getTargetAction());
-        self::assertEquals('test', $this->context->get(MetadataContext::TARGET_ACTION));
+        self::assertEquals('test', $this->context->get('targetAction'));
     }
 
     public function testConfig()
@@ -79,7 +79,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($this->context));
 
         $this->context->setExtras([$extra]);
-        self::assertEquals(['test'], $this->context->get(MetadataContext::EXTRA));
+        self::assertEquals(['test'], $this->context->get('extra'));
     }
 
     public function testSetInvalidExtras()
@@ -98,6 +98,6 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setWithExcludedProperties(true);
         self::assertTrue($this->context->getWithExcludedProperties());
-        self::assertTrue($this->context->get(MetadataContext::WITH_EXCLUDED_PROPERTIES));
+        self::assertTrue($this->context->get('withExcludedProperties'));
     }
 }

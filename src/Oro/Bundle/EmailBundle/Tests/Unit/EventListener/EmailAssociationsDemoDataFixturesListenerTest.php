@@ -9,7 +9,7 @@ use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 
 class EmailAssociationsDemoDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    const LISTENERS = [
+    private const LISTENERS = [
         'test_listener_1',
         'test_listener_2',
     ];

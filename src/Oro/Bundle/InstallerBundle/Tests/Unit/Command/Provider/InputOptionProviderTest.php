@@ -11,27 +11,19 @@ use Symfony\Component\Console\Question\Question;
 
 class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const OPTION_NAME = 'option-name';
-    const MESSAGE = 'Question message';
+    private const OPTION_NAME = 'option-name';
+    private const MESSAGE = 'Question message';
 
-    /**
-     * @var QuestionHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var QuestionHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $questionHelper;
 
-    /**
-     * @var InputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $input;
 
-    /**
-     * @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $output;
 
-    /**
-     * @var InputOptionProvider
-     */
+    /** @var InputOptionProvider */
     private $inputOptionProvider;
 
     protected function setUp(): void

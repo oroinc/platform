@@ -9,30 +9,21 @@ use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 
 abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCase
 {
-    const LOCALE_EN = 'en';
-    const LOCALE_RU = 'ru';
-    const LOCALE_AR = 'ar';
-    const LOCALE_PT_BR = 'pt_BR';
+    protected const LOCALE_EN = 'en';
+    protected const LOCALE_RU = 'ru';
+    protected const LOCALE_AR = 'ar';
+    protected const LOCALE_PT_BR = 'pt_BR';
 
-    /**
-     * @var DateTimeFormatConverterInterface
-     */
+    /** @var DateTimeFormatConverterInterface */
     protected $converter;
 
-    /**
-     * @var LocaleSettings
-     */
+    /** @var LocaleSettings */
     protected $formatter;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
-    /**
-     * @var array
-     */
-    protected $localFormatMap = [
+    protected array $localFormatMap = [
         [null, null, self::LOCALE_EN, null, "MMM d, y h:mm a"],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, "MMMM d, y h:mm:ss a"],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMMM d, y"],

@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
-use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewUserRepository;
@@ -19,37 +18,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class GridViewManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const GRID_VIEW_CLASS_NAME = 'GridViewClassName';
-    const GRID_VIEW_USER_CLASS_NAME = 'GridViewUserClassName';
-
-    /** @var GridViewManager */
-    protected $gridViewManager;
+    private const GRID_VIEW_CLASS_NAME = 'GridViewClassName';
+    private const GRID_VIEW_USER_CLASS_NAME = 'GridViewUserClassName';
 
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $gridViewRepository;
+    private $gridViewRepository;
 
     /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $gridViewUserRepository;
+    private $gridViewUserRepository;
 
     /** @var User */
-    protected $user;
+    private $user;
 
     /** @var Manager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dataGridManager;
+    private $dataGridManager;
 
     /** @var RestrictionManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $restrictionManager;
+    private $restrictionManager;
 
-    /** @var GridViewApiEntityManager */
-    protected $gridViewApiEntityManager;
+    /** @var GridViewManager */
+    private $gridViewManager;
 
     protected function setUp(): void
     {
         $this->user = new User();
         $this->user->setUsername('username');
 
-        $aclHelper = $this->createMock(AclHelper::class);
-
+        $this->dataGridManager = $this->createMock(Manager::class);
+        $this->restrictionManager = $this->createMock(RestrictionManager::class);
         $this->gridViewRepository = $this->createMock(GridViewRepository::class);
         $this->gridViewUserRepository = $this->createMock(GridViewUserRepository::class);
 
@@ -66,12 +62,8 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getManagerForClass')
             ->willReturn($manager);
 
-        $this->dataGridManager = $this->createMock(Manager::class);
-
-        $this->restrictionManager = $this->createMock(RestrictionManager::class);
-
         $this->gridViewManager = new GridViewManager(
-            $aclHelper,
+            $this->createMock(AclHelper::class),
             $registry,
             $this->dataGridManager,
             $this->restrictionManager

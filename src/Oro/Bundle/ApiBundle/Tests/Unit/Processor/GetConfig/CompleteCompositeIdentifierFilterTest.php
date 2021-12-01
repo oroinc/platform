@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 
 class CompleteCompositeIdentifierFilterTest extends ConfigProcessorTestCase
 {
+    private const IDENTIFIER_FILTER_NAME = 'id';
+
     /** @var CompleteCompositeIdentifierFilter */
     private $processor;
 
@@ -33,7 +35,7 @@ class CompleteCompositeIdentifierFilterTest extends ConfigProcessorTestCase
         $definition = new EntityDefinitionConfig();
         $definition->setIdentifierFieldNames(['id1', 'id2']);
         $filters = new FiltersConfig();
-        $filter = $filters->addField(CompleteCompositeIdentifierFilter::IDENTIFIER_FILTER_NAME);
+        $filter = $filters->addField(self::IDENTIFIER_FILTER_NAME);
         $filter->setType('custom_filter');
 
         $this->context->setResult($definition);
@@ -42,7 +44,7 @@ class CompleteCompositeIdentifierFilterTest extends ConfigProcessorTestCase
 
         self::assertEquals(
             'custom_filter',
-            $filters->getField(CompleteCompositeIdentifierFilter::IDENTIFIER_FILTER_NAME)->getType()
+            $filters->getField(self::IDENTIFIER_FILTER_NAME)->getType()
         );
     }
 
@@ -56,7 +58,7 @@ class CompleteCompositeIdentifierFilterTest extends ConfigProcessorTestCase
         $this->context->setFilters($filters);
         $this->processor->process($this->context);
 
-        $filter = $filters->getField(CompleteCompositeIdentifierFilter::IDENTIFIER_FILTER_NAME);
+        $filter = $filters->getField(self::IDENTIFIER_FILTER_NAME);
         self::assertNotNull($filter);
         self::assertEquals('composite_identifier', $filter->getType());
         self::assertEquals(DataType::STRING, $filter->getDataType());

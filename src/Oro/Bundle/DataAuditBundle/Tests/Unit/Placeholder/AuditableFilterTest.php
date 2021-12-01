@@ -10,17 +10,11 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AuditableFilterTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_ENTITY_REFERENCE = LoggableClass::class;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
 
-    /**
-     * @var AuditableFilter
-     */
-    protected $filter;
-
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configProvider;
+    /** @var AuditableFilter */
+    private $filter;
 
     protected function setUp(): void
     {
@@ -73,7 +67,7 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
     {
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
-            ->with(self::TEST_ENTITY_REFERENCE)
+            ->with(LoggableClass::class)
             ->willReturn(false);
 
         $this->assertFalse($this->filter->isEntityAuditable(new LoggableClass(), false));
@@ -81,16 +75,16 @@ class AuditableFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testIsEntityAuditable()
     {
-        $config = new Config(new EntityConfigId('dataaudit', self::TEST_ENTITY_REFERENCE));
+        $config = new Config(new EntityConfigId('dataaudit', LoggableClass::class));
         $config->set('auditable', true);
 
         $this->configProvider->expects($this->once())
             ->method('hasConfig')
-            ->with(self::TEST_ENTITY_REFERENCE)
+            ->with(LoggableClass::class)
             ->willReturn(true);
         $this->configProvider->expects($this->once())
             ->method('getConfig')
-            ->with(self::TEST_ENTITY_REFERENCE)
+            ->with(LoggableClass::class)
             ->willReturn($config);
 
         $this->assertTrue(
