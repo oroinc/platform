@@ -18,6 +18,9 @@ use Oro\Component\ChainProcessor\ParameterBag;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
+    private const INCLUDE_ID_META = 'includeId';
+    private const INCLUDE_ID_PROPERTY = '__include_id__';
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
     private $processorBag;
 
@@ -120,15 +123,15 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(
-            array_merge($getResult, [LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            array_merge($getResult, [self::INCLUDE_ID_PROPERTY => $includedEntityId]),
             $includedEntityData->getNormalizedData()
         );
         $metadata = $includedEntityData->getMetadata();
         self::assertSame($getMetadata, $metadata);
-        self::assertTrue($metadata->hasMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY));
+        self::assertTrue($metadata->hasMetaProperty(self::INCLUDE_ID_PROPERTY));
         self::assertEquals(
-            LoadNormalizedIncludedEntities::INCLUDE_ID_META,
-            $metadata->getMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY)->getResultName()
+            self::INCLUDE_ID_META,
+            $metadata->getMetaProperty(self::INCLUDE_ID_PROPERTY)->getResultName()
         );
     }
 
@@ -200,15 +203,15 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(
-            array_merge($getResult, [LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY => $includedEntityId]),
+            array_merge($getResult, [self::INCLUDE_ID_PROPERTY => $includedEntityId]),
             $includedEntityData->getNormalizedData()
         );
         $metadata = $includedEntityData->getMetadata();
         self::assertSame($getMetadata, $metadata);
-        self::assertTrue($metadata->hasMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY));
+        self::assertTrue($metadata->hasMetaProperty(self::INCLUDE_ID_PROPERTY));
         self::assertEquals(
-            LoadNormalizedIncludedEntities::INCLUDE_ID_META,
-            $metadata->getMetaProperty(LoadNormalizedIncludedEntities::INCLUDE_ID_PROPERTY)->getResultName()
+            self::INCLUDE_ID_META,
+            $metadata->getMetaProperty(self::INCLUDE_ID_PROPERTY)->getResultName()
         );
     }
 

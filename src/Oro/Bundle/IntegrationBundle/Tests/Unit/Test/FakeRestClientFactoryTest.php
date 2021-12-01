@@ -11,7 +11,7 @@ use Oro\Bundle\IntegrationBundle\Test\FakeRestClientFactory;
  */
 class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    const FAKE_BASE_URL = 'http://localhost';
+    private const FAKE_BASE_URL = 'http://localhost';
 
     /** @var string */
     private $fixtureFileName;
@@ -19,9 +19,6 @@ class FakeRestClientFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var FakeRestClientFactory */
     private $factory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->factory = new FakeRestClientFactory();

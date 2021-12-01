@@ -6,8 +6,6 @@ use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterfa
 
 class IntegrationTypeWithoutIcon implements IntegrationInterface
 {
-    const TYPE = 'type2';
-
     /**
      * {@inheritdoc}
      */

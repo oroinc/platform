@@ -39,7 +39,7 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->process($context);
 
-        self::assertEquals(NormalizeEntityClass::REQUIREMENT, $context->getRequirement());
+        self::assertEquals('[a-zA-Z]\w+', $context->getRequirement());
         self::assertEquals('Test\Class', $context->getResult());
     }
 
@@ -67,7 +67,7 @@ class NormalizeEntityClassTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals(
-            $this->getArrayRequirement(NormalizeEntityClass::REQUIREMENT),
+            $this->getArrayRequirement('[a-zA-Z]\w+'),
             $context->getRequirement()
         );
         self::assertEquals(['Test\Class1', 'Test\Class2'], $context->getResult());

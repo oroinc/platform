@@ -14,7 +14,7 @@ class ResettableExtensionWrapperTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
 
-    const EXTENSION_SERVICE_ID = 'service_id';
+    private const EXTENSION_SERVICE_ID = 'service_id';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;

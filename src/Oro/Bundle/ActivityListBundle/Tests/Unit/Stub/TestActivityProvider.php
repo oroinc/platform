@@ -12,7 +12,7 @@ class TestActivityProvider implements
     CommentProviderInterface,
     ActivityListUpdatedByProviderInterface
 {
-    const SUPPORTED_TARGET_CLASS_NAME = 'Acme\DemoBundle\Entity\CorrectEntity';
+    public const SUPPORTED_TARGET_CLASS_NAME = 'Acme\DemoBundle\Entity\CorrectEntity';
 
     /** @var object[] */
     private $targets;

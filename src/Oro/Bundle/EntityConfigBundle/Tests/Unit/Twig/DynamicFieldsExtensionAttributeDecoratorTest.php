@@ -15,7 +15,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
     use TwigExtensionTestCaseTrait;
     use EntityTrait;
 
-    const ENTITY_CLASS_NAME = 'entity_class';
+    private const ENTITY_CLASS_NAME = 'entity_class';
 
     /** @var AbstractDynamicFieldsExtension|\PHPUnit\Framework\MockObject\MockObject */
     private $baseExtension;
@@ -61,10 +61,7 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getFieldsDataProvider()
+    public function getFieldsDataProvider(): array
     {
         return [
             'no attributes' => [
@@ -132,16 +129,10 @@ class DynamicFieldsExtensionAttributeDecoratorTest extends \PHPUnit\Framework\Te
 
     /**
      * @dataProvider getFieldsDataProvider
-     *
-     * @param array $fields
-     * @param string $entityClass
-     * @param array $attributeHelperWiths
-     * @param array $attributeHelperReturns
-     * @param array $expectedFields
      */
     public function testGetFields(
         array $fields,
-        $entityClass,
+        ?string $entityClass,
         array $attributeHelperWiths,
         array $attributeHelperReturns,
         array $expectedFields

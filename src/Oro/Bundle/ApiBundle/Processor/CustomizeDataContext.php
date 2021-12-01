@@ -11,13 +11,13 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
 abstract class CustomizeDataContext extends ApiContext implements SharedDataAwareContextInterface
 {
     /** FQCN of a root entity */
-    const ROOT_CLASS_NAME = 'rootClass';
+    private const ROOT_CLASS_NAME = 'rootClass';
 
     /** a path from a root entity to a customizing entity */
-    const PROPERTY_PATH = 'propertyPath';
+    private const PROPERTY_PATH = 'propertyPath';
 
     /** FQCN of a customizing entity */
-    const CLASS_NAME = 'class';
+    private const CLASS_NAME = 'class';
 
     /** @var EntityDefinitionConfig|null */
     private $rootConfig;

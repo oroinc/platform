@@ -2,42 +2,36 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager;
 use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
-use Oro\Bundle\DataGridBundle\Extension\Board\RestrictionManager;
-use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\View;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\DataGridBundle\Extension\GridViews\ViewInterface;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
 {
-    const CLASS_NAME = GridView::class;
+    private const CLASS_NAME = GridView::class;
 
     /** @var GridViewManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $gridViewManager;
+    private $gridViewManager;
 
     /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $om;
+    private $om;
 
     /** @var GridViewApiEntityManager */
-    protected $gridViewApiEntityManager;
+    private $gridViewApiEntityManager;
 
     protected function setUp(): void
     {
         $this->om = $this->createMock(ObjectManager::class);
+        $this->gridViewManager = $this->createMock(GridViewManager::class);
 
-        $metadata = new ClassMetadata(self::CLASS_NAME);
         $this->om->expects($this->once())
             ->method('getClassMetadata')
-            ->willReturn($metadata);
-
-        $this->gridViewManager = $this->createMock(GridViewManager::class);
+            ->willReturn(new ClassMetadata(self::CLASS_NAME));
 
         $this->gridViewApiEntityManager = new GridViewApiEntityManager(
             self::CLASS_NAME,
@@ -46,33 +40,32 @@ class GridViewApiEntityManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetViewSystemAll()
+    public function testSetDefaultGridView()
     {
-        $repo = $this->createMock(EntityRepository::class);
+        $user = $this->createMock(AbstractUser::class);
+        $gridView = $this->createMock(ViewInterface::class);
 
-        $registry = $this->createMock(Registry::class);
+        $this->gridViewManager->expects(self::once())
+            ->method('setDefaultGridView')
+            ->with(self::identicalTo($user), self::identicalTo($gridView));
 
-        $registry->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repo);
+        $this->om->expects(self::once())
+            ->method('flush');
 
-        $dataGridManager = $this->createMock(Manager::class);
+        $this->gridViewApiEntityManager->setDefaultGridView($user, $gridView);
+    }
+    public function testGetView()
+    {
+        $id = 'test_view';
+        $default = 0;
+        $gridName = 'test_grid';
+        $view = $this->createMock(View::class);
 
-        $aclHelper = $this->createMock(AclHelper::class);
+        $this->gridViewManager->expects(self::once())
+            ->method('getView')
+            ->with($id, $default, $gridName)
+            ->willReturn($view);
 
-        $restrictionManager = $this->createMock(RestrictionManager::class);
-
-        $gridViewManager = new GridViewManager(
-            $aclHelper,
-            $registry,
-            $dataGridManager,
-            $restrictionManager
-        );
-
-        $systemAllView = new View(GridViewsExtension::DEFAULT_VIEW_ID);
-        $systemAllView->setGridName('Test');
-        $view = $gridViewManager->getView('Test', 0, 'Test');
-
-        $this->assertEquals($view, $systemAllView);
+        $this->assertSame($view, $this->gridViewApiEntityManager->getView($id, $default, $gridName));
     }
 }

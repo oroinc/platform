@@ -17,18 +17,14 @@ use Symfony\Component\HttpFoundation\Request;
 
 class MassActionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    const MASS_ACTION_NAME = 'massActionName';
-    const HANDLER_SERVICE_ID = 'handlerServiceId';
+    private const MASS_ACTION_NAME = 'massActionName';
+    private const HANDLER_SERVICE_ID = 'handlerServiceId';
 
-    /**
-     * @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var MassActionHelper
-     */
-    protected $massActionHelper;
+    /** @var MassActionHelper */
+    private $massActionHelper;
 
     protected function setUp(): void
     {
@@ -180,11 +176,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($acceptor);
     }
 
-    /**
-     * @param ActionConfiguration $actionConfiguration
-     * @return MassActionInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function creatMassAction(ActionConfiguration $actionConfiguration)
+    private function creatMassAction(ActionConfiguration $actionConfiguration): MassActionInterface
     {
         $massAction = $this->createMock(MassActionInterface::class);
         $massAction->expects($this->any())

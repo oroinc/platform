@@ -16,24 +16,24 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class EmailQueryFactoryTest extends OrmTestCase
 {
-    const JOIN_ALIAS              = 'a';
-    const TEST_ENTITY             = User::class;
-    const TEST_NAME_DQL_FORMATTED = 'CONCAT(a.firstName, CONCAT(a.lastName, \'\'))';
+    private const JOIN_ALIAS = 'a';
+    private const TEST_ENTITY = User::class;
+    private const TEST_NAME_DQL_FORMATTED = 'CONCAT(a.firstName, CONCAT(a.lastName, \'\'))';
 
     /** @var EmailOwnerProviderStorage */
     private $providerStorage;
 
-    /** @var EntityNameResolver */
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $entityNameResolver;
+
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
+
+    /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $mailboxManager;
 
     /** @var EmailQueryFactory */
     private $factory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var MailboxManager */
-    private $mailboxManager;
 
     protected function setUp(): void
     {
@@ -89,7 +89,6 @@ class EmailQueryFactoryTest extends OrmTestCase
 
         $this->factory->addFromEmailAddress($qb);
 
-        // @codingStandardsIgnoreStart
         $this->assertEquals(
             'SELECT e,'
             . ' (CASE'
@@ -103,7 +102,6 @@ class EmailQueryFactoryTest extends OrmTestCase
             . ' FROM OroEmailBundle:Email e LEFT JOIN e.fromEmailAddress a LEFT JOIN a.owner1 owner1',
             $qb->getDQL()
         );
-        // @codingStandardsIgnoreEnd
     }
 
     public function testFilterQueryByUserIdWhenMailboxesAreFound()
@@ -130,11 +128,11 @@ class EmailQueryFactoryTest extends OrmTestCase
         $qb->select('eu')
             ->from('EmailUser', 'eu');
 
-        $this->factory->applyAcl($qb, 1);
+        $this->factory->applyAcl($qb);
 
         $this->assertEquals(
-            "SELECT eu FROM EmailUser eu" .
-            " WHERE (eu.owner = :owner AND eu.organization  = :organization) OR eu.mailboxOwner IN(:mailboxIds)",
+            'SELECT eu FROM EmailUser eu'
+            . ' WHERE (eu.owner = :owner AND eu.organization  = :organization) OR eu.mailboxOwner IN(:mailboxIds)',
             $qb->getQuery()->getDQL()
         );
     }
@@ -163,11 +161,11 @@ class EmailQueryFactoryTest extends OrmTestCase
         $qb->select('eu')
             ->from('EmailUser', 'eu');
 
-        $this->factory->applyAcl($qb, 1);
+        $this->factory->applyAcl($qb);
 
         $this->assertEquals(
-            "SELECT eu FROM EmailUser eu" .
-            " WHERE (eu.owner = :owner AND eu.organization  = :organization) OR eu.mailboxOwner IN(:mailboxIds)",
+            'SELECT eu FROM EmailUser eu'
+            . ' WHERE (eu.owner = :owner AND eu.organization  = :organization) OR eu.mailboxOwner IN(:mailboxIds)',
             $qb->getQuery()->getDQL()
         );
     }

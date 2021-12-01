@@ -179,7 +179,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setResponseStatusCode(500);
         self::assertEquals(500, $this->context->getResponseStatusCode());
-        self::assertEquals(500, $this->context->get(Context::RESPONSE_STATUS_CODE));
+        self::assertEquals(500, $this->context->get('responseStatusCode'));
     }
 
     public function testIsSuccessResponse()
@@ -215,7 +215,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
-        self::assertEquals('test', $this->context->get(Context::CLASS_NAME));
+        self::assertEquals('test', $this->context->get('class'));
     }
 
     public function testGetConfigSections()

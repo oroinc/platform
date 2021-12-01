@@ -12,18 +12,18 @@ use Symfony\Component\Translation\Translator;
 
 class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    private const FORM_DATA = ['field' => 'value'];
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
     private $form;
 
     /** @var Request */
     private $request;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var EmailTemplateHandler */
@@ -76,7 +76,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->entity));
     }
 
-    public function supportedMethods()
+    public function supportedMethods(): array
     {
         return [
             ['POST'],

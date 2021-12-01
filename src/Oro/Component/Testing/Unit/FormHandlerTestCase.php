@@ -12,31 +12,21 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class FormHandlerTestCase extends \PHPUnit\Framework\TestCase
 {
-    const FORM_DATA = ['field' => 'value'];
+    protected const FORM_DATA = ['field' => 'value'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|FormInterface
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface */
     protected $form;
 
-    /**
-     * @var Request
-     */
+    /** @var Request */
     protected $request;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager
-     */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager */
     protected $manager;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     protected $handler;
 
-    /**
-     * @var object
-     */
+    /** @var object */
     protected $entity;
 
     protected function setUp(): void

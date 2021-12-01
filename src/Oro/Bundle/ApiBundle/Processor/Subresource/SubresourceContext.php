@@ -28,19 +28,19 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 class SubresourceContext extends Context
 {
     /** FQCN of the parent entity */
-    const PARENT_CLASS_NAME = 'parentClass';
+    private const PARENT_CLASS_NAME = 'parentClass';
 
     /** the association name the sub-resource represents */
-    const ASSOCIATION = 'association';
+    private const ASSOCIATION = 'association';
 
     /** a flag indicates if an association represents "to-many" or "to-one" relationship */
-    const COLLECTION = 'collection';
+    private const COLLECTION = 'collection';
 
     /** a configuration of the parent entity */
-    const PARENT_CONFIG = 'parentConfig';
+    private const PARENT_CONFIG = 'parentConfig';
 
     /** metadata of the parent entity */
-    const PARENT_METADATA = 'parentMetadata';
+    private const PARENT_METADATA = 'parentMetadata';
 
     /** @var mixed */
     private $parentId;

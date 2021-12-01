@@ -11,7 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CompleteCompositeIdentifierFilter implements ProcessorInterface
 {
-    const IDENTIFIER_FILTER_NAME = 'id';
+    private const IDENTIFIER_FILTER_NAME = 'id';
 
     /**
      * {@inheritdoc}

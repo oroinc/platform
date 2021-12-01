@@ -8,27 +8,17 @@ use Twig\Environment;
 
 class ChartViewTest extends \PHPUnit\Framework\TestCase
 {
-    const TEMPLATE = 'template.twig.html';
+    private const TEMPLATE = 'template.twig.html';
+    private const TEST_VARS = ['foo' => 'bar'];
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|Environment
-     */
-    protected $twig;
+    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
+    private $twig;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DataInterface
-     */
-    protected $data;
+    /** @var DataInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $data;
 
-    /**
-     * @var array
-     */
-    protected $testVars = ['foo' => 'bar'];
-
-    /**
-     * @var ChartView
-     */
-    protected $chartView;
+    /** @var ChartView */
+    private $chartView;
 
     protected function setUp(): void
     {
@@ -38,7 +28,7 @@ class ChartViewTest extends \PHPUnit\Framework\TestCase
             $this->twig,
             self::TEMPLATE,
             $this->data,
-            $this->testVars
+            self::TEST_VARS
         );
     }
 
@@ -46,7 +36,7 @@ class ChartViewTest extends \PHPUnit\Framework\TestCase
     {
         $rawData = ['bar' => 'baz <HELLO>', 'test' => 'string', 'value' => 10.0];
         $expectedArrayData = ['bar' => htmlentities('baz <HELLO>'), 'test' => 'string', 'value' => 10.0];
-        $expectedContext = array_merge($this->testVars, ['data' => $expectedArrayData]);
+        $expectedContext = array_merge(self::TEST_VARS, ['data' => $expectedArrayData]);
         $expectedRenderResult = 'Rendered template';
 
         $this->data->expects($this->once())

@@ -6,11 +6,8 @@ use Oro\Bundle\NavigationBundle\Annotation\TitleTemplate;
 
 class TitleTemplateTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_VALUE = 'test annotation value';
+    private const TEST_VALUE = 'test annotation value';
 
-    /**
-     * Test good annotation
-     */
     public function testGoodAnnotation()
     {
         $annotation = new TitleTemplate(['value' => self::TEST_VALUE]);

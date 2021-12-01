@@ -19,18 +19,14 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
  */
 abstract class AddressFormExtensionTestCase extends FormIntegrationTestCase
 {
-    const COUNTRY_WITHOUT_REGION = 'US';
-    const COUNTRY_WITH_REGION = 'RO';
-    const REGION_WITH_COUNTRY = 'RO-MS';
+    protected const COUNTRY_WITHOUT_REGION = 'US';
+    protected const COUNTRY_WITH_REGION = 'RO';
+    protected const REGION_WITH_COUNTRY = 'RO-MS';
 
-    /**
-     * @var Country
-     */
+    /** @var Country */
     private $validCountry;
 
-    /**
-     * @var Country
-     */
+    /** @var Country */
     private $noRegionsCountry;
 
     /**

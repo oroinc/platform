@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 
 class ClassMethodNameCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
+    private const TEST_CLASS_NAME = TestEntity::class;
 
     /** @var ClassMethodNameChecker */
-    protected $checker;
+    private $checker;
 
     protected function setUp(): void
     {
@@ -24,10 +25,7 @@ class ClassMethodNameCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($result, $this->checker->getMethods($property, self::TEST_CLASS_NAME, $prefixes));
     }
 
-    /**
-     * @return array
-     */
-    public function getMethodsDataProvider()
+    public function getMethodsDataProvider(): array
     {
         return [
             'two methods' => ['name', ClassMethodNameChecker::$setters, ['setName']],

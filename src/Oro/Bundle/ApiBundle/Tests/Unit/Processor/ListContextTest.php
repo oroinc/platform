@@ -33,6 +33,6 @@ class ListContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setTotalCountCallback($totalCountCallback);
         self::assertEquals($totalCountCallback, $this->context->getTotalCountCallback());
-        self::assertEquals($totalCountCallback, $this->context->get(ListContext::TOTAL_COUNT_CALLBACK));
+        self::assertEquals($totalCountCallback, $this->context->get('totalCountCallback'));
     }
 }

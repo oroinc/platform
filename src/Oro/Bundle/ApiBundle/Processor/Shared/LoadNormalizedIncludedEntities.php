@@ -19,11 +19,10 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadNormalizedIncludedEntities implements ProcessorInterface
 {
-    const INCLUDE_ID_META     = 'includeId';
-    const INCLUDE_ID_PROPERTY = '__include_id__';
+    private const INCLUDE_ID_META = 'includeId';
+    private const INCLUDE_ID_PROPERTY = '__include_id__';
 
-    /** @var ActionProcessorBagInterface */
-    protected $processorBag;
+    private ActionProcessorBagInterface $processorBag;
 
     public function __construct(ActionProcessorBagInterface $processorBag)
     {

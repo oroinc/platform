@@ -7,15 +7,13 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class PriceTest extends \PHPUnit\Framework\TestCase
 {
-    const VALUE = 100;
-    const CURRENCY = 'USD';
+    private const VALUE = 100;
+    private const CURRENCY = 'USD';
 
     /**
      * @dataProvider propertiesDataProvider
-     * @param string $property
-     * @param mixed  $value
      */
-    public function testSettersAndGetters($property, $value)
+    public function testSettersAndGetters(string $property, mixed $value)
     {
         $obj = new Price();
 

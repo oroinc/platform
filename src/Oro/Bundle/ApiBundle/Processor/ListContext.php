@@ -9,7 +9,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 class ListContext extends Context
 {
     /** a callback that can be used to calculate the total number of records in a list of entities */
-    const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
+    private const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
 
     /**
      * Gets a callback that can be used to calculate the total number of records in a list of entities

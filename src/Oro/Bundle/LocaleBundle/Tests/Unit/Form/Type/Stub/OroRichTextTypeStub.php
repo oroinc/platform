@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroRichTextTypeStub extends AbstractType
 {
-    const NAME = OroRichTextType::NAME;
+    private const NAME = OroRichTextType::NAME;
 
     /**
      * {@inheritdoc}

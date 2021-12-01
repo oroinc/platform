@@ -12,14 +12,11 @@ use Oro\Bundle\IntegrationBundle\Test\FakeRestResponse as Response;
  */
 class FakeRestClientTest extends \PHPUnit\Framework\TestCase
 {
-    const FAKE_RESOURCE = '/foo';
+    private const FAKE_RESOURCE = '/foo';
 
     /** @var FakeRestClient */
     protected $client;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->client = new FakeRestClient();
@@ -63,7 +60,7 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
     {
         $this->client->setDefaultResponse(new Response(200, [], '[]'));
 
-        $this->assertTrue(is_array($this->client->getJSON(self::FAKE_RESOURCE)));
+        $this->assertIsArray($this->client->getJSON(self::FAKE_RESOURCE));
     }
 
     public function testSetResponseList()
@@ -79,13 +76,12 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Asserts that client returned valid RestResponse with expected status code
-     *
-     * @param int $expectedStatusCode expected status code
-     * @param mixed $restResponse actual response from client
-     * @param string $errorMessage message which will be shown in case of failed assertion
      */
-    private function assertCorrectRestResponse($expectedStatusCode, $restResponse, $errorMessage = '')
-    {
+    private function assertCorrectRestResponse(
+        int $expectedStatusCode,
+        mixed $restResponse,
+        string $errorMessage = ''
+    ): void {
         $this->assertInstanceOf(RestResponseInterface::class, $restResponse, $errorMessage);
         /** @var RestResponseInterface $restResponse */
         $this->assertEquals($expectedStatusCode, $restResponse->getStatusCode(), $errorMessage);
