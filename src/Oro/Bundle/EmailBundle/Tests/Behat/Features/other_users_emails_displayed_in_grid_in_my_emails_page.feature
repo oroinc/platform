@@ -1,5 +1,5 @@
 @ticket-BAP-13987
-@fixture-OroEmailBundle:OtherUser`sEmailsDisplayedInGridInMy EmailsPage.yml
+@fixture-OroEmailBundle:OtherUser`sEmailsDisplayedInGridInMyEmailsPage.yml
 
 Feature: Other users emails displayed in grid in My Emails page
   In order to check ACL for the emails for Sales Rep role
