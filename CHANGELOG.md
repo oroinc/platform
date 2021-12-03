@@ -1,3 +1,6 @@
+The upgrade instructions are available at [Oro documentation website](https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/).
+
+The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
 ## 5.0.0-rc
 
@@ -32,6 +35,10 @@
 * Added `Oro\Bundle\ImapBundle\EventListener\SetUserEmailOriginTransportListener` for adding `X-Transport` and 
   `X-User-Email-Origin-Id` headers to email message required to use `oro://user-email-origin` mailer transport.
 
+#### LayoutBundle
+
+* Provided way to create separate JS builds only with essential modules for landing pages, see article [How to Create Extra JS Build for a Landing Page](https://doc.oroinc.com/master/frontend/storefront/how-to/how-to-create-extra-js-build-for-landing-page/).
+
 #### LoggerBundle
 * Added `Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper` monolog handler wrapper to prevent error log
   notification from being sent when there are no recipients configured.
@@ -44,14 +51,42 @@
   for sending templated email notification messages in a message queue.
 * Added `Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer` for sending mass notification email messages.
 
+#### MessageQueue component
+* Added `Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension` for message routing
+  instead of `Oro\Component\MessageQueue\Client\DelegateMessageProcessor`.
+* Added `Oro\Component\MessageQueue\Client\NoopMessageProcessor` for messages which are not claimed by any message
+  processor.
+* Added `Oro\Component\MessageQueue\Client\Router\MessageRouter` and `Oro\Component\MessageQueue\Client\Router\Envelope`
+  for handling messages routing into queues in `Oro\Component\MessageQueue\Client\MessageProducer`.
+* Added `Oro\Component\MessageQueue\Client\MessageProcessorRegistry` service locator.
+* Added `Oro\Component\MessageQueue\Consumption::getMessageProcessorName()`,
+  `Oro\Component\MessageQueue\Consumption::setMessageProcessorName()`.
+* Added `Oro\Component\MessageQueue\Log\ConsumerState`::getMessageProcessorName(),
+  `Oro\Component\MessageQueue\Log\ConsumerState`::setMessageProcessorName().
+* Added `Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider`.
+* Added `\Oro\Component\MessageQueue\Log\MessageProcessorClassProvider::getMessageProcessorClassByName()` for getting
+  message processor class name by processor name.
+
+#### MessageQueueBundle
+* Added `client.noop_status` used for messages not claimed by any message processor.
+
 ### Changed
+
+#### TranslationBundle
+* Changed translation cache generation logic. Now all translation strings that contain HTML tags are sanitized by the HTMLPurifier before caching.
+  To get the list of translation messages that were sanitized run oro:translation:rebuild-cache with --show-sanitization-errors option.
 
 ### EmailBundle
 * EmailBundle uses Symfony Mailer instead of SwiftMailer from now on.
 * Changed mailer configuration: `mailer_dsn` parameter is used instead of `mailer_transport`, `mailer_host`, `mailer_port`,
   `mailer_encryption`, `mailer_user`, `mailer_password`.
 
+#### MessageQueue component
+* Argument `processor-service` of `Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand` is optional now.
+
 ### Removed
+
+* `installed` container parameter was removed from all application distributions. You can get the installation state by calling the `isInstalled` method of the `Oro\Bundle\DistributionBundle\Handler\ApplicationState` service.
 
 #### EmailBundle
 * Removed `Oro\Bundle\EmailBundle\Async\TemplateEmailMessageSender`.
@@ -77,6 +112,43 @@
 * Removed `Oro\Bundle\NotificationBundle\Mailer\MassEmailDirectMailer`. Use `Oro\Bundle\NotificationBundle\Mailer\MassNotificationsMailer` instead.
 * Removed unused `\Oro\Bundle\NotificationBundle\Entity\SpoolItem` entity, `\Oro\Bundle\NotificationBundle\Entity\Repository\SpoolItemRepository`.
 * Removed unused `Oro\Bundle\NotificationBundle\Provider\Mailer\DbSpool`. 
+
+#### MessageQueue component
+* Removed unused `Oro\Component\MessageQueue\Router`, `Oro\Component\MessageQueue\Router\RouteRecipientListProcessor`,
+  `Oro\Component\MessageQueue\Router\Recipient`.
+* Removed unused `Oro\Component\MessageQueue\Client\Config::getRouterMessageProcessorName()`,
+  `Oro\Component\MessageQueue\Client\Config::getRouterQueueName()`.
+* Removed `Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry`, use instead
+  `Oro\Component\MessageQueue\Client\MessageProcessorRegistry` service locator.
+* Removed `Oro\Component\MessageQueue\Client\DelegateMessageProcessor`, the extension
+  `Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension` is responsible for routing to
+  message processor now.
+* Removed `Oro\Component\MessageQueue\Consumption::getMessageProcessor()` and
+  `Oro\Component\MessageQueue\Consumption::setMessageProcessor()`, use instead
+  `Oro\Component\MessageQueue\Consumption::getMessageProcessorName()`,
+  `Oro\Component\MessageQueue\Consumption::setMessageProcessorName()`.
+* Removed `Oro\Component\MessageQueue\Log\ConsumerState`::getMessageProcessor() and
+  `Oro\Component\MessageQueue\Log\ConsumerState`::setMessageProcessor(), use instead
+  `Oro\Component\MessageQueue\Log\ConsumerState`::getMessageProcessorName(),
+  `Oro\Component\MessageQueue\Log\ConsumerState`::setMessageProcessorName() .
+* Removed `Oro\Component\MessageQueue\Client\Meta\TopicMeta::getDescription()`, use
+  `Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider::getTopicDescription()` instead.
+* Removed `\Oro\Component\MessageQueue\Log\MessageProcessorClassProvider::getMessageProcessorClass()`, use
+  `\Oro\Component\MessageQueue\Log\MessageProcessorClassProvider::getMessageProcessorClassByName()` instead.
+
+#### MessageQueueBundle
+* Removed unused `client.router_processor`, `client.router_destination` configuration options.
+* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass`
+* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass` and
+  `oro_message_queue.processor_locator`, use instead
+  `Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry`.
+* Removed `processorName` attribute from `oro_message_queue.client.message_processor` tag, use service id instead.
+* Removed ability to specify `processorName` in `Oro\Component\MessageQueue\Client\TopicSubscriberInterface::getSubscribedTopics()`,
+  use service id instead.
+* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass`, use
+  `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass` for specifying topic
+  descriptions. `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaRegistryPass` is used to
+  collect topic metadata into `Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry` now.
 
 #### UIBundle
 
@@ -104,17 +176,8 @@ Third party dependencies such as [Font Awesome](https://fontawesome.com/v4.7/) a
       + bootstrap-alert$: '@oroinc/bootstrap/js/dist/alert'
       ```
 
-The upgrade instructions are available at [Oro documentation website](https://doc.oroinc.com/master/backend/setup/upgrade-to-new-version/).
-
-The current file describes significant changes in the code that may affect the upgrade of your customizations.
-
-### Removed
-
-#### UIBundle
-
-Third party dependence [lightGallery](https://www.lightgalleryjs.com/) has removed.
-
-## 5.0.0
+## 5.0.0-beta.1 (2021-07-30)
+[Show detailed list of changes](incompatibilities-5-0-beta-1.md)
 
 ### Added
 
@@ -130,30 +193,8 @@ Third party dependence [lightGallery](https://www.lightgalleryjs.com/) has remov
 #### AssetsBundle
 * New assets versions strategy `Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy` was added. It uses the `public/build/build_version.txt` application file's content as an assets version.
 
-#### MessageQueue component
-* Added `Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension` for message routing 
-  instead of `Oro\Component\MessageQueue\Client\DelegateMessageProcessor`.
-* Added `Oro\Component\MessageQueue\Client\NoopMessageProcessor` for messages which are not claimed by any message 
-  processor.
-* Added `Oro\Component\MessageQueue\Client\Router\MessageRouter` and `Oro\Component\MessageQueue\Client\Router\Envelope`
-  for handling messages routing into queues in `Oro\Component\MessageQueue\Client\MessageProducer`.
-* Added `Oro\Component\MessageQueue\Client\MessageProcessorRegistry` service locator.
-* Added `Oro\Component\MessageQueue\Consumption::getMessageProcessorName()`,
-  `Oro\Component\MessageQueue\Consumption::setMessageProcessorName()`.
-* Added `Oro\Component\MessageQueue\Log\ConsumerState`::getMessageProcessorName(),
-  `Oro\Component\MessageQueue\Log\ConsumerState`::setMessageProcessorName().
-* Added `Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider`.
-* Added `\Oro\Component\MessageQueue\Log\MessageProcessorClassProvider::getMessageProcessorClassByName()` for getting
-  message processor class name by processor name.
-
-#### MessageQueueBundle
-* Added `client.noop_status` used for messages not claimed by any message processor.
-
 ### Changed
 * All application distributions' `config.xml` files were changed to point `Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy` assets version strategy to be used.
-
-#### MessageQueue component
-* Argument `processor-service` of `Oro\Component\MessageQueue\Consumption\ConsumeMessagesCommand` is optional now.
 
 #### EntityBundle
 
@@ -162,51 +203,9 @@ Third party dependence [lightGallery](https://www.lightgalleryjs.com/) has remov
 #### InstallBundle
 * The composer's assets version set script`Oro\Bundle\InstallerBundle\Composer\ScriptHandler::setAssetsVersion` was changed to store time base hash value into `public/build/build_version.txt` application file.
 
-#### LayoutBundle
-
-* Provided way to create separate JS builds only with essential modules for landing pages, see article [How to Create Extra JS Build for a Landing Page](https://doc.oroinc.com/master/frontend/storefront/how-to/how-to-create-extra-js-build-for-landing-page/).
-
 ### Removed
-* `installed` container parameter was removed from all application distributions. You can get the installation state by calling the `isInstalled` method of the `Oro\Bundle\DistributionBundle\Handler\ApplicationState` service.
 * `assets_version` and `assets_version_strategy` container parameters were removed from all application distributions.
 * Symfony's assets version strategy `framework.assets.version` and `framework.assets.version` keyed parameters were removed from `config.xml` file in all application distributions.
-
-#### MessageQueue component
-* Removed unused `Oro\Component\MessageQueue\Router`, `Oro\Component\MessageQueue\Router\RouteRecipientListProcessor`, 
-  `Oro\Component\MessageQueue\Router\Recipient`.
-* Removed unused `Oro\Component\MessageQueue\Client\Config::getRouterMessageProcessorName()`,
-  `Oro\Component\MessageQueue\Client\Config::getRouterQueueName()`.
-* Removed `Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry`, use instead 
-  `Oro\Component\MessageQueue\Client\MessageProcessorRegistry` service locator.
-* Removed `Oro\Component\MessageQueue\Client\DelegateMessageProcessor`, the extension
-  `Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension` is responsible for routing to
-  message processor now.
-* Removed `Oro\Component\MessageQueue\Consumption::getMessageProcessor()` and
-  `Oro\Component\MessageQueue\Consumption::setMessageProcessor()`, use instead
-  `Oro\Component\MessageQueue\Consumption::getMessageProcessorName()`,
-  `Oro\Component\MessageQueue\Consumption::setMessageProcessorName()`.
-* Removed `Oro\Component\MessageQueue\Log\ConsumerState`::getMessageProcessor() and
-  `Oro\Component\MessageQueue\Log\ConsumerState`::setMessageProcessor(), use instead
-  `Oro\Component\MessageQueue\Log\ConsumerState`::getMessageProcessorName(),
-  `Oro\Component\MessageQueue\Log\ConsumerState`::setMessageProcessorName() .
-* Removed `Oro\Component\MessageQueue\Client\Meta\TopicMeta::getDescription()`, use
-  `Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider::getTopicDescription()` instead.
-* Removed `\Oro\Component\MessageQueue\Log\MessageProcessorClassProvider::getMessageProcessorClass()`, use 
-  `\Oro\Component\MessageQueue\Log\MessageProcessorClassProvider::getMessageProcessorClassByName()` instead.
-
-#### MessageQueueBundle
-* Removed unused `client.router_processor`, `client.router_destination` configuration options.
-* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildRouteRegistryPass`
-* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\ProcessorLocatorPass` and 
-  `oro_message_queue.processor_locator`, use instead 
-  `Oro\Component\MessageQueue\Client\ContainerAwareMessageProcessorRegistry`.
-* Removed `processorName` attribute from `oro_message_queue.client.message_processor` tag, use service id instead.
-* Removed ability to specify `processorName` in `Oro\Component\MessageQueue\Client\TopicSubscriberInterface::getSubscribedTopics()`,
-  use service id instead.
-* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicMetaPass`, use 
-  `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass` for specifying topic 
-  descriptions. `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\BuildTopicMetaRegistryPass` is used to 
-  collect topic metadata into `Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry` now.
 
 #### UIBundle
 * Remove reset style for ordered and unordered list in `Resources/public/blank/scss/reset.scss`
