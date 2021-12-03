@@ -72,6 +72,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### TranslationBundle
+* Changed translation cache generation logic. Now all translation strings that contain HTML tags are sanitized by the HTMLPurifier before caching.
+  To get the list of translation messages that were sanitized run oro:translation:rebuild-cache with --show-sanitization-errors option.
+
 ### EmailBundle
 * EmailBundle uses Symfony Mailer instead of SwiftMailer from now on.
 * Changed mailer configuration: `mailer_dsn` parameter is used instead of `mailer_transport`, `mailer_host`, `mailer_port`,
