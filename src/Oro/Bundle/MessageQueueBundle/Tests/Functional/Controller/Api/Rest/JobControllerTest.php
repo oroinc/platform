@@ -3,8 +3,6 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadJobData;
@@ -15,10 +13,7 @@ class JobControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-
-        $this->loadFixtures([
-            LoadJobData::class
-        ]);
+        $this->loadFixtures([LoadJobData::class]);
     }
 
     public function testShouldInterruptRootJobAndAllActiveChildrenJobs(): void
@@ -36,7 +31,7 @@ class JobControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($response, 200);
 
-        $jsonContent = json_decode($response->getContent(), true);
+        $jsonContent = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $expectedContent = [
             'successful' => true,
@@ -63,17 +58,11 @@ class JobControllerTest extends WebTestCase
         return $this->getJobEntityManager();
     }
 
-    /**
-     * @return EntityManagerInterface|ObjectManager
-     */
     private function getJobEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 
-    /**
-     * @return JobRepository|EntityRepository
-     */
     private function getJobRepository(): JobRepository
     {
         return $this->getJobEntityManager()->getRepository(Job::class);

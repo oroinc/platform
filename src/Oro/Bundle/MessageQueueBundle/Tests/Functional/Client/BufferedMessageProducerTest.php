@@ -15,13 +15,13 @@ class BufferedMessageProducerTest extends WebTestCase
     use MessageQueueAssertTrait;
 
     /** @var MessageProducerInterface */
-    protected $producer;
+    private $producer;
 
     /** @var TestBufferedMessageProducer */
-    protected $bufferedProducer;
+    private $bufferedProducer;
 
     /** @var Connection */
-    protected $connection;
+    private $connection;
 
     protected function setUp(): void
     {

@@ -5,30 +5,20 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\Controller\Api\Rest;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 
 class TranslationControllerTest extends WebTestCase
 {
-    /** @var TranslationManager */
-    protected $manager;
-
-    /** @var TranslationRepository */
-    protected $repository;
-
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-
         $this->loadFixtures([LoadTranslations::class]);
+    }
 
-        $this->manager = $this->getContainer()->get('oro_translation.manager.translation');
-
-        $this->repository = $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(Translation::class)
-            ->getRepository(Translation::class);
+    private function getRepository(): TranslationRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Translation::class);
     }
 
     public function testGetListWithTotalCount()
@@ -69,14 +59,9 @@ class TranslationControllerTest extends WebTestCase
     }
 
     /**
-     * @param string $inputValue
-     * @param string $expectedValue
-     * @param int $expectedStatus
-     * @internal param null|string $value
-     *
      * @dataProvider patchActionProvider
      */
-    public function testPatchAction($inputValue, $expectedValue, $expectedStatus)
+    public function testPatchAction(?string $inputValue, ?string $expectedValue, bool $expectedStatus)
     {
         $this->client->jsonRequest(
             'PATCH',
@@ -90,7 +75,7 @@ class TranslationControllerTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $translation = $this->repository->findTranslation(
+        $translation = $this->getRepository()->findTranslation(
             LoadTranslations::TRANSLATION1,
             LoadLanguages::LANGUAGE1,
             LoadTranslations::TRANSLATION_KEY_DOMAIN
@@ -106,10 +91,7 @@ class TranslationControllerTest extends WebTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function patchActionProvider()
+    public function patchActionProvider(): array
     {
         return [
             'update value' => [

@@ -73,7 +73,7 @@ class ReportControllerTest extends WebTestCase
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('Report saved', $crawler->html());
+        self::assertStringContainsString('Report saved', $crawler->html());
     }
 
     /**
@@ -85,8 +85,8 @@ class ReportControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('reports-grid', $crawler->html());
-        static::assertStringContainsString(self::TEST_REPORT, $result->getContent());
+        self::assertStringContainsString('reports-grid', $crawler->html());
+        self::assertStringContainsString(self::TEST_REPORT, $result->getContent());
     }
 
     /**
@@ -111,7 +111,7 @@ class ReportControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('Report saved', $crawler->html());
+        self::assertStringContainsString('Report saved', $crawler->html());
 
         $em->clear();
 
@@ -138,7 +138,7 @@ class ReportControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('Report saved', $crawler->html());
+        self::assertStringContainsString('Report saved', $crawler->html());
 
         $repository = $this->getContainer()
             ->get('doctrine')
@@ -174,7 +174,7 @@ class ReportControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('reports-grid', $crawler->html());
-        static::assertStringContainsString($name, $result->getContent());
+        self::assertStringContainsString('reports-grid', $crawler->html());
+        self::assertStringContainsString($name, $result->getContent());
     }
 }

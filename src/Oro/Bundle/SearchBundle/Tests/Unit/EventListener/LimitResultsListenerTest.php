@@ -26,11 +26,8 @@ class LimitResultsListenerTest extends \PHPUnit\Framework\TestCase
         $query = new Query();
         $query->getCriteria()->setMaxResults($maxResults);
 
-        /** @var SearchQueryAwareEventInterface|\PHPUnit\Framework\MockObject\MockObject $queryAwareEvent */
         $queryAwareEvent = $this->createMock(SearchQueryAwareEventInterface::class);
-
-        $queryAwareEvent
-            ->expects(self::atLeastOnce())
+        $queryAwareEvent->expects(self::atLeastOnce())
             ->method('getQuery')
             ->willReturn($query);
 

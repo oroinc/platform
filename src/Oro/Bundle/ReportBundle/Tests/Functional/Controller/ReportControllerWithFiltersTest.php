@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Functional\Controller;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
@@ -41,7 +41,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
     /** @var ReportType */
     private $reportType;
 
-    /** @var ObjectManager */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
     /** @var ConfigManager */
@@ -94,8 +94,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @throws \Exception
      */
     public function dataProvider(): \Generator
     {
@@ -312,9 +310,6 @@ class ReportControllerWithFiltersTest extends WebTestCase
         ];
     }
 
-    /**
-     * @throws \Exception
-     */
     private function buildFilter(int $type, string $start = null, string $end = null, bool $isVariable = false): array
     {
         if ($isVariable) {

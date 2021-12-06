@@ -11,23 +11,22 @@ use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Symfony\Component\DomCrawler\Form;
 
 class LocalizationControllerTest extends WebTestCase
 {
     use OperationAwareTestTrait;
 
-    const NAME = 'Localization name';
-    const DEFAULT_TITLE = 'Default localization title';
-    const LANGUAGE_CODE = 'es_MX';
-    const FORMATTING_CODE = 'es_MX';
+    private const NAME = 'Localization name';
+    private const DEFAULT_TITLE = 'Default localization title';
+    private const LANGUAGE_CODE = 'es_MX';
+    private const FORMATTING_CODE = 'es_MX';
 
-    const UPDATED_NAME = 'Updated name';
-    const UPDATED_DEFAULT_TITLE = 'Updated default title';
-    const UPDATED_ALTERED_TITLE = 'Updated altered title';
-    const UPDATED_LANGUAGE_CODE = 'es_ES';
-    const UPDATED_FORMATTING_CODE = 'es_ES';
-    const PARENT_LOCALIZATION = 'es';
+    private const UPDATED_NAME = 'Updated name';
+    private const UPDATED_DEFAULT_TITLE = 'Updated default title';
+    private const UPDATED_ALTERED_TITLE = 'Updated altered title';
+    private const UPDATED_LANGUAGE_CODE = 'es_ES';
+    private const UPDATED_FORMATTING_CODE = 'es_ES';
+    private const PARENT_LOCALIZATION = 'es';
 
     /** @var LocalizationManager */
     private $manager;
@@ -45,14 +44,13 @@ class LocalizationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('oro-locale-localizations-grid', $crawler->html());
+        self::assertStringContainsString('oro-locale-localizations-grid', $crawler->html());
     }
 
     public function testCreate()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_create'));
 
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $formValues = $form->getPhpValues();
@@ -75,14 +73,13 @@ class LocalizationControllerTest extends WebTestCase
         $this->assertEquals($localizationId, $cachedLocalization->getId());
 
         $html = $crawler->html();
-        static::assertStringContainsString('Localization has been saved', $html);
+        self::assertStringContainsString('Localization has been saved', $html);
     }
 
     /**
      * @depends testCreate
-     * @return int
      */
-    public function testUpdate()
+    public function testUpdate(): int
     {
         /** @var Localization $localization */
         $localization = $this->getLocalization(self::NAME);
@@ -93,12 +90,11 @@ class LocalizationControllerTest extends WebTestCase
 
         $html = $crawler->html();
 
-        static::assertStringContainsString(self::NAME, $html);
-        static::assertStringContainsString(self::DEFAULT_TITLE, $html);
-        static::assertStringContainsString(self::LANGUAGE_CODE, $html);
-        static::assertStringContainsString($this->getFormattingFormatter()->format(self::FORMATTING_CODE), $html);
+        self::assertStringContainsString(self::NAME, $html);
+        self::assertStringContainsString(self::DEFAULT_TITLE, $html);
+        self::assertStringContainsString(self::LANGUAGE_CODE, $html);
+        self::assertStringContainsString($this->getFormattingFormatter()->format(self::FORMATTING_CODE), $html);
 
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         /** @var Localization $parent */
@@ -127,7 +123,7 @@ class LocalizationControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $html = $crawler->html();
-        static::assertStringContainsString('Localization has been saved', $html);
+        self::assertStringContainsString('Localization has been saved', $html);
 
         $localizationId = $this->getLocalization(self::UPDATED_NAME)->getId();
         $cachedLocalization = $this->manager->getLocalization($localizationId);
@@ -140,12 +136,8 @@ class LocalizationControllerTest extends WebTestCase
 
     /**
      * @depends testUpdate
-     *
-     * @param int $id
-     *
-     * @return int
      */
-    public function testView($id)
+    public function testView(int $id): int
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_locale_localization_view', ['id' => $id]));
 
@@ -155,30 +147,27 @@ class LocalizationControllerTest extends WebTestCase
         $parent = $this->getReference(self::PARENT_LOCALIZATION);
 
         $html = $crawler->html();
-        static::assertStringContainsString(self::UPDATED_NAME, $html);
-        static::assertStringContainsString(self::UPDATED_DEFAULT_TITLE, $html);
-        static::assertStringContainsString(
+        self::assertStringContainsString(self::UPDATED_NAME, $html);
+        self::assertStringContainsString(self::UPDATED_DEFAULT_TITLE, $html);
+        self::assertStringContainsString(
             $this->getLanguageFormatter()->formatLocale(self::UPDATED_LANGUAGE_CODE),
             $html
         );
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             $this->getFormattingFormatter()->format(self::UPDATED_FORMATTING_CODE),
             $html
         );
-        static::assertStringContainsString($parent->getName(), $html);
+        self::assertStringContainsString($parent->getName(), $html);
 
         return $id;
     }
 
     /**
      * @depends testView
-     *
-     * @param int $id
      */
-    public function testDelete($id)
+    public function testDelete(int $id)
     {
         $operationName = 'DELETE';
-        $entityClass = 'Oro\Bundle\LocaleBundle\Entity\Localization';
         $this->client->request(
             'POST',
             $this->getUrl(
@@ -186,10 +175,10 @@ class LocalizationControllerTest extends WebTestCase
                 [
                     'operationName' => $operationName,
                     'entityId' => $id,
-                    'entityClass' => $entityClass
+                    'entityClass' => Localization::class
                 ]
             ),
-            $this->getOperationExecuteParams($operationName, $id, $entityClass),
+            $this->getOperationExecuteParams($operationName, $id, Localization::class),
             [],
             ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']
         );
@@ -203,7 +192,7 @@ class LocalizationControllerTest extends WebTestCase
                 'redirectUrl' => $this->getUrl('oro_locale_localization_index'),
                 'pageReload' => true
             ],
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
 
         $this->client->request('GET', $this->getUrl('oro_locale_localization_view', ['id' => $id]));
@@ -213,40 +202,23 @@ class LocalizationControllerTest extends WebTestCase
         $this->assertNull($cachedLocalization);
     }
 
-    /**
-     * @return LanguageCodeFormatter
-     */
-    protected function getLanguageFormatter()
+    private function getLanguageFormatter(): LanguageCodeFormatter
     {
         return $this->getContainer()->get('oro_locale.formatter.language_code');
     }
 
-    /**
-     * @return FormattingCodeFormatter
-     */
-    protected function getFormattingFormatter()
+    private function getFormattingFormatter(): FormattingCodeFormatter
     {
         return $this->getContainer()->get('oro_locale.formatter.formatting_code');
     }
 
-    /**
-     * @param string $name
-     *
-     * @return Localization|object
-     */
-    private function getLocalization($name)
+    private function getLocalization(string $name): ?Localization
     {
         return $this->getRepository()->findOneBy(['name' => $name]);
     }
 
-    /**
-     * @return LocalizationRepository
-     */
-    protected function getRepository()
+    private function getRepository(): LocalizationRepository
     {
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass('OroLocaleBundle:Localization')
-            ->getRepository('OroLocaleBundle:Localization');
+        return $this->getContainer()->get('doctrine')->getRepository(Localization::class);
     }
 }

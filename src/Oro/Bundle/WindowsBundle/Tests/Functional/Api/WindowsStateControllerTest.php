@@ -36,7 +36,7 @@ class WindowsStateControllerTest extends WebTestCase
 
         $this->assertJsonResponseStatusCodeEquals($result, 201);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('id', $resultJson);
         $this->assertGreaterThan(0, $resultJson['id']);
@@ -65,7 +65,7 @@ class WindowsStateControllerTest extends WebTestCase
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertCount(0, $resultJson);
     }
@@ -89,7 +89,7 @@ class WindowsStateControllerTest extends WebTestCase
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('id', $resultJson[0]);
         $this->assertArrayHasKey('created_at', $resultJson[0]);
@@ -214,7 +214,7 @@ class WindowsStateControllerTest extends WebTestCase
 
             $this->assertJsonResponseStatusCodeEquals($response, 400);
 
-            $responseJson = json_decode($response->getContent(), true);
+            $responseJson = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
             // The original exception message is returned only if functional tests are running in debug mode
             if ($this->client->getKernel()->isDebug()) {

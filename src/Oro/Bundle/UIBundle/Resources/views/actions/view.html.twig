@@ -66,13 +66,8 @@
             {% block pageHeader %}
                 <div class="row">
                     <div class="pull-left-extra">
-                        {% if avatar is defined %}
-                            <div class="page-title__icon">
-                                {%- if avatar %}
-                                <img src="{{ avatar }}" alt="{{ breadcrumbs.entityTitle }}"/>
-                                {% endif -%}
-                            </div>
-                        {% endif %}
+                        {% block pageTitleIcon %}{% endblock %}
+
                         <div class="page-title__path">
                             <div class="top-row">
                                 {% block breadcrumbs %}

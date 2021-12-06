@@ -41,9 +41,9 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
         );
 
         if ($expected) {
-            static::assertStringContainsString($action, $crawler->html());
+            self::assertStringContainsString($action, $crawler->html());
         } else {
-            static::assertStringNotContainsString($action, $crawler->html());
+            self::assertStringNotContainsString($action, $crawler->html());
         }
     }
 
@@ -54,7 +54,6 @@ abstract class AbstractPermissionConfigurableTestCase extends WebTestCase
     {
         self::getConfigurationModifier()->updateCache($config);
 
-        /** @var Role $role */
         $role = $this->getRole();
         $gridData = $this->requestGrid($this->getGridName(), ['role' => $role])['data'];
         $assertGridData($gridData);

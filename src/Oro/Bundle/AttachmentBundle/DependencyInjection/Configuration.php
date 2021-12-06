@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\DependencyInjection;
 
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
+use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -19,6 +20,7 @@ class Configuration implements ConfigurationInterface
 
     public const JPEG_QUALITY = 85;
     public const PNG_QUALITY = 100;
+    public const WEBP_QUALITY = 85;
 
     /**
      * Bytes in one MB. Used to calculate exact bytes in certain MB amount.
@@ -62,6 +64,15 @@ class Configuration implements ConfigurationInterface
                     ->max(100)
                     ->defaultValue(self::JPEG_QUALITY)
                 ->end()
+                ->enumNode('webp_strategy')
+                    ->info('Strategy for converting uploaded images to WebP format.')
+                    ->values([
+                        WebpConfiguration::ENABLED_FOR_ALL,
+                        WebpConfiguration::ENABLED_IF_SUPPORTED,
+                        WebpConfiguration::DISABLED,
+                    ])
+                    ->defaultValue(WebpConfiguration::ENABLED_IF_SUPPORTED)
+                ->end()
             ->end();
 
         SettingsBuilder::append(
@@ -73,6 +84,7 @@ class Configuration implements ConfigurationInterface
                 'processors_allowed' => ['value' => true],
                 'jpeg_quality' => ['value' => self::JPEG_QUALITY],
                 'png_quality' => ['value' => self::PNG_QUALITY],
+                'webp_quality' => ['value' => self::WEBP_QUALITY],
             ]
         );
 

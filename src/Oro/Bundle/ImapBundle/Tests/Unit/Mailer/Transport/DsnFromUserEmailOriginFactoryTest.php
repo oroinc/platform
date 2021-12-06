@@ -11,27 +11,26 @@ use Symfony\Component\Mailer\Transport\Dsn;
 
 class DsnFromUserEmailOriginFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    private OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $oauthManagerRegistry;
+    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $oauthManagerRegistry;
 
-    private DsnFromUserEmailOriginFactory $factory;
+    /** @var DsnFromUserEmailOriginFactory */
+    private $factory;
 
     protected function setUp(): void
     {
-        $crypter = $this->createMock(SymmetricCrypterInterface::class);
         $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
-        $this->factory = new DsnFromUserEmailOriginFactory($crypter, $this->oauthManagerRegistry);
 
-        $crypter
-            ->expects(self::any())
+        $crypter = $this->createMock(SymmetricCrypterInterface::class);
+        $crypter->expects(self::any())
             ->method('decryptData')
             ->willReturnCallback(static fn (string $password) => $password . '-decrypted');
+
+        $this->factory = new DsnFromUserEmailOriginFactory($crypter, $this->oauthManagerRegistry);
     }
 
     /**
      * @dataProvider createReturnsDsnWithSmtpsWhenEncryptionTlsDataProvider
-     *
-     * @param string $smtpEncryption
-     * @param Dsn $expectedDsn
      */
     public function testCreateReturnsDsnWithSmtpsWhenEncryptionTls(string $smtpEncryption, Dsn $expectedDsn): void
     {
@@ -73,21 +72,18 @@ class DsnFromUserEmailOriginFactoryTest extends \PHPUnit\Framework\TestCase
             ->setPassword('sample-password')
             ->setSmtpPort(42);
 
-        $this->oauthManagerRegistry
-            ->expects(self::once())
+        $this->oauthManagerRegistry->expects(self::once())
             ->method('hasManager')
             ->with('sample-type')
             ->willReturn(true);
 
         $oauthManager = $this->createMock(OAuthManagerInterface::class);
-        $this->oauthManagerRegistry
-            ->expects(self::once())
+        $this->oauthManagerRegistry->expects(self::once())
             ->method('getManager')
             ->with('sample-type')
             ->willReturn($oauthManager);
 
-        $oauthManager
-            ->expects(self::once())
+        $oauthManager->expects(self::once())
             ->method('getAccessTokenWithCheckingExpiration')
             ->with($userEmailOrigin)
             ->willReturn('access-token');
@@ -107,21 +103,18 @@ class DsnFromUserEmailOriginFactoryTest extends \PHPUnit\Framework\TestCase
             ->setPassword('sample-password')
             ->setSmtpPort(42);
 
-        $this->oauthManagerRegistry
-            ->expects(self::once())
+        $this->oauthManagerRegistry->expects(self::once())
             ->method('hasManager')
             ->with('sample-type')
             ->willReturn(true);
 
         $oauthManager = $this->createMock(OAuthManagerInterface::class);
-        $this->oauthManagerRegistry
-            ->expects(self::once())
+        $this->oauthManagerRegistry->expects(self::once())
             ->method('getManager')
             ->with('sample-type')
             ->willReturn($oauthManager);
 
-        $oauthManager
-            ->expects(self::once())
+        $oauthManager->expects(self::once())
             ->method('getAccessTokenWithCheckingExpiration')
             ->with($userEmailOrigin)
             ->willReturn(null);

@@ -12,11 +12,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class FileUrlByUuidProvider
 {
-    /** @var FileUrlProviderInterface */
-    private $fileUrlProvider;
+    private ManagerRegistry $registry;
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private FileUrlProviderInterface $fileUrlProvider;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -52,12 +50,14 @@ class FileUrlByUuidProvider
         string $uuid,
         int $width,
         int $height,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         return $this->fileUrlProvider->getResizedImageUrl(
             $this->findFileByUuid($uuid),
             $width,
             $height,
+            $format,
             $referenceType
         );
     }
@@ -70,11 +70,13 @@ class FileUrlByUuidProvider
     public function getFilteredImageUrl(
         string $uuid,
         string $filterName,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         return $this->fileUrlProvider->getFilteredImageUrl(
             $this->findFileByUuid($uuid),
             $filterName,
+            $format,
             $referenceType
         );
     }

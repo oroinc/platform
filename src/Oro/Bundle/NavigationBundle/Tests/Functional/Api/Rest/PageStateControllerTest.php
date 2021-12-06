@@ -40,7 +40,7 @@ class PageStateControllerTest extends WebTestCase
 
         $this->assertJsonResponseStatusCodeEquals($result, 201);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('id', $resultJson);
         $this->assertGreaterThan(0, $resultJson['id']);
@@ -88,7 +88,7 @@ class PageStateControllerTest extends WebTestCase
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertArrayHasKey('id', $resultJson);
         $this->assertArrayHasKey('created_at', $resultJson);

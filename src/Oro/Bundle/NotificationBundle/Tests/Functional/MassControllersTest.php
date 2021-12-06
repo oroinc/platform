@@ -35,6 +35,6 @@ class MassControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString($notification->getBody(), $result->getContent());
+        self::assertStringContainsString($notification->getBody(), $result->getContent());
     }
 }

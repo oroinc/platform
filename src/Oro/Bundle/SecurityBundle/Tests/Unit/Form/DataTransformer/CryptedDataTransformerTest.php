@@ -39,7 +39,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransform($value, $expected)
     {
-        $this->crypter
+        $this->crypter->expects(self::any())
             ->method('decryptData')
             ->with(self::ENCRYPTED_STRING)
             ->willReturn(self::DECRYPTED_STRING);
@@ -62,8 +62,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testTransformWithException()
     {
-        $this->crypter
-            ->expects(self::once())
+        $this->crypter->expects(self::once())
             ->method('decryptData')
             ->willThrowException(new \Exception());
 
@@ -82,7 +81,7 @@ class CryptedDataTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testReverseTransform($value, $expected)
     {
-        $this->crypter
+        $this->crypter->expects(self::any())
             ->method('encryptData')
             ->with(self::DECRYPTED_STRING)
             ->willReturn(self::ENCRYPTED_STRING);

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Command;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
@@ -46,7 +46,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
         $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
 
-        static::assertStringContainsString('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
+        self::assertStringContainsString('Configuration of permission PERMISSION.BAD.NAME is invalid:', $result);
     }
 
     /**
@@ -57,16 +57,16 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         $expectedPermissions = $this->processPermissionConfig($expectedPermissions);
         $this->appendPermissionConfig($this->provider, $expectedPermissions);
 
-        $permissionsBefore = $this->getRepository('OroSecurityBundle:Permission')->findAll();
+        $permissionsBefore = $this->getRepository(Permission::class)->findAll();
 
         $result = $this->runCommand(LoadPermissionConfigurationCommand::getDefaultName());
         $this->assertNotEmpty($result);
 
         foreach ($expectedMessages as $message) {
-            static::assertStringContainsString($message, $result);
+            self::assertStringContainsString($message, $result);
         }
 
-        $permissions = $this->getRepository('OroSecurityBundle:Permission')->findAll();
+        $permissions = $this->getRepository(Permission::class)->findAll();
         $this->assertCount(count($permissionsBefore) + count($expectedPermissions), $permissions);
 
         foreach ($expectedPermissions as $name => $permissionData) {
@@ -74,10 +74,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             [
@@ -116,20 +113,12 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    protected function getRepository($className)
+    private function getRepository(string $className): EntityRepository
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
+        return self::getContainer()->get('doctrine')->getRepository($className);
     }
 
-    /**
-     * @param array $config
-     * @return array
-     */
-    private function processPermissionConfig(array $config)
+    private function processPermissionConfig(array $config): array
     {
         $processor = new Processor();
 
@@ -147,14 +136,10 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         );
     }
 
-    /**
-     * @param array|Permission[] $permissions
-     * @param array $expected
-     * @param string $name
-     */
-    protected function assertPermissionLoaded(array $permissions, array $expected, $name)
+    private function assertPermissionLoaded(array $permissions, array $expected, string $name): void
     {
         $found = false;
+        /** @var Permission $permission */
         foreach ($permissions as $permission) {
             if ($permission->getName() === $name) {
                 $this->assertSame($expected['label'], $permission->getLabel());
@@ -187,9 +172,10 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
     /**
      * @param Collection|PermissionEntity[] $permissionEntities
-     * @return array
+     *
+     * @return string[]
      */
-    protected function getPermissionEntityNames(Collection $permissionEntities)
+    private function getPermissionEntityNames(Collection $permissionEntities): array
     {
         $entities = [];
         foreach ($permissionEntities as $permissionEntity) {
@@ -199,13 +185,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
         return $entities;
     }
 
-    /**
-     * @param array $options
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getConfigurationOption(array $options, $key, $default = null)
+    private function getConfigurationOption(array $options, string $key, mixed $default = null): mixed
     {
         if (array_key_exists($key, $options)) {
             return $options[$key];

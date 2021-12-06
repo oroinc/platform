@@ -144,8 +144,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('updateUser')
             ->with($user);
 
-        $this->emailTemplateManager
-            ->expects($this->once())
+        $this->emailTemplateManager->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
                 From::emailAddress('admin@example.com', 'John Doe'),
@@ -204,8 +203,7 @@ class UserHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('updateUser')
             ->with($user);
 
-        $this->emailTemplateManager
-            ->expects($this->never())
+        $this->emailTemplateManager->expects($this->never())
             ->method('sendTemplateEmail');
 
         $this->assertTrue($this->handler->process($user));

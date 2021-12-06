@@ -69,8 +69,6 @@ class LoadWorkflowEmailTemplates extends AbstractFixture
      * @param ObjectManager $manager
      *
      * @return User
-     *
-     * @throws \RuntimeException
      */
     protected function getAdminUser(ObjectManager $manager)
     {

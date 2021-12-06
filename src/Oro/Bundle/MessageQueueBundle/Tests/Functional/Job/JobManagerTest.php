@@ -3,8 +3,6 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Job;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\MessageQueueBundle\Job\JobManager;
@@ -21,16 +19,11 @@ class JobManagerTest extends WebTestCase
     /** @var JobManager */
     private $jobManager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
-
-        $this->jobManager = self::getContainer()->get('oro_message_queue.job.manager');
-
         $this->loadFixtures([LoadJobData::class]);
+        $this->jobManager = self::getContainer()->get('oro_message_queue.job.manager');
     }
 
     public function testCancelChildJobsWithStatusNew(): void
@@ -284,17 +277,11 @@ class JobManagerTest extends WebTestCase
         return $this->getJobEntityManager();
     }
 
-    /**
-     * @return EntityManagerInterface|ObjectManager
-     */
     private function getJobEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 
-    /**
-     * @return JobRepository|EntityRepository
-     */
     private function getJobRepository(): JobRepository
     {
         return $this->getJobEntityManager()->getRepository(Job::class);

@@ -9,27 +9,26 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailRepositoryTest extends WebTestCase
 {
-    private EmailRepository $repository;
-
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadEmailData::class]);
+    }
 
-        $this->repository = self::getContainer()
-            ->get('doctrine')
-            ->getRepository(Email::class);
+    private function getRepository(): EmailRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Email::class);
     }
 
     public function testFindMessageIdReturnsNullWhenNoEmailFound(): void
     {
-        self::assertNull($this->repository->findMessageIdByEmailId(PHP_INT_MAX));
+        self::assertNull($this->getRepository()->findMessageIdByEmailId(PHP_INT_MAX));
     }
 
     public function testFindMessageId(): void
     {
         $email = $this->getReference('email_1');
 
-        self::assertEquals($email->getMessageId(), $this->repository->findMessageIdByEmailId($email->getId()));
+        self::assertEquals($email->getMessageId(), $this->getRepository()->findMessageIdByEmailId($email->getId()));
     }
 }

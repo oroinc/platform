@@ -28,7 +28,6 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
         $this->questionHelper = $this->createMock(QuestionHelper::class);
         $this->input = $this->createMock(InputInterface::class);
         $this->output = $this->createMock(OutputInterface::class);
@@ -39,8 +38,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetWhenOptionHasValue()
     {
         $defaultOptionValue = 'default option value';
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn($defaultOptionValue);
@@ -53,8 +51,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetWhenOptionHasValueAndConfirmationTypeOfQuestion(string $optionValue, bool $convertedValue)
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn($optionValue);
@@ -102,13 +99,11 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWhenOptionHasNoValueAndNotInteractive()
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('isInteractive')
             ->willReturn(false);
 
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn(null);
@@ -122,19 +117,16 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWhenOptionHasNoValueAndInteractiveAndNoInputFromUser()
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('isInteractive')
             ->willReturn(true);
 
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn(null);
 
-        $this->questionHelper
-            ->expects($this->any())
+        $this->questionHelper->expects($this->any())
             ->method('ask')
             ->with($this->input, $this->output, $this->isInstanceOf(Question::class))
             ->willReturn(null);
@@ -148,20 +140,17 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetWhenOptionHasNoValueAndInteractiveAndUserInputsAnswer()
     {
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('isInteractive')
             ->willReturn(true);
 
-        $this->input
-            ->expects($this->any())
+        $this->input->expects($this->any())
             ->method('getOption')
             ->with(self::OPTION_NAME)
             ->willReturn(null);
 
         $userAnswer = 'user answer';
-        $this->questionHelper
-            ->expects($this->any())
+        $this->questionHelper->expects($this->any())
             ->method('ask')
             ->with($this->input, $this->output, $this->isInstanceOf(Question::class))
             ->willReturn($userAnswer);

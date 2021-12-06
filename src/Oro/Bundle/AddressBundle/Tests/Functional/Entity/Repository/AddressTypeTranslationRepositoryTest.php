@@ -8,23 +8,19 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class AddressTypeTranslationRepositoryTest extends WebTestCase
 {
-    /**
-     * @var AddressTypeTranslationRepository
-     */
-    private $repository;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
+    }
 
-        $this->repository = self::getContainer()->get('doctrine')->getRepository(AddressTypeTranslation::class);
+    private function getRepository(): AddressTypeTranslationRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(AddressTypeTranslation::class);
     }
 
     public function testUpdateTranslations(): void
     {
-        $this->repository->updateTranslations(
+        $this->getRepository()->updateTranslations(
             [
                 'billing' => 'Rechnung',
                 'shipping' => 'Versand'
@@ -32,13 +28,13 @@ class AddressTypeTranslationRepositoryTest extends WebTestCase
             'de'
         );
 
-        $shippingTranslation = $this->repository->findOneBy([
+        $shippingTranslation = $this->getRepository()->findOneBy([
             'locale' => 'de',
             'foreignKey' => 'shipping',
             'field' => 'label'
         ]);
 
-        $billingTranslation = $this->repository->findOneBy([
+        $billingTranslation = $this->getRepository()->findOneBy([
             'locale' => 'de',
             'foreignKey' => 'billing',
             'field' => 'label'

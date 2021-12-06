@@ -118,7 +118,7 @@ class SearchSourceFilteredEntityIdentityReaderTest extends SearchBundleWebTestCa
             ->setToken($token);
     }
 
-    protected function getDatagrid($options)
+    private function getDatagrid($options)
     {
         $name = $options['filteredResultsGrid'];
         $queryString = $options['filteredResultsGridParams'] ?? null;
@@ -129,7 +129,7 @@ class SearchSourceFilteredEntityIdentityReaderTest extends SearchBundleWebTestCa
     /**
      * @return Manager
      */
-    protected function getDatagridManager()
+    private function getDatagridManager()
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

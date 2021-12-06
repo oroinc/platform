@@ -169,7 +169,7 @@ class TranslatorTest extends WebTestCase
         return $this->strategies[$name];
     }
 
-    protected function createStrategies(): void
+    private function createStrategies(): void
     {
         $this->strategies['strategy1'] = new TranslationStrategy('strategy1', [
             'lang1' => [],

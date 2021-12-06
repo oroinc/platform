@@ -98,12 +98,14 @@
 
 {% block attribute_image_widget %}
     {% set attr = layout_attr_defaults(attr, {
-        'src': resized_image_url(value, width, height),
         'alt': label,
         'width': width,
         'height': height
     }) %}
-    <img {{ block('block_attributes') }}>
+    {% include '@OroAttachment/Twig/picture.html.twig' with {
+        sources: oro_resized_picture_sources(value, width, height),
+        img_attrs: attr
+    } %}
 {% endblock %}
 
 {% block attribute_file_widget %}

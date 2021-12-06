@@ -35,7 +35,6 @@ class ControllersTest extends WebTestCase
     public function testCreate(array $report)
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_segment_create'));
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form = $this->fillForm($form, $report);
@@ -44,8 +43,8 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        static::assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('Segment saved', $crawler->html());
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertStringContainsString('Segment saved', $crawler->html());
     }
 
     /**
@@ -100,7 +99,6 @@ class ControllersTest extends WebTestCase
         $id = $result['id'];
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_segment_update', ['id' => $id]));
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $report['oro_segment_form[name]'] .= '_updated';
         $form = $this->fillForm($form, $report);
@@ -110,7 +108,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("Segment saved", $crawler->html());
+        self::assertStringContainsString('Segment saved', $crawler->html());
 
         if ($report['oro_segment_form[type]'] == 'static') {
             $this->ajaxRequest(
@@ -230,7 +228,7 @@ class ControllersTest extends WebTestCase
      *
      * @return Form $form
      */
-    protected function fillForm($form, $fields)
+    private function fillForm($form, $fields)
     {
         foreach ($fields as $fieldName => $value) {
             $form[$fieldName] = $value;
@@ -246,7 +244,7 @@ class ControllersTest extends WebTestCase
      *
      * @return bool
      */
-    protected function verifyReport($expected, $actual, $totalCount)
+    private function verifyReport($expected, $actual, $totalCount)
     {
         $this->assertEquals(count($expected), $totalCount);
         for ($i = 0; $i < $totalCount; $i++) {

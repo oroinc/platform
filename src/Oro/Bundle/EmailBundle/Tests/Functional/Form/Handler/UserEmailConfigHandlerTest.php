@@ -2,19 +2,16 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Form\Handler;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\DomCrawler\Crawler;
 
 class UserEmailConfigHandlerTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
         $this->loadFixtures([LoadUserData::class]);
     }
 
@@ -33,13 +30,12 @@ class UserEmailConfigHandlerTest extends WebTestCase
         ];
 
         $crawler = $this->saveConfiguration($configuration);
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'At least one folder of mailbox is required to be selected.',
             $crawler->html()
         );
 
-        $emailOrigins = $this->getContainer()->get('doctrine')
-            ->getRepository('OroEmailBundle:EmailOrigin')
+        $emailOrigins = $this->getContainer()->get('doctrine')->getRepository(EmailOrigin::class)
             ->findAll();
         $this->assertEmpty($emailOrigins);
     }
@@ -61,36 +57,30 @@ class UserEmailConfigHandlerTest extends WebTestCase
                 'password' => '',
                 'folders' => [
                     [
-                        "syncEnabled" => "on",
-                        "fullName" => "[Gmail]/Trash",
-                        "name" => "Trash",
-                        "type" => "trash",
-                        "subFolders" => []
+                        'syncEnabled' => 'on',
+                        'fullName' => '[Gmail]/Trash',
+                        'name' => 'Trash',
+                        'type' => 'trash',
+                        'subFolders' => []
                     ]
                 ]
             ]
         ];
 
         $crawler = $this->saveConfiguration($configuration);
-        static::assertStringNotContainsString(
+        self::assertStringNotContainsString(
             'At least one folder of mailbox is required to be selected.',
             $crawler->html()
         );
-        static::assertStringContainsString('Could not establish the IMAP connection', $crawler->html());
-        static::assertStringContainsString('Could not establish the SMTP connection', $crawler->html());
+        self::assertStringContainsString('Could not establish the IMAP connection', $crawler->html());
+        self::assertStringContainsString('Could not establish the SMTP connection', $crawler->html());
 
-        $emailOrigins = $this->getContainer()->get('doctrine')
-            ->getRepository('OroEmailBundle:EmailOrigin')
+        $emailOrigins = $this->getContainer()->get('doctrine')->getRepository(EmailOrigin::class)
             ->findAll();
         $this->assertEmpty($emailOrigins);
     }
 
-    /**
-     * @param array $configurationData
-     *
-     * @return null|\Symfony\Component\DomCrawler\Crawler
-     */
-    private function saveConfiguration(array $configurationData)
+    private function saveConfiguration(array $configurationData): Crawler
     {
         $parameters = [
             'activeGroup' => 'platform',
@@ -101,7 +91,6 @@ class UserEmailConfigHandlerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
-        /** @var Form $form */
         $form = $crawler->selectButton('Save settings')->form();
         $formValues = $form->getPhpValues();
         $formValues['user_email_configuration']['oro_email___user_mailbox']['value'] = $configurationData;

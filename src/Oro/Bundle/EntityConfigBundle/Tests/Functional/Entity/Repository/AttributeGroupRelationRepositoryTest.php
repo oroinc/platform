@@ -14,23 +14,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class AttributeGroupRelationRepositoryTest extends WebTestCase
 {
-    /**
-     * @var AttributeGroupRelationRepository
-     */
-    protected $repository;
-
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->loadFixtures([LoadAttributeFamilyData::class]);
+    }
 
-        $this->loadFixtures([
-            LoadAttributeFamilyData::class,
-        ]);
-
-        $this->repository = $this
-            ->getContainer()
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepositoryForClass(AttributeGroupRelation::class);
+    private function getRepository(): AttributeGroupRelationRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(AttributeGroupRelation::class);
     }
 
     public function testGetAttributeFamiliesByAttributeIdsWithAcl()
@@ -40,7 +32,7 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
         $aclHelper = $this
             ->getContainer()
             ->get('oro_security.acl_helper');
-        $families = $this->repository->getFamiliesLabelsByAttributeIdsWithAcl(
+        $families = $this->getRepository()->getFamiliesLabelsByAttributeIdsWithAcl(
             [$systemAttributeId, $regularAttributeId],
             $aclHelper
         );
@@ -94,7 +86,7 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
     {
         /** @var AttributeGroup $emptyAttributeGroup */
         $emptyAttributeGroup = $this->getReference(LoadAttributeGroupData::EMPTY_ATTRIBUTE_GROUP);
-        $map = $this->repository->getAttributesMapByGroupIds([$emptyAttributeGroup->getId()]);
+        $map = $this->getRepository()->getAttributesMapByGroupIds([$emptyAttributeGroup->getId()]);
 
         $this->assertCount(0, $map);
     }
@@ -107,7 +99,7 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
          */
         $defaultGroup = $this->getReference(LoadAttributeGroupData::DEFAULT_ATTRIBUTE_GROUP_1);
         $regularGroup = $this->getReference(LoadAttributeGroupData::REGULAR_ATTRIBUTE_GROUP_1);
-        $map = $this->repository->getAttributesMapByGroupIds([$defaultGroup->getId(), $regularGroup->getId()]);
+        $map = $this->getRepository()->getAttributesMapByGroupIds([$defaultGroup->getId(), $regularGroup->getId()]);
 
         $this->assertCount(2, $map);
         $this->assertCount(2, $map[$defaultGroup->getId()]);
@@ -129,9 +121,9 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
     public function testRemoveByFieldId()
     {
         $regularAttributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
-        $this->assertCount(1, $this->repository->findBy(['entityConfigFieldId' => $regularAttributeId]));
-        $this->assertEquals(1, $this->repository->removeByFieldId($regularAttributeId));
-        $this->assertEmpty($this->repository->findBy(['entityConfigFieldId' => $regularAttributeId]));
+        $this->assertCount(1, $this->getRepository()->findBy(['entityConfigFieldId' => $regularAttributeId]));
+        $this->assertEquals(1, $this->getRepository()->removeByFieldId($regularAttributeId));
+        $this->assertEmpty($this->getRepository()->findBy(['entityConfigFieldId' => $regularAttributeId]));
     }
 
     public function testGetAttributeGroupRelationsByFamily()
@@ -140,9 +132,9 @@ class AttributeGroupRelationRepositoryTest extends WebTestCase
 
         $family = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
 
-        $attributeGroupRelations = $this->repository->getAttributeGroupRelationsByFamily($family);
+        $attributeGroupRelations = $this->getRepository()->getAttributeGroupRelationsByFamily($family);
 
-        $this->assertEquals(3, count($attributeGroupRelations));
+        $this->assertCount(3, $attributeGroupRelations);
 
         usort($attributeGroupRelations, function (AttributeGroupRelation $a, AttributeGroupRelation $b) {
             return $a->getEntityConfigFieldId() - $b->getEntityConfigFieldId();

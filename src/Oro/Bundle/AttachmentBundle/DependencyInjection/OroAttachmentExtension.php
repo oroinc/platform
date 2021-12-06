@@ -41,6 +41,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
         $container->setParameter('oro_attachment.processors_allowed', $config['processors_allowed']);
         $container->setParameter('oro_attachment.png_quality', $config['png_quality']);
         $container->setParameter('oro_attachment.jpeg_quality', $config['jpeg_quality']);
+        $container->setParameter('oro_attachment.webp_strategy', $config['webp_strategy']);
 
         $yaml = new Parser();
         $value = $yaml->parse(file_get_contents(__DIR__ . '/../Resources/config/files.yml'));

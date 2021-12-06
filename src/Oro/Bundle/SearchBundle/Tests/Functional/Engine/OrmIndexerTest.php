@@ -252,7 +252,7 @@ class OrmIndexerTest extends WebTestCase
     /**
      * @return \Doctrine\Bundle\DoctrineBundle\Registry
      */
-    protected function getDoctrine()
+    private function getDoctrine()
     {
         return $this->getContainer()->get('doctrine');
     }
@@ -260,7 +260,7 @@ class OrmIndexerTest extends WebTestCase
     /**
      * @return \Oro\Bundle\SearchBundle\Engine\OrmIndexer
      */
-    protected function getSearchIndexer()
+    private function getSearchIndexer()
     {
         return $this->getContainer()->get('oro_search.search.engine.indexer');
     }

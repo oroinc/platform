@@ -13,8 +13,10 @@ use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -26,11 +28,14 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
     use MessageQueueExtension;
     use ConfigManagerAwareTestTrait;
 
-    protected $emailNotificationSenderEmail;
+    /** @var string */
+    private $emailNotificationSenderEmail;
 
-    protected $emailNotificationSenderName;
+    /** @var string */
+    private $emailNotificationSenderName;
 
-    protected $url;
+    /** @var string */
+    private $url;
 
     protected function setUp(): void
     {
@@ -42,13 +47,10 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $this->emailNotificationSenderName = self::getConfigManager('user')
             ->get('oro_notification.email_notification_sender_name');
 
-        $logPath = $this
-            ->getContainer()
-            ->get('router')
-            ->generate(
-                'oro_importexport_job_error_log',
-                ['jobId' => '_jobId_']
-            );
+        $logPath = $this->getContainer()->get('router')->generate(
+            'oro_importexport_job_error_log',
+            ['jobId' => '_jobId_']
+        );
 
         $this->url = self::getConfigManager('user')->get('oro_ui.application_url') . $logPath;
     }
@@ -184,11 +186,11 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         );
     }
 
-    protected function shouldProcessImportSendNotificationProcess(
+    private function shouldProcessImportSendNotificationProcess(
         array $resultOfImportJob1,
         array $resultOfImportJob2,
         array $notificationExpectedMessage
-    ) {
+    ): void {
         $jobHandler = self::getContainer()->get('oro_message_queue.job.manager');
 
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
@@ -221,10 +223,10 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('test_import_message');
-        $message->setBody(json_encode($messageData));
+        $message->setBody(JSON::encode($messageData));
 
         $processor = $this->getSendImportNotificationMessageProcessor();
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $url = self::getConfigManager('user')->get('oro_ui.application_url') .
             $this->getRouter()->generate('oro_importexport_job_error_log', ['jobId' => $rootJob->getId()]);
@@ -234,34 +236,17 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    /**
-     * @return SendImportNotificationMessageProcessor
-     */
-    private function getSendImportNotificationMessageProcessor()
+    private function getSendImportNotificationMessageProcessor(): SendImportNotificationMessageProcessor
     {
         return $this->getContainer()->get('oro_importexport.async.send_import_notification');
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \Oro\Component\MessageQueue\Job\JobProcessor
-     */
-    private function getJobProcessor()
+    private function getJobProcessor(): JobProcessor
     {
         return $this->getContainer()->get('oro_message_queue.job.processor');
     }
 
-    /**
-     * @return RouterInterface
-     */
-    private function getRouter()
+    private function getRouter(): RouterInterface
     {
         return $this->getContainer()->get('router');
     }

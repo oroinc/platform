@@ -17,13 +17,13 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class IterableResultFactoryTest extends SearchBundleWebTestCase
 {
-    const GRID_NAME = 'test-search-grid';
+    private const GRID_NAME = 'test-search-grid';
 
     protected function setUp(): void
     {
         $this->initClient();
 
-        if (static::getContainer()->getParameter('oro_search.engine') !== 'orm') {
+        if (self::getContainer()->getParameter('oro_search.engine') !== 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
 
@@ -122,18 +122,12 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
         $this->assertEquals($expectedRecordTitles, $recordTitles);
     }
 
-    /**
-     * @return IterableResultFactoryInterface
-     */
-    private function getFactory()
+    private function getFactory(): IterableResultFactoryInterface
     {
         return $this->client->getContainer()->get('oro_search.extension.mass_action.iterable_result_factory.alias');
     }
 
-    /**
-     * @return Manager
-     */
-    private function getDatagridManager()
+    private function getDatagridManager(): Manager
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

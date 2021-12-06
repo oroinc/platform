@@ -31,7 +31,7 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
     {
         $this->initClient();
 
-        if (static::getContainer()->getParameter('oro_search.engine') !== 'orm') {
+        if (self::getContainer()->getParameter('oro_search.engine') !== 'orm') {
             $this->markTestSkipped('Should be tested only with ORM search engine');
         }
 

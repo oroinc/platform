@@ -35,7 +35,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString('Test Dashboard', $html);
+        self::assertStringContainsString('Test Dashboard', $html);
     }
 
     /**
@@ -60,7 +60,7 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString('Test Dashboard Update', $html);
+        self::assertStringContainsString('Test Dashboard Update', $html);
     }
 
     /**
@@ -75,14 +75,14 @@ class DashboardControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString('Test Dashboard Update', $crawler->html());
+        self::assertStringContainsString('Test Dashboard Update', $crawler->html());
     }
 
     /**
      * @param string $label
      * @return string
      */
-    protected function getEntityIdFromGrid($label)
+    private function getEntityIdFromGrid($label)
     {
         $response = $this->client->requestGrid(
             'dashboards-grid',

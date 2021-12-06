@@ -5,15 +5,14 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine\Orm;
 use Doctrine\ORM\Configuration;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql;
+use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsRank;
+use Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsvectorTsquery;
 
 /**
  * @group search
  */
 class PdoPgsqlTest extends AbstractDriverTest
 {
-    const ENTITY_TITLE = 'test-entity-title';
-    const ENVIRONMENT_NAME = 'PostgreSQL';
-
     public function testGetPlainSql()
     {
         $recordString = PdoPgsql::getPlainSql();
@@ -42,12 +41,12 @@ class PdoPgsqlTest extends AbstractDriverTest
     protected function assertInitConfiguration(Configuration $configuration)
     {
         $this->assertEquals(
-            'Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsRank',
+            TsRank::class,
             $configuration->getCustomStringFunction('TsRank')
         );
 
         $this->assertEquals(
-            'Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql\TsvectorTsquery',
+            TsvectorTsquery::class,
             $configuration->getCustomStringFunction('TsvectorTsquery')
         );
     }

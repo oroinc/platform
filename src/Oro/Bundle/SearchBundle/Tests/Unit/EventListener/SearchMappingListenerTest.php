@@ -20,9 +20,9 @@ class SearchMappingListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidateCache(): void
     {
-        $this->searchMappingProvider
-            ->expects($this->once())
+        $this->searchMappingProvider->expects($this->once())
             ->method('warmUpCache');
+
         $this->searchMappingListener->invalidateCache();
     }
 }

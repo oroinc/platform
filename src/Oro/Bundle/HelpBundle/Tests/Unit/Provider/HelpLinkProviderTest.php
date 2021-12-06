@@ -17,17 +17,21 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const VERSION = '1.0';
 
-    private const WIKI      = 'http://wiki.test.com';
-    private const TEST      = 'http://test.com';
+    private const WIKI = 'http://wiki.test.com';
+    private const TEST = 'http://test.com';
     private const TEST_WIKI = self::TEST . '/wiki';
 
-    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
-    private ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject $controllerClassProvider;
+    /** @var ControllerClassProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $controllerClassProvider;
 
-    private VersionHelper|\PHPUnit\Framework\MockObject\MockObject $helper;
+    /** @var VersionHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $helper;
 
-    private CacheProvider|\PHPUnit\Framework\MockObject\MockObject $cache;
+    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
     protected function setUp(): void
     {
@@ -109,8 +113,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
         array $requestAttributes,
         string $expectedLink
     ): void {
-        $this->helper
-            ->expects(self::any())
+        $this->helper->expects(self::any())
             ->method('getVersion')
             ->willReturn(self::VERSION);
 

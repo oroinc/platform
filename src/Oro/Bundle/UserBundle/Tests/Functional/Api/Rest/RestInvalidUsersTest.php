@@ -40,8 +40,8 @@ class RestInvalidUsersTest extends WebTestCase
     public function usernameKeyDataProvider(): array
     {
         return [
-            'invalid key' => [WebTestCase::USER_NAME, 'invalid_key'],
-            'invalid user' => ['invalid_user', WebTestCase::USER_PASSWORD],
+            'invalid key' => [self::USER_NAME, 'invalid_key'],
+            'invalid user' => ['invalid_user', self::USER_PASSWORD],
         ];
     }
 }

@@ -279,7 +279,7 @@ abstract class RestApiTestCase extends ApiTestCase
         $parameters = $this->getRequestData($parameters);
         $content = null;
         if ($parameters) {
-            $content = json_encode($parameters, JSON_PRETTY_PRINT);
+            $content = json_encode($parameters, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         }
         $response = $this->request(
             'PATCH',

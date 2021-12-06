@@ -6,54 +6,47 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestIntegrationTransport;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\DomCrawler\Form;
 
 class IntegrationControllerTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
-
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
-
-        $this->entityManager = $this->client->getContainer()->get('doctrine')
-            ->getManagerForClass('OroIntegrationBundle:Channel');
     }
 
-    /**
-     * @return \Oro\Bundle\OrganizationBundle\Entity\Organization|null
-     */
-    public function getOrganization()
+    private function getEntityManager(): EntityManagerInterface
     {
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getRepository('OroOrganizationBundle:Organization')
-            ->findOneByName(LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION);
+        return $this->getContainer()->get('doctrine')->getManagerForClass(Channel::class);
+    }
+
+    private function getOrganization(): Organization
+    {
+        return $this->getContainer()->get('doctrine')->getRepository(Organization::class)
+            ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
     }
 
     public function testIndex()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_index'));
-        $result  = $this->client->getResponse();
+        $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('Integrations - System', $crawler->html());
+        self::assertStringContainsString('Integrations - System', $crawler->html());
     }
 
     public function testShouldScheduleSyncJobForActiveIntegration()
     {
         $channel = $this->createChannel();
-        $this->entityManager->persist($channel);
-        $this->entityManager->flush();
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($channel);
+        $entityManager->flush();
         $this->ajaxRequest('POST', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -66,23 +59,22 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertCount(1, $traces);
     }
 
-    public function testCreate()
+    public function testCreate(): array
     {
         $this->markTestIncomplete('Skipped due to issue with dynamic form loading');
 
-        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-
         /** @var User $user */
-        $user    = $this->getContainer()->get('security.token_storage')->getToken()->getUser();
+        $user = $this->getContainer()->get('security.token_storage')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());
+
+        $entityManager = $this->getEntityManager();
         $entityManager->persist($newUser);
         $entityManager->flush($newUser);
 
         $organization = $this->getOrganization();
-        $crawler      = $this->client->request('GET', $this->getUrl('oro_integration_create'));
-        /** @var Form $form */
+        $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
         $form = $crawler->selectButton('Save and Close')->form();
 
         $this->assertEquals(
@@ -97,10 +89,10 @@ class IntegrationControllerTest extends WebTestCase
             'Should contain predefined organization'
         );
 
-        $name                                                   = 'name' . $this->generateRandomString();
-        $form['oro_integration_channel_form[name]']             = 'Simple channel';
-        $form['oro_integration_channel_form[organization]']     = $organization->getId();
-        $form['oro_integration_channel_form[type]']             = 'simple';
+        $name = 'name' . $this->generateRandomString();
+        $form['oro_integration_channel_form[name]'] = 'Simple channel';
+        $form['oro_integration_channel_form[organization]'] = $organization->getId();
+        $form['oro_integration_channel_form[type]'] = 'simple';
         $form['oro_integration_channel_form[defaultUserOwner]'] = $newUser->getId();
 
         $this->client->followRedirects(true);
@@ -108,19 +100,15 @@ class IntegrationControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("Integration saved", $crawler->html());
+        self::assertStringContainsString('Integration saved', $crawler->html());
 
         return compact('name', 'newUser', 'organization');
     }
 
     /**
-     * @param array $data
-     *
      * @depends testCreate
-     *
-     * @return array
      */
-    public function testUpdate($data)
+    public function testUpdate(array $data): array
     {
         $response = $this->client->requestGrid(
             'oro-integration-grid',
@@ -131,12 +119,11 @@ class IntegrationControllerTest extends WebTestCase
         $result = reset($result['data']);
 
         $integration = $result;
-        $crawler     = $this->client->request(
+        $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_integration_update', ['id' => $result['id']])
         );
 
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $this->assertEquals(
@@ -151,7 +138,7 @@ class IntegrationControllerTest extends WebTestCase
             'Should save organization'
         );
 
-        $name                                       = 'name' . $this->generateRandomString();
+        $name = 'name' . $this->generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
 
         $this->client->followRedirects(true);
@@ -159,7 +146,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200, 'text/html; charset=UTF-8');
-        static::assertStringContainsString("Integration saved", $crawler->html());
+        self::assertStringContainsString('Integration saved', $crawler->html());
 
         $integration['name'] = $name;
         return $integration;
@@ -170,8 +157,9 @@ class IntegrationControllerTest extends WebTestCase
         $channel = $this->createChannel();
         $channel->setEnabled(false);
 
-        $this->entityManager->persist($channel);
-        $this->entityManager->flush();
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($channel);
+        $entityManager->flush();
 
         $this->ajaxRequest('POST', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
@@ -185,7 +173,7 @@ class IntegrationControllerTest extends WebTestCase
     /**
      * @depends testUpdate
      */
-    public function testDelete($integration)
+    public function testDelete(array $integration)
     {
         $this->client->request(
             'DELETE',
@@ -206,10 +194,7 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertEmpty($result['options']['totalRecords']);
     }
 
-    /**
-     * @return Channel
-     */
-    protected function createChannel()
+    private function createChannel(): Channel
     {
         $channel = new Channel();
         $channel->setName('aName');

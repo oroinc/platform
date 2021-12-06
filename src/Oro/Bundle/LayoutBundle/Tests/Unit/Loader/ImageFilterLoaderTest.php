@@ -13,40 +13,41 @@ use Oro\Bundle\LayoutBundle\Provider\ImageTypeProvider;
 class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
 {
     private const PRODUCT_ORIGINAL = 'product_original';
+    private const PRODUCT_ORIGINAL_WITH_FORMAT = 'product_original_with_format';
     private const PRODUCT_LARGE = 'product_large';
     private const PRODUCT_SMALL = 'product_small';
     private const PRODUCT_GALLERY_MAIN = 'product_gallery_main';
     private const LARGE_SIZE = 378;
     private const SMALL_SIZE = 56;
 
-    /** @var ImageTypeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $imageTypeProvider;
+    private ImageFilterLoader $imageFilterLoader;
 
-    /** @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterConfig;
+    private ImageTypeProvider|\PHPUnit\Framework\MockObject\MockObject $imageTypeProvider;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ImageFilterLoader */
-    private $imageFilterLoader;
+    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
 
     protected function setUp(): void
     {
         $this->imageTypeProvider = $this->createMock(ImageTypeProvider::class);
         $this->filterConfig = $this->createMock(FilterConfiguration::class);
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->imageFilterLoader = new ImageFilterLoader(
             $this->imageTypeProvider,
             $this->filterConfig,
-            $this->doctrineHelper
+            $doctrineHelper
         );
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $productOriginal = new ThemeImageTypeDimension(self::PRODUCT_ORIGINAL, null, null);
+        $productOriginalWithFormat = new ThemeImageTypeDimension(
+            self::PRODUCT_ORIGINAL_WITH_FORMAT,
+            null,
+            null,
+            ['format' => 'formatValue']
+        );
         $productLarge = new ThemeImageTypeDimension(self::PRODUCT_LARGE, self::LARGE_SIZE, self::LARGE_SIZE);
         $productSmall = new ThemeImageTypeDimension(self::PRODUCT_SMALL, self::SMALL_SIZE, self::SMALL_SIZE);
         $productGalleryMain = new ThemeImageTypeDimension(
@@ -78,10 +79,11 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
                 self::PRODUCT_ORIGINAL => $productOriginal,
                 self::PRODUCT_LARGE => $productLarge,
                 self::PRODUCT_SMALL => $productSmall,
-                self::PRODUCT_GALLERY_MAIN => $productGalleryMain
+                self::PRODUCT_GALLERY_MAIN => $productGalleryMain,
+                self::PRODUCT_ORIGINAL_WITH_FORMAT => $productOriginalWithFormat,
             ]);
 
-        $this->filterConfig->expects(self::exactly(4))
+        $this->filterConfig->expects(self::exactly(5))
             ->method('set')
             ->withConsecutive(
                 [self::PRODUCT_ORIGINAL, $this->prepareBaseFilterData()],
@@ -90,13 +92,14 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
                 [
                     self::PRODUCT_GALLERY_MAIN,
                     $this->prepareFilterDataForResizeWithAuto(self::SMALL_SIZE, ThemeConfiguration::AUTO)
-                ]
+                ],
+                [self::PRODUCT_ORIGINAL_WITH_FORMAT, $this->prepareFilterDataForFormat('formatValue')],
             );
 
         $this->imageFilterLoader->load();
     }
 
-    public function testLoadWhenNoNewCustomImageFilterProviderAdded()
+    public function testLoadWhenNoNewCustomImageFilterProviderAdded(): void
     {
         $this->imageTypeProvider->expects(self::exactly(2))
             ->method('getImageDimensions')
@@ -110,7 +113,7 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $this->imageFilterLoader->load();
     }
 
-    public function testForceLoad()
+    public function testForceLoad(): void
     {
         $this->imageTypeProvider->expects(self::exactly(2))
             ->method('getImageDimensions')
@@ -122,7 +125,7 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         $this->imageFilterLoader->forceLoad();
     }
 
-    public function testLoadWhenNewCustomImageFilterProviderAdded()
+    public function testLoadWhenNewCustomImageFilterProviderAdded(): void
     {
         $this->imageTypeProvider->expects(self::once())
             ->method('getImageDimensions')
@@ -163,6 +166,11 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
         ];
 
         return array_merge_recursive($this->prepareBaseFilterData(), ['filters' => $resizeFiltersData]);
+    }
+
+    private function prepareFilterDataForFormat(string $format): array
+    {
+        return array_merge($this->prepareBaseFilterData(), ['format' => $format]);
     }
 
     private function prepareBaseFilterData(): array

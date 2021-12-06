@@ -16,15 +16,10 @@ class DoctrineJobRepositoryTest extends WebTestCase
     /** @var DoctrineJobRepository */
     private $doctrineJobRepository;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
-
         $this->doctrineJobRepository = $this->getContainer()->get('oro_batch.job.repository');
-
         $this->loadFixtures([LoadDoctrineJobRepositoryData::class]);
     }
 
@@ -36,12 +31,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
         return $this->doctrineJobRepository->getJobManager();
     }
 
-    /**
-     * @param string $stepName
-     *
-     * @return StepExecution
-     */
-    private function findStepExecution($stepName)
+    private function findStepExecution(string $stepName): ?StepExecution
     {
         return $this->doctrineJobRepository->getJobManager()
             ->getRepository(StepExecution::class)
@@ -52,10 +42,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
             ->getOneOrNullResult();
     }
 
-    /**
-     * @return array
-     */
-    public function entityManagerStateDataProvider()
+    public function entityManagerStateDataProvider(): array
     {
         return [
             'not closed entity manager' => [false],
@@ -66,7 +53,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
     /**
      * @dataProvider entityManagerStateDataProvider
      */
-    public function testUpdateStepExecution($closed)
+    public function testUpdateStepExecution(bool $closed)
     {
         /** @var StepExecution $stepExecution */
         $stepExecution = $this->getReference('step_execution_1');

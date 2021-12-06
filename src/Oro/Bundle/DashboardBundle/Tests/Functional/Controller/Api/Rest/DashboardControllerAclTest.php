@@ -8,15 +8,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DashboardControllerAclTest extends WebTestCase
 {
-    /**
-     * @var Manager
-     */
-    protected $dashboardManager;
+    /** @var Manager */
+    private $dashboardManager;
 
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures(['Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData']);
+        $this->loadFixtures([LoadUserData::class]);
 
         $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
     }

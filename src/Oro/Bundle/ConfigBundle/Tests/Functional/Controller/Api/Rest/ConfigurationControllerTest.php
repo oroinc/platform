@@ -9,13 +9,10 @@ class ConfigurationControllerTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
     }
 
-    /**
-     * @return array
-     */
-    public function testGetList()
+    public function testGetList(): array
     {
         $this->client->jsonRequest('GET', $this->getUrl('oro_api_get_configurations'));
 
@@ -27,8 +24,6 @@ class ConfigurationControllerTest extends WebTestCase
 
     /**
      * @depends testGetList
-     *
-     * @param string[] $sections
      */
     public function testGet(array $sections)
     {
@@ -45,19 +40,12 @@ class ConfigurationControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @param Response $response
-     * @param integer  $statusCode
-     * @param string   $sectionPath
-     *
-     * @return array
-     */
-    protected function getApiJsonResponseContent(Response $response, $statusCode, $sectionPath)
+    private function getApiJsonResponseContent(Response $response, int $statusCode, string $sectionPath): array
     {
         try {
             $this->assertResponseStatusCodeEquals($response, $statusCode);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $e = new \PHPUnit\Framework\ExpectationFailedException(
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Wrong %s response for section: "%s". Error message: %s',
                     $statusCode,
@@ -66,7 +54,6 @@ class ConfigurationControllerTest extends WebTestCase
                 ),
                 $e->getComparisonFailure()
             );
-            throw $e;
         }
 
         return self::jsonToArray($response->getContent());

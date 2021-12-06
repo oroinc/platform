@@ -3,7 +3,7 @@ import _ from 'underscore';
 import ImagePreviewModal from 'oroui/js/image-preview-model';
 
 /**
- * On click on gallery element (with 'data-gallery' attribte):
+ * On click on gallery element (with 'data-gallery' attribute):
  * find all gallery elements from the same gallery group,
  * dynamically generate array of gallery elements and show the gallery.
  */
@@ -11,6 +11,10 @@ $(document).on('click.gallery', function(e) {
     let $target = $(e.target);
 
     if ($target.is('.thumbnail')) { // if click was done on thumbnail image, use parent element as a target
+        $target = $target.parent();
+    }
+
+    if ($target.is('picture')) { // if picture tag was used to embed an image
         $target = $target.parent();
     }
 

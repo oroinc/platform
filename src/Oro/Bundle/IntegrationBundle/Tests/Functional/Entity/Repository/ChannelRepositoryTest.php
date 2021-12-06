@@ -14,21 +14,15 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ChannelRepositoryTest extends WebTestCase
 {
-    /**
-     * @var ChannelRepository
-     */
-    protected $repository;
-
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadStatusData::class]);
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository(Channel::class);
     }
 
-    public function testRepositoryIsRegistered()
+    private function getRepository(): ChannelRepository
     {
-        $this->assertInstanceOf(ChannelRepository::class, $this->repository);
+        return self::getContainer()->get('doctrine')->getRepository(Channel::class);
     }
 
     public function testGetLastStatusForConnectorWorks()
@@ -37,19 +31,31 @@ class ChannelRepositoryTest extends WebTestCase
 
         $this->assertSame(
             $this->getReference('oro_integration:foo_first_connector_second_status_completed'),
-            $this->repository->getLastStatusForConnector($fooIntegration, 'first_connector', Status::STATUS_COMPLETED)
+            $this->getRepository()->getLastStatusForConnector(
+                $fooIntegration,
+                'first_connector',
+                Status::STATUS_COMPLETED
+            )
         );
 
         $this->assertSame(
             $this->getReference('oro_integration:foo_first_connector_third_status_failed'),
-            $this->repository->getLastStatusForConnector($fooIntegration, 'first_connector', Status::STATUS_FAILED)
+            $this->getRepository()->getLastStatusForConnector(
+                $fooIntegration,
+                'first_connector',
+                Status::STATUS_FAILED
+            )
         );
 
         $barIntegration = $this->getReference('oro_integration:bar_integration');
 
         $this->assertSame(
             $this->getReference('oro_integration:bar_first_connector_first_status_completed'),
-            $this->repository->getLastStatusForConnector($barIntegration, 'first_connector', Status::STATUS_COMPLETED)
+            $this->getRepository()->getLastStatusForConnector(
+                $barIntegration,
+                'first_connector',
+                Status::STATUS_COMPLETED
+            )
         );
     }
 
@@ -57,7 +63,7 @@ class ChannelRepositoryTest extends WebTestCase
     {
         $fooIntegration = $this->getReference('oro_integration:foo_integration');
 
-        static::assertSame([$fooIntegration], $this->repository->findByType('foo'));
+        self::assertSame([$fooIntegration], $this->getRepository()->findByType('foo'));
     }
 
     public function testFindByTypeAndExclude()
@@ -65,9 +71,9 @@ class ChannelRepositoryTest extends WebTestCase
         $expectedIntegration = $this->getReference('oro_integration:bar_integration');
         $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
 
-        static::assertContains(
+        self::assertContains(
             $expectedIntegration,
-            $this->repository->findByTypeAndExclude('bar', [$excludedIntegration])
+            $this->getRepository()->findByTypeAndExclude('bar', [$excludedIntegration])
         );
     }
 
@@ -76,9 +82,9 @@ class ChannelRepositoryTest extends WebTestCase
         $expectedIntegration = $this->getReference('oro_integration:bar_integration');
         $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
 
-        static::assertContains(
+        self::assertContains(
             $expectedIntegration,
-            $this->repository->findByTypeAndExclude('bar', [$excludedIntegration->getId()])
+            $this->getRepository()->findByTypeAndExclude('bar', [$excludedIntegration->getId()])
         );
     }
 
@@ -89,21 +95,21 @@ class ChannelRepositoryTest extends WebTestCase
         /** @var User $user */
         $user = $container->get('doctrine')
             ->getRepository(User::class)
-            ->findOneByUsername('admin');
+            ->findOneBy(['username' => 'admin']);
         $this->updateUserSecurityToken($user->getEmail());
 
         $expectedIntegration = $this->getReference('oro_integration:bar_integration');
         $excludedIntegration = $this->getReference('oro_integration:extended_bar_integration');
 
-        static::assertContains(
+        self::assertContains(
             $expectedIntegration,
-            $this->repository->findByTypeAndExclude('bar', [$excludedIntegration])
+            $this->getRepository()->findByTypeAndExclude('bar', [$excludedIntegration])
         );
     }
 
     public function testGetConfiguredChannelsForSync()
     {
-        $channels = $this->repository->getConfiguredChannelsForSync(null, false);
+        $channels = $this->getRepository()->getConfiguredChannelsForSync(null, false);
         $this->assertCount(3, $channels);
 
         $channelNames = array_map(static function (Channel $channel) {
@@ -118,7 +124,7 @@ class ChannelRepositoryTest extends WebTestCase
 
     public function testGetConfiguredChannelsForSyncByType()
     {
-        $channels = $this->repository->getConfiguredChannelsForSync('no_connectors');
+        $channels = $this->getRepository()->getConfiguredChannelsForSync('no_connectors');
         $this->assertCount(1, $channels);
 
         $channelNames = array_map(static function (Channel $channel) {

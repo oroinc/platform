@@ -33,7 +33,7 @@ class ImageRemovalManagerTest extends WebTestCase
         $this->applyImageFilter($file, 'avatar_xsmall');
 
         $fileNames = $this->getImageFileNames($file);
-        self::assertCount(2, $fileNames);
+        self::assertCount(4, $fileNames);
 
         $this->removeFiles($file);
         $this->assertFilesDoNotExist($file, $fileNames);
@@ -48,7 +48,7 @@ class ImageRemovalManagerTest extends WebTestCase
         $this->applyImageFilter($file, 'avatar_xsmall');
 
         $fileNames = $this->getImageFileNames($file);
-        self::assertCount(2, $fileNames);
+        self::assertCount(4, $fileNames);
 
         $this->removeFiles($file);
         $this->assertFilesDoNotExist($file, $fileNames);

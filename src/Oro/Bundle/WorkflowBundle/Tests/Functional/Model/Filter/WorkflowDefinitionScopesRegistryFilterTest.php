@@ -56,7 +56,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
             }
         );
 
-        self::loadWorkflowFrom(self::WORKFLOW_SCOPES_CONFIG_DIR);
+        $this->loadWorkflowFrom(self::WORKFLOW_SCOPES_CONFIG_DIR);
 
         /* @var WorkflowManager $manager */
         $manager = self::getContainer()->get('oro_workflow.manager');

@@ -56,7 +56,7 @@ class UsersEnableSwitchActionHandlerTest extends WebTestCase
     /**
      * @return UserRepository
      */
-    protected function getUserRepo()
+    private function getUserRepo()
     {
         return self::getContainer()->get('doctrine')->getRepository(User::class);
     }

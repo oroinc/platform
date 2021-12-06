@@ -8,14 +8,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider1;
+    private ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider1;
 
-    /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider2;
+    private ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider2;
 
-    /** @var ChainImagePlaceholderProvider */
-    private $provider;
+    private ChainImagePlaceholderProvider $provider;
 
     protected function setUp(): void
     {
@@ -31,50 +28,53 @@ class ChainImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $data = '/path/to/filtered.img';
         $filter = 'test_filter';
+        $format = 'sample_format';
 
-        $this->provider1->expects($this->once())
+        $this->provider1->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($data);
 
-        $this->provider2->expects($this->never())
-            ->method($this->anything());
+        $this->provider2->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertEquals($data, $this->provider->getPath($filter));
+        self::assertEquals($data, $this->provider->getPath($filter, $format));
     }
 
     public function testGetPathFromSecondProvider(): void
     {
         $data = '/path/to/filtered.img';
         $filter = 'test_filter';
+        $format = 'sample_format';
 
-        $this->provider1->expects($this->once())
+        $this->provider1->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn(null);
 
-        $this->provider2->expects($this->once())
+        $this->provider2->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($data);
 
-        $this->assertEquals($data, $this->provider->getPath($filter));
+        self::assertEquals($data, $this->provider->getPath($filter, $format));
     }
 
     public function testGetPathWithNoData(): void
     {
         $filter = 'test_filter';
+        $format = 'sample_format';
 
-        $this->provider1->expects($this->once())
+        $this->provider1->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn(null);
 
-        $this->provider2->expects($this->once())
+        $this->provider2->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn(null);
 
-        $this->assertNull($this->provider->getPath($filter));
+        self::assertNull($this->provider->getPath($filter, $format));
     }
 }

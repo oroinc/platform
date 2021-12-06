@@ -33,8 +33,7 @@ class LogoutListenerTest extends \PHPUnit\Framework\TestCase
         $event = new LogoutEvent($request, null);
         $event->setResponse($response);
 
-        $this->httpUtils
-            ->expects(self::never())
+        $this->httpUtils->expects(self::never())
             ->method(self::anything());
 
         $this->listener->onLogout($event);
@@ -47,8 +46,7 @@ class LogoutListenerTest extends \PHPUnit\Framework\TestCase
         $request = new Request();
         $event = new LogoutEvent($request, null);
 
-        $this->httpUtils
-            ->expects(self::never())
+        $this->httpUtils->expects(self::never())
             ->method(self::anything());
 
         $this->listener->onLogout($event);
@@ -64,15 +62,13 @@ class LogoutListenerTest extends \PHPUnit\Framework\TestCase
         $event = new LogoutEvent($request, null);
 
         $uri = '/sample/uri';
-        $this->restDocUrlGenerator
-            ->expects(self::once())
+        $this->restDocUrlGenerator->expects(self::once())
             ->method('generate')
             ->with($apiView)
             ->willReturn($uri);
 
         $response = new RedirectResponse($uri, 302);
-        $this->httpUtils
-            ->expects(self::once())
+        $this->httpUtils->expects(self::once())
             ->method('createRedirectResponse')
             ->with($request, $uri)
             ->willReturn($response);

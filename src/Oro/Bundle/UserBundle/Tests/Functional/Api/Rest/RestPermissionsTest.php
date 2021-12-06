@@ -2,42 +2,34 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class RestPermissionsTest extends WebTestCase
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData']);
-        $this->em   = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->user = $this->em->getRepository('OroUserBundle:User')->findOneBy([
-            'username' => LoadUserData::USER_NAME
-        ]);
+        $this->initClient([], self::generateWsseAuthHeader());
+        $this->loadFixtures([LoadUserData::class]);
+    }
+
+    private function getUser(): User
+    {
+        return self::getContainer()->get('doctrine')->getRepository(User::class)
+            ->findOneBy(['username' => LoadUserData::USER_NAME]);
     }
 
     public function testGetPermissions()
     {
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_user_permissions', ['id' => $this->user->getId()])
+            $this->getUrl('oro_api_get_user_permissions', ['id' => $this->getUser()->getId()])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertNotEmpty($result, "Permissions should not be empty");
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
+        self::assertNotEmpty($result, 'Permissions should not be empty');
     }
 
     public function testGetPermissionsWithEntities()
@@ -45,29 +37,23 @@ class RestPermissionsTest extends WebTestCase
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_permissions', [
-                'id'       => $this->user->getId(),
-                'entities' => 'Oro\Bundle\UserBundle\Entity\User'
+                'id'       => $this->getUser()->getId(),
+                'entities' => User::class
             ])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(1, $result, "Result should contains only permissions for one entity");
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
+        self::assertCount(1, $result, 'Result should contains only permissions for one entity');
 
         $this->client->jsonRequest(
             'GET',
             $this->getUrl('oro_api_get_user_permissions', [
-                'id'       => $this->user->getId(),
-                'entities' => implode(
-                    ',',
-                    [
-                        'user',
-                        'Oro\Bundle\OrganizationBundle\Entity\Organization'
-                    ]
-                )
+                'id'       => $this->getUser()->getId(),
+                'entities' => implode(',', ['user', Organization::class])
             ])
         );
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(2, $result, "Result should contains only permissions for two entities");
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
+        self::assertCount(2, $result, 'Result should contains only permissions for two entities');
     }
 }

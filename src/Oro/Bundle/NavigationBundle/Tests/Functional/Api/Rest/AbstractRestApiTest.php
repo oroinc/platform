@@ -56,7 +56,7 @@ abstract class AbstractRestApiTest extends WebTestCase
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(0, $resultJson);
     }
@@ -73,7 +73,7 @@ abstract class AbstractRestApiTest extends WebTestCase
         $result = $this->client->getResponse();
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         self::assertNotEmpty($resultJson);
         self::assertArrayHasKey('id', $resultJson[0]);
         self::assertContains($this->getItemId(), array_column($resultJson, 'id'));
@@ -184,7 +184,7 @@ abstract class AbstractRestApiTest extends WebTestCase
 
             self::assertJsonResponseStatusCodeEquals($response, 400);
 
-            $responseJson = json_decode($response->getContent(), true);
+            $responseJson = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
             self::assertArrayHasKey('message', $responseJson);
             self::assertEquals('Wrong JSON inside POST body', $responseJson['message']);

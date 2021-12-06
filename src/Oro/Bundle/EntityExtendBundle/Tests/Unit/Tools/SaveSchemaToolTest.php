@@ -28,11 +28,11 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
     /** @var Configuration|\PHPUnit\Framework\MockObject\MockObject */
     private $configuration;
 
-    /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
-    private $schemaTool;
-
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
+
+    /** @var SaveSchemaTool|\PHPUnit\Framework\MockObject\MockObject */
+    private $schemaTool;
 
     protected function setUp(): void
     {
@@ -49,8 +49,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
-        $this->managerRegistry
-            ->expects($this->any())
+        $this->managerRegistry->expects($this->any())
             ->method('getManager')
             ->willReturn($this->em);
 
@@ -97,7 +96,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
         Type::addType('int', IntegerType::class);
 
         $fromSchema = new Schema();
-        $table      = $fromSchema->createTable('oro_entity_extend_test_table');
+        $table = $fromSchema->createTable('oro_entity_extend_test_table');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('someExternalColumn', 'string');
         $table->addColumn('relation_id', 'int');
@@ -113,7 +112,7 @@ class SaveSchemaToolTest extends \PHPUnit\Framework\TestCase
         $table->addForeignKeyConstraint($tableRelation, ['relation_id'], ['id']);
 
         $toSchema = new Schema();
-        $table    = $toSchema->createTable('oro_entity_extend_test_table');
+        $table = $toSchema->createTable('oro_entity_extend_test_table');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->setPrimaryKey(['id']);
 

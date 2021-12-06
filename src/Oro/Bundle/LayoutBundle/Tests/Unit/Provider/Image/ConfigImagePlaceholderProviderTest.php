@@ -13,17 +13,13 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const CONFIG_KEY = 'oro_test.key';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
 
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentManager;
+    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
 
-    /** @var ConfigImagePlaceholderProvider */
-    private $provider;
+    private ConfigImagePlaceholderProvider $provider;
 
     protected function setUp(): void
     {
@@ -43,61 +39,62 @@ class ConfigImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $id = 42;
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with(self::CONFIG_KEY)
             ->willReturn($id);
 
         $image = new File();
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->with(File::class, $id)
             ->willReturn($image);
 
         $filter = 'image_filter';
+        $format = 'sample_format';
 
-        $this->attachmentManager->expects($this->once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFilteredImageUrl')
-            ->with($image, $filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($image, $filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/path/to/filtered.img');
 
-        $this->assertEquals('/path/to/filtered.img', $this->provider->getPath($filter));
+        self::assertEquals('/path/to/filtered.img', $this->provider->getPath($filter, $format));
     }
 
     public function testGetPathWithoutConfiguration(): void
     {
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with(self::CONFIG_KEY)
             ->willReturn(null);
 
-        $this->doctrineHelper->expects($this->never())
-            ->method($this->anything());
+        $this->doctrineHelper->expects(self::never())
+            ->method(self::anything());
 
-        $this->attachmentManager->expects($this->never())
-            ->method($this->anything());
+        $this->attachmentManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->provider->getPath('image_filter'));
+        self::assertNull($this->provider->getPath('image_filter'));
     }
 
     public function testGetPathWithoutFile(): void
     {
         $id = 42;
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with(self::CONFIG_KEY)
             ->willReturn($id);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntity')
             ->with(File::class, $id)
             ->willReturn(null);
 
-        $this->attachmentManager->expects($this->never())
-            ->method($this->anything());
+        $this->attachmentManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->provider->getPath('image_filter'));
+        self::assertNull($this->provider->getPath('image_filter'));
     }
 }

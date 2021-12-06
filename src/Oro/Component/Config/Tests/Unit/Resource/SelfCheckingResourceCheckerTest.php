@@ -19,8 +19,7 @@ class SelfCheckingResourceCheckerTest extends \PHPUnit\Framework\TestCase
     {
         $metadata = new ResourceStub();
 
-        $this->innerResourceChecker
-            ->expects(self::once())
+        $this->innerResourceChecker->expects(self::once())
             ->method('supports')
             ->with($metadata)
             ->willReturn(false);
@@ -40,8 +39,7 @@ class SelfCheckingResourceCheckerTest extends \PHPUnit\Framework\TestCase
         $resource = new ResourceStub();
         $timestamp = time();
 
-        $this->innerResourceChecker
-            ->expects(self::once())
+        $this->innerResourceChecker->expects(self::once())
             ->method('isFresh')
             ->with($resource, $timestamp)
             ->willReturn(false);
@@ -63,8 +61,7 @@ class SelfCheckingResourceCheckerTest extends \PHPUnit\Framework\TestCase
         $resource = new ResourceStub();
         $timestamp = time();
 
-        $this->innerResourceChecker
-            ->expects(self::never())
+        $this->innerResourceChecker->expects(self::never())
             ->method('isFresh');
 
         self::assertTrue(
@@ -77,8 +74,7 @@ class SelfCheckingResourceCheckerTest extends \PHPUnit\Framework\TestCase
         $resource = new ResourceStub();
         $timestamp = time();
 
-        $this->innerResourceChecker
-            ->expects(self::never())
+        $this->innerResourceChecker->expects(self::never())
             ->method('isFresh');
 
         self::assertTrue(

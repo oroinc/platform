@@ -58,7 +58,7 @@ class ConfigurableLoggerPassTest extends WebTestCase
 
         // the output of the command in the console
         $output = $commandTester->getDisplay();
-        static::assertStringContainsString("Log level for global scope is set to 'debug' till", $output);
+        self::assertStringContainsString("Log level for global scope is set to 'debug' till", $output);
 
         /** @var CustomLogChannelCommandStub $command */
         $command = $application->find('oro:logger:use-custom-channel');

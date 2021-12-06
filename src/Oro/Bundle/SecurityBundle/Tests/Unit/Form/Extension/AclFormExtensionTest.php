@@ -32,8 +32,7 @@ class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetType(): void
     {
         $expectedType = new ChoiceType();
-        $this->innerExtension
-            ->expects($this->once())
+        $this->innerExtension->expects($this->once())
             ->method('getType')
             ->with('test')
             ->willReturn($expectedType);
@@ -43,8 +42,7 @@ class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testHasType(): void
     {
-        $this->innerExtension
-            ->expects($this->once())
+        $this->innerExtension->expects($this->once())
             ->method('hasType')
             ->with('test')
             ->willReturn(true);
@@ -54,8 +52,7 @@ class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testHasTypeExtensions(): void
     {
-        $this->innerExtension
-            ->expects($this->once())
+        $this->innerExtension->expects($this->once())
             ->method('hasTypeExtensions')
             ->with('test')
             ->willReturn(true);
@@ -66,8 +63,7 @@ class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetTypeGuesser(): void
     {
         $guesser = $this->createMock(FormTypeGuesserInterface::class);
-        $this->innerExtension
-            ->expects($this->once())
+        $this->innerExtension->expects($this->once())
             ->method('getTypeGuesser')
             ->willReturn($guesser);
 
@@ -76,8 +72,7 @@ class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeExtensions(): void
     {
-        $this->innerExtension
-            ->expects($this->exactly(2))
+        $this->innerExtension->expects($this->exactly(2))
             ->method('getTypeExtensions')
             ->willReturn([AclProtectedTypeExtension::class]);
 

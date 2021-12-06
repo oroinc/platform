@@ -22,9 +22,6 @@ class ButtonTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -71,17 +68,14 @@ class ButtonTest extends WebTestCase
             $notExpected = array_diff($allItems, $expected);
         }
         foreach ($expected as $item) {
-            static::assertStringContainsString($item, $crawler->html());
+            self::assertStringContainsString($item, $crawler->html());
         }
         foreach ($notExpected as $item) {
-            static::assertStringNotContainsString($item, $crawler->html());
+            self::assertStringNotContainsString($item, $crawler->html());
         }
     }
 
-    /**
-     * @return array
-     */
-    public function displayButtonsDataProvider()
+    public function displayButtonsDataProvider(): array
     {
         return [
             'empty context' => [
@@ -127,10 +121,7 @@ class ButtonTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return WorkflowAwareEntity
-     */
-    protected function createNewEntity()
+    private function createNewEntity(): WorkflowAwareEntity
     {
         $testEntity = new WorkflowAwareEntity();
         $testEntity->setName('test_' . uniqid('test', true));

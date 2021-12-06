@@ -15,99 +15,112 @@ use Psr\Log\LoggerInterface;
  */
 class ResizedImageProvider implements ResizedImageProviderInterface
 {
-    /** @var FileManager */
-    private $fileManager;
+    private FileManager $fileManager;
 
-    /** @var ImagineBinaryByFileContentFactoryInterface */
-    private $imagineBinaryFactory;
+    private ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory;
 
-    /** @var ImagineBinaryFilterInterface */
-    private $imagineBinaryFilter;
+    private ImagineBinaryFilterInterface $imagineBinaryFilter;
 
-    /** @var FilterConfiguration */
-    private $filterConfig;
+    private FilterConfiguration $filterConfig;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider;
+
+    private LoggerInterface $logger;
 
     public function __construct(
         FileManager $fileManager,
         ImagineBinaryByFileContentFactoryInterface $imagineBinaryFactory,
         ImagineBinaryFilterInterface $imagineBinaryFilter,
         FilterConfiguration $filterConfig,
+        FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider,
         LoggerInterface $logger
     ) {
         $this->fileManager = $fileManager;
         $this->imagineBinaryFactory = $imagineBinaryFactory;
         $this->imagineBinaryFilter = $imagineBinaryFilter;
         $this->filterConfig = $filterConfig;
+        $this->filterRuntimeConfigProvider = $filterRuntimeConfigProvider;
         $this->logger = $logger;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFilteredImage(File $file, string $filterName): ?BinaryInterface
+    public function getFilteredImage(File $file, string $filterName, string $format = ''): ?BinaryInterface
     {
         $content = $this->getImageContent($file, $filterName);
         if (null === $content) {
             return null;
         }
 
-        return $this->filterImage($content, $filterName, $file->getFilename());
+        return $this->filterImage($content, $filterName, $format, $file->getFilename());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFilteredImageByPath(string $fileName, string $filterName): ?BinaryInterface
+    public function getFilteredImageByPath(string $fileName, string $filterName, string $format = ''): ?BinaryInterface
     {
         $content = $this->getImageContentByPath($fileName, $filterName);
         if (null === $content) {
             return null;
         }
 
-        return $this->filterImage($content, $filterName, $fileName);
+        return $this->filterImage($content, $filterName, $format, $fileName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFilteredImageByContent(string $content, string $filterName): ?BinaryInterface
-    {
-        return $this->filterImage($content, $filterName, null);
+    public function getFilteredImageByContent(
+        string $content,
+        string $filterName,
+        string $format = ''
+    ): ?BinaryInterface {
+        return $this->filterImage($content, $filterName, $format, null);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResizedImage(File $file, int $width, int $height): ?BinaryInterface
+    public function getResizedImage(File $file, int $width, int $height, string $format = ''): ?BinaryInterface
     {
         return $this->getFilteredImage(
             $file,
-            $this->getResizedImageFilterName($width, $height)
+            $this->getResizedImageFilterName($width, $height),
+            $format
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResizedImageByPath(string $fileName, int $width, int $height): ?BinaryInterface
-    {
+    public function getResizedImageByPath(
+        string $fileName,
+        int $width,
+        int $height,
+        string $format = ''
+    ): ?BinaryInterface {
         return $this->getFilteredImageByPath(
             $fileName,
-            $this->getResizedImageFilterName($width, $height)
+            $this->getResizedImageFilterName($width, $height),
+            $format
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResizedImageByContent(string $content, int $width, int $height): ?BinaryInterface
-    {
+    public function getResizedImageByContent(
+        string $content,
+        int $width,
+        int $height,
+        string $format = ''
+    ): ?BinaryInterface {
         return $this->getFilteredImageByContent(
             $content,
-            $this->getResizedImageFilterName($width, $height)
+            $this->getResizedImageFilterName($width, $height),
+            $format
         );
     }
 
@@ -141,13 +154,33 @@ class ResizedImageProvider implements ResizedImageProviderInterface
         }
     }
 
-    private function filterImage(string $content, string $filterName, ?string $fileName): ?BinaryInterface
-    {
+    private function filterImage(
+        string $content,
+        string $filterName,
+        string $format,
+        ?string $fileName
+    ): ?BinaryInterface {
         $originalImageBinary = $this->imagineBinaryFactory->createImagineBinary($content);
         try {
-            $filteredBinary = $this->imagineBinaryFilter->applyFilter($originalImageBinary, $filterName);
+            $runtimeConfig = $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter(
+                $originalImageBinary,
+                $filterName,
+                $format
+            );
+            $filteredBinary = $this->imagineBinaryFilter->applyFilter(
+                $originalImageBinary,
+                $filterName,
+                $runtimeConfig
+            );
         } catch (\Exception $e) {
-            $this->logException($e, $filterName, $fileName);
+            $this->logger->warning(
+                sprintf(
+                    'Failed to apply filter %s to file %s',
+                    $filterName,
+                    $fileName ?? '<raw image content skipped>',
+                ),
+                ['exception' => $e, 'runtimeConfig' => $runtimeConfig ?? []]
+            );
 
             return null;
         }

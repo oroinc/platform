@@ -7,10 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailControllerTest extends WebTestCase
 {
-    const INCORRECT_ID = -1;
-
-    /** @var array */
-    protected $email = [
+    private array $email = [
         'folders' => [
             ['fullName' => 'INBOX \ Test Folder', 'name' => 'Test Folder', 'type' => 'inbox']
         ],
@@ -31,9 +28,6 @@ class EmailControllerTest extends WebTestCase
         $this->loadFixtures([LoadAdminOwnerEmailData::class]);
     }
 
-    /**
-     * @return array
-     */
     public function testCget()
     {
         $url = $this->getUrl('oro_api_get_emails');
@@ -76,12 +70,12 @@ class EmailControllerTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result['id']);
         $this->assertEquals('My Web Store Introduction', $result['subject']);
-        static::assertStringContainsString('Thank you for signing up to My Web Store!', $result['body']);
+        self::assertStringContainsString('Thank you for signing up to My Web Store!', $result['body']);
 
         return $result['id'];
     }
 
-    public function testCreateEmail()
+    public function testCreateEmail(): int
     {
         $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
@@ -95,10 +89,8 @@ class EmailControllerTest extends WebTestCase
 
     /**
      * @depends testCreateEmail
-     *
-     * @param integer $id
      */
-    public function testCreateForExistingEmail($id)
+    public function testCreateForExistingEmail(int $id)
     {
         $this->client->jsonRequest('POST', $this->getUrl('oro_api_post_email'), $this->email);
         $response = $this->getJsonResponseContent($this->client->getResponse(), 201);
@@ -142,14 +134,10 @@ class EmailControllerTest extends WebTestCase
 
     /**
      * @depends testCreateEmail
-     *
-     * @param integer $id
-     *
-     * @return int
      */
-    public function testUpdateEmail($id)
+    public function testUpdateEmail(int $id): int
     {
-        $folders   = [];
+        $folders = [];
         $folders[] = [
             'fullName' => 'INBOX \ Folder1',
             'name'     => 'Folder1',
@@ -181,10 +169,8 @@ class EmailControllerTest extends WebTestCase
 
     /**
      * @depends testUpdateEmail
-     *
-     * @param integer $id
      */
-    public function testUpdateEmailProtectedProperty($id)
+    public function testUpdateEmailProtectedProperty(int $id)
     {
         $this->client->jsonRequest(
             'PUT',

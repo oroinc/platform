@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\AssetBundle\Tests\Functional\VersionStrategy;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -75,10 +76,7 @@ class BuildVersionStrategyTest extends WebTestCase
         );
     }
 
-    /**
-     * @return Crawler|null
-     */
-    protected function requestOroDefaultRoute(): ?Crawler
+    private function requestOroDefaultRoute(): ?Crawler
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_default'));
 

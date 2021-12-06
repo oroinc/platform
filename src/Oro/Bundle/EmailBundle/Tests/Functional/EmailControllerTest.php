@@ -25,8 +25,8 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        static::assertStringContainsString('My Web Store Introduction', $content);
-        static::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
+        self::assertStringContainsString('My Web Store Introduction', $content);
+        self::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
     }
 
     public function testItems()
@@ -48,7 +48,7 @@ class EmailControllerTest extends WebTestCase
         $this->client->request('GET', $url, [], [], $this->generateNoHashNavigationHeader());
         $result = $this->client->getResponse();
         $content = $result->getContent();
-        $this->assertEquals("", $content);
+        $this->assertEquals('', $content);
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
@@ -61,7 +61,7 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        static::assertStringContainsString('From', $content);
+        self::assertStringContainsString('From', $content);
     }
 
     public function testBody()
@@ -71,7 +71,7 @@ class EmailControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
-        static::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
+        self::assertStringContainsString('Thank you for signing up to My Web Store!', $content);
     }
 
     public function testActivity()
@@ -158,7 +158,7 @@ class EmailControllerTest extends WebTestCase
         $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
     }
 
@@ -169,13 +169,13 @@ class EmailControllerTest extends WebTestCase
         $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 1]);
         $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
 
         $url = $this->getUrl('oro_email_mark_seen', ['id' => $emailId, 'status' => 0, 'checkThread' => 0]);
         $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
     }
 
@@ -184,7 +184,7 @@ class EmailControllerTest extends WebTestCase
         $url = $this->getUrl('oro_email_mark_all_as_seen');
         $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful']);
     }
 
@@ -203,7 +203,7 @@ class EmailControllerTest extends WebTestCase
         $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
     }
@@ -223,7 +223,7 @@ class EmailControllerTest extends WebTestCase
         $this->ajaxRequest('POST', $url);
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
-        $data = json_decode($result->getContent(), true);
+        $data = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($data['successful'] === true);
         $this->assertTrue($data['count'] === 1);
     }
@@ -368,7 +368,7 @@ class EmailControllerTest extends WebTestCase
         $response = $this->client->getResponse();
         $this->assertResponseStatusCodeEquals($response, 200);
 
-        $data = json_decode($response->getContent(), true);
+        $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $context = ' (User)';
         $expected = [
             [
@@ -377,7 +377,7 @@ class EmailControllerTest extends WebTestCase
                     [
                         'id' => base64_encode($userString),
                         'text' => $userString . $context,
-                        'data' => \json_encode(
+                        'data' => json_encode(
                             [
                                 'key' => $userString,
                                 'contextText' => $user->getFullName() . $context,
@@ -386,7 +386,8 @@ class EmailControllerTest extends WebTestCase
                                     'entityId' => $user->getId(),
                                 ],
                                 'organization' => $user->getOrganization()->getName(),
-                            ]
+                            ],
+                            JSON_THROW_ON_ERROR
                         )
                     ]
                 ]

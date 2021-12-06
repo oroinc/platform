@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller\Api\Rest;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+use Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GridViewControllerTest extends WebTestCase
@@ -12,9 +13,7 @@ class GridViewControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures([
-            'Oro\Bundle\DataGridBundle\Tests\Functional\DataFixtures\LoadGridViewData',
-        ]);
+        $this->loadFixtures([LoadGridViewData::class]);
     }
 
     public function testPostActionShouldReturn400IfSentDataAreInvalid()
@@ -34,7 +33,7 @@ class GridViewControllerTest extends WebTestCase
         ]);
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 201);
 
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('id', $response);
         $createdGridView = $this->findGridView($response['id']);
         $this->assertEquals('admin', $createdGridView->getOwner()->getUsername());
@@ -92,42 +91,27 @@ class GridViewControllerTest extends WebTestCase
         $this->assertNull($this->findGridView($id));
     }
 
-    /**
-     * @return GridView
-     */
-    private function findFirstGridView()
+    private function findFirstGridView(): GridView
     {
         return $this->getGridViewRepository()->findOneBy([], ['id' => 'ASC']);
     }
 
-    /**
-     * @return GridView
-     */
-    private function findLastGridView()
+    private function findLastGridView(): GridView
     {
         return $this->getGridViewRepository()->findOneBy([], ['id' => 'DESC']);
     }
 
-    /**
-     * @return GridView
-     */
-    private function findGridView($id)
+    private function findGridView(int $id): ?GridView
     {
         return $this->getGridViewRepository()->find($id);
     }
 
-    /**
-     * @return GridViewRepository
-     */
-    private function getGridViewRepository()
+    private function getGridViewRepository(): GridViewRepository
     {
-        return $this->getEntityManager()->getRepository('OroDataGridBundle:GridView');
+        return $this->getEntityManager()->getRepository(GridView::class);
     }
 
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
     }

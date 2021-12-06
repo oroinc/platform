@@ -49,7 +49,7 @@ class RestSearchApiTest extends SearchBundleWebTestCase
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
-        $result = json_decode($result->getContent(), true);
+        $result = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
@@ -76,7 +76,7 @@ class RestSearchApiTest extends SearchBundleWebTestCase
         );
     }
 
-    protected function assertResultHasItems(array $items, array $result)
+    private function assertResultHasItems(array $items, array $result): void
     {
         foreach ($items as $item) {
             $this->assertContains($item, $result);

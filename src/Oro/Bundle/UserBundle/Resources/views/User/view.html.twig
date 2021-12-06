@@ -57,13 +57,18 @@
         'entityTitle': fullname,
     } %}
 
-    {% if entity.avatar %}
-        {% set avatar = filtered_image_url(entity.avatar, 'avatar_med') %}
-    {% else %}
-        {% set avatar = oro_configured_image_url(entity, 'avatar') %}
-    {% endif %}
     {{ parent() }}
 {% endblock pageHeader %}
+
+{% block pageTitleIcon %}
+    <div class="page-title__icon">
+        {%- include '@OroAttachment/Twig/picture.html.twig' with {
+            file: entity.avatar,
+            filter: 'avatar_med',
+            img_attrs: { alt: entity|oro_format_name }
+        } -%}
+    </div>
+{% endblock %}
 
 {% block breadcrumbs %}
     {% import '@OroUI/macros.html.twig' as UI %}

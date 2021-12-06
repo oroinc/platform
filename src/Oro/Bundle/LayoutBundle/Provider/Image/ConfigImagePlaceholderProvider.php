@@ -13,17 +13,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /** @var AttachmentManager */
-    private $attachmentManager;
+    private AttachmentManager $attachmentManager;
 
-    /** @var string */
-    private $configKey;
+    private string $configKey;
 
     public function __construct(
         ConfigManager $configManager,
@@ -37,11 +33,11 @@ class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterfac
         $this->configKey = $configKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
-    {
+    public function getPath(
+        string $filter,
+        string $format = '',
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): ?string {
         $id = $this->configManager->get($this->configKey);
         if (!$id) {
             return null;
@@ -53,6 +49,6 @@ class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterfac
             return null;
         }
 
-        return $this->attachmentManager->getFilteredImageUrl($image, $filter, $referenceType);
+        return $this->attachmentManager->getFilteredImageUrl($image, $filter, $format, $referenceType);
     }
 }

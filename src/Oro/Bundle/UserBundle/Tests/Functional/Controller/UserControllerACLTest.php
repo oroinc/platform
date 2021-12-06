@@ -36,7 +36,7 @@ class UserControllerACLTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        static::assertHtmlResponseStatusCodeEquals($response, $status);
+        self::assertHtmlResponseStatusCodeEquals($response, $status);
     }
 
     /**

@@ -27,7 +27,7 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:notification:alerts:cleanup', $params);
 
-        static::assertStringContainsString($expectedContent, $result);
+        self::assertStringContainsString($expectedContent, $result);
 
         $totalRows = self::getContainer()->get('oro_entity.doctrine_helper')
             ->getEntityRepository(NotificationAlert::class)

@@ -16,9 +16,6 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->manager = $this->createMock(SegmentManager::class);
@@ -39,14 +36,12 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getQuery')
             ->willReturn($query);
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('findById')
             ->with(1)
             ->willReturn($segment);
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getEntityQueryBuilder')
             ->with($segment)
             ->willReturn($qb);
@@ -56,14 +51,12 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCollectionWithoutSegment()
     {
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('findById')
             ->with(1)
             ->willReturn(null);
 
-        $this->manager
-            ->expects($this->never())
+        $this->manager->expects($this->never())
             ->method('getEntityQueryBuilder');
 
         $this->assertEquals([], $this->provider->getCollection(1));
@@ -73,14 +66,12 @@ class SegmentProviderTest extends \PHPUnit\Framework\TestCase
     {
         $segment = new Segment();
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('findById')
             ->with(1)
             ->willReturn($segment);
 
-        $this->manager
-            ->expects($this->once())
+        $this->manager->expects($this->once())
             ->method('getEntityQueryBuilder')
             ->with($segment)
             ->willReturn(null);

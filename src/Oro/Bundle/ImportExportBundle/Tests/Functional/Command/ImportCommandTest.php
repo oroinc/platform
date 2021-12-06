@@ -21,19 +21,19 @@ class ImportCommandTest extends WebTestCase
 
     public function testWithoutEmailOption()
     {
-        $result = static::runCommand(
+        $result = self::runCommand(
             'oro:import:file',
             [
                 $this->getFullPathToDataFile('import.csv')
             ]
         );
 
-        static::assertStringContainsString('The --email option is required.', $result);
+        self::assertStringContainsString('The --email option is required.', $result);
     }
 
     public function testInvalidEmail()
     {
-        $result = static::runCommand(
+        $result = self::runCommand(
             'oro:import:file',
             [
                 $this->getFullPathToDataFile('import.csv'),
@@ -41,7 +41,7 @@ class ImportCommandTest extends WebTestCase
             ]
         );
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'Invalid email. There is no user with not_existing@example.com email!',
             $result
         );
@@ -52,7 +52,7 @@ class ImportCommandTest extends WebTestCase
         /** @var User $importOwner */
         $importOwner = $this->getReference(LoadUserData::SIMPLE_USER);
 
-        $result = static::runCommand(
+        $result = self::runCommand(
             'oro:import:file',
             [
                 $this->getFullPathToDataFile('import.csv'),
@@ -62,9 +62,9 @@ class ImportCommandTest extends WebTestCase
             ]
         );
 
-        static::assertStringContainsString('Scheduled successfully.', $result);
+        self::assertStringContainsString('Scheduled successfully.', $result);
 
-        $sentMessage = static::getSentMessage(Topics::PRE_IMPORT);
+        $sentMessage = self::getSentMessage(Topics::PRE_IMPORT);
 
         // Unset randomly generated fileName for test purposes
         unset($sentMessage['fileName']);
@@ -77,12 +77,12 @@ class ImportCommandTest extends WebTestCase
             'process' => 'import'
         ];
 
-        static::assertEquals($expectedMessage, $sentMessage);
+        self::assertEquals($expectedMessage, $sentMessage);
     }
 
     private function getFullPathToDataFile(string $fileName): string
     {
-        $dataDir = static::getContainer()
+        $dataDir = self::getContainer()
             ->get('kernel')
             ->locateResource('@OroImportExportBundle/Tests/Functional/Async/Import/fixtures');
 

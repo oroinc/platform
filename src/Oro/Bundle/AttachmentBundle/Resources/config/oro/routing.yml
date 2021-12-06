@@ -1,10 +1,32 @@
 _liip_imagine:
     resource: "@LiipImagineBundle/Resources/config/routing.yaml"
 
-oro_attachment_bundle:
-    resource:     "@OroAttachmentBundle/Controller"
+oro_attachment:
+    resource:     "@OroAttachmentBundle/Controller/AttachmentController.php"
     type:         annotation
     prefix:       /
+
+oro_filtered_attachment:
+    path: "media/cache/attachment/filter/{filter}/{filterMd5}/{id}/{filename}"
+    defaults: { _controller: oro_attachment.controller.file::getFilteredImageAction }
+    requirements:
+        id: '\d+'
+        filterMd5: '^[0-9a-f]{32}$'
+
+oro_resize_attachment:
+    path: "media/cache/attachment/resize/{id}/{width}/{height}/{filename}"
+    defaults: { _controller: oro_attachment.controller.file::getResizedAttachmentImageAction }
+    requirements:
+        id: '\d+'
+        width: '\d+'
+        height: '\d+'
+
+oro_attachment_get_file:
+    path: "attachment/{action}/{id}/{filename}"
+    defaults: { _controller: oro_attachment.controller.file::getFileAction }
+    requirements:
+        id: '\d+'
+        action: '(get|download)'
 
 
 #

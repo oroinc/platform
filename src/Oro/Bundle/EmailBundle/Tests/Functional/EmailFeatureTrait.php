@@ -15,7 +15,7 @@ trait EmailFeatureTrait
 
     public function enableEmailFeature(): void
     {
-        $configManager = self::getConfigManager('global');
+        $configManager = self::getConfigManager();
         $configManager->set(Configuration::getConfigKeyByName('feature_enabled'), true);
         $configManager->flush();
 
@@ -24,7 +24,7 @@ trait EmailFeatureTrait
 
     public function disableEmailFeature(): void
     {
-        $configManager = self::getConfigManager('global');
+        $configManager = self::getConfigManager();
         $configManager->set(Configuration::getConfigKeyByName('feature_enabled'), false);
         $configManager->flush();
 

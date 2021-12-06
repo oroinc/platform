@@ -3,30 +3,26 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Grid;
 
 use Oro\Bundle\DataGridBundle\Tests\Functional\AbstractDatagridTestCase;
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailThreadedData;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
 {
     /** @var User */
-    protected $user;
+    private $user;
 
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader('simple_user', 'simple_password'));
-
-        $this->loadFixtures([
-            'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailThreadedData',
-        ]);
+        $this->loadFixtures([LoadEmailThreadedData::class]);
 
         $this->user = $this->getReference('simple_user');
     }
 
     /**
      * @dataProvider gridProvider
-     *
-     * @param array $requestData
      */
-    public function testGrid($requestData)
+    public function testGrid(array $requestData)
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
 
@@ -36,7 +32,7 @@ class EmailGridThreadedEmailsTest extends AbstractDatagridTestCase
     /**
      * {@inheritdoc}
      */
-    public function gridProvider()
+    public function gridProvider(): array
     {
         return [
             'Email grid w/o filters' => [

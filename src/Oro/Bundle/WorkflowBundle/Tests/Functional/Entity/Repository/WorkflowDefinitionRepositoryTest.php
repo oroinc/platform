@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Entity\Repository;
 
 use Doctrine\DBAL\Logging\DebugStack;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Proxy;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
@@ -20,43 +20,66 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProv
 
 class WorkflowDefinitionRepositoryTest extends WebTestCase
 {
-    /** @var EntityManager */
-    private $em;
-
-    /** @var WorkflowDefinitionRepository */
-    private $repository;
-
-    /** @var ScopeManager */
-    private $scopeManager;
-
-    /** @var TestActivityScopeProvider */
-    private $activityScopeProvider;
-
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowDefinitionScopes::class]);
-
-        $this->em = self::getContainer()->get('oro_entity.doctrine_helper')
-            ->getEntityManagerForClass(WorkflowDefinition::class);
-        $this->repository = $this->em->getRepository(WorkflowDefinition::class);
-        $this->scopeManager = self::getContainer()->get('oro_scope.scope_manager');
-        $this->activityScopeProvider = self::getContainer()->get('oro_workflow.test_activity_scope_provider');
     }
 
     protected function tearDown(): void
     {
-        $this->activityScopeProvider->setCurrentTestActivity(null);
-        $this->repository->invalidateCache();
+        $this->getActivityScopeProvider()->setCurrentTestActivity(null);
+        $this->getRepository()->invalidateCache();
+    }
+
+    private function getRepository(): WorkflowDefinitionRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
+    }
+
+    private function getManager(): EntityManagerInterface
+    {
+        return self::getContainer()->get('doctrine')->getManagerForClass(WorkflowDefinition::class);
+    }
+
+    private function getScopeManager(): ScopeManager
+    {
+        return self::getContainer()->get('oro_scope.scope_manager');
+    }
+
+    private function getActivityScopeProvider(): TestActivityScopeProvider
+    {
+        return self::getContainer()->get('oro_workflow.test_activity_scope_provider');
+    }
+
+    private function buildProxyClassName(string $class): string
+    {
+        return sprintf('Proxies\\%s\\%s', Proxy::MARKER, $class);
     }
 
     /**
-     * @param string $class
-     * @return string
+     * @param string[] $expectedWorkflows
+     * @param WorkflowDefinition[] $workflows
      */
-    private function buildProxyClassName($class)
+    private function assertWorkflowList(array $expectedWorkflows, array $workflows): void
     {
-        return sprintf('Proxies\\%s\\%s', Proxy::MARKER, $class);
+        $workflows = $this->getWorkflowNames($workflows);
+
+        $this->assertCount(count($expectedWorkflows), $workflows);
+
+        foreach ($expectedWorkflows as $expected) {
+            $this->assertContains($expected, $workflows);
+        }
+    }
+
+    private function getWorkflowNames(array $workflows): array
+    {
+        return array_map(
+            function (WorkflowDefinition $definition) {
+                return $definition->getName();
+            },
+            $workflows
+        );
     }
 
     public function testFindActiveForRelatedEntity()
@@ -65,7 +88,7 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
 
         $this->assertWorkflowList(
             ['test_active_flow1', 'test_active_flow2'],
-            $this->repository->findActiveForRelatedEntity($class)
+            $this->getRepository()->findActiveForRelatedEntity($class)
         );
     }
 
@@ -88,23 +111,23 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
                 'test_flow_transition_with_condition',
 
             ],
-            $this->repository->findForRelatedEntity($class)
+            $this->getRepository()->findForRelatedEntity($class)
         );
     }
 
     public function testGetScopedByNames()
     {
-        $this->activityScopeProvider->setCurrentTestActivity(
+        $this->getActivityScopeProvider()->setCurrentTestActivity(
             $this->getReference(LoadTestActivitiesForScopes::TEST_ACTIVITY_2)
         );
 
-        $workflows = $this->repository->getScopedByNames(
+        $workflows = $this->getRepository()->getScopedByNames(
             [
                 LoadWorkflowDefinitions::WITH_GROUPS2,
                 LoadWorkflowDefinitions::WITH_GROUPS1,
                 LoadWorkflowDefinitions::WITH_START_STEP
             ],
-            $this->scopeManager->getCriteria(WorkflowScopeManager::SCOPE_TYPE)
+            $this->getScopeManager()->getCriteria(WorkflowScopeManager::SCOPE_TYPE)
         );
 
         $this->assertCount(1, $workflows);
@@ -116,7 +139,7 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
 
     public function testFindActive()
     {
-        $workflows = $this->getWorkflowNames($this->repository->findActive());
+        $workflows = $this->getWorkflowNames($this->getRepository()->findActive());
 
         $this->assertGreaterThanOrEqual(2, count($workflows));
         $this->assertContainsEquals('test_active_flow1', $workflows);
@@ -125,14 +148,14 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
 
     public function testGetAllRelatedEntityClasses()
     {
-        $result = $this->repository->getAllRelatedEntityClasses();
+        $result = $this->getRepository()->getAllRelatedEntityClasses();
 
         $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
         $this->assertContainsEquals(WorkflowAwareEntity::class, $result);
         $this->assertContainsEquals(Item::class, $result);
 
-        $result = $this->repository->getAllRelatedEntityClasses(true);
+        $result = $this->getRepository()->getAllRelatedEntityClasses(true);
 
         $this->assertIsArray($result);
         $this->assertGreaterThanOrEqual(1, count($result));
@@ -143,56 +166,27 @@ class WorkflowDefinitionRepositoryTest extends WebTestCase
 
     public function testInvalidateCache()
     {
-        $config = $this->em->getConnection()->getConfiguration();
+        $config = $this->getManager()->getConnection()->getConfiguration();
         $oldLogger = $config->getSQLLogger();
 
         $logger = new DebugStack();
         $config->setSQLLogger($logger);
 
-        $this->repository->findActive();
+        $this->getRepository()->findActive();
         $this->assertCount(1, $logger->queries);
 
-        $this->repository->findActive();
-        $this->repository->findActive();
+        $this->getRepository()->findActive();
+        $this->getRepository()->findActive();
         $this->assertCount(1, $logger->queries);
 
-        $this->repository->invalidateCache();
-        $this->repository->findActive();
+        $this->getRepository()->invalidateCache();
+        $this->getRepository()->findActive();
         $this->assertCount(2, $logger->queries);
 
-        $this->repository->findActive();
-        $this->repository->findActive();
+        $this->getRepository()->findActive();
+        $this->getRepository()->findActive();
         $this->assertCount(2, $logger->queries);
 
         $config->setSQLLogger($oldLogger);
-    }
-
-    /**
-     * @param array|string[] $expectedWorkflows
-     * @param array|WorkflowDefinition[] $workflows
-     */
-    protected function assertWorkflowList(array $expectedWorkflows, array $workflows)
-    {
-        $workflows = $this->getWorkflowNames($workflows);
-
-        $this->assertCount(count($expectedWorkflows), $workflows);
-
-        foreach ($expectedWorkflows as $expected) {
-            $this->assertContains($expected, $workflows);
-        }
-    }
-
-    /**
-     * @param array|WorkflowDefinition[] $workflows
-     * @return array
-     */
-    protected function getWorkflowNames(array $workflows)
-    {
-        return array_map(
-            function (WorkflowDefinition $definition) {
-                return $definition->getName();
-            },
-            $workflows
-        );
     }
 }

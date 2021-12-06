@@ -7,9 +7,11 @@ use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -34,14 +36,11 @@ class ExportMessageProcessorTest extends WebTestCase
      * @dataProvider exportProcessDataProvider
      */
     public function testShouldProcessExport(
-        $resultSuccess,
-        $resultReadsCount,
-        $resultErrorsCount,
-        $expectedResult
+        bool $resultSuccess,
+        int $resultReadsCount,
+        int $resultErrorsCount,
+        string $expectedResult
     ) {
-        /** @var User $user */
-        $user = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(User::class)->find(1);
-
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:oro_test.add_or_replace:test_import_message'
@@ -53,7 +52,7 @@ class ExportMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('abc');
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'jobId' => $childJob->getId(),
             'jobName' => 'job_name',
             'processorAlias' => 'alias',
@@ -67,9 +66,8 @@ class ExportMessageProcessorTest extends WebTestCase
             'entities' => 'User',
         ];
 
-        $exportHandler = $this->createExportHandlerMock();
-        $exportHandler
-            ->expects($this->once())
+        $exportHandler = $this->createMock(ExportHandler::class);
+        $exportHandler->expects($this->once())
             ->method('getExportResult')
             ->with(
                 $this->equalTo('job_name'),
@@ -85,54 +83,35 @@ class ExportMessageProcessorTest extends WebTestCase
 
         $processor = $this->getContainer()->get('oro_importexport.async.export');
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
         $this->assertEquals($expectedResult, $result);
         $this->assertCount(5, $childJob->getData());
         $this->assertEquals($exportResult, $childJob->getData());
     }
 
-    public function exportProcessDataProvider()
+    public function exportProcessDataProvider(): array
     {
         return [
             [
                 'resultSuccess' => true,
                 'readsCount' => 100,
                 'errorsCount' => 0,
-                'processResult' => ExportMessageProcessor::ACK
+                'processResult' => MessageProcessorInterface::ACK
             ], [
                 'resultSuccess' => true,
                 'readsCount' => 0,
                 'errorsCount' => 0,
-                'processResult' => ExportMessageProcessor::ACK
+                'processResult' => MessageProcessorInterface::ACK
             ], [
                 'resultSuccess' => false,
                 'readsCount' => 0,
                 'errorsCount' => 5,
-                'processResult' => ExportMessageProcessor::REJECT
+                'processResult' => MessageProcessorInterface::REJECT
             ],
         ];
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExportHandler
-     */
-    private function createExportHandlerMock()
-    {
-        return $this->createMock(ExportHandler::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
-    /**
-     * @return \Oro\Component\MessageQueue\Job\JobProcessor
-     */
-    private function getJobProcessor()
+    private function getJobProcessor(): JobProcessor
     {
         return $this->getContainer()->get('oro_message_queue.job.processor');
     }

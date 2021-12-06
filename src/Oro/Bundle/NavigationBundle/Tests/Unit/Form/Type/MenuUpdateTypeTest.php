@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\NavigationBundle\Tests\Functional\Form\Type;
+namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Menu\ItemInterface;
@@ -23,10 +23,10 @@ use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
-    const TEST_TITLE = 'Test Title';
-    const TEST_DESCRIPTION = 'Test Description';
-    const TEST_URI = 'http://test_uri';
-    const TEST_ACL_RESOURCE_ID = 'test_acl_rescource_id';
+    private const TEST_TITLE = 'Test Title';
+    private const TEST_DESCRIPTION = 'Test Description';
+    private const TEST_URI = 'http://test_uri';
+    private const TEST_ACL_RESOURCE_ID = 'test_acl_resource_id';
 
     /**
      * {@inheritdoc}
@@ -255,9 +255,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
                     $className = $constraint->validatedBy();
 
                     if ($className === MaxNestedLevelValidator::class) {
-                        $this->validators[$className] = $this->getMockBuilder(MaxNestedLevelValidator::class)
-                            ->disableOriginalConstructor()
-                            ->getMock();
+                        $this->validators[$className] = $this->createMock(MaxNestedLevelValidator::class);
                     }
 
                     if (!isset($this->validators[$className]) ||

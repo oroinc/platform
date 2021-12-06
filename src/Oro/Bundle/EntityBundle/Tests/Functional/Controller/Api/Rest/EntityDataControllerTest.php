@@ -259,7 +259,7 @@ class EntityDataControllerTest extends WebTestCase
      * @param string $url
      * @param string $content
      */
-    protected function sendPatch($url, $content)
+    private function sendPatch($url, $content)
     {
         $this->client->request('PATCH', $url, [], [], [], $content);
     }
@@ -267,7 +267,7 @@ class EntityDataControllerTest extends WebTestCase
     /**
      * @param object $entity
      */
-    protected function refreshEntity($entity)
+    private function refreshEntity($entity)
     {
         /** @var ManagerRegistry $registry */
         $registry = $this->getContainer()->get('doctrine');

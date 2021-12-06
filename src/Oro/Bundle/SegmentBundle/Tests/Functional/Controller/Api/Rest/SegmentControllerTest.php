@@ -30,7 +30,7 @@ class SegmentControllerTest extends WebTestCase
             $this->getUrl('oro_api_get_segment_items', ['entityName' => str_replace('\\', '_', BusinessUnit::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(3, $responseData['results']);
         self::assertEquals('Child BU segment', $responseData['results'][0]['text']);
@@ -56,7 +56,7 @@ class SegmentControllerTest extends WebTestCase
             $this->getUrl('oro_api_get_segment_items', ['entityName' => str_replace('\\', '_', BusinessUnit::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(2, $responseData['results']);
         self::assertEquals('Child BU segment', $responseData['results'][0]['text']);
@@ -81,7 +81,7 @@ class SegmentControllerTest extends WebTestCase
             $this->getUrl('oro_api_get_segment_items', ['entityName' => str_replace('\\', '_', BusinessUnit::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(1, $responseData['results']);
         self::assertEquals('Main BU segment', $responseData['results'][0]['text']);

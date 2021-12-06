@@ -17,6 +17,7 @@ use Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListen
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowSteps;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
@@ -53,7 +54,7 @@ class WorkflowStepAuditTest extends WebTestCase
         );
 
         $message = new Message();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody(JSON::encode($messageBody));
 
         /** @var AuditChangedEntitiesProcessor $processor */
         $processor = self::getContainer()->get('oro_dataaudit.async.audit_changed_entities');

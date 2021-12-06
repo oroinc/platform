@@ -36,14 +36,12 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $sender = From::emailAddress('some@mail.com');
 
-        $this->notificationSettingsModel
-            ->expects($this->atLeastOnce())
+        $this->notificationSettingsModel->expects($this->atLeastOnce())
             ->method('getSender')
             ->willReturn($sender);
 
         $returnValue = 1;
-        $this->emailTemplateManager
-            ->expects($this->once())
+        $this->emailTemplateManager->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
                 $sender,
@@ -65,15 +63,13 @@ class UserTemplateEmailSenderTest extends \PHPUnit\Framework\TestCase
         $sender = From::emailAddress('some@mail.com');
         $scopeEntity = new User();
 
-        $this->notificationSettingsModel
-            ->expects($this->atLeastOnce())
+        $this->notificationSettingsModel->expects($this->atLeastOnce())
             ->method('getSenderByScopeEntity')
             ->with($scopeEntity)
             ->willReturn($sender);
 
         $returnValue = 1;
-        $this->emailTemplateManager
-            ->expects($this->once())
+        $this->emailTemplateManager->expects($this->once())
             ->method('sendTemplateEmail')
             ->with(
                 $sender,

@@ -7,10 +7,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityControllerTest extends WebTestCase
 {
-    /**
-     * @var EntityWithFieldsProvider
-     */
-    protected $provider;
+    /** @var EntityWithFieldsProvider */
+    private $provider;
 
     protected function setUp(): void
     {
@@ -32,7 +30,7 @@ class EntityControllerTest extends WebTestCase
             foreach ($entityData['fields'] as $fieldData) {
                 if (array_key_exists('relation_type', $fieldData)) {
                     $this->assertArrayHasKey('name', $fieldData);
-                    static::assertDoesNotMatchRegularExpression(
+                    self::assertDoesNotMatchRegularExpression(
                         '/many$/',
                         $fieldData['relation_type'],
                         sprintf('Unsupported *toMany relation present %s:%s', $entityData['name'], $fieldData['name'])
@@ -45,10 +43,7 @@ class EntityControllerTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    protected function getExpectedData()
+    private function getExpectedData(): array
     {
         return array_map(
             function (array $data) {

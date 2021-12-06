@@ -3,13 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\EventListener;
 
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
+use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
 class WorkflowAwareCacheTest extends WorkflowTestCase
 {
-    /**
-     * @var \Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache
-     */
+    /** @var WorkflowAwareCache */
     private $cache;
 
     protected function setUp(): void
@@ -30,8 +29,8 @@ class WorkflowAwareCacheTest extends WorkflowTestCase
         $this->cache->invalidateActiveRelated();
         $this->cache->invalidateRelated();
 
-        $workflowRegistry = self::getSystemWorkflowRegistry();
-        $workflowManager = self::getSystemWorkflowManager();
+        $workflowRegistry = $this->getSystemWorkflowRegistry();
+        $workflowManager = $this->getSystemWorkflowManager();
 
         self::assertFalse(
             $workflowRegistry->hasActiveWorkflowsByEntityClass(WorkflowAwareEntity::class),
@@ -43,7 +42,7 @@ class WorkflowAwareCacheTest extends WorkflowTestCase
         self::assertFalse($this->cache->hasRelatedActiveWorkflows(WorkflowAwareEntity::class));
 
         //covering invalidation on new workflow created. Same behavior of update and delete are covered by unit tests.
-        self::loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/AwareCache');
+        $this->loadWorkflowFrom('/Tests/Functional/EventListener/DataFixtures/config/AwareCache');
 
         self::assertTrue($workflowRegistry->hasActiveWorkflowsByEntityClass(WorkflowAwareEntity::class));
         self::assertTrue($this->cache->hasRelatedWorkflows(WorkflowAwareEntity::class));

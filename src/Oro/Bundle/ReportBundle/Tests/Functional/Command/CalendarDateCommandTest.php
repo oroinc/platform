@@ -8,15 +8,11 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CalendarDateCommandTest extends WebTestCase
 {
-    const DATE_FORMAT = 'Y-m-d';
+    private const DATE_FORMAT = 'Y-m-d';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures([]);
     }
 
     public function testGenerateDates()
@@ -41,7 +37,7 @@ class CalendarDateCommandTest extends WebTestCase
         $this->assertCalendarDates($results);
     }
 
-    protected function assertCalendarDates(array $calendarDates)
+    private function assertCalendarDates(array $calendarDates): void
     {
         $generatedDates = [];
         foreach ($calendarDates as $calendarDate) {
@@ -60,10 +56,7 @@ class CalendarDateCommandTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getGeneratedDates()
+    private function getGeneratedDates(): array
     {
         $dates = [];
         $period = new \DatePeriod(

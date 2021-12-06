@@ -7,16 +7,12 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class HtmlTagProviderTest extends WebTestCase
 {
-    /** @var HtmlTagProvider */
-    protected $htmlTagProvider;
-
     /**
      * List of allowed element.
      *
      * @url http://www.tinymce.com/wiki.php/Configuration:valid_elements
-     * @var array
      */
-    protected $allowedElements = [
+    private array $allowedElements = [
         '@[id|style|class]',
         'iframe[allowfullscreen|frameborder|height|marginheight|marginwidth|name|scrolling|src|width|allow]',
         'table[cellspacing|cellpadding|border|align|width]',
@@ -91,8 +87,7 @@ class HtmlTagProviderTest extends WebTestCase
         'aside',
     ];
 
-    /** @var string */
-    protected $allowedTags = '<iframe></iframe><table></table><thead></thead><tbody></tbody><tr></tr><td></td>' .
+    private string $allowedTags = '<iframe></iframe><table></table><thead></thead><tbody></tbody><tr></tr><td></td>' .
     '<th></th><a></a><dl></dl><dt></dt><div></div><ul></ul><ol></ol><li></li><em></em><strong></strong><b></b><p></p>' .
     '<u></u><font></font><i></i><br><span></span><img><h1></h1><h2></h2><h3></h3><h4></h4><h5></h5><h6></h6>' .
     '<hgroup></hgroup><abbr></abbr><address></address><article></article><audio></audio><bdo></bdo>' .
@@ -102,6 +97,9 @@ class HtmlTagProviderTest extends WebTestCase
     '<menu></menu><nav></nav><pre></pre><q></q><samp></samp><section></section><small></small><strike></strike>' .
     '<source></source><sub></sub><sup></sup><time></time><tfoot></tfoot><var></var><video></video>' .
     '<aside></aside>';
+
+    /** @var HtmlTagProvider */
+    private $htmlTagProvider;
 
     protected function setUp(): void
     {

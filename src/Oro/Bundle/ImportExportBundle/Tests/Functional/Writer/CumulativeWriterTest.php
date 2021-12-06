@@ -22,21 +22,19 @@ use Psr\Log\Test\TestLogger;
 class CumulativeWriterTest extends WebTestCase
 {
     /** @var TestLogger */
-    protected $logger;
+    private $logger;
 
     /** @var CumulativeWriter */
-    protected $writer;
+    private $writer;
 
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures(
-            [
-                LoadAttributeData::class,
-                LoadAttributeFamilyData::class,
-                LoadAttributeGroupData::class,
-            ]
-        );
+        $this->loadFixtures([
+            LoadAttributeData::class,
+            LoadAttributeFamilyData::class,
+            LoadAttributeGroupData::class
+        ]);
 
         $this->logger = new TestLogger();
         $this->writer = $this->getContainer()->get('oro_importexport.writer.cumulative');

@@ -14,7 +14,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Tests\Functional\Helper\AdminUserTrait;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -31,7 +30,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
     use MessageQueueExtension;
-    use AdminUserTrait;
 
     protected function setUp(): void
     {
@@ -41,31 +39,31 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         );
     }
 
-    /**
-     * @return SendChangedEntitiesToMessageQueueListener
-     */
-    protected function getListener()
+    private function getListener(): SendChangedEntitiesToMessageQueueListener
     {
         return $this->getContainer()->get('oro_dataaudit.listener.send_changed_entities_to_message_queue');
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManager
     {
         return $this->getContainer()->get('doctrine.orm.entity_manager');
     }
 
-    /**
-     * @return TokenStorageInterface
-     */
-    protected function getTokenStorage()
+    private function getTokenStorage(): TokenStorageInterface
     {
         return $this->getContainer()->get('security.token_storage');
     }
 
-    protected static function assertSentChanges(array $expectedChanges)
+    private function getAdminUser(): User
+    {
+        return self::getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->getRepository(User::class)
+            ->findOneBy(['email' => self::AUTH_USER]);
+    }
+
+    private static function assertSentChanges(array $expectedChanges): void
     {
         /** @var Message $message */
         $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
@@ -981,7 +979,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertCount(1, $sentMessages);
 
         $additionalChanges = ['additionalChanges' => ['old', 'new']];
-        $storage = parent::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
         $storage->addEntityUpdate($em, $entity, $additionalChanges);
 
         $em->flush();
@@ -1080,7 +1078,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $this->assertCount(1, $sentMessages);
 
         $additionalChanges = ['additionalChanges' => ['old', 'new']];
-        $storage = parent::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
         $storage->addEntityUpdate($em, $entity, $additionalChanges);
 
         $entity->setStringProperty('new string');

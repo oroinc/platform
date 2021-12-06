@@ -81,7 +81,7 @@ class NavigationItemData extends AbstractFixture implements DependentFixtureInte
         $urlGenerator = $this->container->get(UrlGeneratorInterface::class);
 
         foreach (self::$navigationItems as $key => $data) {
-            $data['title'] = json_encode($data);
+            $data['title'] = json_encode($data, JSON_THROW_ON_ERROR);
 
             $data['url'] = $urlGenerator->generate($data['route'], ['restore' => 1]);
             unset($data['route']);

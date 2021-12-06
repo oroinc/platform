@@ -9,17 +9,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CountryRepositoryTest extends WebTestCase
 {
-    /** @var CountryRepository */
-    protected $repository;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
         $this->loadFixtures([LoadCountryData::class]);
+    }
 
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository(Country::class);
+    private function getRepository(): CountryRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Country::class);
     }
 
     public function testGetCountries()
@@ -31,7 +29,7 @@ class CountryRepositoryTest extends WebTestCase
             $this->getReference(LoadCountryData::COUNTRY_GERMANY)
         ];
 
-        $countries = $this->repository->getCountries();
+        $countries = $this->getRepository()->getCountries();
         $this->assertGreaterThanOrEqual(3, count($countries));
 
         foreach ($expected as $expectedCountry) {
@@ -47,7 +45,7 @@ class CountryRepositoryTest extends WebTestCase
     {
         /** @var Country $testCountry */
         $testCountry = $this->getReference(LoadCountryData::COUNTRY_MEXICO);
-        $countries = $this->repository->getAllCountryNamesArray();
+        $countries = $this->getRepository()->getAllCountryNamesArray();
         $this->assertContains(
             [
                 'iso2Code' => $testCountry->getIso2Code(),
@@ -60,7 +58,7 @@ class CountryRepositoryTest extends WebTestCase
 
     public function testGetAllIdentities()
     {
-        $result = $this->repository->getAllIdentities();
+        $result = $this->getRepository()->getAllIdentities();
 
         $this->assertGreaterThanOrEqual(3, count($result));
 
@@ -78,29 +76,25 @@ class CountryRepositoryTest extends WebTestCase
 
     public function testUpdateTranslations()
     {
-        $this->repository->updateTranslations(
+        $this->getRepository()->updateTranslations(
             [
                 'US' => 'États Unis',
                 'DE' => 'Allemagne',
             ]
         );
-        $this->repository->clear();
+        $this->getRepository()->clear();
 
-        $actual = $this->repository->findBy(['iso2Code' => ['US', 'DE']]);
+        $actual = $this->getRepository()->findBy(['iso2Code' => ['US', 'DE']]);
 
         $this->assertCount(2, $actual);
         $this->assertTranslationExists('US', 'États Unis', $actual);
         $this->assertTranslationExists('DE', 'Allemagne', $actual);
     }
 
-    /**
-     * @param string $expectedCode
-     * @param string $expectedTranslation
-     * @param array|Country[] $entities
-     */
-    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $entities)
+    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $entities): void
     {
         $actual = null;
+        /** @var Country $entity */
         foreach ($entities as $entity) {
             if ($entity->getIso2Code() === $expectedCode) {
                 $actual = $entity;

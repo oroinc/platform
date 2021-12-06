@@ -40,7 +40,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('Successfully updated', $crawler->html());
+        self::assertStringContainsString('Successfully updated', $crawler->html());
     }
 
     public function testCreate()
@@ -60,7 +60,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $crawler = $this->client->submit($form, [Router::ACTION_PARAMETER => $saveButton->attr('data-action')]);
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('Product Family was successfully saved', $crawler->html());
+        self::assertStringContainsString('Product Family was successfully saved', $crawler->html());
     }
 
     private function assertFamilyIsNotDeleted(AttributeFamily $attributeFamily)
@@ -72,7 +72,7 @@ class AttributeFamilyControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertEquals(200, $result->getStatusCode());
-        static::assertStringContainsString('Can not be deleted', $result->getContent());
+        self::assertStringContainsString('Can not be deleted', $result->getContent());
     }
 
     public function testDelete()
@@ -89,7 +89,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertEquals(200, $result->getStatusCode());
-        static::assertStringContainsString('Successfully deleted', $result->getContent());
+        self::assertStringContainsString('Successfully deleted', $result->getContent());
 
         $lastAttributeFamily = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1);
 
@@ -117,10 +117,7 @@ class AttributeFamilyControllerTest extends WebTestCase
         $this->assertFamilyIsNotDeleted($family);
     }
 
-    /**
-     * @return string
-     */
-    protected function getTestEntityAlias()
+    private function getTestEntityAlias(): string
     {
         return $this->getContainer()
             ->get('oro_entity.entity_alias_resolver')

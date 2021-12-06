@@ -17,9 +17,13 @@ class AuditUpdatedRelationsTest extends WebTestCase
 {
     use AuditChangedEntitiesExtensionTrait;
 
+    /** @var AuditChangedEntitiesRelationsProcessor */
+    private $processor;
+
     protected function setUp(): void
     {
         $this->initClient();
+        $this->processor = self::getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
     }
 
     public function testShouldNotCreateAuditEntityForUpdatedCollectionWithoutChangesButEntityAuditable()
@@ -34,12 +38,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(0);
     }
@@ -87,12 +86,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
         $audit = $this->findLastStoredAudit();
@@ -135,12 +129,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
         $audit = $this->findLastStoredAudit();
@@ -184,12 +173,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -238,12 +222,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -287,12 +266,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -341,12 +315,7 @@ class AuditUpdatedRelationsTest extends WebTestCase
             ],
         ]);
 
-        /** @var AuditChangedEntitiesRelationsProcessor $processor */
-        $processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
-
-        $processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertStoredAuditCount(1);
 
@@ -361,5 +330,10 @@ class AuditUpdatedRelationsTest extends WebTestCase
         $this->assertSame('ownerManyToOne', $auditField->getField());
         $this->assertEquals('Added: TestAuditDataOwner::567', $auditField->getNewValue());
         $this->assertEquals('Removed: TestAuditDataOwner::321', $auditField->getOldValue());
+    }
+
+    private function getConnection(): ConnectionInterface
+    {
+        return self::getContainer()->get('oro_message_queue.transport.connection');
     }
 }

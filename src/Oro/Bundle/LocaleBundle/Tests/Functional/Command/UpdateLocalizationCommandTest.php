@@ -69,28 +69,28 @@ class UpdateLocalizationCommandTest extends WebTestCase
     private function assertLocalizationExists(string $languageCode, string $formattingCode, string $name): void
     {
         $localizations = $this->localizationRepository->findAll();
-        static::assertCount(1, $localizations);
+        self::assertCount(1, $localizations);
         /** @var Localization $localization */
         $localization = reset($localizations);
 
-        static::assertEquals($languageCode, $localization->getLanguageCode());
-        static::assertEquals($formattingCode, $localization->getFormattingCode());
-        static::assertEquals($name, $localization->getName());
-        static::assertEquals($name, $localization->getTitle());
+        self::assertEquals($languageCode, $localization->getLanguageCode());
+        self::assertEquals($formattingCode, $localization->getFormattingCode());
+        self::assertEquals($name, $localization->getName());
+        self::assertEquals($name, $localization->getTitle());
     }
 
     private function assertEnglishLanguageExists(): void
     {
-        static::assertFalse(null === $this->languageRepository->findOneBy(['code' => 'en']));
+        self::assertFalse(null === $this->languageRepository->findOneBy(['code' => 'en']));
     }
 
     private function assertLocalizationNotExists(string $formattingCode): void
     {
-        static::assertTrue(null === $this->localizationRepository->findOneBy(['formattingCode' => $formattingCode]));
+        self::assertTrue(null === $this->localizationRepository->findOneBy(['formattingCode' => $formattingCode]));
     }
 
     private function assertLanguageNotExists(string $code): void
     {
-        static::assertTrue(null === $this->languageRepository->findOneBy(['code' => $code]));
+        self::assertTrue(null === $this->languageRepository->findOneBy(['code' => $code]));
     }
 }

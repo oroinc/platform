@@ -156,7 +156,7 @@ abstract class ActionTestCase extends WebTestCase
                 'redirectUrl' => $this->getUrl($redirectUrl),
                 'pageReload' => true
             ],
-            json_decode($this->client->getResponse()->getContent(), true)
+            json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR)
         );
     }
 
@@ -202,6 +202,6 @@ abstract class ActionTestCase extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString($message, $crawler->html());
+        self::assertStringContainsString($message, $crawler->html());
     }
 }

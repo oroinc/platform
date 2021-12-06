@@ -93,6 +93,10 @@ class ImageFilterLoader
             ]
         ];
 
+        if ($dimension->hasOption('format')) {
+            $filterSettings['format'] = $dimension->getOption('format');
+        }
+
         foreach ($this->customFilterProviders as $provider) {
             if ($provider->isApplicable($dimension)) {
                 $filterSettings = array_replace_recursive($filterSettings, $provider->getFilterConfig());

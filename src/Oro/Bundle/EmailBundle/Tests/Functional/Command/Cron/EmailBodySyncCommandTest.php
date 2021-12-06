@@ -30,9 +30,9 @@ class EmailBodySyncCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron:email-body-sync', $params);
 
         if ('' === $expectedContent) {
-            $this->assertEmpty($result);
+            self::assertEmpty($result);
         } else {
-            static::assertStringContainsString($expectedContent, $result);
+            self::assertStringContainsString($expectedContent, $result);
         }
     }
 
@@ -41,7 +41,7 @@ class EmailBodySyncCommandTest extends WebTestCase
         $this->disableEmailFeature();
         $result = $this->runCommand('oro:cron:email-body-sync');
 
-        static::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
+        self::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
     }
 
     /**

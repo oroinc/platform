@@ -40,7 +40,7 @@ class FixRestAnnotationsTest extends WebTestCase
      *
      * @return bool
      */
-    protected function checkRoute($routeName, $routePath)
+    private function checkRoute($routeName, $routePath)
     {
         $oroDefaultPrefix = $this->getUrl('oro_default');
 

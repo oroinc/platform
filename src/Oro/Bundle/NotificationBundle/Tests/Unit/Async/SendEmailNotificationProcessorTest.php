@@ -37,8 +37,7 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
         );
         $this->setUpLoggerMock($this->processor);
 
-        $embeddedImagesInSymfonyEmailHandler
-            ->expects(self::any())
+        $embeddedImagesInSymfonyEmailHandler->expects(self::any())
             ->method('handleEmbeddedImages')
             ->willReturnCallback(
                 static fn (SymfonyEmail $symfonyEmail) => $symfonyEmail->html('sample body with images extracted')
@@ -52,13 +51,11 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessRejectsMessageWhenBodyIsInvalid(array $messageBody): void
     {
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('critical')
             ->with('Message properties from, toEmail, subject, body were not expected to be empty');
 
-        $this->mailer
-            ->expects(self::never())
+        $this->mailer->expects(self::never())
             ->method(self::anything());
 
         $message = new Message();
@@ -117,14 +114,12 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
      */
     public function testProcessSendsEmailWhenSentCount(array $messageBody, SymfonyEmail $expectedSymfonyEmail): void
     {
-        $this->validator
-            ->expects(self::exactly(2))
+        $this->validator->expects(self::exactly(2))
             ->method('validate')
             ->withConsecutive([$messageBody['from']], [$messageBody['toEmail']])
             ->willReturn(new ConstraintViolationList());
 
-        $this->mailer
-            ->expects(self::once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($expectedSymfonyEmail);
 
@@ -179,18 +174,15 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
             'body' => 'sample body',
         ];
 
-        $this->validator
-            ->expects(self::once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with($messageBody['from'])
             ->willReturn(new ConstraintViolationList([$this->createMock(ConstraintViolation::class)]));
 
-        $this->mailer
-            ->expects(self::never())
+        $this->mailer->expects(self::never())
             ->method(self::anything());
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with('Email address "invalid_from" is not valid');
 
@@ -212,8 +204,7 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
             'body' => 'sample body',
         ];
 
-        $this->validator
-            ->expects(self::exactly(2))
+        $this->validator->expects(self::exactly(2))
             ->method('validate')
             ->withConsecutive([$messageBody['from']], [$messageBody['toEmail']])
             ->willReturnOnConsecutiveCalls(
@@ -221,12 +212,10 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
                 new ConstraintViolationList([$this->createMock(ConstraintViolation::class)])
             );
 
-        $this->mailer
-            ->expects(self::never())
+        $this->mailer->expects(self::never())
             ->method(self::anything());
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with('Email address "invalid_to" is not valid');
 
@@ -248,8 +237,7 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
             'body' => 'sample body',
         ];
 
-        $this->validator
-            ->expects(self::exactly(2))
+        $this->validator->expects(self::exactly(2))
             ->method('validate')
             ->withConsecutive([$messageBody['from']], [$messageBody['toEmail']])
             ->willReturn(new ConstraintViolationList());
@@ -261,14 +249,12 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
             ->text('sample body');
 
         $exception = new \RuntimeException('Sample exception');
-        $this->mailer
-            ->expects(self::once())
+        $this->mailer->expects(self::once())
             ->method('send')
             ->with($symfonyEmail)
             ->willThrowException($exception);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Failed to send an email notification to to@example.com: Sample exception',

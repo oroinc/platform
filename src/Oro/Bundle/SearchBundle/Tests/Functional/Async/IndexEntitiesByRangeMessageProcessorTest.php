@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @nestTransactionsWithSavepoints
@@ -45,7 +46,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
         // test
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'entityClass' => Item::class,
             'offset' => 0,
             'limit' => 1000,
@@ -79,7 +80,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
         // test
         $message = new Message();
-        $message->setBody(json_encode([
+        $message->setBody(JSON::encode([
             'class' => Item::class,
             'offset' => 100000,
             'limit' => 1000,

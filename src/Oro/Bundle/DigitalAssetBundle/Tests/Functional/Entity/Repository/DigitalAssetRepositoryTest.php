@@ -10,19 +10,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DigitalAssetRepositoryTest extends WebTestCase
 {
-    /** @var DigitalAssetRepository */
-    private $repository;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadFileData::class, LoadDigitalAssetData::class]);
+    }
 
-        $this->repository = $this->getContainer()->get('doctrine')
-            ->getRepository(DigitalAsset::class);
+    private function getRepository(): DigitalAssetRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(DigitalAsset::class);
     }
 
     public function testFindChildFilesByDigitalAssetId(): void
@@ -30,13 +26,13 @@ class DigitalAssetRepositoryTest extends WebTestCase
         $digitalAsset = $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1);
         $this->assertEquals(
             $digitalAsset->getChildFiles()->toArray(),
-            $this->repository->findChildFilesByDigitalAssetId($digitalAsset->getId())
+            $this->getRepository()->findChildFilesByDigitalAssetId($digitalAsset->getId())
         );
     }
 
     public function testFindChildFilesByDigitalAssetIdWhenMissing(): void
     {
-        $this->assertEquals([], $this->repository->findChildFilesByDigitalAssetId(99999));
+        $this->assertEquals([], $this->getRepository()->findChildFilesByDigitalAssetId(99999));
     }
 
     public function testFindSourceFile(): void
@@ -46,7 +42,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
 
         $this->assertEquals(
             $digitalAsset->getSourceFile(),
-            $this->repository->findSourceFile($digitalAsset->getId())
+            $this->getRepository()->findSourceFile($digitalAsset->getId())
         );
     }
 
@@ -57,7 +53,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
                 $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_1_CHILD_1),
                 $this->getReference(LoadDigitalAssetData::DIGITAL_ASSET_2_CHILD_1),
             ],
-            $this->repository->findForEntityField(\stdClass::class, 1, 'attachmentFieldA')
+            $this->getRepository()->findForEntityField(\stdClass::class, 1, 'attachmentFieldA')
         );
     }
 
@@ -71,7 +67,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
                 $digitalAsset1->getId() => $digitalAsset1,
                 $digitalAsset3->getId() => $digitalAsset3,
             ],
-            $this->repository->findByIds(
+            $this->getRepository()->findByIds(
                 [$digitalAsset1->getId(), $digitalAsset3->getId()],
                 $this->getContainer()->get('oro_security.acl_helper')
             )
@@ -80,7 +76,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
 
     public function testGetFileDataForTwigTagWhenNotExists(): void
     {
-        $this->assertSame([], $this->repository->getFileDataForTwigTag(999999));
+        $this->assertSame([], $this->getRepository()->getFileDataForTwigTag(999999));
     }
 
     /**
@@ -96,7 +92,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
                 'parentEntityId' => $file->getParentEntityId(),
                 'digitalAssetId' => $file->getDigitalAsset() ? $file->getDigitalAsset()->getId() : null,
             ],
-            $this->repository->getFileDataForTwigTag($file->getId())
+            $this->getRepository()->getFileDataForTwigTag($file->getId())
         );
     }
 

@@ -90,6 +90,6 @@ class AttachmentFilterAwareUrlGeneratorTest extends WebTestCase
 
     private function getHash(array $parameters): string
     {
-        return md5(json_encode($parameters));
+        return md5(json_encode($parameters, JSON_THROW_ON_ERROR));
     }
 }

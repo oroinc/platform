@@ -28,8 +28,7 @@ class SessionStorageFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateStorage(): void
     {
         $request = new Request();
-        $this->innerSessionStorageFactory
-            ->expects(self::once())
+        $this->innerSessionStorageFactory->expects(self::once())
             ->method('createStorage')
             ->with($request)
             ->willReturn(new MockArraySessionStorage());

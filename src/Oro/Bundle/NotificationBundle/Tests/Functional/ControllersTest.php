@@ -2,27 +2,20 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Functional;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ResponseExtension;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
 
 class ControllersTest extends WebTestCase
 {
     use ResponseExtension;
 
-    const ENTITY_NAME = 'Oro\Bundle\UserBundle\Entity\User';
-
-    /** @var Registry */
-    protected $doctrine;
-
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
-        $this->doctrine = $this->getContainer()->get('doctrine');
     }
 
     public function testIndex()
@@ -57,7 +50,7 @@ class ControllersTest extends WebTestCase
             [
                 'email-notification-grid[_pager][_page]' => 1,
                 'email-notification-grid[_pager][_per_page]' => 1,
-                'email-notification-grid[_filter][entityName][value][]' => self::ENTITY_NAME
+                'email-notification-grid[_filter][entityName][value][]' => User::class
             ]
         );
 
@@ -86,7 +79,7 @@ class ControllersTest extends WebTestCase
             [
                 'email-notification-grid[_pager][_page]' => 1,
                 'email-notification-grid[_pager][_per_page]' => 1,
-                'email-notification-grid[_filter][entityName][value][]' => self::ENTITY_NAME
+                'email-notification-grid[_filter][entityName][value][]' => User::class
             ]
         );
 
@@ -102,26 +95,18 @@ class ControllersTest extends WebTestCase
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
     }
 
-    /**
-     * @return null|object|EmailTemplate
-     */
-    protected function getTemplate()
+    private function getTemplate(): EmailTemplate
     {
-        return $this->doctrine
+        return $this->getContainer()->get('doctrine')
             ->getRepository(EmailTemplate::class)
-            ->findOneBy(['entityName' => self::ENTITY_NAME]);
+            ->findOneBy(['entityName' => User::class]);
     }
 
-    /**
-     * @param string $eventName
-     * @param Crawler $crawler
-     */
-    protected function assertFormSubmission($eventName, Crawler $crawler)
+    private function assertFormSubmission(string $eventName, Crawler $crawler): void
     {
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $formValues = $form->getPhpValues();
-        $formValues['emailnotification']['entityName'] = self::ENTITY_NAME;
+        $formValues['emailnotification']['entityName'] = User::class;
         $formValues['emailnotification']['eventName'] = $eventName;
         $formValues['emailnotification']['template'] = $this->getTemplate()->getId();
         $formValues['emailnotification']['recipientList']['users'] = 1;
@@ -134,6 +119,6 @@ class ControllersTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $html = $crawler->html();
-        static::assertStringContainsString("Email notification rule saved", $html);
+        self::assertStringContainsString('Email notification rule saved', $html);
     }
 }

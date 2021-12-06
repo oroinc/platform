@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UIBundle\Model\TreeItem;
@@ -19,33 +20,21 @@ class MenuUpdateManagerTest extends WebTestCase
 {
     use EntityTrait;
 
-    const MENU_NAME = 'application_menu';
-
-    /** @var EntityManager */
-    protected $em;
+    private const MENU_NAME = 'application_menu';
 
     /** @var EntityRepository */
-    protected $repository;
+    private $repository;
 
     /** @var MenuUpdateManager */
-    protected $manager;
+    private $manager;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures(
-            [
-                MenuUpdateData::class
-            ]
-        );
+        $this->loadFixtures([MenuUpdateData::class]);
 
         $this->manager = $this->getContainer()->get('oro_navigation.manager.menu_update');
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass('OroNavigationBundle:MenuUpdate');
-        $this->repository = $this->em->getRepository('OroNavigationBundle:MenuUpdate');
+        $this->repository = self::getContainer()->get('doctrine')->getRepository(MenuUpdate::class);
     }
 
     public function testCreateMenuUpdate()
@@ -215,10 +204,7 @@ class MenuUpdateManagerTest extends WebTestCase
         $this->assertInstanceOf(MenuUpdateRepository::class, $repository);
     }
 
-    /**
-     * @return \Oro\Bundle\ScopeBundle\Entity\Scope
-     */
-    protected function getScope()
+    private function getScope(): Scope
     {
         /** @var ScopeManager $scopeManager */
         $scopeManager = $this->getContainer()->get('oro_scope.scope_manager');
@@ -226,10 +212,7 @@ class MenuUpdateManagerTest extends WebTestCase
         return $scopeManager->findOrCreate('menu_default_visibility', []);
     }
 
-    /**
-     * @return \Knp\Menu\ItemInterface
-     */
-    protected function getMenu()
+    private function getMenu(): ItemInterface
     {
         return $this->getContainer()->get('oro_menu.builder_chain')->get(self::MENU_NAME);
     }

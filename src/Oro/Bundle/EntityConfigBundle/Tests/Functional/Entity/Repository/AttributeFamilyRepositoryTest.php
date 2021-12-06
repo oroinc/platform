@@ -8,42 +8,30 @@ use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeDat
 use Oro\Bundle\EntityConfigBundle\Tests\Functional\DataFixtures\LoadAttributeFamilyData;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class AttributeFamilyRepositoryTest extends WebTestCase
 {
-    use EntityTrait;
-
-    /**
-     * @var AttributeFamilyRepository
-     */
-    protected $repository;
-
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->client->useHashNavigation(true);
+        $this->loadFixtures([LoadAttributeFamilyData::class]);
+    }
 
-        $this->loadFixtures([
-            LoadAttributeFamilyData::class,
-        ]);
-
-        $this->repository = $this
-            ->getContainer()
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepositoryForClass(AttributeFamily::class);
+    private function getRepository(): AttributeFamilyRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(AttributeFamily::class);
     }
 
     public function testGetFamiliesByAttributeIdEmpty()
     {
-        $families = $this->repository->getFamiliesByAttributeId(9999999);
+        $families = $this->getRepository()->getFamiliesByAttributeId(9999999);
 
         $this->assertCount(0, $families);
     }
 
     public function testGetFamiliesByAttributeId()
     {
-        $families = $this->repository->getFamiliesByAttributeId(
+        $families = $this->getRepository()->getFamiliesByAttributeId(
             LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1)
         );
 
@@ -55,14 +43,14 @@ class AttributeFamilyRepositoryTest extends WebTestCase
 
     public function testCountFamiliesByEntityClass()
     {
-        $this->assertEquals(2, $this->repository->countFamiliesByEntityClass(
+        $this->assertEquals(2, $this->getRepository()->countFamiliesByEntityClass(
             LoadAttributeData::ENTITY_CONFIG_MODEL
         ));
     }
 
     public function testCountFamiliesByEntityClassWithNotExistingEntityClass()
     {
-        $this->assertEquals(0, $this->repository->countFamiliesByEntityClass('NotExistingEntityClass'));
+        $this->assertEquals(0, $this->getRepository()->countFamiliesByEntityClass('NotExistingEntityClass'));
     }
 
     public function testGetFamilyIdsForAttributes()
@@ -77,7 +65,7 @@ class AttributeFamilyRepositoryTest extends WebTestCase
         /** @var AttributeFamily $family2 */
         $family2 = $this->getReference(LoadAttributeFamilyData::ATTRIBUTE_FAMILY_2);
 
-        $result = $this->repository->getFamilyIdsForAttributes(
+        $result = $this->getRepository()->getFamilyIdsForAttributes(
             [$attributeId1, $attributeId2, $attributeId3, $attributeId4]
         );
 
@@ -98,7 +86,7 @@ class AttributeFamilyRepositoryTest extends WebTestCase
         $organization = $family->getOwner();
         $attributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::REGULAR_ATTRIBUTE_1);
 
-        $result = $this->repository->getFamilyIdsForAttributesByOrganization([$attributeId], $organization);
+        $result = $this->getRepository()->getFamilyIdsForAttributesByOrganization([$attributeId], $organization);
 
         $expected = [
             $attributeId => [$family->getId()],
@@ -111,15 +99,17 @@ class AttributeFamilyRepositoryTest extends WebTestCase
     {
         $attributeId = LoadAttributeData::getAttributeIdByName(LoadAttributeData::SYSTEM_ATTRIBUTE_1);
 
-        /** @var Organization $organization */
-        $organization = $this->getEntity(Organization::class, ['id' => 0]);
+        $organization = new Organization();
+        $organization->setId(0);
 
-        $this->assertEmpty($this->repository->getFamilyIdsForAttributesByOrganization([$attributeId], $organization));
+        $this->assertEmpty(
+            $this->getRepository()->getFamilyIdsForAttributesByOrganization([$attributeId], $organization)
+        );
     }
 
     public function testGetFamilyByCode(): void
     {
-        $family = $this->repository->getFamilyByCode(
+        $family = $this->getRepository()->getFamilyByCode(
             LoadAttributeFamilyData::ATTRIBUTE_FAMILY_1,
             $this->getContainer()->get('oro_security.acl_helper')
         );

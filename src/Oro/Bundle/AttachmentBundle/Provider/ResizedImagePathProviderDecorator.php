@@ -28,20 +28,20 @@ class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInter
     /**
      * {@inheritdoc}
      */
-    public function getPathForResizedImage(File $entity, int $width, int $height): string
+    public function getPathForResizedImage(File $entity, int $width, int $height, string $format = ''): string
     {
         return $this->removePrefix(
-            $this->resizedImagePathProvider->getPathForResizedImage($entity, $width, $height)
+            $this->resizedImagePathProvider->getPathForResizedImage($entity, $width, $height, $format)
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPathForFilteredImage(File $entity, string $filterName): string
+    public function getPathForFilteredImage(File $entity, string $filterName, string $format = ''): string
     {
         return $this->removePrefix(
-            $this->resizedImagePathProvider->getPathForFilteredImage($entity, $filterName)
+            $this->resizedImagePathProvider->getPathForFilteredImage($entity, $filterName, $format)
         );
     }
 

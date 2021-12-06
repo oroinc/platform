@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Grid;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
@@ -17,15 +16,8 @@ class SegmentWithConditionsGroupTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $groupingEnabled;
-
-    /**
-     * @var ConfigManager
-     */
-    private $configManager;
 
     protected function setUp(): void
     {
@@ -34,14 +26,13 @@ class SegmentWithConditionsGroupTest extends WebTestCase
             LoadOrganizationsWithUsersData::class,
             LoadSegmentWithToManyFiltersData::class
         ]);
-        $this->configManager = self::getConfigManager(null);
-        $this->groupingEnabled = $this->configManager
+        $this->groupingEnabled = self::getConfigManager(null)
             ->get('oro_query_designer.conditions_group_merge_same_entity_conditions');
     }
 
     protected function tearDown(): void
     {
-        self::getConfigManager('global')
+        self::getConfigManager()
             ->set('oro_query_designer.conditions_group_merge_same_entity_conditions', $this->groupingEnabled);
     }
 
@@ -68,7 +59,7 @@ class SegmentWithConditionsGroupTest extends WebTestCase
 
     public function testSegmentWithGroupedFiltersGroupingDisabled()
     {
-        self::getConfigManager('global')
+        self::getConfigManager()
             ->set('oro_query_designer.conditions_group_merge_same_entity_conditions', false);
 
         $this->assertSegmentResults(
@@ -80,7 +71,7 @@ class SegmentWithConditionsGroupTest extends WebTestCase
         );
     }
 
-    protected function assertSegmentResults(Segment $segment, array $expected)
+    private function assertSegmentResults(Segment $segment, array $expected): void
     {
         $gridManager = $this->getContainer()->get('oro_datagrid.datagrid.manager');
 

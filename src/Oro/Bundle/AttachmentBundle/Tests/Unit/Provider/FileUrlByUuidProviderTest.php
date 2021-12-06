@@ -13,14 +13,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileUrlProvider;
+    private FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileUrlProvider;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
 
-    /** @var FileUrlByUuidProvider */
-    private $provider;
+    private FileUrlByUuidProvider $provider;
 
     protected function setUp(): void
     {
@@ -36,12 +33,12 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadFileFromDB($file);
 
-        $this->fileUrlProvider->expects($this->once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getFileUrl')
             ->with($file, FileUrlProviderInterface::FILE_ACTION_GET, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/url');
 
-        $this->assertSame(
+        self::assertSame(
             '/url',
             $this->provider->getFileUrl($file->getUuid())
         );
@@ -54,7 +51,7 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadNotExistFile($file);
 
-        $this->fileUrlProvider->expects($this->never())
+        $this->fileUrlProvider->expects(self::never())
             ->method('getFileUrl');
 
         $this->provider->getFileUrl($file->getUuid());
@@ -63,17 +60,18 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetResizedImageUrlFromDB(): void
     {
         $file = $this->createFile();
+        $format = 'sample_format';
 
         $this->assertLoadFileFromDB($file);
 
-        $this->fileUrlProvider->expects($this->once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getResizedImageUrl')
-            ->with($file, 100, 300, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($file, 100, 300, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/url');
 
-        $this->assertSame(
+        self::assertSame(
             '/url',
-            $this->provider->getResizedImageUrl($file->getUuid(), 100, 300)
+            $this->provider->getResizedImageUrl($file->getUuid(), 100, 300, $format)
         );
     }
 
@@ -84,7 +82,7 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadNotExistFile($file);
 
-        $this->fileUrlProvider->expects($this->never())
+        $this->fileUrlProvider->expects(self::never())
             ->method('getResizedImageUrl');
 
         $this->provider->getResizedImageUrl($file->getUuid(), 100, 300);
@@ -93,17 +91,18 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetFilteredImageUrlFromDB(): void
     {
         $file = $this->createFile();
+        $format = 'sample_format';
 
         $this->assertLoadFileFromDB($file);
 
-        $this->fileUrlProvider->expects($this->once())
+        $this->fileUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
-            ->with($file, 'testFilter', UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($file, 'testFilter', $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/url');
 
-        $this->assertSame(
+        self::assertSame(
             '/url',
-            $this->provider->getFilteredImageUrl($file->getUuid(), 'testFilter')
+            $this->provider->getFilteredImageUrl($file->getUuid(), 'testFilter', $format)
         );
     }
 
@@ -114,7 +113,7 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertLoadNotExistFile($file);
 
-        $this->fileUrlProvider->expects($this->never())
+        $this->fileUrlProvider->expects(self::never())
             ->method('getFilteredImageUrl');
 
         $this->provider->getFilteredImageUrl($file->getUuid(), 'testFilter');
@@ -137,12 +136,12 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
             ->addMethods(['findOneByUuid'])
             ->getMock();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getRepository')
             ->with(File::class)
             ->willReturn($repository);
 
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('findOneByUuid')
             ->with($file->getUuid())
             ->willReturn($file);
@@ -155,12 +154,12 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
             ->addMethods(['findOneByUuid'])
             ->getMock();
 
-        $this->registry->expects($this->once())
+        $this->registry->expects(self::once())
             ->method('getRepository')
             ->with(File::class)
             ->willReturn($repository);
 
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('findOneByUuid')
             ->with($file->getUuid())
             ->willReturn(null);

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameSanitizer;
 
 /**
  * Returns a filename for a specific File entity as is.
@@ -10,10 +11,12 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 class FileNameProvider implements FileNameProviderInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
-    public function getFileName(File $file): string
+    public function getFileName(File $file, string $format = ''): string
     {
-        return $file->getFilename();
+        $extension = $format && $file->getExtension() !== $format ? '.' . $format : '';
+
+        return FilenameSanitizer::sanitizeFilename($file->getFilename() . $extension);
     }
 }

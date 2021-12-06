@@ -14,6 +14,7 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Util\JSON;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 use Symfony\Bridge\Monolog\Logger;
 
@@ -69,7 +70,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $messageData = $this->getSentMessage(Topics::SYNC_EMAIL_SEEN_FLAG);
 
         $message = new Message();
-        $message->setBody(json_encode($messageData));
+        $message->setBody(JSON::encode($messageData));
 
         $this->assertEquals(SyncEmailSeenFlagMessageProcessor::ACK, $processor->process($message, $session));
     }
@@ -101,7 +102,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $messageData = $this->getSentMessage(Topics::SYNC_EMAIL_SEEN_FLAG);
 
         $message = new Message();
-        $message->setBody(json_encode($messageData));
+        $message->setBody(JSON::encode($messageData));
 
         /** @var Logger $logger */
         $logger = $this->getContainer()->get('logger');

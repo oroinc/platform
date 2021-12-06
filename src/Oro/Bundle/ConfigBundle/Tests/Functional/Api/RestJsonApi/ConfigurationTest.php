@@ -15,40 +15,37 @@ class ConfigurationTest extends RestJsonApiTestCase
         // check that the result is a list of configuration section identity objects
         // check that each returned section is accessible
         $requestInfo = 'get_list';
-        $content = $this->jsonToArray($response->getContent());
-        $this->assertArrayHasKey('data', $content, $requestInfo);
-        $this->assertArrayNotHasKey('included', $content, $requestInfo);
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content, $requestInfo);
+        self::assertArrayNotHasKey('included', $content, $requestInfo);
         foreach ($content['data'] as $key => $item) {
-            $this->assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
-            $this->assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
-            $this->assertEquals(
+            self::assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertEquals(
                 $entityType,
                 $item['type'],
                 sprintf('%s. unexpected entity type. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayNotHasKey('attributes', $item, sprintf('%s. item index: %s', $requestInfo, $key));
-            $this->assertArrayNotHasKey('relationships', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayNotHasKey('attributes', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayNotHasKey('relationships', $item, sprintf('%s. item index: %s', $requestInfo, $key));
             $sectionId = $item['id'];
             $this->checkGetConfigurationSection($sectionId);
         }
     }
 
-    /**
-     * @param string $sectionId
-     */
-    protected function checkGetConfigurationSection($sectionId)
+    private function checkGetConfigurationSection(string $sectionId)
     {
         $entityType = 'configuration';
 
         $response = $this->get(['entity' => $entityType, 'id' => $sectionId]);
 
         $requestInfo = sprintf('get->%s', $sectionId);
-        $content = $this->jsonToArray($response->getContent());
-        $this->assertArrayHasKey('data', $content, $requestInfo);
-        $this->assertArrayNotHasKey('included', $content, $requestInfo);
-        $this->assertArrayHasKey('relationships', $content['data'], $requestInfo);
-        $this->assertArrayHasKey('options', $content['data']['relationships'], $requestInfo);
-        $this->assertArrayHasKey('data', $content['data']['relationships']['options'], $requestInfo);
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content, $requestInfo);
+        self::assertArrayNotHasKey('included', $content, $requestInfo);
+        self::assertArrayHasKey('relationships', $content['data'], $requestInfo);
+        self::assertArrayHasKey('options', $content['data']['relationships'], $requestInfo);
+        self::assertArrayHasKey('data', $content['data']['relationships']['options'], $requestInfo);
     }
 
     public function testGetExpandedConfigurationSections()
@@ -64,28 +61,28 @@ class ConfigurationTest extends RestJsonApiTestCase
         // check that the result contains full info about configuration section and its options
         // check that each returned section is accessible and contains full info including options
         $requestInfo = 'get_list';
-        $content = $this->jsonToArray($response->getContent());
-        $this->assertArrayHasKey('data', $content, $requestInfo);
-        $this->assertArrayHasKey('included', $content, $requestInfo);
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content, $requestInfo);
+        self::assertArrayHasKey('included', $content, $requestInfo);
         foreach ($content['data'] as $key => $item) {
-            $this->assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
-            $this->assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
-            $this->assertEquals(
+            self::assertArrayHasKey('id', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('type', $item, sprintf('%s. item index: %s', $requestInfo, $key));
+            self::assertEquals(
                 $entityType,
                 $item['type'],
                 sprintf('%s. unexpected entity type. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'relationships',
                 $item,
                 sprintf('%s. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'options',
                 $item['relationships'],
                 sprintf('%s. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'data',
                 $item['relationships']['options'],
                 sprintf('%s. item index: %s', $requestInfo, $key)
@@ -94,19 +91,19 @@ class ConfigurationTest extends RestJsonApiTestCase
             $this->checkGetExpandedConfigurationSection($sectionId);
         }
         foreach ($content['included'] as $key => $item) {
-            $this->assertArrayHasKey('id', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
-            $this->assertArrayHasKey('type', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
-            $this->assertEquals(
+            self::assertArrayHasKey('id', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('type', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
+            self::assertEquals(
                 'configurationoptions',
                 $item['type'],
                 sprintf('%s. included. unexpected entity type. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'attributes',
                 $item,
                 sprintf('%s. included. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'value',
                 $item['attributes'],
                 sprintf('%s. included. item index: %s', $requestInfo, $key)
@@ -114,10 +111,7 @@ class ConfigurationTest extends RestJsonApiTestCase
         }
     }
 
-    /**
-     * @param string $sectionId
-     */
-    protected function checkGetExpandedConfigurationSection($sectionId)
+    private function checkGetExpandedConfigurationSection(string $sectionId)
     {
         $entityType = 'configuration';
 
@@ -129,26 +123,26 @@ class ConfigurationTest extends RestJsonApiTestCase
         ]);
 
         $requestInfo = sprintf('get->%s', $sectionId);
-        $content = $this->jsonToArray($response->getContent());
-        $this->assertArrayHasKey('data', $content, $requestInfo);
-        $this->assertArrayHasKey('included', $content, $requestInfo);
-        $this->assertArrayHasKey('relationships', $content['data'], $requestInfo);
-        $this->assertArrayHasKey('options', $content['data']['relationships'], $requestInfo);
-        $this->assertArrayHasKey('data', $content['data']['relationships']['options'], $requestInfo);
+        $content = self::jsonToArray($response->getContent());
+        self::assertArrayHasKey('data', $content, $requestInfo);
+        self::assertArrayHasKey('included', $content, $requestInfo);
+        self::assertArrayHasKey('relationships', $content['data'], $requestInfo);
+        self::assertArrayHasKey('options', $content['data']['relationships'], $requestInfo);
+        self::assertArrayHasKey('data', $content['data']['relationships']['options'], $requestInfo);
         foreach ($content['included'] as $key => $item) {
-            $this->assertArrayHasKey('id', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
-            $this->assertArrayHasKey('type', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
-            $this->assertEquals(
+            self::assertArrayHasKey('id', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
+            self::assertArrayHasKey('type', $item, sprintf('%s. included. item index: %s', $requestInfo, $key));
+            self::assertEquals(
                 'configurationoptions',
                 $item['type'],
                 sprintf('%s. included. unexpected entity type. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'attributes',
                 $item,
                 sprintf('%s. included. item index: %s', $requestInfo, $key)
             );
-            $this->assertArrayHasKey(
+            self::assertArrayHasKey(
                 'value',
                 $item['attributes'],
                 sprintf('%s. included. item index: %s', $requestInfo, $key)

@@ -51,23 +51,26 @@ abstract class WebTestCase extends BaseWebTestCase
     use DbIsolationExtension;
     use TestEventsLoggerTrait;
 
-    /** Annotation names */
-    const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
+    /**
+     * Use to isolate database changed between tests.
+     * This adds a transaction that will be performed before a test starts and is rolled back when a test ends.
+     */
+    protected const DB_ISOLATION_PER_TEST_ANNOTATION = 'dbIsolationPerTest';
 
     /**
      * Use to avoid transaction rollbacks with Connection::transactional and missing on conflict in Doctrine
      * SQLSTATE[25P02] current transaction is aborted, commands ignored until end of transaction block
      */
-    const NEST_TRANSACTIONS_WITH_SAVEPOINTS = 'nestTransactionsWithSavepoints';
+    protected const NEST_TRANSACTIONS_WITH_SAVEPOINTS = 'nestTransactionsWithSavepoints';
 
     /** Default WSSE credentials */
-    const USER_NAME = 'admin';
-    const USER_PASSWORD = 'admin_api_key';
+    protected const USER_NAME = 'admin';
+    protected const USER_PASSWORD = 'admin_api_key';
 
     /**  Default user name and password */
-    const AUTH_USER = 'admin@example.com';
-    const AUTH_PW = 'admin';
-    const AUTH_ORGANIZATION = 1;
+    protected const AUTH_USER = 'admin@example.com';
+    protected const AUTH_PW = 'admin';
+    protected const AUTH_ORGANIZATION = 1;
 
     /** @var string Default application kernel class */
     protected static $class = 'AppKernel';
@@ -93,9 +96,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /** @var array */
     private static $afterInitClientMethods = [];
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private static $beforeResetClientMethods = [];
 
     /** @var bool */

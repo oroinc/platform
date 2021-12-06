@@ -98,7 +98,7 @@ class OroFeatureContext extends RawMinkContext implements AppKernelAwareInterfac
         return new CookieJar(false, $cookies);
     }
 
-    protected function loadImage(string $imageUrl): ResponseInterface
+    protected function loadImage(string $imageUrl, bool|array $allowRedirects = false): ResponseInterface
     {
         $imageUrl = $this->locatePath($imageUrl);
         $imageUrl = filter_var($imageUrl, FILTER_VALIDATE_URL);
@@ -107,7 +107,7 @@ class OroFeatureContext extends RawMinkContext implements AppKernelAwareInterfac
 
         $cookieJar = $this->getCookieJar($this->getSession());
         $client = new Client([
-            'allow_redirects' => false,
+            'allow_redirects' => $allowRedirects,
             'cookies' => $cookieJar,
         ]);
 

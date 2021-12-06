@@ -38,19 +38,17 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
     {
         $timezone = new \DateTimeZone('UTC');
         $entityManager = $this->createMock(EntityManager::class);
-        $this
-            ->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $startDate = new \DateTime('first day of january', $timezone);
         $endDate = new \DateTime('tomorrow', $timezone);
-        $entityManager
-            ->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
+        $entityManager->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
-        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($this->once())
+            ->method('flush');
 
         $this->calendarDateManager->handleCalendarDates();
     }
@@ -62,29 +60,24 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
         $calendarDate = new CalendarDate();
         $calendarDate->setDate($startDate);
         $repository = $this->createMock(CalendarDateRepository::class);
-        $this
-            ->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with(CalendarDate::class)
             ->willReturn($repository);
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('getDate')
             ->willReturn($calendarDate);
 
         $entityManager = $this->createMock(EntityManager::class);
-        $this
-            ->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
-        $entityManager
-            ->expects($this->exactly(9))
+        $entityManager->expects($this->exactly(9))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
-        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($this->once())
+            ->method('flush');
 
         $this->calendarDateManager->handleCalendarDates(true);
     }
@@ -93,31 +86,26 @@ class CalendarDateManagerTest extends \PHPUnit\Framework\TestCase
     {
         $timezone = new \DateTimeZone('UTC');
         $repository = $this->createMock(CalendarDateRepository::class);
-        $this
-            ->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with(CalendarDate::class)
             ->willReturn($repository);
-        $repository
-            ->expects($this->once())
+        $repository->expects($this->once())
             ->method('getDate')
             ->willReturn(null);
 
         $entityManager = $this->createMock(EntityManager::class);
-        $this
-            ->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityManager')
             ->with(CalendarDate::class)
             ->willReturn($entityManager);
         $startDate = new \DateTime('first day of january', $timezone);
         $endDate = new \DateTime('tomorrow', $timezone);
-        $entityManager
-            ->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
+        $entityManager->expects($this->exactly((int)$endDate->diff($startDate)->format('%a')))
             ->method('persist')
             ->with($this->isInstanceOf(CalendarDate::class));
-        $entityManager->expects($this->once())->method('flush');
+        $entityManager->expects($this->once())
+            ->method('flush');
 
         $this->calendarDateManager->handleCalendarDates(true);
     }

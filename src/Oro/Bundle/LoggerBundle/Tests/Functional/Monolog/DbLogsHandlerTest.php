@@ -11,10 +11,10 @@ use Psr\Log\LoggerInterface;
 class DbLogsHandlerTest extends WebTestCase
 {
     /** @var LoggerInterface */
-    protected $logger;
+    private $logger;
 
     /** @var EntityRepository */
-    protected $repo;
+    private $repo;
 
     protected function setUp(): void
     {
@@ -26,12 +26,8 @@ class DbLogsHandlerTest extends WebTestCase
 
     /**
      * @dataProvider writeDataProvider
-     * @param string $message
-     * @param array $context
-     * @param string $level
-     * @param array $expected
      */
-    public function testWrite($message, array $context, $level, array $expected)
+    public function testWrite(string $message, array $context, string $level, array $expected)
     {
         $this->logger->$level($message, $context);
 
@@ -46,10 +42,7 @@ class DbLogsHandlerTest extends WebTestCase
         self::assertSame([], $logEntry->getExtra());
     }
 
-    /**
-     * @return array
-     */
-    public function writeDataProvider()
+    public function writeDataProvider(): array
     {
         return [
             [

@@ -8,7 +8,6 @@ use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
 use Oro\Component\Layout\BlockView;
-use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\Extension\Theme\ResourceProvider\ThemeResourceProvider;
 use Oro\Component\Layout\Layout;
 use Oro\Component\Layout\LayoutContext;
@@ -17,9 +16,6 @@ abstract class AbstractLayoutBuilderTest extends WebTestCase
 {
     /** @var array */
     private $initialBundles;
-
-    /** @var ThemeManager */
-    private $initialThemeManager;
 
     /** @var ThemeResourceProvider */
     private $resourcesProvider;

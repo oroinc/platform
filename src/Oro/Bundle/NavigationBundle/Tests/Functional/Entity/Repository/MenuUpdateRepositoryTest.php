@@ -18,25 +18,15 @@ class MenuUpdateRepositoryTest extends WebTestCase
 {
     use UserUtilityTrait;
 
-    /** @var MenuUpdateRepository */
-    protected $repository;
-
     protected function setUp(): void
     {
         $this->initClient();
-        $this->client->useHashNavigation(true);
+        $this->loadFixtures([MenuUpdateData::class]);
+    }
 
-        $this->repository = $this
-            ->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(MenuUpdate::class)
-            ->getRepository(MenuUpdate::class);
-
-        $this->loadFixtures(
-            [
-                MenuUpdateData::class
-            ]
-        );
+    private function getRepository(): MenuUpdateRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(MenuUpdate::class);
     }
 
     public function testGetUsedScopesByMenu()
@@ -51,23 +41,20 @@ class MenuUpdateRepositoryTest extends WebTestCase
                 $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE)->getId(),
             ]
         ];
-        $this->assertEqualsCanonicalizing($expected, $this->repository->getUsedScopesByMenu());
+        $this->assertEqualsCanonicalizing($expected, $this->getRepository()->getUsedScopesByMenu());
     }
 
     /**
-     * @dataProvider findMenuUpdatesByscopeReferencesDataProvider
-     * @param string $menuName
-     * @param array  $scopeReferences
-     * @param array  $expectedMenuUpdateReferences
+     * @dataProvider findMenuUpdatesByScopeReferencesDataProvider
      */
     public function testFindMenuUpdatesByScopeIds(
-        $menuName,
+        string $menuName,
         array $scopeReferences,
         array $expectedMenuUpdateReferences
     ) {
         $scopeIds = $this->getScopeIdsByReferences($scopeReferences);
         /** @var MenuUpdate[] $actualMenuUpdates */
-        $actualMenuUpdates = $this->repository->findMenuUpdatesByScopeIds($menuName, $scopeIds);
+        $actualMenuUpdates = $this->getRepository()->findMenuUpdatesByScopeIds($menuName, $scopeIds);
         $this->assertCount(count($expectedMenuUpdateReferences), $actualMenuUpdates);
         $menuUpdateIds = [];
         foreach ($actualMenuUpdates as $menuUpdate) {
@@ -78,10 +65,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function findMenuUpdatesByscopeReferencesDataProvider()
+    public function findMenuUpdatesByScopeReferencesDataProvider(): array
     {
         return [
             'global scope only' => [
@@ -113,15 +97,14 @@ class MenuUpdateRepositoryTest extends WebTestCase
 
     /**
      * @dataProvider findMenuUpdatesByScopeDataProvider
-     *
-     * @param string $menu
-     * @param string $scopeReference
-     * @param array  $expectedMenuUpdateReferences
      */
-    public function testFindMenuUpdatesByScope($menu, $scopeReference, $expectedMenuUpdateReferences)
-    {
+    public function testFindMenuUpdatesByScope(
+        string $menu,
+        string $scopeReference,
+        array $expectedMenuUpdateReferences
+    ) {
         $scope = $this->getReference($scopeReference);
-        $actualMenuUpdates = $this->repository->findMenuUpdatesByScope($menu, $scope);
+        $actualMenuUpdates = $this->getRepository()->findMenuUpdatesByScope($menu, $scope);
         $this->assertCount(count($expectedMenuUpdateReferences), $actualMenuUpdates);
         $menuUpdateIds = [];
         foreach ($actualMenuUpdates as $menuUpdate) {
@@ -132,10 +115,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function findMenuUpdatesByScopeDataProvider()
+    public function findMenuUpdatesByScopeDataProvider(): array
     {
         return [
             'global scope' => [
@@ -166,7 +146,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
         $globalMenuUpdate = $this->getReference('test_menu_item1_global');
         /** @var MenuUpdate $userMenuUpdate */
         $userMenuUpdate = $this->getReference('test_menu_item1_user');
-        $this->repository->updateDependentMenuUpdates($globalMenuUpdate);
+        $this->getRepository()->updateDependentMenuUpdates($globalMenuUpdate);
 
         $this->assertEquals($globalMenuUpdate->getUri(), $userMenuUpdate->getUri());
     }
@@ -175,7 +155,7 @@ class MenuUpdateRepositoryTest extends WebTestCase
     {
         /** @var MenuUpdate $globalMenuUpdate */
         $globalMenuUpdate = $this->getReference('test_menu_item1_global');
-        $scopes = $this->repository->getDependentMenuUpdateScopes($globalMenuUpdate);
+        $scopes = $this->getRepository()->getDependentMenuUpdateScopes($globalMenuUpdate);
         $this->assertCount(1, $scopes);
         /** @var Scope $expectedScope */
         $expectedScope = $this->getReference(LoadScopeUserData::SIMPLE_USER_SCOPE);
@@ -183,19 +163,13 @@ class MenuUpdateRepositoryTest extends WebTestCase
         $this->assertEquals($expectedScope->getId(), $scopes[0]->getId());
     }
 
-    /**
-     * @param array $scopeReferences
-     * @return array
-     */
-    protected function getScopeIdsByReferences(array $scopeReferences)
+    private function getScopeIdsByReferences(array $scopeReferences): array
     {
-        $scopeIds = array_map(
+        return array_map(
             function ($reference) {
                 return $this->getReference($reference)->getId();
             },
             $scopeReferences
         );
-
-        return $scopeIds;
     }
 }

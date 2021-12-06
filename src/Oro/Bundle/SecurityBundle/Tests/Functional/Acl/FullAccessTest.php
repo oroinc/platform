@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Acl;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper;
@@ -19,12 +20,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class FullAccessTest extends WebTestCase
 {
     /** @var TestEntity */
-    protected $testEntity;
+    private $testEntity;
 
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
+        /** @var EntityManagerInterface $em */
         $em = $this->getContainer()->get('doctrine')->getManagerForClass(User::class);
         $user = $em->getRepository(User::class)->findOneBy(['email' => self::AUTH_USER]);
         $organization = $em->getRepository(Organization::class)->find(self::AUTH_ORGANIZATION);
@@ -48,10 +50,7 @@ class FullAccessTest extends WebTestCase
         }
     }
 
-    /**
-     * @return AuthorizationCheckerInterface
-     */
-    protected function getAuthorizationChecker()
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         return $this->getContainer()->get('security.authorization_checker');
     }

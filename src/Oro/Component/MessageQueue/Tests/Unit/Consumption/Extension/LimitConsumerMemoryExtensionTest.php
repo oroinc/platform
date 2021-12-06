@@ -27,8 +27,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context->getLogger()
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringContains('Interrupt execution as memory limit reached.'))
-        ;
+            ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());
@@ -46,8 +45,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context->getLogger()
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringContains('Interrupt execution as memory limit reached.'))
-        ;
+            ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());
@@ -65,8 +63,7 @@ class LimitConsumerMemoryExtensionTest extends \PHPUnit\Framework\TestCase
         $context->getLogger()
             ->expects($this->once())
             ->method('debug')
-            ->with($this->stringContains('Interrupt execution as memory limit reached.'))
-        ;
+            ->with($this->stringContains('Interrupt execution as memory limit reached.'));
 
         // guard
         $this->assertFalse($context->isExecutionInterrupted());

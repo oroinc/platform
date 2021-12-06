@@ -39,7 +39,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         $this->assertCount($expected, $message->getBody()['collections_updated']);
     }
 
-    protected function createOwner(): TestAuditDataOwner
+    private function createOwner(): TestAuditDataOwner
     {
         $owner = new TestAuditDataOwner();
 
@@ -51,10 +51,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         return $owner;
     }
 
-    /**
-     * @return TestAuditDataOwner|Proxy
-     */
-    protected function createOwnerProxy()
+    private function createOwnerProxy(): TestAuditDataOwner|Proxy
     {
         $owner = $this->createOwner();
 
@@ -68,7 +65,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         return $ownerProxy;
     }
 
-    protected function createChild(): TestAuditDataChild
+    private function createChild(): TestAuditDataChild
     {
         $child = new TestAuditDataChild();
 
@@ -80,7 +77,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         return $child;
     }
 
-    protected function getFirstEntitiesChangedMessage(): Message
+    private function getFirstEntitiesChangedMessage(): Message
     {
         $messages = self::getSentMessages();
 
@@ -91,10 +88,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
         return $messages[0]['message'];
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getClientInstance()->getContainer()->get('doctrine.orm.entity_manager');
     }

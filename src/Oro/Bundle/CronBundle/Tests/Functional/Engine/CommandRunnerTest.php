@@ -25,9 +25,9 @@ class CommandRunnerTest extends WebTestCase
 
         $result = $runner->run('about');
 
-        static::assertStringContainsString('Symfony', $result);
-        static::assertStringContainsString('Kernel', $result);
-        static::assertStringContainsString('PHP', $result);
+        self::assertStringContainsString('Symfony', $result);
+        self::assertStringContainsString('Kernel', $result);
+        self::assertStringContainsString('PHP', $result);
     }
 
     public function testShouldAcceptCommandArguments(): void
@@ -36,7 +36,7 @@ class CommandRunnerTest extends WebTestCase
 
         $result = $runner->run('about', ['--help']);
 
-        static::assertStringContainsString('Help:', $result);
-        static::assertStringContainsString('Display information about the current project', $result);
+        self::assertStringContainsString('Help:', $result);
+        self::assertStringContainsString('Display information about the current project', $result);
     }
 }

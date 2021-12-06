@@ -36,8 +36,7 @@ class ApiEntityManager
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
 
     /** @var EntityClassNameHelper */
     protected $entityClassNameHelper;

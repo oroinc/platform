@@ -9,21 +9,19 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class CountryTranslationRepositoryTest extends WebTestCase
 {
-    /** @var CountryTranslationRepository */
-    protected $repository;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
+    }
 
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository(CountryTranslation::class);
+    private function getRepository(): CountryTranslationRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(CountryTranslation::class);
     }
 
     public function testUpdateTranslations()
     {
-        $this->repository->updateTranslations(
+        $this->getRepository()->updateTranslations(
             [
                 'US' => 'États Unis',
                 'DE' => 'Allemagne',
@@ -31,21 +29,20 @@ class CountryTranslationRepositoryTest extends WebTestCase
             'fr'
         );
 
-        $actual = $this->repository->findBy(['locale' => 'fr']);
+        $actual = $this->getRepository()->findBy(['locale' => 'fr']);
 
         $this->assertCount(2, $actual);
         $this->assertTranslationExists('US', 'États Unis', $actual);
         $this->assertTranslationExists('DE', 'Allemagne', $actual);
     }
 
-    /**
-     * @param string $expectedCode
-     * @param string $expectedTranslation
-     * @param array|CountryTranslation[] $translations
-     */
-    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $translations)
-    {
+    private function assertTranslationExists(
+        string $expectedCode,
+        string $expectedTranslation,
+        array $translations
+    ): void {
         $actual = null;
+        /** @var CountryTranslation $translation */
         foreach ($translations as $translation) {
             if ($translation->getForeignKey() === $expectedCode) {
                 $actual = $translation;

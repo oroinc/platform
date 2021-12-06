@@ -28,7 +28,7 @@ class AbstractScopeProviderTestCase extends WebTestCase
             //if provider would be loaded by certain scope type - criteria would be filled with proper value from scope
             $criteria = $scopeManager->getCriteriaByScope($scope, $scopeType);
 
-            static::assertEquals(
+            self::assertEquals(
                 'value',
                 $criteria->toArray()[$scopeProviderCriteriaField],
                 'Criteria field from correct provider is filled by scope value.'

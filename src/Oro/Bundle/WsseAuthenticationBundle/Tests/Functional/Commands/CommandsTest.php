@@ -7,15 +7,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\WsseAuthenticationBundle\Command\DeleteNoncesCommand;
 use Oro\Bundle\WsseAuthenticationBundle\Command\GenerateWsseHeaderCommand;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 
 class CommandsTest extends WebTestCase
 {
-    const FIREWALL_NAME = 'wsse_secured';
+    private const FIREWALL_NAME = 'wsse_secured';
 
     protected function setUp(): void
     {
@@ -29,8 +29,7 @@ class CommandsTest extends WebTestCase
 
         $container = $this->client->getContainer();
 
-        /** @var Application $application */
-        $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
+        $application = new Application($kernel);
         $application->setAutoExit(false);
 
         $doctrine = $container->get('doctrine');
@@ -41,7 +40,7 @@ class CommandsTest extends WebTestCase
         $apiKey = $doctrine->getRepository(UserApi::class)
             ->findOneBy(['user' => $user, 'organization' => $organization]);
 
-        static::assertInstanceOf(UserApi::class, $apiKey, '$apiKey is not an object');
+        self::assertInstanceOf(UserApi::class, $apiKey, '$apiKey is not an object');
 
         $command = new GenerateWSSEHeaderCommand(
             $doctrine,
@@ -64,7 +63,7 @@ class CommandsTest extends WebTestCase
     /**
      * @depends testGenerateWsse
      */
-    public function testApiWithWSSE(array $header): array
+    public function testApiWithWsse(array $header): array
     {
         $response = $this->checkWsse($header);
 
@@ -110,7 +109,7 @@ class CommandsTest extends WebTestCase
     }
 
     /**
-     * @depends testApiWithWSSE
+     * @depends testApiWithWsse
      */
     public function testDeleteNonces(array $header): array
     {
@@ -121,8 +120,7 @@ class CommandsTest extends WebTestCase
         /** @var Kernel $kernel */
         $kernel = $this->client->getKernel();
 
-        /** @var Application $application */
-        $application = new \Symfony\Bundle\FrameworkBundle\Console\Application($kernel);
+        $application = new Application($kernel);
         $application->setAutoExit(false);
 
         $command = new DeleteNoncesCommand(
@@ -137,7 +135,7 @@ class CommandsTest extends WebTestCase
         ]);
 
         $this->assertFalse($nonceCache->hasItem($this->getNonceCacheKey($this->getNonce($header[4][1]))));
-        static::assertStringContainsString('Deleted nonce cache', $commandTester->getDisplay());
+        self::assertStringContainsString('Deleted nonce cache', $commandTester->getDisplay());
 
         return $header;
     }
@@ -149,11 +147,6 @@ class CommandsTest extends WebTestCase
         return $nonceCacheServiceLocator->get('oro_wsse_authentication.nonce_cache.' . $firewallName);
     }
 
-    /**prepare
-     * @param string $wsseHeader
-     *
-     * @return string
-     */
     private function getNonce(string $wsseHeader): ?string
     {
         preg_match('/Nonce="([^"]+)"/', $wsseHeader, $matches);

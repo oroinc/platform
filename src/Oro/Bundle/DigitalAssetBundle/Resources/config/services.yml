@@ -14,6 +14,13 @@ services:
             - '@oro_attachment.provider.file_icon'
             - '@oro_attachment.provider.file_title'
 
+    oro_digital_asset.provider.preview_metadata.webp_aware:
+        class: Oro\Bundle\DigitalAssetBundle\Provider\WebpAwarePreviewMetadataProvider
+        decorates: oro_digital_asset.provider.preview_metadata
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.manager'
+
     oro_digital_asset.form.type.digital_asset:
         class: Oro\Bundle\DigitalAssetBundle\Form\Type\DigitalAssetType
         arguments:

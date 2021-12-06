@@ -6,3 +6,7 @@ services:
   oro_attachment.behat.media_cache_manager_registry:
     alias: oro_attachment.media_cache_manager_registry
     public: true
+
+  oro_attachment.behat.tools.webp_configuration:
+    alias: oro_attachment.tools.webp_configuration
+    public: true

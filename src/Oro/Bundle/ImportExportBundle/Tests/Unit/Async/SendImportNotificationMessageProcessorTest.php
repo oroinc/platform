@@ -88,8 +88,7 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             ->willReturn(null);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine
-            ->expects(self::any())
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->willReturnMap([[User::class, null, $userRepo], [Job::class, null, $jobRepository]]);
 
@@ -143,13 +142,11 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             ->with(1)
             ->willReturn($user);
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine
-            ->expects(self::any())
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->willReturnMap([[User::class, null, $userRepo], [Job::class, null, $jobRepository]]);
         $consolidateImportJobResultNotification = $this->createMock(ImportExportResultSummarizer::class);
-        $consolidateImportJobResultNotification
-            ->expects(self::once())
+        $consolidateImportJobResultNotification->expects(self::once())
             ->method('getSummaryResultForNotification')
             ->with($job, 'import.csv')
             ->willReturn(['data' => 'summary import information']);

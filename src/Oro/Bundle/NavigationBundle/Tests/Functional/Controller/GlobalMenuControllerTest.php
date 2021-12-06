@@ -3,17 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
-use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class GlobalMenuControllerTest extends WebTestCase
 {
-    const MENU_NAME = 'application_menu';
+    private const MENU_NAME = 'application_menu';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -36,7 +32,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'Select existing menu item or create new.',
             $crawler->filter('[data-role="content"] .tree-empty-content .no-data')->html()
         );
@@ -62,7 +58,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString('Menu item saved successfully.', $crawler->html());
+        self::assertStringContainsString('Menu item saved successfully.', $crawler->html());
     }
 
     public function testCreateChild()
@@ -88,7 +84,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString('Menu item saved successfully.', $crawler->html());
+        self::assertStringContainsString('Menu item saved successfully.', $crawler->html());
     }
 
     public function testUpdateCustom()
@@ -118,8 +114,8 @@ class GlobalMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $html = $crawler->html();
-        static::assertStringContainsString('Menu item saved successfully.', $html);
-        static::assertStringContainsString('menu_update.changed.title.default', $html);
+        self::assertStringContainsString('Menu item saved successfully.', $html);
+        self::assertStringContainsString('menu_update.changed.title.default', $html);
     }
 
     public function testUpdateNotCustom()
@@ -133,7 +129,7 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             $this->getContainer()->get('translator')->trans('oro.navigation.menu.menu_list_default.label'),
             $crawler->html()
         );
@@ -148,8 +144,8 @@ class GlobalMenuControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         $html = $crawler->html();
-        static::assertStringContainsString('Menu item saved successfully.', $html);
-        static::assertStringContainsString('menu_update.changed.title.default', $html);
+        self::assertStringContainsString('Menu item saved successfully.', $html);
+        self::assertStringContainsString('menu_update.changed.title.default', $html);
     }
 
     public function testMove()
@@ -185,11 +181,8 @@ class GlobalMenuControllerTest extends WebTestCase
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
-        /** @var MenuUpdateRepository $repository */
-        $repository = $this->getContainer()->get('doctrine')
-            ->getManagerForClass('OroNavigationBundle:MenuUpdate')
-            ->getRepository('OroNavigationBundle:MenuUpdate');
-        $menuUpdate = $repository->findOneBy(['key' => MenuUpdateData::MENU_UPDATE_1_1]);
+        $menuUpdate = self::getContainer()->get('doctrine')->getRepository(MenuUpdate::class)
+            ->findOneBy(['key' => MenuUpdateData::MENU_UPDATE_1_1]);
         $this->assertEquals(MenuUpdateData::MENU_UPDATE_1, $menuUpdate->getParentKey());
     }
 }

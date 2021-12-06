@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Command\LoadProcessConfigurationCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -24,24 +24,24 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
      */
     public function testExecute(array $expectedMessages, array $expectedDefinitions, array $expectedTriggers)
     {
-        $definitionsBefore = $this->getRepository('OroWorkflowBundle:ProcessDefinition')->findAll();
-        $triggersBefore = $this->getRepository('OroWorkflowBundle:ProcessTrigger')->findAll();
+        $definitionsBefore = $this->getRepository(ProcessDefinition::class)->findAll();
+        $triggersBefore = $this->getRepository(ProcessTrigger::class)->findAll();
 
         $result = $this->runCommand(LoadProcessConfigurationCommand::getDefaultName());
 
         $this->assertNotEmpty($result);
         foreach ($expectedMessages as $message) {
-            static::assertStringContainsString($message, $result);
+            self::assertStringContainsString($message, $result);
         }
 
-        $definitions = $this->getRepository('OroWorkflowBundle:ProcessDefinition')->findAll();
+        $definitions = $this->getRepository(ProcessDefinition::class)->findAll();
 
         $this->assertCount(count($definitionsBefore) + 2, $definitions);
         foreach ($expectedDefinitions as $definition) {
             $this->assertDefinitionLoaded($definitions, $definition);
         }
 
-        $triggers = $this->getRepository('OroWorkflowBundle:ProcessTrigger')->findAll();
+        $triggers = $this->getRepository(ProcessTrigger::class)->findAll();
 
         $this->assertCount(count($triggersBefore) + 4, $triggers);
         foreach ($expectedTriggers as $trigger) {
@@ -49,10 +49,7 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             [
@@ -80,23 +77,15 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         ];
     }
 
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    protected function getRepository($className)
+    private function getRepository(string $className): EntityRepository
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
+        return self::getContainer()->get('doctrine')->getRepository($className);
     }
 
-    /**
-     * @param array|ProcessDefinition[] $definitions
-     * @param string $name
-     */
-    protected function assertDefinitionLoaded(array $definitions, $name)
+    private function assertDefinitionLoaded(array $definitions, string $name): void
     {
         $found = false;
-
+        /** @var ProcessDefinition $definition */
         foreach ($definitions as $definition) {
             if ($definition->getName() === $name) {
                 $found = true;
@@ -107,16 +96,10 @@ class LoadProcessConfigurationCommandTest extends WebTestCase
         $this->assertTrue($found);
     }
 
-    /**
-     * @param array|ProcessTrigger[] $triggers
-     * @param string $name
-     * @param string $event
-     * @param string $cron
-     */
-    protected function assertTriggerLoaded(array $triggers, $name, $event, $cron)
+    private function assertTriggerLoaded(array $triggers, string $name, ?string $event, ?string $cron): void
     {
         $found = false;
-
+        /** @var ProcessTrigger $trigger */
         foreach ($triggers as $trigger) {
             if ($trigger->getEvent() === $event &&
                 $trigger->getCron() === $cron &&

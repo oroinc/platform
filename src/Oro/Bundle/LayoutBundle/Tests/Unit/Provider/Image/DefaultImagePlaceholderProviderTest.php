@@ -10,11 +10,9 @@ class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const DEFAULT_PATH = '/some/default/image.png';
 
-    /** @var CacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagineCacheManager;
+    private CacheManager|\PHPUnit\Framework\MockObject\MockObject $imagineCacheManager;
 
-    /** @var DefaultImagePlaceholderProvider */
-    private $provider;
+    private DefaultImagePlaceholderProvider $provider;
 
     protected function setUp(): void
     {
@@ -33,6 +31,34 @@ class DefaultImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->with(self::DEFAULT_PATH, $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($expected);
 
-        $this->assertEquals($expected, $this->provider->getPath($filter));
+        self::assertEquals($expected, $this->provider->getPath($filter));
+    }
+
+    public function testGetPathReturnsUnchangedWhenSameFormat(): void
+    {
+        $expected = '/some/default/filtered_image.png';
+        $filter = 'image_filter';
+        $format = 'png';
+
+        $this->imagineCacheManager->expects(self::once())
+            ->method('generateUrl')
+            ->with(self::DEFAULT_PATH, $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->willReturn($expected);
+
+        self::assertEquals($expected, $this->provider->getPath($filter, $format));
+    }
+
+    public function testGetPathReturnsWithNewExtensionWhenNewFormat(): void
+    {
+        $expected = '/some/default/filtered_image.png';
+        $filter = 'image_filter';
+        $format = 'webp';
+
+        $this->imagineCacheManager->expects(self::once())
+            ->method('generateUrl')
+            ->with(self::DEFAULT_PATH . '.webp', $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->willReturn($expected);
+
+        self::assertEquals($expected, $this->provider->getPath($filter, $format));
     }
 }

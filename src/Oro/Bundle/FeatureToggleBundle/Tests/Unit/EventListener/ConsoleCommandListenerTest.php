@@ -12,22 +12,22 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
+
     /** @var ConsoleCommandListener */
     private $listener;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    protected $featureChecker;
 
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->listener = new ConsoleCommandListener($this->featureChecker);
     }
 
     public function testWhenCommandFeatureDisabled()
     {
-        $this->featureChecker
-            ->expects($this->any())
+        $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
             ->with('oro:search:index', 'commands')
             ->willReturn(false);
@@ -43,8 +43,7 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testWhenCommandRequireFeatureChecker()
     {
-        $this->featureChecker
-            ->expects($this->any())
+        $this->featureChecker->expects($this->any())
             ->method('isResourceEnabled')
             ->willReturn(true);
 

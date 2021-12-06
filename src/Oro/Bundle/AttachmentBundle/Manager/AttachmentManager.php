@@ -9,6 +9,7 @@ use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\AttachmentBundle\Provider\FileIconProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypeChecker;
+use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -25,50 +26,32 @@ class AttachmentManager
     public const THUMBNAIL_WIDTH = 110;
     public const THUMBNAIL_HEIGHT = 80;
 
-    /** @var FileUrlProviderInterface */
-    private $fileUrlProvider;
+    private FileUrlProviderInterface $fileUrlProvider;
 
-    /** @var FileIconProvider */
-    private $fileIconProvider;
+    private FileIconProvider $fileIconProvider;
 
-    /** @var MimeTypeChecker */
-    private $mimeTypeChecker;
+    private MimeTypeChecker $mimeTypeChecker;
 
-    /** @var AssociationManager */
-    private $associationManager;
+    private AssociationManager $associationManager;
 
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    private ManagerRegistry $registry;
 
-    /** @var ManagerRegistry */
-    private $registry;
+    private WebpConfiguration $webpConfiguration;
 
     public function __construct(
         FileUrlProviderInterface $fileUrlProvider,
         FileIconProvider $fileIconProvider,
         MimeTypeChecker $mimeTypeChecker,
         AssociationManager $associationManager,
-        UrlGeneratorInterface $urlGenerator,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        WebpConfiguration $webpConfiguration
     ) {
         $this->fileUrlProvider = $fileUrlProvider;
         $this->fileIconProvider = $fileIconProvider;
         $this->mimeTypeChecker = $mimeTypeChecker;
         $this->associationManager = $associationManager;
-        $this->urlGenerator = $urlGenerator;
         $this->registry = $registry;
-    }
-
-    /**
-     * Get url of REST API resource which can be used to get the content of the given file
-     *
-     * @param int $fileId The id of the File object
-     *
-     * @return string
-     */
-    public function getFileRestApiUrl(int $fileId): string
-    {
-        return $this->urlGenerator->generate('oro_api_get_file', ['id' => $fileId, '_format' => 'binary']);
+        $this->webpConfiguration = $webpConfiguration;
     }
 
     /**
@@ -89,20 +72,32 @@ class AttachmentManager
         File $file,
         int $width = self::DEFAULT_IMAGE_WIDTH,
         int $height = self::DEFAULT_IMAGE_HEIGHT,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
-        return $this->fileUrlProvider->getResizedImageUrl($file, $width, $height, $referenceType);
+        return $this->fileUrlProvider->getResizedImageUrl($file, $width, $height, $format, $referenceType);
     }
 
     /**
-     * Get image attachment link with liip imagine filter applied to image
+     * Get image attachment url with LiipImagine filter applied to image
      */
     public function getFilteredImageUrl(
         File $file,
         string $filterName,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
-        return $this->fileUrlProvider->getFilteredImageUrl($file, $filterName, $referenceType);
+        return $this->fileUrlProvider->getFilteredImageUrl($file, $filterName, $format, $referenceType);
+    }
+
+    public function isWebpEnabledIfSupported(): bool
+    {
+        return $this->webpConfiguration->isEnabledIfSupported();
+    }
+
+    public function isWebpEnabledForAll(): bool
+    {
+        return $this->webpConfiguration->isEnabledForAll();
     }
 
     public function getFilteredImageUrlByIdAndFilename(
@@ -116,7 +111,7 @@ class AttachmentManager
             return '';
         }
 
-        return $this->getFilteredImageUrl($file, $filterName, $referenceType);
+        return $this->getFilteredImageUrl($file, $filterName, '', $referenceType);
     }
 
     /**

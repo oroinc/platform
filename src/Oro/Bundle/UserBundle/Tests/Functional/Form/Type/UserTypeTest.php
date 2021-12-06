@@ -29,16 +29,9 @@ class UserTypeTest extends WebTestCase
             self::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, LoadUserData::SIMPLE_USER_PASSWORD)
         );
         $this->client->useHashNavigation(true);
-        $this->loadFixtures(
-            [
-                LoadUserData::class,
-            ]
-        );
+        $this->loadFixtures([LoadUserData::class]);
     }
 
-    /**
-     * @return array
-     */
     public function createDataProvider(): array
     {
         return [
@@ -71,17 +64,12 @@ class UserTypeTest extends WebTestCase
 
     /**
      * @dataProvider createDataProvider
-     *
-     * @param string $username
-     * @param string $email
-     * @param string $plainPassword
-     * @param bool $sendPassword
      */
     public function testCreate(string $username, string $email, string $plainPassword, bool $sendPassword): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
 
-        $configManager = self::getConfigManager('global');
+        $configManager = self::getConfigManager();
         $configManager->set('oro_user.send_password_in_invitation_email', $sendPassword);
         $configManager->flush();
 
@@ -119,7 +107,7 @@ class UserTypeTest extends WebTestCase
         $result = $this->client->getResponse();
 
         self::assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('User saved', $crawler->html());
+        self::assertStringContainsString('User saved', $crawler->html());
     }
 
     public function testUserChangeUsernameToAnotherUserUsername(): void
@@ -137,8 +125,8 @@ class UserTypeTest extends WebTestCase
 
         $result = $this->client->getResponse();
         self::assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('This value is already used', $crawler->html());
-        static::assertStringNotContainsString('User saved', $crawler->html());
+        self::assertStringContainsString('This value is already used', $crawler->html());
+        self::assertStringNotContainsString('User saved', $crawler->html());
 
         /** @var User $expectedUser */
         $expectedUser = $this->getReference(LoadUserData::SIMPLE_USER);
@@ -147,7 +135,7 @@ class UserTypeTest extends WebTestCase
         self::assertEquals($expectedUser->getUsername(), $actualUsername);
     }
 
-    protected function assertMessage(RawMessage $symfonyEmail, string $email, string $plainPassword): void
+    private function assertMessage(RawMessage $symfonyEmail, string $email, string $plainPassword): void
     {
         self::assertInstanceOf(SymfonyEmail::class, $symfonyEmail);
 
@@ -164,24 +152,24 @@ class UserTypeTest extends WebTestCase
             $configManager->get('oro_notification.email_notification_sender_email')
         );
 
-        static::assertStringContainsString('Invite user', $symfonyEmail->getSubject());
+        self::assertStringContainsString('Invite user', $symfonyEmail->getSubject());
 
         if ($configManager->get('oro_user.send_password_in_invitation_email')) {
-            static::assertStringContainsString('Password:', $symfonyEmail->getHtmlBody());
-            static::assertStringContainsString($plainPassword, $symfonyEmail->getHtmlBody());
+            self::assertStringContainsString('Password:', $symfonyEmail->getHtmlBody());
+            self::assertStringContainsString($plainPassword, $symfonyEmail->getHtmlBody());
         } else {
             self::assertNotNull($user->getConfirmationToken());
-            static::assertStringContainsString($user->getConfirmationToken(), $symfonyEmail->getHtmlBody());
-            static::assertStringNotContainsString('Password:', $symfonyEmail->getHtmlBody());
+            self::assertStringContainsString($user->getConfirmationToken(), $symfonyEmail->getHtmlBody());
+            self::assertStringNotContainsString('Password:', $symfonyEmail->getHtmlBody());
         }
     }
 
-    protected function getUserRepository(): UserRepository
+    private function getUserRepository(): UserRepository
     {
         return self::getContainer()->get('doctrine')->getRepository(User::class);
     }
 
-    protected function getUserRoleRepository(): RoleRepository
+    private function getUserRoleRepository(): RoleRepository
     {
         return self::getContainer()->get('doctrine')->getRepository(Role::class);
     }

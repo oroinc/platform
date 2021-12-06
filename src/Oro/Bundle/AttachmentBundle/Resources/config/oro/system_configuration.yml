@@ -11,6 +11,8 @@ system_configuration:
             title:  oro.attachment.config.attachment_processors_settings.label
             description: oro.attachment.config.attachment_processors_settings.description
             description_style: warning
+        attachment_webp_settings:
+            title: oro.attachment.config.webp_settings.label
     fields:
         oro_attachment.maxsize:
             data_type: integer
@@ -82,6 +84,20 @@ system_configuration:
                     oro.attachment.config.png_preserve_quality: 100
                     oro.attachment.config.png_minimize_file_size: 35
 
+        oro_attachment.webp_quality:
+            data_type: integer
+            type: Symfony\Component\Form\Extension\Core\Type\IntegerType
+            options:
+                required: true
+                label: oro.attachment.config.webp_quality.label
+                tooltip: oro.attachment.config.webp_quality.tooltip
+                constraints:
+                    - NotBlank: ~
+                    - Type: integer
+                    - Range:
+                          min: 30
+                          max: 100
+
     tree:
         system_configuration:
             platform:
@@ -103,7 +119,9 @@ system_configuration:
                                             - oro_attachment.processors_allowed
                                             - oro_attachment.jpeg_quality
                                             - oro_attachment.png_quality
-
+                                    attachment_webp_settings:
+                                        children:
+                                            - oro_attachment.webp_quality
     api_tree:
         attachments:
             oro_attachment.upload_file_mime_types: ~

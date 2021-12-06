@@ -17,7 +17,7 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
 
     public function testExecuteWithNonValidInterval()
     {
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             "Value 'invalid' should be valid date interval",
             $this->runCommand('oro:navigation:history:clear', ['--interval' => 'invalid'])
         );
@@ -31,7 +31,7 @@ class ClearNavigationHistoryCommandTest extends WebTestCase
 
         $this->assertCount(5, $repo->findAll());
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             "'2' items deleted from navigation history.",
             $this->runCommand('oro:navigation:history:clear', ['--interval' => '3 days'])
         );

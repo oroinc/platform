@@ -18,21 +18,19 @@ use Psr\Log\Test\TestLogger;
 class ConfigurableImportStrategyHelperTest extends WebTestCase
 {
     /** @var TestLogger */
-    protected $logger;
+    private $logger;
 
     /** @var ConfigurableImportStrategyHelper */
-    protected $helper;
+    private $helper;
 
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures(
-            [
-                LoadAttributeData::class,
-                LoadAttributeFamilyData::class,
-                LoadAttributeGroupData::class,
-            ]
-        );
+        $this->loadFixtures([
+            LoadAttributeData::class,
+            LoadAttributeFamilyData::class,
+            LoadAttributeGroupData::class
+        ]);
 
         $this->logger = new TestLogger();
         $this->helper = $this->getContainer()->get('oro_importexport.strategy.configurable_import_strategy_helper');
@@ -253,14 +251,14 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
     public function testChangeDate()
     {
         $family1 = new AttributeFamily();
-        $family1->setUpdatedAt(new \DateTime('2030-05-05 00:00:00'), new \DateTimeZone('UTC'));
+        $family1->setUpdatedAt(new \DateTime('2030-05-05 00:00:00', new \DateTimeZone('UTC')));
         $family2 = new AttributeFamily();
-        $family2->setUpdatedAt(new \DateTime('2030-05-05 00:00:00'), new \DateTimeZone('UTC'));
+        $family2->setUpdatedAt(new \DateTime('2030-05-05 00:00:00', new \DateTimeZone('UTC')));
 
         $this->helper->importEntity($family1, $family2);
         $this->assertFalse($this->logger->hasRecords(LogLevel::DEBUG));
 
-        $family2->setUpdatedAt(new \DateTime('2040-05-05 00:00:00'), new \DateTimeZone('UTC'));
+        $family2->setUpdatedAt(new \DateTime('2040-05-05 00:00:00', new \DateTimeZone('UTC')));
         $this->helper->importEntity($family1, $family2);
 
         $this->assertTrue(

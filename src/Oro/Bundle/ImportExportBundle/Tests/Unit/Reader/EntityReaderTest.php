@@ -30,11 +30,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class EntityReaderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
     /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $contextRegistry;
+
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $ownershipMetadataProvider;
@@ -48,13 +48,13 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
         $this->reader = new EntityReaderTestAdapter(
             $this->contextRegistry,
-            $this->managerRegistry,
+            $this->doctrine,
             $this->ownershipMetadataProvider,
             $this->exportQueryProvider
         );
@@ -75,7 +75,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
     public function testReadMockIterator()
     {
         $iterator = $this->createMock(\Iterator::class);
-        $this->managerRegistry->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method(self::anything());
 
         $fooEntity = $this->createMock(\stdClass::class);
@@ -112,7 +112,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
     public function testReadRealIterator()
     {
-        $this->managerRegistry->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method(self::anything());
 
         $fooEntity = $this->createMock(\stdClass::class);
@@ -143,7 +143,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Reader must be configured with source');
 
-        $this->managerRegistry->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method(self::anything());
 
         $this->reader->read();
@@ -151,7 +151,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
     public function testSetStepExecutionWithQueryBuilder()
     {
-        $this->managerRegistry->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method(self::anything());
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
@@ -189,7 +189,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $this->managerRegistry->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method(self::anything());
 
         $query = new Query($em);
@@ -255,7 +255,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ->with($entityName)
             ->willReturn($repository);
 
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
@@ -285,7 +285,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             'Configuration of entity reader must contain either "entityName", "queryBuilder" or "query".'
         );
 
-        $this->managerRegistry->expects(self::never())
+        $this->doctrine->expects(self::never())
             ->method(self::anything());
 
         $context = $this->createMock(ContextInterface::class);
@@ -310,8 +310,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
                 'testMultiple' => ['fieldName' => 'testMultiple'],
             ]);
 
-        $this->exportQueryProvider
-            ->expects($this->exactly(2))
+        $this->exportQueryProvider->expects($this->exactly(2))
             ->method('isAssociationExportable')
             ->willReturnMap([
                 [$classMetadata, 'testSingle', true],
@@ -354,7 +353,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($emConfiguration);
 
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($name)
             ->willReturn($entityManager);
@@ -442,7 +441,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
             ->with($entityName)
             ->willReturn($repository);
 
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
@@ -496,7 +495,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects(self::never())
             ->method('getRepository');
 
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($entityName)
             ->willReturn($entityManager);
