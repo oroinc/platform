@@ -29,12 +29,12 @@ class FileStrategyEventListenerTest extends WebTestCase
      */
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
 
         $this->loadFixtures([LoadUsersWithAvatars::class]);
 
-        $this->listener = $this->getContainer()->get('oro_attachment.import_export.event_listener.file_strategy');
+        $this->listener = self::getContainer()->get('oro_attachment.import_export.event_listener.file_strategy');
     }
 
     public function testWhenNoFileFields(): void
@@ -45,7 +45,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->listener->onProcessBefore($event);
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
+        self::assertEmpty($context->getErrors());
     }
 
     public function testWhenFileFieldWhenNoFileNoColumn(): void
@@ -56,7 +56,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->listener->onProcessBefore($event);
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
+        self::assertEmpty($context->getErrors());
     }
 
     private function getContext(array $itemData = []): Context
@@ -70,7 +70,7 @@ class FileStrategyEventListenerTest extends WebTestCase
     private function getEvent(Context $context, object $entity): StrategyEvent
     {
         return new StrategyEvent(
-            $this->getContainer()->get('oro_user.importexport.strategy.user.add_or_replace'),
+            self::getContainer()->get('oro_user.importexport.strategy.user.add_or_replace'),
             $entity,
             $context
         );
@@ -85,7 +85,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->listener->onProcessBefore($event);
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
+        self::assertEmpty($context->getErrors());
     }
 
     public function testFileFieldWhenNoFile(): void
@@ -102,7 +102,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
+        self::assertEmpty($context->getErrors());
     }
 
     public function testFileFieldWhenFieldExcluded(): void
@@ -113,11 +113,11 @@ class FileStrategyEventListenerTest extends WebTestCase
         $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
         $event = $this->getEvent($context, $user);
 
-        $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $entityConfigManager = self::getContainer()->get('oro_entity_config.config_manager');
         $fieldConfig = $entityConfigManager->getFieldConfig('importexport', User::class, 'avatar');
         $fieldConfig->set('excluded', true);
 
-        $this->assertNotNull($existingUser->getAvatar());
+        self::assertNotNull($existingUser->getAvatar());
 
         $this->listener->onProcessBefore($event);
 
@@ -125,8 +125,8 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertEmpty($context->getErrors());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertEmpty($context->getErrors());
     }
 
     public function testWhenFileFieldWhenExistingFileShouldBeDeleted(): void
@@ -146,9 +146,9 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertNull($existingUser->getAvatar());
-        $this->assertTrue($existingUserAvatar->isEmptyFile());
-        $this->assertEmpty($context->getErrors());
+        self::assertNull($existingUser->getAvatar());
+        self::assertTrue($existingUserAvatar->isEmptyFile());
+        self::assertEmpty($context->getErrors());
     }
 
     public function testWhenFileFieldWhenSameUuid(): void
@@ -172,10 +172,10 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertEmpty($existingUser->getAvatar()->getFile());
-        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
-        $this->assertEquals($existingFileUuid, $existingUser->getAvatar()->getUuid());
+        self::assertEmpty($context->getErrors());
+        self::assertEmpty($existingUser->getAvatar()->getFile());
+        self::assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        self::assertEquals($existingFileUuid, $existingUser->getAvatar()->getUuid());
     }
 
     public function testWhenFileFieldWhenCloneByUuid(): void
@@ -200,26 +200,26 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessBefore($event);
 
-        $this->assertNotEquals($existingFileUuid, $user->getAvatar()->getUuid());
+        self::assertNotEquals($existingFileUuid, $user->getAvatar()->getUuid());
 
         $existingUser->setAvatar(new File());
         $event->setEntity($existingUser);
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotEmpty($existingUser->getAvatar()->getFile());
-        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
-        $this->assertNotEquals($existingFileUuid, $existingUser->getAvatar()->getUuid());
+        self::assertEmpty($context->getErrors());
+        self::assertNotEmpty($existingUser->getAvatar()->getFile());
+        self::assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        self::assertNotEquals($existingFileUuid, $existingUser->getAvatar()->getUuid());
 
-        $this->getContainer()->get('oro_user.manager')->updateUser($existingUser);
+        self::getContainer()->get('oro_user.manager')->updateUser($existingUser);
 
-        $this->assertNotEmpty(
+        self::assertNotEmpty(
             $existingUser->getAvatar()->getFilename(),
             'Failed asserting that file has been uploaded'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $existingFileOriginalFilename,
             $existingUser->getAvatar()->getOriginalFilename(),
             'Failed asserting that original filename is taken from uploaded file'
@@ -234,7 +234,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
-            (string) $this->getContainer()->get('kernel')
+            (string) self::getContainer()->get('kernel')
                 ->locateResource('@OroUserBundle/Tests/Functional/DataFixtures/files/empty.jpg')
         );
         $file->setFile($symfonyFile);
@@ -245,27 +245,27 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessBefore($event);
 
-        $this->assertNotEmpty($user->getAvatar());
-        $this->assertNotEmpty($user->getAvatar()->getUuid());
+        self::assertNotEmpty($user->getAvatar());
+        self::assertNotEmpty($user->getAvatar()->getUuid());
 
         $existingUser->setAvatar((new File())->setUuid($file->getUuid()));
         $event->setEntity($existingUser);
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotEmpty($existingUser->getAvatar()->getFile());
-        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
-        $this->assertNotEmpty($existingUser->getAvatar()->getUuid());
+        self::assertEmpty($context->getErrors());
+        self::assertNotEmpty($existingUser->getAvatar()->getFile());
+        self::assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        self::assertNotEmpty($existingUser->getAvatar()->getUuid());
 
-        $this->getContainer()->get('oro_user.manager')->updateUser($existingUser);
+        self::getContainer()->get('oro_user.manager')->updateUser($existingUser);
 
-        $this->assertNotEmpty(
+        self::assertNotEmpty(
             $existingUser->getAvatar()->getFilename(),
             'Failed asserting that file has been uploaded'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             'empty.jpg',
             $existingUser->getAvatar()->getOriginalFilename(),
             'Failed asserting that original filename is taken from uploaded file'
@@ -283,7 +283,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
-            (string) $this->getContainer()->get('kernel')
+            (string) self::getContainer()->get('kernel')
                 ->locateResource('@OroUserBundle/Tests/Functional/DataFixtures/files/empty.jpg')
         );
         $file->setFile($symfonyFile);
@@ -294,28 +294,28 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessBefore($event);
 
-        $this->assertNotEmpty($user->getAvatar());
-        $this->assertNotEmpty($user->getAvatar()->getUuid());
+        self::assertNotEmpty($user->getAvatar());
+        self::assertNotEmpty($user->getAvatar()->getUuid());
 
         $existingUser->setAvatar((new File())->setUuid($file->getUuid()));
         $event->setEntity($existingUser);
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotEmpty($existingUser->getAvatar()->getFile());
-        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
-        $this->assertNotEmpty($existingUser->getAvatar()->getUuid());
+        self::assertEmpty($context->getErrors());
+        self::assertNotEmpty($existingUser->getAvatar()->getFile());
+        self::assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        self::assertNotEmpty($existingUser->getAvatar()->getUuid());
 
-        $this->getContainer()->get('oro_user.manager')->updateUser($existingUser);
+        self::getContainer()->get('oro_user.manager')->updateUser($existingUser);
 
-        $this->assertNotEquals(
+        self::assertNotEquals(
             $oldFilename,
             $existingUser->getAvatar()->getFilename(),
             'Failed asserting that file has been updated'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $oldOriginalFilename,
             $existingUser->getAvatar()->getOriginalFilename(),
             'Failed asserting that original filename has not been changed'
@@ -341,7 +341,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Error in row #0. Failed to either upload or clone file from the existing one: file not found by ' .
                 'specified UUID and nothing is specified for uploading. Please make sure avatar.URI and avatar.UUID ' .
@@ -373,7 +373,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Error in row #0. Failed to upload a file from invalid/path: Failed to copy "invalid/path" '
                 . 'because file does not exist.',
@@ -385,7 +385,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
     public function testFileFieldWhenUploadWrongMimeType(): void
     {
-        $kernel = $this->getContainer()->get('kernel');
+        $kernel = self::getContainer()->get('kernel');
 
         $file = new File();
         $file->setFile(
@@ -405,25 +405,25 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessBefore($event);
 
-        $this->assertNotEmpty($user->getAvatar());
-        $this->assertNotEmpty($user->getAvatar()->getUuid());
+        self::assertNotEmpty($user->getAvatar());
+        self::assertNotEmpty($user->getAvatar()->getUuid());
 
         $event->setEntity($existingUser);
 
         $this->listener->onProcessAfter($event);
 
-        $this->getContainer()->get('oro_user.manager')->updateUser($existingUser);
+        self::getContainer()->get('oro_user.manager')->updateUser($existingUser);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Error in row #0. File validation failed for field Avatar: The mime type of the file is invalid ' .
-                '("text/html"). Allowed mime types are "image/gif", "image/jpeg", "image/png".',
+                '("text/html"). Allowed mime types are "image/gif", "image/jpeg", "image/png", "image/webp".',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
             $context->getErrors()
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             'empty.jpg',
             $existingUser->getAvatar()->getOriginalFilename(),
             'Failed asserting that original filename was not changed'
@@ -438,7 +438,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
-            (string) $this->getContainer()->get('kernel')
+            (string) self::getContainer()->get('kernel')
                 ->locateResource('@OroAttachmentBundle/Tests/Functional/DataFixtures/files/invalid.extension')
         );
         $file->setFile($symfonyFile);
@@ -454,7 +454,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Error in row #0. File validation failed for field Avatar: An empty file is not allowed.',
                 'Error in row #0. File importing has failed, entity is skipped',
@@ -486,7 +486,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba: The file '
                 . '"attachments/invalid/filepath.jpg" was not found.',
@@ -519,7 +519,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba: you do not have '
                 . 'permission to view the file with uuid 74d27cad-b800-4d71-833e-775d01aebeba',

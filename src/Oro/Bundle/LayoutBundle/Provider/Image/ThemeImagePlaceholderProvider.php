@@ -13,17 +13,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    /** @var LayoutContextHolder */
-    private $contextHolder;
+    private LayoutContextHolder $contextHolder;
 
-    /** @var ThemeManager */
-    private $themeManager;
+    private ThemeManager $themeManager;
 
-    /** @var CacheManager */
-    private $imagineCacheManager;
+    private CacheManager $imagineCacheManager;
 
-    /** @var string */
-    private $placeholderName;
+    private string $placeholderName;
 
     public function __construct(
         LayoutContextHolder $contextHolder,
@@ -37,18 +33,23 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         $this->placeholderName = $placeholderName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
-    {
+    public function getPath(
+        string $filter,
+        string $format = '',
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): ?string {
         $imagePlaceholders = $this->getImagePlaceholders();
         if (!isset($imagePlaceholders[$this->placeholderName])) {
             return null;
         }
 
+        $path = $imagePlaceholders[$this->placeholderName];
+        if ($format && pathinfo($path, PATHINFO_EXTENSION) !== $format) {
+            $path .= '.' . $format;
+        }
+
         return $this->imagineCacheManager->generateUrl(
-            $imagePlaceholders[$this->placeholderName],
+            $path,
             $filter,
             [],
             null,

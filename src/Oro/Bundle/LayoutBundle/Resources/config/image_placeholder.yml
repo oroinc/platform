@@ -1,7 +1,6 @@
 services:
     oro_layout.provider.image_placeholder.config.abstract:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\ConfigImagePlaceholderProvider'
-        public: false
         abstract: true
         arguments:
             - '@oro_config.manager'
@@ -10,7 +9,6 @@ services:
 
     oro_layout.provider.image_placeholder.theme.abstract:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\ThemeImagePlaceholderProvider'
-        public: false
         abstract: true
         arguments:
             - '@oro_layout.layout_context_holder'
@@ -19,7 +17,6 @@ services:
 
     oro_layout.provider.image_placeholder.default.abstract:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\DefaultImagePlaceholderProvider'
-        public: false
         abstract: true
         arguments:
             - '@liip_imagine.cache.manager'

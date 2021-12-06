@@ -8,6 +8,9 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * Provides image types and image types dimensions collected from theme configs.
+ */
 class ImageTypeProvider
 {
     /**
@@ -100,7 +103,7 @@ class ImageTypeProvider
                     $name,
                     $dimension['width'],
                     $dimension['height'],
-                    array_key_exists('options', $dimension) ? $dimension['options'] : null
+                    $dimension['options'] ?? []
                 );
             }
         }

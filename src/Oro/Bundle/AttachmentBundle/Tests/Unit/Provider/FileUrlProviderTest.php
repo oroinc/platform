@@ -9,14 +9,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
+    private UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $urlGenerator;
 
-    /** @var FileNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filenameProvider;
+    private FileNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject $filenameProvider;
 
-    /** @var FileUrlProvider */
-    private $provider;
+    private FileUrlProvider $provider;
 
     protected function setUp(): void
     {
@@ -50,11 +47,12 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
     {
         $fileId = 1;
         $filename = 'sample-filename';
+        $format = 'sample_format';
         $file = $this->getFile($fileId, $filename);
 
-        $this->filenameProvider->expects($this->once())
+        $this->filenameProvider->expects(self::once())
             ->method('getFileName')
-            ->with($file)
+            ->with($file, $format)
             ->willReturn($filename);
 
         $this->urlGenerator
@@ -73,7 +71,7 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $url,
-            $this->provider->getResizedImageUrl($file, $width, $height, $referenceType)
+            $this->provider->getResizedImageUrl($file, $width, $height, $format, $referenceType)
         );
     }
 
@@ -82,11 +80,12 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
         $fileId = 1;
         $filename = 'sample-filename';
         $filter = 'sample-filter';
+        $format = 'sample_format';
         $file = $this->getFile($fileId, $filename);
 
-        $this->filenameProvider->expects($this->once())
+        $this->filenameProvider->expects(self::once())
             ->method('getFileName')
-            ->with($file)
+            ->with($file, $format)
             ->willReturn($filename);
 
         $this->urlGenerator
@@ -96,7 +95,7 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     'id' => $fileId,
                     'filename' => $filename,
-                    'filter' => $filter
+                    'filter' => $filter,
                 ],
                 $referenceType = 1
             )
@@ -104,7 +103,7 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             $url,
-            $this->provider->getFilteredImageUrl($file, $filter, $referenceType)
+            $this->provider->getFilteredImageUrl($file, $filter, $format, $referenceType)
         );
     }
 

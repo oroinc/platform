@@ -9,14 +9,11 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagePlaceholderProvider;
+    private ImagePlaceholderProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagePlaceholderProvider;
 
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
+    private Cache|\PHPUnit\Framework\MockObject\MockObject $cache;
 
-    /** @var CacheImagePlaceholderProvider */
-    private $decorator;
+    private CacheImagePlaceholderProvider $decorator;
 
     protected function setUp(): void
     {
@@ -29,8 +26,9 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetPath(): void
     {
         $filter = 'test_filter';
+        $format = 'sample_format';
         $path = 'test/path';
-        $cacheKey = $filter . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
+        $cacheKey = $filter . '|' . $format . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -41,16 +39,17 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->method('save');
 
         $this->imagePlaceholderProvider->expects(self::never())
-            ->method($this->anything());
+            ->method(self::anything());
 
-        $this->assertEquals($path, $this->decorator->getPath($filter));
+        self::assertEquals($path, $this->decorator->getPath($filter, $format));
     }
 
     public function testGetPathWhenEmptyCache(): void
     {
         $filter = 'test_filter';
+        $format = 'sample_format';
         $path = 'test/path';
-        $cacheKey = $filter . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
+        $cacheKey = $filter . '|' . $format . '|' . UrlGeneratorInterface::ABSOLUTE_PATH;
 
         $this->cache->expects(self::once())
             ->method('fetch')
@@ -63,9 +62,9 @@ class CacheImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->imagePlaceholderProvider->expects(self::once())
             ->method('getPath')
-            ->with($filter, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($path);
 
-        $this->assertEquals($path, $this->decorator->getPath($filter));
+        self::assertEquals($path, $this->decorator->getPath($filter, $format));
     }
 }

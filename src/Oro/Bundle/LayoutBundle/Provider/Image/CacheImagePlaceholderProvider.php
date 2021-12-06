@@ -20,16 +20,16 @@ class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
-    {
-        $key = $filter . '|' . $referenceType;
+    public function getPath(
+        string $filter,
+        string $format = '',
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): ?string {
+        $key = $filter .'|'. $format . '|' . $referenceType;
 
         $path = $this->cache->fetch($key);
         if (!$path) {
-            $path = $this->imagePlaceholderProvider->getPath($filter, $referenceType);
+            $path = $this->imagePlaceholderProvider->getPath($filter, $format, $referenceType);
             $this->cache->save($key, $path);
         }
 

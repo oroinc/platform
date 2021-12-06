@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Twig;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -14,25 +15,13 @@ use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
- * Provides Twig functions to work with files, images and attachments:
- *   - file_url
- *   - file_size
- *   - resized_image_url
- *   - filtered_image_url
- *   - oro_configured_image_url
- *   - oro_attachment_icon
- *   - oro_type_is_image
- *   - oro_is_preview_available
- *   - oro_file_icons_config
- *   - oro_file_view
- *   - oro_image_view
+ * Provides Twig functions to work with files, images and attachments.
  */
 class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
@@ -52,14 +41,13 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * {@inheritdoc}
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return [
             new TwigFunction('file_url', [$this, 'getFileUrl']),
             new TwigFunction('file_size', [$this, 'getFileSize']),
             new TwigFunction('resized_image_url', [$this, 'getResizedImageUrl']),
             new TwigFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
-            new TwigFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new TwigFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new TwigFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
             new TwigFunction('oro_is_preview_available', [$this, 'isPreviewAvailable']),
@@ -74,24 +62,23 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
                 [$this, 'getImageView'],
                 ['is_safe' => ['html'], 'needs_environment' => true]
             ),
+            new TwigFunction(
+                'oro_resized_picture_sources',
+                [$this, 'getResizedPictureSources']
+            ),
+            new TwigFunction(
+                'oro_filtered_picture_sources',
+                [$this, 'getFilteredPictureSources']
+            ),
             new TwigFunction('oro_file_title', [$this, 'getFileTitle']),
         ];
     }
 
-    /**
-     * Get file url
-     *
-     * @param File $file
-     * @param string $action
-     * @param bool $absolute
-     *
-     * @return string
-     */
     public function getFileUrl(
         File $file,
         string $action = FileUrlProviderInterface::FILE_ACTION_GET,
         bool $absolute = false
-    ) {
+    ): string {
         $referenceType = $absolute === false
             ? UrlGeneratorInterface::ABSOLUTE_URL
             : UrlGeneratorInterface::ABSOLUTE_PATH;
@@ -99,98 +86,42 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $this->getAttachmentManager()->getFileUrl($file, $action, $referenceType);
     }
 
-    /**
-     * Get resized attachment image url
-     *
-     * @param File $file
-     * @param int  $width
-     * @param int  $height
-     *
-     * @return string
-     */
     public function getResizedImageUrl(
         File $file,
-        $width = self::DEFAULT_THUMB_SIZE,
-        $height = self::DEFAULT_THUMB_SIZE
-    ) {
-        return $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height);
+        int $width = self::DEFAULT_THUMB_SIZE,
+        int $height = self::DEFAULT_THUMB_SIZE,
+        string $format = ''
+    ): string {
+        return $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height, $format);
+    }
+
+    public function getFilteredImageUrl(File $file, string $filterName, string $format = ''): string
+    {
+        return $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName, $format);
     }
 
     /**
-     * @param File $file
-     * @param string $filterName
-     *
-     * @return string
+     * Get human-readable file size
      */
-    public function getFilteredImageUrl(File $file, $filterName)
+    public function getFileSize(int|string|null $bytes): string
     {
-        return $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName);
-    }
-
-    /**
-     * Get attachment image resized with config values
-     *
-     * @param object $parentEntity
-     * @param string $fieldName
-     * @param File   $file
-     *
-     * @return string
-     */
-    public function getConfiguredImageUrl($parentEntity, $fieldName, File $file = null)
-    {
-        if (!$file) {
-            $file = $this->getPropertyAccessor()->getValue($parentEntity, $fieldName);
-        }
-
-        if ($file && $file->getFilename()) {
-            $entityClass = ClassUtils::getRealClass($parentEntity);
-            $config = $this->getConfigManager()->getFieldConfig('attachment', $entityClass, $fieldName);
-
-            return $this->getResizedImageUrl($file, $config->get('width'), $config->get('height'));
-        }
-
-        return '';
-    }
-
-    /**
-     * Get human readable file size
-     *
-     * @param integer $bytes
-     *
-     * @return string
-     */
-    public function getFileSize($bytes)
-    {
-        return BytesFormatter::format($bytes);
+        return BytesFormatter::format((int)$bytes);
     }
 
     /**
      * Get attachment icon class
-     *
-     * @param FileExtensionInterface $attachment
-     *
-     * @return string
      */
-    public function getAttachmentIcon(FileExtensionInterface $attachment)
+    public function getAttachmentIcon(FileExtensionInterface $attachment): string
     {
         return $this->getAttachmentManager()->getAttachmentIconClass($attachment);
     }
 
     /**
      * Get file view html block
-     *
-     * @param Environment $environment
-     * @param File|int|null $file
-     * @param array $additional
-     *
-     * @return string
      */
-    public function getFileView(Environment $environment, $file, ?array $additional = null)
+    public function getFileView(Environment $environment, File|int|null $file, ?array $additional = null): string
     {
-        if (filter_var($file, FILTER_VALIDATE_INT)) {
-            $file = $this->getFileById($file);
-        }
-
+        $file = $this->getFile($file);
         if (!$file || !$file->getFilename()) {
             return '';
         }
@@ -215,18 +146,10 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
 
     /**
      * Get Image html block
-     *
-     * @param Environment $environment
-     * @param File|int|null $file
-     *
-     * @return string
      */
-    public function getImageView(Environment $environment, $file)
+    public function getImageView(Environment $environment, File|int|null $file): string
     {
-        if (filter_var($file, FILTER_VALIDATE_INT)) {
-            $file = $this->getFileById($file);
-        }
-
+        $file = $this->getFile($file);
         if (!$file || !$file->getFilename()) {
             return '';
         }
@@ -245,25 +168,102 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $environment->render(
             self::IMAGES_TEMPLATE,
             [
-                'imagePath' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height),
-                'url' => $this->getAttachmentManager()->getFileUrl(
-                    $file,
-                    FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                ),
+                'file' => $file,
+                'width' => $width,
+                'height' => $height,
                 'fileName' => $file->getOriginalFilename(),
-                'title' => $this->getFileTitle($file),
             ]
         );
     }
 
     /**
-     * Checks if file type is an image
+     * Returns sources array that can be used in <picture> tag.
+     * Adds WebP image variants is current oro_attachment.webp_strategy is "if_supported".
      *
-     * @param  string $type
-     * @return bool
+     * @param File|int|null $file
+     * @param int $width
+     * @param int $height
+     * @param array $attrs Extra attributes to add to <source> tags
+     *
+     * @return array
+     *  [
+     *      [
+     *          'srcset' => '/url/for/image.png',
+     *          'type' => 'image/png',
+     *      ],
+     *      // ...
+     *  ]
      */
-    public function getTypeIsImage($type)
+    public function getResizedPictureSources(
+        File|int|null $file,
+        int $width = self::DEFAULT_THUMB_SIZE,
+        int $height = self::DEFAULT_THUMB_SIZE,
+        array $attrs = []
+    ): array {
+        $file = $this->getFile($file);
+        $sources = [];
+        if ($file instanceof File) {
+            $isWebpEnabledIfSupported = $this->getAttachmentManager()->isWebpEnabledIfSupported();
+            if ($isWebpEnabledIfSupported && $file->getExtension() !== 'webp') {
+                $sources[] = $attrs + [
+                    'srcset' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height, 'webp'),
+                    'type' => 'image/webp',
+                ];
+            }
+            $sources[] = $attrs + [
+                'srcset' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height),
+                'type' => $file->getMimeType(),
+            ];
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Returns sources array that can be used in <picture> tag.
+     * Adds WebP image variants is current oro_attachment.webp_strategy is "if_supported".
+     *
+     * @param File|int|null $file
+     * @param string $filterName
+     * @param array $attrs Extra attributes to add to <source> tags
+     *
+     * @return array
+     *  [
+     *      [
+     *          'srcset' => '/url/for/image.png',
+     *          'type' => 'image/png',
+     *      ],
+     *      // ...
+     *  ]
+     */
+    public function getFilteredPictureSources(
+        File|int|null $file,
+        string $filterName = 'original',
+        array $attrs = []
+    ): array {
+        $file = $this->getFile($file);
+        $sources = [];
+        if ($file instanceof File) {
+            $isWebpEnabledIfSupported = $this->getAttachmentManager()->isWebpEnabledIfSupported();
+            if ($isWebpEnabledIfSupported && $file->getExtension() !== 'webp') {
+                $sources[] = $attrs + [
+                        'srcset' => $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName, 'webp'),
+                        'type' => 'image/webp',
+                    ];
+            }
+            $sources[] = $attrs + [
+                    'srcset' => $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName),
+                    'type' => $file->getMimeType(),
+                ];
+        }
+
+        return $sources;
+    }
+
+    /**
+     * Checks if file type is an image
+     */
+    public function getTypeIsImage(string $type): bool
     {
         return $this->getAttachmentManager()->isImageType($type);
     }
@@ -271,32 +271,22 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * Check if we can show preview for file type
      * Currently only images preview is supported
-     *
-     * @param  string $type
-     * @return bool
      */
-    public function isPreviewAvailable($type)
+    public function isPreviewAvailable(string $type): bool
     {
         return $this->getTypeIsImage($type);
     }
 
     /**
      * Get config array of file icons
-     *
-     * @return array
      */
-    public function getFileIconsConfig()
+    public function getFileIconsConfig(): array
     {
         return $this->getAttachmentManager()->getFileIcons();
     }
 
     /**
      * Provides file title which can be used, e.g. in title or alt HTML attributes.
-     *
-     * @param File|null $file
-     * @param Localization|null $localization
-     *
-     * @return string|null
      */
     public function getFileTitle(?File $file, Localization $localization = null): string
     {
@@ -307,25 +297,19 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $this->container->get(FileTitleProviderInterface::class)->getTitle($file, $localization);
     }
 
-    /**
-     * @param int $id
-     *
-     * @return File
-     */
-    private function getFileById($id)
+    private function getFile(File|int|null $file): ?File
     {
-        return $this->getDoctrine()->getRepository(File::class)->find($id);
-    }
+        if (filter_var($file, FILTER_VALIDATE_INT)) {
+            return $this->getDoctrine()->getRepository(File::class)->find($file);
+        }
 
-    private function getPropertyAccessor(): PropertyAccessorInterface
-    {
-        return $this->container->get(PropertyAccessorInterface::class);
+        return $file;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return [
             AttachmentManager::class,
@@ -333,6 +317,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             ManagerRegistry::class,
             PropertyAccessorInterface::class,
             FileTitleProviderInterface::class,
+            CacheManager::class,
         ];
     }
 

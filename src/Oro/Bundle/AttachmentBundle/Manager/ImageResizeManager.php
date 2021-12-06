@@ -13,17 +13,13 @@ use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFile
  */
 class ImageResizeManager implements ImageResizeManagerInterface
 {
-    /** @var ResizedImageProviderInterface */
-    private $resizedImageProvider;
+    private ResizedImageProviderInterface $resizedImageProvider;
 
-    /** @var ResizedImagePathProviderInterface */
-    private $resizedImagePathProvider;
+    private ResizedImagePathProviderInterface $resizedImagePathProvider;
 
-    /** @var MediaCacheManagerRegistryInterface  */
-    private $mediaCacheManagerRegistry;
+    private MediaCacheManagerRegistryInterface $mediaCacheManagerRegistry;
 
-    /** @var ImagineBinaryByFileContentFactoryInterface */
-    private $imagineBinaryByFileContentFactory;
+    private ImagineBinaryByFileContentFactoryInterface $imagineBinaryByFileContentFactory;
 
     public function __construct(
         ResizedImageProviderInterface $resizedImageProvider,
@@ -37,18 +33,20 @@ class ImageResizeManager implements ImageResizeManagerInterface
         $this->imagineBinaryByFileContentFactory = $imagineBinaryByFileContentFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function resize(File $file, int $width, int $height, bool $forceUpdate = false): ?BinaryInterface
-    {
+    public function resize(
+        File $file,
+        int $width,
+        int $height,
+        string $format = '',
+        bool $forceUpdate = false
+    ): ?BinaryInterface {
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
-        $storagePath = $this->resizedImagePathProvider->getPathForResizedImage($file, $width, $height);
+        $storagePath = $this->resizedImagePathProvider->getPathForResizedImage($file, $width, $height, $format);
 
         if (!$forceUpdate && $rawResizedImage = $mediaCacheManager->getFileContent($storagePath, false)) {
             $resizedImageBinary = $this->imagineBinaryByFileContentFactory->createImagineBinary($rawResizedImage);
         } else {
-            $resizedImageBinary = $this->resizedImageProvider->getResizedImage($file, $width, $height);
+            $resizedImageBinary = $this->resizedImageProvider->getResizedImage($file, $width, $height, $format);
             if (!$resizedImageBinary) {
                 return null;
             }
@@ -59,18 +57,19 @@ class ImageResizeManager implements ImageResizeManagerInterface
         return $resizedImageBinary;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function applyFilter(File $file, string $filterName, bool $forceUpdate = false): ?BinaryInterface
-    {
+    public function applyFilter(
+        File $file,
+        string $filterName,
+        string $format = '',
+        bool $forceUpdate = false
+    ): ?BinaryInterface {
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
-        $storagePath = $this->resizedImagePathProvider->getPathForFilteredImage($file, $filterName);
+        $storagePath = $this->resizedImagePathProvider->getPathForFilteredImage($file, $filterName, $format);
 
         if (!$forceUpdate && $rawResizedImage = $mediaCacheManager->getFileContent($storagePath, false)) {
             $resizedImageBinary = $this->imagineBinaryByFileContentFactory->createImagineBinary($rawResizedImage);
         } else {
-            $resizedImageBinary = $this->resizedImageProvider->getFilteredImage($file, $filterName);
+            $resizedImageBinary = $this->resizedImageProvider->getFilteredImage($file, $filterName, $format);
             if (!$resizedImageBinary) {
                 return null;
             }

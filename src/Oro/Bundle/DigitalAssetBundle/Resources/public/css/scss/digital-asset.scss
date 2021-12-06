@@ -10,7 +10,7 @@
             display: inline-block;
             padding: $dam-file-inner-offset;
 
-            > img {
+            > picture > img {
                 display: inline-block;
                 overflow: hidden;
                 width: 16px;

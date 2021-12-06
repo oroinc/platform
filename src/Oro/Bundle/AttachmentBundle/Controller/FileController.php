@@ -3,27 +3,20 @@
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
-use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager;
 use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * The controller with actions that work with files.
  */
 class FileController extends AbstractController
 {
-    /**
-     * @Route("attachment/{action}/{id}/{filename}",
-     *   name="oro_attachment_get_file",
-     *   requirements={"id"="\d+", "action"="(get|download)"}
-     * )
-     */
     public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
@@ -50,12 +43,6 @@ class FileController extends AbstractController
         return $response;
     }
 
-    /**
-     * @Route("media/cache/attachment/resize/{id}/{width}/{height}/{filename}",
-     *   name="oro_resize_attachment",
-     *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
-     * )
-     */
     public function getResizedAttachmentImageAction(
         int $id,
         int $width,
@@ -66,7 +53,7 @@ class FileController extends AbstractController
         $file = $this->getFileByIdAndFileName($id, $filename);
         $this->unlockSession($request);
 
-        $binary = $this->getImageResizeManager()->resize($file, $width, $height);
+        $binary = $this->getImageResizeManager()->resize($file, $width, $height, $this->getFormat($file, $filename));
         if (!$binary) {
             throw $this->createNotFoundException();
         }
@@ -74,18 +61,12 @@ class FileController extends AbstractController
         return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
     }
 
-    /**
-     * @Route("media/cache/attachment/filter/{filter}/{filterMd5}/{id}/{filename}",
-     *   name="oro_filtered_attachment",
-     *   requirements={"id"="\d+", "filterMd5"="^[0-9a-f]{32}$"}
-     * )
-     */
     public function getFilteredImageAction(int $id, string $filter, string $filename, Request $request): Response
     {
         $file = $this->getFileByIdAndFileName($id, $filename);
         $this->unlockSession($request);
 
-        $binary = $this->getImageResizeManager()->applyFilter($file, $filter);
+        $binary = $this->getImageResizeManager()->applyFilter($file, $filter, $this->getFormat($file, $filename));
         if (!$binary) {
             throw $this->createNotFoundException();
         }
@@ -93,16 +74,22 @@ class FileController extends AbstractController
         return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
     }
 
-    private function getFileByIdAndFileName(int $id, string $fileName): File
+    private function getFormat(File $file, string $filename): string
+    {
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        $format = '';
+        if (strtolower($file->getExtension()) !== $extension) {
+            $format = $extension;
+        }
+
+        return $format;
+    }
+
+    private function getFileByIdAndFileName(int $id, string $filename): File
     {
         /** @var File|null $file */
         $file = $this->getDoctrine()->getManagerForClass(File::class)->find(File::class, $id);
-        if (null === $file
-            || (
-                $fileName !== $file->getFilename()
-                && $fileName !== $file->getOriginalFilename()
-                && $fileName !== $this->getFileNameProvider()->getFileName($file)
-            )) {
+        if (!$file || !$this->isValidFilename($file, $filename)) {
             throw $this->createNotFoundException('File not found');
         }
 
@@ -111,6 +98,24 @@ class FileController extends AbstractController
         }
 
         return $file;
+    }
+
+    private function isValidFilename(File $file, string $filename): bool
+    {
+        $extension = pathinfo($filename, PATHINFO_EXTENSION);
+        if (strtolower($extension) !== $file->getExtension()) {
+            $filename = $this->stripExtension($filename);
+        }
+
+        return $filename === $file->getFilename()
+            || $this->stripExtension($filename) === $file->getFilename()
+            || $filename === $file->getOriginalFilename()
+            || $filename === $this->getFileNameProvider()->getFileName($file);
+    }
+
+    private function stripExtension(string $filename): string
+    {
+        return pathinfo($filename, PATHINFO_FILENAME);
     }
 
     private function unlockSession(Request $request): void
@@ -123,28 +128,29 @@ class FileController extends AbstractController
 
     private function getFileManager(): FileManager
     {
-        return $this->get('oro_attachment.file_manager');
+        return $this->container->get(FileManager::class);
     }
 
     private function getImageResizeManager(): ImageResizeManagerInterface
     {
-        return $this->get('oro_attachment.manager.image_resize');
+        return $this->container->get(ImageResizeManagerInterface::class);
     }
 
     private function getFileNameProvider(): FileNameProviderInterface
     {
-        return $this->get('oro_attachment.provider.file_name');
+        return $this->container->get(FileNameProviderInterface::class);
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [
-            'oro_attachment.file_manager'         => FileManager::class,
-            'oro_attachment.manager.image_resize' => ImageResizeManager::class,
-            'oro_attachment.provider.file_name'   => FileNameProviderInterface::class
+            AttachmentManager::class,
+            FileManager::class,
+            ImageResizeManagerInterface::class,
+            FileNameProviderInterface::class,
         ]);
     }
 }

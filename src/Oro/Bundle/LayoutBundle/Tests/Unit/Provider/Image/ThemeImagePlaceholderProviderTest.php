@@ -12,17 +12,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextHolder;
+    private LayoutContextHolder|\PHPUnit\Framework\MockObject\MockObject $contextHolder;
 
-    /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManager;
+    private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
 
-    /** @var CacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagineCacheManager;
+    private CacheManager|\PHPUnit\Framework\MockObject\MockObject $imagineCacheManager;
 
-    /** @var ThemeImagePlaceholderProvider */
-    private $provider;
+    private ThemeImagePlaceholderProvider $provider;
 
     protected function setUp(): void
     {
@@ -38,72 +34,90 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPath(): void
+    /**
+     * @dataProvider getPathDataProvider
+     *
+     * @param string $format
+     * @param string $expectedPath
+     */
+    public function testGetPath(string $format, string $expectedPath): void
     {
         $themeName = 'test_theme';
 
         $context = $this->createMock(LayoutContext::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getOr')
             ->with('theme')
             ->willReturn($themeName);
 
-        $this->contextHolder->expects($this->once())
+        $this->contextHolder->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
 
         $theme = new Theme($themeName);
         $theme->setImagePlaceholders(['pl1' => '/path/to/pl1.img', 'pl2' => '/path/to/pl2.img']);
 
-        $this->themeManager->expects($this->once())
+        $this->themeManager->expects(self::once())
             ->method('getTheme')
             ->with($themeName)
             ->willReturn($theme);
 
         $filter = 'image_filter';
 
-        $this->imagineCacheManager->expects($this->once())
+        $this->imagineCacheManager->expects(self::once())
             ->method('generateUrl')
-            ->with('/path/to/pl2.img', $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
+            ->with($expectedPath, $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/path/to/filtered_pl2.img');
 
-        $this->assertEquals('/path/to/filtered_pl2.img', $this->provider->getPath($filter));
+        self::assertEquals('/path/to/filtered_pl2.img', $this->provider->getPath($filter, $format));
+    }
+
+    public function getPathDataProvider(): array
+    {
+        return [
+            'path unchanged if format is empty' => ['format' => '', 'expectedPath' => '/path/to/pl2.img'],
+            'path unchanged if format is the same' => ['format' => 'img', 'expectedPath' => '/path/to/pl2.img'],
+            'path with new extension if format is not the same' => [
+                'format' => 'webp',
+                'expectedPath' => '/path/to/pl2.img.webp',
+            ],
+        ];
     }
 
     public function testGetPathWithoutContext(): void
     {
-        $this->contextHolder->expects($this->once())
+        $this->contextHolder->expects(self::once())
             ->method('getContext')
             ->willReturn(null);
 
-        $this->themeManager->expects($this->never())
-            ->method($this->anything());
+        $this->themeManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->imagineCacheManager->expects($this->never())
-            ->method($this->anything());
+        $this->imagineCacheManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->provider->getPath('image_filter'));
+        self::assertNull($this->provider->getPath('image_filter'));
     }
 
     public function testGetPathWithoutThemeName(): void
     {
         $context = $this->createMock(LayoutContext::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getOr')
             ->with('theme')
             ->willReturn(null);
 
-        $this->contextHolder->expects($this->once())
+        $this->contextHolder->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
 
-        $this->themeManager->expects($this->never())
-            ->method($this->anything());
+        $this->themeManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->imagineCacheManager->expects($this->never())
-            ->method($this->anything());
+        $this->imagineCacheManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->provider->getPath('image_filter'));
+        self::assertNull($this->provider->getPath('image_filter'));
     }
 
     public function testGetPathWithoutPlaceholder(): void
@@ -111,28 +125,28 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $themeName = 'test_theme';
 
         $context = $this->createMock(LayoutContext::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getOr')
             ->with('theme')
             ->willReturn($themeName);
 
-        $this->contextHolder->expects($this->once())
+        $this->contextHolder->expects(self::once())
             ->method('getContext')
             ->willReturn($context);
 
         $theme = new Theme($themeName);
         $theme->setImagePlaceholders(['pl1' => '/path/to/pl1.img']);
 
-        $this->themeManager->expects($this->once())
+        $this->themeManager->expects(self::once())
             ->method('getTheme')
             ->with($themeName)
             ->willReturn($theme);
 
         $filter = 'image_filter';
 
-        $this->imagineCacheManager->expects($this->never())
-            ->method($this->anything());
+        $this->imagineCacheManager->expects(self::never())
+            ->method(self::anything());
 
-        $this->assertNull($this->provider->getPath($filter));
+        self::assertNull($this->provider->getPath($filter));
     }
 }

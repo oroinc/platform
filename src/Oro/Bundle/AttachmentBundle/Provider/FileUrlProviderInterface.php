@@ -24,20 +24,37 @@ interface FileUrlProviderInterface
 
     /**
      * Get resized image URL.
+     *
+     * @param File $file
+     * @param int $width
+     * @param int $height
+     * @param string $format Adds extension to the filename in url. Leave empty to stay with default format.
+     * @param int $referenceType
+     *
+     * @return string
      */
     public function getResizedImageUrl(
         File $file,
         int $width,
         int $height,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string;
 
     /**
-     * Get URL to the image with applied liip imagine filter.
+     * Get URL to the image with applied LiipImagine filter.
+     *
+     * @param File $file
+     * @param string $filterName
+     * @param string $format Adds extension to the filename in url. Leave empty to stay with default format.
+     * @param int $referenceType
+     *
+     * @return string
      */
     public function getFilteredImageUrl(
         File $file,
         string $filterName,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string;
 }

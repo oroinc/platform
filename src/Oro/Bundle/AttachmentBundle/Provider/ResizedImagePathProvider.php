@@ -9,8 +9,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 class ResizedImagePathProvider implements ResizedImagePathProviderInterface
 {
-    /** @var FileUrlProviderInterface */
-    private $fileUrlProvider;
+    private FileUrlProviderInterface $fileUrlProvider;
 
     public function __construct(FileUrlProviderInterface $fileUrlProvider)
     {
@@ -20,20 +19,20 @@ class ResizedImagePathProvider implements ResizedImagePathProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getPathForResizedImage(File $entity, int $width, int $height): string
+    public function getPathForResizedImage(File $entity, int $width, int $height, string $format = ''): string
     {
         return $this->normalizePath(
-            $this->fileUrlProvider->getResizedImageUrl($entity, $width, $height)
+            $this->fileUrlProvider->getResizedImageUrl($entity, $width, $height, $format)
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPathForFilteredImage(File $entity, string $filterName): string
+    public function getPathForFilteredImage(File $entity, string $filterName, string $format = ''): string
     {
         return $this->normalizePath(
-            $this->fileUrlProvider->getFilteredImageUrl($entity, $filterName)
+            $this->fileUrlProvider->getFilteredImageUrl($entity, $filterName, $format)
         );
     }
 

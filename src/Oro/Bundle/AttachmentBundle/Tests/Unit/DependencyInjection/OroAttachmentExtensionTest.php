@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AttachmentBundle\DependencyInjection\OroAttachmentExtension;
+use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -18,27 +19,29 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             [
-                'kernel.environment'                                 => 'prod',
+                'kernel.environment' => 'prod',
                 'oro_attachment.liip_imagine.unsupported_mime_types' => ['image/svg+xml'],
-                'oro_attachment.debug_images'                        => true,
-                'oro_attachment.upload_file_mime_types'              => [],
-                'oro_attachment.upload_image_mime_types'             => [],
-                'oro_attachment.processors_allowed'                  => true,
-                'oro_attachment.png_quality'                         => 100,
-                'oro_attachment.jpeg_quality'                        => 85,
-                'oro_attachment.files'                               => [
+                'liip_imagine.controller.filter_action' => 'oro_attachment.controller.imagine::filterAction',
+                'oro_attachment.debug_images' => true,
+                'oro_attachment.upload_file_mime_types' => [],
+                'oro_attachment.upload_image_mime_types' => [],
+                'oro_attachment.processors_allowed' => true,
+                'oro_attachment.png_quality' => 100,
+                'oro_attachment.jpeg_quality' => 85,
+                'oro_attachment.webp_strategy' => WebpConfiguration::ENABLED_IF_SUPPORTED,
+                'oro_attachment.files' => [
                     'default' => 'fa-file-o',
-                    'doc'     => 'fa-file-text-o',
-                    'docx'    => 'fa-file-text-o',
-                    'xls'     => 'fa-file-excel-o',
-                    'xlsx'    => 'fa-file-excel-o',
-                    'pdf'     => 'fa-file-pdf-o',
-                    'png'     => 'fa-file-image-o',
-                    'jpg'     => 'fa-file-image-o',
-                    'jpeg'    => 'fa-file-image-o',
-                    'gif'     => 'fa-file-image-o',
-                    'mp4'     => 'fa-file-movie-o'
-                ]
+                    'doc' => 'fa-file-text-o',
+                    'docx' => 'fa-file-text-o',
+                    'xls' => 'fa-file-excel-o',
+                    'xlsx' => 'fa-file-excel-o',
+                    'pdf' => 'fa-file-pdf-o',
+                    'png' => 'fa-file-image-o',
+                    'jpg' => 'fa-file-image-o',
+                    'jpeg' => 'fa-file-image-o',
+                    'gif' => 'fa-file-image-o',
+                    'mp4' => 'fa-file-movie-o',
+                ],
             ],
             $container->getParameterBag()->all()
         );

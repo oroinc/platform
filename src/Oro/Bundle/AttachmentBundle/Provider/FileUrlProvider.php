@@ -47,13 +47,14 @@ class FileUrlProvider implements FileUrlProviderInterface
         File $file,
         int $width,
         int $height,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         return $this->urlGenerator->generate(
             'oro_resize_attachment',
             [
                 'id' => $file->getId(),
-                'filename' => $this->filenameProvider->getFileName($file),
+                'filename' => $this->filenameProvider->getFileName($file, $format),
                 'width' => $width,
                 'height' => $height,
             ],
@@ -67,13 +68,14 @@ class FileUrlProvider implements FileUrlProviderInterface
     public function getFilteredImageUrl(
         File $file,
         string $filterName,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         return $this->urlGenerator->generate(
             'oro_filtered_attachment',
             [
                 'id' => $file->getId(),
-                'filename' => $this->filenameProvider->getFileName($file),
+                'filename' => $this->filenameProvider->getFileName($file, $format),
                 'filter' => $filterName,
             ],
             $referenceType

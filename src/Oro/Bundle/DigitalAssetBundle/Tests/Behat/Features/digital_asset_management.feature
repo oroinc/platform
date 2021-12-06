@@ -1,4 +1,5 @@
 @ticket-BB-17850
+@feature-BAP-19790
 Feature:  Digital asset management
   In order to have a possibility to manage digital assets
   As an Admin user
@@ -16,7 +17,7 @@ Feature:  Digital asset management
       | Title | Not supported mime type |
     When I save form
     Then I should see validation errors:
-      | File | The mime type of the file is invalid ("text/html"). Allowed mime types are "text/csv", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png". |
+      | File | The mime type of the file is invalid ("text/html"). Allowed mime types are "text/csv", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png", "image/webp". |
 
   Scenario: Create digital assets with jpg mime types
     Given I fill "Digital Asset Form" with:
@@ -25,6 +26,7 @@ Feature:  Digital asset management
     When I save form
     Then I should see "Digital Asset has been saved" flash message
     And I should see "cat1.jpg"
+    And I should see picture "Digital Asset Preview" element
     And I go to Marketing/ Digital Assets
     And I click "Create Digital Asset"
     And I fill "Digital Asset Form" with:
@@ -82,6 +84,7 @@ Feature:  Digital asset management
     Given I click My User in user menu
     And I click "Entity Edit Button"
     And I click "Choose Image"
+    And I should see picture "Digital Assets Grid First Row Image Picture" element
     When click on JPG image asset in grid
     Then I should see "cat1.jpg"
     When I save form

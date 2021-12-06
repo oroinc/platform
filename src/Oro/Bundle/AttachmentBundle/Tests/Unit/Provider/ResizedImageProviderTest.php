@@ -6,6 +6,7 @@ use Imagine\Exception\RuntimeException;
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
@@ -17,23 +18,19 @@ use Psr\Log\LoggerInterface;
  */
 class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /** @var ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagineBinaryFactory;
+    private ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFactory;
 
-    /** @var ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagineBinaryFilter;
+    private ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFilter;
 
-    /** @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterConfig;
+    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private FilterRuntimeConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject $filterRuntimeConfigProvider;
 
-    /** @var ResizedImageProvider */
-    private $provider;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+
+    private ResizedImageProvider $provider;
 
     protected function setUp(): void
     {
@@ -41,6 +38,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $this->imagineBinaryFactory = $this->createMock(ImagineBinaryByFileContentFactoryInterface::class);
         $this->imagineBinaryFilter = $this->createMock(ImagineBinaryFilterInterface::class);
         $this->filterConfig = $this->createMock(FilterConfiguration::class);
+        $this->filterRuntimeConfigProvider = $this->createMock(FilterRuntimeConfigProviderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->provider = new ResizedImageProvider(
@@ -48,6 +46,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             $this->imagineBinaryFactory,
             $this->imagineBinaryFilter,
             $this->filterConfig,
+            $this->filterRuntimeConfigProvider,
             $this->logger
         );
     }
@@ -86,6 +85,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $imageContent = 'test image content';
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'test-filter';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
 
         $this->fileManager->expects(self::once())
             ->method('getContent')
@@ -95,14 +96,18 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willThrowException(new RuntimeException());
         $this->logger->expects(self::once())
             ->method('warning');
 
-        self::assertNull($this->provider->getFilteredImage($file, $filterName));
+        self::assertNull($this->provider->getFilteredImage($file, $filterName, $format));
     }
 
     public function testGetFilteredImage(): void
@@ -112,6 +117,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filteredImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'test-filter';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
 
         $this->fileManager->expects(self::once())
             ->method('getContent')
@@ -121,16 +128,20 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willReturn($filteredImageBinary);
         $this->logger->expects(self::never())
             ->method(self::anything());
 
         self::assertSame(
             $filteredImageBinary,
-            $this->provider->getFilteredImage($file, $filterName)
+            $this->provider->getFilteredImage($file, $filterName, $format)
         );
     }
 
@@ -159,6 +170,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $imageContent = 'test image content';
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'test-filter';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
 
         $this->fileManager->expects(self::once())
             ->method('getContent')
@@ -168,14 +181,18 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willThrowException(new RuntimeException());
         $this->logger->expects(self::once())
             ->method('warning');
 
-        self::assertNull($this->provider->getFilteredImageByPath($fileName, $filterName));
+        self::assertNull($this->provider->getFilteredImageByPath($fileName, $filterName, $format));
     }
 
     public function testGetFilteredImageByPath(): void
@@ -185,6 +202,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filteredImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'test-filter';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
 
         $this->fileManager->expects(self::once())
             ->method('getContent')
@@ -194,16 +213,20 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willReturn($filteredImageBinary);
         $this->logger->expects(self::never())
             ->method(self::anything());
 
         self::assertSame(
             $filteredImageBinary,
-            $this->provider->getFilteredImageByPath($fileName, $filterName)
+            $this->provider->getFilteredImageByPath($fileName, $filterName, $format)
         );
     }
 
@@ -212,19 +235,25 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $imageContent = 'test image content';
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'test-filter';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
 
         $this->imagineBinaryFactory->expects(self::once())
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willThrowException(new RuntimeException());
         $this->logger->expects(self::once())
             ->method('warning');
 
-        self::assertNull($this->provider->getFilteredImageByContent($imageContent, $filterName));
+        self::assertNull($this->provider->getFilteredImageByContent($imageContent, $filterName, $format));
     }
 
     public function testGetFilteredImageByContent(): void
@@ -233,21 +262,27 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filteredImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'test-filter';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
 
         $this->imagineBinaryFactory->expects(self::once())
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willReturn($filteredImageBinary);
         $this->logger->expects(self::never())
             ->method(self::anything());
 
         self::assertSame(
             $filteredImageBinary,
-            $this->provider->getFilteredImageByContent($imageContent, $filterName)
+            $this->provider->getFilteredImageByContent($imageContent, $filterName, $format)
         );
     }
 
@@ -258,6 +293,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filteredImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'attachment_10_20';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
         $width = 10;
         $height = 20;
 
@@ -276,14 +313,18 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willReturn($filteredImageBinary);
 
         self::assertSame(
             $filteredImageBinary,
-            $this->provider->getResizedImage($file, $width, $height)
+            $this->provider->getResizedImage($file, $width, $height, $format)
         );
     }
 
@@ -294,6 +335,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filteredImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'attachment_10_20';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
         $width = 10;
         $height = 20;
 
@@ -312,14 +355,18 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willReturn($filteredImageBinary);
 
         self::assertSame(
             $filteredImageBinary,
-            $this->provider->getResizedImageByPath($fileName, $width, $height)
+            $this->provider->getResizedImageByPath($fileName, $width, $height, $format)
         );
     }
 
@@ -329,6 +376,8 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
         $originalImageBinary = $this->createMock(BinaryInterface::class);
         $filteredImageBinary = $this->createMock(BinaryInterface::class);
         $filterName = 'attachment_10_20';
+        $format = 'sample_format';
+        $runtimeConfig = ['sample_key' => 'sample_value'];
         $width = 10;
         $height = 20;
 
@@ -343,14 +392,18 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createImagineBinary')
             ->with($imageContent)
             ->willReturn($originalImageBinary);
+        $this->filterRuntimeConfigProvider->expects(self::once())
+            ->method('getRuntimeConfigForFilter')
+            ->with($originalImageBinary, $filterName, $format)
+            ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
-            ->with(self::identicalTo($originalImageBinary), $filterName)
+            ->with(self::identicalTo($originalImageBinary), $filterName, $runtimeConfig)
             ->willReturn($filteredImageBinary);
 
         self::assertSame(
             $filteredImageBinary,
-            $this->provider->getResizedImageByContent($imageContent, $width, $height)
+            $this->provider->getResizedImageByContent($imageContent, $width, $height, $format)
         );
     }
 }

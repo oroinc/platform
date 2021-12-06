@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Behat\Context;
 
+use Behat\Mink\Element\NodeElement;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Psr\Http\Message\ResponseInterface;
@@ -291,5 +292,69 @@ JS;
         self::assertNotEmpty($matches['filename'], sprintf('Filename not found for file %s', $name));
 
         return $matches['filename'];
+    }
+
+    /**
+     * Example: I should see picture "Attachment Picture" element
+     *
+     * @Then /^I should see picture "(?P<elementName>[^"]+)" element$/
+     *
+     * @param NodeElement|string $picture
+     */
+    public function iShouldSeePictureElement(NodeElement|string $picture): void
+    {
+        $webpConfiguration = $this->getAppContainer()->get('oro_attachment.behat.tools.webp_configuration');
+
+        if ($webpConfiguration->isEnabledIfSupported()) {
+            $this->iShouldSeeWebpPictureSourceInElement($picture);
+        } else {
+            $this->findPictureTag($picture);
+        }
+    }
+
+    private function iShouldSeeWebpPictureSourceInElement(NodeElement|string $picture): void
+    {
+        $picture = $this->findPictureTag($picture);
+
+        $sourceSelector = '//source[@type="image/webp"][last()]';
+        $source = $picture->find('xpath', $sourceSelector);
+
+        self::assertNotNull(
+            $source,
+            sprintf('No picture source found by "%s" selector', $sourceSelector)
+        );
+
+        $sourceUrl = preg_replace('/\\?.*/', '', $source->getAttribute('srcset'));
+        self::assertStringEndsWith(
+            '.webp',
+            $sourceUrl,
+            sprintf('Expected url with webp file extension, got "%s"', $sourceUrl)
+        );
+
+        $response = $this->loadImage($sourceUrl, true);
+
+        self::assertEquals(
+            200,
+            $response->getStatusCode(),
+            sprintf(
+                'Expected "200" status code, got "%s" when requested the url "%s" of picture source',
+                $response->getStatusCode(),
+                $sourceUrl
+            )
+        );
+    }
+
+    private function findPictureTag(NodeElement|string $picture): NodeElement
+    {
+        if (is_string($picture)) {
+            $pictureName = $picture;
+            $picture = $this->createElement($pictureName);
+
+            self::assertNotNull($picture, sprintf('Element with name "%s" not found', $pictureName));
+        }
+
+        self::assertTrue($picture->isVisible(), 'Picture is not visible');
+
+        return $picture;
     }
 }

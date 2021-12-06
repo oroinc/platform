@@ -50,13 +50,22 @@
             'entityTitle': fullname,
         }
         %}
-        {% set avatar = oro_configured_image_url(form.vars.value, 'avatar') %}
         {{ parent() }}
     {% else %}
         {% set title = 'oro.ui.create_entity'|trans({'%entityName%': 'oro.user.entity_label'|trans}) %}
         {% include '@OroUI/page_title_block.html.twig' with { title: title } %}
     {% endif %}
 {% endblock pageHeader %}
+
+{% block pageTitleIcon %}
+    <div class="page-title__icon">
+        {%- include '@OroAttachment/Twig/picture.html.twig' with {
+            file: form.vars.value.avatar,
+            filter: 'avatar_med',
+            img_attrs: { alt: form.vars.value|oro_format_name }
+        } -%}
+    </div>
+{% endblock %}
 
 {% block stats %}
     <li>{{ 'oro.ui.created_at'|trans }}: {{ form.vars.value.createdAt ? form.vars.value.createdAt|oro_format_datetime : 'N/A' }}</li>

@@ -2,6 +2,9 @@ parameters:
     oro_attachment.liip_imagine.unsupported_mime_types: ['image/svg+xml']
 
 services:
+    Liip\ImagineBundle\Imagine\Filter\FilterConfiguration:
+        alias: liip_imagine.filter.configuration
+
     oro_attachment.manager:
         public: true
         class: Oro\Bundle\AttachmentBundle\Manager\AttachmentManager
@@ -10,8 +13,8 @@ services:
             - '@oro_attachment.provider.file_icon'
             - '@oro_attachment.tools.mime_type_checker'
             - '@oro_entity_extend.association_manager'
-            - '@router'
             - '@doctrine'
+            - '@oro_attachment.tools.webp_configuration'
 
     Oro\Bundle\AttachmentBundle\Manager\AttachmentManager:
         alias: oro_attachment.manager
@@ -103,6 +106,7 @@ services:
             - '@security.authorization_checker'
             - '@oro_attachment.manager'
             - '@oro_entity.doctrine_helper'
+            - '@oro_attachment.manager.file.api'
 
     oro_attachment.manager.file.api:
         class: Oro\Bundle\AttachmentBundle\Entity\Manager\FileApiEntityManager
@@ -113,6 +117,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@security.authorization_checker'
             - '@oro_attachment.file_manager'
+            - '@router'
 
     oro_attachment.listener.file_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\FileListener
@@ -343,6 +348,14 @@ services:
     oro_attachment.provider.file_name:
         class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
 
+    oro_attachment.provider.file_name.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider
+        decorates: oro_attachment.provider.file_name
+        decoration_priority: 100
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
+
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
         arguments:
@@ -382,6 +395,16 @@ services:
             - '@oro_attachment.provider.resized_image_path.remove_media_cache_prefix.inner'
             - 'media/cache'
 
+    oro_attachment.provider.filter_runtime_config:
+        class: Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigDefaultProvider
+
+    oro_attachment.provider.filter_runtime_config.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFilterRuntimeConfigProvider
+        decorates: oro_attachment.provider.filter_runtime_config
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
+
     Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider:
         alias: oro_attachment.provider.resized_image
 
@@ -393,6 +416,7 @@ services:
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
             - '@oro_attachment.liip_imagine.binary.filter'
             - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.provider.filter_runtime_config'
             - '@logger'
 
     oro_attachment.manager.image_resize:
@@ -402,6 +426,14 @@ services:
             - '@oro_attachment.provider.resized_image_path'
             - '@oro_attachment.media_cache_manager_registry'
             - '@oro_attachment.liip_imagine.binary.factory.guess_mime_type'
+
+    oro_attachment.manager.image_resize.webp_aware:
+        class: 'Oro\Bundle\AttachmentBundle\Manager\WebpAwareImageResizeManager'
+        decorates: oro_attachment.manager.image_resize
+        decoration_priority: -100
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
 
     oro_attachment.provider.file_icon:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileIconProvider'
@@ -510,6 +542,14 @@ services:
         arguments:
             - '@liip_imagine.filter.configuration'
             - '@oro_attachment.provider.resized_image_path'
+
+    oro_attachment.provider.image_file_names.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareImageFileNamesProvider
+        decorates: oro_attachment.provider.image_file_names
+        decoration_priority: -255 # Should be executed as the last one to add filenames with .webp extension if needed.
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.tools.webp_configuration'
 
     oro_attachment.manager.image_file_removal_config:
         class: Oro\Bundle\AttachmentBundle\Manager\FileRemoval\ImageFileRemovalManagerConfig
@@ -620,3 +660,33 @@ services:
     Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_attachment.checker.voter.webp_feature_voter:
+        class: Oro\Bundle\AttachmentBundle\Checker\Voter\WebpFeatureVoter
+        arguments:
+            - '%oro_attachment.webp_strategy%'
+        tags:
+            - { name: oro_featuretogle.voter }
+
+    oro_attachment.tools.webp_configuration:
+        class: Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration
+        arguments:
+            - '@oro_config.manager'
+            - '%oro_attachment.webp_strategy%'
+
+    Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration:
+        alias: oro_attachment.tools.webp_configuration
+
+    oro_attachment.twig.webp_strategy:
+        class: Oro\Bundle\AttachmentBundle\Twig\WebpStrategyExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+
+    oro_attachment.imagine.filter_service:
+        class: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService
+        arguments:
+            - '@liip_imagine.data.manager'
+            - '@liip_imagine.cache.manager'
+            - '@oro_attachment.provider.resized_image'

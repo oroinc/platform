@@ -13,5 +13,5 @@ interface FileNameProviderInterface
     /**
      * Gets a filename for the given File entity.
      */
-    public function getFileName(File $file): string;
+    public function getFileName(File $file, string $format = ''): string;
 }

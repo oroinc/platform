@@ -15,36 +15,29 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AttachmentApiEntityManager extends ApiEntityManager
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    protected AuthorizationCheckerInterface $authorizationChecker;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    protected AttachmentManager $attachmentManager;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
 
-    /** @var array|null */
-    protected $attachmentTargets;
+    private FileApiEntityManager $fileApiEntityManager;
 
-    /**
-     * @param string                        $class
-     * @param ObjectManager                 $om
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param AttachmentManager             $attachmentManager
-     * @param DoctrineHelper                $doctrineHelper
-     */
+    protected ?array $attachmentTargets = null;
+
     public function __construct(
-        $class,
+        string $class,
         ObjectManager $om,
         AuthorizationCheckerInterface $authorizationChecker,
         AttachmentManager $attachmentManager,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        FileApiEntityManager $fileApiEntityManager
     ) {
         parent::__construct($class, $om);
         $this->authorizationChecker = $authorizationChecker;
         $this->attachmentManager = $attachmentManager;
         $this->doctrineHelper = $doctrineHelper;
+        $this->fileApiEntityManager = $fileApiEntityManager;
     }
 
     /**
@@ -91,7 +84,7 @@ class AttachmentApiEntityManager extends ApiEntityManager
     protected function postSerializeAttachment(array $result): array
     {
         if (!empty($result['file'])) {
-            $result['file'] = $this->attachmentManager->getFileRestApiUrl($result['file']['id']);
+            $result['file'] = $this->fileApiEntityManager->getFileRestApiUrl($result['file']['id']);
         }
 
         // move all attachment association fields into 'target' field

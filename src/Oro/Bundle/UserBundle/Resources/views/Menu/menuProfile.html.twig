@@ -9,9 +9,14 @@
             {% if isMobileVersion() %}
                 <span class="fa-user-circle" aria-hidden="true"></span>
             {% else %}
-                {{ app.user|oro_format_name|escape }}
+                {% set user_name = app.user|oro_format_name %}
+                {{ user_name }}
                 {% if app.user.avatar %}
-                    <img class="avatar" src="{{ filtered_image_url(app.user.avatar, 'avatar_med') }}" alt="{{ app.user|oro_format_name }}"/>
+                    {% include '@OroAttachment/Twig/picture.html.twig' with {
+                        file: app.user.avatar,
+                        filter: 'avatar_med',
+                        img_attrs: { alt: user_name, class: 'avatar' },
+                    } %}
                 {%  endif %}
             {% endif %}
         </button>

@@ -9,23 +9,23 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class ChainImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    /** @var array|ImagePlaceholderProviderInterface[] */
-    private $providers = [];
+    /** @var ImagePlaceholderProviderInterface[] */
+    private array $providers = [];
 
     public function addProvider(ImagePlaceholderProviderInterface $provider): void
     {
         $this->providers[] = $provider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
-    {
+    public function getPath(
+        string $filter,
+        string $format = '',
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): ?string {
         $path = null;
 
         foreach ($this->providers as $provider) {
-            $path = $provider->getPath($filter, $referenceType);
+            $path = $provider->getPath($filter, $format, $referenceType);
             if ($path) {
                 break;
             }

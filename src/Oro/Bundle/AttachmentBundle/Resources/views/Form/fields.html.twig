@@ -103,7 +103,10 @@
                 {% else %}
                     <div class="well well-small oro_attachment_file">
                         <a href="{{ file_url(value, 'download', true) }}" class="no-hash attachment-item__filename" title="{{ value.originalFilename }}">
-                            <img src="{{ resized_image_url(value) }}" alt="{{ value.originalFilename }}" />
+                            {% include '@OroAttachment/Twig/picture.html.twig' with {
+                                sources: oro_resized_picture_sources(value),
+                                img_attrs: { alt: value.originalFilename }
+                            } %}
                             {{ value.originalFilename }}
                         </a>
                     </div>

@@ -20,11 +20,16 @@ class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterfa
         $this->defaultPath = $defaultPath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPath(string $filter, int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
-    {
-        return $this->imagineCacheManager->generateUrl($this->defaultPath, $filter, [], null, $referenceType);
+    public function getPath(
+        string $filter,
+        string $format = '',
+        int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
+    ): ?string {
+        $path = $this->defaultPath;
+        if ($format && pathinfo($path, PATHINFO_EXTENSION) !== $format) {
+            $path .= '.' . $format;
+        }
+
+        return $this->imagineCacheManager->generateUrl($path, $filter, [], null, $referenceType);
     }
 }
