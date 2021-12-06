@@ -4,12 +4,14 @@ namespace Oro\Bundle\EntityBundle\Tests\Functional\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\MultiInsertQueryExecutor;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -20,41 +22,41 @@ class MultiInsertQueryExecutorTest extends WebTestCase
 {
     private const BATCH_SIZE = 1;
 
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var MultiInsertQueryExecutor
-     */
-    protected $queryExecutor;
+    /** @var MultiInsertQueryExecutor */
+    private $queryExecutor;
 
     protected function setUp(): void
     {
         $this->initClient();
-        $this->registry = $this->getContainer()->get('doctrine');
         $this->queryExecutor = $this->getContainer()->get('oro_entity.orm.multi_insert_query_executor');
         $this->queryExecutor->setBatchSize(self::BATCH_SIZE);
+    }
+
+    private function getRepository(string $entityClass): EntityRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository($entityClass);
+    }
+
+    private function getOrganization(): Organization
+    {
+        /** @var OrganizationRepository $repository */
+        $repository = self::getContainer()->get('doctrine')->getRepository(Organization::class);
+
+        return $repository->getFirst();
     }
 
     public function testInsert()
     {
         $decimalValue = 12345678.29;
 
-        $group = $this->registry
-            ->getManagerForClass('OroUserBundle:Group')
-            ->getRepository('OroUserBundle:Group')
+        $group = $this->getRepository(Group::class)
             ->findOneBy(['name' => 'Administrators']);
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->registry
-            ->getManagerForClass('OroUserBundle:User')
-            ->getRepository('OroUserBundle:User')
+        $queryBuilder = $this->getRepository(User::class)
             ->createQueryBuilder('u')
             ->select('u.email')
             ->addSelect('u.id')
-            ->addSelect("$decimalValue")
+            ->addSelect((string)$decimalValue)
             ->addSelect('(TRUE)')
             ->addSelect('u.createdAt')
             ->addSelect('u.id')
@@ -63,11 +65,10 @@ class MultiInsertQueryExecutorTest extends WebTestCase
             ->where('u.createdAt <= :datetime')
             ->andWhere('g = :group')
             ->setParameter('datetime', new \DateTime(), Types::DATETIME_MUTABLE)
-            ->setParameter('group', $group)
-        ;
+            ->setParameter('group', $group);
 
         $affectedRecords = $this->queryExecutor->execute(
-            'OroTestFrameworkBundle:Item',
+            Item::class,
             [
                 'stringValue',
                 'integerValue',
@@ -82,17 +83,13 @@ class MultiInsertQueryExecutorTest extends WebTestCase
         $this->assertEquals(1, $affectedRecords);
 
         /** @var User[] $users */
-        $users = $this->registry
-            ->getManagerForClass(User::class)
-            ->getRepository(User::class)
+        $users = $this->getRepository(User::class)
             ->findAll();
 
         /** @var Item[] $items */
-        $items = $this->registry->getManagerForClass(Item::class)
-            ->getRepository(Item::class)
+        $items = $this->getRepository(Item::class)
             ->findAll();
 
-        $this->assertNotEmpty($items);
         $this->assertCount(count($users), $items);
 
         foreach ($users as $index => $user) {
@@ -110,23 +107,20 @@ class MultiInsertQueryExecutorTest extends WebTestCase
     public function testInsertMultipleBatches()
     {
         $decimalValue = 12345678.29;
+        $expectedUserCount = self::BATCH_SIZE + 1;
         $multiInsertRole = new Role();
         $multiInsertRole->setLabel('statusMultiInsertRole');
-        $this->registry->getManagerForClass(Role::class)->persist($multiInsertRole);
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(Role::class);
+        $em->persist($multiInsertRole);
+        $this->createUsers($multiInsertRole, $this->getOrganization(), $expectedUserCount);
+        $em->refresh($multiInsertRole);
 
-        $expectedUserCount = self::BATCH_SIZE + 1;
-        $organization = $this->registry->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $this->createUsers($multiInsertRole, $organization, $expectedUserCount);
-        $this->registry->getManagerForClass(Role::class)->refresh($multiInsertRole);
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->registry
-            ->getManagerForClass('OroUserBundle:User')
-            ->getRepository('OroUserBundle:User')
+        $queryBuilder = $this->getRepository(User::class)
             ->createQueryBuilder('u')
             ->select('u.email')
             ->addSelect('u.id')
-            ->addSelect("$decimalValue")
+            ->addSelect((string)$decimalValue)
             ->addSelect('(TRUE)')
             ->addSelect('u.createdAt')
             ->addSelect('u.id')
@@ -138,7 +132,7 @@ class MultiInsertQueryExecutorTest extends WebTestCase
             ->setParameter('role', $multiInsertRole);
 
         $affectedRecords = $this->queryExecutor->execute(
-            'OroTestFrameworkBundle:Item',
+            Item::class,
             [
                 'stringValue',
                 'integerValue',
@@ -153,11 +147,9 @@ class MultiInsertQueryExecutorTest extends WebTestCase
         $this->assertEquals($expectedUserCount, $affectedRecords);
 
         /** @var Item[] $items */
-        $items = $this->registry->getManagerForClass(Item::class)
-            ->getRepository(Item::class)
+        $items = $this->getRepository(Item::class)
             ->findAll();
 
-        $this->assertNotEmpty($items);
         $this->assertCount(count($multiInsertRole->getUsers()), $items);
     }
 
@@ -176,10 +168,12 @@ class MultiInsertQueryExecutorTest extends WebTestCase
                 ->setOrganizations(new ArrayCollection([$organization]))
                 ->setOwner($organization->getBusinessUnits()->first())
                 ->addUserRole($userRole)
-                ->setEnabled(true)
-            ;
+                ->setEnabled(true);
             $userManager->updateUser($user, false);
         }
-        $this->registry->getManagerForClass(User::class)->flush();
+
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(User::class);
+        $em->flush();
     }
 }

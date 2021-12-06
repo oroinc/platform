@@ -5,7 +5,9 @@ namespace Oro\Bundle\TagBundle\Tests\Functional\Controller;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ImportExportControllerTest extends WebTestCase
@@ -48,10 +50,10 @@ class ImportExportControllerTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_importexport_import_form',
-                array(
-                    'entity'           => 'Oro\Bundle\UserBundle\Entity\User',
+                [
+                    'entity'           => User::class,
                     '_widgetContainer' => 'dialog'
-                )
+                ]
             )
         );
         $response = $this->client->getResponse();
@@ -83,52 +85,37 @@ class ImportExportControllerTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_importexport_import_process',
-                array(
+                [
                     'processorAlias' => 'oro_user.add_or_replace',
                     '_format'        => 'json'
-                )
+                ]
             )
         );
 
         $data = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertEquals(
-            array(
-                'success'   => true,
-            ),
-            $data
-        );
+        $this->assertEquals(['success' => true], $data);
 
         $this->assertNotNull(
-            $this->getTaggingRepository()->findOneByEntityName('Oro\Bundle\UserBundle\Entity\User')
+            $this->getTaggingRepository()->findOneByEntityName(User::class)
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getImportTemplate()
+    private function getImportTemplate(): string
     {
-        $result = $this
-            ->getContainer()
-            ->get('oro_importexport.handler.export')
+        $result = $this->getContainer()->get('oro_importexport.handler.export')
             ->getExportResult(
                 JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
                 'oro_user',
                 ProcessorRegistry::TYPE_EXPORT_TEMPLATE
             );
 
-        return $this
-            ->getContainer()
-            ->get('oro_importexport.file.file_manager')
+        return $this->getContainer()->get('oro_importexport.file.file_manager')
             ->writeToTmpLocalStorage($result['file']);
     }
 
-    /**
-     * @return EntityRepository
-     */
-    protected function getTaggingRepository()
+    private function getTaggingRepository(): EntityRepository
     {
-        return $this->getContainer()->get('doctrine')->getRepository('OroTagBundle:Tagging');
+        return $this->getContainer()->get('doctrine')->getRepository(Tagging::class);
     }
 }

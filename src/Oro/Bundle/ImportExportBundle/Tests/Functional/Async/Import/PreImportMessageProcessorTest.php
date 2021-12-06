@@ -7,14 +7,20 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 
 class PreImportMessageProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
 
-    protected $fixturePath;
+    /** @var string */
+    private $fixturePath;
+
+    /** @var PreImportMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
@@ -23,14 +29,8 @@ class PreImportMessageProcessorTest extends WebTestCase
 
         $this->initClient();
         $this->fixturePath =  __DIR__. DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR;
-    }
 
-    public function testCouldBeConstructedByContainer()
-    {
-        $instance = $this->getPreparingHttpImportMessageProcessor();
-
-        $this->assertInstanceOf(PreImportMessageProcessor::class, $instance);
-        $this->assertInstanceOf(MessageProcessorInterface::class, $instance);
+        $this->processor = $this->getContainer()->get('oro_importexport.async.pre_import');
     }
 
     public function testShouldProcessPreparingHttpImportMessageAndSendMessageToProducerForImport()
@@ -48,9 +48,8 @@ class PreImportMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('test_import_message');
-        $message->setBody(json_encode($messageData));
-        $processor = $this->getPreparingHttpImportMessageProcessor();
-        $result = $processor->process($message, $this->createSessionMock());
+        $message->setBody(JSON::encode($messageData));
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
@@ -71,35 +70,15 @@ class PreImportMessageProcessorTest extends WebTestCase
         $dependentJob = current($dataRootJob['dependentJobs']);
         $this->assertArrayHasKey('topic', $dependentJob);
         $this->assertArrayHasKey('message', $dependentJob);
-        $this->assertEquals($dependentJob['topic'], Topics::SEND_IMPORT_NOTIFICATION);
-        $this->assertEquals($dependentJob['message']['rootImportJobId'], $rootJob->getId());
-        $this->assertEquals($dependentJob['message']['subscribedTopic'], [Topics::IMPORT_HTTP_PREPARING]);
+        $this->assertEquals(Topics::SEND_IMPORT_NOTIFICATION, $dependentJob['topic']);
+        $this->assertEquals($rootJob->getId(), $dependentJob['message']['rootImportJobId']);
+        $this->assertEquals([Topics::PRE_IMPORT], $dependentJob['message']['subscribedTopic']);
         $this->assertArrayHasKey('filePath', $dependentJob['message']);
         $this->assertArrayHasKey('originFileName', $dependentJob['message']);
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    /**
-     * @return \Oro\Component\MessageQueue\Job\JobProcessor
-     */
-    private function getJobProcessor()
+    private function getJobProcessor(): JobProcessor
     {
         return $this->getContainer()->get('oro_message_queue.job.processor');
-    }
-
-    /**
-     * @return PreparingHttpImportMessageProcessor
-     */
-    private function getPreparingHttpImportMessageProcessor()
-    {
-        return $this->getContainer()->get('oro_importexport.async.preparing_http_import');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

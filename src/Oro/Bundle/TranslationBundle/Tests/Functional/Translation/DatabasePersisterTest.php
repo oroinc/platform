@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Translation;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -13,23 +13,10 @@ use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
 
 class DatabasePersisterTest extends WebTestCase
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var DatabasePersister */
-    protected $persister;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
-
         $this->loadFixtures([LoadTranslations::class, LoadLanguages::class]);
-
-        $this->em = $this->getContainer()->get('doctrine')->getManagerForClass(Translation::class);
-        $this->persister = $this->getContainer()->get('oro_translation.database_translation.persister');
     }
 
     public function testPersist()
@@ -47,7 +34,7 @@ class DatabasePersisterTest extends WebTestCase
         ];
         $keyCount = $this->getEntityCount(TranslationKey::class);
         $translationCount = $this->getEntityCount(Translation::class);
-        $this->persister->persist(LoadLanguages::LANGUAGE1, $catalogData);
+        $this->getPersister()->persist(LoadLanguages::LANGUAGE1, $catalogData);
         $this->assertEquals($keyCount + 5, $this->getEntityCount(TranslationKey::class));
         $this->assertEquals($translationCount + 5, $this->getEntityCount(Translation::class));
     }
@@ -56,18 +43,20 @@ class DatabasePersisterTest extends WebTestCase
     {
         $this->expectException(LanguageNotFoundException::class);
         $this->expectExceptionMessage('Language "NotExisted" not found');
-        $this->persister->persist('NotExisted', []);
+        $this->getPersister()->persist('NotExisted', []);
     }
 
-    /**
-     * @param string $class
-     * @return int
-     */
-    private function getEntityCount($class)
+    private function getPersister(): DatabasePersister
     {
-        return (int) $this->em
-            ->getRepository($class)
-            ->createQueryBuilder('t')
+        return $this->getContainer()->get('oro_translation.database_translation.persister');
+    }
+
+    private function getEntityCount(string $class): int
+    {
+        /** @var EntityRepository $repo */
+        $repo = $this->getContainer()->get('doctrine')->getRepository($class);
+
+        return (int)$repo->createQueryBuilder('t')
             ->select('COUNT(t)')
             ->getQuery()
             ->getSingleScalarResult();

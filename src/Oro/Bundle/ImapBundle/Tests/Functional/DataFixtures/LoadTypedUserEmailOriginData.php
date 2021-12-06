@@ -88,9 +88,6 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
         $manager->flush();
     }
 
-    /**
-     * @throws \Exception
-     */
     private function generateToken(int $length = 8192): string
     {
         return bin2hex(random_bytes($length / 2));

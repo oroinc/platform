@@ -27,7 +27,7 @@ class AttachmentFilterConfigurationTest extends WebTestCase
         $this->changeProcessorsParameters(1, 1, false);
         $filters = $this->attachmentFilterConfigurator->all();
         $this->assertNotEmpty($filters);
-        foreach ($filters as $filterName => $filterConfig) {
+        foreach ($filters as $filterConfig) {
             $this->assertEmpty($filterConfig['post_processors']);
         }
     }
@@ -54,7 +54,7 @@ class AttachmentFilterConfigurationTest extends WebTestCase
         }
     }
 
-    private function assertFilterEqual(array $filter, int $jpegQuality = 85, int $pngQuality = 100)
+    private function assertFilterEqual(array $filter, int $jpegQuality = 85, int $pngQuality = 100): void
     {
         $this->assertEquals(
             [

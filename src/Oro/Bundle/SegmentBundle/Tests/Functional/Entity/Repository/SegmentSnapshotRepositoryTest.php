@@ -136,7 +136,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         ];
     }
 
-    protected function getExpectedResult(array $entities): array
+    private function getExpectedResult(array $entities): array
     {
         $doctrine = $this->getDoctrine();
         $segmentQB = $this->getEntityRepository(Segment::class)->createQueryBuilder('s');
@@ -166,7 +166,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         return $expectedCondition;
     }
 
-    protected function findSegmentSnapshots(
+    private function findSegmentSnapshots(
         SegmentSnapshotRepository $segmentSnapshotRepository,
         array $expectedCondition
     ): array {
@@ -190,7 +190,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         return $selectQB->getQuery()->getResult();
     }
 
-    protected function getEntities(int $count, bool $withSegmentSnapshot): array
+    private function getEntities(int $count, bool $withSegmentSnapshot): array
     {
         $queryBuilder = $this->getEntityRepository(WorkflowAwareEntity::class)->createQueryBuilder('entity');
 
@@ -223,7 +223,7 @@ class SegmentSnapshotRepositoryTest extends WebTestCase
         $segment = $this->getSegment(LoadSegmentData::SEGMENT_STATIC);
         $repository = $this->getSegmentSnapshotRepository();
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'integerEntityId FROM Oro\Bundle\SegmentBundle\Entity\SegmentSnapshot snp',
             $repository->getIdentifiersSelectQueryBuilder($segment)->getDQL()
         );

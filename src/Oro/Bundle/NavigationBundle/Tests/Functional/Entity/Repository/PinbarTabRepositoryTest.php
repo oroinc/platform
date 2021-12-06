@@ -11,22 +11,15 @@ use Oro\Bundle\UserBundle\Tests\Functional\Api\DataFixtures\LoadUserData;
 
 class PinbarTabRepositoryTest extends WebTestCase
 {
-    private PinbarTabRepository $repository;
-
     protected function setUp(): void
     {
         $this->initClient();
-        $this->client->useHashNavigation(true);
+        $this->loadFixtures([PinbarTabData::class]);
+    }
 
-        $this->repository = self::getContainer()
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepositoryForClass(PinbarTab::class);
-
-        $this->loadFixtures(
-            [
-                PinbarTabData::class,
-            ]
-        );
+    private function getRepository(): PinbarTabRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(PinbarTab::class);
     }
 
     /**
@@ -38,7 +31,7 @@ class PinbarTabRepositoryTest extends WebTestCase
 
         self::assertEquals(
             $expectedCount,
-            $this->repository->countNavigationItems($url, $user, $user->getOrganization(), 'pinbar')
+            $this->getRepository()->countNavigationItems($url, $user, $user->getOrganization(), 'pinbar')
         );
     }
 
@@ -57,7 +50,7 @@ class PinbarTabRepositoryTest extends WebTestCase
 
         self::assertEquals(
             1,
-            $this->repository->countNavigationItems($url, $user, $user->getOrganization(), 'pinbar')
+            $this->getRepository()->countNavigationItems($url, $user, $user->getOrganization(), 'pinbar')
         );
     }
 
@@ -65,7 +58,7 @@ class PinbarTabRepositoryTest extends WebTestCase
     {
         $user = $this->getReference(LoadUserData::USER_NAME_2);
 
-        $pinbarItems = $this->repository->getNavigationItems($user, $user->getOrganization(), 'pinbar');
+        $pinbarItems = $this->getRepository()->getNavigationItems($user, $user->getOrganization(), 'pinbar');
 
         self::assertCount(3, $pinbarItems);
 
@@ -90,7 +83,7 @@ class PinbarTabRepositoryTest extends WebTestCase
 
         self::assertEquals(
             $expectedCount,
-            $this->repository->countPinbarTabDuplicatedTitles($titleShort, $user, $user->getOrganization())
+            $this->getRepository()->countPinbarTabDuplicatedTitles($titleShort, $user, $user->getOrganization())
         );
     }
 

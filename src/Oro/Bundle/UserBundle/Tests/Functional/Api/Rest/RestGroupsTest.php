@@ -8,7 +8,7 @@ class RestGroupsTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
     }
 
     /**
@@ -16,12 +16,12 @@ class RestGroupsTest extends WebTestCase
      */
     public function testCreateGroup()
     {
-        $request = array(
-            "group" => array(
-                "name" => 'Group_'.mt_rand(100, 500),
+        $request = [
+            'group' => [
+                'name' => 'Group_'.mt_rand(100, 500),
                 'owner' => '1'
-            )
-        );
+            ]
+        ];
 
         $this->client->jsonRequest(
             'POST',
@@ -71,7 +71,7 @@ class RestGroupsTest extends WebTestCase
         $request['group']['name'] .= '_updated';
         $this->client->jsonRequest(
             'PUT',
-            $this->getUrl('oro_api_put_group', array('id' => $group['id'])),
+            $this->getUrl('oro_api_put_group', ['id' => $group['id']]),
             $request
         );
         $result = $this->client->getResponse();
@@ -79,7 +79,7 @@ class RestGroupsTest extends WebTestCase
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_get_group', ['id' => $group['id']])
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
@@ -97,14 +97,14 @@ class RestGroupsTest extends WebTestCase
     {
         $this->client->jsonRequest(
             'DELETE',
-            $this->getUrl('oro_api_delete_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_delete_group', ['id' => $group['id']])
         );
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->jsonRequest(
             'GET',
-            $this->getUrl('oro_api_get_group', array('id' => $group['id']))
+            $this->getUrl('oro_api_get_group', ['id' => $group['id']])
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 404);

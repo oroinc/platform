@@ -23,7 +23,7 @@ class CleanupCommandTest extends WebTestCase
     public function testCommandOutput(string $expectedContent, array $params): void
     {
         $result = self::runCommand('oro:cron:batch:cleanup', $params);
-        static::assertStringContainsString($expectedContent, $result);
+        self::assertStringContainsString($expectedContent, $result);
 
         $fileName = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'Fixture'
             . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'expected_results.yml';

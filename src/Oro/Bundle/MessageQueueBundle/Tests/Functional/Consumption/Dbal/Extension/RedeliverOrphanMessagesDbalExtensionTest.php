@@ -47,11 +47,9 @@ class RedeliverOrphanMessagesDbalExtensionTest extends WebTestCase
         $id = (int) $dbal->lastInsertId('message_queue_id_seq');
 
         $consumer = $this->createMessageConsumerMock();
-        $consumer
-            ->expects($this->once())
+        $consumer->expects($this->once())
             ->method('getConsumerId')
-            ->will($this->returnValue('any-other-consumer-id'))
-        ;
+            ->willReturn('any-other-consumer-id');
 
         //guard
         $this->assertGreaterThan(0, $id);

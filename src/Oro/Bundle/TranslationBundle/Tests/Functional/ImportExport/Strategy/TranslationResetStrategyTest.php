@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\ImportExport\Strategy;
 
+use Oro\Bundle\ImportExportBundle\Strategy\Import\AbstractImportStrategy;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\ImportExport\Strategy\TranslationResetStrategy;
@@ -43,7 +44,7 @@ class TranslationResetStrategyTest extends AbstractTranslationImportStrategyTest
     /**
      * {@inheritdoc}
      */
-    protected function getStrategyObject()
+    protected function getStrategyObject(): AbstractImportStrategy
     {
         $container = $this->getContainer();
 

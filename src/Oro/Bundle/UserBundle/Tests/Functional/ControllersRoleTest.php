@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
 
 class ControllersRoleTest extends WebTestCase
 {
@@ -25,7 +24,6 @@ class ControllersRoleTest extends WebTestCase
     {
         /** @var Crawler $crawler */
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_role_create'));
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form['oro_user_role_form[label]'] = 'testRole';
@@ -35,7 +33,7 @@ class ControllersRoleTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("Role saved", $crawler->html());
+        self::assertStringContainsString('Role saved', $crawler->html());
     }
 
     /**
@@ -57,7 +55,6 @@ class ControllersRoleTest extends WebTestCase
             $this->getUrl('oro_user_role_update', ['id' => $result['id']])
         );
 
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form['oro_user_role_form[label]']       = 'testRoleUpdated';
@@ -68,7 +65,7 @@ class ControllersRoleTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("Role saved", $crawler->html());
+        self::assertStringContainsString('Role saved', $crawler->html());
     }
 
     /**
@@ -117,19 +114,19 @@ class ControllersRoleTest extends WebTestCase
             $this->getUrl('oro_user_role_view', ['id' => $result['id']])
         );
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'testRoleUpdated',
             $crawler->filter('.responsive-section')->first()->html()
         );
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'Clone',
             $crawler->filter('.navigation .title-buttons-container a')->eq(0)->html()
         );
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'Edit',
             $crawler->filter('.navigation .title-buttons-container a')->eq(1)->html()
         );
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'Delete',
             $crawler->filter('.navigation .title-buttons-container a')->eq(2)->html()
         );

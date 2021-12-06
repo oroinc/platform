@@ -38,8 +38,7 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
     {
         $message = new RawMessage('sample body');
         $sentMessage = $this->createMock(SentMessage::class);
-        $this->transport
-            ->expects(self::once())
+        $this->transport->expects(self::once())
             ->method('send')
             ->with($message, null)
             ->willReturn($sentMessage);
@@ -48,16 +47,14 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
             SymfonyAddress::create('from@example.com'),
             SymfonyAddress::createArray(['to@example.com'])
         );
-        $sentMessage
-            ->expects(self::once())
+        $sentMessage->expects(self::once())
             ->method('getEnvelope')
             ->willReturn($envelope);
 
         $this->assertLoggerNotCalled();
 
         $event = new NotificationSentEvent($message, 1, MassNotificationSender::NOTIFICATION_LOG_TYPE);
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event);
 
@@ -73,22 +70,19 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
         );
 
         $sentMessage = $this->createMock(SentMessage::class);
-        $this->transport
-            ->expects(self::once())
+        $this->transport->expects(self::once())
             ->method('send')
             ->with($message, $envelope)
             ->willReturn($sentMessage);
 
-        $sentMessage
-            ->expects(self::once())
+        $sentMessage->expects(self::once())
             ->method('getEnvelope')
             ->willReturn($envelope);
 
         $this->assertLoggerNotCalled();
 
         $event = new NotificationSentEvent($message, 1, MassNotificationSender::NOTIFICATION_LOG_TYPE);
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event);
 
@@ -104,14 +98,12 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
         );
 
         $transportException = new TransportException('Invalid recipient');
-        $this->transport
-            ->expects(self::once())
+        $this->transport->expects(self::once())
             ->method('send')
             ->with($message, $envelope)
             ->willThrowException($transportException);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 sprintf(
@@ -123,8 +115,7 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
             );
 
         $event = new NotificationSentEvent($message, 0, MassNotificationSender::NOTIFICATION_LOG_TYPE);
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event);
 

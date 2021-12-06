@@ -20,9 +20,9 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
     {
         $typeNames = array_keys($this->factory->getTypes());
         $result = $this->runCommand($this->getCommandName());
-        static::assertStringContainsString('Short Description', $result);
+        self::assertStringContainsString('Short Description', $result);
         foreach ($typeNames as $name) {
-            static::assertStringContainsString($name, $result);
+            self::assertStringContainsString($name, $result);
         }
     }
 
@@ -32,9 +32,9 @@ abstract class AbstractDebugCommandTestCase extends WebTestCase
         $typeNames = array_keys($types);
         $name = array_shift($typeNames);
         $result = $this->runCommand($this->getCommandName(), [$name]);
-        static::assertStringContainsString('Full Description', $result);
-        static::assertStringContainsString($name, $result);
-        static::assertStringContainsString(array_shift($types), $result);
+        self::assertStringContainsString('Full Description', $result);
+        self::assertStringContainsString($name, $result);
+        self::assertStringContainsString(array_shift($types), $result);
     }
 
     public function testExecuteWithNotExistsArgument(): void

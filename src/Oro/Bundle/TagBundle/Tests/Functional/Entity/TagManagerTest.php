@@ -11,14 +11,14 @@ class TagManagerTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([LoadTagsData::class]);
     }
 
     public function testGetPreparedArrayAndEnsureTaggingsLoadedOnlyForGivenEntity()
     {
-        $entityManager = static::getContainer()->get('doctrine')->getManagerForClass(TestActivity::class);
-        $tagManager = static::getContainer()->get('oro_tag.tag.manager');
+        $entityManager = self::getContainer()->get('doctrine')->getManagerForClass(TestActivity::class);
+        $tagManager = self::getContainer()->get('oro_tag.tag.manager');
 
         $activity = $this->getReference(LoadTagsData::FIRST_ACTIVITY);
 

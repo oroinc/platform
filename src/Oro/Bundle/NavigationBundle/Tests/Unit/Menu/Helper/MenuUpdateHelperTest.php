@@ -43,8 +43,7 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $update = new MenuUpdateStub();
 
-        $this->translator
-            ->expects($this->exactly(3))
+        $this->translator->expects($this->exactly(3))
             ->method('trans')
             ->willReturnMap([
                 ['test.title', [], null, 'en', 'EN Test Title'],
@@ -57,15 +56,9 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $deLocalization = new Localization();
         $deLocalization->setLanguage($this->getLanguage('de'));
 
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizations')
-            ->willReturn(
-                [
-                    $enLocalization,
-                    $deLocalization,
-                ]
-            );
+            ->willReturn([$enLocalization, $deLocalization]);
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
 
@@ -90,12 +83,10 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
         $update = new MenuUpdateStub();
         $update->setDefaultTitle('Test Title');
 
-        $this->translator
-            ->expects($this->never())
+        $this->translator->expects($this->never())
             ->method('trans');
 
-        $this->localizationHelper
-            ->expects($this->never())
+        $this->localizationHelper->expects($this->never())
             ->method('getLocalizations');
 
         $this->helper->applyLocalizedFallbackValue($update, 'test.title', 'title', 'string');
@@ -105,12 +96,10 @@ class MenuUpdateHelperTest extends \PHPUnit\Framework\TestCase
     {
         $update = new MenuUpdateStub();
 
-        $this->translator
-            ->expects($this->never())
+        $this->translator->expects($this->never())
             ->method('trans');
 
-        $this->localizationHelper
-            ->expects($this->never())
+        $this->localizationHelper->expects($this->never())
             ->method('getLocalizations');
 
         $message = 'Can\'t get a way to read the property "undefined_names" in class "' . MenuUpdateStub::class . '".';

@@ -75,8 +75,7 @@ class ImpersonationAuthenticatorTest extends WebTestCase
         /** @var Impersonation $impersonation */
         $impersonation = $this->getReference(LoadImpersonationData::IMPERSONATION_SIMPLE_USER);
 
-        $eventDispatcher
-            ->expects($this->once())
+        $eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(new ImpersonationSuccessEvent($impersonation), ImpersonationSuccessEvent::EVENT_NAME);
 

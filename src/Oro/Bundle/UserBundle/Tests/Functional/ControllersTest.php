@@ -4,21 +4,19 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
-use Symfony\Component\DomCrawler\Form;
 
 class ControllersTest extends WebTestCase
 {
-    /**
-     * @var Registry
-     */
-    protected $registry;
+    /** @var Registry */
+    private $registry;
 
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->registry = $this->getContainer()->get('doctrine');
-        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
+        $this->loadFixtures([LoadUserData::class]);
     }
 
     public function testIndex()
@@ -54,14 +52,14 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("User saved", $crawler->html());
+        self::assertStringContainsString('User saved', $crawler->html());
     }
 
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
             'users-grid',
-            array('users-grid[_filter][username][value]' => 'testUser1')
+            ['users-grid[_filter][username][value]' => 'testUser1']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -69,7 +67,7 @@ class ControllersTest extends WebTestCase
 
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_user_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_update', ['id' => $result['id']])
         );
 
         $form = $crawler->selectButton('Save and Close')->form();
@@ -86,7 +84,7 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("User saved", $crawler->html());
+        self::assertStringContainsString('User saved', $crawler->html());
     }
 
     public function testApiGen()
@@ -121,18 +119,17 @@ class ControllersTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('John Doe - View - Users - User Management - System', $result->getContent());
+        self::assertStringContainsString('John Doe - View - Users - User Management - System', $result->getContent());
     }
 
     public function testUpdateProfile()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $form['oro_user_user_form[birthday]'] = '1999-01-01';
 
@@ -141,39 +138,36 @@ class ControllersTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("User saved", $crawler->html());
+        self::assertStringContainsString('User saved', $crawler->html());
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
         );
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
         $this->assertEquals('1999-01-01', $form['oro_user_user_form[birthday]']->getValue());
     }
 
     /**
      * @dataProvider autoCompleteHandlerProvider
-     * @param boolean $active
-     * @param string $handlerName
      */
-    public function testAutoCompleteHandler($active, $handlerName, $query)
+    public function testAutoCompleteHandler(bool $active, string $handlerName, string $query)
     {
-        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'simple_user']);
+        $user = $this->registry->getRepository(User::class)->findOneBy(['username' => 'simple_user']);
         $user->setEnabled($active);
         $this->registry->getManager()->flush();
 
         $this->client->request(
             'GET',
             $this->getUrl('oro_form_autocomplete_search'),
-            array(
+            [
                 'page' => 1,
                 'per_page' => 10,
                 'name' => $handlerName,
                 'query' => $query,
-            )
+            ]
         );
 
         $result = $this->client->getResponse();
@@ -181,36 +175,33 @@ class ControllersTest extends WebTestCase
         $this->assertCount((int)$active, $arr['results']);
     }
 
-    /**
-     * @return array
-     */
-    public function autoCompleteHandlerProvider()
+    public function autoCompleteHandlerProvider(): array
     {
-        return array(
+        return [
                 'Acl user autocomplete handler active' =>
-                array(
+                [
                     'active' => true,
                     'handler' => 'acl_users',
                     'query' => 'Elley Towards;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
-                ),
+                ],
                 'Acl user autocomplete handler inactive' =>
-                array(
+                [
                     'active' => false,
                     'handler' => 'acl_users',
                     'query' => 'Elley Towards;Oro_Bundle_UserBundle_Entity_User;CREATE;0;'
-                ),
+                ],
                 'Organization user autocomplete handler active' =>
-                array(
+                [
                     'active' => true,
                     'handler' => 'organization_users',
                     'query' => 'Elley Towards'
-                ),
+                ],
                 'Organization user autocomplete handler inactive' =>
-                array(
+                [
                     'active' => false,
                     'handler' => 'organization_users',
                     'query' => 'Elley Towards'
-                ),
-        );
+                ],
+        ];
     }
 }

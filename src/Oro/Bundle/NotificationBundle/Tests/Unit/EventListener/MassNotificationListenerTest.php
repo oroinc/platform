@@ -34,8 +34,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $event = new NotificationSentEvent(new SymfonyEmail(), 1, 'sample_type');
 
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method(self::anything());
 
         $this->listener->logMassNotification($event);
@@ -49,8 +48,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
             MassNotificationSender::NOTIFICATION_LOG_TYPE
         );
 
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method(self::anything());
 
         $this->listener->logMassNotification($event);
@@ -70,8 +68,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
     ): void {
         $event = new NotificationSentEvent($symfonyEmail, $sentCount, MassNotificationSender::NOTIFICATION_LOG_TYPE);
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('persist')
             ->willReturnCallback(static function (MassNotification $entity) use ($massNotification) {
                 self::assertEquals($massNotification->getSender(), $entity->getSender());
@@ -83,8 +80,7 @@ class MassNotificationListenerTest extends \PHPUnit\Framework\TestCase
                 self::assertInstanceOf(\DateTimeInterface::class, $entity->getScheduledAt());
             });
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('flush');
 
         $this->listener->logMassNotification($event);

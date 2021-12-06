@@ -10,9 +10,6 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\RebuildTranslationCacheHa
 
 class TranslationOperationsTest extends ActionTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -48,10 +45,8 @@ class TranslationOperationsTest extends ActionTestCase
 
     /**
      * @dataProvider removeTranslationOperationDataProvider
-     *
-     * @param string $translation
      */
-    public function testRemoveTranslationOperation($translation)
+    public function testRemoveTranslationOperation(string $translation)
     {
         $translation = $this->getReference($translation);
         $translationClass = Translation::class;
@@ -63,21 +58,18 @@ class TranslationOperationsTest extends ActionTestCase
             $translationClass,
             ['datagrid' => 'oro-translation-translations-grid', 'group' => ['datagridRowAction']]
         );
-        $response = json_decode($this->client->getResponse()->getContent(), true);
+        $response = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals(true, $response['success']);
-        $this->assertContains("oro-translation-translations-grid", $response['refreshGrid']);
+        $this->assertContains('oro-translation-translations-grid', $response['refreshGrid']);
         $removedTranslation = self::getContainer()
             ->get('doctrine')
             ->getRepository($translationClass)
             ->find($entityId);
 
-        static::assertNull($removedTranslation);
+        self::assertNull($removedTranslation);
     }
 
-    /**
-     * @return array
-     */
-    public function removeTranslationOperationDataProvider()
+    public function removeTranslationOperationDataProvider(): array
     {
         return [
             'scope SYSTEM' => [LoadTranslations::TRANSLATION_KEY_1],

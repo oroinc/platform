@@ -16,18 +16,14 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 class TranslationManagerTest extends WebTestCase
 {
     /** @var TranslationManager */
-    protected $manager;
+    private $manager;
 
     /** @var TranslationRepository */
-    protected $repository;
+    private $repository;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
-
         $this->loadFixtures([LoadTranslations::class]);
 
         $this->manager = $this->getContainer()->get('oro_translation.manager.translation');
@@ -229,40 +225,24 @@ class TranslationManagerTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $key
-     * @param string $value
-     * @param string $locale
-     * @param string $domain
-     * @param int $scope
-     */
-    protected function createTranslation($key, $value, $locale, $domain, $scope)
+    private function createTranslation(string $key, string $value, string $locale, string $domain, int $scope): void
     {
         $this->manager->saveTranslation($key, $value, $locale, $domain, $scope);
         $this->manager->flush();
     }
 
-    /**
-     * @param string $class
-     * @return EntityRepository
-     */
-    protected function getRepository($class)
+    private function getRepository(string $class): EntityRepository
     {
-        return $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass($class)
-            ->getRepository($class);
+        return self::getContainer()->get('doctrine')->getRepository($class);
     }
 
-    /**
-     * @param Translation $translation
-     * @param string $key
-     * @param string $value
-     * @param string $domain
-     * @param string $locale
-     */
-    protected function ensureTranslationIsCorrect(Translation $translation, $key, $value, $domain, $locale)
-    {
+    private function ensureTranslationIsCorrect(
+        Translation $translation,
+        string $key,
+        string $value,
+        string $domain,
+        string $locale
+    ): void {
         $this->assertEquals($value, $translation->getValue());
         $this->assertInstanceOf(Language::class, $translation->getLanguage());
         $this->assertEquals($locale, $translation->getLanguage()->getCode());

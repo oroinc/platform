@@ -18,11 +18,11 @@ class OroTranslationLoadCommandTest extends WebTestCase
         $result = $this->runCommand('oro:translation:load', ['--languages=en']);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString('Loading translations', $result);
-        static::assertStringContainsString('loading [messages]', $result);
-        static::assertStringContainsString('loading [jsmessages]', $result);
-        static::assertStringContainsString('All messages successfully processed.', $result);
-        static::assertStringNotContainsString('Rebuilding cache', $result);
+        self::assertStringContainsString('Loading translations', $result);
+        self::assertStringContainsString('loading [messages]', $result);
+        self::assertStringContainsString('loading [jsmessages]', $result);
+        self::assertStringContainsString('All messages successfully processed.', $result);
+        self::assertStringNotContainsString('Rebuilding cache', $result);
     }
 
     public function testExecuteEmptyLanguage()
@@ -30,8 +30,8 @@ class OroTranslationLoadCommandTest extends WebTestCase
         $result = $this->runCommand('oro:translation:load', ['--languages=' . LoadLanguages::LANGUAGE1]);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString('All messages successfully processed.', $result);
-        static::assertStringNotContainsString('Rebuilding cache', $result);
+        self::assertStringContainsString('All messages successfully processed.', $result);
+        self::assertStringNotContainsString('Rebuilding cache', $result);
     }
 
     public function testExecuteWithNotExistedLanguage()
@@ -39,8 +39,8 @@ class OroTranslationLoadCommandTest extends WebTestCase
         $result = $this->runCommand('oro:translation:load', ['--languages=NotExisted']);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString('Language "NotExisted" not found', $result);
-        static::assertStringNotContainsString('Rebuilding cache', $result);
+        self::assertStringContainsString('Language "NotExisted" not found', $result);
+        self::assertStringNotContainsString('Rebuilding cache', $result);
     }
 
     public function testExecuteWithRebuildCache()
@@ -53,7 +53,7 @@ class OroTranslationLoadCommandTest extends WebTestCase
         ]);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString('All messages successfully processed.', $result);
-        static::assertStringContainsString('Rebuilding cache', $result);
+        self::assertStringContainsString('All messages successfully processed.', $result);
+        self::assertStringContainsString('Rebuilding cache', $result);
     }
 }

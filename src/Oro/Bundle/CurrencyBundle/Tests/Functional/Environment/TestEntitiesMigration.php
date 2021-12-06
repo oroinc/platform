@@ -23,7 +23,7 @@ class TestEntitiesMigration implements Migration
     /**
      * Create oro_test_money_entity table
      */
-    protected function createTestMoneyEntityTable(Schema $schema)
+    private function createTestMoneyEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_test_money_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);

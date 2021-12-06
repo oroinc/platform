@@ -7,6 +7,8 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\ItemValue;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
@@ -16,13 +18,8 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
  */
 class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
         $this->loadFixtures([
             LoadOrganization::class,
@@ -35,7 +32,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
 
         $this->assertSameResult($queryBuilder);
     }
@@ -45,7 +42,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item.id, item.stringValue, SUM(value.id)')
             ->leftJoin('item.values', 'value')
@@ -61,7 +58,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item.id, item.stringValue, value.id')
             ->leftJoin('item.values', 'value')
@@ -79,7 +76,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item.id, item.stringValue, value.id as vid')
             ->leftJoin('item.values', 'value');
@@ -92,7 +89,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item, value')
             ->leftJoin('item.values', 'value');
@@ -105,7 +102,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item.id, item.stringValue, value.id as vid')
             ->leftJoin('item.values', 'value')
@@ -120,7 +117,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item, value')
             ->leftJoin('item.values', 'value')
@@ -132,23 +129,20 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     /**
      * @dataProvider limitOffsetProvider
-     *
-     * @param integer $offset
-     * @param integer $limit
      */
-    public function testLimitOffset($offset, $limit)
+    public function testLimitOffset(int $offset, int $limit)
     {
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder->setFirstResult($offset);
         $queryBuilder->setMaxResults($limit);
 
         $this->assertSameResult($queryBuilder);
     }
 
-    public function limitOffsetProvider()
+    public function limitOffsetProvider(): array
     {
         $data = [];
         foreach (range(0, 10) as $i) {
@@ -166,7 +160,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder->where('item.stringValue != :v');
         $queryBuilder->setParameter('v', 'processed');
 
@@ -199,7 +193,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
+        $queryBuilder = $em->getRepository(ItemValue::class)->createQueryBuilder('value');
         $all = count($queryBuilder->getQuery()->execute());
 
         //every 3rd row
@@ -215,7 +209,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
                 ->exec("delete from test_search_item_value where id = {$id}");
         }
 
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:ItemValue')->createQueryBuilder('value');
+        $queryBuilder = $em->getRepository(ItemValue::class)->createQueryBuilder('value');
         $afterDelete = count($queryBuilder->getQuery()->execute());
 
         if ($this->isPostgreSql()) {
@@ -235,7 +229,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item.id, item.stringValue, item.integerValue')
             ->leftJoin('item.values', 'value')
@@ -244,7 +238,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->orderBy('value.id');
 
         if ($this->isPostgreSql() || $this->isMySql8()) {
-            self::expectException(\LogicException::class);
+            $this->expectException(\LogicException::class);
         }
 
         $this->assertSameByIdWithoutOrder($queryBuilder);
@@ -258,7 +252,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         $em = $this->getContainer()->get('doctrine');
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $em->getRepository('OroTestFrameworkBundle:Item')->createQueryBuilder('item');
+        $queryBuilder = $em->getRepository(Item::class)->createQueryBuilder('item');
         $queryBuilder
             ->select('item, value')
             ->leftJoin('item.values', 'value')
@@ -267,18 +261,13 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
             ->orderBy('value.id');
 
         if ($this->isPostgreSql() || $this->isMySql8()) {
-            self::expectException(\LogicException::class);
+            $this->expectException(\LogicException::class);
         }
 
         $this->assertSameResult($queryBuilder);
     }
 
-    /**
-     * @param $queryBuilder
-     *
-     * @return array
-     */
-    private function getResultsWithForeachLoop(QueryBuilder $queryBuilder)
+    private function getResultsWithForeachLoop(QueryBuilder $queryBuilder): array
     {
         $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);
         $iterator->setBufferSize(3);
@@ -294,12 +283,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         return [$result, $iteratorResult];
     }
 
-    /**
-     * @param $queryBuilder
-     *
-     * @return array
-     */
-    private function getResultsWithWhileLoopRewindFirst(QueryBuilder $queryBuilder)
+    private function getResultsWithWhileLoopRewindFirst(QueryBuilder $queryBuilder): array
     {
         $iteratorResult = [];
 
@@ -320,12 +304,7 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
         return [$result, $iteratorResult];
     }
 
-    /**
-     * @param $queryBuilder
-     *
-     * @return array
-     */
-    private function getResultsWithWhileLoopNextFirst(QueryBuilder $queryBuilder)
+    private function getResultsWithWhileLoopNextFirst(QueryBuilder $queryBuilder): array
     {
         $iteratorResult = [];
 
@@ -353,18 +332,18 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
     /**
      * Asserts 2 datasets are equal
      */
-    private function assertSameResult(QueryBuilder $queryBuilder)
+    private function assertSameResult(QueryBuilder $queryBuilder): void
     {
-        list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
-        self::assertSame(count($expected), count($actual));
+        [$expected, $actual] = $this->getResultsWithForeachLoop($queryBuilder);
+        self::assertCount(count($expected), $actual);
         self::assertThat($expected, new ArrayContainsConstraint($actual, false));
 
-        list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
-        self::assertSame(count($expected), count($actual));
+        [$expected, $actual] = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        self::assertCount(count($expected), $actual);
         self::assertThat($expected, new ArrayContainsConstraint($actual, false));
 
-        list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
-        self::assertSame(count($expected), count($actual));
+        [$expected, $actual] = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
+        self::assertCount(count($expected), $actual);
         self::assertThat($expected, new ArrayContainsConstraint($actual, false));
     }
 
@@ -373,26 +352,22 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
      */
     private function assertSameByIdWithoutOrder(QueryBuilder $queryBuilder)
     {
-        list($expected, $actual) = $this->getResultsWithForeachLoop($queryBuilder);
-        self::compareQueryResultWithIteratorResult($expected, $actual);
+        [$expected, $actual] = $this->getResultsWithForeachLoop($queryBuilder);
+        $this->compareQueryResultWithIteratorResult($expected, $actual);
 
-        list($expected, $actual) = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
-        self::compareQueryResultWithIteratorResult($expected, $actual);
+        [$expected, $actual] = $this->getResultsWithWhileLoopRewindFirst($queryBuilder);
+        $this->compareQueryResultWithIteratorResult($expected, $actual);
 
-        list($expected, $actual) = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
-        self::compareQueryResultWithIteratorResult($expected, $actual);
+        [$expected, $actual] = $this->getResultsWithWhileLoopNextFirst($queryBuilder);
+        $this->compareQueryResultWithIteratorResult($expected, $actual);
     }
 
-    /**
-     * @param array $queryResult
-     * @param array $iteratorResult
-     */
-    private function compareQueryResultWithIteratorResult($queryResult, $iteratorResult)
+    private function compareQueryResultWithIteratorResult(array $queryResult, array $iteratorResult): void
     {
         // Compares datasets expecting each item will contain 'id' field
         $queryResultIds = array_column($queryResult, 'id');
         $iteratorResultIds = array_column($iteratorResult, 'id');
-        self::assertSame(count($queryResultIds), count($iteratorResultIds));
+        self::assertCount(count($queryResultIds), $iteratorResultIds);
 
         // Sorting results due to result rows may appear in different order after iteration by Iterator
         asort($queryResultIds, SORT_NUMERIC);
@@ -406,10 +381,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     /**
      * Checks if current DB adapter is PostgreSQL
-     *
-     * @return bool
      */
-    private function isPostgreSql()
+    private function isPostgreSql(): bool
     {
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManager();
@@ -419,10 +392,8 @@ class BufferedIdentityQueryResultIteratorTest extends WebTestCase
 
     /**
      * Checks if current DB adapter is MySQL 8
-     *
-     * @return bool
      */
-    private function isMySql8()
+    private function isMySql8(): bool
     {
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine')->getManager();

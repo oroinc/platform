@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Provider;
 
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
@@ -13,7 +13,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
 class TranslationDomainProviderTest extends WebTestCase
 {
     /** @var TranslationDomainProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {
@@ -38,7 +38,9 @@ class TranslationDomainProviderTest extends WebTestCase
     {
         $domains = [];
 
-        foreach ($this->getRepository()->findAvailableDomains() as $domain) {
+        /** @var TranslationKeyRepository $repository */
+        $repository = self::getContainer()->get('doctrine')->getRepository(TranslationKey::class);
+        foreach ($repository->findAvailableDomains() as $domain) {
             $domains[] = ['code' => LoadLanguages::LANGUAGE2, 'domain' => $domain];
         }
 
@@ -65,29 +67,14 @@ class TranslationDomainProviderTest extends WebTestCase
         $key = new TranslationKey();
         $key->setKey($uniqueKey)->setDomain($uniqueDomain);
 
-        $manager = $this->getManager();
-        $manager->persist($key);
-        $manager->flush();
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(TranslationKey::class);
+        $em->persist($key);
+        $em->flush();
 
         $domains = $this->provider->clearCache()->getAvailableDomains();
 
         $this->assertGreaterThanOrEqual(2, count($domains));
         $this->assertContains($uniqueDomain, $domains);
-    }
-
-    /**
-     * @return ObjectManager
-     */
-    protected function getManager()
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass(TranslationKey::class);
-    }
-
-    /**
-     * @return TranslationKeyRepository
-     */
-    protected function getRepository()
-    {
-        return $this->getManager()->getRepository(TranslationKey::class);
     }
 }

@@ -15,10 +15,10 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class AddAttributesToTestActivityTargetMigration implements Migration
 {
-    const SYSTEM_ATTRIBUTE_1  = 'system_attribute_1';
-    const SYSTEM_ATTRIBUTE_2  = 'system_attribute_2';
-    const REGULAR_ATTRIBUTE_1 = 'regular_attribute_1';
-    const REGULAR_ATTRIBUTE_2 = 'regular_attribute_2';
+    public const SYSTEM_ATTRIBUTE_1 = 'system_attribute_1';
+    public const SYSTEM_ATTRIBUTE_2 = 'system_attribute_2';
+    public const REGULAR_ATTRIBUTE_1 = 'regular_attribute_1';
+    public const REGULAR_ATTRIBUTE_2 = 'regular_attribute_2';
 
     /**
      * {@inheritdoc}

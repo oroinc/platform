@@ -93,8 +93,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRepository()
     {
-        $this->doctrineHelper
-            ->expects($this->once())
+        $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
             ->with('OroActivityListBundle:ActivityList');
         $this->activityListManager->getRepository();
@@ -103,8 +102,13 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetNonExistItem()
     {
         $repo = $this->createMock(ActivityListRepository::class);
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
-        $repo->expects($this->once())->method('find')->with(12)->willReturn(null);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->willReturn($repo);
+        $repo->expects($this->once())
+            ->method('find')
+            ->with(12)
+            ->willReturn(null);
         $this->assertNull($this->activityListManager->getItem(12));
     }
 
@@ -153,26 +157,36 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $testItem->setRelatedActivityClass('Acme\TestBundle\Entity\TestEntity');
         $testItem->setRelatedActivityId(127);
 
-        $this->entityNameResolver->expects($this->any())->method('getName')
-            ->willReturnCallback(
-                function ($user) {
-                    if ($user->getId() === 15) {
-                        return 'Owner_String';
-                    }
-
-                    return 'Editor_String';
+        $this->entityNameResolver->expects($this->any())
+            ->method('getName')
+            ->willReturnCallback(function ($user) {
+                if ($user->getId() === 15) {
+                    return 'Owner_String';
                 }
-            );
+
+                return 'Editor_String';
+            });
 
         $repo = $this->createMock(ActivityListRepository::class);
-        $this->doctrineHelper->expects($this->once())->method('getEntityRepository')->willReturn($repo);
-        $this->doctrineHelper->expects(self::once())->method('getEntity')->willReturn($testItem);
-        $repo->expects($this->once())->method('find')->with(105)->willReturn($testItem);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepository')
+            ->willReturn($repo);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntity')
+            ->willReturn($testItem);
+        $repo->expects($this->once())
+            ->method('find')
+            ->with(105)
+            ->willReturn($testItem);
 
-        $this->authorizationChecker->expects($this->any())->method('isGranted')->willReturn(true);
+        $this->authorizationChecker->expects($this->any())
+            ->method('isGranted')
+            ->willReturn(true);
 
         $provider = new TestActivityProvider();
-        $this->provider->expects($this->once())->method('getProviderForEntity')->willReturn($provider);
+        $this->provider->expects($this->once())
+            ->method('getProviderForEntity')
+            ->willReturn($provider);
 
         $this->assertEquals(
             [

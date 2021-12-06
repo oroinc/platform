@@ -9,15 +9,13 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
-use Oro\Bundle\UserBundle\Tests\Functional\Helper\AdminUserTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolationPerTest
  */
 class ImpersonationSearchHandlerTest extends WebTestCase
 {
-    use AdminUserTrait;
-
     /** @var ImpersonationSearchHandler */
     private $searchHandler;
 
@@ -51,9 +49,9 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         );
 
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
 
-        $this->saveImpresonation($impersonation);
+        $this->saveImpersonation($impersonation);
 
         $this->assertSame(
             ['results' => [], 'more' => false],
@@ -69,7 +67,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     public function testSearchById()
     {
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation);
 
         $this->assertSame(
@@ -95,11 +93,11 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     public function testSearchByIds()
     {
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation);
 
         $impersonation2 = new Impersonation();
-        $impersonation2->setUser($user = $this->getAdminUser());
+        $impersonation2->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation2);
 
         $this->assertSame(
@@ -135,7 +133,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     public function testSearchByQueryByToken()
     {
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation);
 
         $this->assertSame(
@@ -161,7 +159,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     public function testSearchByQueryByIpAddress()
     {
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation);
 
         $this->assertSame(
@@ -187,11 +185,11 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     public function testSearchByWithEmptyQuery()
     {
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation);
 
         $impersonation2 = new Impersonation();
-        $impersonation2->setUser($user = $this->getAdminUser());
+        $impersonation2->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation2);
 
         $this->assertSame(
@@ -227,11 +225,11 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     public function testPagination()
     {
         $impersonation = new Impersonation();
-        $impersonation->setUser($user = $this->getAdminUser());
+        $impersonation->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation);
 
         $impersonation2 = new Impersonation();
-        $impersonation2->setUser($user = $this->getAdminUser());
+        $impersonation2->setUser($this->getAdminUser());
         $this->createImpersonationAndAuditLog($impersonation2);
 
         $this->assertSame(
@@ -275,7 +273,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
 
     private function createImpersonationAndAuditLog(Impersonation $impersonation): void
     {
-        $this->saveImpresonation($impersonation);
+        $this->saveImpersonation($impersonation);
 
         $this->entityChangesToAuditEntryConverter->convert(
             [
@@ -296,7 +294,16 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         );
     }
 
-    private function saveImpresonation(Impersonation $impersonation): void
+    private function getAdminUser(): User
+    {
+        return self::getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->getRepository(User::class)
+            ->findOneBy(['email' => self::AUTH_USER]);
+    }
+
+    private function saveImpersonation(Impersonation $impersonation): void
     {
         $this->doctrineHelper->getEntityManager($impersonation)->persist($impersonation);
         $this->doctrineHelper->getEntityManager($impersonation)->flush($impersonation);

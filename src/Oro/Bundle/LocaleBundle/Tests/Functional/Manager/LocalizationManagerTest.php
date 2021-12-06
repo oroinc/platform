@@ -13,7 +13,8 @@ use Oro\Component\Testing\Unit\Cache\CacheTrait;
 
 class LocalizationManagerTest extends WebTestCase
 {
-    use ConfigManagerAwareTestTrait, CacheTrait;
+    use ConfigManagerAwareTestTrait;
+    use CacheTrait;
 
     protected function setUp(): void
     {
@@ -71,7 +72,7 @@ class LocalizationManagerTest extends WebTestCase
 
         $manager = new LocalizationManager(
             $doctrineHelper,
-            self::getConfigManager('global'),
+            self::getConfigManager(),
             $cache
         );
 
@@ -99,10 +100,7 @@ class LocalizationManagerTest extends WebTestCase
         $this->assertCount(3, $sqlLogger->getExecutedQueries());
     }
 
-    /**
-     * @return object|\Oro\Bundle\LocaleBundle\Manager\LocalizationManager
-     */
-    private function setUpLocalizationManager()
+    private function setUpLocalizationManager(): LocalizationManager
     {
         //Clear cache
         $this->getContainer()->get('oro_locale.manager.localization')->clearCache();

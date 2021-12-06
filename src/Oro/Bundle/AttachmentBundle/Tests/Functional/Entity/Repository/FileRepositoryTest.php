@@ -9,21 +9,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class FileRepositoryTest extends WebTestCase
 {
-    /** @var FileRepository */
-    private $repository;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->client->useHashNavigation(true);
-
         $this->loadFixtures([LoadFileData::class]);
+    }
 
-        $container = $this->getContainer();
-        $this->repository = $container->get('doctrine')->getRepository(File::class);
+    private function getRepository(): FileRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(File::class);
     }
 
     public function testFindForEntityField(): void
@@ -32,7 +26,7 @@ class FileRepositoryTest extends WebTestCase
             [
                 $this->getReference(LoadFileData::FILE_1)
             ],
-            $this->repository->findForEntityField(\stdClass::class, 1, 'fieldA')
+            $this->getRepository()->findForEntityField(\stdClass::class, 1, 'fieldA')
         );
     }
 }

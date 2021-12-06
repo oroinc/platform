@@ -8,11 +8,8 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GlobalAjaxMenuControllerTest extends WebTestCase
 {
-    const MENU_NAME = 'application_menu';
+    private const MENU_NAME = 'application_menu';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

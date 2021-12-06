@@ -21,44 +21,43 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY_ID = 42;
 
-    private Transport|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
+    /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
+    private $transportFactory;
 
-    private DsnFromUserEmailOriginFactory|\PHPUnit\Framework\MockObject\MockObject $dsnFromUserEmailOriginFactory;
+    /** @var DsnFromUserEmailOriginFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $dsnFromUserEmailOriginFactory;
 
-    private UserEmailOriginTransport $transport;
+    /** @var UserEmailOrigin|\PHPUnit\Framework\MockObject\MockObject */
+    private $userEmailOrigin;
 
-    private UserEmailOrigin|\PHPUnit\Framework\MockObject\MockObject $userEmailOrigin;
+    /** @var UserEmailOriginTransport */
+    private $transport;
 
     protected function setUp(): void
     {
         $this->transportFactory = $this->createMock(Transport::class);
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->dsnFromUserEmailOriginFactory = $this->createMock(DsnFromUserEmailOriginFactory::class);
-        $requestStack = new RequestStack();
-
-        $this->transport = new UserEmailOriginTransport(
-            $this->transportFactory,
-            $managerRegistry,
-            $this->dsnFromUserEmailOriginFactory,
-            $requestStack
-        );
+        $this->userEmailOrigin = $this->createMock(UserEmailOrigin::class);
 
         $entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
-            ->expects(self::any())
+        $entityManager->expects(self::any())
+            ->method('find')
+            ->willReturnMap([
+                [UserEmailOrigin::class, self::ENTITY_ID, null, null, $this->userEmailOrigin],
+            ]);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(UserEmailOrigin::class)
             ->willReturn($entityManager);
 
-        $this->userEmailOrigin = $this->createMock(UserEmailOrigin::class);
-        $entityManager
-            ->expects(self::any())
-            ->method('find')
-            ->willReturnMap(
-                [
-                    [UserEmailOrigin::class, self::ENTITY_ID, null, null, $this->userEmailOrigin],
-                ]
-            );
+        $this->transport = new UserEmailOriginTransport(
+            $this->transportFactory,
+            $doctrine,
+            $this->dsnFromUserEmailOriginFactory,
+            new RequestStack()
+        );
     }
 
     public function testToString(): void
@@ -68,32 +67,31 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
 
     public function testSendThrowsExceptionWhenNotMessage(): void
     {
-        $this->expectExceptionObject(
-            new \InvalidArgumentException(
-                sprintf(
-                    'Message was expected to be an instance of "%s" at this point, got "%s"',
-                    Message::class,
-                    RawMessage::class
-                )
-            )
-        );
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Message was expected to be an instance of "%s" at this point, got "%s"',
+            Message::class,
+            RawMessage::class
+        ));
 
         $this->transport->send(new RawMessage('sample_body'));
     }
 
     public function testSendThrowsTransportExceptionWhenNoRequiredHeader(): void
     {
-        $this->expectExceptionObject(new TransportException('Header X-User-Email-Origin-Id was expected to be set'));
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Header X-User-Email-Origin-Id was expected to be set');
 
         $this->transport->send(new Message());
     }
 
     public function testSendThrowsExceptionWhenRequiredHeaderEmpty(): void
     {
-        $this->expectExceptionObject(new TransportException('Header X-User-Email-Origin-Id was expected to be set'));
-
         $message = new Message();
         $message->getHeaders()->addHeader(UserEmailOriginTransport::HEADER_NAME, '');
+
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage('Header X-User-Email-Origin-Id was expected to be set');
 
         $this->transport->send($message);
     }
@@ -103,10 +101,9 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->getHeaders()->addHeader(UserEmailOriginTransport::HEADER_NAME, 'sample_string');
 
-        $this->expectExceptionObject(
-            new TransportException(
-                'Header X-User-Email-Origin-Id was expected to contain numeric id, got "sample_string"'
-            )
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage(
+            'Header X-User-Email-Origin-Id was expected to contain numeric id, got "sample_string"'
         );
 
         $this->transport->send($message);
@@ -118,11 +115,8 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
         $id = 99;
         $message->getHeaders()->addHeader(UserEmailOriginTransport::HEADER_NAME, $id);
 
-        $this->expectExceptionObject(
-            new TransportException(
-                sprintf('UserEmailOrigin #"%d" is not found', $id)
-            )
-        );
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage(sprintf('UserEmailOrigin #"%d" is not found', $id));
 
         $this->transport->send($message);
     }
@@ -132,16 +126,15 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->getHeaders()->addHeader(UserEmailOriginTransport::HEADER_NAME, self::ENTITY_ID);
 
-        $this->userEmailOrigin
-            ->expects(self::once())
+        $this->userEmailOrigin->expects(self::once())
             ->method('isSmtpConfigured')
             ->willReturn(false);
 
-        $this->expectExceptionObject(
-            new TransportException(
-                sprintf('UserEmailOrigin #"%d" was expected to have configured SMTP settings', self::ENTITY_ID)
-            )
-        );
+        $this->expectException(TransportException::class);
+        $this->expectExceptionMessage(sprintf(
+            'UserEmailOrigin #"%d" was expected to have configured SMTP settings',
+            self::ENTITY_ID
+        ));
 
         $this->transport->send($message);
     }
@@ -152,27 +145,23 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
         $message->getHeaders()->addHeader(UserEmailOriginTransport::HEADER_NAME, self::ENTITY_ID);
         $envelope = new Envelope(new SymfonyAddress('foo@example.org'), [new SymfonyAddress('bar@example.org')]);
 
-        $this->userEmailOrigin
-            ->expects(self::once())
+        $this->userEmailOrigin->expects(self::once())
             ->method('isSmtpConfigured')
             ->willReturn(true);
 
         $dsn = new Dsn('scheme', 'host');
-        $this->dsnFromUserEmailOriginFactory
-            ->expects(self::once())
+        $this->dsnFromUserEmailOriginFactory->expects(self::once())
             ->method('create')
             ->with($this->userEmailOrigin)
             ->willReturn($dsn);
 
         $configuredTransport = $this->createMock(TransportInterface::class);
-        $this->transportFactory
-            ->expects(self::once())
+        $this->transportFactory->expects(self::once())
             ->method('fromDsnObject')
             ->with($dsn)
             ->willReturn($configuredTransport);
 
-        $configuredTransport
-            ->expects(self::exactly(2))
+        $configuredTransport->expects(self::exactly(2))
             ->method('send')
             ->with($message, $envelope);
 

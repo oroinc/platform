@@ -39,7 +39,7 @@ class InstallerTest extends WebTestCase
         $eventDispatcher->removeListener(MigrationEvents::POST_UP, $closure);
     }
 
-    protected function assertMigrations(MigrationsLoader $loader)
+    private function assertMigrations(MigrationsLoader $loader): void
     {
         $notCoveredMigrations = [];
         $migrationStates = $loader->getMigrations();

@@ -7,30 +7,20 @@ use Oro\Bundle\IntegrationBundle\Generator\Prefixed\PrefixedIntegrationIdentifie
 
 class PrefixedIntegrationIdentifierGeneratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @return Channel|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createChannelMock()
-    {
-        return $this->createMock(Channel::class);
-    }
-
     public function testGenerateIdentifier()
     {
         $prefix = 'somePrefix';
         $channelId = 5;
 
-        $channelMock = $this->createChannelMock();
-
-        $channelMock
-            ->expects($this->once())
+        $channel = $this->createMock(Channel::class);
+        $channel->expects($this->once())
             ->method('getId')
             ->willReturn($channelId);
 
         $expectedResult = sprintf('%s_%s', $prefix, $channelId);
 
         $generator = new PrefixedIntegrationIdentifierGenerator($prefix);
-        $actualResult = $generator->generateIdentifier($channelMock);
+        $actualResult = $generator->generateIdentifier($channel);
 
         $this->assertEquals($expectedResult, $actualResult);
     }

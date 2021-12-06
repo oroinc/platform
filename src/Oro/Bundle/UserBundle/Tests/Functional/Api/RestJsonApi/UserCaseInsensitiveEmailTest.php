@@ -23,7 +23,7 @@ class UserCaseInsensitiveEmailTest extends RestJsonApiTestCase
 
     private function setCaseInsensitiveEmailAddresses(bool $value)
     {
-        $configManager = self::getConfigManager('global');
+        $configManager = self::getConfigManager();
         $configManager->set('oro_user.case_insensitive_email_addresses_enabled', $value);
         $configManager->flush();
     }

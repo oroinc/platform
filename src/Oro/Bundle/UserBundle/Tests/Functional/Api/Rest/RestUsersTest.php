@@ -68,7 +68,7 @@ class RestUsersTest extends WebTestCase
          * },
          */
         $this->assertJsonResponseStatusCodeEquals($result, 400);
-        $message = json_decode($result->getContent())->message;
+        $message = json_decode($result->getContent(), false, 512, JSON_THROW_ON_ERROR)->message;
         $this->assertEquals('Validation Failed', $message);
 
         return $request;
@@ -147,7 +147,7 @@ class RestUsersTest extends WebTestCase
     /**
      * Check created user
      */
-    protected function assertEqualsUser(array $request, array $result): int
+    private function assertEqualsUser(array $request, array $result): int
     {
         $flag = 1;
         foreach ($result as $key => $object) {

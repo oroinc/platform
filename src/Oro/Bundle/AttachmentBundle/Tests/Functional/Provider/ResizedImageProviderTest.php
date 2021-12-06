@@ -63,13 +63,10 @@ class ResizedImageProviderTest extends WebTestCase
     public function testGetPNG(string $fileName, int $quality): void
     {
         $this->changeProcessorsParameters(85, $quality);
-        self::getConfigManager('global')->flush();
+        self::getConfigManager()->flush();
         $this->assertImageSizeShrink($fileName);
     }
 
-    /**
-     * @return string[]
-     */
     public function pngDataProvider(): array
     {
         return [

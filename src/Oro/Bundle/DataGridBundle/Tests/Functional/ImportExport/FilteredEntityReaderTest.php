@@ -30,7 +30,7 @@ class FilteredEntityReaderTest extends WebTestCase
             ->setToken(null);
     }
 
-    protected function setSecurityToken(): void
+    private function setSecurityToken(): void
     {
         $container = $this->getContainer();
 
@@ -140,9 +140,9 @@ class FilteredEntityReaderTest extends WebTestCase
         $this->reader->read();
     }
 
-    private function getAdminUser(): ?User
+    private function getAdminUser(): User
     {
-        return $this->getContainer()->get('doctrine')
+        return self::getContainer()->get('doctrine')
             ->getRepository(User::class)
             ->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
     }

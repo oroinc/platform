@@ -35,8 +35,8 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 
         /** @var WorkflowDefinition $workflow */
         foreach ($workflows as $workflow) {
-            static::assertStringContainsString($workflow->getName(), $result);
-            static::assertStringContainsString(
+            self::assertStringContainsString($workflow->getName(), $result);
+            self::assertStringContainsString(
                 $translator->trans(
                     $workflow->getLabel(),
                     [],
@@ -44,17 +44,14 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
                 ),
                 $result
             );
-            static::assertStringContainsString($workflow->getRelatedEntity(), $result);
+            self::assertStringContainsString($workflow->getRelatedEntity(), $result);
         }
     }
 
     /**
-     * @param string $workflowName
-     * @param bool $exists
-     *
      * @dataProvider executeDataProvider
      */
-    public function testExecuteWithArgument($workflowName, $exists = true)
+    public function testExecuteWithArgument(string $workflowName, bool $exists = true)
     {
         /** @var WorkflowDefinition $initialWorkflow */
         $initialWorkflow = $this->getWorkflowDefinitionRepository()->findOneBy(['name' => $workflowName]);
@@ -62,7 +59,7 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         $result = $this->runCommand(DebugWorkflowDefinitionsCommand::getDefaultName(), [$workflowName], false);
 
         if ($exists) {
-            static::assertStringNotContainsString('No workflow definitions found.', $result);
+            self::assertStringNotContainsString('No workflow definitions found.', $result);
 
             $workflowConfiguration = Yaml::parse($result);
             $workflowConfiguration = $this->getContainer()
@@ -107,14 +104,11 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
                 $workflowDefinition->getExclusiveRecordGroups()
             );
         } else {
-            static::assertStringContainsString('No workflow definitions found.', $result);
+            self::assertStringContainsString('No workflow definitions found.', $result);
         }
     }
 
-    /**
-     * @return array
-     */
-    public function executeDataProvider()
+    public function executeDataProvider(): array
     {
         return [
             [LoadWorkflowDefinitions::NO_START_STEP, true],
@@ -125,11 +119,8 @@ class DebugWorkflowDefinitionsCommandTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return WorkflowDefinitionRepository
-     */
-    protected function getWorkflowDefinitionRepository()
+    private function getWorkflowDefinitionRepository(): WorkflowDefinitionRepository
     {
-        return $this->getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
+        return self::getContainer()->get('doctrine')->getRepository(WorkflowDefinition::class);
     }
 }

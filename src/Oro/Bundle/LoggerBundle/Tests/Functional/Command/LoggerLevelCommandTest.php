@@ -5,6 +5,7 @@ namespace Oro\Bundle\LoggerBundle\Tests\Functional\Command;
 use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\LoggerBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolationPerTest
@@ -13,9 +14,6 @@ class LoggerLevelCommandTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -28,21 +26,21 @@ class LoggerLevelCommandTest extends WebTestCase
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for user 'admin@example.com' is successfully set to 'debug' till";
 
-        static::assertStringContainsString($expectedContent, $result);
+        self::assertStringContainsString($expectedContent, $result);
 
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
 
-        $user = $this->getContainer()->get('doctrine')->getRepository('OroUserBundle:User')
+        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)
             ->findOneBy(['email' => 'admin@example.com']);
         $configUser->setScopeIdFromEntity($user);
 
-        static::assertEquals(
+        self::assertEquals(
             $params[0],
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY))
         );
 
-        static::assertEqualsWithDelta(
+        self::assertEqualsWithDelta(
             $disableAfter->getTimestamp(),
             $configUser->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
             10,
@@ -52,22 +50,22 @@ class LoggerLevelCommandTest extends WebTestCase
 
     public function testRunCommandToUpdateGlobalScope()
     {
-        $configGlobal = self::getConfigManager('global');
+        $configGlobal = self::getConfigManager();
         $params = ['warning', '15 days'];
         $result = $this->runCommand('oro:logger:level', $params);
         $expectedContent = "Log level for global scope is set to 'warning' till";
 
-        static::assertStringContainsString($expectedContent, $result);
+        self::assertStringContainsString($expectedContent, $result);
 
         $disableAfter = new \DateTime('now', new \DateTimeZone('UTC'));
         $disableAfter->add(\DateInterval::createFromDateString($params[1]));
 
-        static::assertEquals(
+        self::assertEquals(
             $params[0],
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY))
         );
 
-        static::assertEqualsWithDelta(
+        self::assertEqualsWithDelta(
             $disableAfter->getTimestamp(),
             $configGlobal->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY)),
             10,
@@ -77,21 +75,15 @@ class LoggerLevelCommandTest extends WebTestCase
 
     /**
      * @dataProvider runCommandWithFailedValidationDataProvider
-     *
-     * @param string      $expectedContent
-     * @param array       $params
      */
-    public function testRunCommandWithFailedValidation($expectedContent, $params)
+    public function testRunCommandWithFailedValidation(string $expectedContent, array $params)
     {
         $result = $this->runCommand('oro:logger:level', $params);
 
-        static::assertStringContainsString($expectedContent, $result);
+        self::assertStringContainsString($expectedContent, $result);
     }
 
-    /**
-     * @return array
-     */
-    public function runCommandWithFailedValidationDataProvider()
+    public function runCommandWithFailedValidationDataProvider(): array
     {
         return [
             'should show failed config update without required arguments' => [
@@ -117,6 +109,6 @@ class LoggerLevelCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:level', ['--help']);
 
-        static::assertStringContainsString('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
+        self::assertStringContainsString('Usage: oro:logger:level [options] [--] <level> <disable-after>', $result);
     }
 }

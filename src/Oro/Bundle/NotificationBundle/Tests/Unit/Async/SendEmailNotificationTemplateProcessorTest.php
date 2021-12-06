@@ -40,8 +40,7 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
         $this->setUpLoggerMock($this->processor);
 
         $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
-            ->expects(self::any())
+        $managerRegistry->expects(self::any())
             ->method('getManagerForClass')
             ->with(User::class)
             ->willReturn($this->entityManager);
@@ -62,13 +61,11 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
      */
     public function testProcessRejectsMessageWhenBodyIsInvalid(array $messageBody): void
     {
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('critical')
             ->with('Message properties from, recipientUserId, template were not expected to be empty');
 
-        $this->emailTemplateManager
-            ->expects(self::never())
+        $this->emailTemplateManager->expects(self::never())
             ->method(self::anything());
 
         $message = new Message();
@@ -110,13 +107,11 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
 
     public function testProcessRejectsMessageWhenTemplateParamsIsNotArray(): void
     {
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('critical')
             ->with('Message property "templateParams" was expected to be array');
 
-        $this->emailTemplateManager
-            ->expects(self::never())
+        $this->emailTemplateManager->expects(self::never())
             ->method(self::anything());
 
         $message = new Message();
@@ -136,13 +131,11 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
 
     public function testProcessRejectsMessageWhenRecipientIsNotFound(): void
     {
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with('User with id "142" was not found');
 
-        $this->emailTemplateManager
-            ->expects(self::never())
+        $this->emailTemplateManager->expects(self::never())
             ->method(self::anything());
 
         $message = new Message();
@@ -177,14 +170,12 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
         ];
 
         $user = new User();
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getReference')
             ->with(User::class, 42)
             ->willReturn($user);
 
-        $this->emailTemplateManager
-            ->expects(self::once())
+        $this->emailTemplateManager->expects(self::once())
             ->method('sendTemplateEmail')
             ->with(
                 From::emailAddress($messageBody['from']),

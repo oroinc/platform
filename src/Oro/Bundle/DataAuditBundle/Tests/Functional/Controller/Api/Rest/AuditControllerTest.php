@@ -600,18 +600,12 @@ class AuditControllerTest extends WebTestCase
         $this->assertCount(0, $result);
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->client->getContainer()->get('doctrine.orm.entity_manager');
     }
 
-    /**
-     * @return User
-     */
-    private function findAdmin()
+    private function findAdmin(): User
     {
         return $this->getEntityManager()->getRepository(User::class)->findOneBy([
             'username' => 'admin'

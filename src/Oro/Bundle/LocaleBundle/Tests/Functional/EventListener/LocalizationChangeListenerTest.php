@@ -12,11 +12,7 @@ class LocalizationChangeListenerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->loadFixtures(
-            [
-                '@OroLocaleBundle/Tests/Functional/DataFixtures/localizations_data.yml'
-            ]
-        );
+        $this->loadFixtures(['@OroLocaleBundle/Tests/Functional/DataFixtures/localizations_data.yml']);
     }
 
     public function testChangeGlobalLocalizations(): void
@@ -25,7 +21,7 @@ class LocalizationChangeListenerTest extends WebTestCase
         $localizationId2 = $this->getReference('german_localization')->getId();
         $userId = $this->getReference('user')->getId();
 
-        $globalConfigManager = self::getConfigManager('global');
+        $globalConfigManager = self::getConfigManager();
 
         $globalConfigManager->set('oro_locale.enabled_localizations', [$localizationId1, $localizationId2]);
         $globalConfigManager->set('oro_locale.default_localization', $localizationId1);

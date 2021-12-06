@@ -12,17 +12,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class RegionRepositoryTest extends WebTestCase
 {
-    /** @var RegionRepository */
-    protected $repository;
-
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->initClient();
         $this->loadFixtures([LoadCountryRegionData::class]);
+    }
 
-        $this->repository = $this->getContainer()->get('doctrine')->getRepository(Region::class);
+    private function getRepository(): RegionRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Region::class);
     }
 
     public function testGetCountryRegions()
@@ -33,7 +31,7 @@ class RegionRepositoryTest extends WebTestCase
         /** @var Region $usny */
         $usny = $this->getReference(LoadRegionData::REGION_US_NY);
 
-        $this->assertRegionExists($usny, $this->repository->getCountryRegions($usa));
+        $this->assertRegionExists($usny, $this->getRepository()->getCountryRegions($usa));
     }
 
     public function testGetCountryRegionsQueryBuilder()
@@ -46,13 +44,13 @@ class RegionRepositoryTest extends WebTestCase
 
         $this->assertRegionExists(
             $usny,
-            $this->repository->getCountryRegionsQueryBuilder($usa)->getQuery()->getResult()
+            $this->getRepository()->getCountryRegionsQueryBuilder($usa)->getQuery()->getResult()
         );
     }
 
     public function testGetAllIdentities()
     {
-        $result = $this->repository->getAllIdentities();
+        $result = $this->getRepository()->getAllIdentities();
 
         $this->assertGreaterThanOrEqual(4601, count($result));
 
@@ -86,29 +84,25 @@ class RegionRepositoryTest extends WebTestCase
 
     public function testUpdateTranslations()
     {
-        $this->repository->updateTranslations(
+        $this->getRepository()->updateTranslations(
             [
                 'US-FL' => 'Floride',
                 'DE-HH' => 'Hambourg',
             ]
         );
-        $this->repository->clear();
+        $this->getRepository()->clear();
 
-        $actual = $this->repository->findBy(['combinedCode' => ['US-FL', 'DE-HH']]);
+        $actual = $this->getRepository()->findBy(['combinedCode' => ['US-FL', 'DE-HH']]);
 
         $this->assertCount(2, $actual);
         $this->assertTranslationExists('US-FL', 'Floride', $actual);
         $this->assertTranslationExists('DE-HH', 'Hambourg', $actual);
     }
 
-    /**
-     * @param string $expectedCode
-     * @param string $expectedTranslation
-     * @param array|Region[] $entities
-     */
-    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $entities)
+    private function assertTranslationExists(string $expectedCode, string $expectedTranslation, array $entities): void
     {
         $actual = null;
+        /** @var Region $entity */
         foreach ($entities as $entity) {
             if ($entity->getCombinedCode() === $expectedCode) {
                 $actual = $entity;

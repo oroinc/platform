@@ -13,10 +13,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
 {
-    /**
-     * @var ValidatorInterface
-     */
-    protected $validator;
+    /** @var ValidatorInterface */
+    private $validator;
 
     protected function setUp(): void
     {
@@ -109,10 +107,8 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
 
     /**
      * Helps to clear unnecessary validation constraints to be able to check only specific constraint work
-     *
-     * @param object $entity
      */
-    protected function clearEntityMetadataConstraints($entity)
+    private function clearEntityMetadataConstraints(object $entity): void
     {
         /** @var ClassMetadata $metadata */
         $metadata = $this->validator->getMetadataFor($entity);
@@ -127,13 +123,11 @@ class NotBlankDefaultLocalizedValueValidatorTest extends WebTestCase
         }
     }
 
-    /**
-     * @param object $entity
-     * @param string $propertyName
-     * @param Constraint $constraint
-     */
-    protected function addPropertyValidationConstraint($entity, string $propertyName, Constraint $constraint)
-    {
+    private function addPropertyValidationConstraint(
+        object $entity,
+        string $propertyName,
+        Constraint $constraint
+    ): void {
         /** @var ClassMetadata $metadata */
         $metadata = $this->validator->getMetadataFor($entity);
         $metadata->addPropertyConstraint($propertyName, $constraint);

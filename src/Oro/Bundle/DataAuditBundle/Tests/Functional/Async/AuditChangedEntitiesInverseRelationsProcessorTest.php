@@ -76,11 +76,6 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
         );
     }
 
-    /**
-     * @param array $body
-     *
-     * @return Message
-     */
     private function createMessage(array $body): MessageInterface
     {
         $message = new Message();
@@ -90,9 +85,6 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
         return $message;
     }
 
-    /**
-     * @return ConnectionInterface|object
-     */
     private function getConnection(): ConnectionInterface
     {
         return $this->getContainer()->get('oro_message_queue.transport.connection');

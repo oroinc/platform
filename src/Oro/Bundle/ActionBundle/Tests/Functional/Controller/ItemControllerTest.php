@@ -5,20 +5,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItemsValues;
 use Symfony\Component\DomCrawler\Crawler;
 
 class ItemControllerTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures([
-            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItemsValues',
-        ]);
+        $this->loadFixtures([LoadItemsValues::class]);
     }
 
     public function testIndexPage()
@@ -128,9 +123,9 @@ class ItemControllerTest extends WebTestCase
      * @param string $gridName
      * @return array
      */
-    protected function assertDataGrid(Crawler $crawler, $gridName)
+    private function assertDataGrid(Crawler $crawler, $gridName)
     {
-        static::assertStringContainsString($gridName, $crawler->html());
+        self::assertStringContainsString($gridName, $crawler->html());
 
         $container = $crawler->filter(sprintf('div[data-page-component-name="%s"]', $gridName));
 
@@ -140,12 +135,12 @@ class ItemControllerTest extends WebTestCase
 
         $this->assertNotNull($encodedOptions);
 
-        $options = json_decode($encodedOptions, true);
+        $options = json_decode($encodedOptions, true, 512, JSON_THROW_ON_ERROR);
 
         return $options['data'];
     }
 
-    protected function assertPageContainsOperations(Crawler $crawler, array $operations)
+    private function assertPageContainsOperations(Crawler $crawler, array $operations)
     {
         $node = $crawler->filter('a.operation-button');
 
@@ -155,7 +150,7 @@ class ItemControllerTest extends WebTestCase
         $container = $node->parents()->parents()->html();
 
         foreach ($operations as $operation) {
-            static::assertStringContainsString(
+            self::assertStringContainsString(
                 $router->generate('oro_action_operation_execute', ['operationName' => $operation]),
                 $container
             );

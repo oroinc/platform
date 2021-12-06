@@ -40,7 +40,7 @@ class RefreshContextListenerTest extends WebTestCase
         $this->assertTokenEntities($entityManager, $token);
     }
 
-    protected function assertTokenEntities(EntityManager $entityManager, TokenInterface $token)
+    private function assertTokenEntities(EntityManager $entityManager, TokenInterface $token): void
     {
         $unitOfWork = $entityManager->getUnitOfWork();
 

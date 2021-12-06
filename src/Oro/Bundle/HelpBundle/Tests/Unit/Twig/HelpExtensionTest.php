@@ -10,7 +10,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var HelpLinkProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $linkProvider;
 
     /** @var HelpExtension */
@@ -31,8 +31,7 @@ class HelpExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $expects = 'http://server.com/help/list';
 
-        $this->linkProvider
-            ->expects($this->once())
+        $this->linkProvider->expects($this->once())
             ->method('getHelpLinkUrl')
             ->willReturn($expects);
 

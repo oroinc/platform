@@ -14,21 +14,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TranslationControllerTest extends WebTestCase
 {
-    const DATAGRID_NAME = 'oro-translation-translations-grid';
-    const RESET_ACTION_NAME = 'oro_translation_translation_reset';
+    private const DATAGRID_NAME = 'oro-translation-translations-grid';
+    private const RESET_ACTION_NAME = 'oro_translation_translation_reset';
 
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadTranslations::class]);
+    }
 
-        $this->registry = $this->getContainer()->get('doctrine');
+    private function getDoctrine(): ManagerRegistry
+    {
+        return $this->getContainer()->get('doctrine');
     }
 
     public function testIndex()
@@ -36,15 +33,19 @@ class TranslationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_translation_index'));
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString(self::DATAGRID_NAME, $crawler->html());
+        self::assertStringContainsString(self::DATAGRID_NAME, $crawler->html());
 
-        $domains = $this->registry->getManagerForClass(TranslationKey::class)
-            ->getRepository(TranslationKey::class)
+        $domains = $this->getDoctrine()->getRepository(TranslationKey::class)
             ->findAvailableDomains();
 
         // Assert Domain filter choices
         $gridElement = $crawler->filter('[data-page-component-name="oro-translation-translations-grid"]');
-        $gridComponentOptions = json_decode($gridElement->attr('data-page-component-options'), JSON_OBJECT_AS_ARRAY);
+        $gridComponentOptions = json_decode(
+            $gridElement->attr('data-page-component-options'),
+            true,
+            513,
+            JSON_THROW_ON_ERROR
+        );
         $this->assertArrayHasKey('metadata', $gridComponentOptions);
         $this->assertArrayHasKey('filters', $gridComponentOptions['metadata']);
         $this->assertIsArray($gridComponentOptions['metadata']['filters']);
@@ -59,7 +60,8 @@ class TranslationControllerTest extends WebTestCase
             self::assertContains(['label' => $domain, 'value' => $domain], $domainFilter['choices']);
         }
 
-        $language = $this->registry->getRepository(Language::class)->findOneBy(['code' => LoadLanguages::LANGUAGE1]);
+        $language = $this->getDoctrine()->getRepository(Language::class)
+            ->findOneBy(['code' => LoadLanguages::LANGUAGE1]);
         $response = $this->getDatagridJsonResponse(
             [
                 self::DATAGRID_NAME . '[_filter][domain][value][]' => LoadTranslations::TRANSLATION_KEY_DOMAIN,
@@ -68,15 +70,14 @@ class TranslationControllerTest extends WebTestCase
             ]
         );
 
-        $translations = $this->registry
-            ->getRepository(Translation::class)
+        $translations = $this->getDoctrine()->getRepository(Translation::class)
             ->findAllByLanguageAndDomain(LoadLanguages::LANGUAGE1, LoadTranslations::TRANSLATION_KEY_DOMAIN);
 
         foreach ($translations as $translation) {
-            static::assertStringContainsString(sprintf('"id":"%d"', $translation['id']), $response);
-            static::assertStringContainsString(sprintf('"key":"%s"', $translation['key']), $response);
-            static::assertStringContainsString(sprintf('"domain":"%s"', $translation['domain']), $response);
-            static::assertStringContainsString(sprintf('"value":"%s"', $translation['value']), $response);
+            self::assertStringContainsString(sprintf('"id":"%d"', $translation['id']), $response);
+            self::assertStringContainsString(sprintf('"key":"%s"', $translation['key']), $response);
+            self::assertStringContainsString(sprintf('"domain":"%s"', $translation['domain']), $response);
+            self::assertStringContainsString(sprintf('"value":"%s"', $translation['value']), $response);
         }
     }
 
@@ -95,13 +96,13 @@ class TranslationControllerTest extends WebTestCase
         ]));
 
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertNotEmpty($result['successful']);
         $this->assertArrayHasKey('count', $result);
         $this->assertEquals(2, $result['count']);
 
         /** @var TranslationRepository $repo */
-        $repo = $this->getContainer()->get('oro_entity.doctrine_helper')->getEntityRepository(Translation::class);
+        $repo = $this->getDoctrine()->getRepository(Translation::class);
 
         $translations = $repo->findBy(['id' => $ids]);
         $this->assertEmpty($translations);
@@ -119,7 +120,7 @@ class TranslationControllerTest extends WebTestCase
         $translator = $this->getContainer()->get('translator');
 
         $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
-        $result = json_decode($this->client->getResponse()->getContent(), true);
+        $result = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('successful', $result);
         $this->assertFalse($result['successful']);
         $this->assertArrayHasKey('message', $result);
@@ -129,12 +130,7 @@ class TranslationControllerTest extends WebTestCase
         );
     }
 
-    /**
-     * @param array $filter
-     * @param array $gridOptions
-     * @return string
-     */
-    protected function getDatagridJsonResponse(array $filter = [], array $gridOptions = [])
+    private function getDatagridJsonResponse(array $filter = [], array $gridOptions = []): string
     {
         $response = $this->client->requestGrid(
             array_merge(

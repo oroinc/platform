@@ -10,25 +10,22 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowEntityAc
 
 class WorkflowEntityAclIdentityRepositoryTest extends WebTestCase
 {
-    /** @var WorkflowEntityAclIdentityRepository */
-    private $repository;
-
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowEntityAclIdentities::class]);
+    }
 
-        $this->repository = $this->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass(WorkflowEntityAclIdentity::class)
-            ->getRepository(WorkflowEntityAclIdentity::class);
+    private function getRepository(): WorkflowEntityAclIdentityRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(WorkflowEntityAclIdentity::class);
     }
 
     public function testFindByClassAndIdentifierAndActiveWorkflows(): void
     {
         $entity = $this->getReference('workflow_aware_entity.1');
 
-        $result = $this->repository->findByClassAndIdentifierAndActiveWorkflows(
+        $result = $this->getRepository()->findByClassAndIdentifierAndActiveWorkflows(
             WorkflowAwareEntity::class,
             $entity->getId()
         );
@@ -41,7 +38,7 @@ class WorkflowEntityAclIdentityRepositoryTest extends WebTestCase
             ->get('oro_workflow.manager')
             ->deactivateWorkflow('test_active_flow1');
 
-        $result = $this->repository->findByClassAndIdentifierAndActiveWorkflows(
+        $result = $this->getRepository()->findByClassAndIdentifierAndActiveWorkflows(
             WorkflowAwareEntity::class,
             $entity->getId()
         );
@@ -51,23 +48,16 @@ class WorkflowEntityAclIdentityRepositoryTest extends WebTestCase
         $this->assertTrue($this->isWorkflowEntityAclIdentityExists($result, 'test_active_flow2', 'step1', 'name'));
     }
 
-    /**
-     * @param array|WorkflowEntityAclIdentity[] $data
-     * @param string $workflow
-     * @param string $step
-     * @param string $attr
-     * @return bool
-     */
     private function isWorkflowEntityAclIdentityExists(array $data, string $workflow, string $step, string $attr): bool
     {
         $found = false;
-
+        /** @var WorkflowEntityAclIdentity $identity */
         foreach ($data as $identity) {
             $acl = $identity->getAcl();
 
-            if ($identity->getWorkflowItem()->getDefinition()->getName() === $workflow &&
-                $acl->getStep()->getName() === $step &&
-                $acl->getAttribute() === $attr
+            if ($identity->getWorkflowItem()->getDefinition()->getName() === $workflow
+                && $acl->getStep()->getName() === $step
+                && $acl->getAttribute() === $attr
             ) {
                 $found = true;
                 break;

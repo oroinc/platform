@@ -13,20 +13,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 class RemoveManyToManyRelationQueryTest extends WebTestCase
 {
     /** @var Connection */
-    protected $connection;
+    private $connection;
 
     /** @var ArrayLogger */
-    protected $logger;
+    private $logger;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([
-            LoadExtendedRelationsData::class
-        ]);
+        $this->loadFixtures([LoadExtendedRelationsData::class]);
 
         $this->logger = new ArrayLogger();
         $this->connection = $this->getContainer()->get('doctrine')->getConnection();
@@ -186,12 +181,7 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    protected function getEntityRow($entityClass)
+    private function getEntityRow(string $entityClass): array
     {
         $getEntitySql = 'SELECT e.data 
                 FROM oro_entity_config as e 
@@ -204,13 +194,7 @@ class RemoveManyToManyRelationQueryTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $entityField
-     *
-     * @return array
-     */
-    protected function getFieldRow($entityClass, $entityField)
+    private function getFieldRow(string $entityClass, string $entityField): array
     {
         $getFieldSql = 'SELECT f.id, f.data
             FROM oro_entity_config_field as f

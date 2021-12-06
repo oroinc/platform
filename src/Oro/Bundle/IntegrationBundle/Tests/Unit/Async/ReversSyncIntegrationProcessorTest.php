@@ -56,35 +56,33 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     public function testCouldBeConstructedWithExpectedArguments()
     {
         new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createReversSyncProcessorMock(),
-            $this->createTypeRegistryMock(),
+            $this->createDoctrineHelper(),
+            $this->createReversSyncProcessor(),
+            $this->createMock(TypesRegistry::class),
             new JobRunner(),
-            $this->createTokenStorageMock(),
-            $this->createLoggerMock()
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
     }
 
     public function testRejectAndLogIfMessageBodyMissIntegrationId()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Invalid message: integration_id and connector should not be empty');
         $processor = new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createReversSyncProcessorMock(),
-            $this->createTypeRegistryMock(),
+            $this->createDoctrineHelper(),
+            $this->createReversSyncProcessor(),
+            $this->createMock(TypesRegistry::class),
             new JobRunner(),
-            $this->createTokenStorageMock(),
+            $this->createMock(TokenStorageInterface::class),
             $logger
         );
 
         $message = new Message();
         $message->setBody('[]');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -97,44 +95,41 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('The malformed json given.');
 
         $processor = new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createReversSyncProcessorMock(),
-            $this->createTypeRegistryMock(),
+            $this->createDoctrineHelper(),
+            $this->createReversSyncProcessor(),
+            $this->createMock(TypesRegistry::class),
             new JobRunner(),
-            $this->createTokenStorageMock(),
-            $this->createLoggerMock()
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody('[}');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
     }
 
     public function testRejectAndLogIfMessageBodyMissConnector()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with(
                 'Invalid message: integration_id and connector should not be empty'
             );
         $processor = new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelperStub(),
-            $this->createReversSyncProcessorMock(),
-            $this->createTypeRegistryMock(),
+            $this->createDoctrineHelper(),
+            $this->createReversSyncProcessor(),
+            $this->createMock(TypesRegistry::class),
             new JobRunner(),
-            $this->createTokenStorageMock(),
+            $this->createMock(TokenStorageInterface::class),
             $logger
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -143,33 +138,28 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectAndLogIfIntegrationNotExist()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Integration should exist and be enabled');
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn(null);
 
-        $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
-
         $processor = new ReversSyncIntegrationProcessor(
-            $doctrineHelperStub,
-            $this->createReversSyncProcessorMock(),
-            $this->createTypeRegistryMock(),
+            $this->createDoctrineHelper($entityManager),
+            $this->createReversSyncProcessor(),
+            $this->createMock(TypesRegistry::class),
             new JobRunner(),
-            $this->createTokenStorageMock(),
+            $this->createMock(TokenStorageInterface::class),
             $logger
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'connector']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -178,36 +168,31 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectAndLogIfIntegrationIsNotEnabled()
     {
-        $logger = $this->createLoggerMock();
-        $logger
-            ->expects($this->once())
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())
             ->method('critical')
             ->with('Integration should exist and be enabled');
         $integration = new Integration();
         $integration->setEnabled(false);
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
 
-        $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
-
         $processor = new ReversSyncIntegrationProcessor(
-            $doctrineHelperStub,
-            $this->createReversSyncProcessorMock(),
-            $this->createTypeRegistryMock(),
+            $this->createDoctrineHelper($entityManager),
+            $this->createReversSyncProcessor(),
+            $this->createMock(TypesRegistry::class),
             new JobRunner(),
-            $this->createTokenStorageMock(),
+            $this->createMock(TokenStorageInterface::class),
             $logger
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'connector']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -220,40 +205,34 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration->setEnabled(true);
         $integration->setType('theIntegrationType');
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
 
-        $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
-
-        $typeRegistryMock = $this->createTypeRegistryMock();
-        $typeRegistryMock
-            ->expects(self::once())
+        $typeRegistry = $this->createMock(TypesRegistry::class);
+        $typeRegistry->expects(self::once())
             ->method('getConnectorType')
             ->with('theIntegrationType', 'theConnector')
             ->willReturn($this->createMock(ConnectorInterface::class));
 
-        $reversSyncProcessorMock = $this->createReversSyncProcessorMock();
-        $reversSyncProcessorMock
-            ->expects(self::never())
+        $reversSyncProcessor = $this->createReversSyncProcessor();
+        $reversSyncProcessor->expects(self::never())
             ->method('process');
 
         $processor = new ReversSyncIntegrationProcessor(
-            $doctrineHelperStub,
-            $reversSyncProcessorMock,
-            $typeRegistryMock,
+            $this->createDoctrineHelper($entityManager),
+            $reversSyncProcessor,
+            $typeRegistry,
             new JobRunner(),
-            $this->createTokenStorageMock(),
-            $this->createLoggerMock()
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -267,37 +246,32 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration->setType('theIntegrationType');
         $integration->setOrganization(new Organization());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
 
-        $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
-
-        $typeRegistryMock = $this->createTypeRegistryMock();
-        $typeRegistryMock
-            ->expects(self::once())
+        $typeRegistry = $this->createMock(TypesRegistry::class);
+        $typeRegistry->expects(self::once())
             ->method('getConnectorType')
             ->willReturn($this->createMock(TwoWaySyncConnectorInterface::class));
 
         $jobRunner = new JobRunner();
 
         $processor = new ReversSyncIntegrationProcessor(
-            $doctrineHelperStub,
-            $this->createReversSyncProcessorMock(),
-            $typeRegistryMock,
+            $this->createDoctrineHelper($entityManager),
+            $this->createReversSyncProcessor(),
+            $typeRegistry,
             $jobRunner,
-            $this->createTokenStorageMock(),
-            $this->createLoggerMock()
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
         $message->setMessageId('theMessageId');
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);
 
@@ -314,35 +288,30 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration->setType('theIntegrationType');
         $integration->setOrganization(new Organization());
 
-        $entityManagerMock = $this->createEntityManagerStub();
-        $entityManagerMock
-            ->expects($this->once())
+        $entityManager = $this->createEntityManager();
+        $entityManager->expects($this->once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
 
-        $doctrineHelperStub = $this->createDoctrineHelperStub($entityManagerMock);
-
-        $typeRegistryMock = $this->createTypeRegistryMock();
-        $typeRegistryMock
-            ->expects(self::once())
+        $typeRegistry = $this->createMock(TypesRegistry::class);
+        $typeRegistry->expects(self::once())
             ->method('getConnectorType')
             ->with('theIntegrationType', 'theConnector')
             ->willReturn($this->createMock(TwoWaySyncConnectorInterface::class));
 
         $processor = new ReversSyncIntegrationProcessor(
-            $doctrineHelperStub,
-            $this->createReversSyncProcessorMock(),
-            $typeRegistryMock,
+            $this->createDoctrineHelper($entityManager),
+            $this->createReversSyncProcessor(),
+            $typeRegistry,
             new JobRunner(),
-            $this->createTokenStorageMock(),
-            $this->createLoggerMock()
+            $this->createMock(TokenStorageInterface::class),
+            $this->createMock(LoggerInterface::class)
         );
 
         $message = new Message();
         $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
 
-        /** @var SessionInterface|\PHPUnit\Framework\MockObject\MockObject $session */
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
@@ -350,21 +319,12 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|TypesRegistry
+     * @return ReverseSyncProcessor|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function createTypeRegistryMock()
+    private function createReversSyncProcessor()
     {
-        return $this->createMock(TypesRegistry::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ReverseSyncProcessor
-     */
-    private function createReversSyncProcessorMock()
-    {
-        $reverseSyncProcessor =  $this->createMock(ReverseSyncProcessor::class);
-        $reverseSyncProcessor
-            ->expects($this->any())
+        $reverseSyncProcessor = $this->createMock(ReverseSyncProcessor::class);
+        $reverseSyncProcessor->expects($this->any())
             ->method('getLoggerStrategy')
             ->willReturn(new LoggerStrategy());
 
@@ -372,54 +332,32 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface
+     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function createEntityManagerStub()
+    private function createEntityManager()
     {
         $configuration = new Configuration();
 
-        $connectionMock = $this->createMock(Connection::class);
-        $connectionMock
-            ->expects($this->any())
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $entityManagerMock
-            ->expects($this->any())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->any())
             ->method('getConnection')
-            ->willReturn($connectionMock);
+            ->willReturn($connection);
 
-        return $entityManagerMock;
+        return $entityManager;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper
-     */
-    private function createDoctrineHelperStub($entityManager = null)
+    private function createDoctrineHelper(EntityManagerInterface $entityManager = null): DoctrineHelper
     {
-        $helperMock = $this->createMock(DoctrineHelper::class);
-        $helperMock
-            ->expects($this->any())
+        $helper = $this->createMock(DoctrineHelper::class);
+        $helper->expects($this->any())
             ->method('getEntityManagerForClass')
             ->willReturn($entityManager);
 
-        return $helperMock;
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | LoggerInterface
-     */
-    private function createLoggerMock()
-    {
-        return $this->createMock(LoggerInterface::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject | TokenStorageInterface
-     */
-    private function createTokenStorageMock()
-    {
-        return $this->createMock(TokenStorageInterface::class);
+        return $helper;
     }
 }

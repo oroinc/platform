@@ -30,7 +30,7 @@ class EntityPageTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         $this->assertNotEmpty($crawler->html());
 
-        static::assertStringContainsString('Oro Test Workflow', $crawler->html());
-        static::assertStringContainsString('To Second Step', $crawler->html());
+        self::assertStringContainsString('Oro Test Workflow', $crawler->html());
+        self::assertStringContainsString('To Second Step', $crawler->html());
     }
 }

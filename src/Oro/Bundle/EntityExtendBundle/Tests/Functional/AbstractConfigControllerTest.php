@@ -62,7 +62,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createSelectOneToMany($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][target_grid][]"' .
             ' id="oro_entity_config_type_extend_relation_target_grid" >' .
@@ -101,7 +101,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createSelectManyToOne($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][target_field]"' .
             ' id="oro_entity_config_type_extend_relation_target_field" >' .
@@ -122,7 +122,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createManyToOneNonExtendableEntitySelect($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][target_field]"' .
             ' id="oro_entity_config_type_extend_relation_target_field" >' .
@@ -143,7 +143,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
      */
     protected function createBidirectionalSelect($form)
     {
-        $doc = new \DOMDocument("1.0");
+        $doc = new \DOMDocument('1.0');
         $doc->loadHTML(
             '<select required="required" name="oro_entity_config_type[extend][relation][bidirectional]"' .
             ' id="oro_entity_config_type_extend_relation_bidirectional" >' .

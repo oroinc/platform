@@ -60,8 +60,8 @@ class DuplicateFilterTest extends WebTestCase
         self::assertEquals($expected, array_map('current', $actualData));
 
         $dql = $qb->getDQL();
-        static::assertStringNotContainsString('EXISTS(', $dql);
-        static::assertStringContainsString('GROUP BY ', $dql);
+        self::assertStringNotContainsString('EXISTS(', $dql);
+        self::assertStringContainsString('GROUP BY ', $dql);
     }
 
     /**
@@ -92,8 +92,8 @@ class DuplicateFilterTest extends WebTestCase
         $actualData = $qb->getQuery()->getResult();
         self::assertEquals($expected, array_map('current', $actualData));
         $dql = $qb->getDQL();
-        static::assertStringContainsString('EXISTS(', $dql);
-        static::assertStringContainsString('GROUP BY ', $dql);
+        self::assertStringContainsString('EXISTS(', $dql);
+        self::assertStringContainsString('GROUP BY ', $dql);
     }
 
     public function duplicateDataProvider()

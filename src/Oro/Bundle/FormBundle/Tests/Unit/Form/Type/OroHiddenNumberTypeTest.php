@@ -12,15 +12,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroHiddenNumberTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroHiddenNumberType
-     */
-    private $formType;
-
-    /**
-     * @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
     private $numberFormatter;
+
+    /** @var OroHiddenNumberType */
+    private $formType;
 
     protected function setUp(): void
     {
@@ -47,8 +43,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
     {
         \Locale::setDefault('de_DE');
 
-        $this->numberFormatter
-            ->expects(self::once())
+        $this->numberFormatter->expects(self::once())
             ->method('getAttribute')
             ->with(\NumberFormatter::GROUPING_USED)
             ->willReturn(true);
@@ -63,8 +58,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
     {
         \Locale::setDefault('en_US');
 
-        $this->numberFormatter
-            ->expects(self::once())
+        $this->numberFormatter->expects(self::once())
             ->method('getAttribute')
             ->with(\NumberFormatter::GROUPING_USED)
             ->willReturn(false);
@@ -80,8 +74,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
      */
     public function testConfigureOptions(bool $groupingUsed, array $expectedOptions)
     {
-        $this->numberFormatter
-            ->expects(self::once())
+        $this->numberFormatter->expects(self::once())
             ->method('getAttribute')
             ->with(\NumberFormatter::GROUPING_USED)
             ->willReturn($groupingUsed);
@@ -112,7 +105,7 @@ class OroHiddenNumberTypeTest extends FormIntegrationTestCase
     }
 
     /**
-     * @return array
+     * {@inheritDoc}
      */
     protected function getExtensions()
     {

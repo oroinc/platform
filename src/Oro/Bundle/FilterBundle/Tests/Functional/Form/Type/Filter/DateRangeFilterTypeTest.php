@@ -92,10 +92,7 @@ class DateRangeFilterTypeTest extends WebTestCase
         ];
     }
 
-    /**
-     * @return FormFactoryInterface
-     */
-    protected function getFormFactory()
+    private function getFormFactory(): FormFactoryInterface
     {
         return $this->getContainer()->get('form.factory');
     }

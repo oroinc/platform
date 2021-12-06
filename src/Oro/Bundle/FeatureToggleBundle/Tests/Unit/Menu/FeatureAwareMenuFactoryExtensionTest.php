@@ -26,8 +26,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildOptionsChangeToNotAllowed()
     {
-        $this->featureChecker
-            ->expects($this->once())
+        $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
             ->with('route_name', 'routes')
             ->willReturn(false);
@@ -49,8 +48,7 @@ class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testBuildOptionsNoChanges(array $options)
     {
-        $this->featureChecker
-            ->expects($this->never())
+        $this->featureChecker->expects($this->never())
             ->method('isResourceEnabled');
 
         $this->extension->buildOptions($options);

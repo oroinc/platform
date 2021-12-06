@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async;
 
-use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\SaveImportExportResultProcessor;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * @dbIsolationPerTest
@@ -35,8 +34,7 @@ class SaveImportExportResultProcessorTest extends WebTestCase
 
     public function testProcessSaveJobWithValidData(): void
     {
-        $manager = $this->getManager();
-        $importExportResultManager = $manager->getRepository(ImportExportResult::class);
+        $importExportResultManager = self::getContainer()->get('doctrine')->getRepository(ImportExportResult::class);
 
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_export_result_message',
@@ -52,12 +50,12 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         ]));
 
         $processor = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
-        $processorResult = $processor->process($message, $this->createSessionMock());
+        $processorResult = $processor->process($message, $this->createMock(SessionInterface::class));
 
         /** @var ImportExportResult $rootJobResult */
         $rootJobResult = $importExportResultManager->findOneBy(['jobId' => $rootJob->getId()]);
 
-        self::assertEquals(ExportMessageProcessor::ACK, $processorResult);
+        self::assertEquals(MessageProcessorInterface::ACK, $processorResult);
         self::assertEquals($rootJob->getId(), $rootJobResult->getJobId());
         self::assertEquals(ProcessorRegistry::TYPE_EXPORT, $rootJobResult->getType());
         self::assertEquals(ImportExportResult::class, $rootJobResult->getEntity());
@@ -70,29 +68,13 @@ class SaveImportExportResultProcessorTest extends WebTestCase
         $message->setBody(JSON::encode([]));
 
         $processor = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
-        $processorResult = $processor->process($message, $this->createSessionMock());
+        $processorResult = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        self::assertEquals(ExportMessageProcessor::REJECT, $processorResult);
+        self::assertEquals(MessageProcessorInterface::REJECT, $processorResult);
     }
 
-    private function getManager(): ManagerRegistry
-    {
-        return $this->getContainer()->get('doctrine');
-    }
-
-    /**
-     * @returnJobProcessor
-     */
     private function getJobProcessor(): JobProcessor
     {
         return $this->getContainer()->get('oro_message_queue.job.processor');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

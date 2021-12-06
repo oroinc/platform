@@ -66,7 +66,7 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         self::assertJsonResponseStatusCodeEquals($result, 422);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertEquals(
             ['message' => 'This pin already exists'],
@@ -94,7 +94,7 @@ class PinbarRestApiTest extends AbstractRestApiTest
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
 
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(0, $resultJson);
 
@@ -105,7 +105,7 @@ class PinbarRestApiTest extends AbstractRestApiTest
             self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
         );
 
-        $resultJson = json_decode($this->client->getResponse()->getContent(), true);
+        $resultJson = json_decode($this->client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $expectedUrl = $urlGenerator->generate(
             'oro_config_configuration_system',
             ['restore' => 1, 'sample_key' => 'sample_value']
@@ -147,7 +147,7 @@ class PinbarRestApiTest extends AbstractRestApiTest
         $result = $this->client->getResponse();
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertArrayHasKey('id', $resultJson[0]);
         $this->assertArrayHasKey('parent_id', $resultJson[0]);
         unset($resultJson[0]['id'], $resultJson[0]['parent_id']);

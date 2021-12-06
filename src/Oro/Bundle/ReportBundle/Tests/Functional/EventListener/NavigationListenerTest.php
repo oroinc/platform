@@ -46,7 +46,7 @@ class NavigationListenerTest extends WebTestCase
         $divider = array_splice($children, 0, 1);
         $divider = reset($divider);
 
-        static::assertStringContainsString('divider', $divider->getName());
+        self::assertStringContainsString('divider', $divider->getName());
         foreach ($children as $child) {
             $this->assertMatchesRegularExpression('/^Report [123]_report$/i', $child->getFirstChild()->getName());
             $this->assertMatchesRegularExpression('/^Report [123]$/i', $child->getFirstChild()->getLabel());
@@ -56,7 +56,7 @@ class NavigationListenerTest extends WebTestCase
     /**
      * @return NavigationListener
      */
-    protected function getNavigationListener()
+    private function getNavigationListener()
     {
         return $this->getContainer()->get('oro_report.listener.navigation_listener');
     }

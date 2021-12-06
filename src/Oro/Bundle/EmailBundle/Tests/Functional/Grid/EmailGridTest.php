@@ -4,29 +4,23 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Grid;
 
 use Oro\Bundle\DataGridBundle\Tests\Functional\AbstractDatagridTestCase;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailToOtherFolderData;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 
 class EmailGridTest extends AbstractDatagridTestCase
 {
-    /**
-     * @var User
-     */
-    protected $user;
+    /** @var User */
+    private $user;
 
-    /**
-     * @var OroClassMetadataFactory
-     */
-    protected $metadataFactory;
+    /** @var OroClassMetadataFactory */
+    private $metadataFactory;
 
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader('simple_user', 'simple_password'));
-
-        $this->loadFixtures([
-            'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailToOtherFolderData',
-        ]);
+        $this->loadFixtures([LoadEmailToOtherFolderData::class]);
 
         $this->user = $this->getReference('simple_user');
         $this->metadataFactory = $this->getContainer()->get('oro_entity_extend.orm.metadata_factory');
@@ -43,10 +37,8 @@ class EmailGridTest extends AbstractDatagridTestCase
 
     /**
      * @dataProvider gridProvider
-     *
-     * @param array $requestData
      */
-    public function testGrid($requestData)
+    public function testGrid(array $requestData)
     {
         $requestData['gridParameters'][$requestData['gridParameters']['gridName']]['_pager']['_per_page'] = 100;
 
@@ -76,7 +68,7 @@ class EmailGridTest extends AbstractDatagridTestCase
     /**
      * {@inheritdoc}
      */
-    public function gridProvider()
+    public function gridProvider(): array
     {
         return [
             'Email grid' => [

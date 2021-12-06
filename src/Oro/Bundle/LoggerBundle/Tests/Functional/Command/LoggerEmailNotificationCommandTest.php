@@ -9,9 +9,6 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -22,7 +19,7 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
         $params = ['--recipients="recipient1@example.com;recipient2@example.com"'];
         $result = $this->runCommand('oro:logger:email-notification', $params);
 
-        static::assertStringContainsString('Error logs notification will be sent to listed email addresses', $result);
+        self::assertStringContainsString('Error logs notification will be sent to listed email addresses', $result);
     }
 
     public function testRunCommandWithFailedValidation()
@@ -30,23 +27,23 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
         $params = ['--recipients="recipient1@example.com;not_valid_email'];
         $result = $this->runCommand('oro:logger:email-notification', $params);
 
-        static::assertStringContainsString('not_valid_email - This value is not a valid email address.', $result);
+        self::assertStringContainsString('not_valid_email - This value is not a valid email address.', $result);
     }
 
     public function testRunCommandToDisableNotifications()
     {
-        $configGlobal = self::getConfigManager('global');
+        $configGlobal = self::getConfigManager();
         $configGlobal->set('oro_logger.email_notification_recipients', 'recipient1@example.com');
         $params = ['--disable'];
 
         $result = $this->runCommand('oro:logger:email-notification', $params);
-        $expectedContent = "Error logs notification successfully disabled.";
-        static::assertStringContainsString($expectedContent, $result);
+        $expectedContent = 'Error logs notification successfully disabled.';
+        self::assertStringContainsString($expectedContent, $result);
         $this->assertEquals('', $configGlobal->get('oro_logger.email_notification_recipients'));
 
         $result = $this->runCommand('oro:logger:email-notification', $params);
-        $expectedContent = "Error logs notification already disabled.";
-        static::assertStringContainsString($expectedContent, $result);
+        $expectedContent = 'Error logs notification already disabled.';
+        self::assertStringContainsString($expectedContent, $result);
         $this->assertEquals('', $configGlobal->get('oro_logger.email_notification_recipients'));
     }
 
@@ -54,6 +51,6 @@ class LoggerEmailNotificationCommandTest extends WebTestCase
     {
         $result = $this->runCommand('oro:logger:email-notification', ['--help']);
 
-        static::assertStringContainsString("Usage: oro:logger:email-notification [options]", $result);
+        self::assertStringContainsString('Usage: oro:logger:email-notification [options]', $result);
     }
 }

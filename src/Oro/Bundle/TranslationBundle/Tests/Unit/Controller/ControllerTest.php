@@ -85,8 +85,7 @@ class ControllerTest extends \PHPUnit\Framework\TestCase
                 return json_encode($context['json'], JSON_THROW_ON_ERROR);
             });
 
-        $this->translator
-            ->expects(self::any())
+        $this->translator->expects(self::any())
             ->method('getTranslations')
             ->willReturnCallback(function ($domains) {
                 return array_intersect_key($this->translations, array_flip($domains));

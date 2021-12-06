@@ -2,57 +2,64 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditFieldRepository;
-use Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Tests\Functional\Helper\AdminUserTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @dbIsolationPerTest
  */
 class AuditFieldRepositoryTest extends WebTestCase
 {
-    use AdminUserTrait;
-
-    /** @var AuditFieldRepository */
-    private $repository;
-
-    /** @var AuditRepository */
-    private $auditRepository;
-
-    /** @var EntityChangesToAuditEntryConverter */
-    private $entityChangesToAuditEntryConverter;
-
     protected function setUp(): void
     {
         $this->initClient();
-        $this->repository = $this->getContainer()->get('doctrine')
-            ->getManagerForClass(AuditField::class)->getRepository(AuditField::class);
-        $this->auditRepository = $this->getContainer()->get('doctrine')->getRepository(Audit::class);
-        $this->entityChangesToAuditEntryConverter = $this->getContainer()->get(
-            'oro_dataaudit.converter.entity_changes_to_audit_entry'
-        );
+    }
+
+    private function getRepository(): AuditFieldRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(AuditField::class);
+    }
+
+    private function getAuditRepository(): EntityRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Audit::class);
+    }
+
+    private function getEntityChangesToAuditEntryConverter(): EntityChangesToAuditEntryConverter
+    {
+        return self::getContainer()->get('oro_dataaudit.converter.entity_changes_to_audit_entry');
+    }
+
+    private function getAdminUser(): User
+    {
+        return self::getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->getRepository(User::class)
+            ->findOneBy(['email' => self::AUTH_USER]);
     }
 
     public function testEmptyIds()
     {
         $this->assertSame(
             [],
-            $this->repository->getVisibleFieldsByAuditIds([])
+            $this->getRepository()->getVisibleFieldsByAuditIds([])
         );
     }
 
     public function testGetVisibleFieldsByAuditIds()
     {
-        $audits = $this->auditRepository->findAll();
+        $audits = $this->getAuditRepository()->findAll();
         $this->assertEmpty($audits);
 
-        $this->entityChangesToAuditEntryConverter->convert(
+        $this->getEntityChangesToAuditEntryConverter()->convert(
             [
                 [
                     'entity_class' => get_class($this->getAdminUser()),
@@ -70,15 +77,15 @@ class AuditFieldRepositoryTest extends WebTestCase
             new EntityReference()
         );
 
-        $audits = $this->auditRepository->findAll();
+        $audits = $this->getAuditRepository()->findAll();
         $this->assertIsArray($audits);
         $this->assertNotEmpty($audits);
         $this->assertCount(1, $audits);
 
-        $audit = $this->auditRepository->findOneBy([]);
+        $audit = $this->getAuditRepository()->findOneBy([]);
         $this->assertInstanceOf(Audit::class, $audit);
 
-        $fieldsByAudit = $this->repository->getVisibleFieldsByAuditIds([$audit->getId()]);
+        $fieldsByAudit = $this->getRepository()->getVisibleFieldsByAuditIds([$audit->getId()]);
         $this->assertIsArray($fieldsByAudit);
         $this->assertNotEmpty($fieldsByAudit);
         $this->assertCount(1, $fieldsByAudit);
@@ -97,10 +104,10 @@ class AuditFieldRepositoryTest extends WebTestCase
 
     public function testGetVisibleFieldsByAuditIdsAndSkipInvisible()
     {
-        $audits = $this->auditRepository->findAll();
+        $audits = $this->getAuditRepository()->findAll();
         $this->assertEmpty($audits);
 
-        $this->entityChangesToAuditEntryConverter->convert(
+        $this->getEntityChangesToAuditEntryConverter()->convert(
             [
                 [
                     'entity_class' => get_class($this->getAdminUser()),
@@ -118,15 +125,15 @@ class AuditFieldRepositoryTest extends WebTestCase
             new EntityReference()
         );
 
-        $audits = $this->auditRepository->findAll();
+        $audits = $this->getAuditRepository()->findAll();
         $this->assertIsArray($audits);
         $this->assertNotEmpty($audits);
         $this->assertCount(1, $audits);
 
-        $audit = $this->auditRepository->findOneBy([]);
+        $audit = $this->getAuditRepository()->findOneBy([]);
         $this->assertInstanceOf(Audit::class, $audit);
 
-        $this->repository
+        $this->getRepository()
             ->createQueryBuilder('f')
             ->update()
             ->set('f.visible', ':visible')
@@ -134,7 +141,7 @@ class AuditFieldRepositoryTest extends WebTestCase
             ->getQuery()
             ->execute();
 
-        $fieldsByAudit = $this->repository->getVisibleFieldsByAuditIds([$audit->getId()]);
+        $fieldsByAudit = $this->getRepository()->getVisibleFieldsByAuditIds([$audit->getId()]);
         $this->assertIsArray($fieldsByAudit);
         $this->assertEmpty($fieldsByAudit);
     }

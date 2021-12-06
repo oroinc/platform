@@ -20,7 +20,7 @@ class JsRoutingDumpCommandTest extends WebTestCase
         $result = $this->runCommand('fos:js-routing:dump', ['-vvv']);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString($this->getEndPath($this->getFilename(), 'json'), $result);
+        self::assertStringContainsString($this->getEndPath($this->getFilename(), 'json'), $result);
     }
 
     public function testExecuteWithJsFormat(): void
@@ -28,7 +28,7 @@ class JsRoutingDumpCommandTest extends WebTestCase
         $result = $this->runCommand('fos:js-routing:dump', ['-vvv', '--format=js']);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString($this->getEndPath($this->getFilename(), 'js'), $result);
+        self::assertStringContainsString($this->getEndPath($this->getFilename(), 'js'), $result);
     }
 
     public function testExecuteWithCustomTarget(): void
@@ -41,7 +41,7 @@ class JsRoutingDumpCommandTest extends WebTestCase
         $result = $this->runCommand('fos:js-routing:dump', ['-vvv', sprintf('--target=%s%s', $projectDir, $endPath)]);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString($endPath, $result);
+        self::assertStringContainsString($endPath, $result);
     }
 
     private function getEndPath(string $filename, string $format): string

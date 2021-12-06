@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
@@ -166,9 +167,9 @@ class WidgetControllerTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        /** @var  EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->client->getContainer()->get('doctrine.orm.entity_manager');
-        $widgetRepository = $em->getRepository('OroDashboardBundle:Widget');
+        $widgetRepository = $em->getRepository(Widget::class);
         foreach ($widgets as $key => $widget) {
             $updatedWidget = $widgetRepository->findOneBy(['id' => $widget->getId()]);
             $this->assertEquals($expectedPositions[$key], $updatedWidget->getLayoutPosition());

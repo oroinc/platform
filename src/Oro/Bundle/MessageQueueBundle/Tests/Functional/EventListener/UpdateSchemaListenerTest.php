@@ -78,7 +78,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     /**
      * Remove all listeners except UpdateSchemaListener for UpdateSchemaEvent
      */
-    protected function removeListenersForEventExceptTested()
+    private function removeListenersForEventExceptTested()
     {
         $dispatcher = $this->getEventDispatcher();
 
@@ -92,7 +92,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     /**
      * Dispatch UpdateSchemaEvent
      */
-    protected function dispatchUpdateSchemaEvent()
+    private function dispatchUpdateSchemaEvent()
     {
         $dispatcher = $this->getEventDispatcher();
 
@@ -103,7 +103,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     /**
      * @return EventDispatcherInterface
      */
-    protected function getEventDispatcher()
+    private function getEventDispatcher()
     {
         return $this->getContainer()->get('event_dispatcher');
     }

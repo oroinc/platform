@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\ImportExport\FilteredEntityReader;
 
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader\OrmFilteredEntityIdentityReader;
@@ -69,12 +70,6 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
 
         $this->assertCount(1, $ids);
 
-        $expectedData = empty($expected) ? [0] : [];
-
-        foreach ($expected as $expectedIdentifiers) {
-            $expectedData[] = $this->getReference($expectedIdentifiers)->getId();
-        }
-
         $this->assertEquals(sort($expected), sort($ids));
     }
 
@@ -140,28 +135,23 @@ class OrmFilteredEntityIdentityReaderTest extends WebTestCase
             ->setToken($token);
     }
 
-    private function getDatagrid($options)
+    private function getDatagrid(array $options): DatagridInterface
     {
         $name = $options['filteredResultsGrid'];
         $queryString = $options['filteredResultsGridParams'] ?? null;
         parse_str($queryString, $parameters);
+
         return $this->getDatagridManager()->getDatagrid($name, [ParameterBag::MINIFIED_PARAMETERS => $parameters]);
     }
 
-    /**
-     * @return Manager
-     */
-    private function getDatagridManager()
+    private function getDatagridManager(): Manager
     {
-        return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
+        return self::getContainer()->get('oro_datagrid.datagrid.manager');
     }
 
-    /**
-     * @return mixed
-     */
-    private function getAdminUser(): ?User
+    private function getAdminUser(): User
     {
-        return $this->getContainer()->get('doctrine')
+        return self::getContainer()->get('doctrine')
             ->getRepository(User::class)
             ->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
     }

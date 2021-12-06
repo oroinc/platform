@@ -85,7 +85,7 @@ class EmailSyncCommandTest extends WebTestCase
         ];
         $result = $this->runCommand('oro:cron:imap-sync', []);
         foreach ($expectedList as $expected) {
-            static::assertStringContainsString($expected, $result);
+            self::assertStringContainsString($expected, $result);
         }
     }
 
@@ -94,7 +94,7 @@ class EmailSyncCommandTest extends WebTestCase
         $this->disableEmailFeature();
         $result = $this->runCommand('oro:cron:imap-sync', []);
 
-        static::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
+        self::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
     }
 
     /**
@@ -131,10 +131,10 @@ class EmailSyncCommandTest extends WebTestCase
 
         $result = $this->runCommand('oro:cron:imap-sync', $params);
         foreach ($expectedList as $expected) {
-            static::assertStringContainsString($expected, $result);
+            self::assertStringContainsString($expected, $result);
         }
 
-        $listRepo = $this->getContainer()->get('doctrine')->getRepository('OroEmailBundle:Email');
+        $listRepo = $this->getContainer()->get('doctrine')->getRepository(Email::class);
         $list = $listRepo->findAll();
 
         $this->assertCount($assertCount, $list);
@@ -185,7 +185,7 @@ class EmailSyncCommandTest extends WebTestCase
 
     private function isDbTypeIsValid(string $expectedEmailDataDbType): bool
     {
-        if ($expectedEmailDataDbType === '') {
+        if ('' === $expectedEmailDataDbType) {
             return true;
         }
 

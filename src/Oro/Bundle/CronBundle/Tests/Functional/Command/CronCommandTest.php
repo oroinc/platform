@@ -27,8 +27,8 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
         $this->assertNotEmpty($result);
 
-        static::assertStringContainsString('Scheduling run for command ', $result);
-        static::assertStringContainsString('All commands scheduled', $result);
+        self::assertStringContainsString('Scheduling run for command ', $result);
+        self::assertStringContainsString('All commands scheduled', $result);
     }
 
     public function testShouldRunAndNotScheduleIfNotCommandDue()
@@ -38,8 +38,8 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv']);
 
         $this->assertNotEmpty($result);
-        static::assertStringContainsString('Skipping not due command', $result);
-        static::assertStringContainsString('All commands scheduled', $result);
+        self::assertStringContainsString('Skipping not due command', $result);
+        self::assertStringContainsString('All commands scheduled', $result);
     }
 
     public function testShouldSendMessageIfCommandDue()
@@ -80,13 +80,13 @@ class CronCommandTest extends WebTestCase
         $result = $this->runCommand('oro:cron', ['-vvv' => true]);
         $this->assertNotEmpty($result);
 
-        static::assertStringContainsString('The feature that enables this command is turned off', $result);
+        self::assertStringContainsString('The feature that enables this command is turned off', $result);
     }
 
     /**
      * @param bool $isDue
      */
-    protected function mockCronHelper($isDue = false)
+    private function mockCronHelper($isDue = false)
     {
         $cronExpression = $this->createMock(CronExpression::class);
         $cronExpression->expects($this->any())->method('isDue')->willReturn($isDue);

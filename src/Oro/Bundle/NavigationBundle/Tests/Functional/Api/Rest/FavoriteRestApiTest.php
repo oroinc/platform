@@ -33,7 +33,7 @@ class FavoriteRestApiTest extends AbstractRestApiTest
         $result = $this->client->getResponse();
 
         self::assertJsonResponseStatusCodeEquals($result, 200);
-        $resultJson = json_decode($result->getContent(), true);
+        $resultJson = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $urlGenerator = self::getContainer()->get(UrlGeneratorInterface::class);
         self::assertEquals(
             [

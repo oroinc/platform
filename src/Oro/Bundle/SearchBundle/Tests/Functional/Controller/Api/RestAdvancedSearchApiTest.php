@@ -36,7 +36,7 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 200);
-        $result = json_decode($result->getContent(), true);
+        $result = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         //compare result
         $this->assertEquals($response['records_count'], $result['records_count']);
@@ -66,7 +66,7 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
         $result = $this->client->getResponse();
 
         $this->assertJsonResponseStatusCodeEquals($result, 400);
-        $result = json_decode($result->getContent(), true);
+        $result = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals($response['code'], $result['code']);
         $this->assertEquals($response['message'], $result['message']);
     }

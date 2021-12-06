@@ -18,7 +18,7 @@ class AbstractWidgetTestCase extends WebTestCase
     protected function setOrAdd(Form $form, $fieldName, $value, $fieldType = 'text')
     {
         if (!$form->has($fieldName)) {
-            $doc = new \DOMDocument("1.0");
+            $doc = new \DOMDocument('1.0');
             $doc->loadHTML(sprintf('<input type="%s" name="%s" value="" />', $fieldType, $fieldName));
             $dynamicField = new InputFormField($doc->getElementsByTagName('input')->item(0));
             $form->set($dynamicField);
@@ -63,12 +63,12 @@ class AbstractWidgetTestCase extends WebTestCase
         $dataComponent = $crawler->filter('.column-chart');
         if ($dataComponent->extract(['data-page-component-options'])) {
             $data = $dataComponent->extract(['data-page-component-options']);
-            $data = json_decode($data[0]);
+            $data = json_decode($data[0], false, 512, JSON_THROW_ON_ERROR);
             return $data->chartOptions->dataSource->data;
         } else {
             $dataComponent = $crawler->filter('.dashboard-widget-content > [data-page-component-options]');
             $data = $dataComponent->extract(['data-page-component-options']);
-            $data = json_decode($data[0]);
+            $data = json_decode($data[0], false, 512, JSON_THROW_ON_ERROR);
             return $data->data;
         }
     }

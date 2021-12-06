@@ -2,22 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\Acl;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Tests\Functional\AclQuery\AclTestCase;
 use Oro\Bundle\SecurityBundle\Tests\Functional\DataFixtures\LoadRolesData;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership as TestEntity;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class FieldAclTest extends AclTestCase
 {
     /** @var TestEntity */
-    protected $testEntity;
+    private $testEntity;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,8 +25,8 @@ class FieldAclTest extends AclTestCase
             LoadRolesData::class
         ]);
 
-        /** @var EntityManager $em */
-        $em = self::getContainer()->get('doctrine')->getManagerForClass('OroUserBundle:User');
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(User::class);
         $this->testEntity = $em->getRepository(TestEntity::class)
             ->createQueryBuilder('e')
             ->orderBy('e.id')
@@ -40,13 +38,13 @@ class FieldAclTest extends AclTestCase
             $this->testEntity
                 ->setName('test')
                 ->setOrganization($this->getReference('organization'))
-                ->setOwner($em->getRepository('OroUserBundle:User')->findOneBy(['email' => self::AUTH_USER]));
+                ->setOwner($em->getRepository(User::class)->findOneBy(['email' => self::AUTH_USER]));
             $em->persist($this->testEntity);
             $em->flush();
         }
     }
 
-    protected function getAuthorizationChecker(): AuthorizationCheckerInterface
+    private function getAuthorizationChecker(): AuthorizationCheckerInterface
     {
         return self::getContainer()->get('security.authorization_checker');
     }

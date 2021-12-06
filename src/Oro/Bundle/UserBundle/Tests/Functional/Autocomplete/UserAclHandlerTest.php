@@ -22,6 +22,6 @@ class UserAclHandlerTest extends WebTestCase
         /* UserAclHandler $aclHandler */
         $aclHandler = $this->getContainer()->get('oro_user.autocomplete.user.search_acl_handler');
         $data = $aclHandler->search($query, 1, 50);
-        static::assertEmpty($data['results']);
+        self::assertEmpty($data['results']);
     }
 }

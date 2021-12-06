@@ -7,9 +7,6 @@ namespace Oro\Bundle\ReportBundle\Tests\Functional;
  */
 trait ReportDateTimeFilterExtension
 {
-    /**
-     * @throws \Exception
-     */
     public function dateTimeWithModify(
         string $modify = '+0 seconds',
         string $formattedTime = 'now',
@@ -29,9 +26,6 @@ trait ReportDateTimeFilterExtension
         return $modifiedDateTime;
     }
 
-    /**
-     * @throws \Exception
-     */
     public function dateTimeWithModifyAsString(
         string $modify = '+0 day',
         string $formattedTime = 'now', //'now' or 2021-12-12 12:12

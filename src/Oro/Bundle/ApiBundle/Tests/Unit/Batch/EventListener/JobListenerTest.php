@@ -33,8 +33,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->doctineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctineHelper
-            ->expects(self::any())
+        $this->doctineHelper->expects(self::any())
             ->method('getEntityManager')
             ->with(AsyncOperation::class)
             ->willReturn($this->em);

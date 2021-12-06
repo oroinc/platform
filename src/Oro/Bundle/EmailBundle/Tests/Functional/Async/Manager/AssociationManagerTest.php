@@ -23,17 +23,14 @@ class AssociationManagerTest extends WebTestCase
     use MessageQueueAssertTrait;
 
     /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
+    private $eventDispatcher;
 
     /** @var AssociationManager */
-    protected $manager;
+    private $manager;
 
     /** @var array */
-    protected $dispatched = [];
+    private $dispatched = [];
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -162,15 +159,15 @@ class AssociationManagerTest extends WebTestCase
         $this->assertMessagesEmpty(Topics::ADD_ASSOCIATION_TO_EMAILS);
     }
 
-    protected function assertDispatchedEvents(array $expected)
+    private function assertDispatchedEvents(array $expected)
     {
-        static::assertEqualsCanonicalizing($expected, $this->dispatched);
+        self::assertEqualsCanonicalizing($expected, $this->dispatched);
     }
 
     /**
-     * @return array|Email[]
+     * @return Email[]
      */
-    protected function getTestEmails()
+    private function getTestEmails(): array
     {
         $emails = [];
         for ($i = 1; $i <= 10; $i++) {
@@ -183,7 +180,7 @@ class AssociationManagerTest extends WebTestCase
     /**
      * @return ActivityManager
      */
-    protected function getActivityManager()
+    private function getActivityManager()
     {
         return $this->getContainer()->get('oro_activity.manager');
     }
@@ -192,7 +189,7 @@ class AssociationManagerTest extends WebTestCase
      * @param string $className
      * @return EntityManager
      */
-    protected function getManagerForClass($className)
+    private function getManagerForClass($className)
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass($className);
     }

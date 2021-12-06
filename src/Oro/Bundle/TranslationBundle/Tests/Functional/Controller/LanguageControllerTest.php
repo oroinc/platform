@@ -25,18 +25,18 @@ class LanguageControllerTest extends WebTestCase
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_language_index'));
 
-        static::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('oro-translation-language-grid', $crawler->html());
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertStringContainsString('oro-translation-language-grid', $crawler->html());
 
-        $languages = static::getContainer()->get('oro_translation.provider.language')
+        $languages = self::getContainer()->get('oro_translation.provider.language')
             ->getAvailableLanguagesByCurrentUser();
         $languagesCount = \count($languages);
 
-        $result = static::getJsonResponseContent($this->client->requestGrid('oro-translation-language-grid'), 200);
-        static::assertCount($languagesCount, $result['data']);
+        $result = self::getJsonResponseContent($this->client->requestGrid('oro-translation-language-grid'), 200);
+        self::assertCount($languagesCount, $result['data']);
 
         for ($i = 0; $i < $languagesCount; $i ++) {
-            static::assertEquals(Locales::getName($languages[$i]->getCode(), 'en'), $result['data'][$i]['language']);
+            self::assertEquals(Locales::getName($languages[$i]->getCode(), 'en'), $result['data'][$i]['language']);
         }
     }
 }

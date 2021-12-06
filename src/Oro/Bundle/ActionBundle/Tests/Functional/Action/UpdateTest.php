@@ -46,7 +46,7 @@ class UpdateTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 200);
 
-        $response = json_decode($result->getContent(), true);
+        $response = json_decode($result->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertEquals(
             [

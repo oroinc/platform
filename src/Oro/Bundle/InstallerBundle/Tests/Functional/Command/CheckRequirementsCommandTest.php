@@ -80,7 +80,7 @@ class CheckRequirementsCommandTest extends WebTestCase
         $this->assertContains('openssl_encrypt() should be available', $messages, $errorMessage);
     }
 
-    protected function executeCommand(array $args = []): string
+    private function executeCommand(array $args = []): string
     {
         $finder = new PhpExecutableFinder();
         $phpBinary = $finder->find();
@@ -92,7 +92,7 @@ class CheckRequirementsCommandTest extends WebTestCase
         return $process->getOutput()."\n".$process->getErrorOutput();
     }
 
-    protected function parseMessages(string $output, string $prefix): array
+    private function parseMessages(string $output, string $prefix): array
     {
         $regexp = '/' . $prefix . '\s+\|(.*?)\|(\n|\r\n)/s';
 

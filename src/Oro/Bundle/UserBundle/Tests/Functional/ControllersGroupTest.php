@@ -4,13 +4,12 @@ namespace Oro\Bundle\UserBundle\Tests\Functional;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\DomCrawler\Form;
 
 class ControllersGroupTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
     }
 
@@ -25,7 +24,6 @@ class ControllersGroupTest extends WebTestCase
     {
         /** @var Crawler $crawler */
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_group_create'));
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form['oro_user_group_form[name]'] = 'testGroup';
@@ -36,14 +34,14 @@ class ControllersGroupTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("Group saved", $crawler->html());
+        self::assertStringContainsString('Group saved', $crawler->html());
     }
 
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
             'groups-grid',
-            array('groups-grid[_filter][name][value]' => 'testGroup')
+            ['groups-grid[_filter][name][value]' => 'testGroup']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -52,9 +50,8 @@ class ControllersGroupTest extends WebTestCase
         /** @var Crawler $crawler */
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_user_group_update', array('id' => $result['id']))
+            $this->getUrl('oro_user_group_update', ['id' => $result['id']])
         );
-        /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 
         $form['oro_user_group_form[name]'] = 'testGroupUpdated';
@@ -65,14 +62,14 @@ class ControllersGroupTest extends WebTestCase
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString("Group saved", $crawler->html());
+        self::assertStringContainsString('Group saved', $crawler->html());
     }
 
     public function testGridData()
     {
         $response = $this->client->requestGrid(
             'groups-grid',
-            array('groups-grid[_filter][name][value]' => 'testGroupUpdated')
+            ['groups-grid[_filter][name][value]' => 'testGroupUpdated']
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -80,10 +77,10 @@ class ControllersGroupTest extends WebTestCase
 
         $response = $this->client->requestGrid(
             'group-users-grid',
-            array(
+            [
                 'group-users-grid[_filter][has_group][value]' => 1,
                 'group-users-grid[group_id]' => $result['id']
-            )
+            ]
         );
 
         $result = $this->getJsonResponseContent($response, 200);

@@ -44,8 +44,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     public function testContains(bool $isContains, bool $expected)
     {
         $localization = (new Localization())->setFormattingCode(self::LOCALE);
-        $this->localizationHelper
-            ->expects($this->any())
+        $this->localizationHelper->expects($this->any())
             ->method('getCurrentLocalization')
             ->willReturn($localization);
 
@@ -77,8 +76,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
     public function testFetch(bool $isContains, array $values)
     {
         $key = $this->getKey();
-        $this->localeSettings
-            ->expects($this->any())
+        $this->localeSettings->expects($this->any())
             ->method('getLocale')
             ->willReturn(self::LOCALE);
 
@@ -119,8 +117,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
             ['value' => 2]
         ];
 
-        $this->localeSettings
-            ->expects($this->any())
+        $this->localeSettings->expects($this->any())
             ->method('getLocale')
             ->willReturn(self::LOCALE);
 
@@ -136,8 +133,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $key = $this->getKey();
         $localization = new Localization();
         $localization->setFormattingCode(self::LOCALE);
-        $this->localizationHelper
-            ->expects($this->once())
+        $this->localizationHelper->expects($this->once())
             ->method('getLocalizations')
             ->willReturn([$localization]);
 

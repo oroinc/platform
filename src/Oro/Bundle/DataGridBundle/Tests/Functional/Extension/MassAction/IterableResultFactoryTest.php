@@ -25,12 +25,12 @@ class IterableResultFactoryTest extends WebTestCase
 {
     use RolePermissionExtension;
 
-    const GRID_NAME = 'test-entity-grid';
-    const GRID_ONLY_NAME = 'test-entity-name-grid';
+    private const GRID_NAME = 'test-entity-grid';
+    private const GRID_ONLY_NAME = 'test-entity-name-grid';
 
     protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, 'simple_password'));
+        $this->initClient([], self::generateBasicAuthHeader(LoadUserData::SIMPLE_USER, 'simple_password'));
         $this->loadFixtures([LoadTestEntitiesData::class]);
     }
 
@@ -213,7 +213,7 @@ class IterableResultFactoryTest extends WebTestCase
         ], $iterableResult);
     }
 
-    private function assertNames(array $expectedNames, IterableResultInterface $iterableResult)
+    private function assertNames(array $expectedNames, IterableResultInterface $iterableResult): void
     {
         $this->assertIterableResult($expectedNames, 'name', $iterableResult);
     }
@@ -228,10 +228,10 @@ class IterableResultFactoryTest extends WebTestCase
             iterator_to_array($iterableResult)
         );
 
-        static::assertEquals($expected, $values);
+        self::assertEquals($expected, $values);
     }
 
-    private function makeUserViewOnlyOwnEntities()
+    private function makeUserViewOnlyOwnEntities(): void
     {
         /** @var User $simpleUser */
         $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
@@ -240,18 +240,12 @@ class IterableResultFactoryTest extends WebTestCase
         $this->updateRolePermission('ROLE_USER', TestEntity::class, AccessLevel::BASIC_LEVEL);
     }
 
-    /**
-     * @return IterableResultFactory
-     */
-    private function getFactory()
+    private function getFactory(): IterableResultFactory
     {
         return $this->client->getContainer()->get('oro_datagrid.extension.mass_action.iterable_result_factory.alias');
     }
 
-    /**
-     * @return Manager
-     */
-    private function getDatagridManager()
+    private function getDatagridManager(): Manager
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

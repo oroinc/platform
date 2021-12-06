@@ -27,9 +27,9 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
 
         $result = $this->runCommand('oro:cron:definitions:load');
 
-        static::assertStringContainsString('Removing all previously loaded commands...', $result);
-        static::assertStringContainsString('Processing command ', $result);
-        static::assertStringContainsString(' setting up schedule..', $result);
+        self::assertStringContainsString('Removing all previously loaded commands...', $result);
+        self::assertStringContainsString('Processing command ', $result);
+        self::assertStringContainsString(' setting up schedule..', $result);
 
         $schedules = $this->getScheduleRepository()->findAll();
 
@@ -41,7 +41,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         $this->markTestIncomplete('Requires a proper test stub as it now excludes itself from the list');
         $result = $this->runCommand('oro:cron:definitions:load');
 
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'Processing command "oro:cron:definitions:load": '.
             'Skipping, the command does not implement CronCommandInterface',
             $result

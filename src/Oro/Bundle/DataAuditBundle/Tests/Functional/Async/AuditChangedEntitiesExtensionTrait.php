@@ -3,17 +3,17 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Message;
+use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait AuditChangedEntitiesExtensionTrait
 {
-    protected function createOwner(): TestAuditDataOwner
+    private function createOwner(): TestAuditDataOwner
     {
         $owner = new TestAuditDataOwner();
 
@@ -23,7 +23,7 @@ trait AuditChangedEntitiesExtensionTrait
         return $owner;
     }
 
-    protected function createChild(): TestAuditDataChild
+    private function createChild(): TestAuditDataChild
     {
         $child = new TestAuditDataChild();
 
@@ -44,8 +44,7 @@ trait AuditChangedEntitiesExtensionTrait
             ->select('log')
             ->from(Audit::class, 'log')
             ->orderBy('log.id', 'DESC')
-            ->setMaxResults(1)
-        ;
+            ->setMaxResults(1);
 
         return $qb->getQuery()->getSingleResult();
     }
@@ -53,13 +52,12 @@ trait AuditChangedEntitiesExtensionTrait
     /**
      * @return Audit[]
      */
-    private function findStoredAudits()
+    private function findStoredAudits(): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder()
             ->select('log')
             ->from(Audit::class, 'log')
-            ->orderBy('log.id', 'DESC')
-        ;
+            ->orderBy('log.id', 'DESC');
 
         return $qb->getQuery()->getResult();
     }
@@ -76,36 +74,22 @@ trait AuditChangedEntitiesExtensionTrait
         ], $body);
 
         $message = new Message();
-        $message->setBody(json_encode($body));
+        $message->setBody(JSON::encode($body));
         $message->setMessageId('some_message_id');
 
         return $message;
     }
 
-    /**
-     * @return User
-     */
-    private function findAdmin()
+    private function findAdmin(): User
     {
         return $this->getEntityManager()->getRepository(User::class)->findOneBy([
             'username' => 'admin'
         ]);
     }
 
-    /**
-     * @return EntityManagerInterface
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getClientInstance()->getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return AuditChangedEntitiesProcessor
-     */
-    protected function getAuditChangedEntitiesProcessor()
-    {
-        return $this->getClientInstance()->getContainer()->get('oro_dataaudit.async.audit_changed_entities');
     }
 
     /**

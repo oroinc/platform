@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsChunkProcessor;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsProcessor;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
@@ -70,8 +69,6 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         $batchSize = 2;
         /** @var TestAuditDataOwner $testAuditOwner */
         $testAuditOwner = $this->getReference('testAuditOwner');
-        /** @var ConnectionInterface $connection */
-        $connection = $this->getConnection();
         $expectedCount = ceil($testAuditOwner->getChildrenOneToMany()->count() / $batchSize);
         $message = $this->createMessage([
             'timestamp' => time(),
@@ -89,7 +86,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         ]);
 
         $this->processor->setBatchSize($batchSize);
-        $this->processor->process($message, $connection->createSession());
+        $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertMessagesCount(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS_CHUNK, $expectedCount);
         $this->assertMessagesCreatedAndEntityIdsIsSplitting($batchSize);
@@ -102,8 +99,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
 
     private function processedMessages(): void
     {
-        $connection = $this->getConnection();
-        $session = $connection->createSession();
+        $session = $this->getConnection()->createSession();
         foreach (self::getSentMessages() as $sentMessage) {
             /** @var ClientMessage $message */
             $message = $sentMessage['message'];
@@ -114,8 +110,8 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
     private function assertMessagesCreatedAndEntityIdsIsSplitting(int $batchSize): void
     {
         foreach (self::getSentMessages() as $sentMessage) {
-            /** @var ClientMessage $sentMessage */
             $topic = $sentMessage['topic'];
+            /** @var ClientMessage $message */
             $message = $sentMessage['message'];
             $body = $message->getBody();
             $countIds = count($body['entityData']['fields']['childrenOneToMany']['entity_ids']);
@@ -145,11 +141,6 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         }
     }
 
-    /**
-     * @param array $body
-     *
-     * @return Message
-     */
     private function createMessage(array $body): MessageInterface
     {
         $message = new Message();
@@ -159,19 +150,8 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         return $message;
     }
 
-    /**
-     * @return object|EntityManagerInterface
-     */
-    protected function getEntityManager(): EntityManagerInterface
-    {
-        return $this->getContainer()->get('doctrine.orm.entity_manager');
-    }
-
-    /**
-     * @return ConnectionInterface|object
-     */
     private function getConnection(): ConnectionInterface
     {
-        return $this->getContainer()->get('oro_message_queue.transport.connection');
+        return self::getContainer()->get('oro_message_queue.transport.connection');
     }
 }

@@ -64,7 +64,7 @@ class GridViewRepositoryTest extends AbstractDataGridRepositoryTest
     /**
      * {@inheritdoc}
      */
-    protected function getUsername()
+    protected function getUsername(): string
     {
         return LoadAdminUserData::DEFAULT_ADMIN_USERNAME;
     }

@@ -150,6 +150,6 @@ class EmailActivityEntityControllerTest extends WebTestCase
         // Check that user has activity list target(email) on view page
         $this->client->jsonRequest('GET', $this->getUrl('oro_user_view', ['id' => $user->getId()]));
         $content = $this->client->getResponse()->getContent();
-        static::assertStringContainsString($email['subject'], $content);
+        self::assertStringContainsString($email['subject'], $content);
     }
 }

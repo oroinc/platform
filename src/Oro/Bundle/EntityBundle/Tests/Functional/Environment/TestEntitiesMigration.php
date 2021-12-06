@@ -23,7 +23,7 @@ class TestEntitiesMigration implements Migration
     /**
      * Create oro_test_decimal_entity table
      */
-    protected function createTestDecimalEntityTable(Schema $schema)
+    private function createTestDecimalEntityTable(Schema $schema): void
     {
         $table = $schema->createTable('oro_test_decimal_entity');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);

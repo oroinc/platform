@@ -141,8 +141,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);
         $session = $this->createMock(SessionInterface::class);
-        $session
-            ->expects(self::any())
+        $session->expects(self::any())
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
         $request->setSession($session);

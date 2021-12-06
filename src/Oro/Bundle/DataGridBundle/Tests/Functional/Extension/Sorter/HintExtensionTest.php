@@ -10,18 +10,18 @@ class HintExtensionTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([]);
     }
 
     public function testHintDisableOrderByModificationNullsIsAppliedByDefault()
     {
         /** @var Manager $dataGridManager */
-        $dataGridManager = static::getContainer()->get('oro_datagrid.datagrid.manager');
+        $dataGridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
 
         $dataGrid = $dataGridManager->getDatagrid('items-grid');
 
-        static::assertArrayHasKey(
+        self::assertArrayHasKey(
             PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
             array_flip($dataGrid->getConfig()->getOrmQuery()->getHints())
         );
@@ -30,11 +30,11 @@ class HintExtensionTest extends WebTestCase
     public function testHintDisableOrderByModificationNullsIsRemovedByGridConfiguration()
     {
         /** @var Manager $dataGridManager */
-        $dataGridManager = static::getContainer()->get('oro_datagrid.datagrid.manager');
+        $dataGridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
 
         $dataGrid = $dataGridManager->getDatagrid('items-values-grid');
 
-        static::assertArrayNotHasKey(
+        self::assertArrayNotHasKey(
             PostgreSqlOrderByNullsOutputResultModifier::HINT_DISABLE_ORDER_BY_MODIFICATION_NULLS,
             array_flip($dataGrid->getConfig()->getOrmQuery()->getHints())
         );

@@ -7,29 +7,20 @@ use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * This trait add support of loading YAML test cases in dataproviders
+ * This trait adds a support of loading YAML test cases in data providers.
  */
 trait LoadTestCaseDataTrait
 {
-    /**
-     * @param string $path
-     * @param string $fileNamePattern
-     * @return array
-     */
-    protected function getTestCaseData($path, $fileNamePattern = '*.yml')
+    private function getTestCaseData(string $path, string $fileNamePattern = '*.yml'): array
     {
         $finder = new Finder();
-
-        $finder
-            ->files()
-            ->in($path)
-            ->name($fileNamePattern);
+        $finder->files()->in($path)->name($fileNamePattern);
 
         $cases = [];
 
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
-            yield $file->getRelativePathname() => Yaml::parse($file->getContents());
+            $cases[$file->getRelativePathname()] = Yaml::parse($file->getContents());
         }
 
         return $cases;

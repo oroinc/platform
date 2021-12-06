@@ -29,7 +29,7 @@ class DictionaryControllerAclTest extends WebTestCase
             $this->getUrl('oro_dictionary_search', ['dictionary' => str_replace('\\', '_', Tag::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(5, $responseData['results']);
         self::assertEquals('admin_tag', $responseData['results'][0]['text']);
@@ -57,7 +57,7 @@ class DictionaryControllerAclTest extends WebTestCase
             $this->getUrl('oro_dictionary_search', ['dictionary' => str_replace('\\', '_', Tag::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(3, $responseData['results']);
         self::assertEquals('admin_tag', $responseData['results'][0]['text']);
@@ -83,7 +83,7 @@ class DictionaryControllerAclTest extends WebTestCase
             $this->getUrl('oro_dictionary_search', ['dictionary' => str_replace('\\', '_', Tag::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(2, $responseData['results']);
         self::assertEquals('admin_tag', $responseData['results'][0]['text']);
@@ -108,7 +108,7 @@ class DictionaryControllerAclTest extends WebTestCase
             $this->getUrl('oro_dictionary_search', ['dictionary' => str_replace('\\', '_', Tag::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(1, $responseData['results']);
         self::assertEquals('admin_tag', $responseData['results'][0]['text']);
@@ -132,7 +132,7 @@ class DictionaryControllerAclTest extends WebTestCase
             $this->getUrl('oro_dictionary_search', ['dictionary' => str_replace('\\', '_', Tag::class)])
         );
         $response = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $responseData = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
 
         self::assertCount(0, $responseData['results']);
     }

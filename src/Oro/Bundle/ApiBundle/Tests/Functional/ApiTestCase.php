@@ -416,7 +416,7 @@ abstract class ApiTestCase extends WebTestCase
                     $requestType,
                     $entityName,
                     $e->getMessage(),
-                    is_array($content) ? json_encode($content) : (string)$content
+                    is_array($content) ? json_encode($content, JSON_THROW_ON_ERROR) : (string)$content
                 ),
                 $e->getComparisonFailure()
             );

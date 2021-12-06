@@ -158,8 +158,7 @@ class GridViewsLoadListenerTest extends \PHPUnit\Framework\TestCase
         $originalView = new View('view');
         $event = new GridViewsLoadEvent('grid', $this->createMock(DatagridConfiguration::class), [$originalView]);
 
-        $this->gridViewRepository
-            ->expects($this->never())
+        $this->gridViewRepository->expects($this->never())
             ->method('findGridViews');
 
         $this->gridViewsLoadListener->onViewsLoad($event);

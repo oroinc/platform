@@ -18,6 +18,6 @@ class ScheduleControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('oro-cron-schedules-grid', $crawler->html());
+        self::assertStringContainsString('oro-cron-schedules-grid', $crawler->html());
     }
 }

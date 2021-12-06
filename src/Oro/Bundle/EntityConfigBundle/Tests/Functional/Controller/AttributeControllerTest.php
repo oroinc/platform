@@ -101,7 +101,7 @@ class AttributeControllerTest extends AbstractConfigControllerTest
     {
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('Attribute was successfully saved', $result->getContent());
+        self::assertStringContainsString('Attribute was successfully saved', $result->getContent());
     }
 
     public function testCreateFile()
@@ -243,7 +243,7 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('Attribute was successfully saved', $result->getContent());
+        self::assertStringContainsString('Attribute was successfully saved', $result->getContent());
 
         $fieldConfig = $this->getFieldConfigByName('file', 'entity');
 

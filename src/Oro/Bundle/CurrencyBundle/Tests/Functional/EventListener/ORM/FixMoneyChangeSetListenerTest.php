@@ -9,7 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolationPerTest
- * @SuppressWarnings(PHPMD)
  */
 class FixMoneyChangeSetListenerTest extends WebTestCase
 {
@@ -82,12 +81,12 @@ class FixMoneyChangeSetListenerTest extends WebTestCase
         return $em->find(TestMoneyEntity::class, $entity->getId());
     }
 
-    protected function getEntityManager(): EntityManagerInterface
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(TestMoneyEntity::class);
     }
 
-    private static function assertUpdateQueriesCount(int $expectedCount, array $queries, string $message = '')
+    private static function assertUpdateQueriesCount(int $expectedCount, array $queries, string $message = ''): void
     {
         self::assertCount(
             $expectedCount,

@@ -275,7 +275,7 @@ class ImportExportControllerTest extends WebTestCase
             $this->getUrl('oro_importexport_import_validate_export_template_form')
         );
 
-        static::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
+        self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
     }
 
     public function testImportValidateExportTemplateFormGetRequest()
@@ -291,10 +291,10 @@ class ImportExportControllerTest extends WebTestCase
 
         $response = $this->client->getResponse();
 
-        static::assertResponseStatusCodeEquals($response, 200);
-        static::assertStringContainsString('Cancel', $response->getContent());
-        static::assertStringContainsString('Validate', $response->getContent());
-        static::assertStringContainsString('Import file', $response->getContent());
+        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertStringContainsString('Cancel', $response->getContent());
+        self::assertStringContainsString('Validate', $response->getContent());
+        self::assertStringContainsString('Import file', $response->getContent());
     }
 
     public function testImportValidateExportTemplateFormAction(): void
@@ -432,9 +432,9 @@ class ImportExportControllerTest extends WebTestCase
     {
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertNotEmpty($result);
-        $this->assertCount(2, $result);
-        $this->assertTrue($result['success']);
-        static::assertContainsEquals('message', $result);
+        self::assertNotEmpty($result);
+        self::assertCount(2, $result);
+        self::assertTrue($result['success']);
+        self::assertContainsEquals('message', $result);
     }
 }

@@ -264,7 +264,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 sprintf(
                     "%s\nResponse:\n%s",
                     $e->getMessage(),
-                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                    json_encode($content, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR)
                 ),
                 $e->getComparisonFailure()
             );

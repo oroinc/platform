@@ -18,7 +18,7 @@ trait SearchExtensionTrait
      */
     protected static function getSearchIndexer()
     {
-        return static::getContainer()->get('oro_search.search.engine.indexer');
+        return self::getContainer()->get('oro_search.search.engine.indexer');
     }
 
     /**
@@ -26,7 +26,7 @@ trait SearchExtensionTrait
      */
     protected static function getSearchObjectMapper()
     {
-        return static::getContainer()->get('oro_search.mapper');
+        return self::getContainer()->get('oro_search.mapper');
     }
 
     /**
@@ -45,7 +45,7 @@ trait SearchExtensionTrait
         $requestCounts = 30;
         do {
             /** @var Result $result */
-            $result = static::getContainer()->get($searchService)->search($query);
+            $result = self::getContainer()->get($searchService)->search($query);
             $actualLoaded = $result->getRecordsCount();
             $isLoaded = $actualLoaded === $itemsCount;
             if (!$isLoaded) {
@@ -70,7 +70,7 @@ trait SearchExtensionTrait
      */
     protected static function clearTestData(string $entity = Item::class)
     {
-        $manager = static::getContainer()->get('doctrine')->getManager();
+        $manager = self::getContainer()->get('doctrine')->getManager();
         $repository = $manager->getRepository($entity);
         $repository->createQueryBuilder('qb')
             ->delete()

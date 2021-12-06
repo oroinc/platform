@@ -82,7 +82,7 @@ class RendererTest extends LayoutTestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    protected function getCoreBlocksTestLayout(ContextInterface $context)
+    private function getCoreBlocksTestLayout(ContextInterface $context)
     {
         /** @var LayoutManager $layoutManager */
         $layoutManager = $this->getContainer()->get('oro_layout.layout_manager');
@@ -262,7 +262,7 @@ class RendererTest extends LayoutTestCase
      *
      * @return FormInterface
      */
-    protected function getTestForm($action = null, $method = null)
+    private function getTestForm($action = null, $method = null)
     {
         $options = ['csrf_protection' => false];
         if ($action) {
@@ -302,7 +302,7 @@ class RendererTest extends LayoutTestCase
      *
      * @return string
      */
-    protected function getCoreBlocksTestLayoutResult($formLayout)
+    private function getCoreBlocksTestLayoutResult($formLayout)
     {
         $expected = <<<HTML
 <!DOCTYPE html>
@@ -342,7 +342,7 @@ HTML;
     /**
      * @return string
      */
-    protected function getTwigFormLayoutResult()
+    private function getTwigFormLayoutResult()
     {
         // @codingStandardsIgnoreStart
         $expected = <<<HTML
@@ -408,7 +408,7 @@ HTML;
     /**
      * @return string
      */
-    protected function getFormStartTestLayoutResult()
+    private function getFormStartTestLayoutResult()
     {
         // @codingStandardsIgnoreStart
         $expected = <<<HTML

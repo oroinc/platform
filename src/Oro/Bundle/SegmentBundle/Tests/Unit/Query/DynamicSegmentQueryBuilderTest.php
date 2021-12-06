@@ -3,9 +3,11 @@
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\Configuration\EntityConfigurationProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -73,10 +75,16 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $builder = $this->getQueryBuilder($doctrine);
-        /** @var \PHPUnit\Framework\MockObject\MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
-        $this->mockConnection($em);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(null);
+        $em->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($connection);
         $em->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
@@ -165,10 +173,16 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             [self::TEST_ENTITY => [self::TEST_IDENTIFIER_NAME]]
         );
         $builder = $this->getQueryBuilder($doctrine);
-        /** @var \PHPUnit\Framework\MockObject\MockObject $em */
+        /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em */
         $em = $doctrine->getManagerForClass(self::TEST_ENTITY);
         $qb = new QueryBuilder($em);
-        $this->mockConnection($em);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->any())
+            ->method('getDatabasePlatform')
+            ->willReturn(null);
+        $em->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($connection);
         $em->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($qb);
@@ -186,12 +200,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $this->assertNotEmpty($qb->getDQLPart('join'));
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $doctrine
-     *
-     * @return DynamicSegmentQueryBuilder
-     */
-    private function getQueryBuilder($doctrine = null)
+    private function getQueryBuilder(ManagerRegistry $doctrine = null): DynamicSegmentQueryBuilder
     {
         $manager = $this->createMock(Manager::class);
         $manager->expects($this->any())
@@ -201,8 +210,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
             });
 
         $entityHierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);
-        $entityHierarchyProvider
-            ->expects($this->any())
+        $entityHierarchyProvider->expects($this->any())
             ->method('getHierarchy')
             ->willReturn([]);
 
@@ -239,45 +247,23 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
     /**
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
-     *
-     * @param string $name   A filter name
-     * @param array  $params An additional parameters of a new filter
-     *
-     * @return FilterInterface
-     * @throws \Exception
      */
-    public function createFilter($name, array $params = null)
+    public function createFilter(string $name, array $params = null): FilterInterface
     {
         $defaultParams = [
             'type' => $name
         ];
-        if ($params !== null && !empty($params)) {
+        if (!empty($params)) {
             $params = array_merge($defaultParams, $params);
         }
 
-        switch ($name) {
-            case 'string':
-                $filter = new StringFilter($this->formFactory, new FilterUtility());
-                break;
-            default:
-                throw new \Exception(sprintf('Not implemented in this test filter: "%s" . ', $name));
+        if ('string' !== $name) {
+            throw new \Exception(sprintf('Not implemented in this test filter: "%s" . ', $name));
         }
+
+        $filter = new StringFilter($this->formFactory, new FilterUtility());
         $filter->init($name, $params);
 
         return $filter;
-    }
-
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $em
-     */
-    private function mockConnection($em)
-    {
-        $connection = $this->createMock(Connection::class);
-        $connection->expects($this->any())
-            ->method('getDatabasePlatform')
-            ->willReturn(null);
-        $em->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($connection);
     }
 }

@@ -21,8 +21,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
         $consumer = $this->createMessageConsumerMock();
         $consumer
             ->expects($this->never())
-            ->method('reject')
-        ;
+            ->method('reject');
 
         $context = new Context($this->createSessionMock());
         $context->setMessageConsumer($consumer);
@@ -36,8 +35,7 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
         $consumer = $this->createMessageConsumerMock();
         $consumer
             ->expects($this->never())
-            ->method('reject')
-        ;
+            ->method('reject');
 
         $context = new Context($this->createSessionMock());
         $context->setException(new \Exception());
@@ -59,15 +57,13 @@ class RejectMessageOnExceptionDbalExtensionTest extends \PHPUnit\Framework\TestC
             ->with(
                 'Execution was interrupted and message was rejected. {id}',
                 ['id' => '123']
-            )
-        ;
+            );
 
         $consumer = $this->createMessageConsumerMock();
         $consumer
             ->expects($this->once())
             ->method('reject')
-            ->with($this->identicalTo($message), $this->isTrue())
-        ;
+            ->with($this->identicalTo($message), $this->isTrue());
 
         $context = new Context($this->createSessionMock());
         $context->setLogger($logger);

@@ -30,9 +30,6 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractIndexer|\PHPUnit\Framework\MockObject\MockObject */
     private $indexer;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -57,8 +54,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldRejectMessageIfIsNotArray()
     {
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('error')
             ->with('Expected array but got: "NULL"');
 
@@ -76,8 +72,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->setBody(JSON::encode(['class' => 'class-name']));
 
-        $this->logger
-            ->expects($this->once())
+        $this->logger->expects($this->once())
             ->method('error')
             ->with('Expected array with keys "class" and "context" but given: "class"');
 
@@ -88,12 +83,10 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildJobNameForMessage()
     {
-        $this->logger
-            ->expects($this->never())
+        $this->logger->expects($this->never())
             ->method('error');
 
-        $this->jobRunner
-            ->expects($this->once())
+        $this->jobRunner->expects($this->once())
             ->method('runUnique')
             ->willReturn(true)
             ->with('message id', 'search_reindex|d0d06767b38da968e7118c69f821bc1e');

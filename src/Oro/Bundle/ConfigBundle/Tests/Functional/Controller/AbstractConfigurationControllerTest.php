@@ -28,13 +28,13 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getRequestUrl($parameters));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringNotContainsString(
+        self::assertStringNotContainsString(
             'System configuration is not available in mobile version. Please open the page on the desktop.',
             $crawler->html()
         );
 
         foreach ($expected as $value) {
-            static::assertStringContainsString($value, $crawler->html());
+            self::assertStringContainsString($value, $crawler->html());
         }
     }
 
@@ -57,7 +57,7 @@ abstract class AbstractConfigurationControllerTest extends WebTestCase
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString(
+        self::assertStringContainsString(
             'System configuration is not available in mobile version. Please open the page on the desktop.',
             $crawler->html()
         );

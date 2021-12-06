@@ -21,8 +21,8 @@ class ConfigurationTest extends RestPlainApiTestCase
         // check that each returned section is accessible
         $content = self::jsonToArray($response->getContent());
         foreach ($content as $key => $sectionId) {
-            self::assertTrue(
-                is_string($sectionId),
+            self::assertIsString(
+                $sectionId,
                 sprintf(
                     '%s. expected a string, got "%s". item index: %s',
                     $requestInfo,
@@ -34,10 +34,7 @@ class ConfigurationTest extends RestPlainApiTestCase
         }
     }
 
-    /**
-     * @param string $sectionId
-     */
-    protected function checkGetConfigurationSection($sectionId)
+    private function checkGetConfigurationSection(string $sectionId)
     {
         $entityType = 'configuration';
 

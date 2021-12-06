@@ -16,9 +16,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailTemplateRepositoryTest extends WebTestCase
 {
-    const SYSTEM_TEMPLATE_EMAIL_WITHOUT_ENTITY = 'import_result';
-    const SYSTEM_TEMPLATE_EMAIL_WITH_ENTITY = 'user_reset_password';
-    const USER_ENTITY_TEMPLATE_NAME = 'user_reset_password';
+    private const SYSTEM_TEMPLATE_EMAIL_WITHOUT_ENTITY = 'import_result';
+    private const SYSTEM_TEMPLATE_EMAIL_WITH_ENTITY = 'user_reset_password';
+    private const USER_ENTITY_TEMPLATE_NAME = 'user_reset_password';
 
     protected function setUp(): void
     {
@@ -401,8 +401,6 @@ class EmailTemplateRepositoryTest extends WebTestCase
 
     private function getRepository(): EmailTemplateRepository
     {
-        return self::getContainer()->get('doctrine')
-            ->getManagerForClass(EmailTemplate::class)
-            ->getRepository(EmailTemplate::class);
+        return self::getContainer()->get('doctrine')->getRepository(EmailTemplate::class);
     }
 }

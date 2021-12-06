@@ -16,7 +16,7 @@ trait ApiFeatureTrait
      */
     protected function enableApiFeature(string $featureName = 'oro_api.web_api'): void
     {
-        $configManager = self::getConfigManager('global');
+        $configManager = self::getConfigManager();
         $configManager->set($featureName, true);
         $configManager->flush();
     }
@@ -26,7 +26,7 @@ trait ApiFeatureTrait
      */
     protected function disableApiFeature(string $featureName = 'oro_api.web_api'): void
     {
-        $configManager = self::getConfigManager('global');
+        $configManager = self::getConfigManager();
         $configManager->set($featureName, false);
         $configManager->flush();
     }

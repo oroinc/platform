@@ -63,7 +63,7 @@ class SegmentControllerTest extends WebTestCase
         $crawler = $this->client->request($form->getMethod(), $form->getUri(), $formValues);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('Segment saved', $crawler->html());
+        self::assertStringContainsString('Segment saved', $crawler->html());
     }
 
     /**
@@ -75,8 +75,8 @@ class SegmentControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('oro_segments-grid', $crawler->html());
-        static::assertStringContainsString(self::TEST_SEGMENT, $result->getContent());
+        self::assertStringContainsString('oro_segments-grid', $crawler->html());
+        self::assertStringContainsString(self::TEST_SEGMENT, $result->getContent());
     }
 
     /**
@@ -101,7 +101,7 @@ class SegmentControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('Segment saved', $crawler->html());
+        self::assertStringContainsString('Segment saved', $crawler->html());
 
         $em->clear();
 
@@ -128,7 +128,7 @@ class SegmentControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        static::assertStringContainsString('Segment saved', $crawler->html());
+        self::assertStringContainsString('Segment saved', $crawler->html());
 
         $repository = $this->getContainer()
             ->get('doctrine')
@@ -165,7 +165,7 @@ class SegmentControllerTest extends WebTestCase
         $result = $this->client->getResponse();
 
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        static::assertStringContainsString('oro_segments-grid', $crawler->html());
-        static::assertStringContainsString($name, $result->getContent());
+        self::assertStringContainsString('oro_segments-grid', $crawler->html());
+        self::assertStringContainsString($name, $result->getContent());
     }
 }

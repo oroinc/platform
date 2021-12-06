@@ -8,15 +8,11 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTestActivitiesForScopes;
-use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProvider;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\WorkflowTestCase;
 
 class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
 {
     private const WITH_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopes';
-
-    /** @var TestActivityScopeProvider */
-    private $activityScopeProvider;
 
     protected function setUp(): void
     {
@@ -24,10 +20,7 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
         $this->loadFixtures([LoadTestActivitiesForScopes::class]);
     }
 
-    /**
-     * @return TestActivity
-     */
-    public function testScopesCreated()
+    public function testScopesCreated(): TestActivity
     {
         /** @var TestActivity $activity */
         $activity = $this->getReference('test_activity_1');
@@ -50,7 +43,7 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
                 }
             );
 
-        self::loadWorkflowFrom(self::WITH_SCOPES_CONFIG_DIR);
+        $this->loadWorkflowFrom(self::WITH_SCOPES_CONFIG_DIR);
 
         $registry = self::getContainer()->get('oro_workflow.registry');
         $workflow = $registry->getWorkflow('test_flow_with_scopes');
@@ -90,7 +83,7 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
             }
         );
 
-        self::loadWorkflowFrom(self::WITH_SCOPES_CONFIG_DIR);
+        $this->loadWorkflowFrom(self::WITH_SCOPES_CONFIG_DIR);
 
         $registry = self::getContainer()->get('oro_workflow.registry');
         $workflow = $registry->getWorkflow('test_flow_with_scopes');
@@ -108,7 +101,7 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
         );
     }
 
-    protected function assertActivityExists(Collection $scopes, TestActivity $activity)
+    private function assertActivityExists(Collection $scopes, TestActivity $activity): void
     {
         $this->assertTrue(
             $scopes->exists(

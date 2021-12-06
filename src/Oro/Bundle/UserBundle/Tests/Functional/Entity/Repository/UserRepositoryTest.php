@@ -15,16 +15,14 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithSameEmailIn
  */
 class UserRepositoryTest extends WebTestCase
 {
-    /** @var UserRepository */
-    private $repository;
-
     protected function setUp(): void
     {
         $this->initClient();
+    }
 
-        $this->repository = self::getContainer()->get('doctrine')
-            ->getManagerForClass(User::class)
-            ->getRepository(User::class);
+    private function getRepository(): UserRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(User::class);
     }
 
     public function testFindUserByEmailSensitive(): void
@@ -34,9 +32,9 @@ class UserRepositoryTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference(LoadUserData::SIMPLE_USER);
 
-        $this->assertEquals($user, $this->repository->findUserByEmail(strtoupper($user->getEmail()), true));
-        $this->assertEquals($user, $this->repository->findUserByEmail(ucfirst($user->getEmail()), true));
-        $this->assertEquals($user, $this->repository->findUserByEmail($user->getEmail(), true));
+        $this->assertEquals($user, $this->getRepository()->findUserByEmail(strtoupper($user->getEmail()), true));
+        $this->assertEquals($user, $this->getRepository()->findUserByEmail(ucfirst($user->getEmail()), true));
+        $this->assertEquals($user, $this->getRepository()->findUserByEmail($user->getEmail(), true));
     }
 
     public function testFindUserByEmailInsensitive(): void
@@ -46,9 +44,9 @@ class UserRepositoryTest extends WebTestCase
         /** @var User $user */
         $user = $this->getReference(LoadUserData::SIMPLE_USER);
 
-        $this->assertTrue(null === $this->repository->findUserByEmail(strtoupper($user->getEmail()), false));
-        $this->assertTrue(null === $this->repository->findUserByEmail(ucfirst($user->getEmail()), false));
-        $this->assertEquals($user, $this->repository->findUserByEmail($user->getEmail(), false));
+        $this->assertTrue(null === $this->getRepository()->findUserByEmail(strtoupper($user->getEmail()), false));
+        $this->assertTrue(null === $this->getRepository()->findUserByEmail(ucfirst($user->getEmail()), false));
+        $this->assertEquals($user, $this->getRepository()->findUserByEmail($user->getEmail(), false));
     }
 
     public function testFindLowercaseDuplicatedEmails(): void
@@ -57,7 +55,7 @@ class UserRepositoryTest extends WebTestCase
 
         $this->assertEquals(
             [LoadUsersWithSameEmailInLowercase::EMAIL],
-            $this->repository->findLowercaseDuplicatedEmails(10)
+            $this->getRepository()->findLowercaseDuplicatedEmails(10)
         );
     }
 
@@ -65,7 +63,7 @@ class UserRepositoryTest extends WebTestCase
     {
         $this->loadFixtures([LoadUserData::class]);
 
-        $result = $this->repository->findEnabledUserEmails();
+        $result = $this->getRepository()->findEnabledUserEmails();
         self::assertCount(4, $result);
 
         /**
@@ -74,7 +72,7 @@ class UserRepositoryTest extends WebTestCase
          * @var User $simpleUser2
          * @var User $userWithConfirmationToken
          */
-        $adminUser = $this->repository->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
+        $adminUser = $this->getRepository()->findOneBy(['email' => LoadAdminUserData::DEFAULT_ADMIN_EMAIL]);
         $simpleUser = $this->getReference(LoadUserData::SIMPLE_USER);
         $simpleUser2 = $this->getReference(LoadUserData::SIMPLE_USER_2);
         $userWithConfirmationToken = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);
@@ -97,7 +95,7 @@ class UserRepositoryTest extends WebTestCase
 
         $this->assertFalse(null === $organization);
 
-        $user1 = $this->repository->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
+        $user1 = $this->getRepository()->findOneBy(['username' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME]);
         $user2 = $this->getReference(LoadUserData::SIMPLE_USER);
         $user3 = $this->getReference(LoadUserData::SIMPLE_USER_2);
         $user4 = $this->getReference(LoadUserData::USER_WITH_CONFIRMATION_TOKEN);
@@ -105,7 +103,7 @@ class UserRepositoryTest extends WebTestCase
         $expected = [$user1->getId(), $user2->getId(), $user3->getId(), $user4->getId()];
         sort($expected);
 
-        $actual = $this->repository->findIdsByOrganizations([$organization]);
+        $actual = $this->getRepository()->findIdsByOrganizations([$organization]);
         sort($actual);
 
         $this->assertEquals($expected, $actual);

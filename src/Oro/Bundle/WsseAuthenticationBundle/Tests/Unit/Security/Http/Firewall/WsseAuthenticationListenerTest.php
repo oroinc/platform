@@ -41,8 +41,7 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->responseEvent = $this->createMock(RequestEvent::class);
         $this->request = Request::create('/sample/uri');
-        $this->responseEvent
-            ->expects(self::once())
+        $this->responseEvent->expects(self::once())
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -65,8 +64,7 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
      */
     public function testHandleWhenNoHeader(array $header): void
     {
-        $this->tokenStorage
-            ->expects(self::never())
+        $this->tokenStorage->expects(self::never())
             ->method('setToken');
 
         $this->request->headers->add($header);
@@ -86,14 +84,12 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->mockWsseTokenFactory();
 
-        $this->authenticationManager
-            ->expects(self::once())
+        $this->authenticationManager->expects(self::once())
             ->method('authenticate')
             ->with($token)
             ->willReturn($tokenMock2 = $this->createMock(WsseToken::class));
 
-        $this->tokenStorage
-            ->expects(self::once())
+        $this->tokenStorage->expects(self::once())
             ->method('setToken')
             ->with($tokenMock2);
 
@@ -108,8 +104,7 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
         $token->setAttribute('nonce', self::NONCE);
         $token->setAttribute('created', self::CREATED);
 
-        $this->wsseTokenFactory
-            ->expects(self::once())
+        $this->wsseTokenFactory->expects(self::once())
             ->method('create')
             ->with(self::USERNAME, self::PASSWORD, self::PROVIDER_KEY)
             ->willReturn($token);
@@ -121,14 +116,12 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->mockWsseTokenFactory();
 
-        $this->authenticationManager
-            ->expects(self::once())
+        $this->authenticationManager->expects(self::once())
             ->method('authenticate')
             ->with($token)
             ->willReturn($response = new Response());
 
-        $this->responseEvent
-            ->expects(self::once())
+        $this->responseEvent->expects(self::once())
             ->method('setResponse')
             ->with($response);
 
@@ -141,20 +134,17 @@ class WsseAuthenticationListenerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->mockWsseTokenFactory();
 
-        $this->authenticationManager
-            ->expects(self::once())
+        $this->authenticationManager->expects(self::once())
             ->method('authenticate')
             ->with($token)
             ->willThrowException($exception = new AuthenticationException($msg = 'sample exception'));
 
-        $this->authenticationEntryPoint
-            ->expects(self::once())
+        $this->authenticationEntryPoint->expects(self::once())
             ->method('start')
             ->with($this->request, $exception)
             ->willReturn($response = new Response($msg));
 
-        $this->responseEvent
-            ->expects(self::once())
+        $this->responseEvent->expects(self::once())
             ->method('setResponse')
             ->with($response);
 

@@ -120,7 +120,7 @@ class QueryCalculatorTest extends WebTestCase
         $jobManager->saveJob($child);
     }
 
-    protected function getJobReference(string $name): ?Job
+    private function getJobReference(string $name): ?Job
     {
         return $this->getContainer()
             ->get('oro_entity.doctrine_helper')

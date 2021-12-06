@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Oro\Component\MessageQueue\Util\JSON;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 {
@@ -34,17 +37,17 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $this->createEmailAttachmentWithContent('aaa');
 
         $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertEquals(3, count($allAttachments));
+        $this->assertCount(3, $allAttachments);
 
         $message = new Message();
-        $message->setBody(json_encode(['size' => null, 'all' => true]));
+        $message->setBody(JSON::encode(['size' => null, 'all' => true]));
         $message->setMessageId('SomeId');
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments');
 
-        $result = $processor->process($message, $this->createSessionMock());
+        $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(PurgeEmailAttachmentsMessageProcessor::ACK, $result);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
         $this->assertMessageSent(
             Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS,
             [
@@ -59,11 +62,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         );
     }
 
-    /**
-     * @param string $content
-     * @return EmailAttachment
-     */
-    private function createEmailAttachmentWithContent($content)
+    private function createEmailAttachmentWithContent(string $content): EmailAttachment
     {
         $attachmentContent = new EmailAttachmentContent();
         $attachmentContent->setContent($content);
@@ -80,19 +79,8 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         return $attachment;
     }
 
-    /**
-     * @return \Doctrine\ORM\EntityManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(EmailAttachment::class);
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|SessionInterface
-     */
-    private function createSessionMock()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 }

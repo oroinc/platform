@@ -36,19 +36,24 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
         $idReader = $this->createMock(IdReader::class);
-        $idReader
-            ->expects(self::any())
+        $idReader->expects(self::any())
             ->method('isSingleId')
             ->willReturn(true);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $entityManager = $this->createMock(ObjectManager::class);
-        $entityManager->expects(self::once())->method('getRepository')->willReturn($repository);
-        $entityManager->expects(self::once())->method('getClassMetadata')->willReturn($classMetadata);
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
         $optionResolver = new OptionsResolver();
         $this->extension->configureOptions($optionResolver);
@@ -68,19 +73,24 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $classMetadata = new ClassMetadata(self::CLASS_NAME);
         $idReader = $this->createMock(IdReader::class);
-        $idReader
-            ->expects(self::any())
+        $idReader->expects(self::any())
             ->method('isSingleId')
             ->willReturn(true);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects(self::once())->method('createQueryBuilder')->willReturn($queryBuilder);
+        $repository->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($queryBuilder);
 
         $entityManager = $this->createMock(ObjectManager::class);
-        $entityManager->expects(self::once())->method('getRepository')->willReturn($repository);
-        $entityManager->expects(self::once())->method('getClassMetadata')->willReturn($classMetadata);
+        $entityManager->expects(self::once())
+            ->method('getRepository')
+            ->willReturn($repository);
+        $entityManager->expects(self::once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
 
         $optionResolver = new OptionsResolver();
         $this->extension->configureOptions($optionResolver);

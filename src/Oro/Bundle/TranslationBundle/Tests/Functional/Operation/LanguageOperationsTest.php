@@ -16,7 +16,7 @@ class LanguageOperationsTest extends ActionTestCase
 {
     protected function setUp(): void
     {
-        $this->initClient([], static::generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->loadFixtures([LoadLanguages::class,]);
         $this->client->disableReboot();
     }
@@ -26,10 +26,10 @@ class LanguageOperationsTest extends ActionTestCase
         /** @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
 
-        static::assertFalse($language->isEnabled());
+        self::assertFalse($language->isEnabled());
         $this->assertExecuteOperation('oro_translation_language_enable', $language->getId(), Language::class);
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
-        static::assertTrue($language->isEnabled());
+        self::assertTrue($language->isEnabled());
     }
 
     public function testDisableLanguage(): void
@@ -38,10 +38,10 @@ class LanguageOperationsTest extends ActionTestCase
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
         $language->setEnabled(true);
 
-        static::assertTrue($language->isEnabled());
+        self::assertTrue($language->isEnabled());
         $this->assertExecuteOperation('oro_translation_language_disable', $language->getId(), Language::class);
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
-        static::assertFalse($language->isEnabled());
+        self::assertFalse($language->isEnabled());
     }
 
     public function testAddLanguage(): void
@@ -50,7 +50,7 @@ class LanguageOperationsTest extends ActionTestCase
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
         $language->setEnabled(true);
 
-        static::assertTrue($language->isEnabled());
+        self::assertTrue($language->isEnabled());
         $crawler = $this->assertOperationForm('oro_translation_language_add', $language->getId(), Language::class);
         $form = $crawler->selectButton('Add Language')->form([
             'oro_action_operation[language_code]' => 'zu_ZA',
@@ -60,7 +60,7 @@ class LanguageOperationsTest extends ActionTestCase
 
     public function testInstallLanguage(): void
     {
-        static::markTestSkipped('BAP-20390');
+        self::markTestSkipped('BAP-20390');
 
         /** @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE1);
@@ -82,7 +82,7 @@ class LanguageOperationsTest extends ActionTestCase
 
     public function testUpdateLanguage(): void
     {
-        static::markTestSkipped('BAP-20390');
+        self::markTestSkipped('BAP-20390');
 
         /** @var Language $language */
         $language = $this->getReference(LoadLanguages::LANGUAGE2);

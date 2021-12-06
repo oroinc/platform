@@ -9,18 +9,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserAjaxMenuControllerTest extends WebTestCase
 {
-    const MENU_NAME = 'application_menu';
+    private const MENU_NAME = 'application_menu';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-
-        $this->loadFixtures([
-            MenuUpdateData::class
-        ]);
+        $this->loadFixtures([MenuUpdateData::class]);
     }
 
     public function testCreate()

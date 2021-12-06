@@ -11,9 +11,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TranslationCheckerTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -53,11 +50,7 @@ class TranslationCheckerTest extends WebTestCase
         $this->assertEquals([], $notTranslatedKeys, 'Some workflow keys are not translated');
     }
 
-    /**
-     * @param string $field
-     * @return int
-     */
-    protected function isNotRequiredField($field)
+    private function isNotRequiredField(string $field): int
     {
         return preg_match(
             '/^oro\.workflow\..+\.transition\..+\.(warning_message|button_label|button_title|attribute\..+)$/',
