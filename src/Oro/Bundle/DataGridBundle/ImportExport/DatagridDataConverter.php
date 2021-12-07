@@ -167,7 +167,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
             str_replace(
                 "\xC2\xA0", // non-breaking space (&nbsp;)
                 ' ',
-                html_entity_decode(strip_tags($val))
+                html_entity_decode(strip_tags($val), CREDITS_ALL)
             )
         );
         if ($exportType === 'list') {
