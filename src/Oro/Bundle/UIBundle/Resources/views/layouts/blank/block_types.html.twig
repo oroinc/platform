@@ -91,6 +91,18 @@
         'alt': 'oro_frontend.logo.alt.label'|trans
     }) %}
 
+    {% if width is defined and width is not null %}
+        {% set attr_img = layout_attr_defaults(attr_img, {
+            'width': width
+        }) %}
+    {% endif %}
+
+    {% if height is defined and height is not null %}
+        {% set attr_img = layout_attr_defaults(attr_img, {
+            'height': height
+        }) %}
+    {% endif %}
+
     {% if renderLink and app.request.attributes.get('_route') != route %}
         <a href="{{ path(route) }}" {{ block('block_attributes') }} aria-label="{{ 'oro_frontend.logo.aria_label'|trans }}">
             <img {{ UI.attributes(attr_img) }}>

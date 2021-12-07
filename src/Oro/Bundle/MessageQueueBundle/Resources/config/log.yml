@@ -4,9 +4,9 @@ services:
 
     oro_message_queue.log.consumption_extension:
         class: Oro\Component\MessageQueue\Consumption\Extension\ConsumptionExtension
-        public: false
         arguments:
             - '@oro_message_queue.log.consumer_state'
+            - '@oro_message_queue.log.message_processor_class_provider'
         tags:
             - { name: oro_message_queue.consumption.extension, persistent: true }
 
@@ -43,10 +43,8 @@ services:
 
     oro_message_queue.log.processor.add_consumer_state:
         class: Oro\Component\MessageQueue\Log\Processor\AddConsumerStateProcessor
-        public: false
         arguments:
             - '@oro_message_queue.log.consumer_state'
-            - '@oro_message_queue.log.message_processor_class_provider'
             - '@oro_message_queue.log.message_to_array_converter'
         tags:
             - { name: monolog.processor }

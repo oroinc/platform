@@ -156,6 +156,7 @@ services:
         arguments:
             - "@oro_entity_config.config_manager"
             - "@doctrine"
+            - "@oro_query_designer.query_designer.subquery_limit_helper"
 
     # Strategies
     oro_activity_list.strategy.replace:

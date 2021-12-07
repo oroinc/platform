@@ -61,6 +61,8 @@ services:
                   renderLink: {default: true}
                   route: {default: 'oro_frontend_root'}
                   src: {default: '=data["asset"].getUrl(data["theme"].getLogo(context["theme"]))'}
+                  width: {default: null}
+                  height: {default: null}
               }]]
         tags:
             - { name: layout.block_type, alias: logo }

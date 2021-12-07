@@ -21,6 +21,9 @@ class ConsumerState
     /** @var string */
     private string $messageProcessorName = '';
 
+    /** @var string */
+    private string $messageProcessorClass = '';
+
     /** @var MessageInterface */
     private $message;
 
@@ -81,7 +84,7 @@ class ConsumerState
     }
 
     /**
-     * Returns a message processor that is executed at the moment.
+     * Returns a message processor name that is executed at the moment.
      *
      * @return string
      */
@@ -96,6 +99,24 @@ class ConsumerState
     public function setMessageProcessorName(string $messageProcessorName = ''): void
     {
         $this->messageProcessorName = $messageProcessorName;
+    }
+
+    /**
+     * Returns a message processor class that is executed at the moment.
+     *
+     * @return string
+     */
+    public function getMessageProcessorClass(): string
+    {
+        return $this->messageProcessorClass ?? '';
+    }
+
+    /**
+     * Sets a message processor class that is executed at the moment.
+     */
+    public function setMessageProcessorClass(string $messageProcessorClass = ''): void
+    {
+        $this->messageProcessorClass = $messageProcessorClass;
     }
 
     /**
@@ -180,6 +201,7 @@ class ConsumerState
     {
         $this->extension = null;
         $this->messageProcessorName = '';
+        $this->messageProcessorClass = '';
         $this->message = null;
         $this->job = null;
         $this->startTime = null;

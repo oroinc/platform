@@ -32,6 +32,7 @@ class ErrorLogNotificationMailerHandlerPass implements CompilerPassInterface
                             new Reference('oro_logger.provider.error_log_notification_recipients'),
                         ]
                     )
+                    ->addMethodCall('setLogger', [new Reference('logger')])
                     // Priority is set to 32 to make sure it is applied before decorators
                     // from {@see ConfigurableLoggerPass}.
                     ->setDecoratedService($handlerId, null, 32);

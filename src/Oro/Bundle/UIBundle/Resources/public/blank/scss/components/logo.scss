@@ -11,7 +11,8 @@
 
     &-img {
         display: $logo-img-display;
-        max-width: $logo-img-width;
+        width: $logo-img-width;
+        max-width: $logo-img-max-width;
         height: $logo-img-height;
     }
 }

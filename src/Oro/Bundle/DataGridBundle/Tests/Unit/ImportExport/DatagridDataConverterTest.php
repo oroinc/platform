@@ -56,9 +56,27 @@ class DatagridDataConverterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function convertDataProvider(): array
     {
         return [
+            'Columns with html type' => [
+                'columns' => [
+                    'c1' => [
+                        'label' => 'Label',
+                        'frontend_type' => 'html'
+                    ],
+                ],
+                'exported_record' => [
+                    'c1' => 'Carte d&#039;identité',
+                    'id' => 1
+                ],
+                'expectedResult' => [
+                    'Label' => 'Carte d\'identité',
+                ]
+            ],
             'Columns with same labels' => [
                 'columns' => [
                     'c1' => [

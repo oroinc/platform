@@ -78,6 +78,12 @@ class ErrorLogNotificationMailerHandlerPassTest extends \PHPUnit\Framework\TestC
             ],
             $definition->getArguments()
         );
+        self::assertEquals(
+            [
+                ['setLogger', [new Reference('logger')]],
+            ],
+            $definition->getMethodCalls()
+        );
         self::assertEquals(['monolog.handler.mailer', null, 32], $definition->getDecoratedService());
     }
 }
