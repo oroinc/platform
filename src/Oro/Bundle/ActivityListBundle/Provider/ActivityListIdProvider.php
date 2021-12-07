@@ -243,10 +243,13 @@ class ActivityListIdProvider
                 ]
             );
 
-            $ids = array_merge($ids, $query->getArrayResult());
+            $ids[] = $query->getArrayResult();
         }
 
-        return $ids;
+        if (!$ids) {
+            return [];
+        }
+        return array_merge(...$ids);
     }
 
     /**
@@ -280,10 +283,13 @@ class ActivityListIdProvider
                     ActivityListAccessRule::ACTIVITY_OWNER_TABLE_ALIAS => 'ao'
                 ]
             );
-            $ids = array_merge($ids, $query->getArrayResult());
+            $ids[] = $query->getArrayResult();
         }
 
-        return $ids;
+        if (!$ids) {
+            return [];
+        }
+        return array_merge(...$ids);
     }
 
     /**

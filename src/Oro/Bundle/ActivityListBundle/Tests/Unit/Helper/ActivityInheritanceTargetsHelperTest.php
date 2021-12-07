@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 
 class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,17 +20,22 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
     protected $registry;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubQueryLimitHelper */
+    protected $limitHelper;
+
     protected function setUp(): void
     {
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()->getMock();
         $this->registry = $this->getMockBuilder('Doctrine\Bundle\DoctrineBundle\Registry')
             ->disableOriginalConstructor()->getMock();
+        $this->limitHelper = $this->createMock(SubQueryLimitHelper::class);
 
         $this->activityInheritanceTargetsHelper = new ActivityInheritanceTargetsHelper(
             $this->configManager,
             $this->registry
         );
+        $this->activityInheritanceTargetsHelper->setLimitHelper($this->limitHelper);
     }
 
     public function testHasInheritancesDoNotHasConfig()
@@ -113,6 +119,9 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     public function testApplyInheritanceActivity()
     {
         $mainQb = $this->prepareMock();
+
+        $this->limitHelper->expects($this->once())
+            ->method('setLimit');
 
         $this->activityInheritanceTargetsHelper->applyInheritanceActivity(
             $mainQb,
