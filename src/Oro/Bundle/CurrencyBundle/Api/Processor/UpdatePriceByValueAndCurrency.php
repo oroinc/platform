@@ -2,41 +2,26 @@
 
 namespace Oro\Bundle\CurrencyBundle\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Processor\AbstractUpdateNestedModel;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\PhpUtils\ReflectionUtil;
-use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Sets price based on "value" and "currency" fields if they are submitted.
  * It is expected that an entity for which this processor is used
  * has "getPrice()" and "setPrice(Price $price)" methods.
  */
-class UpdatePriceByValueAndCurrency implements ProcessorInterface
+class UpdatePriceByValueAndCurrency extends AbstractUpdateNestedModel
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContextInterface $context)
+    public function __construct()
     {
-        /** @var CustomizeFormDataContext $context */
-
-        switch ($context->getEvent()) {
-            case CustomizeFormDataContext::EVENT_PRE_SUBMIT:
-                $this->processPreSubmit($context);
-                break;
-            case CustomizeFormDataContext::EVENT_POST_VALIDATE:
-                $this->processPostValidate($context);
-                break;
-        }
+        $this->modelPropertyPath = "price";
     }
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function processPreSubmit(CustomizeFormDataContext $context): void
+    protected function processPreSubmit(CustomizeFormDataContext $context): void
     {
         /** @var array $data */
         $data = $context->getData();
@@ -67,25 +52,6 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
                 $currency = $entity->getPrice()->getCurrency();
             }
             $entity->setPrice(Price::create($value, $currency));
-        }
-    }
-
-    private function processPostValidate(CustomizeFormDataContext $context): void
-    {
-        // fix property path for validation errors related to "price" field
-        // it is required to return correct error source pointer in API response
-        $errors = $context->getForm()->getErrors();
-        foreach ($errors as $error) {
-            $cause = $error->getCause();
-            if ($cause instanceof ConstraintViolation
-                && str_starts_with($cause->getPropertyPath(), 'data.price.')
-            ) {
-                $property = ReflectionUtil::getProperty(new \ReflectionClass($cause), 'propertyPath');
-                if (null !== $property) {
-                    $property->setAccessible(true);
-                    $property->setValue($cause, str_replace('.price.', '.', $cause->getPropertyPath()));
-                }
-            }
         }
     }
 }
