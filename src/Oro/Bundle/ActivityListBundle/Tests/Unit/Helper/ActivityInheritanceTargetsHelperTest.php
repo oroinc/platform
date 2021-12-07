@@ -9,6 +9,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 
 class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,14 +22,19 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
     private $registry;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|SubQueryLimitHelper */
+    protected $limitHelper;
+
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->registry = $this->createMock(Registry::class);
+        $this->limitHelper = $this->createMock(SubQueryLimitHelper::class);
 
         $this->activityInheritanceTargetsHelper = new ActivityInheritanceTargetsHelper(
             $this->configManager,
-            $this->registry
+            $this->registry,
+            $this->limitHelper
         );
     }
 
@@ -109,6 +115,9 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     public function testApplyInheritanceActivity()
     {
         $mainQb = $this->prepareMock();
+
+        $this->limitHelper->expects($this->once())
+            ->method('setLimit');
 
         $this->activityInheritanceTargetsHelper->applyInheritanceActivity(
             $mainQb,

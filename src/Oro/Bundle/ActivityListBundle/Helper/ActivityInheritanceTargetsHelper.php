@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
@@ -16,16 +17,22 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class ActivityInheritanceTargetsHelper
 {
+    protected const MAX_INHERITANCE_TARGETS = 10000;
+
     /** @var ConfigManager */
     protected $configManager;
 
     /** @var Registry */
     protected $registry;
 
-    public function __construct(ConfigManager $configManager, Registry $registry)
+    /** @var SubQueryLimitHelper */
+    protected $limitHelper;
+
+    public function __construct(ConfigManager $configManager, Registry $registry, SubQueryLimitHelper $limitHelper)
     {
         $this->configManager = $configManager;
         $this->registry = $registry;
+        $this->limitHelper = $limitHelper;
     }
 
     /**
@@ -52,9 +59,9 @@ class ActivityInheritanceTargetsHelper
      * for integrate activity lists from inheritance target
      *
      * @param QueryBuilder $qb
-     * @param array        $inheritanceTarget
-     * @param string       $aliasSuffix
-     * @param string       $entityIdExpr
+     * @param array $inheritanceTarget
+     * @param string $aliasSuffix
+     * @param string $entityIdExpr
      */
     public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr)
     {
@@ -90,7 +97,7 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
-     * @param  string $entityClass
+     * @param string $entityClass
      * @return array
      */
     public function getInheritanceTargets($entityClass)
@@ -104,10 +111,10 @@ class ActivityInheritanceTargetsHelper
     }
 
     /**
-     * @param string   $target
+     * @param string $target
      * @param string[] $path
-     * @param string   $entityIdExpr
-     * @param string  $uniqueKey
+     * @param string $entityIdExpr
+     * @param string $uniqueKey
      *
      * @return QueryBuilder
      */
@@ -137,6 +144,12 @@ class ActivityInheritanceTargetsHelper
         }
 
         $subQueryBuilder->where($subQueryBuilder->expr()->eq(QueryBuilderUtil::getField($alias, 'id'), $entityIdExpr));
+
+        $this->limitHelper->setLimit(
+            $subQueryBuilder,
+            static::MAX_INHERITANCE_TARGETS,
+            'id'
+        );
 
         return $subQueryBuilder;
     }
@@ -187,7 +200,7 @@ class ActivityInheritanceTargetsHelper
     protected function hasValueInInheritanceTargets($configValues)
     {
         return is_array($configValues) && array_key_exists('inheritance_targets', $configValues)
-        && is_array($configValues['inheritance_targets']);
+            && is_array($configValues['inheritance_targets']);
     }
 
     /**
