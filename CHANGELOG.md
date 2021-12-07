@@ -175,6 +175,8 @@ Third party dependencies such as [Font Awesome](https://fontawesome.com/v4.7/) a
       - bootstrap-alert$: bootstrap/js/dist/alert
       + bootstrap-alert$: '@oroinc/bootstrap/js/dist/alert'
       ```
+## 5.0.0-beta.2 (2021-09-30)
+[Show detailed list of changes](incompatibilities-5-0-beta-2.md)
 
 ## 5.0.0-beta.1 (2021-07-30)
 [Show detailed list of changes](incompatibilities-5-0-beta-1.md)
