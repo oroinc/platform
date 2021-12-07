@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverterInterface;
-use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Log\Processor\AddConsumerStateProcessor;
 use Oro\Component\MessageQueue\Tests\Unit\Log\Processor\Stub\ExtensionProxy;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -23,29 +22,20 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
 
     private ConsumerState|\PHPUnit\Framework\MockObject\MockObject $consumerState;
 
-    private MessageProcessorClassProvider|\PHPUnit\Framework\MockObject\MockObject $messageProcessorClassProvider;
-
     private AddConsumerStateProcessor $processor;
 
     protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();
 
-        $this->messageProcessorClassProvider = $this->createMock(MessageProcessorClassProvider::class);
-        /** @var MessageToArrayConverterInterface|\PHPUnit\Framework\MockObject\MockObject $messageToArrayConverter */
         $messageToArrayConverter = $this->createMock(MessageToArrayConverterInterface::class);
 
-        $messageToArrayConverter->expects(self::any())
+        $messageToArrayConverter
+            ->expects(self::any())
             ->method('convert')
-            ->willReturnCallback(function (MessageInterface $message) {
-                return ['id' => $message->getMessageId()];
-            });
+            ->willReturnCallback(static fn (MessageInterface $message) => ['id' => $message->getMessageId()]);
 
-        $this->processor = new AddConsumerStateProcessor(
-            $this->consumerState,
-            $this->messageProcessorClassProvider,
-            $messageToArrayConverter
-        );
+        $this->processor = new AddConsumerStateProcessor($this->consumerState, $messageToArrayConverter);
     }
 
     private function getMessageMock(string $messageId): MessageInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -130,14 +120,9 @@ class AddConsumerStateProcessorTest extends \PHPUnit\Framework\TestCase
         $messageProcessorClass = get_class($messageProcessor);
 
         $this->consumerState->startConsumption();
-        $this->consumerState->setMessageProcessorName($messageProcessorClass);
+        $this->consumerState->setMessageProcessorClass($messageProcessorClass);
         $message = $this->getMessageMock('1');
         $this->consumerState->setMessage($message);
-
-        $this->messageProcessorClassProvider->expects(self::once())
-            ->method('getMessageProcessorClassByName')
-            ->with(self::identicalTo($messageProcessorClass))
-            ->willReturn($messageProcessorClass);
 
         $record = call_user_func($this->processor, self::MESSAGE);
 

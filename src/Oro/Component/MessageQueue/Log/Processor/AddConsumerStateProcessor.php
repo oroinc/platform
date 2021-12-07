@@ -6,7 +6,6 @@ use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Log\ConsumerState;
 use Oro\Component\MessageQueue\Log\Converter\MessageToArrayConverterInterface;
-use Oro\Component\MessageQueue\Log\MessageProcessorClassProvider;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
 use ProxyManager\Proxy\ValueHolderInterface;
@@ -19,17 +18,13 @@ class AddConsumerStateProcessor
 {
     private ConsumerState $consumerState;
 
-    private MessageProcessorClassProvider $messageProcessorClassProvider;
-
     private MessageToArrayConverterInterface $messageToArrayConverter;
 
     public function __construct(
         ConsumerState $consumerState,
-        MessageProcessorClassProvider $messageProcessorClassProvider,
         MessageToArrayConverterInterface $messageToArrayConverter
     ) {
         $this->consumerState = $consumerState;
-        $this->messageProcessorClassProvider = $messageProcessorClassProvider;
         $this->messageToArrayConverter = $messageToArrayConverter;
     }
 
@@ -51,10 +46,9 @@ class AddConsumerStateProcessor
             // add info about a message and a message processor
             $message = $this->consumerState->getMessage();
             if (null !== $message) {
-                $messageProcessorName = $this->consumerState->getMessageProcessorName();
-                if ($messageProcessorName !== '') {
-                    $record['extra']['processor'] = $this->messageProcessorClassProvider
-                        ->getMessageProcessorClassByName($messageProcessorName);
+                $messageProcessorClass = $this->consumerState->getMessageProcessorClass();
+                if ($messageProcessorClass !== '') {
+                    $record['extra']['processor'] = $messageProcessorClass;
                 }
                 $this->addMessageInfo($message, $record['extra']);
             }
