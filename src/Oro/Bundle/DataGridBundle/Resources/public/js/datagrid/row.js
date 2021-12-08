@@ -274,15 +274,13 @@ define(function(require) {
             this.clickPermit = false;
             // remember selection and target
             const $target = this.$(e.target);
-            let exclude;
-            let allowed;
             if (this.themeOptions.actionSelector) {
-                allowed = this.themeOptions.actionSelector;
+                const allowed = this.themeOptions.actionSelector;
                 if (!$target.is(allowed) && !$target.parents(allowed).length) {
                     return;
                 }
             } else {
-                exclude = 'a, .dropdown, .skip-row-click, :input';
+                const exclude = 'a, .dropdown, .skip-row-click, :input';
                 // if the target is an action element, skip toggling the email
                 if ($target.is(exclude) || $target.parents(exclude).length) {
                     return;

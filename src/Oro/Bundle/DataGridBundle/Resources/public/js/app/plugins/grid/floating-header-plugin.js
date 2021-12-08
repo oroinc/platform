@@ -187,7 +187,10 @@ define(function(require) {
                 top: -this.headerHeight
             }, this.currentFloatTheadMode === 'default');
             let mode = 'default';
-            if (visibleRect.top !== tableRect.top || this.grid.layout === 'fullscreen') {
+            if (
+                (visibleRect.top !== tableRect.top && tableRect.bottom > this.headerHeight) ||
+                this.grid.layout === 'fullscreen'
+            ) {
                 mode = this.isHeaderDropdownVisible ? 'relative' : 'fixed';
             }
             this.setFloatTheadMode(mode, visibleRect, tableRect);

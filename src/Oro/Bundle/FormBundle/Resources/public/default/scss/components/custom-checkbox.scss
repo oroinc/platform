@@ -79,3 +79,15 @@
         }
     }
 }
+
+.shift-checkbox {
+    display: flex;
+    padding-left: $checkbox-shift-offset;
+
+    .custom-checkbox {
+        display: inline-flex;
+        align-self: flex-start;
+        margin-left: -$checkbox-shift-offset;
+        margin-right: $offset-x-m;
+    }
+}
