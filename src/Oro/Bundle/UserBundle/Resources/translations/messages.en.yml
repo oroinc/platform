@@ -118,20 +118,14 @@ oro:
         imap_configuration.label:           Email synchronization settings
         imap_configuration.update:          Update settings
         last_login:
-            label:                          Last logged in
+            label:                          Last Login
             description:                    The date and time when the user last logged into the system.
         last_name:
             label:                          Last name
             description:                    The last name of the user.
         login_count:
-            label:                          Login count
+            label:                          Login Count
             description:                    How many time the user logged into the system.
-        password_expires_at:
-            label:                          Password expires at
-            description:                    The date and time when the user's password expires.
-        failed_login_count:
-            label:                          Failed login count
-            description:                    How many times the user tried to log into the system using incorrect credentials.
         middle_name:
             label:                          Middle name
             description:                    The middle name of the user.

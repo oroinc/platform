@@ -6,12 +6,12 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * This provider provides basic user info for logging purposes
+ * Provides basic user info for logging purposes.
  */
-class UserLoggingInfoProvider
+class UserLoggingInfoProvider implements UserLoggingInfoProviderInterface
 {
     /** @var RequestStack */
-    private $requestStack;
+    protected $requestStack;
 
     public function __construct(RequestStack $requestStack)
     {
@@ -25,9 +25,7 @@ class UserLoggingInfoProvider
     public function getUserLoggingInfo($user): array
     {
         $info = [];
-        if (!$user instanceof User) {
-            $info['username'] = $user;
-        } else {
+        if ($user instanceof User) {
             $info['user'] = [
                 'id' => $user->getId(),
                 'username' => $user->getUsername(),
@@ -37,22 +35,24 @@ class UserLoggingInfoProvider
                 'lastlogin' => $user->getLastLogin(),
                 'createdat' => $user->getCreatedAt(),
             ];
+        } elseif (\is_string($user)) {
+            $info['username'] = $user;
         }
+
         $ip = $this->getIp();
         if ($ip) {
             $info['ipaddress'] = $ip;
         }
+
         return $info;
     }
 
-    /**
-     * @return string|null
-     */
-    private function getIp()
+    protected function getIp(): ?string
     {
         if (!$this->requestStack->getCurrentRequest()) {
             return null;
         }
+
         return $this->requestStack->getCurrentRequest()->getClientIp();
     }
 }
