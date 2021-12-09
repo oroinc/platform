@@ -22,19 +22,8 @@
         &.is-group {
             width: 100%;
 
-            .form-layout__part {
-                &:nth-child(odd) {
-                    padding-right: $content-padding-small / 2;
-                }
-
-                &:nth-child(even) {
-                    padding-left: $content-padding-small / 2;
-                }
-
-                &:only-child {
-                    padding-left: 0;
-                    padding-right: 0;
-                }
+            .fields-row-error {
+                order: 1;
             }
         }
 
@@ -42,17 +31,21 @@
             width: $field-width;
         }
 
-        &.length-28 {
-            width: 28%;
-        }
-
-        &.length-72 {
-            width: 72%;
-        }
-
         &.short {
             width: 90px;
             min-width: 90px;
+        }
+
+        .is-group__col-start {
+            flex: 1;
+            max-width: 28%;
+            padding-right: $content-padding-small * .5;
+        }
+    
+        .is-group__col-end {
+            flex: 1;
+            max-width: 72%;
+            padding-left: $content-padding-small * .5;
         }
     }
 

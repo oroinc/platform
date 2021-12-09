@@ -19,15 +19,16 @@
         &.is-group {
             width: 100%;
 
-            .form-layout__part {
+            .fields-row-error {
                 padding-bottom: $content-padding-medium;
 
-                &:last-child,
-                &:only-child {
-                    padding-bottom: 0;
-                }
             }
         }
+    }
+
+    .is-group__col-start,
+    .is-group__col-end {
+        width: 100%;
     }
 
     // Update static widths in form fields
