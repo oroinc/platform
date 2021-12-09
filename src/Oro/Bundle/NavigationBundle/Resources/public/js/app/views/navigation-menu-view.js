@@ -55,7 +55,7 @@ const NavigationMenuView = BaseView.extend({
      */
     options: {
         openClass: 'show',
-        focusableElements: 'a:visible, button:visible',
+        focusableElements: 'a:visible:not([data-ignore-navigation]), button:visible:not([data-ignore-navigation])',
         itemSelector: '.main-menu__item',
         linkSelector: '.main-menu__link:first',
         subMenus: 'ul, ol, nav, [data-role="sub-menu"]',
