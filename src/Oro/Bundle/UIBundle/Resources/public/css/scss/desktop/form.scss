@@ -79,14 +79,14 @@ input[type='text'].hasDatepicker {
 .clearable-input {
     &__container--clear .clearable-input__placeholder-icon {
         font-size: $icon-font-size;
-        top: math.div($field-size - $icon-font-size, -2);
+        top: 0;
         width: $field-size;
         height: $field-size;
         line-height: $field-size;
     }
 
     &__clear {
-        top: math.div($field-size - $icon-font-size, -2);
+        top: 0;
     }
 
     &__container > input {
