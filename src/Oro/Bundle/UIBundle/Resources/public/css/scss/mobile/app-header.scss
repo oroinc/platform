@@ -71,8 +71,6 @@
 
             .nav-header {
                 margin-right: $mobile-app-header-header-margin-end;
-                margin-bottom: $mobile-app-header-header-margin-bottom;
-
                 font-size: $mobile-app-header-header-font-size;
                 line-height: 1;
                 text-transform: none;
@@ -191,11 +189,6 @@
 
             .dropdown-menu {
                 padding: $mobile-app-header-dropdown-menu-padding;
-
-                .nav-header {
-                    font-size: $mobile-app-header-title-font-size;
-                    margin-bottom: $mobile-app-header-header-margin-bottom;
-                }
             }
         }
 
@@ -210,13 +203,7 @@
                 }
             }
 
-            .nav-content form {
-                padding: 0 0 18px;
-            }
-
             .dropdown-item {
-                padding: $mobile-app-header-dropdown-item-padding;
-
                 > a {
                     font-size: $mobile-app-header-dropdown-link-font-size;
                 }
@@ -298,7 +285,6 @@
 
                 .nav-header {
                     margin-right: $mobile-app-header-header-margin-end;
-                    margin-bottom: $mobile-app-header-title-margin-bottom;
                 }
 
                 .divider {

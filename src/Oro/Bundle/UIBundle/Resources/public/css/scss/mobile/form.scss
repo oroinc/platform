@@ -163,14 +163,10 @@
 .clearable-input {
     &__container--clear .clearable-input__placeholder-icon {
         font-size: $icon-font-size;
-        top: math.div($input-size - $icon-font-size, -2);
         width: $input-size;
         height: $input-size;
         line-height: $input-size;
-    }
-
-    &__clear {
-        top: math.div($input-size - $icon-font-size, -2);
+        top: 0;
     }
 
     &__container > input {
