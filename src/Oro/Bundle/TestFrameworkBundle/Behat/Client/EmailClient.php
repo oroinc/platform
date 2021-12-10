@@ -31,6 +31,10 @@ class EmailClient
         $messages = [];
         foreach ($data as $message) {
             $messageDetails = $this->getJson($this->url.'/messages/'.$message['id'].'.json');
+            if (!isset($messageDetails['source'])) {
+                $plainMessage = $this->client->get($this->url . '/messages/' . $message['id'] . '.source');
+                $messageDetails['source'] = $plainMessage->getBody()->getContents();
+            }
             $message = array_merge($message, $messageDetails);
             Decode::splitMessage($message['source'], $headers, $body);
             if (str_starts_with($headers->get('contenttype')->getType(), 'multipart/')) {
