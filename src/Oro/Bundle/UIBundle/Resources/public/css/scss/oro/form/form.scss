@@ -480,6 +480,7 @@ input[type='number'] {
 .clearable-input {
     &__container {
         position: relative;
+        display: block;
     }
 
     &__placeholder-icon {
