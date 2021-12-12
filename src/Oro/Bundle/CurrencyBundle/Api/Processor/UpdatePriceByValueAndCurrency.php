@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\CurrencyBundle\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\PhpUtils\ReflectionUtil;
-use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Sets price based on "value" and "currency" fields if they are submitted.
@@ -28,7 +27,7 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
                 $this->processPreSubmit($context);
                 break;
             case CustomizeFormDataContext::EVENT_POST_VALIDATE:
-                $this->processPostValidate($context);
+                FormUtil::fixValidationErrorPropertyPathForExpandedProperty($context->getForm(), 'price');
                 break;
         }
     }
@@ -67,25 +66,6 @@ class UpdatePriceByValueAndCurrency implements ProcessorInterface
                 $currency = $entity->getPrice()->getCurrency();
             }
             $entity->setPrice(Price::create($value, $currency));
-        }
-    }
-
-    private function processPostValidate(CustomizeFormDataContext $context): void
-    {
-        // fix property path for validation errors related to "price" field
-        // it is required to return correct error source pointer in API response
-        $errors = $context->getForm()->getErrors();
-        foreach ($errors as $error) {
-            $cause = $error->getCause();
-            if ($cause instanceof ConstraintViolation
-                && 0 === strpos($cause->getPropertyPath(), 'data.price.')
-            ) {
-                $property = ReflectionUtil::getProperty(new \ReflectionClass($cause), 'propertyPath');
-                if (null !== $property) {
-                    $property->setAccessible(true);
-                    $property->setValue($cause, str_replace('.price.', '.', $cause->getPropertyPath()));
-                }
-            }
         }
     }
 }

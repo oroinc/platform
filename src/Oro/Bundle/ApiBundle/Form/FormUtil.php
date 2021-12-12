@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
+use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -166,6 +167,56 @@ class FormUtil
     public static function findFormFieldByPropertyPath(FormInterface $form, string $propertyPath): ?FormInterface
     {
         return FormUtils::findFormField($form, $propertyPath);
+    }
+
+    /**
+     * Asserts the given form is a root form and it is already submitted.
+     *
+     * @throws \InvalidArgumentException if the given form is not root form or it is not submitted yet
+     */
+    public static function assertSubmittedRootForm(FormInterface $form): void
+    {
+        if (!$form->isRoot()) {
+            throw new \InvalidArgumentException('The root form is expected.');
+        }
+        if (!$form->isSubmitted()) {
+            throw new \InvalidArgumentException('The submitted form is expected.');
+        }
+    }
+
+    /**
+     * Fixes property paths for validation errors related to properties expanded in API.
+     * An example of a property expanded in API is a price. In this case an entity has
+     * a "price" property that is an object with "value" and "currency" properties
+     * and these properties are represented in API as separate attributes
+     * and "price" property is not represented in API at all.
+     * In this case all validation errors related to the "price" property should be moved to
+     * "value" and "currency" API attributes, or in other words the ".price" prefix
+     * should be removed from such validation errors.
+     * It is required to return a correct error source pointer in API response.
+     */
+    public static function fixValidationErrorPropertyPathForExpandedProperty(
+        FormInterface $form,
+        string $propertyName
+    ): void {
+        $errors = $form->getErrors();
+        foreach ($errors as $error) {
+            $cause = $error->getCause();
+            if (!$cause instanceof ConstraintViolation) {
+                continue;
+            }
+            $path = '.' . $propertyName . '.';
+            if (str_starts_with($cause->getPropertyPath(), 'data' . $path)) {
+                $property = ReflectionUtil::getProperty(new \ReflectionClass($cause), 'propertyPath');
+                if (null !== $property) {
+                    $property->setAccessible(true);
+                    $property->setValue(
+                        $cause,
+                        str_replace($path, '.', $cause->getPropertyPath())
+                    );
+                }
+            }
+        }
     }
 
     private static function createFormError(ConstraintViolation $violation): FormError
