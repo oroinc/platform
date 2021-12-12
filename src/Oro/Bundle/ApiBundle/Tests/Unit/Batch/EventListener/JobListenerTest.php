@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\EventListener;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\EventListener\JobListener;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 use Oro\Component\Testing\ReflectionUtil;
@@ -17,9 +17,6 @@ use Oro\Component\Testing\ReflectionUtil;
  */
 class JobListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctineHelper;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
     private $em;
 
@@ -32,17 +29,19 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
-        $this->doctineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctineHelper->expects(self::any())
-            ->method('getEntityManager')
-            ->with(AsyncOperation::class)
-            ->willReturn($this->em);
         $this->uow = $this->createMock(UnitOfWork::class);
+
         $this->em->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
-        $this->listener = new JobListener($this->doctineHelper);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(AsyncOperation::class)
+            ->willReturn($this->em);
+
+        $this->listener = new JobListener($doctrine);
     }
 
     public function testForNotRootJob()

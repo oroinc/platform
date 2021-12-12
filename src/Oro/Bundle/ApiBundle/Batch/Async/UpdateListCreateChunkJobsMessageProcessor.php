@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
-use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -24,8 +23,8 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
     /** @var JobRunner */
     private $jobRunner;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    /** @var ManagerRegistry */
+    private $doctrine;
 
     /** @var AsyncOperationManager */
     private $operationManager;
@@ -41,13 +40,13 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
 
     public function __construct(
         JobRunner $jobRunner,
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $doctrine,
         AsyncOperationManager $operationManager,
         UpdateListProcessingHelper $processingHelper,
         LoggerInterface $logger
     ) {
         $this->jobRunner = $jobRunner;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
         $this->operationManager = $operationManager;
         $this->processingHelper = $processingHelper;
         $this->logger = $logger;
@@ -134,11 +133,8 @@ class UpdateListCreateChunkJobsMessageProcessor implements MessageProcessorInter
         return self::ACK;
     }
 
-    /**
-     * @return JobRepository|EntityRepository
-     */
     private function getJobRepository(): JobRepository
     {
-        return $this->doctrineHelper->getEntityRepository(Job::class);
+        return $this->doctrine->getRepository(Job::class);
     }
 }

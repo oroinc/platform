@@ -125,13 +125,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $body
-     * @param string $messageId
-     *
-     * @return MessageInterface
-     */
-    private function getMessage(array $body, string $messageId = '')
+    private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
@@ -144,10 +138,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $message;
     }
 
-    /**
-     * @return SessionInterface
-     */
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         return $this->createMock(SessionInterface::class);
     }

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
 use Oro\Bundle\ApiBundle\Batch\Async\Topics;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListCreateChunkJobsMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -46,28 +46,23 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         $this->operationManager = $this->createMock(AsyncOperationManager::class);
         $this->processingHelper = $this->createMock(UpdateListProcessingHelper::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper->expects($this->any())
-            ->method('getEntityRepository')
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
             ->with(JobEntity::class)
             ->willReturn($this->jobRepository);
 
         $this->processor = new UpdateListCreateChunkJobsMessageProcessor(
             $this->jobRunner,
-            $doctrineHelper,
+            $doctrine,
             $this->operationManager,
             $this->processingHelper,
             $this->logger
         );
     }
 
-    /**
-     * @param array $body
-     * @param string $messageId
-     *
-     * @return MessageInterface
-     */
-    private function getMessage(array $body, string $messageId = '')
+    private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
@@ -83,7 +78,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
     /**
      * @return SessionInterface
      */
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         return $this->createMock(SessionInterface::class);
     }

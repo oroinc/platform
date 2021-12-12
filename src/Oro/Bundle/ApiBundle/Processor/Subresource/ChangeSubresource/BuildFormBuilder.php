@@ -76,13 +76,11 @@ class BuildFormBuilder implements ProcessorInterface
 
     protected function createFormBuilder(ChangeSubresourceContext $context): FormBuilderInterface
     {
-        $formBuilder = $this->formHelper->createFormBuilder(
+        return $this->formHelper->createFormBuilder(
             FormType::class,
             $context->getResult(),
             $this->getFormOptions($context)
         );
-
-        return $formBuilder;
     }
 
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
@@ -121,7 +119,7 @@ class BuildFormBuilder implements ProcessorInterface
         $options = $config->getFormOptions();
         if (!empty($options)) {
             unset($options['validation_groups']);
-            $entryFormOptions = \array_replace($entryFormOptions, $options);
+            $entryFormOptions = array_replace($entryFormOptions, $options);
         }
         $entryFormOptions[CustomizeFormDataHandler::API_CONTEXT] = $context;
 

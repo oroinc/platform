@@ -14,6 +14,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
             - '@oro_api.validation_helper'
+            - 'Oro\Bundle\OrganizationBundle\Validator\Constraints\Owner'
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -50 }
 

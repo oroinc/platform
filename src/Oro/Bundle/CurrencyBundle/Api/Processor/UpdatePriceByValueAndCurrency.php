@@ -2,56 +2,68 @@
 
 namespace Oro\Bundle\CurrencyBundle\Api\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\AbstractUpdateNestedModel;
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\CurrencyBundle\Entity\Price;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Sets price based on "value" and "currency" fields if they are submitted.
  * It is expected that an entity for which this processor is used
  * has "getPrice()" and "setPrice(Price $price)" methods.
  */
-class UpdatePriceByValueAndCurrency extends AbstractUpdateNestedModel
+class UpdatePriceByValueAndCurrency implements ProcessorInterface
 {
-    public function __construct()
+    /**
+     * {@inheritdoc}
+     */
+    public function process(ContextInterface $context): void
     {
-        $this->modelPropertyPath = "price";
+        /** @var CustomizeFormDataContext $context */
+
+        switch ($context->getEvent()) {
+            case CustomizeFormDataContext::EVENT_PRE_SUBMIT:
+                $this->processPreSubmit($context);
+                break;
+            case CustomizeFormDataContext::EVENT_POST_VALIDATE:
+                FormUtil::fixValidationErrorPropertyPathForExpandedProperty($context->getForm(), 'price');
+                break;
+        }
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    protected function processPreSubmit(CustomizeFormDataContext $context): void
+    private function processPreSubmit(CustomizeFormDataContext $context): void
     {
         /** @var array $data */
         $data = $context->getData();
-        $entity = $context->getForm()->getData();
 
-        $value = null;
-        $currency = null;
-
-        $isValueSubmitted = false;
-        $valueFieldName = $context->findFormFieldName('value');
-        if (null !== $valueFieldName && array_key_exists($valueFieldName, $data)) {
-            $isValueSubmitted = true;
-            $value = $data[$valueFieldName];
-        }
-
-        $isCurrencySubmitted = false;
-        $currencyFieldName = $context->findFormFieldName('currency');
-        if (null !== $currencyFieldName && array_key_exists($currencyFieldName, $data)) {
-            $isCurrencySubmitted = true;
-            $currency = $data[$currencyFieldName];
-        }
+        [$value, $isValueSubmitted] = $this->getSubmittedValue($data, $context->findFormFieldName('value'));
+        [$currency, $isCurrencySubmitted] = $this->getSubmittedValue($data, $context->findFormFieldName('currency'));
 
         if ($isValueSubmitted || $isCurrencySubmitted) {
-            if (!$isValueSubmitted && null !== $entity->getPrice()) {
-                $value = $entity->getPrice()->getValue();
-            }
-            if (!$isCurrencySubmitted && null !== $entity->getPrice()) {
-                $currency = $entity->getPrice()->getCurrency();
+            $entity = $context->getForm()->getData();
+            $entityPrice = $entity->getPrice();
+            if (null !== $entityPrice) {
+                if (!$isValueSubmitted) {
+                    $value = $entityPrice->getValue();
+                }
+                if (!$isCurrencySubmitted) {
+                    $currency = $entityPrice->getCurrency();
+                }
             }
             $entity->setPrice(Price::create($value, $currency));
         }
+    }
+
+    private function getSubmittedValue(array $data, ?string $formFieldName): array
+    {
+        $value = null;
+        $isValueSubmitted = false;
+        if (null !== $formFieldName && \array_key_exists($formFieldName, $data)) {
+            $value = $data[$formFieldName];
+            $isValueSubmitted = true;
+        }
+
+        return [$value, $isValueSubmitted];
     }
 }

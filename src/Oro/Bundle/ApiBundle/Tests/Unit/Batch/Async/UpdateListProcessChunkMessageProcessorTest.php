@@ -80,13 +80,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         );
     }
 
-    /**
-     * @param array $body
-     * @param string $messageId
-     *
-     * @return MessageInterface
-     */
-    private function getMessage(array $body, string $messageId = '')
+    private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
@@ -99,10 +93,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         return $message;
     }
 
-    /**
-     * @return SessionInterface
-     */
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         return $this->createMock(SessionInterface::class);
     }
@@ -1035,7 +1026,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function processWhenRetryRequestedDataProvider()
+    public function processWhenRetryRequestedDataProvider(): array
     {
         return [
             'first retry' => ['oro:batch_api:123:chunk:1', 'oro:batch_api:123:chunk:1:r1', false],

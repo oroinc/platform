@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\EventListener;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 
@@ -22,12 +22,11 @@ class JobListener
     private const CREATE_COUNT   = 'createCount';
     private const UPDATE_COUNT   = 'updateCount';
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
     }
 
     public function onBeforeSaveJob(BeforeSaveJobEvent $event): void
@@ -43,7 +42,7 @@ class JobListener
             return;
         }
 
-        $em = $this->doctrineHelper->getEntityManager(AsyncOperation::class);
+        $em = $this->doctrine->getManagerForClass(AsyncOperation::class);
         $operation = $em->find(AsyncOperation::class, $data[self::OPERATION_ID]);
         if (null !== $operation && $this->updateOperation($operation, $job)) {
             $uow = $em->getUnitOfWork();

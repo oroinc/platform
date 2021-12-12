@@ -34,10 +34,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return SessionInterface
-     */
-    private function getSession()
+    private function getSession(): SessionInterface
     {
         return $this->createMock(SessionInterface::class);
     }
