@@ -37,7 +37,8 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor = new AddOwnerValidator(
             $this->doctrineHelper,
             $this->ownershipMetadataProvider,
-            $this->validationHelper
+            $this->validationHelper,
+            Owner::class
         );
     }
 

@@ -943,7 +943,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListCreateChunkJobsMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '@oro_api.batch.async.operation_manager'
             - '@oro_api.batch.async.update_list_processing_helper'
             - '@logger'
@@ -954,7 +954,7 @@ services:
     oro_api.batch.async.update_list.start_chunk_jobs:
         class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListStartChunkJobsMessageProcessor
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '@oro_api.batch.async.operation_manager'
             - '@oro_api.batch.async.update_list_processing_helper'
             - '@logger'
@@ -994,7 +994,7 @@ services:
     oro_api.batch.job_event_listener:
         class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: oro_message_queue.before_save_job, method: onBeforeSaveJob }
 
