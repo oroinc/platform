@@ -16,6 +16,9 @@ oro_behat_extension:
         mapping:
           Query: 'search'
 
+    Search Form Field:
+      selector: '#oro_website_search_search [name="search"]'
+
     Search Submit:
       selector:
          type: xpath
