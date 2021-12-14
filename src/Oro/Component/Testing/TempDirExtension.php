@@ -11,7 +11,13 @@ use Symfony\Component\Filesystem\Filesystem;
 trait TempDirExtension
 {
     /** @var string[] */
-    private $tempDirs = [];
+    private array $tempDirs = [];
+
+    /**
+     * @var string Suffix that is added to the temp dir name to ensure uniqueness to isolate current runtime
+     * from others.
+     */
+    private static string $uniqueSuffix = '';
 
     /**
      * Removes all temporary directories requested via getTempDir() method.
@@ -48,12 +54,7 @@ trait TempDirExtension
      */
     protected function getTempDir(string $subDir, ?bool $existence = true): string
     {
-        $subDir = preg_replace('/^[\/\\\\]+(.*)/', '$1', $subDir);
-        if (!str_starts_with(strtolower($subDir), 'oro')) {
-            $subDir = 'oro_' . $subDir;
-        }
-
-        $tmpDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $subDir;
+        $tmpDir = static::getTempDirName($subDir);
         if (!in_array($tmpDir, $this->tempDirs, true)) {
             $this->tempDirs[] = $tmpDir;
         }
@@ -69,6 +70,27 @@ trait TempDirExtension
         }
 
         return $tmpDir;
+    }
+
+    /**
+     * @param string $subDir
+     *
+     * @return string Absolute path to the temp dir with a suffix unique per runtime.
+     */
+    protected static function getTempDirName(string $subDir): string
+    {
+        $subDir = preg_replace('/^[\/\\\\]+(.*)/', '$1', $subDir);
+        if (!str_starts_with(strtolower($subDir), 'oro')) {
+            $subDir = 'oro_' . $subDir;
+        }
+
+        if (!self::$uniqueSuffix) {
+            // Generates unique suffix and sets it to a static property so it does not change during current runtime.
+            self::$uniqueSuffix = str_replace('.', '', uniqid('', true));
+        }
+
+        return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR
+            . $subDir . '_' . self::$uniqueSuffix;
     }
 
     /**

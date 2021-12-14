@@ -8,11 +8,14 @@ use Oro\Component\MessageQueue\Consumption\Dbal\DbalPidFileManager;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RedeliverOrphanMessagesDbalExtension;
 use Oro\Component\MessageQueue\Consumption\Dbal\Extension\RejectMessageOnExceptionDbalExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     /** @var DbalTransportFactory */
     private $dbalTransportFactory;
 
@@ -27,17 +30,18 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreate()
     {
         $container = new ContainerBuilder();
+        $pidFileDir = $this->getTempDir('oro-message-queue');
         $config = [
             'connection' => 'message_queue',
             'table' => 'oro_message_queue',
-            'pid_file_dir' => '/tmp/oro-message-queue',
+            'pid_file_dir' => $pidFileDir,
             'consumer_process_pattern' => ':consume',
             'polling_interval' => 1000,
         ];
 
         $connectionId = $this->dbalTransportFactory->create($container, $config);
         $this->assertEquals('oro_message_queue.transport.dbal.connection', $connectionId);
-        $this->assertEquals('/tmp/oro-message-queue', $container->getParameter('oro_message_queue.dbal.pid_file_dir'));
+        $this->assertEquals($pidFileDir, $container->getParameter('oro_message_queue.dbal.pid_file_dir'));
 
         $this->assertEquals(
             DbalPidFileManager::class,
@@ -99,6 +103,7 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
     public function testAddConfiguration()
     {
         $builder = new ArrayNodeDefinition('transport');
+        $pidFileDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'oro-message-queue';
 
         $this->dbalTransportFactory->addConfiguration($builder);
 
@@ -117,7 +122,7 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
                         ->cannotBeEmpty()
                     ->end()
                     ->scalarNode('pid_file_dir')
-                        ->defaultValue('/tmp/oro-message-queue')
+                        ->defaultValue($pidFileDir)
                         ->cannotBeEmpty()
                     ->end()
                     ->integerNode('consumer_process_pattern')

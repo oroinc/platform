@@ -5,11 +5,14 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Configuration;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Transport\Factory\DbalTransportFactory;
 use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
+use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
+    use TempDirExtension;
+
     public function testGetConfigTreeBuilder(): void
     {
         $factories = [];
@@ -27,7 +30,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
 
         $configuration = new Configuration($factories, 'prod');
         $processor = new Processor();
-
+        $pidFileDir = $this->getTempDir('oro-message-queue');
         $expected = [
             'persistent_services' => [],
             'persistent_processors' => [],
@@ -43,7 +46,7 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'dbal' => [
                     'connection' => 'message_queue',
                     'table' => 'oro_message_queue',
-                    'pid_file_dir' => '/tmp/oro-message-queue',
+                    'pid_file_dir' => $pidFileDir,
                     'consumer_process_pattern' => ':consume',
                     'polling_interval' => 1000,
                 ],
@@ -71,7 +74,11 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'security_agnostic_processors' => [],
                     'time_before_stale' => [],
                     'consumer' => [],
-                    'transport' => [],
+                    'transport' => [
+                        'dbal' => [
+                            'pid_file_dir' => $pidFileDir,
+                        ],
+                    ],
                     'client' => [],
                 ],
             ])
