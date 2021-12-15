@@ -13,7 +13,7 @@ class TextAttributeType extends StringAttributeType
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }

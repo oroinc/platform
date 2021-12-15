@@ -17,7 +17,7 @@ class MultiEnumAttributeType extends EnumAttributeType
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }
