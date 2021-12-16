@@ -10,88 +10,75 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LoadClassMetadataEventArgs|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $event;
-
-    /**
-     * @var DraftSourceListener
-     */
-    private $listener;
-
-    protected function setUp(): void
-    {
-        $this->event = $this->createMock(LoadClassMetadataEventArgs::class);
-
-        $this->listener = new DraftSourceListener(
-            DatabaseDriverInterface::DRIVER_POSTGRESQL
-        );
-    }
-
     public function testPlatformNotSupported(): void
     {
-        $this->event
-            ->expects($this->never())
+        $event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $event->expects($this->never())
             ->method('getClassMetadata');
 
         $listener = new DraftSourceListener('not_pgsql');
-        $listener->loadClassMetadata($this->event);
+        $listener->loadClassMetadata($event);
     }
 
-    public function testNotDraft(): void
+    /**
+     * @dataProvider getSupportedPlatformDataProvider
+     */
+    public function testNotDraft(string $platform): void
     {
         $metadata = $this->createMock(ClassMetadataInfo::class);
         $metadata->expects($this->once())
-            ->method('getReflectionClass')
-            ->willReturn(new \ReflectionClass(new \stdClass()));
+            ->method('getName')
+            ->willReturn(\stdClass::class);
 
-        $this->event
-            ->expects($this->once())
+        $event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $event->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        $this->listener->loadClassMetadata($this->event);
+        $listener = new DraftSourceListener($platform);
+        $listener->loadClassMetadata($event);
     }
 
-    public function testHasAssociationDraftSource(): void
+    /**
+     * @dataProvider getSupportedPlatformDataProvider
+     */
+    public function testHasAssociationDraftSource(string $platform): void
     {
         $metadata = $this->createMock(ClassMetadataInfo::class);
         $metadata->expects($this->once())
-            ->method('getReflectionClass')
-            ->willReturn(new \ReflectionClass(new DraftableEntityStub()));
+            ->method('getName')
+            ->willReturn(DraftableEntityStub::class);
         $metadata->expects($this->once())
             ->method('hasAssociation')
             ->with('draftSource')
             ->willReturn(true);
         $metadata->expects($this->never())
-            ->method('getName');
-        $metadata->expects($this->never())
             ->method('getIdentifier');
         $metadata->expects($this->never())
             ->method('mapManyToOne');
 
-        $this->event
-            ->expects($this->once())
+        $event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $event->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        $this->listener->loadClassMetadata($this->event);
+        $listener = new DraftSourceListener($platform);
+        $listener->loadClassMetadata($event);
     }
 
-    public function testMapManyToOne(): void
+    /**
+     * @dataProvider getSupportedPlatformDataProvider
+     */
+    public function testMapManyToOne(string $platform): void
     {
         $metadata = $this->createMock(ClassMetadataInfo::class);
-        $metadata->expects($this->once())
-            ->method('getReflectionClass')
-            ->willReturn(new \ReflectionClass(new DraftableEntityStub()));
+        $metadata->expects($this->atLeastOnce())
+            ->method('getName')
+            ->willReturn(DraftableEntityStub::class);
         $metadata->expects($this->once())
             ->method('hasAssociation')
             ->with('draftSource')
             ->willReturn(false);
-        $metadata->expects($this->once())
-            ->method('getName')
-            ->willReturn(DraftableEntityStub::class);
         $metadata->expects($this->once())
             ->method('getIdentifier')
             ->willReturn(['id']);
@@ -99,12 +86,21 @@ class DraftSourceListenerTest extends \PHPUnit\Framework\TestCase
             ->method('mapManyToOne')
             ->with($this->getPropertyMetadata());
 
-        $this->event
-            ->expects($this->once())
+        $event = $this->createMock(LoadClassMetadataEventArgs::class);
+        $event->expects($this->once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        $this->listener->loadClassMetadata($this->event);
+        $listener = new DraftSourceListener($platform);
+        $listener->loadClassMetadata($event);
+    }
+
+    public function getSupportedPlatformDataProvider(): array
+    {
+        return [
+            [DatabaseDriverInterface::DRIVER_POSTGRESQL],
+            [DatabaseDriverInterface::DRIVER_MYSQL]
+        ];
     }
 
     private function getPropertyMetadata(): array
