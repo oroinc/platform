@@ -8,50 +8,36 @@ use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
 /**
- * Add an association configuration to "draft source" property for draftable entities
+ * Adds an association configuration to "draft source" property for draftable entities.
  */
 class DraftSourceListener
 {
-    /**
-     * Entity field name
-     */
-    private const FIELD_NAME_ENTITY = 'draftSource';
+    private const FIELD_NAME = 'draftSource';
+    private const COLUMN_NAME = 'draft_source_id';
 
-    /**
-     * Table field name
-     */
-    private const FIELD_NAME_TABLE = 'draft_source_id';
+    private string $databaseDriver;
 
-    /**
-     * @var string
-     */
-    private $databaseDriver;
-
-    /**
-     * @param string $databaseDriver
-     */
-    public function __construct($databaseDriver)
+    public function __construct(string $databaseDriver)
     {
         $this->databaseDriver = $databaseDriver;
     }
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $event): void
     {
-        if (!$this->isPlatformSupport()) {
+        if (!$this->isPlatformSupported()) {
             return;
         }
 
         $metadata = $event->getClassMetadata();
-        if (!$this->isDraft($metadata->getReflectionClass())) {
+        if (!is_subclass_of($metadata->getName(), DraftableInterface::class)) {
             return;
         }
 
-        if ($metadata->hasAssociation(self::FIELD_NAME_ENTITY)) {
+        if ($metadata->hasAssociation(self::FIELD_NAME)) {
             return;
         }
 
-        $draftSourceMetadata = $this->getPropertyMetadata($metadata);
-        $metadata->mapManyToOne($draftSourceMetadata);
+        $metadata->mapManyToOne($this->getPropertyMetadata($metadata));
     }
 
     private function getPropertyMetadata(ClassMetadataInfo $metadata): array
@@ -61,21 +47,21 @@ class DraftSourceListener
 
         return [
             'joinColumns' => [[
-                'name' => self::FIELD_NAME_TABLE,
+                'name' => self::COLUMN_NAME,
                 'nullable' => true,
                 'onDelete' => 'CASCADE',
                 'columnDefinition' => null,
                 'referencedColumnName' => $entityIdentifier
             ]],
             'isOwningSide' => true,
-            'fieldName' => self::FIELD_NAME_ENTITY,
+            'fieldName' => self::FIELD_NAME,
             'targetEntity' => $className,
             'sourceEntity' => $className,
             'fetch' => ClassMetadataInfo::FETCH_LAZY,
             'type' => ClassMetadataInfo::MANY_TO_ONE,
-            'sourceToTargetKeyColumns' => [self::FIELD_NAME_TABLE => $entityIdentifier],
-            'joinColumnFieldNames' => [self::FIELD_NAME_TABLE => self::FIELD_NAME_TABLE],
-            'targetToSourceKeyColumns' => [$entityIdentifier => self::FIELD_NAME_TABLE]
+            'sourceToTargetKeyColumns' => [self::COLUMN_NAME => $entityIdentifier],
+            'joinColumnFieldNames' => [self::COLUMN_NAME => self::COLUMN_NAME],
+            'targetToSourceKeyColumns' => [$entityIdentifier => self::COLUMN_NAME]
         ];
     }
 
@@ -86,15 +72,10 @@ class DraftSourceListener
         return reset($identifier);
     }
 
-    private function isPlatformSupport(): bool
+    private function isPlatformSupported(): bool
     {
-        $drivers = [DatabaseDriverInterface::DRIVER_MYSQL, DatabaseDriverInterface::DRIVER_POSTGRESQL];
-
-        return in_array($this->databaseDriver, $drivers);
-    }
-
-    private function isDraft(\ReflectionClass $class): bool
-    {
-        return in_array(DraftableInterface::class, $class->getInterfaceNames());
+        return
+            DatabaseDriverInterface::DRIVER_POSTGRESQL === $this->databaseDriver
+            || DatabaseDriverInterface::DRIVER_MYSQL === $this->databaseDriver;
     }
 }
