@@ -5,6 +5,7 @@ namespace Oro\Component\Config\Loader;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\CumulativeResourceManager;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
@@ -111,12 +112,12 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
      */
     public function unserialize($serialized)
     {
-        list(
+        [
             $this->relativeFolderPath,
             $this->maxNestingLevel,
             $this->plainResultStructure,
             $this->fileMatcher
-            ) = unserialize($serialized);
+            ] = unserialize($serialized);
     }
 
     /**
@@ -347,25 +348,31 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         return false !== $filemtime && $filemtime < $timestamp;
     }
 
-    /**
-     * @param string $dir
-     *
-     * @return \SplFileInfo[]|\Iterator
-     */
-    protected function getDirectoryContents($dir)
+    protected function getDirectoryContents(string $dir): iterable
     {
-        $recursiveIterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        $recursiveIterator->setMaxDepth($this->maxNestingLevel);
+        $finder = Finder::create()->in($dir);
 
-        return new \CallbackFilterIterator(
-            $recursiveIterator,
-            function (\SplFileInfo $file) {
-                return null === $this->fileMatcher || $this->fileMatcher->isMatched($file);
+        if ($this->maxNestingLevel >= 0) {
+            $finder->depth('<=' . $this->maxNestingLevel);
+        }
+
+        if ($this->fileMatcher) {
+            $finder->filter(fn (\SplFileInfo $file) => $this->fileMatcher->isMatched($file));
+        }
+
+        // Adds sorting by depth to ensure that result is not affected by OS.
+        $finder->sort(static function (\SplFileInfo $file1, \SplFileInfo $file2) {
+            $depth1 = substr_count($file1->getPath(), DIRECTORY_SEPARATOR);
+            $depth2 = substr_count($file2->getPath(), DIRECTORY_SEPARATOR);
+            
+            if ($depth1 === $depth2) {
+                return 0;
             }
-        );
+            
+            return $depth1 > $depth2 ? 1 : -1;
+        });
+
+        return $finder->files();
     }
 
     /**

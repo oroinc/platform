@@ -2,6 +2,14 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## Unreleased
+
+### Changed
+
+#### Config component
+* Added sorting by depth to `Oro\Component\Config\Loader\FolderContentCumulativeLoader::getDirectoryContents()`
+  to ensure that result is not affected by an operating system.
+
 ## 5.0.0-rc (2021-12-07)
 [Show detailed list of changes](incompatibilities-5-0-rc.md)
 

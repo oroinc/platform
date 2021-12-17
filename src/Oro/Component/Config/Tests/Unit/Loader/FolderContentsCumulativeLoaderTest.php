@@ -15,13 +15,23 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
+    private string $rootDir = '';
+
     private string $bundleDir = '';
+
+    private function getRootDir(): string
+    {
+        if (!$this->rootDir) {
+            $this->rootDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
+        }
+
+        return $this->rootDir;
+    }
 
     private function getBundleDir(): string
     {
         if (!$this->bundleDir) {
-            $tmpDir = $this->copyToTempDir('test_data', realpath(__DIR__ . '/../Fixtures'));
-            $this->bundleDir = $tmpDir . $this->getPath('/Bundle/TestBundle1');
+            $this->bundleDir = $this->getRootDir() . $this->getPath('/Bundle/TestBundle1');
         }
 
         return $this->bundleDir;
@@ -348,8 +358,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->getBundleDir();
-        $rootDir = realpath($bundleDir . '/../../app');
-        $bundleAppDir = $rootDir . '/Resources/TestBundle1';
+        $bundleAppDir = $this->getRootDir() . '/app/Resources/TestBundle1';
 
         /** @var CumulativeResourceInfo $result */
         $result = $loader->load($bundleClass, $bundleDir, $bundleAppDir);
@@ -433,8 +442,7 @@ class FolderContentsCumulativeLoaderTest extends \PHPUnit\Framework\TestCase
 
         $bundleClass = TestBundle1::class;
         $bundleDir = $this->getBundleDir();
-        $appRootDir = realpath($bundleDir . '/../../app');
-        $bundleAppDir = $appRootDir . '/Resources/TestBundle1';
+        $bundleAppDir = $this->getRootDir() . '/app/Resources/TestBundle1';
 
         $resource = new CumulativeResource('test_group', new CumulativeResourceLoaderCollection());
         $loader->registerFoundResource($bundleClass, $bundleDir, $bundleAppDir, $resource);
