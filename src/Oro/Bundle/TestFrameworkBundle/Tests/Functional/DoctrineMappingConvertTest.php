@@ -16,6 +16,7 @@ class DoctrineMappingConvertTest extends WebTestCase
 
     protected function setUp(): void
     {
+        $this->markTestSkipped('Skipped due to BAP-21072');
         $this->initClient();
     }
 
