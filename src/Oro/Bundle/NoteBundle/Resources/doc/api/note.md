@@ -123,7 +123,7 @@ Delete a collection of note records.
 
 ### activityTargets
 
-A records to which the note record associated with.
+Records associated with the note record.
 
 #### create
 

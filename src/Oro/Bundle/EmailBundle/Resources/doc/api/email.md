@@ -4,7 +4,7 @@
 
 ### activityTargets
 
-A records to which the email record associated with.
+Records associated with the email record.
 
 ## FILTERS
 
