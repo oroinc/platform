@@ -167,7 +167,9 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         }
 
         foreach ($changeSet as $field => $value) {
-            $accessor->setValue($newEntity, $field, $value['old']);
+            if ($accessor->isWritable($newEntity, $field)) {
+                $accessor->setValue($newEntity, $field, $value['old']);
+            }
         }
 
         return $newEntity;
