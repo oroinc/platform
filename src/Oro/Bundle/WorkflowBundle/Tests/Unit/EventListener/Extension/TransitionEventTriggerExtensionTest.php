@@ -13,11 +13,14 @@ use Oro\Bundle\WorkflowBundle\EventListener\Extension\AbstractEventTriggerExtens
 use Oro\Bundle\WorkflowBundle\EventListener\Extension\TransitionEventTriggerExtension;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
+use Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Stubs\WorkflowAwareEntityProxyStub;
 use Oro\Component\Testing\ReflectionUtil;
 
 class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 {
     use MessageQueueExtension;
+
+    protected const ENTITY_CLASS = WorkflowAwareEntityProxyStub::class;
 
     /** @var TransitionEventTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
     protected $repository;
@@ -110,7 +113,15 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             [
                 'event' => EventTriggerInterface::EVENT_DELETE,
                 'triggers' => ['delete']
-            ]
+            ],
+            'case when change set contains a field with missed setter' => [
+                'event' => EventTriggerInterface::EVENT_UPDATE,
+                'triggers' => ['updateEntity'],
+                'changeSet' => [
+                    'hiddenProperty' => ['old' => 'hiddenPropertyValue', 'new' => 'hiddenPropertyValueModified'],
+                    self::FIELD => ['old' => 2, 'new' => 2]
+                ]
+            ],
         ];
     }
 

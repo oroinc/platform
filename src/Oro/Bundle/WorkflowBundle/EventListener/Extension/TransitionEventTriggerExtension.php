@@ -14,7 +14,7 @@ use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Extension for transition event triggers.
@@ -159,7 +159,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      */
     private function createEntityFromChangeSet($entity, array $changeSet = null)
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $accessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
         $newEntity = clone $entity;
 
         if (null === $changeSet) {
@@ -167,7 +167,9 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         }
 
         foreach ($changeSet as $field => $value) {
-            $accessor->setValue($newEntity, $field, $value['old']);
+            if ($accessor->isWritable($newEntity, $field)) {
+                $accessor->setValue($newEntity, $field, $value['old']);
+            }
         }
 
         return $newEntity;
