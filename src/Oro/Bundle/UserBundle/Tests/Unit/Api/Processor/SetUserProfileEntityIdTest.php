@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Tests\Unit\Api\Processor\Get;
+namespace Oro\Bundle\UserBundle\Tests\Unit\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
-use Oro\Bundle\UserBundle\Api\Processor\Get\SetUserProfileEntityId;
+use Oro\Bundle\UserBundle\Api\Processor\SetUserProfileEntityId;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

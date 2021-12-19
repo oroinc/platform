@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\UserBundle\Api\Processor\Get;
+namespace Oro\Bundle\UserBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
@@ -13,8 +13,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class SetUserProfileEntityId implements ProcessorInterface
 {
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(TokenStorageInterface $tokenStorage)
     {
