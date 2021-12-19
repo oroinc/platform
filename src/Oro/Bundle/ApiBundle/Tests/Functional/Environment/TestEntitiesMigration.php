@@ -54,6 +54,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->createTestNestedObjectsTable($schema);
         $this->createTestAllDataTypesTable($schema);
         $this->createTestCustomEntityTables($schema);
+        $this->createTestCustomEntityTableWithDeletedFields($schema);
         $this->createTestEntityTables($schema);
         $this->createTestProductTable($schema);
         $this->createTestOrderTables($schema);
@@ -373,13 +374,42 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
     }
 
     /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param string $code
-     * @param bool   $isMultiple
+     * Create custom entity table contains deleted fields and associations
      */
-    private function addEnumField($s, $t, $name, $code, $isMultiple = false)
+    private function createTestCustomEntityTableWithDeletedFields(Schema $schema)
+    {
+        if ($schema->hasTable('oro_ext_testapie3')) {
+            return;
+        }
+
+        $t = $this->extendExtension->createCustomEntityTable($schema, 'TestApiE3');
+        $t->addColumn('name', 'string', [
+            'length'        => 255,
+            OroOptions::KEY => ['extend' => ['owner' => ExtendScope::OWNER_CUSTOM]]
+        ]);
+        $t->addColumn('title', 'string', [
+            'length'        => 255,
+            OroOptions::KEY => [
+                'extend' => [
+                    'owner'      => ExtendScope::OWNER_CUSTOM,
+                    'is_deleted' => true,
+                    'state'      => ExtendScope::STATE_DELETE
+                ]
+            ]
+        ]);
+
+        $tt = $schema->getTable('oro_ext_testapie2');
+        $deleted = ['extend' => ['is_deleted' => true, 'state' => ExtendScope::STATE_DELETE]];
+        $deletedWithoutDefault = $deleted;
+        $deletedWithoutDefault['extend']['without_default'] = true;
+        $this->addManyToOneRelation($schema, $t, 'uniM2O', $tt, $deleted);
+        $this->addManyToManyRelation($schema, $t, 'uniM2M', $tt, $deleted);
+        $this->addManyToManyRelation($schema, $t, 'uniM2MnD', $tt, $deletedWithoutDefault);
+        $this->addOneToManyRelation($schema, $t, 'uniO2M', $tt, $deleted);
+        $this->addOneToManyRelation($schema, $t, 'uniO2MnD', $tt, $deletedWithoutDefault);
+    }
+
+    private function addEnumField(Schema $s, Table $t, string $name, string $code, bool $isMultiple = false)
     {
         $this->extendExtension->addEnumField(
             $s,
@@ -392,16 +422,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         );
     }
 
-    /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param Table  $tt
-     * @param array  $options
-     */
-    private function addManyToOneRelation($s, $t, $name, $tt, array $options = [])
+    private function addManyToOneRelation(Schema $s, Table $t, string $name, Table $tt, array $options = [])
     {
-        $options = \array_merge_recursive(
+        $options = array_merge_recursive(
             [
                 'extend' => [
                     'owner'        => ExtendScope::OWNER_CUSTOM,
@@ -413,14 +436,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->extendExtension->addManyToOneRelation($s, $t, $name, $tt, 'name', $options);
     }
 
-    /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param Table  $tt
-     * @param string $targetName
-     */
-    private function addManyToOneInverseRelation($s, $t, $name, $tt, $targetName)
+    private function addManyToOneInverseRelation(Schema $s, Table $t, string $name, Table $tt, string $targetName)
     {
         $this->extendExtension->addManyToOneInverseRelation(
             $s,
@@ -435,16 +451,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         );
     }
 
-    /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param Table  $tt
-     * @param array  $options
-     */
-    private function addManyToManyRelation($s, $t, $name, $tt, array $options = [])
+    private function addManyToManyRelation(Schema $s, Table $t, string $name, Table $tt, array $options = [])
     {
-        $options = \array_merge_recursive(
+        $options = array_merge_recursive(
             [
                 'extend' => [
                     'owner'           => ExtendScope::OWNER_CUSTOM,
@@ -458,14 +467,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->extendExtension->addManyToManyRelation($s, $t, $name, $tt, ['name'], ['name'], ['name'], $options);
     }
 
-    /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param Table  $tt
-     * @param string $targetName
-     */
-    private function addManyToManyInverseRelation($s, $t, $name, $tt, $targetName)
+    private function addManyToManyInverseRelation(Schema $s, Table $t, string $name, Table $tt, string $targetName)
     {
         $this->extendExtension->addManyToManyInverseRelation(
             $s,
@@ -480,16 +482,9 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         );
     }
 
-    /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param Table  $tt
-     * @param array  $options
-     */
-    private function addOneToManyRelation($s, $t, $name, $tt, array $options = [])
+    private function addOneToManyRelation(Schema $s, Table $t, string $name, Table $tt, array $options = [])
     {
-        $options = \array_merge_recursive(
+        $options = array_merge_recursive(
             [
                 'extend' => [
                     'owner'           => ExtendScope::OWNER_CUSTOM,
@@ -503,14 +498,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->extendExtension->addOneToManyRelation($s, $t, $name, $tt, ['name'], ['name'], ['name'], $options);
     }
 
-    /**
-     * @param Schema $s
-     * @param Table  $t
-     * @param string $name
-     * @param Table  $tt
-     * @param string $targetName
-     */
-    private function addOneToManyInverseRelation($s, $t, $name, $tt, $targetName)
+    private function addOneToManyInverseRelation(Schema $s, Table $t, string $name, Table $tt, string $targetName)
     {
         $this->extendExtension->addOneToManyInverseRelation(
             $s,
