@@ -4,26 +4,26 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendExclusionProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
 {
-    const ENTITY_CLASS = 'Test\Entity';
-    const FIELD_NAME   = 'testField';
+    private const ENTITY_CLASS = 'Test\Entity';
+    private const FIELD_NAME = 'testField';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configManager = $this->createMock(ConfigManager::class);
     }
 
     public function testIsIgnoredEntityForNonConfigurableEntity()
@@ -482,32 +482,81 @@ class ExtendExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getEntityConfig($className, $values = [])
+    public function testIsIgnoredRelationForDefaultFieldOfToManyRelation()
     {
-        $configId = new EntityConfigId('extend', $className);
-        $config   = new Config($configId);
+        $metadata = new ClassMetadata(self::ENTITY_CLASS);
+        $fieldName = ExtendConfigDumper::DEFAULT_PREFIX . self::FIELD_NAME;
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->withConsecutive([self::ENTITY_CLASS, $fieldName], [self::ENTITY_CLASS, self::FIELD_NAME])
+            ->willReturnOnConsecutiveCalls(false, true);
+
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('extend', self::ENTITY_CLASS, self::FIELD_NAME)
+            ->willReturn(
+                $this->getFieldConfig(
+                    self::ENTITY_CLASS,
+                    self::FIELD_NAME,
+                    ['target_entity' => 'Test\TargetEntity']
+                )
+            );
+        $this->configManager->expects($this->once())
+            ->method('getEntityConfig')
+            ->with('extend', 'Test\TargetEntity')
+            ->willReturn(
+                $this->getEntityConfig('Test\TargetEntity')
+            );
+
+        $exclusionProvider = new ExtendExclusionProvider($this->configManager);
+
+        $this->assertFalse(
+            $exclusionProvider->isIgnoredRelation($metadata, $fieldName)
+        );
+    }
+
+    public function testIsIgnoredRelationForDefaultFieldOfToManyRelationForNotAccessibleRelation()
+    {
+        $metadata = new ClassMetadata(self::ENTITY_CLASS);
+        $fieldName = ExtendConfigDumper::DEFAULT_PREFIX . self::FIELD_NAME;
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('hasConfig')
+            ->withConsecutive([self::ENTITY_CLASS, $fieldName], [self::ENTITY_CLASS, self::FIELD_NAME])
+            ->willReturnOnConsecutiveCalls(false, true);
+
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('extend', self::ENTITY_CLASS, self::FIELD_NAME)
+            ->willReturn(
+                $this->getFieldConfig(
+                    self::ENTITY_CLASS,
+                    self::FIELD_NAME,
+                    ['is_extend' => true, 'is_deleted' => true, 'target_entity' => 'Test\TargetEntity']
+                )
+            );
+        $this->configManager->expects($this->never())
+            ->method('getEntityConfig');
+
+        $exclusionProvider = new ExtendExclusionProvider($this->configManager);
+
+        $this->assertTrue(
+            $exclusionProvider->isIgnoredRelation($metadata, $fieldName)
+        );
+    }
+
+    private function getEntityConfig(string $className, array $values = []): Config
+    {
+        $config = new Config(new EntityConfigId('extend', $className));
         $config->setValues($values);
 
         return $config;
     }
 
-    /**
-     * @param string $className
-     * @param string $fieldName
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getFieldConfig($className, $fieldName, $values = [])
+    private function getFieldConfig(string $className, string $fieldName, array $values = []): Config
     {
-        $configId = new FieldConfigId('extend', $className, $fieldName);
-        $config   = new Config($configId);
+        $config = new Config(new FieldConfigId('extend', $className, $fieldName));
         $config->setValues($values);
 
         return $config;

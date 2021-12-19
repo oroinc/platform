@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -75,14 +76,27 @@ class ExtendExclusionProvider implements ExclusionProviderInterface
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         if (!$this->configManager->hasConfig($metadata->name, $associationName)) {
+            // check for default field of oneToMany or manyToMany relation
+            if (str_starts_with($associationName, ExtendConfigDumper::DEFAULT_PREFIX)) {
+                $guessedName = substr($associationName, \strlen(ExtendConfigDumper::DEFAULT_PREFIX));
+                if (!empty($guessedName) && $this->configManager->hasConfig($metadata->name, $guessedName)) {
+                    return $this->isIgnoredExtendRelation($metadata->name, $guessedName);
+                }
+            }
+
             return false;
         }
 
-        $extendFieldConfig = $this->configManager->getFieldConfig('extend', $metadata->name, $associationName);
+        return $this->isIgnoredExtendRelation($metadata->name, $associationName);
+    }
+
+    private function isIgnoredExtendRelation(string $entityClass, string $associationName): bool
+    {
+        $extendFieldConfig = $this->configManager->getFieldConfig('extend', $entityClass, $associationName);
         if (!ExtendHelper::isFieldAccessible($extendFieldConfig)) {
             return true;
         }
-        if ($this->excludeHiddenFields && $this->configManager->isHiddenModel($metadata->name, $associationName)) {
+        if ($this->excludeHiddenFields && $this->configManager->isHiddenModel($entityClass, $associationName)) {
             return true;
         }
         if ($extendFieldConfig->has('target_entity')) {
