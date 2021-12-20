@@ -61,13 +61,10 @@ api:
             actions: false
 
         Oro\Bundle\UserBundle\Api\Model\UserProfile:
-            fields:
-                id:
-                    description: The unique identifier of a user.
+            documentation_resource: '@OroUserBundle/Resources/doc/api/user_profile.md'
             actions:
                 get:
                     description: Get current logged in user
-                    documentation: Retrieve a record of the currently logged in user.
                 get_list: false
                 create: false
                 update: false

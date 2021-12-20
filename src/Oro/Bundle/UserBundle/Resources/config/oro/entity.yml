@@ -14,6 +14,3 @@ oro_entity:
         Oro\Bundle\UserBundle\Entity\Role:
             alias:        userrole
             plural_alias: userroles
-        Oro\Bundle\UserBundle\Entity\Status:
-            alias:        userstatus
-            plural_alias: userstatuses

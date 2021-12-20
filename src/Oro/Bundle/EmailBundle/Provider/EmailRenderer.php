@@ -7,6 +7,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRenderer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProviderInterface;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariableProcessorRegistry;
+use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 
@@ -17,18 +18,21 @@ class EmailRenderer extends TemplateRenderer
 {
     private const VARIABLE_NOT_FOUND = 'oro.email.variable.not.found';
 
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
+
+    private HtmlTagHelper $htmlTagHelper;
 
     public function __construct(
         Environment $environment,
         TemplateRendererConfigProviderInterface $configProvider,
         VariableProcessorRegistry $variableProcessors,
         TranslatorInterface $translator,
-        Inflector $inflector
+        Inflector $inflector,
+        HtmlTagHelper $htmlTagHelper
     ) {
         parent::__construct($environment, $configProvider, $variableProcessors, $inflector);
         $this->translator = $translator;
+        $this->htmlTagHelper = $htmlTagHelper;
     }
 
     /**
@@ -61,8 +65,10 @@ class EmailRenderer extends TemplateRenderer
     {
         $this->ensureSandboxConfigured();
 
+        $content = $this->htmlTagHelper->sanitize($template->getContent(), 'default', false);
+
         return $this->environment
-            ->createTemplate('{% verbatim %}' . $template->getContent() . '{% endverbatim %}')
+            ->createTemplate('{% verbatim %}' . $content . '{% endverbatim %}')
             ->render();
     }
 

@@ -57,9 +57,7 @@ class OrmTranslationLoader implements LoaderInterface
      */
     public function load($resource, $locale, $domain = 'messages')
     {
-        /** @var MessageCatalogue $catalogue */
         $catalogue = new MessageCatalogue($locale);
-
         if ($this->enabled && $this->checkDatabase()) {
             $messages = [];
             $translations = $this->getTranslationRepository()->findAllByLanguageAndDomain($locale, $domain);

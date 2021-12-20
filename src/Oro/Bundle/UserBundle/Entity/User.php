@@ -339,22 +339,6 @@ class User extends ExtendUser implements
     protected $apiKeys;
 
     /**
-     * @var Status[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="Status", mappedBy="user")
-     * @ORM\OrderBy({"createdAt" = "DESC"})
-     */
-    protected $statuses;
-
-    /**
-     * @var Status
-     *
-     * @ORM\OneToOne(targetEntity="Status")
-     * @ORM\JoinColumn(name="status_id", referencedColumnName="id", nullable=true)
-     */
-    protected $currentStatus;
-
-    /**
      * @var Email[]|Collection
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="user", orphanRemoval=true, cascade={"persist"})
@@ -457,7 +441,6 @@ class User extends ExtendUser implements
     {
         parent::__construct();
 
-        $this->statuses = new ArrayCollection();
         $this->emails = new ArrayCollection();
         $this->organizations = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
@@ -740,56 +723,6 @@ class User extends ExtendUser implements
             $this->confirmationToken = null;
             $this->passwordRequestedAt = null;
         }
-    }
-
-    /**
-     * Get User Statuses
-     *
-     * @return Status[]|Collection
-     */
-    public function getStatuses()
-    {
-        return $this->statuses;
-    }
-
-    /**
-     * Add Status to User
-     *
-     * @param Status $status
-     *
-     * @return User
-     */
-    public function addStatus(Status $status)
-    {
-        if (!$this->statuses->contains($status)) {
-            $this->statuses->add($status);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get Current Status
-     *
-     * @return Status
-     */
-    public function getCurrentStatus()
-    {
-        return $this->currentStatus;
-    }
-
-    /**
-     * Set User Current Status
-     *
-     * @param Status $status
-     *
-     * @return User
-     */
-    public function setCurrentStatus(Status $status = null)
-    {
-        $this->currentStatus = $status;
-
-        return $this;
     }
 
     /**

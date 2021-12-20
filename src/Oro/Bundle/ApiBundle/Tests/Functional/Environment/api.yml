@@ -6,6 +6,9 @@ api:
         Extend\Entity\TestApiE2:
             alias: testapientity2
             plural_alias: testapientity2
+        Extend\Entity\TestApiE3:
+            alias: testapientity3
+            plural_alias: testapientity3
         Extend\Entity\EV_Api_Enum1:
             alias: testapienum1
             plural_alias: testapienum1
