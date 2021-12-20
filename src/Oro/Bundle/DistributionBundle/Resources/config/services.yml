@@ -62,13 +62,6 @@ services:
         arguments:
           - '%oro_distribution.composer_json%'
 
-    oro_distribution.database_translation.loader:
-        class: Oro\Bundle\DistributionBundle\Translation\DbalTranslationLoader
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: translation.loader, alias: oro_dbal_translation }
-
     oro_distribution.event_listener.install_command_deployment_type:
         class: Oro\Bundle\DistributionBundle\EventListener\InstallCommandDeploymentTypeListener
         arguments:
