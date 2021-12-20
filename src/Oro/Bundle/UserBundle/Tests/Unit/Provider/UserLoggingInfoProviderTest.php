@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -34,7 +35,7 @@ class UserLoggingInfoProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals([
             'user' => [
-                'id' => null,
+                'id' => 123,
                 'username' => 'john',
                 'email' => 'john@example.com',
                 'fullname' => 'John Doe',
@@ -60,12 +61,16 @@ class UserLoggingInfoProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testSetUserInfoForString()
     {
-        self::assertSame(['username' => 'some username'], $this->provider->getUserLoggingInfo('some username'));
+        self::assertSame(
+            ['username' => 'some username'],
+            $this->provider->getUserLoggingInfo('some username')
+        );
     }
 
     private function getUserWithData(): User
     {
         $user = new User();
+        ReflectionUtil::setId($user, 123);
         $user->setEnabled(true);
         $user->setUsername('john');
         $user->setEmail('john@example.com');

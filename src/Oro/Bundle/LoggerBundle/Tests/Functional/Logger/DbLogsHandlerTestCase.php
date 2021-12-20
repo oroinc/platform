@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\LoggerBundle\Tests\Functional\Monolog;
+namespace Oro\Bundle\LoggerBundle\Tests\Functional\Logger;
 
 use Doctrine\ORM\EntityRepository;
 use Monolog\Logger;
@@ -8,7 +8,7 @@ use Oro\Bundle\LoggerBundle\Entity\LogEntry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Psr\Log\LoggerInterface;
 
-class DbLogsHandlerTest extends WebTestCase
+abstract class DbLogsHandlerTestCase extends WebTestCase
 {
     /** @var LoggerInterface */
     protected $logger;
@@ -19,10 +19,12 @@ class DbLogsHandlerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->logger = $this->getContainer()->get('monolog.logger.oro_account_security');
+        $this->logger = $this->getContainer()->get('monolog.logger.' . $this->getLogChannelName());
         $this->repo = $this->getContainer()->get('oro_entity.doctrine_helper')
             ->getEntityRepositoryForClass(LogEntry::class);
     }
+
+    abstract protected function getLogChannelName(): string;
 
     /**
      * @dataProvider writeDataProvider
@@ -41,7 +43,7 @@ class DbLogsHandlerTest extends WebTestCase
         self::assertSame($expected['message'], $logEntry->getMessage());
         self::assertArrayIntersectEquals($expected['context'], $logEntry->getContext());
         self::assertSame(Logger::getLevels()[strtoupper($level)], $logEntry->getLevel());
-        self::assertSame('oro_account_security', $logEntry->getChannel());
+        self::assertSame($this->getLogChannelName(), $logEntry->getChannel());
         self::assertInstanceOf(\DateTime::class, $logEntry->getDatetime());
         self::assertSame([], $logEntry->getExtra());
     }
