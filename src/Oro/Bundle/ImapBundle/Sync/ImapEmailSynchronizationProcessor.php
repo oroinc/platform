@@ -27,6 +27,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManagerFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Psr\Log\LoggerInterface;
@@ -53,6 +54,8 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
     protected ImapEmailManager $manager;
     protected ImapEmailRemoveManager $removeManager;
 
+    private ImapEmailFolderManagerFactory $imapEmailFolderManagerFactory;
+
     private LoggerInterface $emailErrorsLogger;
 
     private ?int $processStartTime = null;
@@ -67,6 +70,15 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         parent::__construct($em, $emailEntityBuilder, $knownEmailAddressChecker);
         $this->manager = $manager;
         $this->removeManager = $removeManager;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setImapEmailFolderManagerFactory(
+        ImapEmailFolderManagerFactory $imapEmailFolderManagerFactory
+    ): void {
+        $this->imapEmailFolderManagerFactory = $imapEmailFolderManagerFactory;
     }
 
     public function setEmailErrorsLogger(LoggerInterface $emailErrorsLogger): void
@@ -84,6 +96,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         $this->initEnv($origin);
         $this->processStartTime = time();
+
+        $manager = $this->imapEmailFolderManagerFactory->getImapEmailFolderManager($origin, $this->em);
+        $this->logger->info('Refresh the folders.');
+        $manager->refreshFolders();
+
         // iterate through all folders enabled for sync and do a synchronization of emails for each one
         $imapFolders = $this->getSyncEnabledImapFolders($origin, true);
         foreach ($imapFolders as $imapFolder) {

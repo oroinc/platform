@@ -6,21 +6,21 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManagerFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Psr\Log\LoggerAwareTrait;
 
+/**
+ * The factory that creates ImapEmailSynchronizationProcessor.
+ */
 class ImapEmailSynchronizationProcessorFactory
 {
     use LoggerAwareTrait;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var EmailEntityBuilder */
-    protected $emailEntityBuilder;
-
-    /** @var ImapEmailRemoveManager */
-    protected $removeManager;
+    protected ManagerRegistry $doctrine;
+    protected EmailEntityBuilder $emailEntityBuilder;
+    protected ImapEmailRemoveManager $removeManager;
+    private ImapEmailFolderManagerFactory $imapEmailFolderManagerFactory;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -30,6 +30,15 @@ class ImapEmailSynchronizationProcessorFactory
         $this->doctrine = $doctrine;
         $this->emailEntityBuilder = $emailEntityBuilder;
         $this->removeManager = $removeManager;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setImapEmailFolderManagerFactory(
+        ImapEmailFolderManagerFactory $imapEmailFolderManagerFactory
+    ): void {
+        $this->imapEmailFolderManagerFactory = $imapEmailFolderManagerFactory;
     }
 
     /**
@@ -52,6 +61,7 @@ class ImapEmailSynchronizationProcessorFactory
             $this->removeManager
         );
         $processor->setEmailErrorsLogger($this->logger);
+        $processor->setImapEmailFolderManagerFactory($this->imapEmailFolderManagerFactory);
 
         return $processor;
     }

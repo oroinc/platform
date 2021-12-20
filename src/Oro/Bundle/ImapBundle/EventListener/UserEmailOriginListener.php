@@ -3,9 +3,7 @@
 namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\LifecycleEventArgs;
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
@@ -21,24 +19,28 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 class UserEmailOriginListener
 {
     /**
+     * @deprecated
+     *
      * @var SymmetricCrypterInterface
      */
     protected $crypter;
 
     /**
+     * @deprecated
+     *
      * @var ImapConnectorFactory
      */
     protected $connectorFactory;
 
     /**
-     * @var Registry
-     */
-    protected $doctrine;
-
-    /**
+     * @deprecated
+     *
      * @var OAuthManagerRegistry
      */
     protected $oauthManagerRegistry;
+
+    /** @var Registry */
+    protected $doctrine;
 
     public function __construct(
         SymmetricCrypterInterface $crypter,
@@ -65,23 +67,15 @@ class UserEmailOriginListener
         }
     }
 
-    /**
-     * @param ArrayCollection|EmailFolder[] $folders
-     * @param ImapEmailFolderManager $manager
-     */
-    protected function createImapEmailFolders($folders, ImapEmailFolderManager $manager)
+    protected function createImapEmailFolders($folders, ImapEmailFolderManager $manager): void
     {
         foreach ($folders as $folder) {
             if ($folder->getId() === null) {
-                $uidValidity = $manager->getUidValidity($folder);
+                $imapEmailFolder = new ImapEmailFolder();
+                $imapEmailFolder->setUidValidity(0);
+                $imapEmailFolder->setFolder($folder);
 
-                if ($uidValidity !== null) {
-                    $imapEmailFolder = new ImapEmailFolder();
-                    $imapEmailFolder->setUidValidity($uidValidity);
-                    $imapEmailFolder->setFolder($folder);
-
-                    $this->doctrine->getManager()->persist($imapEmailFolder);
-                }
+                $this->doctrine->getManager()->persist($imapEmailFolder);
 
                 if ($folder->hasSubFolders()) {
                     $this->createImapEmailFolders($folder->getSubFolders(), $manager);
@@ -91,11 +85,9 @@ class UserEmailOriginListener
     }
 
     /**
-     * @param UserEmailOrigin $origin
-     *
-     * @return ImapEmailFolderManager
+     * @deprecated
      */
-    protected function createManager(UserEmailOrigin $origin)
+    protected function createManager(UserEmailOrigin $origin): ImapEmailFolderManager
     {
         $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
             ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
@@ -108,9 +100,7 @@ class UserEmailOriginListener
             $this->crypter->decryptData($origin->getPassword()),
             $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
         );
-
         $connector = $this->connectorFactory->createImapConnector($config);
-
         return new ImapEmailFolderManager($connector, $this->doctrine->getManager(), $origin);
     }
 }
