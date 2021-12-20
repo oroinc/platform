@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DistributionBundle\DependencyInjection;
 
-use Oro\Bundle\DistributionBundle\Translation\Translator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -22,7 +21,6 @@ class OroDistributionExtension extends Extension
         $loader->load('services.yml');
 
         $this->mergeTwigResources($container);
-        $this->replaceTranslator($container);
     }
 
     protected function mergeTwigResources(ContainerBuilder $container): void
@@ -43,14 +41,5 @@ class OroDistributionExtension extends Extension
             'twig.form.resources',
             array_unique(array_merge((array)$container->getParameter('twig.form.resources'), $data))
         );
-    }
-
-    protected function replaceTranslator(ContainerBuilder $container): void
-    {
-        $bundles = $container->getParameter('kernel.bundles');
-        //Replace translator class only if not registered OroTranslationBundle
-        if (!isset($bundles['OroTranslationBundle'])) {
-            $container->setParameter('translator.class', Translator::class);
-        }
     }
 }
