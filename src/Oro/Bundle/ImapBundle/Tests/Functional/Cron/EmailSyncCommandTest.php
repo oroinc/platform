@@ -146,6 +146,10 @@ class EmailSyncCommandTest extends WebTestCase
             ->method('search')
             ->willReturn($assertCount ? [1] : []);
 
+        $this->protocol->expects($this->any())
+           ->method('listMailbox')
+           ->willReturn(['INBOX' => ['delim' => '/', 'flags' => []]]);
+
         if (isset($params['--id'])) {
             $params['--id'] = (string)$this->getReference($params['--id'])->getId();
         }

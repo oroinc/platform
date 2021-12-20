@@ -55,6 +55,30 @@ class ImapEmailFolderManager
     }
 
     /**
+     * Refresh folders. Sets the UID Validity value to folders without UID Validity and
+     * merge the local saved folders with the current folders state at remote server.
+     */
+    public function refreshFolders()
+    {
+        // set the UID Validity value to folders without UID Validity
+        $foldersWithoutUidValidity = $this->getFoldersWithoutUidValidity();
+        if ($foldersWithoutUidValidity->count()) {
+            foreach ($foldersWithoutUidValidity as $folder) {
+                $uidValidity = $this->getUidValidity($folder->getFolder());
+                if (null !== $uidValidity) {
+                    $folder->setUidValidity($uidValidity);
+                    $this->em->persist($folder);
+                }
+            }
+            $this->em->flush();
+        }
+
+        // merge the local saved folders with the current folders state at remote server
+        $this->mergeFolders($this->processFolders($this->connector->findFolders()), $this->getExistingFolders());
+        $this->em->flush();
+    }
+
+    /**
      * Gets UIDVALIDITY of the given folder
      *
      * @param EmailFolder|Folder|string $folder
@@ -72,7 +96,7 @@ class ImapEmailFolderManager
         }
 
         if (!isset($folderName)) {
-            throw new \RuntimeException('Invalid argument passed to getUidValidity method');
+            throw new \RuntimeException('Invalid argument passed to getUidValidity method.');
         }
 
         try {
@@ -106,13 +130,8 @@ class ImapEmailFolderManager
     {
         $emailFolderModels = new ArrayCollection();
         foreach ($srcFolders as $srcFolder) {
-            $emailFolderModel = null;
-            $uidValidity = $this->getUidValidity($srcFolder);
-
-            if ($uidValidity !== null) {
-                $emailFolderModel = $this->createEmailFolderModel($srcFolder, $uidValidity);
-                $emailFolderModels->add($emailFolderModel);
-            }
+            $emailFolderModel = $this->createEmailFolderModel($srcFolder, 0);
+            $emailFolderModels->add($emailFolderModel);
 
             $childSrcFolders = [];
             foreach ($srcFolder as $childSrcFolder) {
@@ -145,25 +164,50 @@ class ImapEmailFolderManager
         ArrayCollection $existingImapFolders
     ): ArrayCollection {
         foreach ($syncedFolderModels as $syncedFolderModel) {
-            $f = $existingImapFolders->filter(function (ImapEmailFolder $imapEmailFolder) use ($syncedFolderModel) {
-                return $imapEmailFolder->getUidValidity() === $syncedFolderModel->getUidValidity();
-            });
+            $foundItemsByFolderName = $existingImapFolders->filter(
+                function (ImapEmailFolder $imapEmailFolder) use ($syncedFolderModel) {
+                    return (string) $syncedFolderModel->getEmailFolder()->getFullName()
+                        === (string) $imapEmailFolder->getFolder()->getFullName();
+                }
+            );
 
-            if ($f->isEmpty()) {
-                // there is a new folder on server, create it
-                $imapEmailFolder = $this->createImapEmailFolder($syncedFolderModel);
+            if ($foundItemsByFolderName->isEmpty()) {
+                $uidValidity = $this->getUidValidity($syncedFolderModel->getEmailFolder());
+                if (null === $uidValidity) {
+                    continue;
+                }
 
-                // persist ImapEmailFolder and (by cascade) EmailFolder
-                $this->em->persist($imapEmailFolder);
+                // additional chance to find the folder by UID Validity
+                $foundItemsByUidValidity = $existingImapFolders->filter(
+                    function (ImapEmailFolder $imapEmailFolder) use ($uidValidity) {
+                        return $imapEmailFolder->getUidValidity() === $uidValidity;
+                    }
+                );
+
+                if ($foundItemsByUidValidity->isEmpty()) {
+                    $existing = false;
+                    // there is a new folder on server, create it
+                    $syncedFolderModel->setUidValidity($uidValidity);
+                    $imapEmailFolder = $this->createImapEmailFolder($syncedFolderModel);
+
+                    // persist ImapEmailFolder and (by cascade) EmailFolder
+                    $this->em->persist($imapEmailFolder);
+                } else {
+                    $existing = true;
+                    $existingImapFolder = $foundItemsByUidValidity->first();
+                }
             } else {
+                $existing = true;
+                $existingImapFolder = $foundItemsByFolderName->first();
+            }
+
+            if ($existing) {
                 /** @var ImapEmailFolder $existingImapFolder */
-                $existingImapFolder = $f->first();
                 $emailFolder = $existingImapFolder->getFolder();
                 $this->em->refresh($emailFolder);
                 $emailFolder->setName($syncedFolderModel->getEmailFolder()->getName());
                 $emailFolder->setFullName($syncedFolderModel->getEmailFolder()->getFullName());
                 $emailFolder->setType($syncedFolderModel->getEmailFolder()->getType());
-                $emailFolder->setSynchronizedAt($syncedFolderModel->getEmailFolder()->getSynchronizedAt());
                 $syncedFolderModel->setEmailFolder($emailFolder);
 
                 $existingImapFolders->removeElement($existingImapFolder);
@@ -250,6 +294,25 @@ class ImapEmailFolderManager
             ->leftJoin('ief.folder', 'ef')
             ->where('ef.origin = :origin')
             ->setParameter('origin', $this->origin);
+
+        return new ArrayCollection($qb->getQuery()->getResult());
+    }
+
+    /**
+     * Get the first 100 folders that have no UID validity.
+     *
+     * @return ArrayCollection|ImapEmailFolder[]
+     */
+    private function getFoldersWithoutUidValidity(): ArrayCollection
+    {
+        $qb = $this->em->createQueryBuilder()
+           ->select('ief')
+           ->from(ImapEmailFolder::class, 'ief')
+           ->leftJoin('ief.folder', 'ef')
+           ->where('ef.origin = :origin')
+           ->andWhere('ief.uidValidity = 0')
+           ->setParameter('origin', $this->origin)
+           ->setMaxResults(100);
 
         return new ArrayCollection($qb->getQuery()->getResult());
     }

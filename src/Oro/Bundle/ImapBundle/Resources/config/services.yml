@@ -62,8 +62,16 @@ services:
             - '@oro_imap.imap_email_remove_manager'
         calls:
             - ['setLogger', ['@logger']]
+            - ['setImapEmailFolderManagerFactory', ['@oro_imap.imap_email_folder_manager_factory']]
         tags:
             - { name: monolog.logger, channel: oro_imap_email }
+
+    oro_imap.imap_email_folder_manager_factory:
+        class: Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManagerFactory
+        arguments:
+            - '@oro_security.encoder.default'
+            - '@oro_imap.connector.factory'
+            - '@oro_imap.oauth_manager_registry'
 
     oro_imap.imap_email_remove_manager:
         class: Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager

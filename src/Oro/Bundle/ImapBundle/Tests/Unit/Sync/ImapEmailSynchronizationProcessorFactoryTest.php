@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Sync;
 
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManagerFactory;
+use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory;
 use Psr\Log\LoggerInterface;
 
@@ -9,6 +11,7 @@ class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\Te
 {
     public function testCreate()
     {
+        $imapEmailFolderManagerFactory = $this->createMock(ImapEmailFolderManagerFactory::class);
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -42,10 +45,11 @@ class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\Te
             $emailEntityBuilder,
             $removeManager
         );
+        $factory->setImapEmailFolderManagerFactory($imapEmailFolderManagerFactory);
 
         $factory->setLogger($logger);
 
         $result = $factory->create($emailManager, $knownEmailAddressChecker);
-        $this->assertInstanceOf('Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor', $result);
+        $this->assertInstanceOf(ImapEmailSynchronizationProcessor::class, $result);
     }
 }
