@@ -1,6 +1,3 @@
-parameters:
-    translator.class: Oro\Bundle\TranslationBundle\Translation\Translator
-
 services:
     oro_translation.controller:
         class: Oro\Bundle\TranslationBundle\Controller\Controller
