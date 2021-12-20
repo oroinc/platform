@@ -3,10 +3,3 @@ oro_message_queue:
         # `oro_logger.cache` can be persistent because it depends only on 'oro_config.cache'
         # that is persistent as well
         - 'oro_logger.cache'
-monolog:
-    channels: ['oro_account_security']
-    handlers:
-        database_handler:
-            type: service
-            id: oro_logger.monolog.db_logs.handler
-            channels: ['oro_account_security']
