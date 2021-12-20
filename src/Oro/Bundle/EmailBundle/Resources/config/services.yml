@@ -338,6 +338,7 @@ services:
             - '@Doctrine\Inflector\Inflector'
         calls:
             - [addSystemVariableDefaultFilter, ['userSignature', 'oro_html_sanitize']]
+            - [setHtmlTagHelper, ['@oro_ui.html_tag_helper']]
         lazy: true
 
     oro_email.email_renderer_configuration:
