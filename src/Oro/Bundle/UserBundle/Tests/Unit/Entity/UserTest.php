@@ -12,7 +12,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\Status;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 
@@ -59,29 +58,6 @@ class UserTest extends AbstractUserTest
         $user->removeGroup($group);
 
         self::assertFalse($user->hasRole($role));
-    }
-
-    public function testStatuses(): void
-    {
-        $user = $this->getUser();
-        $status = new Status();
-
-        self::assertNotContains($status, $user->getStatuses());
-        self::assertNull($user->getCurrentStatus());
-
-        $user->addStatus($status);
-        $user->setCurrentStatus($status);
-
-        self::assertContains($status, $user->getStatuses());
-        self::assertEquals($status, $user->getCurrentStatus());
-
-        $user->setCurrentStatus();
-
-        self::assertNull($user->getCurrentStatus());
-
-        $user->getStatuses()->clear();
-
-        self::assertNotContains($status, $user->getStatuses());
     }
 
     public function testEmails(): void

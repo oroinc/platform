@@ -282,18 +282,6 @@ class EntityDataControllerTest extends WebTestCase
     public function setAssociationDataProvider()
     {
         return [
-            'entity one to one' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'currentStatus',
-                'status1',
-                Response::HTTP_OK
-            ],
-            'entity one to many' => [
-                'Oro\Bundle\UserBundle\Entity\User',
-                'groups',
-                'status1',
-                Response::HTTP_BAD_REQUEST
-            ],
             'entity many to many' => [
                 'Oro\Bundle\UserBundle\Entity\User',
                 'userRoles',
