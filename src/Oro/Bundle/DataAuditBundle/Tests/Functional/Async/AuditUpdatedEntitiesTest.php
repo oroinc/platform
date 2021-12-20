@@ -9,7 +9,7 @@ use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditData
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
@@ -89,7 +89,7 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         $message = $this->createDummyMessage([
             'entities_updated' => [
                 '000000007ec8f22c00000000536823d4' => [
-                    'entity_class' => Status::class,
+                    'entity_class' => Email::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'status' => [null, 'aNewValue'],

@@ -8,7 +8,7 @@ use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\Entity\Status;
+use Oro\Bundle\UserBundle\Entity\Email;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 
@@ -78,7 +78,7 @@ class AuditDeletedEntitiesTest extends WebTestCase
             'timestamp' => time(),
             'entities_deleted' => [
                 '000000007ec8f22c00000000536823d4' => [
-                    'entity_class' => Status::class,
+                    'entity_class' => Email::class,
                     'entity_id' => 123,
                     'change_set' => [
                         'stringProperty' => ['anOldValue', null],
