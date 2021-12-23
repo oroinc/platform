@@ -5,7 +5,7 @@ services:
         decorates: nelmio_alice.property_accessor
         decoration_priority: -10
         arguments:
-            - '@oro_test.fixtures.reflection_property_accessor.inner'
+            - '@.inner'
 
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
@@ -130,7 +130,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\IncludeProcessor
         decorates: nelmio_alice.file_parser.default_include_processor
         arguments:
-            - '@oro_test.file_parser.include_processor.inner'
+            - '@.inner'
             - '@fob_symfony.kernel'
 
     oro_test.fixture_loader.alice_combined_loader:

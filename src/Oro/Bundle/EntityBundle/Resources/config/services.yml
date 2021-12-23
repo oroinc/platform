@@ -73,7 +73,7 @@ services:
         decorates: 'sensio_framework_extra.converter.doctrine.orm'
         decoration_priority: -256 # should be at the top of the decoration chain
         arguments:
-            - '@oro_entity.converter.doctrine.orm.decorator.inner'
+            - '@.inner'
 
     oro_entity.listener.navigation_listener:
         class: Oro\Bundle\EntityBundle\EventListener\NavigationListener

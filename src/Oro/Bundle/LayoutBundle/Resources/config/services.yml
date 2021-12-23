@@ -312,7 +312,7 @@ services:
         class: Oro\Bundle\LayoutBundle\Loader\ImagineFilterConfigurationDecorator
         decorates: liip_imagine.filter.configuration
         arguments:
-            - '@oro_layout.loader.imagine_filter_configuration_decorator.inner'
+            - '@.inner'
             - '@oro_layout.loader.image_filter.link'
 
     oro_layout.expression_language_provider.instanceof:

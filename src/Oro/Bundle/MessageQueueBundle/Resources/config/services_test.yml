@@ -3,7 +3,7 @@ services:
         class: Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector
         decorates: oro_message_queue.client.message_producer
         arguments:
-            - '@oro_message_queue.test.message_collector.inner'
+            - '@.inner'
 
     oro_message_queue.async.basic_message_processor:
         class: Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor

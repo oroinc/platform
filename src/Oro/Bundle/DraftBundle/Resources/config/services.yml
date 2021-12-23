@@ -67,7 +67,7 @@ services:
         class: Oro\Bundle\DraftBundle\Voter\AclVoter
         decorates: oro_security.acl.voter.basic_permissions
         arguments:
-            - '@oro_draft.voter.acl_voter.inner'
+            - '@.inner'
 
     oro_draft.listener.search_listener:
         class: Oro\Bundle\DraftBundle\EventListener\SearchListener

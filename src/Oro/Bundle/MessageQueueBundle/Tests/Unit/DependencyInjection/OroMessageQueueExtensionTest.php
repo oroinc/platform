@@ -236,7 +236,7 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition('oro_message_queue.consumption.signal_extension')->getTags()
         );
         self::assertEquals(
-            'oro_message_queue.client.traceable_message_producer.inner',
+            '.inner',
             (string)$container->getDefinition('oro_message_queue.client.traceable_message_producer')->getArgument(0)
         );
     }

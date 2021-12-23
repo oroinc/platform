@@ -17,6 +17,9 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages MessageQueueBundle service configuration
+ */
 class OroMessageQueueExtension extends Extension
 {
     /** @var TransportFactoryInterface[] */
@@ -64,7 +67,7 @@ class OroMessageQueueExtension extends Extension
                 $producerId = 'oro_message_queue.client.traceable_message_producer';
                 $container->register($producerId, TraceableMessageProducer::class)
                     ->setDecoratedService('oro_message_queue.client.message_producer')
-                    ->addArgument(new Reference($producerId . '.inner'));
+                    ->addArgument(new Reference('.inner'));
             }
 
             $container->setParameter('oro_message_queue.client.noop_status', $config['client']['noop_status']);

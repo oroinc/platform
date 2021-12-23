@@ -40,7 +40,7 @@ class ConfigurableLoggerPass implements CompilerPassInterface
                         ->setArguments(
                             [
                                 new Reference('oro_logger.log_level_config_provider'),
-                                new Reference($disableWrapperServiceId.'.inner'),
+                                new Reference('.inner'),
                             ]
                         )
                         ->setDecoratedService($handlerId)
@@ -56,7 +56,7 @@ class ConfigurableLoggerPass implements CompilerPassInterface
                         ->setArguments(
                             [
                                 new Reference('oro_logger.log_level_config_provider'),
-                                new Reference($disableWrapperServiceId.'.inner'),
+                                new Reference('.inner'),
                             ]
                         )
                         ->setDecoratedService($handlerId)

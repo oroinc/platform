@@ -57,7 +57,7 @@ services:
         public: false
         decorates: security.csrf.token_storage
         arguments:
-            - '@oro_embedded_form.csrf_token_storage.decorator.inner'
+            - '@.inner'
             - '@oro_embedded_form.csrf_token_storage'
             - '@request_stack'
             - 'oro_embedded_form_submit'

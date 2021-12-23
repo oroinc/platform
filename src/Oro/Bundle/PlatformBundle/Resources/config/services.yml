@@ -25,14 +25,14 @@ services:
         class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixJsonStatusCodeErrorRenderer
         decorates: error_renderer.serializer
         arguments:
-            - '@oro_platform.fix_json_status_code_error_renderer.inner'
+            - '@.inner'
             - ['application/json', 'application/x-json']
 
     oro_platform.fos_rest.fix_message_flatten_exception_normalizer:
         class: Oro\Bundle\PlatformBundle\ErrorRenderer\FixMessageFlattenExceptionNormalizer
         decorates: fos_rest.serializer.flatten_exception_normalizer
         arguments:
-            - '@oro_platform.fos_rest.fix_message_flatten_exception_normalizer.inner'
+            - '@.inner'
 
     oro_platform.service_link.service_locator:
         class: Symfony\Component\DependencyInjection\ServiceLocator

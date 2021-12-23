@@ -184,7 +184,7 @@ services:
         decorates: text_representation.processor_registry
         arguments:
             - [] # processors; they are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
-            - '@text_representation.simple_processor_registry.inner'
+            - '@.inner'
 ```
 
 - Implement a simple processor that will get an object identifier and register it in `prepare_data` group

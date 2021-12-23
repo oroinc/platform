@@ -63,7 +63,7 @@ services:
         decorates: oro_platform.tests.merge_service_locators.decorated
         arguments:
             - '@Psr\Container\ContainerInterface'
-            - '@oro_platform.tests.merge_service_locators.decorator.inner'
+            - '@.inner'
         tags:
             - { name: oro_platform.tests.merge_service_locators }
             - { name: container.service_subscriber }
