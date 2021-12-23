@@ -60,7 +60,7 @@ define(function(require) {
         /**
          * Collection of GET parameters which must remain in action url.
          */
-        contextParameters: ['entityClass', 'entityId[id]', 'route', 'datagrid', 'group', 'fromUrl'],
+        contextParameters: ['entityClass', 'entityId[id]', 'entityId', 'route', 'datagrid', 'group', 'fromUrl'],
 
         /**
          * @inheritdoc
