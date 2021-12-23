@@ -15,11 +15,11 @@ trait AttributeLocalizableTrait
     protected $doctrineHelper;
 
     /**
-     * @param FieldConfigModel|null $attribute
+     * @param FieldConfigModel $attribute
      *
      * @return bool
      */
-    protected function isAttributeLocalizable(FieldConfigModel $attribute = null)
+    protected function isAttributeLocalizable(FieldConfigModel $attribute)
     {
         if (!$attribute) {
             return false;

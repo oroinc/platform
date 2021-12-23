@@ -13,7 +13,7 @@ class StringAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSearchable(FieldConfigModel $attribute = null)
+    public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -21,7 +21,7 @@ class StringAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isFilterable(FieldConfigModel $attribute = null)
+    public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
@@ -29,7 +29,7 @@ class StringAttributeType implements AttributeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isSortable(FieldConfigModel $attribute = null)
+    public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }

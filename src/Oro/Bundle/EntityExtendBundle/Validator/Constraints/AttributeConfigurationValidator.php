@@ -59,21 +59,21 @@ class AttributeConfigurationValidator extends ConstraintValidator
         }
 
         $attributeType = $this->attributeTypeRegistry->getAttributeType($value);
-        if ($attributeScopeData->is('filterable') && !$attributeType->isFilterable()) {
+        if ($attributeScopeData->is('filterable') && !$attributeType->isFilterable($value)) {
             $this->context->addViolation(
                 $constraint->message,
                 ['{{ type }}' => $value->getType(), '{{ option }}' => 'filterable']
             );
         }
 
-        if ($attributeScopeData->is('sortable') && !$attributeType->isSortable()) {
+        if ($attributeScopeData->is('sortable') && !$attributeType->isSortable($value)) {
             $this->context->addViolation(
                 $constraint->message,
                 ['{{ type }}' => $value->getType(), '{{ option }}' => 'sortable']
             );
         }
 
-        if ($attributeScopeData->is('searchable') && !$attributeType->isSearchable()) {
+        if ($attributeScopeData->is('searchable') && !$attributeType->isSearchable($value)) {
             $this->context->addViolation(
                 $constraint->message,
                 ['{{ type }}' => $value->getType(), '{{ option }}' => 'searchable']
