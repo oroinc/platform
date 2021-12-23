@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerInterface;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManagerFactory;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor;
@@ -16,6 +17,7 @@ class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\Te
 {
     public function testCreate()
     {
+        $imapEmailFolderManagerFactory = $this->createMock(ImapEmailFolderManagerFactory::class);
         $em = $this->createMock(EntityManager::class);
         $doctrine = $this->createMock(ManagerRegistry::class);
         $emailEntityBuilder = $this->createMock(EmailEntityBuilder::class);
@@ -37,7 +39,8 @@ class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\Te
         $factory = new ImapEmailSynchronizationProcessorFactory(
             $doctrine,
             $emailEntityBuilder,
-            $removeManager
+            $removeManager,
+            $imapEmailFolderManagerFactory
         );
 
         $factory->setLogger($logger);

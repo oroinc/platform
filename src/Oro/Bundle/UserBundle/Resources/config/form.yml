@@ -43,12 +43,6 @@ services:
         factory: ['@form.factory', createNamed]
         arguments: ["oro_user_reset_form", Oro\Bundle\UserBundle\Form\Type\ResetType, null, { validation_groups: [ResetPassword, Default] }]
 
-    oro_user.form.status:
-        class: Symfony\Component\Form\Form
-        public: true
-        factory: ['@form.factory', createNamed]
-        arguments: ["oro_user_status_form", Oro\Bundle\UserBundle\Form\Type\StatusType, null]
-
     oro_user.form.emailsettings:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]
@@ -126,11 +120,6 @@ services:
             - '@oro_user.form.provider.password_field_options_provider'
         tags:
             - { name: form.type, alias: oro_user_reset }
-
-    oro_user.form.type.status:
-        class: Oro\Bundle\UserBundle\Form\Type\StatusType
-        tags:
-            - { name: form.type, alias: oro_user_status }
 
     oro_user.form.type.user_select:
         class: Oro\Bundle\UserBundle\Form\Type\UserSelectType
@@ -237,18 +226,6 @@ services:
         arguments:
             - '@oro_user.form.reset'
             - '@request_stack'
-            - '@oro_user.manager'
-
-    Oro\Bundle\UserBundle\Form\Handler\StatusHandler:
-        alias: oro_user.form.handler.status
-
-    oro_user.form.handler.status:
-        class: Oro\Bundle\UserBundle\Form\Handler\StatusHandler
-        public: true
-        arguments:
-            - '@oro_user.form.status'
-            - '@request_stack'
-            - '@doctrine.orm.entity_manager'
             - '@oro_user.manager'
 
     oro_user.form.handler.abstract.acl_role:

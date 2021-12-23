@@ -69,7 +69,6 @@ oro:
             group.message.saved: "Group saved"
             role.message.saved: "Role saved"
             user.message.saved: "User saved"
-            status.message.saved: "Status saved"
             invite.fail.message: An invitation email sending was failed
         user_configuration:
             label: Configuration
@@ -97,7 +96,6 @@ oro:
         confirmation_token:
             label:                          Confirmation token
             description:                    The one-time token generated for the password reset procedure.
-        current_status.label:               Current status
         phone:
             label:                          Phone
             description:                    The user's primary phone number.
@@ -174,7 +172,6 @@ oro:
         new_password.label:          New password
         new_password_re.label:       Repeat new password
         salt.label:                  Salt
-        statuses.label:              Statuses
         username:
             label:                   Username
             description:             The login name that the user uses to log into the system.

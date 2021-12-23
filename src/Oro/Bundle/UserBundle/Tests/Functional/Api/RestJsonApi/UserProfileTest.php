@@ -3,13 +3,27 @@
 namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\UserBundle\Api\Model\UserProfile;
+use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @dbIsolationPerTest
  */
 class UserProfileTest extends RestJsonApiTestCase
 {
+    private function getCurrentUser(): User
+    {
+        return self::getContainer()->get('security.token_storage')->getToken()->getUser();
+    }
+
+    private function getExpectedContent(array $expectedContent): array
+    {
+        $content = Yaml::dump($expectedContent);
+        $content = str_replace('{baseUrl}', $this->getApiBaseUrl(), $content);
+
+        return self::processTemplateData(Yaml::parse($content));
+    }
+
     public function testGet()
     {
         $response = $this->request(
@@ -19,19 +33,53 @@ class UserProfileTest extends RestJsonApiTestCase
 
         self::assertResponseStatusCodeEquals($response, 200);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
-        $result = self::jsonToArray($response->getContent());
-        self::assertEquals(
-            $this->getEntityType(UserProfile::class),
-            $result['data']['type']
+        $user = $this->getCurrentUser();
+        $this->assertResponseContains([
+            'data' => [
+                'type'          => 'userprofile',
+                'id'            => (string)$user->getId(),
+                'attributes'    => [
+                    'username' => self::USER_NAME,
+                ],
+                'relationships' => [
+                    'owner' => [
+                        'data' => ['type' => 'businessunits', 'id' => (string)$user->getOwner()->getId()]
+                    ]
+                ]
+            ]
+        ], $response);
+    }
+
+    public function testGetWithHateoasLinks()
+    {
+        $response = $this->request(
+            'GET',
+            $this->getUrl('oro_rest_api_user_profile'),
+            [],
+            ['HTTP_HATEOAS' => true]
         );
-        self::assertEquals(
-            (string)$this->getContainer()->get('security.token_storage')->getToken()->getUser()->getId(),
-            $result['data']['id']
-        );
-        self::assertEquals(
-            self::USER_NAME,
-            $result['data']['attributes']['username']
-        );
+
+        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
+        $user = $this->getCurrentUser();
+        $this->assertResponseContains($this->getExpectedContent([
+            'data' => [
+                'type'          => 'userprofile',
+                'id'            => (string)$user->getId(),
+                'links'         => [
+                    'self'    => '{baseUrl}/userprofile',
+                    'related' => '{baseUrl}/users/' . $user->getId()
+                ],
+                'relationships' => [
+                    'owner' => [
+                        'links' => [
+                            'self'    => '{baseUrl}/users/' . $user->getId() . '/relationships/owner',
+                            'related' => '{baseUrl}/users/' . $user->getId() . '/owner'
+                        ]
+                    ]
+                ]
+            ]
+        ]), $response);
     }
 
     public function testOptions()

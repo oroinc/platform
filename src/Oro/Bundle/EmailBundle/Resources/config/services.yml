@@ -365,6 +365,7 @@ services:
             - '@oro_email.emailtemplate.variable_processor'
             - '@translator'
             - '@Doctrine\Inflector\Inflector'
+            - '@oro_ui.html_tag_helper'
         calls:
             - [addSystemVariableDefaultFilter, ['userSignature', 'oro_html_sanitize']]
         lazy: true

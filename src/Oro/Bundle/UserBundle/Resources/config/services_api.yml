@@ -1,10 +1,20 @@
 services:
-    oro_user.api.get.set_user_profile_entity_id:
-        class: Oro\Bundle\UserBundle\Api\Processor\Get\SetUserProfileEntityId
+    oro_user.api.set_user_profile_entity_id:
+        class: Oro\Bundle\UserBundle\Api\Processor\SetUserProfileEntityId
         arguments:
             - '@security.token_storage'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\UserBundle\Api\Model\UserProfile }
+
+    oro_user.api.add_user_profile_hateoas_links:
+        class: Oro\Bundle\UserBundle\Api\Processor\AddUserProfileHateoasLinks
+        arguments:
+            - '@oro_api.rest.routes_registry'
+            - '@router'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.subresources_provider'
+        tags:
+            - { name: oro.api.processor, action: get_metadata, extra: hateoas, requestType: rest&json_api, class: Oro\Bundle\UserBundle\Api\Model\UserProfile, priority: -195 }
 
     oro_user.api.reload_logged_in_user:
         class: Oro\Bundle\UserBundle\Api\Processor\ReloadLoggedInUser

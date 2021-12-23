@@ -332,8 +332,6 @@ class UserController extends RestController
         unset($result['confirmationToken']);
         unset($result['passwordRequestedAt']);
         unset($result['imapConfiguration']);
-        unset($result['currentStatus']);
-        unset($result['statuses']);
         unset($result['apiKeys']);
         unset($result['organizations']);
         unset($result['emailOrigins']);

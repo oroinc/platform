@@ -106,16 +106,6 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
-    Oro\Bundle\UserBundle\Entity\Manager\StatusManager:
-        alias: oro_user.status_manager
-
-    oro_user.status_manager:
-        class: Oro\Bundle\UserBundle\Entity\Manager\StatusManager
-        public: true
-        arguments:
-            - "@doctrine.orm.entity_manager"
-            - "@oro_user.manager"
-
     oro_user.role_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\RoleManager
         arguments:

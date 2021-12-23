@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\DependencyInjection\Compiler;
 
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -17,8 +18,8 @@ class TranslatorDependencyPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $translatorDef = $container->getDefinition('translator.default');
+        $translatorDef->setClass(Translator::class);
 
-        $translatorDef->setClass('Oro\Bundle\TranslationBundle\Translation\Translator');
         $translatorDef->addMethodCall(
             'setDatabaseMetadataCache',
             [new Reference('oro_translation.database_translation.metadata.cache')]

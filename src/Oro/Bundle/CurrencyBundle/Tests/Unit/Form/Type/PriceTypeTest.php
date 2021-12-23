@@ -10,6 +10,7 @@ use Oro\Bundle\CurrencyBundle\Utils\CurrencyNameHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PriceTypeTest extends FormIntegrationTestCase
@@ -48,14 +49,17 @@ class PriceTypeTest extends FormIntegrationTestCase
 
     public function testValueWhenDefaultEnglishLocale()
     {
-        $form = $this->factory->create(PriceType::class, (new Price())->setValue(1234567.89));
+        $value = 1234567.89;
+        $form = $this->factory->create(PriceType::class, (new Price())->setValue($value));
         $view = $form->createView();
 
-        self::assertEquals('1,234,567.8900', $view->children['value']->vars['value']);
+        $transformer = new NumberToLocalizedStringTransformer(Price::MAX_VALUE_SCALE, true);
+        self::assertEquals($transformer->transform($value), $view->children['value']->vars['value']);
 
-        $form->submit(['value' => '2,432,765.9800', 'currency' => 'USD']);
+        $submittedValue = 2432765.98;
+        $form->submit(['value' => $transformer->transform($submittedValue), 'currency' => 'USD']);
 
-        self::assertEquals(2432765.98, $form->getData()->getValue());
+        self::assertEquals($submittedValue, $form->getData()->getValue());
     }
 
     public function testValueWhenGermanLocale()
@@ -63,14 +67,17 @@ class PriceTypeTest extends FormIntegrationTestCase
         $previousLocale = \Locale::getDefault();
         try {
             \Locale::setDefault('de_DE');
-            $form = $this->factory->create(PriceType::class, (new Price())->setValue(1234567.89));
+            $value = 1234567.89;
+            $form = $this->factory->create(PriceType::class, (new Price())->setValue($value));
             $view = $form->createView();
 
-            self::assertEquals('1.234.567,8900', $view->children['value']->vars['value']);
+            $transformer = new NumberToLocalizedStringTransformer(Price::MAX_VALUE_SCALE, true);
+            self::assertEquals($transformer->transform($value), $view->children['value']->vars['value']);
 
-            $form->submit(['value' => '2.432.765,9800', 'currency' => 'USD']);
+            $submittedValue = 2432765.98;
+            $form->submit(['value' => $transformer->transform($submittedValue), 'currency' => 'USD']);
 
-            self::assertEquals(2432765.98, $form->getData()->getValue());
+            self::assertEquals($submittedValue, $form->getData()->getValue());
         } finally {
             \Locale::setDefault($previousLocale);
         }
