@@ -40,7 +40,7 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_entity_config.config_manager'
         calls:
-            - [setAttachmentManager, ['@oro_attachment.manager']]
+            - [setPictureSourcesProvider, ['@oro_attachment.provider.picture_sources']]
             - [setHtmlTagHelper, ['@oro_ui.html_tag_helper']]
 
     oro_comment.comment_lifecycle_listener:

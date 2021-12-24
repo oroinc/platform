@@ -13,6 +13,8 @@ system_configuration:
             description_style: warning
         attachment_webp_settings:
             title: oro.attachment.config.webp_settings.label
+            description: oro.attachment.config.webp_settings.description
+            description_style: warning
     fields:
         oro_attachment.maxsize:
             data_type: integer

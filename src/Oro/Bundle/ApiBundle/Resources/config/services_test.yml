@@ -208,13 +208,13 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataDecorator
         decorates: oro_api.tests.update_loaded_data_simple_processor
         arguments:
-            - '@oro_api.tests.update_loaded_data_simple_processor.decorator.inner'
+            - '@.inner'
 
     oro_api.tests.update_loaded_data_container_processor.decorator:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedDataDecorator
         decorates: oro_api.tests.update_loaded_data_container_processor
         arguments:
-            - '@oro_api.tests.update_loaded_data_container_processor.decorator.inner'
+            - '@.inner'
 
     oro_api.tests.update_loaded_collection:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\UpdateLoadedCollection
@@ -369,5 +369,5 @@ services:
         class: Oro\Bundle\GaufretteBundle\Tests\Functional\Environment\SkippedGaufretteFileSystemProvider
         decorates: oro_gaufrette.tests.skipped_file_systems
         arguments:
-            - '@oro_api.tests.skipped_file_systems.inner'
+            - '@.inner'
             - ['api', 'api_source_data']

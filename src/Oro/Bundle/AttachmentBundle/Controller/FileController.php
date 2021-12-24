@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\AttachmentBundle\Controller;
 
+use Imagine\Exception\RuntimeException;
+use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * The controller with actions that work with files.
@@ -19,8 +23,9 @@ class FileController extends AbstractController
 {
     public function getFileAction(int $id, string $filename, string $action, Request $request): Response
     {
-        $file = $this->getFileByIdAndFileName($id, $filename);
+        $file = $this->getFileById($id);
         $this->unlockSession($request);
+        $this->assertValidFilename($file, $filename);
 
         $response = new Response();
         $response->headers->set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -50,11 +55,31 @@ class FileController extends AbstractController
         string $filename,
         Request $request
     ): Response {
-        $file = $this->getFileByIdAndFileName($id, $filename);
+        $file = $this->getFileById($id);
         $this->unlockSession($request);
 
-        $binary = $this->getImageResizeManager()->resize($file, $width, $height, $this->getFormat($file, $filename));
-        if (!$binary) {
+        try {
+            $this->assertValidResizedImageName($file, $filename, $width, $height);
+
+            // Image name is assumed to be valid at this point, so we can pick its extension.
+            $format = pathinfo($filename, PATHINFO_EXTENSION);
+
+            $binary = $this->getImageResizeManager()->resize($file, $width, $height, $format);
+        } catch (RuntimeException $exception) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Unable to create image "%s" resized to width "%d" and height "%d". Message was "%s"',
+                    $filename,
+                    $width,
+                    $height,
+                    $exception->getMessage()
+                ),
+                0,
+                $exception
+            );
+        }
+
+        if (!isset($binary)) {
             throw $this->createNotFoundException();
         }
 
@@ -63,33 +88,43 @@ class FileController extends AbstractController
 
     public function getFilteredImageAction(int $id, string $filter, string $filename, Request $request): Response
     {
-        $file = $this->getFileByIdAndFileName($id, $filename);
+        $file = $this->getFileById($id);
         $this->unlockSession($request);
 
-        $binary = $this->getImageResizeManager()->applyFilter($file, $filter, $this->getFormat($file, $filename));
-        if (!$binary) {
+        try {
+            $this->assertValidFilteredImageName($file, $filename, $filter);
+
+            // Image name is assumed to be valid at this point, so we can pick its extension.
+            $format = pathinfo($filename, PATHINFO_EXTENSION);
+
+            $binary = $this->getImageResizeManager()->applyFilter($file, $filter, $format);
+        } catch (NonExistingFilterException $exception) {
+            throw new NotFoundHttpException(sprintf('Requested non-existing filter "%s"', $filter), $exception);
+        } catch (RuntimeException $exception) {
+            throw new \RuntimeException(
+                sprintf(
+                    'Unable to create image "%s" using filter "%s". Message was "%s"',
+                    $filename,
+                    $filter,
+                    $exception->getMessage()
+                ),
+                0,
+                $exception
+            );
+        }
+
+        if (!isset($binary)) {
             throw $this->createNotFoundException();
         }
 
         return new Response($binary->getContent(), Response::HTTP_OK, ['Content-Type' => $binary->getMimeType()]);
     }
 
-    private function getFormat(File $file, string $filename): string
-    {
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        $format = '';
-        if (strtolower($file->getExtension()) !== $extension) {
-            $format = $extension;
-        }
-
-        return $format;
-    }
-
-    private function getFileByIdAndFileName(int $id, string $filename): File
+    private function getFileById(int $id): File
     {
         /** @var File|null $file */
-        $file = $this->getDoctrine()->getManagerForClass(File::class)->find(File::class, $id);
-        if (!$file || !$this->isValidFilename($file, $filename)) {
+        $file = $this->container->get('doctrine')->getManagerForClass(File::class)->find(File::class, $id);
+        if (!$file) {
             throw $this->createNotFoundException('File not found');
         }
 
@@ -100,22 +135,43 @@ class FileController extends AbstractController
         return $file;
     }
 
-    private function isValidFilename(File $file, string $filename): bool
+    private function assertValidFilename(File $file, string $filename): void
     {
-        $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        if (strtolower($extension) !== $file->getExtension()) {
-            $filename = $this->stripExtension($filename);
+        if ($filename === $file->getFilename()
+            || $filename === $file->getOriginalFilename()
+            || $filename === $this->getFileNameProvider()->getFileName($file)) {
+            return;
         }
 
-        return $filename === $file->getFilename()
-            || $this->stripExtension($filename) === $file->getFilename()
-            || $filename === $file->getOriginalFilename()
-            || $filename === $this->getFileNameProvider()->getFileName($file);
+        throw $this->createNotFoundException('File not found');
     }
 
-    private function stripExtension(string $filename): string
+    private function assertValidFilteredImageName(File $file, string $filename, string $filterName): void
     {
-        return pathinfo($filename, PATHINFO_FILENAME);
+        if ($filename === $this->getFileNameProvider()->getFilteredImageName($file, $filterName)) {
+            return;
+        }
+
+        if ($this->getWebpConfiguration()->isEnabledIfSupported()
+            && $filename === $this->getFileNameProvider()->getFilteredImageName($file, $filterName, 'webp')) {
+            return;
+        }
+
+        throw $this->createNotFoundException('File not found');
+    }
+
+    private function assertValidResizedImageName(File $file, string $filename, int $width, int $height): void
+    {
+        if ($filename === $this->getFileNameProvider()->getResizedImageName($file, $width, $height)) {
+            return;
+        }
+
+        if ($this->getWebpConfiguration()->isEnabledIfSupported()
+            && $filename === $this->getFileNameProvider()->getResizedImageName($file, $width, $height, 'webp')) {
+            return;
+        }
+
+        throw $this->createNotFoundException('File not found');
     }
 
     private function unlockSession(Request $request): void
@@ -141,6 +197,11 @@ class FileController extends AbstractController
         return $this->container->get(FileNameProviderInterface::class);
     }
 
+    private function getWebpConfiguration(): WebpConfiguration
+    {
+        return $this->container->get(WebpConfiguration::class);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -151,6 +212,7 @@ class FileController extends AbstractController
             FileManager::class,
             ImageResizeManagerInterface::class,
             FileNameProviderInterface::class,
+            WebpConfiguration::class,
         ]);
     }
 }

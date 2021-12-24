@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider\Image;
 
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -10,13 +10,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
-    private CacheManager $imagineCacheManager;
+    private ImagineUrlProviderInterface $imagineUrlProvider;
 
     private string $defaultPath;
 
-    public function __construct(CacheManager $imagineCacheManager, string $defaultPath)
+    public function __construct(ImagineUrlProviderInterface $imagineUrlProvider, string $defaultPath)
     {
-        $this->imagineCacheManager = $imagineCacheManager;
+        $this->imagineUrlProvider = $imagineUrlProvider;
         $this->defaultPath = $defaultPath;
     }
 
@@ -25,11 +25,6 @@ class DefaultImagePlaceholderProvider implements ImagePlaceholderProviderInterfa
         string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): ?string {
-        $path = $this->defaultPath;
-        if ($format && pathinfo($path, PATHINFO_EXTENSION) !== $format) {
-            $path .= '.' . $format;
-        }
-
-        return $this->imagineCacheManager->generateUrl($path, $filter, [], null, $referenceType);
+        return $this->imagineUrlProvider->getFilteredImageUrl($this->defaultPath, $filter, $format, $referenceType);
     }
 }

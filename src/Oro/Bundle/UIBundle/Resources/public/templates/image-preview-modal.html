@@ -23,7 +23,7 @@
                 <div class="images-list">
                     <% _.each(images, function(image) { %>
                         <div class="lazy-loading">
-                            <img data-lazy="<%- image.src %>" class="images-list__item">
+                            <img data-lazy="<%- getSourceSrc(image) %>" class="images-list__item">
                         </div>
                     <% }) %>
                 </div>

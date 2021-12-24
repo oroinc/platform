@@ -13,7 +13,7 @@ services:
         decorates: oro_message_queue.client.message_producer
         decoration_priority: -254
         arguments:
-            - '@oro_message_queue.client.mock_lifecycle_message_producer.inner'
+            - '@.inner'
             - '@oro_message_queue.mock_lifecycle_message.cache'
 
     oro_message_queue.client.mock_lifecycle_message_extension:

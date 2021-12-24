@@ -11,7 +11,7 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: 'oro_attachment.imagine.filter_service' }
+            - { name: container.service_subscriber, id: 'oro_attachment.imagine.filter_service', key: Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService }
 
     oro_attachment.controller.file:
         class: Oro\Bundle\AttachmentBundle\Controller\FileController

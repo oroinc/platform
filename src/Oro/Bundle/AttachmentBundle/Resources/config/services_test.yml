@@ -3,7 +3,7 @@ services:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProvider
         decorates: oro_api.tests.skipped_entity_provider
         arguments:
-            - '@oro_attachment.tests.api.skipped_entity_provider.inner'
+            - '@.inner'
         calls:
             - [ addSkippedEntity, [ 'Oro\Bundle\AttachmentBundle\Entity\File', [ 'create' ] ] ]
 
@@ -13,4 +13,8 @@ services:
 
     oro_attachment.tests.provider.image_file_names:
         alias: oro_attachment.provider.image_file_names
+        public: true
+
+    oro_attachment.tests.imagine.provider.url:
+        alias: oro_attachment.imagine.provider.url
         public: true

@@ -16,6 +16,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\Yaml\Yaml;
 
+/**
+ * This is the class that loads and manages ApiBundle service configuration
+ */
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     public const API_DOC_VIEWS_PARAMETER_NAME        = 'oro_api.api_doc.views';
@@ -179,7 +182,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $container
                 ->register($configBagDecoratorServiceId, TestConfigBag::class)
                 ->setArguments([
-                    new Reference($configBagDecoratorServiceId . '.inner'),
+                    new Reference('.inner'),
                     new Reference('oro_api.config_merger.entity')
                 ])
                 ->setDecoratedService($configBagServiceId, null, 255)

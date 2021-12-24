@@ -6,10 +6,12 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
+use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 class LoadFileData extends AbstractFixture
 {
     use UserUtilityTrait;
+
     public const FILE_1 = 'file_1';
     public const FILE_2 = 'file_2';
     public const FILE_3 = 'file_3';
@@ -20,7 +22,7 @@ class LoadFileData extends AbstractFixture
     public function load(ObjectManager $manager): void
     {
         $file = new File();
-        $file->setFilename('file_a');
+        $file->setFile(new ComponentFile(__DIR__ . '/files/file_1.txt'));
         $file->setParentEntityClass(\stdClass::class);
         $file->setParentEntityId(1);
         $file->setParentEntityFieldName('fieldA');
@@ -28,7 +30,8 @@ class LoadFileData extends AbstractFixture
         $this->setReference(self::FILE_1, $file);
 
         $file = new File();
-        $file->setFilename('file_b');
+        $file->setFile(new ComponentFile(__DIR__ . '/files/file_2.txt'));
+        $file->setOriginalFilename('file_2.txt');
         $file->setParentEntityClass(\stdClass::class);
         $file->setParentEntityId(2);
         $file->setParentEntityFieldName('fieldB');
@@ -36,7 +39,7 @@ class LoadFileData extends AbstractFixture
         $this->setReference(self::FILE_2, $file);
 
         $file = new File();
-        $file->setFilename('file_c');
+        $file->setFile(new ComponentFile(__DIR__ . '/files/file_3.txt'));
         $file->setParentEntityClass(\stdClass::class);
         $file->setParentEntityId(1);
         $file->setParentEntityFieldName('fieldC');

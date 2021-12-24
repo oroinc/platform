@@ -18,9 +18,15 @@
             </label>
             <div class="attachment-item attachment-item--note">
                 <div class="thumbnail">
-                    {% if attachment.attachmentThumbnail  %}
-                        <a href="{{ attachment.attachmentURL }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName|e('html_attr') }}">
-                            <span class="thumbnail" style="background: url('{{ attachment.attachmentThumbnail  }}') 50% 50% no-repeat;"></span>
+                    {% if attachment.attachmentThumbnailPicture.src  %}
+                        <a href="{{ attachment.attachmentURL.url }}" data-gallery="note-view-{{ entity.id }}" class="no-hash" title="{{ attachment.attachmentFileName|e('html_attr') }}" data-sources="{{ attachment.attachmentURL.sources|json_encode }}">
+                            {% include '@OroAttachment/Twig/picture.html.twig' with {
+                                sources: attachment.attachmentThumbnailPicture.sources,
+                                img_attrs: {
+                                    src: attachment.attachmentThumbnailPicture.src,
+                                    class: "thumbnail"
+                                }
+                            } %}
                         </a>
                     {% else  %}
                         <span class="fa {{ attachment.attachmentIcon }} fa-offset-none" aria-hidden="true"></span>
@@ -34,7 +40,7 @@
                     </a>
                     <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="{{ togglerId }}">
                         <li>
-                            <a class="dropdown-item no-hash" tabindex="-1" href="{{ attachment.attachmentURL }}">
+                            <a class="dropdown-item no-hash" tabindex="-1" href="{{ attachment.attachmentURL.url }}">
                                 {{ 'oro.translation.action.download'|trans }} <span>{{ attachment.attachmentSize }}</span>
                             </a>
                         </li>

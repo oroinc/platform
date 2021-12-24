@@ -669,7 +669,7 @@ services:
         decorates: oro_dataaudit.converter.change_set_to_audit_fields
         public: false
         arguments:
-            - '@oro_workflow.workflow_step_to_audit_field_converter.inner'
+            - '@.inner'
             - '@oro_entity.doctrine_helper'
 
     oro_workflow.event_listener.send_workflow_step_changes_to_audit:

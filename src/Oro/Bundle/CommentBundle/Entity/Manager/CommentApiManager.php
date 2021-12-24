@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 use Oro\Bundle\CommentBundle\Entity\Comment;
@@ -44,8 +44,8 @@ class CommentApiManager extends ApiEntityManager
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var PictureSourcesProviderInterface */
+    protected $pictureSourcesProvider;
 
     /** @var AttachmentProvider */
     protected $attachmentProvider;
@@ -87,9 +87,9 @@ class CommentApiManager extends ApiEntityManager
         $this->htmlTagHelper = $htmlTagHelper;
     }
 
-    public function setAttachmentManager(AttachmentManager $attachmentManager)
+    public function setPictureSourcesProvider(PictureSourcesProviderInterface $pictureSourcesProvider)
     {
-        $this->attachmentManager = $attachmentManager;
+        $this->pictureSourcesProvider = $pictureSourcesProvider;
     }
 
     /**
@@ -220,9 +220,8 @@ class CommentApiManager extends ApiEntityManager
             'removable'     => $this->authorizationChecker->isGranted('DELETE', $entity),
         ];
         $result = array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
-        $result = array_merge($result, $this->getCommentAvatarImageUrl($entity->getOwner()));
 
-        return $result;
+        return array_merge($result, $this->getCommentAvatarImage($entity->getOwner()));
     }
 
     /**
@@ -240,19 +239,23 @@ class CommentApiManager extends ApiEntityManager
      *
      * @return array
      */
-    protected function getCommentAvatarImageUrl($user)
+    protected function getCommentAvatarImage($user): array
     {
         $attachment = PropertyAccess::createPropertyAccessor()->getValue($user, self::AVATAR_FIELD_NAME);
-        if ($attachment &&
-            $attachment->getFilename() &&
-            ($this->attachmentManager instanceof AttachmentManager)
+        if (($this->pictureSourcesProvider instanceof PictureSourcesProviderInterface) &&
+            $attachment &&
+            $attachment->getFilename()
         ) {
             $config = $this->configManager
                 ->getProvider('attachment')
                 ->getConfig(get_class($user), self::AVATAR_FIELD_NAME);
+
             return [
-                'avatarUrl' => $this->attachmentManager
-                    ->getResizedImageUrl($attachment, $config->get('width'), $config->get('height'))
+                'avatarPicture' => $this->pictureSourcesProvider->getResizedPictureSources(
+                    $attachment,
+                    $config->get('width'),
+                    $config->get('height')
+                )
             ];
         }
 

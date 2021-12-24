@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Provider\Image;
 
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Bundle\LayoutBundle\Provider\Image\ThemeImagePlaceholderProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
@@ -16,7 +16,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     private ThemeManager|\PHPUnit\Framework\MockObject\MockObject $themeManager;
 
-    private CacheManager|\PHPUnit\Framework\MockObject\MockObject $imagineCacheManager;
+    private ImagineUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagineUrlProvider;
 
     private ThemeImagePlaceholderProvider $provider;
 
@@ -24,23 +24,17 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->contextHolder = $this->createMock(LayoutContextHolder::class);
         $this->themeManager = $this->createMock(ThemeManager::class);
-        $this->imagineCacheManager = $this->createMock(CacheManager::class);
+        $this->imagineUrlProvider = $this->createMock(ImagineUrlProviderInterface::class);
 
         $this->provider = new ThemeImagePlaceholderProvider(
             $this->contextHolder,
             $this->themeManager,
-            $this->imagineCacheManager,
+            $this->imagineUrlProvider,
             'pl2'
         );
     }
 
-    /**
-     * @dataProvider getPathDataProvider
-     *
-     * @param string $format
-     * @param string $expectedPath
-     */
-    public function testGetPath(string $format, string $expectedPath): void
+    public function testGetPath(): void
     {
         $themeName = 'test_theme';
 
@@ -63,10 +57,11 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($theme);
 
         $filter = 'image_filter';
+        $format = 'sample_format';
 
-        $this->imagineCacheManager->expects(self::once())
-            ->method('generateUrl')
-            ->with($expectedPath, $filter, [], null, UrlGeneratorInterface::ABSOLUTE_PATH)
+        $this->imagineUrlProvider->expects(self::once())
+            ->method('getFilteredImageUrl')
+            ->with('/path/to/pl2.img', $filter, $format, UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn('/path/to/filtered_pl2.img');
 
         self::assertEquals('/path/to/filtered_pl2.img', $this->provider->getPath($filter, $format));
@@ -93,7 +88,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->themeManager->expects(self::never())
             ->method(self::anything());
 
-        $this->imagineCacheManager->expects(self::never())
+        $this->imagineUrlProvider->expects(self::never())
             ->method(self::anything());
 
         self::assertNull($this->provider->getPath('image_filter'));
@@ -114,7 +109,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
         $this->themeManager->expects(self::never())
             ->method(self::anything());
 
-        $this->imagineCacheManager->expects(self::never())
+        $this->imagineUrlProvider->expects(self::never())
             ->method(self::anything());
 
         self::assertNull($this->provider->getPath('image_filter'));
@@ -144,7 +139,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
         $filter = 'image_filter';
 
-        $this->imagineCacheManager->expects(self::never())
+        $this->imagineUrlProvider->expects(self::never())
             ->method(self::anything());
 
         self::assertNull($this->provider->getPath($filter));

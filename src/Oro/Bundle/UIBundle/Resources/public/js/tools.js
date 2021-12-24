@@ -85,6 +85,10 @@ define(function(require) {
                 query = query.slice(1);
             }
             const setValue = function(root, path, value) {
+                if (path[0] === '__proto__') {
+                    // Prevent Object.prototype pollution
+                    return;
+                }
                 if (path.length > 1) {
                     const dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
@@ -488,6 +492,20 @@ define(function(require) {
                 }
             });
             return versions;
+        },
+
+        /**
+         * Detect if browser support WebP images
+         * @returns {boolean}
+         */
+        isSupportWebp() {
+            let supports = false;
+            try {
+                const canvas = document.createElement('canvas');
+                supports = !!canvas && canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+            } catch (e) {}
+
+            return supports;
         }
     });
 

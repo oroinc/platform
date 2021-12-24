@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
@@ -20,26 +21,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $em;
 
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
+    private AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $authorizationChecker;
 
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
+    private AclHelper|\PHPUnit\Framework\MockObject\MockObject $aclHelper;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
+    private EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject $entityNameResolver;
 
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentManager;
+    private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pictureSourcesProvider;
 
-    /** @var AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationHelper;
-
-    /** @var NoteManager */
-    private $manager;
+    private NoteManager $manager;
 
     protected function setUp(): void
     {
@@ -47,13 +39,15 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
-        $this->attachmentManager = $this->createMock(AttachmentManager::class);
-        $this->attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
+        $this->pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
+        $attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
+        $attachmentManager = $this->createMock(AttachmentManager::class);
 
         $attachmentProvider = new AttachmentProviderStub(
             $this->em,
-            $this->attachmentAssociationHelper,
-            $this->attachmentManager
+            $attachmentAssociationHelper,
+            $attachmentManager,
+            $this->pictureSourcesProvider
         );
 
         $this->manager = new NoteManager(
@@ -62,11 +56,11 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
             $this->aclHelper,
             $this->entityNameResolver,
             $attachmentProvider,
-            $this->attachmentManager
+            $this->pictureSourcesProvider
         );
     }
 
-    public function testGetList()
+    public function testGetList(): void
     {
         $entityClass = 'Test\Entity';
         $entityId    = 123;
@@ -76,47 +70,50 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
         $qb = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
         $repo = $this->createMock(NoteRepository::class);
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getRepository')
             ->with('OroNoteBundle:Note')
             ->willReturn($repo);
-        $repo->expects($this->once())
+        $repo->expects(self::once())
             ->method('getAssociatedNotesQueryBuilder')
             ->with($entityClass, $entityId)
             ->willReturn($qb);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('orderBy')
             ->with('note.createdAt', $sorting)
             ->willReturnSelf();
-        $this->aclHelper->expects($this->once())
+        $this->aclHelper->expects(self::once())
             ->method('apply')
-            ->with($this->identicalTo($qb), 'VIEW', ['checkRelations' => false])
+            ->with(self::identicalTo($qb), 'VIEW', ['checkRelations' => false])
             ->willReturn($query);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getResult')
             ->willReturn($result);
 
-        $this->assertEquals(
+        self::assertEquals(
             $result,
             $this->manager->getList($entityClass, $entityId, $sorting)
         );
     }
 
-    public function testGetEntityViewModels()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testGetEntityViewModels(): void
     {
         $createdByAvatar = new File();
         $createdBy = $this->createMock(TestUser::class);
-        $createdBy->expects($this->once())
+        $createdBy->expects(self::once())
             ->method('getId')
             ->willReturn(100);
-        $createdBy->expects($this->once())
+        $createdBy->expects(self::once())
             ->method('getAvatar')
             ->willReturn($createdByAvatar);
         $updatedBy = $this->createMock(TestUser::class);
-        $updatedBy->expects($this->once())
+        $updatedBy->expects(self::once())
             ->method('getId')
             ->willReturn(100);
-        $updatedBy->expects($this->once())
+        $updatedBy->expects(self::once())
             ->method('getAvatar')
             ->willReturn(null);
 
@@ -129,7 +126,7 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
             ->setOwner($createdBy)
             ->setUpdatedBy($updatedBy);
 
-        $this->authorizationChecker->expects($this->exactly(4))
+        $this->authorizationChecker->expects(self::exactly(4))
             ->method('isGranted')
             ->willReturnMap([
                 ['EDIT', $note, true],
@@ -138,36 +135,68 @@ class NoteManagerTest extends \PHPUnit\Framework\TestCase
                 ['VIEW', $updatedBy, false]
             ]);
 
-        $this->entityNameResolver->expects($this->exactly(2))
+        $this->entityNameResolver->expects(self::exactly(2))
             ->method('getName')
             ->willReturnMap([
                 [$createdBy, null, null, 'User1'],
                 [$updatedBy, null, null, 'User2']
             ]);
 
-        $this->attachmentManager->expects($this->once())
-            ->method('getFilteredImageUrl')
-            ->with($this->identicalTo($createdByAvatar), 'avatar_xsmall')
-            ->willReturn('image1_xsmall');
+        $this->pictureSourcesProvider->expects(self::exactly(2))
+            ->method('getFilteredPictureSources')
+            ->willReturnMap([
+                [
+                    $createdByAvatar,
+                    'avatar_xsmall',
+                    [
+                        'src' => 'image1_xsmall.jpg',
+                        'sources' => [
+                            [
+                                'srcset' => 'image1_xsmall.jpg.webp',
+                                'type' => 'image/webp',
+                            ],
+                        ],
+                    ]
+                ],
+                [
+                    null,
+                    'avatar_xsmall',
+                    [
+                        'src' => null,
+                        'sources' => [],
+                    ]
+                ],
+            ]);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 [
-                    'id'                 => 123,
-                    'message'            => 'test message',
-                    'createdAt'          => '2014-01-20T10:30:40+00:00',
-                    'updatedAt'          => '2014-01-21T10:30:40+00:00',
-                    'hasUpdate'          => true,
-                    'editable'           => true,
-                    'removable'          => false,
-                    'createdBy'          => 'User1',
-                    'createdBy_id'       => 100,
+                    'id' => 123,
+                    'message' => 'test message',
+                    'createdAt' => '2014-01-20T10:30:40+00:00',
+                    'updatedAt' => '2014-01-21T10:30:40+00:00',
+                    'hasUpdate' => true,
+                    'editable' => true,
+                    'removable' => false,
+                    'createdBy' => 'User1',
+                    'createdBy_id' => 100,
                     'createdBy_viewable' => true,
-                    'createdBy_avatar'   => 'image1_xsmall',
-                    'updatedBy'          => 'User2',
-                    'updatedBy_id'       => 100,
+                    'createdBy_avatarPicture' => [
+                        'src' => 'image1_xsmall.jpg',
+                        'sources'  => [
+                            [
+                                'srcset' => 'image1_xsmall.jpg.webp',
+                                'type' => 'image/webp',
+                            ]
+                        ],
+                    ],
+                    'updatedBy' => 'User2',
+                    'updatedBy_id' => 100,
                     'updatedBy_viewable' => false,
-                    'updatedBy_avatar'   => null,
+                    'updatedBy_avatarPicture' => [
+                        'src' => null,
+                        'sources' => [],
+                    ],
                 ]
             ],
             $this->manager->getEntityViewModels([$note])

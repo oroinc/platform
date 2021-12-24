@@ -1,6 +1,11 @@
 <div class="comment-title">
-    <% if (avatarUrl) { %>
-        <img class="comment-title-avatar" src="<%- avatarUrl %>">
+    <% if (typeof(avatarPicture) !== "undefined" && avatarPicture && avatarPicture.src) { %>
+        <picture>
+            <% _.each(avatarPicture.sources, function(source) { %>
+            <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+            <% }); %>
+            <img class="comment-title-avatar" src="<%- avatarPicture.src %>">
+        </picture>
     <% } else { %>
     <div class="comment-title-avatar no-avatar"></div>
     <% } %>
@@ -24,9 +29,14 @@
     <div class="comment-attachments">
         <div class="attachment-item attachment-item--note">
             <div class="thumbnail">
-            <% if (attachmentThumbnail) { %>
-                <a href="<%- attachmentURL %>" data-gallery="comment-view-<%- relationId %>" class="no-hash" title="<%- attachmentFileName %>">
-                    <div class="thumbnail" style="background: url('<%- attachmentThumbnail %>') 50% 50% no-repeat;"></div>
+            <% if (attachmentThumbnailPicture && attachmentThumbnailPicture.src) { %>
+                <a href="<%- attachmentURL.url %>" data-gallery="comment-view-<%- relationId %>" class="no-hash" title="<%- attachmentFileName %>" data-sources="<%- JSON.stringify(attachmentURL.sources) %>">
+                    <picture>
+                        <% _.each(attachmentThumbnailPicture.sources, function(source) { %>
+                        <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+                        <% }); %>
+                        <img src="<%- attachmentThumbnailPicture.src %>" class="thumbnail" />
+                    </picture>
                 </a>
             <% } else { %>
                     <span class="fa <%- attachmentIcon %> fa-offset-none" aria-hidden="true"></span>
@@ -40,12 +50,10 @@
                 </a>
                 <ul class="dropdown-menu file-menu" role="menu" aria-labelledby="<%- attachmentTogglerId %>">
                     <li>
-                    <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL %>">
+                    <a class="dropdown-item no-hash" tabindex="-1" href="<%- attachmentURL.url %>">
                         <%- _.__('oro.comment.attachment.download') %><span>(<%- attachmentSize %>)</span>
                     </a>
-                    <% if (attachmentThumbnail) { %>
-                        <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL %>"><%- _.__('oro.comment.attachment.view') %></a>
-                    <% } %>
+                    <a class="dropdown-item view-image no-hash" tabindex="-1" data-gallery="comment-view-<%- relationId %>" href="<%- attachmentURL.url %>"><%- _.__('oro.comment.attachment.view') %></a>
                     </li>
                 </ul>
             </div>

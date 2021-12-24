@@ -23,7 +23,7 @@ services:
         decorates: nelmio_alice.property_accessor
         decoration_priority: -10
         arguments:
-            - '@oro_test.fixtures.reflection_property_accessor.inner'
+            - '@.inner'
 
     oro_test.provider.exclusion_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\EntityExclusionProvider
@@ -72,7 +72,7 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceYamlParser
         decorates: nelmio_alice.file_parser.chainable.yaml
         arguments:
-            - '@oro_test.alice_file_parser.yaml.inner'
+            - '@.inner'
 
     oro_test.reference_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceReferenceResolver

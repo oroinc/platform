@@ -3,8 +3,8 @@
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
@@ -19,23 +19,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class NoteManager
 {
-    /** @var EntityManager */
-    protected $em;
+    private EntityManager $em;
 
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
-    /** @var AclHelper */
-    protected $aclHelper;
+    private AclHelper $aclHelper;
 
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
+    private EntityNameResolver $entityNameResolver;
 
-    /** @var AttachmentProvider */
-    protected $attachmentProvider;
+    private AttachmentProvider $attachmentProvider;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    private PictureSourcesProviderInterface $pictureSourcesProvider;
 
     public function __construct(
         EntityManager $em,
@@ -43,14 +37,14 @@ class NoteManager
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,
         AttachmentProvider $attachmentProvider,
-        AttachmentManager $attachmentManager
+        PictureSourcesProviderInterface $pictureSourcesProvider
     ) {
         $this->em = $em;
         $this->authorizationChecker = $authorizationChecker;
         $this->aclHelper = $aclHelper;
         $this->entityNameResolver = $entityNameResolver;
         $this->attachmentProvider = $attachmentProvider;
-        $this->attachmentManager = $attachmentManager;
+        $this->pictureSourcesProvider = $pictureSourcesProvider;
     }
 
     /**
@@ -59,7 +53,7 @@ class NoteManager
      * @param string $sorting
      * @return Note[]
      */
-    public function getList($entityClass, $entityId, $sorting)
+    public function getList(string $entityClass, int $entityId, string $sorting)
     {
         /** @var NoteRepository $repo */
         $repo = $this->em->getRepository('OroNoteBundle:Note');
@@ -75,20 +69,17 @@ class NoteManager
      * @param Note[] $entities
      * @return array
      */
-    public function getEntityViewModels($entities)
+    public function getEntityViewModels(array $entities): array
     {
         $result = [];
         foreach ($entities as $entity) {
             $result[] = $this->getEntityViewModel($entity);
         }
+
         return $result;
     }
 
-    /**
-     * @param Note $entity
-     * @return array
-     */
-    public function getEntityViewModel(Note $entity)
+    public function getEntityViewModel(Note $entity): array
     {
         $result = [
             'id'        => $entity->getId(),
@@ -101,9 +92,8 @@ class NoteManager
         ];
         $this->addUser($result, 'createdBy', $entity->getOwner());
         $this->addUser($result, 'updatedBy', $entity->getUpdatedBy());
-        $result = array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
 
-        return $result;
+        return array_merge($result, $this->attachmentProvider->getAttachmentInfo($entity));
     }
 
     /**
@@ -114,13 +104,11 @@ class NoteManager
     protected function addUser(array &$result, $attrName, $user)
     {
         if ($user) {
-            $result[$attrName]               = $this->entityNameResolver->getName($user);
-            $result[$attrName . '_id']       = $user->getId();
+            $result[$attrName] = $this->entityNameResolver->getName($user);
+            $result[$attrName . '_id'] = $user->getId();
             $result[$attrName . '_viewable'] = $this->authorizationChecker->isGranted('VIEW', $user);
-            $avatar                          = $user->getAvatar();
-            $result[$attrName . '_avatar']   = $avatar
-                ? $this->attachmentManager->getFilteredImageUrl($avatar, 'avatar_xsmall')
-                : null;
+            $result[$attrName . '_avatarPicture'] = $this->pictureSourcesProvider
+                ->getFilteredPictureSources($user->getAvatar(), 'avatar_xsmall');
         }
     }
 }

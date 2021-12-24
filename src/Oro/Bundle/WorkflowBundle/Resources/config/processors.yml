@@ -15,7 +15,7 @@ services:
         decorates: oro_workflow.processor_registry
         arguments:
             - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
-            - '@oro_workflow.simple_processor_registry.inner'
+            - '@.inner'
 
     oro_workflow.processor_bag:
         class: Oro\Component\ChainProcessor\ProcessorBag

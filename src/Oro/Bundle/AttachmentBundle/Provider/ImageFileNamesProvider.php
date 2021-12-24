@@ -10,11 +10,9 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  */
 class ImageFileNamesProvider implements FileNamesProviderInterface
 {
-    /** @var FilterConfiguration */
-    private $filterConfiguration;
+    private FilterConfiguration $filterConfiguration;
 
-    /** @var ResizedImagePathProviderInterface */
-    private $imagePathProvider;
+    private ResizedImagePathProviderInterface $imagePathProvider;
 
     public function __construct(
         FilterConfiguration $filterConfiguration,
@@ -35,10 +33,12 @@ class ImageFileNamesProvider implements FileNamesProviderInterface
             $fileNames[] = $this->normalizeFileName(
                 $this->imagePathProvider->getPathForFilteredImage($file, $dimension)
             );
+            $fileNames[] = $this->normalizeFileName(
+                $this->imagePathProvider->getPathForFilteredImage($file, $dimension, 'webp')
+            );
         }
-        $fileNames[] = $this->normalizeFileName(
-            $this->imagePathProvider->getPathForResizedImage($file, 1, 1)
-        );
+        $fileNames[] = $this->normalizeFileName($this->imagePathProvider->getPathForResizedImage($file, 1, 1));
+        $fileNames[] = $this->normalizeFileName($this->imagePathProvider->getPathForResizedImage($file, 1, 1, 'webp'));
 
         return array_values(array_unique($fileNames));
     }

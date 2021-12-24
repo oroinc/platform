@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -66,9 +66,9 @@ class AssignedToOrganizationUsersHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(User::class)
             ->willReturn('user');
 
-        $attachmentManager = $this->createMock(AttachmentManager::class);
+        $pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
 
-        $this->handler = new AssignedToOrganizationUsersHandler($attachmentManager, User::class, []);
+        $this->handler = new AssignedToOrganizationUsersHandler($pictureSourcesProvider, User::class, []);
         $this->handler->setTokenAccessor($this->tokenAccessor);
         $this->handler->initSearchIndexer($this->searchIndexer, $searchMappingProvider);
         $this->handler->initDoctrinePropertiesByEntityManager($this->manager);

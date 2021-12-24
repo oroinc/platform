@@ -11,7 +11,7 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_attachment.provider.attachment'
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
 
     oro_note.manager.api:
         class: Oro\Bundle\NoteBundle\Entity\Manager\ApiEntityManager
@@ -35,7 +35,7 @@ services:
         class: Oro\Bundle\NoteBundle\Handler\NoteActivityEntityDeleteHandlerExtension
         decorates: oro_activity.activity_entity_delete_handler_extension
         arguments:
-            - '@oro_note.activity_entity_delete_handler_extension.inner'
+            - '@.inner'
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.delete_handler_access_denied_exception_factory'
 

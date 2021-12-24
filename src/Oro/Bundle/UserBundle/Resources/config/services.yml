@@ -155,7 +155,7 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
@@ -177,7 +177,7 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
@@ -187,7 +187,7 @@ services:
         class: Oro\Bundle\UserBundle\Autocomplete\AssignedToOrganizationUsersHandler
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         calls:
@@ -200,7 +200,7 @@ services:
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@translator'
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         calls:
@@ -227,7 +227,7 @@ services:
         parent: oro_form.autocomplete.full_name.search_handler
         arguments:
             - '@oro_security.token_accessor'
-            - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
             - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
         tags:
@@ -555,7 +555,7 @@ services:
         decorates: oro_scope.scope_cache_key_builder
         decoration_priority: 100
         arguments:
-            - '@oro_user.user_scope_cache_key_builder.inner'
+            - '@.inner'
             - '@security.token_storage'
 
     oro_user.datagrid.action_checker:

@@ -13,13 +13,13 @@ services:
         arguments:
             - '@oro_layout.layout_context_holder'
             - '@oro_layout.theme_manager'
-            - '@liip_imagine.cache.manager'
+            - '@oro_attachment.imagine.provider.url'
 
     oro_layout.provider.image_placeholder.default.abstract:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\DefaultImagePlaceholderProvider'
         abstract: true
         arguments:
-            - '@liip_imagine.cache.manager'
+            - '@oro_attachment.imagine.provider.url'
 
     oro_layout.provider.image_placeholder.chain.abstract:
         class: 'Oro\Bundle\LayoutBundle\Provider\Image\ChainImagePlaceholderProvider'

@@ -100,10 +100,16 @@ class AttachmentManager
         return $this->webpConfiguration->isEnabledForAll();
     }
 
+    public function isWebpDisabled(): bool
+    {
+        return $this->webpConfiguration->isDisabled();
+    }
+
     public function getFilteredImageUrlByIdAndFilename(
         int $fileId,
         string $filename,
         string $filterName,
+        string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         $file = $this->getFileByIdAndFilename($fileId, $filename);
@@ -111,7 +117,7 @@ class AttachmentManager
             return '';
         }
 
-        return $this->getFilteredImageUrl($file, $filterName, '', $referenceType);
+        return $this->getFilteredImageUrl($file, $filterName, $format, $referenceType);
     }
 
     /**

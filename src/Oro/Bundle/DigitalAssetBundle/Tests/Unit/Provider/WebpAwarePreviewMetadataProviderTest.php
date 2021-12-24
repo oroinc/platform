@@ -26,10 +26,31 @@ class WebpAwarePreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataReturnsUnchangedWhenWebpNotEnabledIfSupported(): void
+    public function testGetMetadataReturnsUnchangedWhenNoPreviewElement(): void
     {
         $file = new File();
         $innerMetadata = ['sample_key' => 'sample_value'];
+        $this->innerPreviewMetadataProvider
+            ->expects(self::once())
+            ->method('getMetadata')
+            ->with($file)
+            ->willReturn($innerMetadata);
+
+        $this->attachmentManager
+            ->expects(self::never())
+            ->method('isWebpEnabledIfSupported');
+
+        $this->attachmentManager
+            ->expects(self::never())
+            ->method('getFilteredImageUrl');
+
+        self::assertEquals($innerMetadata, $this->provider->getMetadata($file));
+    }
+
+    public function testGetMetadataReturnsUnchangedWhenWebpNotEnabledIfSupported(): void
+    {
+        $file = new File();
+        $innerMetadata = ['sample_key' => 'sample_value', 'preview' => '/sample/image.png'];
         $this->innerPreviewMetadataProvider
             ->expects(self::once())
             ->method('getMetadata')
@@ -51,7 +72,7 @@ class WebpAwarePreviewMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadataReturnsWithPreviewWhenWebpEnabledIfSupported(): void
     {
         $file = new File();
-        $innerMetadata = ['sample_key' => 'sample_value'];
+        $innerMetadata = ['sample_key' => 'sample_value', 'preview' => '/sample/image.png'];
         $this->innerPreviewMetadataProvider
             ->expects(self::once())
             ->method('getMetadata')

@@ -5,8 +5,9 @@ namespace Oro\Bundle\AttachmentBundle\Imagine;
 use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
+use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
-use Oro\Bundle\AttachmentBundle\Tools\FilenameSanitizer;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 
 /**
  * Provides url for the image with applied LiipImagine filter.
@@ -17,15 +18,19 @@ class ImagineFilterService
 
     private CacheManager $cacheManager;
 
+    private FilterConfiguration $filterConfiguration;
+
     private ResizedImageProviderInterface $resizedImageProvider;
 
     public function __construct(
         DataManager $dataManager,
         CacheManager $cacheManager,
+        FilterConfiguration $filterConfiguration,
         ResizedImageProviderInterface $resizedImageProvider
     ) {
         $this->dataManager = $dataManager;
         $this->cacheManager = $cacheManager;
+        $this->filterConfiguration = $filterConfiguration;
         $this->resizedImageProvider = $resizedImageProvider;
     }
 
@@ -39,7 +44,11 @@ class ImagineFilterService
         string $format = '',
         string $resolver = null
     ): string {
-        $targetPath = $this->getTargetPath($path, $format);
+        if (!$format) {
+            $format = $this->filterConfiguration->get($filterName)['format'] ?? '';
+        }
+
+        $targetPath = FilenameExtensionHelper::addExtension($path, $format);
 
         if (!$this->cacheManager->isStored($targetPath, $filterName, $resolver)) {
             $filteredImageBinary = $this->getFilteredImageBinary($path, $filterName, $format);
@@ -58,17 +67,5 @@ class ImagineFilterService
 
         return $this->resizedImageProvider
             ->getFilteredImageByContent($originalImageBinary->getContent(), $filterName, $format);
-    }
-
-    private function getTargetPath(string $path, string $format): string
-    {
-        $format = FilenameSanitizer::sanitizeFilename($format);
-        if ($format && pathinfo($path, PATHINFO_EXTENSION) !== $format) {
-            $targetPath = $path . '.' . $format;
-        } else {
-            $targetPath = $path;
-        }
-
-        return $targetPath;
     }
 }

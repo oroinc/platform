@@ -109,7 +109,7 @@ services:
         decorates: oro.cache.serializer.mapping.factory.class_metadata
         class: Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory
         arguments:
-            - "@oro.cache.serializer.mapping.factory.cache_class_metadata.inner"
+            - "@.inner"
             - "@oro.cache.serializer.mapping.cache"
 
     oro.cache.serializer.normalizer:

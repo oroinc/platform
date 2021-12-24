@@ -137,7 +137,7 @@ class FormCompilerPass implements CompilerPassInterface
         $container
             ->register(self::API_FORM_TYPE_FACTORY_SERVICE_ID, ApiResolvedFormTypeFactory::class)
             ->setArguments([
-                new Reference(self::API_FORM_TYPE_FACTORY_SERVICE_ID . '.inner'),
+                new Reference('.inner'),
                 new Reference(self::API_FORM_EXTENSION_STATE_SERVICE_ID)
             ])
             ->setPublic(false)

@@ -4,6 +4,6 @@ services:
         decorates: debug.security.voter.vote_listener
         arguments:
             - '@oro_config.manager'
-            - '@oro_security.event_listener.debug.vote.inner'
+            - '@.inner'
         tags:
             - { name: kernel.event_subscriber }
