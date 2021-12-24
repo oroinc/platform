@@ -85,6 +85,10 @@ define(function(require) {
                 query = query.slice(1);
             }
             const setValue = function(root, path, value) {
+                if (path[0] === '__proto__') {
+                    // Prevent Object.prototype pollution
+                    return;
+                }
                 if (path.length > 1) {
                     const dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
