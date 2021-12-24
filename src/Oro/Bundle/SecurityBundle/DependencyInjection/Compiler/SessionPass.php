@@ -23,7 +23,7 @@ class SessionPass implements CompilerPassInterface
         $container
             ->register(self::HTTP_KERNEL_DECORATOR_SERVICE, SessionHttpKernelDecorator::class)
             ->setArguments([
-                new Reference(self::HTTP_KERNEL_DECORATOR_SERVICE . '.inner'),
+                new Reference('.inner'),
                 new Reference('service_container')
             ])
             ->setDecoratedService('http_kernel', null, 250)

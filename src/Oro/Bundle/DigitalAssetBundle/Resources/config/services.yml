@@ -82,7 +82,7 @@ services:
         decorates: oro_attachment.provider.file_title
         class: Oro\Bundle\DigitalAssetBundle\Provider\FileTitleProvider
         arguments:
-            - '@oro_digital_asset.provider.file_title.inner'
+            - '@.inner'
             - '@oro_locale.helper.localization'
             - '@doctrine'
 
@@ -90,7 +90,7 @@ services:
         decorates: oro_attachment.listener.file_delete_listener
         class: Oro\Bundle\DigitalAssetBundle\EventListener\FileDeleteListener
         arguments:
-            - '@oro_digital_asset.listener.file_delete_listener.inner'
+            - '@.inner'
         tags:
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: preRemove }
 

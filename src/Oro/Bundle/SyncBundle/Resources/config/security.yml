@@ -23,7 +23,7 @@ services:
         class: Oro\Bundle\SyncBundle\EventListener\ClientEventListener
         decorates: gos_web_socket.event_listener.client
         arguments:
-            - '@oro_sync.event_listener.client.inner'
+            - '@.inner'
             - '@oro_sync.authentication.websocket_authentication_by_ticket_provider'
             - '@gos_web_socket.client.storage'
         calls:

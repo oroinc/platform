@@ -48,11 +48,10 @@ class DbalConnectionCompilerPass implements CompilerPassInterface
             ));
         }
 
-        $decoratorServiceId = 'oro_report.datagrid_orm_query_executor';
         $container
-            ->register($decoratorServiceId, ReportQueryExecutor::class)
+            ->register('oro_report.datagrid_orm_query_executor', ReportQueryExecutor::class)
             ->setArguments([
-                new Reference($decoratorServiceId . '.inner'),
+                new Reference('.inner'),
                 new Reference('doctrine'),
                 $reportConnectionName,
                 $reportDatagridPrefixes

@@ -21,9 +21,8 @@ class DebugWorkflowItemSerializerPass implements CompilerPassInterface
             return;
         }
 
-        $serviceId = 'oro_workflow.debug_workflow_item_serializer';
-        $container->register($serviceId, DebugWorkflowItemSerializer::class)
-            ->addArgument(new Reference($serviceId . '.inner'))
+        $container->register('oro_workflow.debug_workflow_item_serializer', DebugWorkflowItemSerializer::class)
+            ->addArgument(new Reference('.inner'))
             // should be at the top of the decoration chain
             ->setDecoratedService('oro_workflow.workflow_item_serializer', null, -255)
             ->setPublic(false);

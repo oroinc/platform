@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcessWithoutReportDbalConnectionParameter()
+    public function testProcessWithoutReportDbalConnectionParameter(): void
     {
         $container = new ContainerBuilder();
         $container->register('oro_datagrid.orm.query_executor');
@@ -20,7 +20,7 @@ class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($container->hasDefinition('oro_report.datagrid_orm_query_executor'));
     }
 
-    public function testProcessWithReportDbalConnectionParameter()
+    public function testProcessWithReportDbalConnectionParameter(): void
     {
         $reportConnectionName = 'reports';
         $reportDatagridPrefixes = ['prefix1'];
@@ -45,7 +45,7 @@ class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(ReportQueryExecutor::class, $decoratorDef->getClass());
         self::assertEquals(
             [
-                new Reference('oro_report.datagrid_orm_query_executor.inner'),
+                new Reference('.inner'),
                 new Reference('doctrine'),
                 $reportConnectionName,
                 $reportDatagridPrefixes
@@ -56,7 +56,7 @@ class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($decoratorDef->isPublic());
     }
 
-    public function testProcessWithReportDbalConnectionParameterButDbalConnectionWasNotConfigured()
+    public function testProcessWithReportDbalConnectionParameterButDbalConnectionWasNotConfigured(): void
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(

@@ -5,4 +5,4 @@ services:
         decorates: oro_datagrid.orm.query_executor
         decoration_priority: -255
         arguments:
-            - '@oro_datagrid.tests.datagrid_orm_query_collector.inner'
+            - '@.inner'

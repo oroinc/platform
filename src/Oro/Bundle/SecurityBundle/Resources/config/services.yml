@@ -6,7 +6,7 @@ services:
         class: Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker
         decorates: security.authorization_checker
         arguments:
-            - '@oro_security.authorization_checker.inner'
+            - '@.inner'
             - '@oro_security.acl.object_identity_factory'
             - '@oro_security.acl.annotation_provider'
             - '@logger'
@@ -612,7 +612,7 @@ services:
         decorates: 'form.extension'
         arguments:
             - '@oro_security.form.extension.aclprotected_fields_type'
-            - '@oro_security.form.extension.decorator.inner'
+            - '@.inner'
 
     oro_security.acl.extension.field:
         public: false
@@ -658,7 +658,7 @@ services:
         decorates: security.acl.security_identity_retrieval_strategy
         decoration_priority: -255 # should be at the top of the decoration chain
         arguments:
-            - '@oro_security.security.acl.security_identity_retrieval_strategy.cacheable.inner'
+            - '@.inner'
 
     oro_security.acl.voter.basic_permissions:
         class: Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter
