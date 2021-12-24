@@ -17,15 +17,9 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
 {
     use LoggerAwareTrait;
 
-    /**
-     * @var UrlGeneratorInterface
-     */
-    private $urlGenerator;
+    private UrlGeneratorInterface $urlGenerator;
 
-    /**
-     * @var AttachmentHashProvider
-     */
-    private $attachmentHashProvider;
+    private AttachmentHashProvider $attachmentHashProvider;
 
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
@@ -42,7 +36,8 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
         if (!empty($parameters['filter'])) {
-            $parameters['filterMd5'] = $this->getFilterHash($parameters['filter']);
+            $parameters['filterMd5'] = $this->getFilterHash($parameters['filter'], $parameters['format'] ?? '');
+            unset($parameters['format']);
         }
 
         try {
@@ -94,8 +89,8 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
      * - If the system configuration has changed and is not equivalent to the prevent(default) configuration,
      *   then build a hash with the 'post_processors' parameter.
      */
-    public function getFilterHash(string $filterName): string
+    public function getFilterHash(string $filterName, string $format = ''): string
     {
-        return $this->attachmentHashProvider->getFilterConfigHash($filterName);
+        return $this->attachmentHashProvider->getFilterConfigHash($filterName, $format);
     }
 }

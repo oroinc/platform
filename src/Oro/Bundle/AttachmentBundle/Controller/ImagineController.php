@@ -7,6 +7,7 @@ use Liip\ImagineBundle\Exception\Binary\Loader\NotLoadableException;
 use Liip\ImagineBundle\Exception\Imagine\Filter\NonExistingFilterException;
 use Liip\ImagineBundle\Imagine\Cache\Helper\PathHelper;
 use Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,21 +16,16 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Serves requests to filter local images.
- * Converts image to webp format if the requested file has '.webp' extension webp strategy is not disabled.
+ * Can return url to the image in WebP format if webp strategy is not disabled.
  */
 class ImagineController extends AbstractController
 {
-    public function filterAction(string $path, string $filter): Response
+    public function getFilteredImageAction(string $path, string $filter): Response
     {
         $path = PathHelper::urlPathToFilePath($path);
 
         try {
-            if ($this->isWebp($path)) {
-                $format = 'webp';
-                $path = $this->stripWebpFromPath($path);
-            }
-
-            $url = $this->getImagineFilterService()->getUrlOfFilteredImage($path, $filter, $format ?? '');
+            $url = $this->getUrlOfFilteredImage($path, $filter);
         } catch (NotLoadableException $exception) {
             throw new NotFoundHttpException(
                 sprintf('Source image for path "%s" could not be found', $path),
@@ -53,26 +49,45 @@ class ImagineController extends AbstractController
         return new RedirectResponse($url);
     }
 
-    private function isWebp(string $path): bool
-    {
-        return pathinfo($path, PATHINFO_EXTENSION) === 'webp' &&
-            !$this->get(WebpConfiguration::class)->isDisabled();
-    }
+    private function getUrlOfFilteredImage(
+        string $path,
+        string $filterName,
+        string $format = ''
+    ): string {
+        try {
+            $url = $this->getImagineFilterService()->getUrlOfFilteredImage($path, $filterName, $format);
+        } catch (NotLoadableException $exception) {
+            $pathinfo = pathinfo($path) + ['dirname' => '', 'filename' => '', 'extension' => ''];
+            $requestedExtension = $pathinfo['extension'];
+            if (!$requestedExtension) {
+                throw $exception;
+            }
 
-    private function stripWebpFromPath($path): string
-    {
-        $pathWithoutWebp = mb_substr($path, 0, -5);
-        if (!pathinfo($pathWithoutWebp, PATHINFO_EXTENSION)) {
-            // Returns original path as '.webp' is the only extension present.
-            return $path;
+            if (!$this->isAllowedExtension($requestedExtension)) {
+                $requestedExtension = '';
+            }
+
+            $pathWithoutExtension = $pathinfo['dirname'] . DIRECTORY_SEPARATOR . $pathinfo['filename'];
+            $url = $this->getUrlOfFilteredImage($pathWithoutExtension, $filterName, $requestedExtension);
         }
 
-        return $pathWithoutWebp;
+        return $url;
+    }
+
+    private function isAllowedExtension(string $extension): bool
+    {
+        return FilenameExtensionHelper::canonicalizeExtension($extension) === 'webp'
+            && !$this->getWebpConfiguration()->isDisabled();
     }
 
     private function getImagineFilterService(): ImagineFilterService
     {
-        return $this->container->get('oro_attachment.imagine.filter_service');
+        return $this->container->get(ImagineFilterService::class);
+    }
+
+    private function getWebpConfiguration(): WebpConfiguration
+    {
+        return $this->container->get(WebpConfiguration::class);
     }
 
     /**
@@ -83,7 +98,7 @@ class ImagineController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                'oro_attachment.imagine.filter_service' => ImagineFilterService::class,
+                ImagineFilterService::class,
                 WebpConfiguration::class,
             ]
         );

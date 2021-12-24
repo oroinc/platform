@@ -10,12 +10,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class FileUrlProvider implements FileUrlProviderInterface
 {
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-    /**
-     * @var FilenameProviderInterface
-     */
-    private $filenameProvider;
+    private UrlGeneratorInterface $urlGenerator;
+
+    private FilenameProviderInterface $filenameProvider;
 
     public function __construct(
         UrlGeneratorInterface $urlGenerator,
@@ -35,7 +32,7 @@ class FileUrlProvider implements FileUrlProviderInterface
     ): string {
         return $this->urlGenerator->generate(
             'oro_attachment_get_file',
-            ['id' => $file->getId(), 'filename' => $file->getFilename(), 'action' => $action],
+            ['id' => $file->getId(), 'filename' => $this->filenameProvider->getFileName($file), 'action' => $action],
             $referenceType
         );
     }
@@ -54,7 +51,7 @@ class FileUrlProvider implements FileUrlProviderInterface
             'oro_resize_attachment',
             [
                 'id' => $file->getId(),
-                'filename' => $this->filenameProvider->getFileName($file, $format),
+                'filename' => $this->filenameProvider->getResizedImageName($file, $width, $height, $format),
                 'width' => $width,
                 'height' => $height,
             ],
@@ -75,8 +72,9 @@ class FileUrlProvider implements FileUrlProviderInterface
             'oro_filtered_attachment',
             [
                 'id' => $file->getId(),
-                'filename' => $this->filenameProvider->getFileName($file, $format),
+                'filename' => $this->filenameProvider->getFilteredImageName($file, $filterName, $format),
                 'filter' => $filterName,
+                'format' => $format,
             ],
             $referenceType
         );

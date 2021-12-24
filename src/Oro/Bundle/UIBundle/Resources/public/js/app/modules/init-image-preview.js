@@ -30,11 +30,13 @@ $(document).on('click.gallery', function(e) {
         $items.each(function() {
             const $item = $(this);
             const src = $item.attr('href');
+            const sources = $item.attr('data-sources');
 
             if (_.indexOf(images, src) === -1) {
                 images.push(src);
                 const el = {};
                 el.src = src;
+                el.sources = sources ? JSON.parse(sources) : [];
                 const img = $item.find('.thumbnail');
                 if (img.length) {
                     el.thumb = img.css('background-image').replace(/^url\(['"]?/, '').replace(/['"]?\)$/, '');

@@ -9,6 +9,8 @@ use Oro\Bundle\AttachmentBundle\Entity\FileExtensionInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
@@ -31,6 +33,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
 
     private ContainerInterface $container;
     private ?AttachmentManager $attachmentManager = null;
+    private ?PictureSourcesProviderInterface $pictureSourcesProvider = null;
     private ?ConfigManager $configManager = null;
 
     public function __construct(ContainerInterface $container)
@@ -132,11 +135,17 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
+        $sources = [];
+        if ($this->getAttachmentManager()->isImageType($file->getMimeType())) {
+            $sources = $this->getFilteredPictureSources($file);
+        }
+
         return $environment->render(
             self::FILES_TEMPLATE,
             [
                 'iconClass' => $this->getAttachmentManager()->getAttachmentIconClass($file),
                 'url' => $url,
+                'sources' => $sources,
                 'fileName' => $file->getOriginalFilename(),
                 'additional' => $additional,
                 'title' => $this->getFileTitle($file),
@@ -203,17 +212,8 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         $file = $this->getFile($file);
         $sources = [];
         if ($file instanceof File) {
-            $isWebpEnabledIfSupported = $this->getAttachmentManager()->isWebpEnabledIfSupported();
-            if ($isWebpEnabledIfSupported && $file->getExtension() !== 'webp') {
-                $sources[] = $attrs + [
-                    'srcset' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height, 'webp'),
-                    'type' => 'image/webp',
-                ];
-            }
-            $sources[] = $attrs + [
-                'srcset' => $this->getAttachmentManager()->getResizedImageUrl($file, $width, $height),
-                'type' => $file->getMimeType(),
-            ];
+            $pictureSources = $this->getPictureSourcesProvider()->getResizedPictureSources($file, $width, $height);
+            $sources = $this->mergeSources($pictureSources, $file, $attrs);
         }
 
         return $sources;
@@ -244,17 +244,25 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         $file = $this->getFile($file);
         $sources = [];
         if ($file instanceof File) {
-            $isWebpEnabledIfSupported = $this->getAttachmentManager()->isWebpEnabledIfSupported();
-            if ($isWebpEnabledIfSupported && $file->getExtension() !== 'webp') {
-                $sources[] = $attrs + [
-                        'srcset' => $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName, 'webp'),
-                        'type' => 'image/webp',
-                    ];
-            }
-            $sources[] = $attrs + [
-                    'srcset' => $this->getAttachmentManager()->getFilteredImageUrl($file, $filterName),
-                    'type' => $file->getMimeType(),
-                ];
+            $pictureSources = $this->getPictureSourcesProvider()->getFilteredPictureSources($file, $filterName);
+            $sources = $this->mergeSources($pictureSources, $file, $attrs);
+        }
+
+        return $sources;
+    }
+
+    private function mergeSources(array $pictureSources, File $file, array $attrs): array
+    {
+        $sources = $pictureSources['sources'] ?? [];
+        if (!empty($pictureSources['src'])) {
+            $sources = array_merge(
+                $pictureSources['sources'],
+                [['srcset' => $pictureSources['src'], 'type' => $file->getMimeType()]]
+            );
+        }
+
+        if ($attrs) {
+            $sources = array_map(static fn (array $source) => array_merge($source, $attrs), $sources);
         }
 
         return $sources;
@@ -313,6 +321,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     {
         return [
             AttachmentManager::class,
+            PictureSourcesProvider::class,
             ConfigManager::class,
             ManagerRegistry::class,
             PropertyAccessorInterface::class,
@@ -328,6 +337,15 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         }
 
         return $this->attachmentManager;
+    }
+
+    private function getPictureSourcesProvider(): PictureSourcesProviderInterface
+    {
+        if (null === $this->pictureSourcesProvider) {
+            $this->pictureSourcesProvider = $this->container->get(PictureSourcesProvider::class);
+        }
+
+        return $this->pictureSourcesProvider;
     }
 
     private function getConfigManager(): ConfigManager

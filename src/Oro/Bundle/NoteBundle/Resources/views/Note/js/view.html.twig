@@ -4,9 +4,14 @@
             <div class="title-item">
                 <a href="#accordion-item<%- id %>" class="no-hash accordion-toggle<% if (collapsed) { %> collapsed<% } %>"></a>
                 <span class="visual">
-                    <% if (createdBy_avatar) { %>
+                    <% if (createdBy_avatarPicture and createdBy_avatarPicture.src) { %>
                         <span class="avatar">
-                            <img src="<%- createdBy_avatar %>" />
+                            <picture>
+                                <% _.each(typeof createdBy_avatarPicture.sources !== 'undefined' && createdBy_avatarPicture.sources ? createdBy_avatarPicture.sources : [], function(source) { %>
+                                    <source srcset="<%- source.srcset %>" type="<%- source.type %>">
+                                <% }); %>
+                                <img src="<%- createdBy_avatarPicture.src %>"/>
+                            </picture>
                         </span>
                     <% } else { %>
                         <span class="avatar-placeholder fa-user-circle" aria-hidden="true"></span>

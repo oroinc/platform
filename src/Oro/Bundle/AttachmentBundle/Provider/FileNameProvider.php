@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
+use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameSanitizer;
 
 /**
@@ -10,13 +12,44 @@ use Oro\Bundle\AttachmentBundle\Tools\FilenameSanitizer;
  */
 class FileNameProvider implements FileNameProviderInterface
 {
+    private FilterConfiguration $filterConfiguration;
+
+    public function __construct(FilterConfiguration $filterConfiguration)
+    {
+        $this->filterConfiguration = $filterConfiguration;
+    }
+
     /**
      * {@inheritdoc}
      */
-    public function getFileName(File $file, string $format = ''): string
+    public function getFileName(File $file): string
     {
-        $extension = $format && $file->getExtension() !== $format ? '.' . $format : '';
+        return (string) $file->getFilename();
+    }
 
-        return FilenameSanitizer::sanitizeFilename($file->getFilename() . $extension);
+    /**
+     * Uses format taken from LiipImagine filter config if it is not specified explicitly.
+     *
+     * {@inheritdoc}
+     */
+    public function getFilteredImageName(File $file, string $filterName, string $format = ''): string
+    {
+        if (!$format) {
+            $format = $this->filterConfiguration->get($filterName)['format'] ?? '';
+        }
+
+        return $this->getNameWithFormat($file, $format);
+    }
+
+    public function getResizedImageName(File $file, int $width, int $height, string $format = ''): string
+    {
+        return $this->getNameWithFormat($file, $format);
+    }
+
+    private function getNameWithFormat(File $file, string $format): string
+    {
+        $filename = FilenameExtensionHelper::addExtension((string) $file->getFilename(), $format);
+
+        return FilenameSanitizer::sanitizeFilename($filename);
     }
 }

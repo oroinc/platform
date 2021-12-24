@@ -2,6 +2,7 @@ import $ from 'jquery';
 import __ from 'orotranslation/js/translator';
 import ModalView from 'oroui/js/modal';
 import template from 'tpl-loader!oroui/templates/image-preview-modal.html';
+import tools from 'oroui/js/tools';
 import 'slick';
 
 const ImagePreviewModal = ModalView.extend({
@@ -21,6 +22,12 @@ const ImagePreviewModal = ModalView.extend({
     slider: null,
 
     hasOpenModal: false,
+
+    /**
+     * Is browser support WebP
+     * @property boolean
+     */
+    supportWebp: tools.isSupportWebp(),
 
     /**
      * @inheritdoc
@@ -59,8 +66,20 @@ const ImagePreviewModal = ModalView.extend({
         data.counterCurrent = this.options.currentSlide + 1;
         data.counterAll = this.options.images.length;
         data.images = this.options.images;
-
+        data.getSourceSrc = this.getSourceForLazyLoading.bind(this);
         return data;
+    },
+
+    getSourceForLazyLoading(image) {
+        const webP = image.sources.find(({type}) => {
+            return type === 'image/webp';
+        });
+
+        if (webP && this.supportWebp) {
+            return webP.srcset;
+        }
+
+        return image.src;
     },
 
     onModalHidden() {

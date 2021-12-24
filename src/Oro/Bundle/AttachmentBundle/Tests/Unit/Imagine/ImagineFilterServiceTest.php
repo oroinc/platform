@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Imagine;
 
 use Liip\ImagineBundle\Imagine\Cache\CacheManager;
 use Liip\ImagineBundle\Imagine\Data\DataManager;
+use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
@@ -22,7 +23,13 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
     {
         $this->dataManager = $this->createMock(DataManager::class);
         $this->cacheManager = $this->createMock(CacheManager::class);
+        $filterConfiguration = $this->createMock(FilterConfiguration::class);
         $this->resizedImageProvider = $this->createMock(ResizedImageProviderInterface::class);
+
+        $filterConfiguration
+            ->expects(self::any())
+            ->method('get')
+            ->willReturnMap([['jpeg_filter', ['format' => 'jpeg']], ['empty_filter', []]]);
 
         $this->cacheManager
             ->expects(self::any())
@@ -34,6 +41,7 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
         $this->imagineFilterService = new ImagineFilterService(
             $this->dataManager,
             $this->cacheManager,
+            $filterConfiguration,
             $this->resizedImageProvider
         );
     }
@@ -44,9 +52,9 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
     public function testGetUrlOfFilteredImageReturnsUrlForAlreadyStored(
         string $path,
         string $targetPath,
+        string $filterName,
         string $format
     ): void {
-        $filterName = 'sample_filter';
         $resolver = 'sample_resolver';
         $this->cacheManager
             ->expects(self::once())
@@ -74,21 +82,43 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
             'when path is empty' => [
                 'path' => '',
                 'targetPath' => '',
+                'filter' => 'empty_filter',
                 'format' => '',
             ],
             'uses unchanged target path' => [
                 'path' => '/sample/image.png',
                 'targetPath' => '/sample/image.png',
+                'filter' => 'empty_filter',
                 'format' => '',
             ],
             'adds webp extension to target path' => [
                 'path' => '/sample/image.png',
                 'targetPath' => '/sample/image.png.webp',
+                'filter' => 'empty_filter',
                 'format' => 'webp',
             ],
             'uses unchanged target path because extension is already webp' => [
                 'path' => '/sample/image.png.webp',
                 'targetPath' => '/sample/image.png.webp',
+                'filter' => 'empty_filter',
+                'format' => 'webp',
+            ],
+            'adds jpeg extension as filter config has format jpeg' => [
+                'path' => '/sample/image.png',
+                'targetPath' => '/sample/image.png.jpeg',
+                'filter' => 'jpeg_filter',
+                'format' => 'jpeg',
+            ],
+            'uses unchanged target path because extension is already jpeg for filter config with format jpeg' => [
+                'path' => '/sample/image.jpeg',
+                'targetPath' => '/sample/image.jpeg',
+                'filter' => 'jpeg_filter',
+                'format' => 'jpeg',
+            ],
+            'adds webp extension even if filter config has format jpeg' => [
+                'path' => '/sample/image.png',
+                'targetPath' => '/sample/image.png.webp',
+                'filter' => 'jpeg_filter',
                 'format' => 'webp',
             ],
         ];
@@ -100,9 +130,9 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
     public function testGetUrlOfFilteredImageStoresAndReturnsUrlWhenNotYetStored(
         string $path,
         string $targetPath,
+        string $filterName,
         string $format
     ): void {
-        $filterName = 'sample_filter';
         $resolver = 'sample_resolver';
         $this->cacheManager
             ->expects(self::once())
@@ -117,7 +147,7 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
             ->with($filterName, $path)
             ->willReturn($binary);
 
-        $filteredImageBinary = new Binary('sample_filtered_binary', 'image/sample');
+        $filteredImageBinary = new Binary('empty_filtered_binary', 'image/sample');
         $this->resizedImageProvider
             ->expects(self::once())
             ->method('getFilteredImageByContent')

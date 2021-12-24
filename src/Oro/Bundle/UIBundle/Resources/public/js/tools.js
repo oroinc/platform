@@ -492,6 +492,20 @@ define(function(require) {
                 }
             });
             return versions;
+        },
+
+        /**
+         * Detect if browser support WebP images
+         * @returns {boolean}
+         */
+        isSupportWebp() {
+            let supports = false;
+            try {
+                const canvas = document.createElement('canvas');
+                supports = !!canvas && canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+            } catch (e) {}
+
+            return supports;
         }
     });
 

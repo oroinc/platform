@@ -8,37 +8,41 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
+use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\AttachmentAwareTestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
+use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 
 class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationHelper;
+    private AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject $attachmentAssociationHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentManager;
+    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
 
-    /** @var AttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentProvider;
+    private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pictureSourcesProvider;
+
+    private AttachmentProvider $attachmentProvider;
 
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
+        $this->pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
 
         $this->attachmentProvider = new AttachmentProvider(
             $this->em,
             $this->attachmentAssociationHelper,
-            $this->attachmentManager
+            $this->attachmentManager,
+            $this->pictureSourcesProvider
         );
     }
 
-    public function testGetEntityAttachments()
+    public function testGetEntityAttachments(): void
     {
         $entity = new TestClass();
 
@@ -81,10 +85,11 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($qb);
 
         $result = $this->attachmentProvider->getEntityAttachments($entity);
-        $this->assertEquals('result', $result);
+
+        self::assertEquals('result', $result);
     }
 
-    public function testUnsupportedAttachments()
+    public function testUnsupportedAttachments(): void
     {
         $entity = new TestClass();
 
@@ -94,6 +99,157 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $result = $this->attachmentProvider->getEntityAttachments($entity);
-        $this->assertEquals([], $result);
+
+        self::assertEquals([], $result);
+    }
+
+    public function testGetAttachmentInfoEmptyAttachment(): void
+    {
+        $entity = new AttachmentAwareTestClass();
+
+        $result = $this->attachmentProvider->getAttachmentInfo($entity);
+
+        self::assertEquals([], $result);
+    }
+
+    public function testGetAttachmentInfoNotIsWebpEnabledIfSupported(): void
+    {
+        $attachment = (new TestFile())
+            ->setId(1)
+            ->setMimeType('image/jpeg')
+            ->setFileSize(500)
+            ->setOriginalFilename('original_file_name');
+        $entity = new AttachmentAwareTestClass();
+        $entity->setAttachment($attachment);
+
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('isImageType')
+            ->with('image/jpeg')
+            ->willReturn(true);
+
+        $this->pictureSourcesProvider
+            ->expects(self::once())
+            ->method('getResizedPictureSources')
+            ->with($attachment, AttachmentManager::THUMBNAIL_WIDTH, AttachmentManager::THUMBNAIL_HEIGHT)
+            ->willReturn([
+                'src' => '/url/thumbnail.jpg',
+                'sources' => [],
+            ]);
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('getFileUrl')
+            ->with($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD)
+            ->willReturn('/attachment/download/file.jpg');
+        $this->attachmentManager
+            ->expects(self::never())
+            ->method('getFilteredImageUrl');
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('getAttachmentIconClass')
+            ->with($attachment)
+            ->willReturn('fa-file-o');
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('isWebpEnabledIfSupported')
+            ->willReturn(false);
+
+        $result = $this->attachmentProvider->getAttachmentInfo($entity);
+
+        self::assertEquals(
+            [
+                'attachmentURL' => [
+                    'url' => '/attachment/download/file.jpg',
+                    'sources' => [],
+                ],
+                'attachmentSize' => '500.00 B',
+                'attachmentFileName' => 'original_file_name',
+                'attachmentIcon' => 'fa-file-o',
+                'attachmentThumbnailPicture' => [
+                    'src' => '/url/thumbnail.jpg',
+                    'sources' => [],
+                ],
+            ],
+            $result
+        );
+    }
+
+    public function testGetAttachmentInfoIsWebpEnabledIfSupported(): void
+    {
+        $attachment = (new TestFile())
+            ->setId(1)
+            ->setMimeType('image/jpeg')
+            ->setFileSize(500)
+            ->setOriginalFilename('original_file_name');
+        $entity = new AttachmentAwareTestClass();
+        $entity->setAttachment($attachment);
+
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('isImageType')
+            ->with('image/jpeg')
+            ->willReturn(true);
+
+        $this->pictureSourcesProvider
+            ->expects(self::once())
+            ->method('getResizedPictureSources')
+            ->with($attachment, AttachmentManager::THUMBNAIL_WIDTH, AttachmentManager::THUMBNAIL_HEIGHT)
+            ->willReturn([
+                'src' => '/url/thumbnail.jpg',
+                'sources' => [
+                    [
+                        'srcset' => '/url/thumbnail.jpg.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('getFileUrl')
+            ->with($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD)
+            ->willReturn('/attachment/download/file.jpg');
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('getFilteredImageUrl')
+            ->with($attachment, 'original', 'webp')
+            ->willReturn('/url/to/original/filtered/file.jpg.webp');
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('getAttachmentIconClass')
+            ->with($attachment)
+            ->willReturn('fa-file-o');
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('isWebpEnabledIfSupported')
+            ->willReturn(true);
+
+        $result = $this->attachmentProvider->getAttachmentInfo($entity);
+
+        self::assertEquals(
+            [
+                'attachmentURL' => [
+                    'url' => '/attachment/download/file.jpg',
+                    'sources' => [
+                        [
+                            'srcset' => '/url/to/original/filtered/file.jpg.webp',
+                            'type' => 'image/webp',
+                        ],
+                    ],
+                ],
+                'attachmentSize' => '500.00 B',
+                'attachmentFileName' => 'original_file_name',
+                'attachmentIcon' => 'fa-file-o',
+                'attachmentThumbnailPicture' => [
+                    'src' => '/url/thumbnail.jpg',
+                    'sources' => [
+                        [
+                            'srcset' => '/url/thumbnail.jpg.webp',
+                            'type' => 'image/webp',
+                        ],
+                    ],
+                ],
+            ],
+            $result
+        );
     }
 }

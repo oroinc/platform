@@ -9,7 +9,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -45,7 +45,7 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->repository = $this->createMock(EntityRepository::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
 
-        $attachmentManager = $this->createMock(AttachmentManager::class);
+        $pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
 
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
@@ -73,7 +73,12 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::NAME)
             ->willReturn('user');
 
-        $this->handler = new UserWithoutCurrentHandler($this->tokenAccessor, $attachmentManager, self::NAME, []);
+        $this->handler = new UserWithoutCurrentHandler(
+            $this->tokenAccessor,
+            $pictureSourcesProvider,
+            self::NAME,
+            []
+        );
         $this->handler->initSearchIndexer($this->indexer, $searchMappingProvider);
         $this->handler->initDoctrinePropertiesByEntityManager($manager);
         $this->handler->setAclHelper($this->aclHelper);

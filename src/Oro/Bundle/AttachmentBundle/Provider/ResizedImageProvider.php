@@ -162,11 +162,7 @@ class ResizedImageProvider implements ResizedImageProviderInterface
     ): ?BinaryInterface {
         $originalImageBinary = $this->imagineBinaryFactory->createImagineBinary($content);
         try {
-            $runtimeConfig = $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter(
-                $originalImageBinary,
-                $filterName,
-                $format
-            );
+            $runtimeConfig = $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format);
             $filteredBinary = $this->imagineBinaryFilter->applyFilter(
                 $originalImageBinary,
                 $filterName,

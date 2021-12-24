@@ -98,7 +98,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -130,7 +130,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -183,7 +183,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -215,7 +215,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -244,7 +244,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -271,7 +271,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -315,7 +315,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -357,7 +357,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')
@@ -394,7 +394,7 @@ class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($originalImageBinary);
         $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($originalImageBinary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
         $this->imagineBinaryFilter->expects(self::once())
             ->method('applyFilter')

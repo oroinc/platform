@@ -5,7 +5,7 @@ namespace Oro\Bundle\UserBundle\Autocomplete;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
@@ -29,8 +29,8 @@ class UserAclHandler implements SearchHandlerInterface
     /** @var EntityManager */
     protected $em;
 
-    /** @var AttachmentManager */
-    protected $attachmentManager;
+    /** @var PictureSourcesProviderInterface */
+    protected $pictureSourcesProvider;
 
     /** @var string */
     protected $className;
@@ -60,18 +60,18 @@ class UserAclHandler implements SearchHandlerInterface
     protected $treeProvider;
 
     /**
-     * @param EntityManager                 $em
-     * @param AttachmentManager             $attachmentManager
-     * @param string                        $className
+     * @param EntityManager $em
+     * @param PictureSourcesProviderInterface $pictureSourcesProvider
+     * @param string $className
      * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param OwnerTreeProvider             $treeProvider
+     * @param TokenAccessorInterface $tokenAccessor
+     * @param OwnerTreeProvider $treeProvider
      * @param EntityRoutingHelper $entityRoutingHelper
-     * @param AclVoterInterface|null        $aclVoter
+     * @param AclVoterInterface|null $aclVoter
      */
     public function __construct(
         EntityManager $em,
-        AttachmentManager $attachmentManager,
+        PictureSourcesProviderInterface $pictureSourcesProvider,
         $className,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
@@ -80,7 +80,7 @@ class UserAclHandler implements SearchHandlerInterface
         AclVoterInterface $aclVoter = null
     ) {
         $this->em = $em;
-        $this->attachmentManager = $attachmentManager;
+        $this->pictureSourcesProvider = $pictureSourcesProvider;
         $this->className = $className;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
@@ -197,7 +197,10 @@ class UserAclHandler implements SearchHandlerInterface
             $result[$field] = $this->getPropertyValue($field, $user);
         }
 
-        $result['avatar'] = $this->getUserAvatar($user);
+        $result['avatar'] = $this->pictureSourcesProvider->getFilteredPictureSources(
+            $this->getPropertyValue('avatar', $user),
+            UserSearchHandler::IMAGINE_AVATAR_FILTER
+        );
 
         if (!$this->entityNameResolver) {
             throw new \RuntimeException('Name resolver must be configured');
@@ -205,24 +208,6 @@ class UserAclHandler implements SearchHandlerInterface
         $result['fullName'] = $this->entityNameResolver->getName($user);
 
         return $result;
-    }
-
-    /**
-     * @param $user
-     *
-     * @return string|null
-     */
-    protected function getUserAvatar($user)
-    {
-        $avatar = $this->getPropertyValue('avatar', $user);
-        if (!$avatar) {
-            return null;
-        }
-
-        return $this->attachmentManager->getFilteredImageUrl(
-            $avatar,
-            UserSearchHandler::IMAGINE_AVATAR_FILTER
-        );
     }
 
     /**

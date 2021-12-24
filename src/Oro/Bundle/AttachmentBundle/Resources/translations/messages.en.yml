@@ -111,6 +111,7 @@ oro:
                 description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
             webp_settings:
                 label: WebP Settings
+                description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
             webp_quality:
                 label: WebP resize quality (%)
                 tooltip: Modification of the value may cause temporary storefront slow-down until all product images are resized.

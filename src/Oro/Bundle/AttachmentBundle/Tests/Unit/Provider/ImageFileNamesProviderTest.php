@@ -9,14 +9,11 @@ use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface;
 
 class ImageFileNamesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterConfiguration;
+    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfiguration;
 
-    /** @var ResizedImagePathProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $imagePathProvider;
+    private ResizedImagePathProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagePathProvider;
 
-    /** @var ImageFileNamesProvider */
-    private $fileNamesProvider;
+    private ImageFileNamesProvider $fileNamesProvider;
 
     protected function setUp(): void
     {
@@ -29,7 +26,7 @@ class ImageFileNamesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFileNames()
+    public function testGetFileNames(): void
     {
         $file = $this->createMock(File::class);
 
@@ -37,28 +34,41 @@ class ImageFileNamesProviderTest extends \PHPUnit\Framework\TestCase
             ->method('all')
             ->willReturn([
                 'filter1' => [],
-                'filter2' => []
+                'filter2' => [],
             ]);
-        $this->imagePathProvider->expects(self::exactly(2))
+        $this->imagePathProvider->expects(self::exactly(4))
             ->method('getPathForFilteredImage')
             ->withConsecutive(
                 [$file, 'filter1'],
-                [$file, 'filter2']
+                [$file, 'filter1', 'webp'],
+                [$file, 'filter2'],
+                [$file, 'filter2', 'webp']
             )
             ->willReturnOnConsecutiveCalls(
                 '/attachment/filter/filter1/file.jpg',
-                '/attachment/filter/filter2/file.jpg'
+                '/attachment/filter/filter1/file.jpg.webp',
+                '/attachment/filter/filter2/file.jpg',
+                '/attachment/filter/filter2/file.jpg.webp'
             );
-        $this->imagePathProvider->expects(self::once())
+        $this->imagePathProvider->expects(self::exactly(2))
             ->method('getPathForResizedImage')
-            ->with($file, 1, 1)
-            ->willReturn('/attachment/resize/1/1/file.jpg');
+            ->withConsecutive(
+                [$file, 1, 1],
+                [$file, 1, 1, 'webp']
+            )
+            ->willReturnOnConsecutiveCalls(
+                '/attachment/resize/1/1/file.jpg',
+                '/attachment/resize/1/1/file.jpg.webp'
+            );
 
         self::assertSame(
             [
                 'attachment/filter/filter1/file.jpg',
+                'attachment/filter/filter1/file.jpg.webp',
                 'attachment/filter/filter2/file.jpg',
-                'attachment/resize/1/1/file.jpg'
+                'attachment/filter/filter2/file.jpg.webp',
+                'attachment/resize/1/1/file.jpg',
+                'attachment/resize/1/1/file.jpg.webp',
             ],
             $this->fileNamesProvider->getFileNames($file)
         );

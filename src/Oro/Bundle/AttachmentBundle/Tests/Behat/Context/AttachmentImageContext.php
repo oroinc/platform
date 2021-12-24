@@ -305,41 +305,44 @@ JS;
     {
         $webpConfiguration = $this->getAppContainer()->get('oro_attachment.behat.tools.webp_configuration');
 
-        if ($webpConfiguration->isEnabledIfSupported()) {
-            $this->iShouldSeeWebpPictureSourceInElement($picture);
+        if (!$webpConfiguration->isDisabled()) {
+            $this->iShouldSeeWebpImageInElement($picture);
         } else {
             $this->findPictureTag($picture);
         }
     }
 
-    private function iShouldSeeWebpPictureSourceInElement(NodeElement|string $picture): void
+    private function iShouldSeeWebpImageInElement(NodeElement|string $picture): void
     {
         $picture = $this->findPictureTag($picture);
 
-        $sourceSelector = '//source[@type="image/webp"][last()]';
-        $source = $picture->find('xpath', $sourceSelector);
+        $source = $picture->find('xpath', '//source[@type="image/webp"][last()]');
+        if ($source) {
+            $imageUrl = $source->getAttribute('srcset');
+        } else {
+            $img = $picture->find('xpath', '//img');
+            $imageUrl = $img->getAttribute('src');
+        }
 
-        self::assertNotNull(
-            $source,
-            sprintf('No picture source found by "%s" selector', $sourceSelector)
-        );
+        self::assertNotEmpty($imageUrl, sprintf('Image url was not found in "%s"', $picture->getXpath()));
 
-        $sourceUrl = preg_replace('/\\?.*/', '', $source->getAttribute('srcset'));
+        $imageUrl = preg_replace('/\\?.*/', '', $imageUrl);
+
         self::assertStringEndsWith(
             '.webp',
-            $sourceUrl,
-            sprintf('Expected url with webp file extension, got "%s"', $sourceUrl)
+            $imageUrl,
+            sprintf('Expected image url with ".webp" extension, got "%s"', $imageUrl)
         );
 
-        $response = $this->loadImage($sourceUrl, true);
+        $response = $this->loadImage($imageUrl, true);
 
         self::assertEquals(
             200,
             $response->getStatusCode(),
             sprintf(
-                'Expected "200" status code, got "%s" when requested the url "%s" of picture source',
+                'Expected "200" status code, got "%s" when requested the image url "%s"',
                 $response->getStatusCode(),
-                $sourceUrl
+                $imageUrl
             )
         );
     }

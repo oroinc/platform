@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
-use Liip\ImagineBundle\Binary\BinaryInterface;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 
 /**
@@ -22,10 +21,9 @@ class WebpAwareFilterRuntimeConfigProvider implements FilterRuntimeConfigProvide
         $this->webpConfiguration = $webpConfiguration;
     }
 
-    public function getRuntimeConfigForFilter(BinaryInterface $binary, string $filterName, string $format = ''): array
+    public function getRuntimeConfigForFilter(string $filterName, string $format = ''): array
     {
-        $runtimeConfig = $this->innerFilterRuntimeConfigProvider
-            ->getRuntimeConfigForFilter($binary, $filterName, $format);
+        $runtimeConfig = $this->innerFilterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format);
 
         return array_replace_recursive($runtimeConfig, $this->getRuntimeConfig($format));
     }
