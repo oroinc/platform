@@ -34,7 +34,7 @@ class ConnectionControllerManager
     public function __construct(
         FormFactoryInterface $formFactory,
         SymmetricCrypterInterface $crypter,
-        ManagerRegistry $doctrineHelper,
+        ManagerRegistry $doctrine,
         ImapConnectorFactory $imapConnectorFactory,
         OAuthManagerRegistry $oauthManagerRegistry,
         string $userFormName,
@@ -44,7 +44,7 @@ class ConnectionControllerManager
     ) {
         $this->formFactory = $formFactory;
         $this->crypter = $crypter;
-        $this->doctrine = $doctrineHelper;
+        $this->doctrine = $doctrine;
         $this->imapConnectorFactory = $imapConnectorFactory;
         $this->oauthManagerRegistry = $oauthManagerRegistry;
         $this->userFormName = $userFormName;
@@ -58,8 +58,12 @@ class ConnectionControllerManager
      */
     public function getCheckConnectionForm(Request $request, string $formParentName): FormInterface
     {
+        $type = $request->get('type');
         $data = $this->getUserEmailOrigin($request->get('id'));
-        $type = $data ? $data->getAccountType() : $request->get('type');
+        if (null === $type && $data) {
+            $type = $data->getAccountType();
+        }
+
         $oauthManager = $this->oauthManagerRegistry->getManager($type);
 
         $typeClass = $oauthManager->getConnectionFormTypeClass();
@@ -98,24 +102,38 @@ class ConnectionControllerManager
         return $this->prepareForm($formParentName, $accountTypeModel);
     }
 
-    /**
-     * @param string $type
-     * @param string|null $accessToken
-     * @param string $formParentName
-     *
-     * @return FormInterface
-     */
-    public function getImapConnectionForm($type, $accessToken, $formParentName)
-    {
-        $oauthEmailOrigin = new UserEmailOrigin();
-        $oauthEmailOrigin->setAccessToken($accessToken);
+    public function getImapConnectionForm(
+        string $type,
+        ?string $accessToken,
+        string $formParentName,
+        $originId = null
+    ): FormInterface {
+        $emailOrigin = new UserEmailOrigin();
 
-        if ($type && ($type !== AccountTypeModel::ACCOUNT_TYPE_OTHER)) {
-            $oauthEmailOrigin->setAccountType($type);
-            $this->oauthManagerRegistry->getManager($type)->setOriginDefaults($oauthEmailOrigin);
+        $existingOrigin = null;
+        if ($originId) {
+            $existingOrigin = $this->getUserEmailOrigin($originId);
         }
 
-        $accountTypeModel = $this->createAccountModel($type, $oauthEmailOrigin);
+        // if user have existing email origin and old or new origin type is Other - use existing origin as base
+        // to be able to save existing synced emails.
+        if ($existingOrigin
+            && (
+                $existingOrigin->getAccountType() === AccountTypeModel::ACCOUNT_TYPE_OTHER
+                || $type === AccountTypeModel::ACCOUNT_TYPE_OTHER
+            )
+        ) {
+            $emailOrigin = $existingOrigin;
+        }
+
+        $emailOrigin->setAccessToken($accessToken);
+
+        if ($type && ($type !== AccountTypeModel::ACCOUNT_TYPE_OTHER)) {
+            $emailOrigin->setAccountType($type);
+            $this->oauthManagerRegistry->getManager($type)->setOriginDefaults($emailOrigin);
+        }
+
+        $accountTypeModel = $this->createAccountModel($type, $emailOrigin);
 
         return $this->prepareForm($formParentName, $accountTypeModel);
     }

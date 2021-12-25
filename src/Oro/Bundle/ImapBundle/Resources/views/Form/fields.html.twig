@@ -40,7 +40,8 @@
         'route': "oro_imap_change_account_type",
         'formSelector': '#'~formSelector|default(form.vars.id),
         'formParentName': form.parent.vars.name,
-        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
+        'id': form.vars.value and form.vars.value.userEmailOrigin.id is defined ? form.vars.value.userEmailOrigin.id : null,
     }) %}
 
     <div class="container-change-account-type"

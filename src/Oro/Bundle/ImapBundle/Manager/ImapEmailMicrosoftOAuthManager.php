@@ -57,6 +57,13 @@ class ImapEmailMicrosoftOAuthManager extends AbstractOAuthManager
     {
         $origin->setImapHost(Office365Imap::DEFAULT_IMAP_HOST);
         $origin->setImapPort(Office365Imap::DEFAULT_IMAP_PORT);
+        $origin->setImapEncryption(Office365Imap::DEFAULT_IMAP_ENCRYPTION);
+
+        $origin->setSmtpHost(Office365Imap::DEFAULT_SMTP_HOST);
+        $origin->setSmtpPort(Office365Imap::DEFAULT_SMTP_PORT);
+        $origin->setSmtpEncryption(Office365Imap::DEFAULT_SMTP_ENCRYPTION);
+
+        $origin->setAccountType(AccountTypeModel::ACCOUNT_TYPE_MICROSOFT);
     }
 
     /**
