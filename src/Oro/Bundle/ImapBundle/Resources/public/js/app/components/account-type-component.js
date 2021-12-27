@@ -25,6 +25,7 @@ define(function(require) {
         initialize: function(options) {
             this.route = _.result(options, 'route') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
+            this.originId = _.result(options, 'id') || null;
 
             const viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
@@ -59,7 +60,8 @@ define(function(require) {
                 method: 'POST',
                 data: {
                     type: value,
-                    formParentName: this.formParentName
+                    formParentName: this.formParentName,
+                    id: this.originId
                 },
                 success: _.bind(this.templateLoaded, this)
             });
