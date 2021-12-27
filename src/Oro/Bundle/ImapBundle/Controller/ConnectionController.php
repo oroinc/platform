@@ -78,7 +78,12 @@ class ConnectionController extends AbstractController
         $formParentName = $request->get('formParentName');
 
         $connectionControllerManager = $this->get(ConnectionControllerManager::class);
-        $form = $connectionControllerManager->getImapConnectionForm($type, $token, $formParentName);
+        $form = $connectionControllerManager->getImapConnectionForm(
+            $type,
+            $token,
+            $formParentName,
+            $request->get('id')
+        );
 
         if ($token) {
             $html = $this->renderView('@OroImap/Form/accountTypeAuthorized.html.twig', [

@@ -73,15 +73,16 @@ class ImapEmailGoogleOAuthManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetOriginDefaults(): void
     {
-        $userEmailOrigin = $this->createMock(UserEmailOrigin::class);
-        $userEmailOrigin->expects($this->once())
-            ->method('setImapHost')
-            ->with('imap.gmail.com');
-        $userEmailOrigin->expects($this->once())
-            ->method('setImapPort')
-            ->with(993);
-
+        $userEmailOrigin = new UserEmailOrigin();
         $this->manager->setOriginDefaults($userEmailOrigin);
+
+        self::assertEquals('imap.gmail.com', $userEmailOrigin->getImapHost());
+        self::assertEquals('993', $userEmailOrigin->getImapPort());
+        self::assertEquals('ssl', $userEmailOrigin->getImapEncryption());
+        self::assertEquals('smtp.gmail.com', $userEmailOrigin->getSmtpHost());
+        self::assertEquals('465', $userEmailOrigin->getSmtpPort());
+        self::assertEquals('ssl', $userEmailOrigin->getSmtpEncryption());
+        self::assertEquals('gmail', $userEmailOrigin->getAccountType());
     }
 
     public function testIsOAuthEnabled(): void
