@@ -57,5 +57,12 @@ class ImapEmailGoogleOAuthManager extends AbstractOAuthManager
     {
         $origin->setImapHost(GmailImap::DEFAULT_GMAIL_HOST);
         $origin->setImapPort(GmailImap::DEFAULT_GMAIL_PORT);
+        $origin->setImapEncryption(GmailImap::DEFAULT_GMAIL_SSL);
+
+        $origin->setSmtpHost(GmailImap::DEFAULT_GMAIL_SMTP_HOST);
+        $origin->setSmtpPort(GmailImap::DEFAULT_GMAIL_SMTP_PORT);
+        $origin->setSmtpEncryption(GmailImap::DEFAULT_GMAIL_SMTP_SSL);
+
+        $origin->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
     }
 }

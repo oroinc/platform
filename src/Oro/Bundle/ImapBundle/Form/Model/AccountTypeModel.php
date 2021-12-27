@@ -11,11 +11,8 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 class AccountTypeModel
 {
     public const ACCOUNT_TYPE_GMAIL = 'gmail';
-
     public const ACCOUNT_TYPE_MICROSOFT = 'microsoft';
-
     public const ACCOUNT_TYPE_OTHER = 'other';
-
     public const ACCOUNT_TYPE_NO_SELECT = 'selectType';
 
     /** @var string|null */
@@ -53,6 +50,15 @@ class AccountTypeModel
      */
     public function setUserEmailOrigin($value)
     {
+        if ($value) {
+            if ($value->getAccountType() === self::ACCOUNT_TYPE_OTHER) {
+                $value->setAccessToken(null);
+                $value->setRefreshToken(null);
+                $value->setAccessTokenExpiresAt(null);
+            } else {
+                $value->setPassword(null);
+            }
+        }
         $this->userEmailOrigin = $value;
     }
 }

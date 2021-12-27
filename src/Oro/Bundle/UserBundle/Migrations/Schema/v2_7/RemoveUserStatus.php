@@ -15,8 +15,10 @@ class RemoveUserStatus implements Migration
      */
     public function up(Schema $schema, QueryBag $queries)
     {
-        $schema->getTable('oro_user')->dropColumn('status_id');
-        $schema->dropTable('oro_user_status');
+        if ($schema->hasTable('oro_user_status')) {
+            $schema->getTable('oro_user')->dropColumn('status_id');
+            $schema->dropTable('oro_user_status');
+        }
 
         $queries->addQuery(new RemoveFieldQuery(User::class, 'currentStatus'));
         $queries->addQuery(new RemoveFieldQuery(User::class, 'statuses'));

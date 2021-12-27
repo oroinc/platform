@@ -73,15 +73,16 @@ class ImapEmailMicrosoftOAuthManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testSetOriginDefaults(): void
     {
-        $userEmailOrigin = $this->createMock(UserEmailOrigin::class);
-        $userEmailOrigin->expects($this->once())
-            ->method('setImapHost')
-            ->with('outlook.office365.com');
-        $userEmailOrigin->expects($this->once())
-            ->method('setImapPort')
-            ->with(993);
-
+        $userEmailOrigin = new UserEmailOrigin();
         $this->manager->setOriginDefaults($userEmailOrigin);
+
+        self::assertEquals('outlook.office365.com', $userEmailOrigin->getImapHost());
+        self::assertEquals('993', $userEmailOrigin->getImapPort());
+        self::assertEquals('ssl', $userEmailOrigin->getImapEncryption());
+        self::assertEquals('smtp.office365.com', $userEmailOrigin->getSmtpHost());
+        self::assertEquals('587', $userEmailOrigin->getSmtpPort());
+        self::assertEquals('tls', $userEmailOrigin->getSmtpEncryption());
+        self::assertEquals('microsoft', $userEmailOrigin->getAccountType());
     }
 
     public function testIsOAuthEnabled(): void
