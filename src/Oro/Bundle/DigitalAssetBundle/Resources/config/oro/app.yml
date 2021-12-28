@@ -32,8 +32,6 @@ liip_imagine:
                     mode: outbound
                 strip: ~
 
-        original: {}
-
         max_width_992:
             quality: 95
             filters:

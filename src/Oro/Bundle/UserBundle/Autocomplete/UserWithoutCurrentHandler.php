@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
+/**
+ * Autocomplete search handler for users except current user.
+ */
 class UserWithoutCurrentHandler extends UserSearchHandler
 {
     /** @var TokenAccessorInterface */
@@ -12,19 +15,19 @@ class UserWithoutCurrentHandler extends UserSearchHandler
 
     /**
      * @param TokenAccessorInterface $tokenAccessor
-     * @param AttachmentManager      $attachmentManager
-     * @param array                  $userEntityName
-     * @param array                  $properties
+     * @param PictureSourcesProviderInterface $pictureSourcesProvider
+     * @param array $userEntityName
+     * @param array $properties
      */
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
-        AttachmentManager $attachmentManager,
+        PictureSourcesProviderInterface $pictureSourcesProvider,
         $userEntityName,
         array $properties
     ) {
         $this->tokenAccessor = $tokenAccessor;
 
-        parent::__construct($attachmentManager, $userEntityName, $properties);
+        parent::__construct($pictureSourcesProvider, $userEntityName, $properties);
     }
 
     /**

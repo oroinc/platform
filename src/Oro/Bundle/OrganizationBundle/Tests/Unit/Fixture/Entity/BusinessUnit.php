@@ -6,11 +6,10 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit as ParentBU;
 
 class BusinessUnit extends ParentBU
 {
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setId(int $id): self
     {
         $this->id = $id;
+
+        return $this;
     }
 }

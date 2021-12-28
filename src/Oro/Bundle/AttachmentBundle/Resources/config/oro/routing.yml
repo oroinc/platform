@@ -1,6 +1,3 @@
-_liip_imagine:
-    resource: "@LiipImagineBundle/Resources/config/routing.yaml"
-
 oro_attachment:
     resource:     "@OroAttachmentBundle/Controller/AttachmentController.php"
     type:         annotation
@@ -27,6 +24,14 @@ oro_attachment_get_file:
     requirements:
         id: '\d+'
         action: '(get|download)'
+
+oro_imagine_filter:
+    path: "/media/cache/resolve/{filter}/{path}"
+    defaults: { _controller: oro_attachment.controller.imagine:getFilteredImageAction }
+    methods: [ GET ]
+    requirements:
+        filter: '[a-z0-9_-]*'
+        path: .+
 
 
 #

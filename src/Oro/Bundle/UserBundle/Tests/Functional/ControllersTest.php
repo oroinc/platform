@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithAvatars;
 
 class ControllersTest extends WebTestCase
 {
@@ -16,17 +17,17 @@ class ControllersTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->registry = $this->getContainer()->get('doctrine');
-        $this->loadFixtures([LoadUserData::class]);
+        $this->loadFixtures([LoadUserData::class, LoadUsersWithAvatars::class]);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->client->request('GET', $this->getUrl('oro_user_index'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_create'));
         $form = $crawler->selectButton('Save and Close')->form();
@@ -51,18 +52,18 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('User saved', $crawler->html());
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         $response = $this->client->requestGrid(
             'users-grid',
             ['users-grid[_filter][username][value]' => 'testUser1']
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $crawler = $this->client->request(
@@ -83,11 +84,11 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('User saved', $crawler->html());
     }
 
-    public function testApiGen()
+    public function testApiGen(): void
     {
         $user = $this->getReference(LoadUserData::SIMPLE_USER);
         $crawler = $this->client->request(
@@ -114,18 +115,18 @@ class ControllersTest extends WebTestCase
         $this->assertEquals($userApi->getApiKey(), $data['data']['apiKey']);
     }
 
-    public function testViewProfile()
+    public function testViewProfile(): void
     {
         $this->client->request('GET', $this->getUrl('oro_user_profile_view'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('John Doe - View - Users - User Management - System', $result->getContent());
     }
 
-    public function testUpdateProfile()
+    public function testUpdateProfile(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         self::assertStringContainsString(
             'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
@@ -137,11 +138,11 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('User saved', $crawler->html());
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_user_profile_update'));
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
         self::assertStringContainsString(
             'John Doe - Edit - Users - User Management - System',
             $this->client->getResponse()->getContent()
@@ -153,7 +154,7 @@ class ControllersTest extends WebTestCase
     /**
      * @dataProvider autoCompleteHandlerProvider
      */
-    public function testAutoCompleteHandler(bool $active, string $handlerName, string $query)
+    public function testAutoCompleteHandler(bool $active, string $handlerName, string $query): void
     {
         $user = $this->registry->getRepository(User::class)->findOneBy(['username' => 'simple_user']);
         $user->setEnabled($active);
@@ -171,7 +172,7 @@ class ControllersTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $arr = $this->getJsonResponseContent($result, 200);
+        $arr = self::getJsonResponseContent($result, 200);
         $this->assertCount((int)$active, $arr['results']);
     }
 
@@ -203,5 +204,77 @@ class ControllersTest extends WebTestCase
                     'query' => 'Elley Towards'
                 ],
         ];
+    }
+
+    public function testAutoCompleteHandlerUserWithoutAvatar(): void
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_form_autocomplete_search'),
+            [
+                'page' => 1,
+                'per_page' => 10,
+                'name' => 'organization_users',
+                'query' => 'simple_user2',
+            ]
+        );
+
+        $result = $this->client->getResponse();
+        $searchResults = self::getJsonResponseContent($result, 200);
+
+        self::assertCount(1, $searchResults['results']);
+
+        $simpleUser2Result = array_shift($searchResults['results']);
+
+        self::assertEquals(
+            [
+                'src' => null,
+                'sources' => [],
+            ],
+            $simpleUser2Result['avatar']
+        );
+    }
+
+    public function testAutoCompleteHandlerUserWithAvatar(): void
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_form_autocomplete_search'),
+            [
+                'page' => 1,
+                'per_page' => 10,
+                'name' => 'organization_users',
+                'query' => 'user2 user2',
+            ]
+        );
+
+        $result = $this->client->getResponse();
+        $searchResults = self::getJsonResponseContent($result, 200);
+
+        self::assertCount(1, $searchResults['results']);
+
+        $user2Result = array_shift($searchResults['results']);
+
+        $user2 = $this->getReference('user2');
+        $user2AvatarFile = $this->getReference(sprintf('user_%d_avatar', $user2->getId()));
+        $user2Avatar =  self::getContainer()->get('oro_attachment.manager')
+            ->getFilteredImageUrl($user2AvatarFile, 'avatar_xsmall');
+        $user2AvatarWebp =  self::getContainer()->get('oro_attachment.manager')
+            ->getFilteredImageUrl($user2AvatarFile, 'avatar_xsmall', 'webp');
+
+        self::assertArrayIntersectEquals(
+            [
+                'avatar' => [
+                    'src' => $user2Avatar,
+                    'sources' => [
+                        [
+                            'srcset' => $user2AvatarWebp,
+                            'type' => 'image/webp'
+                        ]
+                    ],
+                ],
+            ],
+            $user2Result
+        );
     }
 }

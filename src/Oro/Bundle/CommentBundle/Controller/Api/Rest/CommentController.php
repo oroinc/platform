@@ -262,7 +262,7 @@ class CommentController extends RestController
         unset($data['updatedAt']);
         unset($data['editable']);
         unset($data['removable']);
-        unset($data['avatarUrl']);
+        unset($data['avatarPicture']);
 
         return true;
     }

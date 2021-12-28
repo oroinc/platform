@@ -27,7 +27,7 @@ class WebpAwarePreviewMetadataProvider implements PreviewMetadataProviderInterfa
     public function getMetadata(File $file): array
     {
         $metadata = $this->innerPreviewMetadataProvider->getMetadata($file);
-        if ($this->attachmentManager->isWebpEnabledIfSupported()) {
+        if (!empty($metadata['preview']) && $this->attachmentManager->isWebpEnabledIfSupported()) {
             $metadata['preview_webp'] = $this->attachmentManager
                 ->getFilteredImageUrl($file, static::PREVIEW_FILTER_NAME, 'webp');
         }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider\Image;
 
-use Liip\ImagineBundle\Imagine\Cache\CacheManager;
+use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
 use Oro\Bundle\LayoutBundle\Layout\LayoutContextHolder;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
@@ -17,19 +17,19 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 
     private ThemeManager $themeManager;
 
-    private CacheManager $imagineCacheManager;
+    private ImagineUrlProviderInterface $imagineUrlProvider;
 
     private string $placeholderName;
 
     public function __construct(
         LayoutContextHolder $contextHolder,
         ThemeManager $themeManager,
-        CacheManager $imagineCacheManager,
+        ImagineUrlProviderInterface $imagineUrlProvider,
         string $placeholderName
     ) {
         $this->contextHolder = $contextHolder;
         $this->themeManager = $themeManager;
-        $this->imagineCacheManager = $imagineCacheManager;
+        $this->imagineUrlProvider = $imagineUrlProvider;
         $this->placeholderName = $placeholderName;
     }
 
@@ -43,18 +43,8 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
             return null;
         }
 
-        $path = $imagePlaceholders[$this->placeholderName];
-        if ($format && pathinfo($path, PATHINFO_EXTENSION) !== $format) {
-            $path .= '.' . $format;
-        }
-
-        return $this->imagineCacheManager->generateUrl(
-            $path,
-            $filter,
-            [],
-            null,
-            $referenceType
-        );
+        return $this->imagineUrlProvider
+            ->getFilteredImageUrl($imagePlaceholders[$this->placeholderName], $filter, $format, $referenceType);
     }
 
     private function getImagePlaceholders(): array

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
-use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\WebpAwareFilterRuntimeConfigProvider;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
@@ -28,7 +27,6 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
 
     public function testGetRuntimeConfigForFilterWhenFormatNotWebp(): void
     {
-        $binary = new Binary('sample_binary', ' image/png');
         $filterName = 'sample_filter';
         $format = 'not_webp';
         $runtimeConfig = ['sample_key' => 'sample_value'];
@@ -36,15 +34,14 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
         $this->innerFilterRuntimeConfigProvider
             ->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($binary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
 
-        self::assertEquals($runtimeConfig, $this->provider->getRuntimeConfigForFilter($binary, $filterName, $format));
+        self::assertEquals($runtimeConfig, $this->provider->getRuntimeConfigForFilter($filterName, $format));
     }
 
     public function testGetRuntimeConfigForFilterWhenWebpIsDisabled(): void
     {
-        $binary = new Binary('sample_binary', ' image/png');
         $filterName = 'sample_filter';
         $format = 'webp';
         $runtimeConfig = ['sample_key' => 'sample_value'];
@@ -57,15 +54,14 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
         $this->innerFilterRuntimeConfigProvider
             ->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($binary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
 
-        self::assertEquals($runtimeConfig, $this->provider->getRuntimeConfigForFilter($binary, $filterName, $format));
+        self::assertEquals($runtimeConfig, $this->provider->getRuntimeConfigForFilter($filterName, $format));
     }
 
     public function testGetRuntimeConfigForFilterWhenWebpAndNotIsDisabled(): void
     {
-        $binary = new Binary('sample_binary', ' image/png');
         $filterName = 'sample_filter';
         $format = 'webp';
         $runtimeConfig = ['sample_key' => 'sample_value'];
@@ -84,12 +80,12 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
         $this->innerFilterRuntimeConfigProvider
             ->expects(self::once())
             ->method('getRuntimeConfigForFilter')
-            ->with($binary, $filterName, $format)
+            ->with($filterName, $format)
             ->willReturn($runtimeConfig);
 
         self::assertEquals(
             ['format' => 'webp', 'quality' => $webpQuality] + $runtimeConfig,
-            $this->provider->getRuntimeConfigForFilter($binary, $filterName, $format)
+            $this->provider->getRuntimeConfigForFilter($filterName, $format)
         );
     }
 }

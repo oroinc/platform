@@ -117,6 +117,7 @@ class DigitalAssetRepository extends EntityRepository
                     'file.parentEntityClass',
                     'file.parentEntityId',
                     'IDENTITY(file.digitalAsset) as digitalAssetId',
+                    'file.extension',
                 ]
             )
             ->from(File::class, 'file')

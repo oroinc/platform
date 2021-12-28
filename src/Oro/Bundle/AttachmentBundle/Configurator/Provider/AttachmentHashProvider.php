@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\AttachmentBundle\Configurator\Provider;
 
-use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration;
+use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 
 /**
  * Responsible for build unique hash and involved in building the url hash and specifying the location of the
@@ -11,22 +11,20 @@ use Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration;
  */
 class AttachmentHashProvider
 {
-    /**
-     * @var AttachmentPostProcessorsProvider
-     */
-    private $attachmentPostProcessorsProvider;
+    private AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider;
 
-    /**
-     * @var FilterConfiguration
-     */
-    private $attachmentFilterConfiguration;
+    private AttachmentFilterConfiguration $attachmentFilterConfiguration;
+
+    private FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider;
 
     public function __construct(
         AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider,
-        AttachmentFilterConfiguration $attachmentFilterConfiguration
+        AttachmentFilterConfiguration $attachmentFilterConfiguration,
+        FilterRuntimeConfigProviderInterface $filterRuntimeConfigProvider
     ) {
         $this->attachmentPostProcessorsProvider = $attachmentPostProcessorsProvider;
         $this->attachmentFilterConfiguration = $attachmentFilterConfiguration;
+        $this->filterRuntimeConfigProvider = $filterRuntimeConfigProvider;
     }
 
     /**
@@ -37,11 +35,16 @@ class AttachmentHashProvider
      * In this case, we have a service decorator that can return both the new filter and the original,
      * depending on the configuration.
      */
-    public function getFilterConfigHash(string $filterName): string
+    public function getFilterConfigHash(string $filterName, string $format = ''): string
     {
         $filterConfig = $this->attachmentPostProcessorsProvider->isPostProcessingEnabled()
             ? $this->attachmentFilterConfiguration->get($filterName)
             : $this->attachmentFilterConfiguration->getOriginal($filterName);
+
+        $filterConfig = array_replace_recursive(
+            $filterConfig,
+            $this->filterRuntimeConfigProvider->getRuntimeConfigForFilter($filterName, $format)
+        );
 
         return md5(json_encode($filterConfig));
     }

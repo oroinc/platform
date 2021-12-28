@@ -26,14 +26,19 @@ class AttachmentProvider
     /** @var AttachmentManager */
     private $attachmentManager;
 
+    /** @var PictureSourcesProviderInterface */
+    private $pictureSourcesProvider;
+
     public function __construct(
         EntityManager $entityManager,
         AttachmentAssociationHelper $attachmentAssociationHelper,
-        AttachmentManager $attachmentManager
+        AttachmentManager $attachmentManager,
+        PictureSourcesProviderInterface $pictureSourcesProvider
     ) {
         $this->em                          = $entityManager;
         $this->attachmentAssociationHelper = $attachmentAssociationHelper;
         $this->attachmentManager           = $attachmentManager;
+        $this->pictureSourcesProvider      = $pictureSourcesProvider;
     }
 
     /**
@@ -83,20 +88,41 @@ class AttachmentProvider
         $attachment = $this->getAttachmentByEntity($entity);
         if ($attachment && $attachment->getId()) {
             $thumbnail = '';
+            $thumbnailSources = [];
             if ($this->attachmentManager->isImageType($attachment->getMimeType())) {
-                $thumbnail = $this->attachmentManager->getResizedImageUrl(
+                $thumbnailPictureSources = $this->pictureSourcesProvider->getResizedPictureSources(
                     $attachment,
                     AttachmentManager::THUMBNAIL_WIDTH,
                     AttachmentManager::THUMBNAIL_HEIGHT
                 );
+
+                $thumbnail = $thumbnailPictureSources['src'];
+                $thumbnailSources = $thumbnailPictureSources['sources'];
             }
             $result = [
-                'attachmentURL'       => $this->attachmentManager
-                    ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
-                'attachmentSize'      => BytesFormatter::format($attachment->getFileSize()),
-                'attachmentFileName'  => $attachment->getOriginalFilename() ?: $attachment->getFilename(),
-                'attachmentIcon'      => $this->attachmentManager->getAttachmentIconClass($attachment),
-                'attachmentThumbnail' => $thumbnail
+                'attachmentURL' => [
+                    'url' => $this->attachmentManager
+                        ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
+                    'sources' => $this->attachmentManager->isWebpEnabledIfSupported() ? [
+                        [
+                            'srcset' => $this->attachmentManager
+                                ->getFilteredImageUrl(
+                                    $attachment,
+                                    'original',
+                                    'webp'
+                                ),
+                            'type' => 'image/webp',
+                        ]
+                    ]
+                    : [],
+                ],
+                'attachmentSize' => BytesFormatter::format($attachment->getFileSize()),
+                'attachmentFileName' => $attachment->getOriginalFilename() ?: $attachment->getFilename(),
+                'attachmentIcon' => $this->attachmentManager->getAttachmentIconClass($attachment),
+                'attachmentThumbnailPicture' => [
+                    'src' => $thumbnail,
+                    'sources' => $thumbnailSources,
+                ],
             ];
         }
 

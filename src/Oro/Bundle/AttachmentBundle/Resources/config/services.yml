@@ -251,6 +251,7 @@ services:
             - '@doctrine.orm.entity_manager'
             - '@oro_attachment.association_helper'
             - '@oro_attachment.manager'
+            - '@oro_attachment.provider.picture_sources'
 
     oro_attachment.exclusion_provider:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider
@@ -347,14 +348,18 @@ services:
 
     oro_attachment.provider.file_name:
         class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
+        arguments:
+            - '@liip_imagine.filter.configuration'
 
     oro_attachment.provider.file_name.webp_aware:
         class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider
         decorates: oro_attachment.provider.file_name
-        decoration_priority: 100
+        # Should be executed first, so it can set format to webp if format is not already specified.
+        decoration_priority: -100
         arguments:
             - '@.inner'
             - '@oro_attachment.tools.webp_configuration'
+            - '@liip_imagine.filter.configuration'
 
     oro_attachment.provider.file_url:
         class: 'Oro\Bundle\AttachmentBundle\Provider\FileUrlProvider'
@@ -543,14 +548,6 @@ services:
             - '@liip_imagine.filter.configuration'
             - '@oro_attachment.provider.resized_image_path'
 
-    oro_attachment.provider.image_file_names.webp_aware:
-        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareImageFileNamesProvider
-        decorates: oro_attachment.provider.image_file_names
-        decoration_priority: -255 # Should be executed as the last one to add filenames with .webp extension if needed.
-        arguments:
-            - '@.inner'
-            - '@oro_attachment.tools.webp_configuration'
-
     oro_attachment.manager.image_file_removal_config:
         class: Oro\Bundle\AttachmentBundle\Manager\FileRemoval\ImageFileRemovalManagerConfig
 
@@ -592,7 +589,7 @@ services:
         arguments:
             - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
             - '@oro_attachment.configurator.attachment_filter_configuration'
-            - '@oro_attachment.configurator.attachment_filter_configuration.inner'
+            - '@oro_attachment.provider.filter_runtime_config'
 
     oro_attachment.configurator.provider.attachment_post_processors_provider:
         class: Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider
@@ -689,4 +686,37 @@ services:
         arguments:
             - '@liip_imagine.data.manager'
             - '@liip_imagine.cache.manager'
+            - '@liip_imagine.filter.configuration'
             - '@oro_attachment.provider.resized_image'
+
+    Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider:
+        alias: oro_attachment.provider.picture_sources
+
+    oro_attachment.provider.picture_sources:
+        class: Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider
+        arguments:
+            - '@oro_attachment.manager'
+
+    oro_attachment.provider.picture_sources.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Provider\WebpAwarePictureSourcesProvider
+        decorates: oro_attachment.provider.picture_sources
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.manager'
+
+    oro_attachment.imagine.provider.url:
+        class: Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider
+        arguments:
+            - '@router'
+            - '@liip_imagine.filter.configuration'
+
+    oro_attachment.imagine.provider.url.webp_aware:
+        class: Oro\Bundle\AttachmentBundle\Imagine\Provider\WebpAwareImagineUrlProvider
+        decorates: oro_attachment.imagine.provider.url
+        # Should be executed first, so it can set format to webp if format is not already specified.
+        decoration_priority: -100
+        arguments:
+            - '@.inner'
+            - '@liip_imagine.filter.configuration'
+            - '@oro_attachment.tools.webp_configuration'
+

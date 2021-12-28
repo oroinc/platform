@@ -24,22 +24,32 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileUrl(): void
     {
+        $fileId = 1;
+        $filename = 'sample-filename';
+        $action = 'sample-action';
+        $referenceType = 1;
+        $file = $this->getFile($fileId, $filename);
+        $this->filenameProvider->expects(self::once())
+            ->method('getFileName')
+            ->with($file)
+            ->willReturn($filename);
+
         $this->urlGenerator
             ->method('generate')
             ->with(
                 'oro_attachment_get_file',
                 [
-                    'id' => $fileId = 1,
-                    'filename' => $filename = 'sample-filename',
-                    'action' => $action = 'sample-action',
+                    'id' => $fileId,
+                    'filename' => $filename,
+                    'action' => $action,
                 ],
-                $referenceType = 1
+                $referenceType
             )
             ->willReturn($url = 'sample-url');
 
         self::assertEquals(
             $url,
-            $this->provider->getFileUrl($this->getFile($fileId, $filename), $action, $referenceType)
+            $this->provider->getFileUrl($file, $action, $referenceType)
         );
     }
 
@@ -47,12 +57,14 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
     {
         $fileId = 1;
         $filename = 'sample-filename';
+        $width = 10;
+        $height = 20;
         $format = 'sample_format';
         $file = $this->getFile($fileId, $filename);
 
         $this->filenameProvider->expects(self::once())
-            ->method('getFileName')
-            ->with($file, $format)
+            ->method('getResizedImageName')
+            ->with($file, $width, $height, $format)
             ->willReturn($filename);
 
         $this->urlGenerator
@@ -62,8 +74,8 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
                 [
                     'id' => $fileId,
                     'filename' => $filename,
-                    'width' => $width = 10,
-                    'height' => $height = 20,
+                    'width' => $width,
+                    'height' => $height,
                 ],
                 $referenceType = 1
             )
@@ -84,8 +96,8 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
         $file = $this->getFile($fileId, $filename);
 
         $this->filenameProvider->expects(self::once())
-            ->method('getFileName')
-            ->with($file, $format)
+            ->method('getFilteredImageName')
+            ->with($file, $filter, $format)
             ->willReturn($filename);
 
         $this->urlGenerator
@@ -96,6 +108,7 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
                     'id' => $fileId,
                     'filename' => $filename,
                     'filter' => $filter,
+                    'format' => $format,
                 ],
                 $referenceType = 1
             )

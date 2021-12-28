@@ -27,7 +27,9 @@ define(function(require) {
         dt: [],
         q: [],
         blockquote: [],
-        figure: []
+        figure: [],
+        picture: [],
+        source: ['srcset', 'type']
     });
 
     Tooltip.prototype.show = function(...args) {

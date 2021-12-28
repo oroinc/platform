@@ -16,6 +16,9 @@ use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 {
     private FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileUrlProvider;
@@ -106,12 +109,18 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->fileUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
-            ->with($file, $filter = 'sample-filter', '', $referenceType = 1)
+            ->with($file, $filter = 'sample-filter', $format = 'sample-format', $referenceType = 1)
             ->willReturn($url = '/sample-url');
 
         self::assertEquals(
             $url,
-            $this->attachmentManager->getFilteredImageUrlByIdAndFilename($fileId, $filename, $filter, $referenceType)
+            $this->attachmentManager->getFilteredImageUrlByIdAndFilename(
+                $fileId,
+                $filename,
+                $filter,
+                $format,
+                $referenceType
+            )
         );
     }
 
@@ -194,5 +203,35 @@ class AttachmentManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($targets = ['sample_target_entity_class' => 'sample_field_name']);
 
         self::assertEquals($targets, $this->attachmentManager->getAttachmentTargets());
+    }
+
+    public function testIsWebpEnabledIfSupported(): void
+    {
+        $this->webpConfiguration
+            ->expects(self::once())
+            ->method('isEnabledIfSupported')
+            ->willReturn(true);
+
+        self::assertTrue($this->attachmentManager->isWebpEnabledIfSupported());
+    }
+
+    public function testIsWebpEnabledForAll(): void
+    {
+        $this->webpConfiguration
+            ->expects(self::once())
+            ->method('isEnabledForAll')
+            ->willReturn(false);
+
+        self::assertFalse($this->attachmentManager->isWebpEnabledForAll());
+    }
+
+    public function testIsWebpDisabled(): void
+    {
+        $this->webpConfiguration
+            ->expects(self::once())
+            ->method('isDisabled')
+            ->willReturn(false);
+
+        self::assertFalse($this->attachmentManager->isWebpDisabled());
     }
 }
