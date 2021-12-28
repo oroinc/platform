@@ -46,6 +46,7 @@ oro:
         cell:
             blank:
                 placeholder: 'N/A'
+                aria_label: 'Blank'
     grid:
         mass_action:
             label: Mass Actions

@@ -22,13 +22,12 @@ define(function(require) {
      */
     const TagsCell = Backgrid.StringCell.extend(_.extend(
         _.pick(TagsView.prototype, [
-            'template',
             'getTemplateFunction',
             'getTemplateData',
             'render'
         ]), {
 
-            showDefault: false,
+            template: require('tpl-loader!orotag/templates/viewer/tags-view.html'),
             /**
              * @property {string}
              */

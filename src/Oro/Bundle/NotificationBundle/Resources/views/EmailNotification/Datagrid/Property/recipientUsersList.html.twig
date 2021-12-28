@@ -1,5 +1,12 @@
-<ul>
-    {% for recipient in value if recipient is not empty %}
-        <li>{{ recipient|oro_format_name }} <bdo dir="ltr">&lt;{{ recipient.email }}&gt;</bdo></li>
+{% set listItems -%}
+    {% for recipient in value %}
+        {% if recipient is not empty %}
+            <li>{{ recipient|oro_format_name }} <bdo dir="ltr">&lt;{{ recipient.email }}&gt;</bdo></li>
+        {% endif %}
     {% endfor %}
-</ul>
+{%- endset %}
+{% if listItems is not empty %}
+    <ul>
+        {{ listItems|raw }}
+    </ul>
+{% endif %}

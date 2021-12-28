@@ -225,12 +225,6 @@
     }
 }
 
-[data-blank-content] {
-    &::after {
-        content: attr(data-blank-content);
-    }
-}
-
 .ascending,
 .descending {
     .grid-header-cell__link,
