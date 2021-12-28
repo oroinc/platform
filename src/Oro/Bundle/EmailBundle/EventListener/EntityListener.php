@@ -213,7 +213,14 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
     {
         $flush = false;
 
+        $newEmails = [];
         foreach ($this->newEmailAddresses as $newEmailAddress) {
+            $newEmail = $newEmailAddress->getEmail();
+            if (array_key_exists($newEmail, $newEmails)) {
+                continue;
+            }
+            $newEmails[$newEmail] = true;
+
             $emailAddress = $this->getEmailAddressManager()
                 ->getEmailAddressRepository()
                 ->findOneBy(['email' => $newEmailAddress->getEmail()]);

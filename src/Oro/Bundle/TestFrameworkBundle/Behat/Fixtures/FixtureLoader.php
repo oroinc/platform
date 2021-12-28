@@ -3,12 +3,14 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Fixtures;
 
 use Behat\Gherkin\Node\TableNode;
-use Behat\Testwork\Suite\Suite;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\Exception\FileNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader as AliceLoader;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
  * Loads fixtures.
@@ -17,30 +19,15 @@ use Symfony\Component\HttpKernel\KernelInterface;
  */
 class FixtureLoader
 {
-    /**
-     * @var AliceLoader
-     */
-    protected $aliceLoader;
+    private AliceLoader $aliceLoader;
 
-    /**
-     * @var KernelInterface
-     */
-    protected $kernel;
+    private KernelInterface $kernel;
 
-    /**
-     * @var Suite
-     */
-    protected $suite;
+    private EntityClassResolver $entityClassResolver;
 
-    /**
-     * @var EntityClassResolver
-     */
-    protected $entityClassResolver;
+    private EntitySupplement $entitySupplement;
 
-    /**
-     * @var EntitySupplement
-     */
-    protected $entitySupplement;
+    private array $fileLoaderProcessorsStates = [];
 
     public function __construct(
         KernelInterface $kernel,
@@ -54,32 +41,27 @@ class FixtureLoader
         $this->aliceLoader = $aliceLoader;
     }
 
-    /**
-     * @param string $filename
-     * @throws \InvalidArgumentException
-     */
-    public function loadFixtureFile($filename)
+    public function loadFixtureFile(string $filename): void
     {
+        $parameters = $this->processFileParametersBefore($filename);
         $file = $this->findFile($filename);
 
         $objects = $this->load($file);
         $this->persist($objects);
+
+        $this->processFileParametersAfter($parameters);
     }
 
     /**
      * @param string $file Full path to yml file with fixture
      */
-    public function loadFile($file)
+    public function loadFile(string $file)
     {
         $objects = $this->load($file);
         $this->persist($objects);
     }
 
-    /**
-     * @param string $entityName
-     * @param TableNode $table
-     */
-    public function loadTable($entityName, TableNode $table)
+    public function loadTable($entityName, TableNode $table): void
     {
         $className = $this->getEntityClass($entityName);
         $em = $this->getEntityManager();
@@ -111,7 +93,7 @@ class FixtureLoader
      * @param array $objectValues Object values in format ['property' => 'value']
      * @return object Entity object instantiated and filled with values. All required values will filled by faker
      */
-    public function getObjectFromArray($entity, array $aliceValues, array $objectValues = [])
+    public function getObjectFromArray(string $entity, array $aliceValues, array $objectValues = []): object
     {
         $className = class_exists($entity) ? $entity : $this->getEntityClass($entity);
 
@@ -126,10 +108,10 @@ class FixtureLoader
 
     /**
      * @param string $entityName
-     * @param integer $numberOfEntities
+     * @param int $numberOfEntities
      * @return array Generated objects in format ['aliceReference' => object]
      */
-    public function loadRandomEntities($entityName, $numberOfEntities)
+    public function loadRandomEntities(string $entityName, int $numberOfEntities)
     {
         $className = $this->getEntityClass($entityName);
         $em = $this->getEntityManager();
@@ -154,7 +136,7 @@ class FixtureLoader
      * @param string|array $dataOrFilename
      * @return array
      */
-    public function load($dataOrFilename)
+    public function load($dataOrFilename): array
     {
         if (\is_string($dataOrFilename)) {
             $dataOrFilename = [$dataOrFilename];
@@ -176,7 +158,7 @@ class FixtureLoader
      * @param string $entityName Entity name in plural or single form, e.g. Tasks, Calendar Event etc.
      * @return string Full namespace to class
      */
-    public function getEntityClass($entityName)
+    public function getEntityClass(string $entityName): string
     {
         return $this->entityClassResolver->getEntityClass($entityName);
     }
@@ -208,7 +190,7 @@ class FixtureLoader
      * @return string Real path to file with fixtures
      * @throws \InvalidArgumentException
      */
-    public function findFile($filename)
+    public function findFile(string $filename): string
     {
         if (false === strpos($filename, ':')) {
             throw new FileNotFoundException(
@@ -236,7 +218,7 @@ class FixtureLoader
      * @param array $paths
      * @return string|null
      */
-    private function findFileInPath($filename, array $paths)
+    private function findFileInPath(string $filename, array $paths): ?string
     {
         foreach ($paths as $path) {
             $file = $path.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;
@@ -248,10 +230,7 @@ class FixtureLoader
         return null;
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         return $this->kernel->getContainer()->get('doctrine')->getManager();
     }
@@ -261,7 +240,7 @@ class FixtureLoader
      * @param array $values
      * @return array
      */
-    protected function buildAliceFixture($className, array $values)
+    protected function buildAliceFixture(string $className, array $values): array
     {
         $entityReference = uniqid('', true);
 
@@ -272,11 +251,7 @@ class FixtureLoader
         ];
     }
 
-    /**
-     * @param string $name
-     * @param object $instance
-     */
-    public function addReference($name, $instance)
+    public function addReference(string $name, object $instance): void
     {
         $this->aliceLoader->getReferenceRepository()->set($name, $instance);
     }
@@ -286,8 +261,110 @@ class FixtureLoader
      * @param string|null $property
      * @return mixed
      */
-    public function getReference($name, $property = null)
+    public function getReference(string $name, string $property = null)
     {
         return $this->aliceLoader->getReferenceRepository()->find($name, $property);
+    }
+
+    private function processFileParametersBefore(string &$fileName): array
+    {
+        $parameters = explode('?', $fileName);
+        $fileName = $parameters[0];
+
+        if (!isset($parameters[1])) {
+            return [];
+        }
+
+        $parametersString = $parameters[1];
+        $parameters = [];
+        parse_str($parametersString, $parameters);
+
+        foreach ($parameters as $parameterName => $parameterValue) {
+            $this->processFileParameterBefore($parameterName, $parameterValue);
+        }
+
+        return $parameters;
+    }
+
+    private function processFileParametersAfter(array $parameters): void
+    {
+        foreach ($parameters as $parameterName => $parameterValue) {
+            $this->processFileParameterAfter($parameterName, $parameterValue);
+        }
+    }
+
+    private function processFileParameterBefore(string $parameterName, string $parameterValue): void
+    {
+        if ($parameterName === 'user') {
+            $this->setupSecurityTokenByUsername($parameterValue);
+        } elseif ($parameterName === 'user_reference') {
+            $this->setupSecurityTokenByUserFromReferenceRepository($parameterValue);
+        }
+    }
+
+    private function processFileParameterAfter(string $parameterName, string $parameterValue)
+    {
+        // $parameterValue is left for possible future use(other cases)
+        if (in_array($parameterName, ['user', 'user_reference'], true)) {
+            $this->restoreReplacedSecurityToken();
+        }
+    }
+
+    public function setupSecurityTokenByUsername(string $userName): void
+    {
+        $this->fileLoaderProcessorsStates['securityToken'] = null;
+
+        $userName = trim($userName);
+        $doctrine = $this->kernel->getContainer()->get('doctrine');
+        $user = $doctrine->getManager()
+            ->getRepository(User::class)
+            ->findOneByUsername($userName);
+        if (!$user) {
+            throw new \UnexpectedValueException(sprintf("User with username '%s' doesn't exists", $userName));
+        }
+
+        $this->setupSecurityTokenByUser($user);
+    }
+
+    private function setupSecurityTokenByUserFromReferenceRepository(string $userReferenceName): void
+    {
+        $this->fileLoaderProcessorsStates['securityToken'] = null;
+
+        $userReferenceName = trim($userReferenceName);
+        $user = $this->getReference($userReferenceName);
+        if (!$user instanceof User) {
+            throw new \UnexpectedValueException(sprintf("Reference '%s' is not of 'User' class", $userReferenceName));
+        }
+
+        $this->setupSecurityTokenByUser($user);
+    }
+
+    private function setupSecurityTokenByUser(User $user): void
+    {
+        $token = new UsernamePasswordOrganizationToken(
+            $user,
+            $user->getUsernameLowercase(),
+            'main',
+            $user->getOrganization(),
+            $user->getUserRoles()
+        );
+
+        $this->fileLoaderProcessorsStates['securityToken'] = $this->setSecurityToken($token);
+    }
+
+    private function restoreReplacedSecurityToken(): void
+    {
+        $token = $this->fileLoaderProcessorsStates['securityToken'] ?? null;
+        $this->setSecurityToken($token);
+    }
+
+    private function setSecurityToken(TokenInterface $token = null): ?TokenInterface
+    {
+        $tokenStorage = $this->kernel->getContainer()->get('security.token_storage');
+
+        $oldToken = $tokenStorage->getToken();
+        $tokenStorage->setToken($token);
+
+        return $oldToken;
     }
 }

@@ -2,6 +2,4 @@
 
 {% if record.getValue('applications') is not empty %}
     {{ UI.renderList(record.getValue('applications')) }}
-{% else %}
-    {{ 'N/A'|trans }}
 {% endif %}

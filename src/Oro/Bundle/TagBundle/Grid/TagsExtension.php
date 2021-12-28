@@ -148,6 +148,7 @@ class TagsExtension extends AbstractTagsExtension
             },
             'editable' => false,
             'translatable' => true,
+            'notMarkAsBlank' => true,
             'renderable' => $this->taggableHelper->isEnableGridColumn($className)
         ];
     }

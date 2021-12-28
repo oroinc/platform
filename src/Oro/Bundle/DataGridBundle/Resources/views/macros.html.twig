@@ -79,3 +79,15 @@
         </div>
     {% endif %}
 {% endmacro %}
+
+{#
+    Renders element that represents blank value
+
+    parameters:
+        class: css class for the element
+#}
+{% macro renderBlankCellValue(parameters = {}) %}
+    <span {% if (parameters.class is defined) %}class="{{ parameters.class }}"{% endif %}
+          aria-label="{{ 'oro.datagrid.cell.blank.aria_label'|trans }}"
+          data-blank-content="{{ 'oro.datagrid.cell.blank.placeholder'|trans }}"></span>
+{% endmacro %}
