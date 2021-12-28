@@ -41,6 +41,7 @@ define(function(require) {
         this.listenTo(model, 'change:' + column.get('name'), function() {
             if (!$el.hasClass('editor')) {
                 this.render();
+                this._setAttributes(this._collectAttributes());
             }
         });
 
@@ -124,10 +125,14 @@ define(function(require) {
             if (
                 value === void 0 ||
                 value === null ||
-                (_.isString(value) && value.trim().length === 0)
+                (_.isString(value) && value.trim().length === 0) ||
+                (_.isArray(value) && value.length === 0)
             ) {
                 attrs['aria-label'] = __('oro.datagrid.cell.blank.aria_label');
                 attrs['data-blank-content'] = __('oro.datagrid.cell.blank.placeholder');
+            } else {
+                attrs['aria-label'] = null;
+                attrs['data-blank-content'] = null;
             }
         }
 

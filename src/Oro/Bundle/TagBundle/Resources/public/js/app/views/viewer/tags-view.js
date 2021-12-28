@@ -3,6 +3,7 @@ define(function(require) {
     const BaseView = require('oroui/js/app/views/base/view');
     const _ = require('underscore');
     const colorUtil = require('oroui/js/tools/color-util');
+    const tagsViewTemplate = require('tpl-loader!orotag/templates/viewer/tags-view.html');
 
     /**
      * Tags view, able to handle tags array in model.
@@ -27,9 +28,11 @@ define(function(require) {
      * @exports TagsView
      */
     const TagsView = BaseView.extend(/** @exports TagsView.prototype */{
-        showDefault: true,
-
-        template: require('tpl-loader!orotag/templates/viewer/tags-view.html'),
+        template(data) {
+            return data.tags.length > 0
+                ? tagsViewTemplate(data)
+                : `<span class="tags-container__na">${_.__('N/A')}</span>`;
+        },
 
         listen: {
             'change model': 'render'
@@ -63,8 +66,7 @@ define(function(require) {
             });
             tags = _.sortBy(tags, 'owner');
             return {
-                tags: tags,
-                showDefault: this.showDefault
+                tags: tags
             };
         }
     });

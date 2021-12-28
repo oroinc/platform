@@ -21,7 +21,7 @@ define(function(require) {
      * @extends oro.datagrid.cell.StringCell
      */
     const TagsCell = Backgrid.StringCell.extend({
-        template: TagsView.prototype.template,
+        template: require('tpl-loader!orotag/templates/viewer/tags-view.html'),
 
         getTemplateFunction: TagsView.prototype.getTemplateFunction,
 
@@ -29,7 +29,6 @@ define(function(require) {
 
         render: TagsView.prototype.render,
 
-        showDefault: false,
         /**
          * @property {string}
          */

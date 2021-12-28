@@ -166,6 +166,7 @@ datagrids:
                 data_name: has_attachments
                 type: twig
                 label:
+                notMarkAsBlank: true
                 frontend_type: html
                 template: '@OroEmail/Email/Datagrid/Property/attachments.html.twig'
                 manageable: false
