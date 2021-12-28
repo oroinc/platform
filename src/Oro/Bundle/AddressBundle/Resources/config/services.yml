@@ -32,7 +32,7 @@ services:
         class: Oro\Bundle\AddressBundle\Extension\JsValidation\ConstraintsProviderDecorator
         decorates: oro_form.extension.js_validation.constraints_provider
         arguments:
-            - '@oro_address.extension.js_valdation.constraints_provider_decorator.inner'
+            - '@.inner'
 
     oro_address.twig.extension.phone:
         class: Oro\Bundle\AddressBundle\Twig\PhoneExtension

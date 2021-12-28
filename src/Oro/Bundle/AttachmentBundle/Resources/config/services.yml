@@ -37,7 +37,7 @@ services:
         class: Oro\Bundle\AttachmentBundle\Validator\GaufretteProtocolValidator
         decorates: oro_attachment.protocol_validator
         arguments:
-            - '@oro_attachment.protocol_validator.gaufrette.inner'
+            - '@.inner'
             -
                 - "@=container.hasParameter('knp_gaufrette.stream_wrapper.protocol') ? parameter('knp_gaufrette.stream_wrapper.protocol') : ''"
                 - "@=container.hasParameter('oro_gaufrette.stream_wrapper.readonly_protocol') ? parameter('oro_gaufrette.stream_wrapper.readonly_protocol') : ''"
@@ -87,7 +87,7 @@ services:
        decorates: oro_attachment.liip_imagine.binary.filter
        decoration_priority: 10
        arguments:
-          - '@oro_attachment.liip_imagine.binary.filter.unsupported_binaries.skip_by_mime_type.inner'
+          - '@.inner'
           - '%oro_attachment.liip_imagine.unsupported_mime_types%'
 
     oro_attachment.association_helper:
@@ -389,7 +389,7 @@ services:
         decorates: oro_attachment.provider.resized_image_path
         decoration_priority: 300
         arguments:
-            - '@oro_attachment.provider.resized_image_path.remove_base_url.inner'
+            - '@.inner'
             - '@=service("router").getContext().getBaseUrl()'
 
     oro_attachment.provider.resized_image_path.remove_media_cache_prefix:
@@ -397,7 +397,7 @@ services:
         decorates: oro_attachment.provider.resized_image_path
         decoration_priority: 200
         arguments:
-            - '@oro_attachment.provider.resized_image_path.remove_media_cache_prefix.inner'
+            - '@.inner'
             - 'media/cache'
 
     oro_attachment.provider.filter_runtime_config:
@@ -581,7 +581,7 @@ services:
         # Any decorators cannot have a higher priority than specified, as this will violate backward compatibility.
         decoration_priority: -255
         arguments:
-            - '@oro_attachment.configurator.attachment_filter_configuration.inner'
+            - '@.inner'
             - '@oro_attachment.configurator.provider.attachment_post_processors_provider'
 
     oro_attachment.configurator.provider.attachment_hash_provider:

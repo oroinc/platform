@@ -14,7 +14,7 @@ services:
         class: Oro\Bundle\SyncBundle\Client\LoggerAwareWebsocketClientDecorator
         decorates: oro_sync.websocket_client
         arguments:
-            - '@oro_sync.client.logger_aware_decorator.inner'
+            - '@.inner'
         calls:
             - [ setLogger, [ '@logger' ] ]
         tags:
@@ -24,7 +24,7 @@ services:
         class: Oro\Bundle\SyncBundle\Client\ClientManipulator
         decorates: gos_web_socket.client.manipulator
         arguments:
-            - '@oro_sync.client.manipulator.inner'
+            - '@.inner'
             - '@gos_web_socket.client.storage'
             - '@oro_user.security.provider'
             - '@oro_sync.authentication.ticket_provider'

@@ -44,7 +44,7 @@ services:
         public: false
         decorates: doctrine.orm.validator_initializer
         arguments:
-            - '@oro_form.doctrine.orm.validator_initializer.inner'
+            - '@.inner'
 
     oro_form.update_factory:
         class: Oro\Bundle\FormBundle\Model\UpdateFactory

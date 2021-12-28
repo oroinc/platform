@@ -64,7 +64,7 @@ services:
         decorates: oro_api.processor_registry
         arguments:
             - [] # processors. They are set by Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass
-            - '@oro_api.simple_processor_registry.inner'
+            - '@.inner'
 
     oro_api.criteria_connector:
         class: Oro\Bundle\ApiBundle\Util\CriteriaConnector
@@ -622,20 +622,20 @@ services:
         decorates: 'fos_rest.body_listener'
         decoration_priority: 250
         arguments:
-            - '@oro_api.rest.body_listener_adapter.inner'
+            - '@.inner'
 
     oro_api.rest.error_handling_body_listener:
         class: Oro\Bundle\ApiBundle\EventListener\ErrorHandlingBodyListenerDecorator
         decorates: 'fos_rest.body_listener'
         decoration_priority: -250
         arguments:
-            - '@oro_api.rest.error_handling_body_listener.inner'
+            - '@.inner'
 
     oro_api.rest.update_list_body_listener:
         class: Oro\Bundle\ApiBundle\EventListener\UpdateListBodyListenerDecorator
         decorates: 'fos_rest.body_listener'
         arguments:
-            - '@oro_api.rest.update_list_body_listener.inner'
+            - '@.inner'
             - '@oro_api.rest.routes'
 
     oro_api.rest.unhandled_error_exception_listener:
