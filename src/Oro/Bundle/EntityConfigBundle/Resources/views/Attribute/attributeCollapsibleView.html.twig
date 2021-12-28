@@ -3,14 +3,10 @@
 
 {% set dynamicField = oro_get_dynamic_field(entity, field) %}
 {% if dynamicField %}
-    {{ UI.renderCollapsibleHtml(
-        entityConfig.formatDynamicFieldValue(
-            entity,
-            field.entity.className,
-            field.fieldName,
-            dynamicField
-        ),
+    {{ entityConfig.formatDynamicFieldValue(
         entity,
-        field.fieldName
+        field.entity.className,
+        field.fieldName,
+        dynamicField
     ) }}
 {% endif %}
