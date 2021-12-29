@@ -103,6 +103,7 @@
         "dragonmantank/cron-expression": "~3.1.0",
         "gos/web-socket-bundle": "~3.11.0",
         "guzzlehttp/guzzle": "~7.4.0",
+        "guzzlehttp/psr7": "^1.8.3",
         "composer/composer": "~2.1.8",
         "nesbot/carbon": "~2.54.0",
         "monolog/monolog": "~2.3.5",
