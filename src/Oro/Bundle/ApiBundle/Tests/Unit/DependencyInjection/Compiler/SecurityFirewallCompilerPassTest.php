@@ -156,6 +156,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
             $contextFirewallListener->getArguments()
         );
         self::assertTrue($contextFirewallListener->hasMethodCall('setCsrfRequestManager'));
+        self::assertTrue($contextFirewallListener->hasMethodCall('setCsrfProtectedRequestHelper'));
         self::assertEquals(ExceptionListener::class, $exceptionListenerDefinition->getClass());
 
         $listeners = $contextFirewallContext->getArgument(0)->getValues();

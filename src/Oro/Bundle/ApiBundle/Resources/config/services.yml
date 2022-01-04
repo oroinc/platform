@@ -146,6 +146,11 @@ services:
         tags:
             - { name: monolog.logger, channel: api }
 
+    oro_api.request_helper:
+        class: Oro\Bundle\ApiBundle\Request\ApiRequestHelper
+        arguments:
+            - '%oro_api.rest.pattern%'
+
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
         arguments:
@@ -642,7 +647,7 @@ services:
         class: Oro\Bundle\ApiBundle\EventListener\UnhandledApiErrorExceptionListener
         arguments:
             - '@Psr\Container\ContainerInterface'
-            - '%oro_api.rest.pattern%'
+            - '@oro_api.request_helper'
         tags:
             - { name: kernel.event_listener, event: kernel.exception, priority: -10 }
             - { name: container.service_subscriber, id: oro_api.rest.request_action_handler, key: Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler }

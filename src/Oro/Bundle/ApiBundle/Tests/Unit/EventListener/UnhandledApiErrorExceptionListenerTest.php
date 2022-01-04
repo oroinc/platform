@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\ApiBundle\EventListener\UnhandledApiErrorExceptionListener;
+use Oro\Bundle\ApiBundle\Request\ApiRequestHelper;
 use Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,12 +16,16 @@ class UnhandledApiErrorExceptionListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RequestActionHandler|\PHPUnit\Framework\MockObject\MockObject */
     private $handler;
 
+    /** @var ApiRequestHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $apiRequestHelper;
+
     /** @var UnhandledApiErrorExceptionListener */
     private $listener;
 
     protected function setUp(): void
     {
         $this->handler = $this->createMock(RequestActionHandler::class);
+        $this->apiRequestHelper = $this->createMock(ApiRequestHelper::class);
 
         $container = TestContainerBuilder::create()
             ->add(RequestActionHandler::class, $this->handler)
@@ -28,7 +33,7 @@ class UnhandledApiErrorExceptionListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener = new UnhandledApiErrorExceptionListener(
             $container,
-            '^/api/(?!(rest|doc)($|/.*))'
+            $this->apiRequestHelper
         );
     }
 
@@ -56,6 +61,10 @@ class UnhandledApiErrorExceptionListenerTest extends \PHPUnit\Framework\TestCase
     {
         $request = Request::create('http://test.com/product/view/1');
 
+        $this->apiRequestHelper->expects(self::once())
+            ->method('isApiRequest')
+            ->with($request->getPathInfo())
+            ->willReturn(false);
         $this->handler->expects(self::never())
             ->method('handleUnhandledError');
 
@@ -70,6 +79,10 @@ class UnhandledApiErrorExceptionListenerTest extends \PHPUnit\Framework\TestCase
         $exception = new \Exception('some error');
         $response = $this->createMock(Response::class);
 
+        $this->apiRequestHelper->expects(self::once())
+            ->method('isApiRequest')
+            ->with($request->getPathInfo())
+            ->willReturn(true);
         $this->handler->expects(self::once())
             ->method('handleUnhandledError')
             ->with(self::identicalTo($request), self::identicalTo($exception))
