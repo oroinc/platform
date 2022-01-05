@@ -14,6 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Sets "Access-Control-Allow-Headers" response header
  * to allow including the following headers on CORS preflight requests:
+ * * Authorization
  * * Content-Type
  * * X-Include
  * Sets "Access-Control-Expose-Headers" response header
@@ -49,6 +50,7 @@ class SetCorsAllowAndExposeHeaders implements ProcessorInterface
                 CorsHeaders::ACCESS_CONTROL_ALLOW_HEADERS,
                 self::getHeaders(
                     [
+                        'Authorization',
                         'Content-Type',
                         Context::INCLUDE_HEADER
                     ],

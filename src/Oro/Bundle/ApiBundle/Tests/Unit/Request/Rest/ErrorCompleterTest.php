@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
-use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider;
@@ -16,9 +15,6 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
     private $exceptionTextExtractor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
-    private $metadata;
-
     /** @var RequestType */
     private $requestType;
 
@@ -28,7 +24,6 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->exceptionTextExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
-        $this->metadata = $this->createMock(EntityMetadata::class);
         $this->requestType = new RequestType([RequestType::REST]);
 
         $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
@@ -140,7 +135,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
         $expectedError = new Error();
         $expectedError->setStatusCode(400);
-        $expectedError->setTitle(Response::$statusTexts[400]);
+        $expectedError->setTitle(strtolower(Response::$statusTexts[400]));
 
         $this->errorCompleter->complete($error, $this->requestType);
         self::assertEquals($expectedError, $error);

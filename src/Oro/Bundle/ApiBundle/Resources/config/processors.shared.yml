@@ -1332,6 +1332,44 @@ services:
         tags:
             - { name: oro.api.processor, action: not_allowed, group: normalize_result, requestType: rest, priority: -30 }
 
+    oro_api.rest.set_www_authenticate_response_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\SetWwwAuthenticateResponseHeader
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -32 }
+
+    oro_api.rest.remove_empty_unauthorized_response_error:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveEmptyUnauthorizedResponseError
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: get_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, responseStatusCode: 401, priority: -35 }
+
     oro_api.rest.remove_response_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveResponseErrors
         tags:
@@ -1350,6 +1388,7 @@ services:
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_result, requestType: rest, priority: -35 }
+            - { name: oro.api.processor, action: unhandled_error, group: normalize_result, requestType: rest, priority: -35 }
             - { name: oro.api.processor, action: options, group: normalize_result, requestType: rest, priority: -35 }
 
     oro_api.set_result_document_builder:

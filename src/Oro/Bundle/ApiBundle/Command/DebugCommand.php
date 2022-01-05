@@ -560,10 +560,10 @@ HELP
     {
         $publicActions = $this->actionProcessorBag->getActions();
         unset($publicActions[array_search('unhandled_error', $publicActions, true)]);
-        $publicActions = array_values($publicActions);
 
-        return $publicActions;
+        return array_values($publicActions);
     }
+
     /**
      * @return string[]
      */

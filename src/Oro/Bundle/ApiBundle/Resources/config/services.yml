@@ -629,6 +629,15 @@ services:
             - '@oro_api.rest.update_list_body_listener.inner'
             - '@oro_api.rest.routes'
 
+    oro_api.rest.unauthorized_api_request_listener:
+        class: Oro\Bundle\ApiBundle\EventListener\UnauthorizedApiRequestListener
+        arguments:
+            - '@Psr\Container\ContainerInterface'
+            - '%oro_api.rest.pattern%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse, priority: -100 }
+            - { name: container.service_subscriber, id: oro_api.rest.request_action_handler, key: Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler }
+
     oro_api.rest.unhandled_error_exception_listener:
         class: Oro\Bundle\ApiBundle\EventListener\UnhandledApiErrorExceptionListener
         arguments:

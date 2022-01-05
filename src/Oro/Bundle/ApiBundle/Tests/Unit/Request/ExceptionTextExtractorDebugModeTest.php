@@ -11,6 +11,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
@@ -78,6 +79,8 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
             [new \UnexpectedValueException(), 500],
             [new BadRequestHttpException(), 400],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 400],
+            [new HttpException(400), 400],
+            [new HttpException(401), 401],
             [new AccessDeniedException(), 403],
             [new LockedException('Reason.'), 403],
             [new DisabledException('Reason.'), 403],
@@ -115,6 +118,8 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
             [new \InvalidArgumentException(), 'invalid argument exception'],
             [new BadRequestHttpException(), 'bad request http exception'],
             [$this->createExecutionFailedException(new BadRequestHttpException()), 'bad request http exception'],
+            [new HttpException(400), 'bad request http exception'],
+            [new HttpException(401), 'unauthorized http exception'],
             [new RuntimeException('Some error.'), 'runtime exception'],
             [new ActionNotAllowedException(), 'action not allowed exception'],
             [new AccessDeniedException('Reason.'), 'access denied exception'],

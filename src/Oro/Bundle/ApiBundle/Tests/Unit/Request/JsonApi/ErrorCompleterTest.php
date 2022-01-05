@@ -172,7 +172,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
         $expectedError = new Error();
         $expectedError->setStatusCode(400);
-        $expectedError->setTitle(Response::$statusTexts[400]);
+        $expectedError->setTitle(strtolower(Response::$statusTexts[400]));
 
         $this->errorCompleter->complete($error, $this->requestType);
         self::assertEquals($expectedError, $error);
@@ -239,7 +239,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function completeErrorWithPropertyPathButWithoutMetadataDataProvider()
+    public function completeErrorWithPropertyPathButWithoutMetadataDataProvider(): array
     {
         return [
             [
