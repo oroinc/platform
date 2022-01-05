@@ -705,12 +705,6 @@ oro_api:
                     priority: -70
                 normalize_result:
                     priority: -80
-        unhandled_error:
-            processing_groups:
-                initialize:
-                    priority: -10
-                normalize_result:
-                    priority: -20
         not_allowed:
             processing_groups:
                 initialize:
@@ -719,6 +713,12 @@ oro_api:
                     priority: -20
                 normalize_result:
                     priority: -30
+        unhandled_error:
+            processing_groups:
+                initialize:
+                    priority: -10
+                normalize_result:
+                    priority: -20
         batch_update:
             processing_groups:
                 # the priorities of groups are not matter because each group is executed separately

@@ -34,8 +34,21 @@ class SetCorsAllowOrigin implements ProcessorInterface
         }
 
         $origin = $context->getRequestHeaders()->get(CorsHeaders::ORIGIN);
-        if ($origin && \in_array($origin, $this->corsSettings->getAllowedOrigins(), true)) {
+        if ($origin && $this->isAllowedOrigin($origin)) {
             $responseHeaders->set(CorsHeaders::ACCESS_CONTROL_ALLOW_ORIGIN, $origin);
         }
+    }
+
+    private function isAllowedOrigin(string $origin): bool
+    {
+        $allowedOrigins = $this->corsSettings->getAllowedOrigins();
+
+        foreach ($allowedOrigins as $allowedOrigin) {
+            if ('*' === $allowedOrigin || $origin === $allowedOrigin) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
