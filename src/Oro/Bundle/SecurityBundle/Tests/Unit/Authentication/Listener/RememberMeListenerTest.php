@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication\Listener;
 
 use Oro\Bundle\SecurityBundle\Authentication\Listener\RememberMeListener;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -30,7 +31,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
             ->with($event->getRequest(), false);
 
         $listener = $this->getListener($innerListener);
-        $listener->setCsrfRequestManager($csrfRequestManager);
+        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
 
         $listener($event);
     }
@@ -53,7 +54,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
             ->with($event->getRequest(), false);
 
         $listener = $this->getListener($innerListener);
-        $listener->setCsrfRequestManager($csrfRequestManager);
+        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
         $listener->switchToProcessAjaxCsrfOnlyRequest();
 
         $listener($event);
@@ -78,7 +79,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         $listener = $this->getListener($innerListener);
-        $listener->setCsrfRequestManager($csrfRequestManager);
+        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
         $listener->switchToProcessAjaxCsrfOnlyRequest();
 
         $listener($event);
@@ -101,7 +102,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
             ->with($event->getRequest(), false);
 
         $listener = $this->getListener($innerListener);
-        $listener->setCsrfRequestManager($csrfRequestManager);
+        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
         $listener->switchToProcessAjaxCsrfOnlyRequest();
 
         $listener($event);
@@ -125,7 +126,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $listener = $this->getListener($innerListener);
-        $listener->setCsrfRequestManager($csrfRequestManager);
+        $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
         $listener->switchToProcessAjaxCsrfOnlyRequest();
 
         $listener($event);

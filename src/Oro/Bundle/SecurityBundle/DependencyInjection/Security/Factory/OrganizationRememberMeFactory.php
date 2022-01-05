@@ -55,7 +55,10 @@ class OrganizationRememberMeFactory extends RememberMeFactory
             ->setArguments([
                 new Reference($innerListenerId)
             ])
-            ->addMethodCall('setCsrfRequestManager', [new Reference('oro_security.csrf_request_manager')]);
+            ->addMethodCall(
+                'setCsrfProtectedRequestHelper',
+                [new Reference('oro_security.csrf_protected_request_helper')]
+            );
         // point if listener processes CSRF protected AJAX requests only
         if ($config['csrf_protected_mode'] === true) {
             $listener->addMethodCall('switchToProcessAjaxCsrfOnlyRequest');

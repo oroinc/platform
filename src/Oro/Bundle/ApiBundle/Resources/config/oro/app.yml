@@ -706,7 +706,6 @@ oro_api:
                 normalize_result:
                     priority: -80
         unhandled_error:
-            processor_service_id: oro_api.unhandled_error.processor
             processing_groups:
                 initialize:
                     priority: -10

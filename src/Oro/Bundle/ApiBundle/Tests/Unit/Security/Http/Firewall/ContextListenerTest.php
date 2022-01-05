@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -32,17 +33,16 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     private function getListener(
         object $innerListener,
         TokenStorageInterface $tokenStorage,
-        ?SessionInterface $session,
         ?CsrfRequestManager $csrfRequestManager
     ): ContextListener {
         $listener = new ContextListener(
             $innerListener,
-            $tokenStorage,
-            $session
+            $tokenStorage
         );
 
         if ($csrfRequestManager) {
             $listener->setCsrfRequestManager($csrfRequestManager);
+            $listener->setCsrfProtectedRequestHelper(new CsrfProtectedRequestHelper($csrfRequestManager));
         }
 
         return $listener;
@@ -89,7 +89,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->with($event->getRequest(), false)
             ->willReturn(true);
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
     }
 
@@ -113,7 +113,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->innerListener->expects(self::never())
             ->method('__invoke');
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
     }
 
@@ -138,7 +138,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->innerListener->expects(self::never())
             ->method('__invoke');
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
     }
 
@@ -162,7 +162,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->innerListener->expects(self::never())
             ->method('__invoke');
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
     }
 
@@ -194,7 +194,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->with($event)
             ->willReturnCallback(static fn (RequestEvent $event) => $tokenStorage->setToken($sessionToken));
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
 
         self::assertSame($sessionToken, $tokenStorage->getToken());
@@ -227,7 +227,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->with($event)
             ->willReturnCallback(static fn (RequestEvent $event) => $tokenStorage->setToken(null));
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
 
         self::assertSame($anonymousToken, $tokenStorage->getToken());
@@ -258,7 +258,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->innerListener->expects(self::never())
             ->method('__invoke');
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
     }
 
@@ -282,7 +282,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $this->innerListener->expects(self::never())
             ->method('__invoke');
 
-        $listener = $this->getListener($this->innerListener, $tokenStorage, $session, $csrfRequestManager);
+        $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
     }
 }

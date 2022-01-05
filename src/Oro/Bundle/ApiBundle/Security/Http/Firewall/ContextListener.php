@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Security\Http\Firewall;
 
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
-use Symfony\Component\HttpFoundation\Request;
+use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\Security\Core\Authentication\Token\AnonymousToken;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -18,10 +18,9 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ContextListener
 {
     private object $innerListener;
-
     private TokenStorageInterface $tokenStorage;
-
     private CsrfRequestManager $csrfRequestManager;
+    private CsrfProtectedRequestHelper $csrfProtectedRequestHelper;
 
     public function __construct(
         object $innerListener,
@@ -36,15 +35,20 @@ class ContextListener
         $this->csrfRequestManager = $csrfRequestManager;
     }
 
+    public function setCsrfProtectedRequestHelper(CsrfProtectedRequestHelper $csrfProtectedRequestHelper): void
+    {
+        $this->csrfProtectedRequestHelper = $csrfProtectedRequestHelper;
+    }
+
     public function __invoke(RequestEvent $event): void
     {
         $token = $this->tokenStorage->getToken();
         if (null === $token) {
-            if ($this->isAjaxRequest($event->getRequest())) {
+            if ($this->csrfProtectedRequestHelper->isCsrfProtectedRequest($event->getRequest())) {
                 $this->processEvent($event);
             }
         } elseif ($token instanceof AnonymousToken) {
-            if ($this->isAjaxRequest($event->getRequest())) {
+            if ($this->csrfProtectedRequestHelper->isCsrfProtectedRequest($event->getRequest())) {
                 $this->processEvent($event);
                 if (null === $this->tokenStorage->getToken()) {
                     $this->tokenStorage->setToken($token);
@@ -53,24 +57,7 @@ class ContextListener
         }
     }
 
-    /**
-     * Checks whether the request is AJAX request
-     * (cookies has the session cookie and the request has "X-CSRF-Header" header with valid CSRF token).
-     */
-    private function isAjaxRequest(Request $request): bool
-    {
-        $isGetRequest = $request->isMethod('GET');
-
-        return
-            $request->hasSession()
-            && $request->cookies->has($request->getSession()->getName())
-            && (
-                (!$isGetRequest && $this->csrfRequestManager->isRequestTokenValid($request))
-                || ($isGetRequest && $request->headers->has(CsrfRequestManager::CSRF_HEADER))
-            );
-    }
-
-    protected function processEvent(RequestEvent $event): void
+    private function processEvent(RequestEvent $event): void
     {
         ($this->innerListener)($event);
         $this->csrfRequestManager->refreshRequestToken();

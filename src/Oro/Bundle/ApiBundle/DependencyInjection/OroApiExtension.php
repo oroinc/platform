@@ -10,6 +10,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,21 +22,21 @@ use Symfony\Component\Yaml\Yaml;
  */
 class OroApiExtension extends Extension implements PrependExtensionInterface
 {
-    public const API_DOC_VIEWS_PARAMETER_NAME        = 'oro_api.api_doc.views';
+    public const API_DOC_VIEWS_PARAMETER_NAME = 'oro_api.api_doc.views';
     public const API_DOC_DEFAULT_VIEW_PARAMETER_NAME = 'oro_api.api_doc.default_view';
-    public const REST_API_PREFIX_PARAMETER_NAME      = 'oro_api.rest.prefix';
-    public const REST_API_PATTERN_PARAMETER_NAME     = 'oro_api.rest.pattern';
+    public const REST_API_PREFIX_PARAMETER_NAME = 'oro_api.rest.prefix';
+    public const REST_API_PATTERN_PARAMETER_NAME = 'oro_api.rest.pattern';
 
-    private const REST_API_PREFIX_CONFIG  = 'rest_api_prefix';
+    private const REST_API_PREFIX_CONFIG = 'rest_api_prefix';
     private const REST_API_PATTERN_CONFIG = 'rest_api_pattern';
 
-    private const ACTION_PROCESSOR_BAG_SERVICE_ID               = 'oro_api.action_processor_bag';
-    private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID          = 'oro_api.config_extension_registry';
-    private const FILTER_OPERATOR_REGISTRY_SERVICE_ID           = 'oro_api.filter_operator_registry';
+    private const ACTION_PROCESSOR_BAG_SERVICE_ID = 'oro_api.action_processor_bag';
+    private const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
+    private const FILTER_OPERATOR_REGISTRY_SERVICE_ID = 'oro_api.filter_operator_registry';
     private const REST_FILTER_VALUE_ACCESSOR_FACTORY_SERVICE_ID = 'oro_api.rest.filter_value_accessor_factory';
-    private const CORS_SETTINGS_SERVICE_ID                      = 'oro_api.rest.cors_settings';
-    private const CONFIG_CACHE_WARMER_SERVICE_ID                = 'oro_api.config_cache_warmer';
-    private const CACHE_MANAGER_SERVICE_ID                      = 'oro_api.cache_manager';
+    private const CORS_SETTINGS_SERVICE_ID = 'oro_api.rest.cors_settings';
+    private const CONFIG_CACHE_WARMER_SERVICE_ID = 'oro_api.config_cache_warmer';
+    private const CACHE_MANAGER_SERVICE_ID = 'oro_api.cache_manager';
 
     /**
      * {@inheritdoc}
@@ -237,40 +238,72 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
             $container,
             self::ACTION_PROCESSOR_BAG_SERVICE_ID
         );
-        if (null !== $actionProcessorBagServiceDef) {
-            $debug = $container->getParameter('kernel.debug');
-            $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
-            foreach ($config['actions'] as $action => $actionConfig) {
-                if (empty($actionConfig['processor_service_id'])) {
-                    continue;
-                }
-                $actionProcessorServiceId = $actionConfig['processor_service_id'];
-                // inject the logger for "api" channel into an action processor
-                // we have to do it in this way rather than in service.yml to avoid
-                // "The service definition "logger" does not exist." exception
-                $container->getDefinition($actionProcessorServiceId)
-                    ->addTag('monolog.logger', ['channel' => 'api'])
-                    ->addMethodCall('setLogger', [$logger]);
-                // register an action processor in the bag
-                $actionProcessorBagServiceDef->addMethodCall(
-                    'addProcessor',
-                    [new Reference($actionProcessorServiceId)]
-                );
+        if (null === $actionProcessorBagServiceDef) {
+            return;
+        }
 
-                // decorate with TraceableActionProcessor
-                if ($debug) {
-                    $actionProcessorDecoratorServiceId = $actionProcessorServiceId . '.oro_api.profiler';
-                    $container
-                        ->register($actionProcessorDecoratorServiceId, TraceableActionProcessor::class)
-                        ->setArguments([
-                            new Reference($actionProcessorDecoratorServiceId . '.inner'),
-                            new Reference('oro_api.profiler.logger')
-                        ])
-                        // should be at the top of the decoration chain
-                        ->setDecoratedService($actionProcessorServiceId, null, -255)
-                        ->setPublic(false);
-                }
+        $debug = $container->getParameter('kernel.debug');
+        $logger = new Reference('logger', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+        foreach ($config['actions'] as $actionConfig) {
+            if (empty($actionConfig['processor_service_id'])) {
+                continue;
             }
+            $this->registerActionProcessor(
+                $container,
+                $actionProcessorBagServiceDef,
+                $actionConfig['processor_service_id'],
+                $logger,
+                $debug
+            );
+        }
+
+        /**
+         * The "unhandled_error" action is a special case.
+         * This action is not a public action, but it is stored in the processor bag for public actions
+         * to be able get it by RequestActionHandler.
+         * @see \Oro\Bundle\ApiBundle\Request\RequestActionHandler::handleUnhandledError
+         * @see \Oro\Bundle\ApiBundle\Processor\ActionProcessorBag::getActions
+         */
+        $this->registerActionProcessor(
+            $container,
+            $actionProcessorBagServiceDef,
+            'oro_api.unhandled_error.processor',
+            $logger,
+            $debug
+        );
+    }
+
+    private function registerActionProcessor(
+        ContainerBuilder $container,
+        Definition $actionProcessorBagServiceDef,
+        string $actionProcessorServiceId,
+        Reference $logger,
+        bool $debug
+    ): void {
+        // inject the logger for "api" channel into an action processor
+        // we have to do it in this way rather than in service.yml to avoid
+        // "The service definition "logger" does not exist." exception
+        $container->getDefinition($actionProcessorServiceId)
+            ->addTag('monolog.logger', ['channel' => 'api'])
+            ->addMethodCall('setLogger', [$logger]);
+        // register an action processor in the bag
+        $actionProcessorBagServiceDef->addMethodCall(
+            'addProcessor',
+            [new Reference($actionProcessorServiceId)]
+        );
+
+        // decorate with TraceableActionProcessor
+        if ($debug) {
+            $actionProcessorDecoratorServiceId = $actionProcessorServiceId . '.oro_api.profiler';
+            $container
+                ->register($actionProcessorDecoratorServiceId, TraceableActionProcessor::class)
+                ->setArguments([
+                    new Reference($actionProcessorDecoratorServiceId . '.inner'),
+                    new Reference('oro_api.profiler.logger')
+                ])
+                // should be at the top of the decoration chain
+                ->setDecoratedService($actionProcessorServiceId, null, -255)
+                ->setPublic(false);
         }
     }
 
