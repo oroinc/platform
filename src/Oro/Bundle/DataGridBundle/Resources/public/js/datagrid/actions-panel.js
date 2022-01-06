@@ -70,6 +70,7 @@ define(function(require) {
             this.launchers.forEach(launcher => {
                 launcher.setOptions({withinDropdown: isDropdown});
                 this.$el.append(launcher.render().$el);
+                launcher.trigger('appended');
             });
 
             return this;
