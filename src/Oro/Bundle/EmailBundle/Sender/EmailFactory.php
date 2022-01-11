@@ -38,8 +38,8 @@ class EmailFactory
         if ($parentMessageId) {
             $parentMessageId = MessageIdHelper::unwrapMessageId($parentMessageId);
             $symfonyEmail->getHeaders()
-                ->addHeader('References', $parentMessageId)
-                ->addHeader('In-Reply-To', $parentMessageId);
+                ->addTextHeader('References', $parentMessageId)
+                ->addTextHeader('In-Reply-To', $parentMessageId);
         }
 
         $from = $this->getAddresses($emailModel->getFrom());
