@@ -205,6 +205,21 @@ Example:
 
 Remove the business units that belong to a specific organization record.
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "businessunits",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
+
 ### users
 
 #### get_subresource
@@ -264,3 +279,18 @@ Example:
 #### delete_relationship
 
 Delete users who have access to a specific organization.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+   "data": [
+      {
+         "type": "users",
+         "id": "1"
+      }
+   ]
+}
+```
+{@/request}
