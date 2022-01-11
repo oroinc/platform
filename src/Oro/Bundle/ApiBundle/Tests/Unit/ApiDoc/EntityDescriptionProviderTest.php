@@ -47,6 +47,22 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
+    private function getEntityConfig(string $entityClass, array $values): Config
+    {
+        $config = new Config(new EntityConfigId('entity', $entityClass));
+        $config->setValues($values);
+
+        return $config;
+    }
+
+    private function getFieldConfig(string $entityClass, string $fieldName, array $values): Config
+    {
+        $config = new Config(new FieldConfigId('entity', $entityClass, $fieldName));
+        $config->setValues($values);
+
+        return $config;
+    }
+
     public function testGetEntityDescription()
     {
         $entityClass = 'Test\Class';
@@ -1118,31 +1134,50 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $values
-     *
-     * @return Config
+     * @dataProvider humanizeAssociationNameDataProvider
      */
-    protected function getEntityConfig($entityClass, array $values)
+    public function testHumanizeAssociationName(string $associationName, string $humanReadableAssociationName)
     {
-        $config = new Config(new EntityConfigId('entity', $entityClass));
-        $config->setValues($values);
-
-        return $config;
+        self::assertEquals(
+            $humanReadableAssociationName,
+            $this->entityDescriptionProvider->humanizeAssociationName($associationName)
+        );
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param array  $values
-     *
-     * @return Config
-     */
-    protected function getFieldConfig($entityClass, $fieldName, array $values)
+    public function humanizeAssociationNameDataProvider(): array
     {
-        $config = new Config(new FieldConfigId('entity', $entityClass, $fieldName));
-        $config->setValues($values);
-
-        return $config;
+        return [
+            ['updated', 'updated'],
+            ['Updated', 'updated'],
+            ['_updated', 'updated'],
+            ['_Updated', 'updated'],
+            ['updatedFor', 'updated for'],
+            ['UpdatedFor', 'updated for'],
+            ['updated-for', 'updated for'],
+            ['updated_for', 'updated for'],
+            ['updated_For', 'updated for'],
+            ['Updated_For', 'updated for'],
+            ['updated_for_UI', 'updated for UI'],
+            ['updated_for_API', 'updated for API'],
+            ['updated for', 'updated for'],
+            ['updated For', 'updated for'],
+            ['Updated For', 'updated for'],
+            ['updated for UI', 'updated for UI'],
+            ['updated for API', 'updated for API'],
+            ['UI', 'UI'],
+            ['API', 'API'],
+            ['applicableOnUI', 'applicable on UI'],
+            ['applicableOnUi', 'applicable on ui'],
+            ['applicableOnAPI', 'applicable on API'],
+            ['applicableOnApi', 'applicable on api'],
+            ['UIApplicable', 'UI applicable'],
+            ['UiApplicable', 'ui applicable'],
+            ['APIApplicable', 'API applicable'],
+            ['ApiApplicable', 'api applicable'],
+            ['isUIApplicable', 'is UI applicable'],
+            ['isUiApplicable', 'is ui applicable'],
+            ['isAPIApplicable', 'is API applicable'],
+            ['isApiApplicable', 'is api applicable'],
+        ];
     }
 }

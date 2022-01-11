@@ -254,11 +254,20 @@ class EntityDescriptionProvider
 
     private function humanizePropertyName(string $propertyPath): string
     {
-        return \preg_replace(
-            '/(?<=[^A-Z])([A-Z])/',
-            ' $1',
-            \strtr($propertyPath, ['_' => ' ', '-' => ' '])
+        $result = strtr($propertyPath, ['_' => ' ', '-' => ' ']);
+        $result = ' ' . preg_replace('/(?<=[^A-Z ])([A-Z])/', ' $1', $result);
+        $result = preg_replace_callback(
+            '/([A-Z])([A-Z])([a-z])/',
+            static fn (array $matches) => $matches[1] . ' ' . strtolower($matches[2]) . $matches[3],
+            $result
         );
+        $result = preg_replace_callback(
+            '/ ([A-Z])([^A-Z])/',
+            static fn (array $matches) => ' ' . strtolower($matches[1]) . $matches[2],
+            $result
+        );
+
+        return ltrim($result, ' ');
     }
 
     private function trans(string $label): ?string
