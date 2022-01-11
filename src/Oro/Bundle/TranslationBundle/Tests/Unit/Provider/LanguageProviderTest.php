@@ -42,8 +42,14 @@ class LanguageProviderTest extends \PHPUnit\Framework\TestCase
             [true, $enabledLanguages],
         ]);
 
-        static::assertSame(\array_keys($allLanguages), $this->provider->getAvailableLanguageCodes(false));
-        static::assertSame(\array_keys($enabledLanguages), $this->provider->getAvailableLanguageCodes(true));
+        static::assertEqualsCanonicalizing(
+            \array_keys($allLanguages),
+            $this->provider->getAvailableLanguageCodes(false)
+        );
+        static::assertEqualsCanonicalizing(
+            \array_keys($enabledLanguages),
+            $this->provider->getAvailableLanguageCodes(true)
+        );
     }
 
     public function testGetAvailableLanguagesByCurrentUser(): void
