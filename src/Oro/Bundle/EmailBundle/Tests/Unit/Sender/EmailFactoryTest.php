@@ -143,8 +143,8 @@ class EmailFactoryTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($symfonyEmail->getTextBody());
         self::assertEquals($emailModel->getBody(), $symfonyEmail->getHtmlBody());
 
-        self::assertEquals([$parentMessageId], $symfonyEmail->getHeaders()->getHeaderBody('References'));
-        self::assertEquals([$parentMessageId], $symfonyEmail->getHeaders()->getHeaderBody('In-Reply-To'));
+        self::assertEquals($parentMessageId, $symfonyEmail->getHeaders()->getHeaderBody('References'));
+        self::assertEquals($parentMessageId, $symfonyEmail->getHeaders()->getHeaderBody('In-Reply-To'));
 
         self::assertEmpty($symfonyEmail->getAttachments());
     }
