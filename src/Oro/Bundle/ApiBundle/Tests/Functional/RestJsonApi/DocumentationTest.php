@@ -58,9 +58,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('simple_data_types.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
     }
@@ -77,9 +75,7 @@ class DocumentationTest extends RestJsonApiTestCase
             ApiAction::GET_SUBRESOURCE
         );
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals($resourceData['section'], $entityType);
     }
 
@@ -106,9 +102,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('simple_data_types_filters.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
     }
@@ -121,9 +115,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('associations.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
     }
@@ -136,9 +128,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('filters.yml', 'documentation');
         self::assertArrayContains($expectedData, $resourceData);
     }
@@ -151,9 +141,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::CREATE);
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertArrayContains(
             [
                 'description'   => 'Create Resource Without Identifier',
@@ -203,9 +191,7 @@ class DocumentationTest extends RestJsonApiTestCase
         $entityType = $this->getEntityType(TestDepartment::class);
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::GET_LIST);
 
-        $data = $this->getSimpleFormatter()->format($docs);
-        $resourceData = reset($data);
-        $resourceData = reset($resourceData);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         $expectedData = $this->loadYamlData('filters.yml', 'documentation');
         unset(
             $expectedData['filters']['meta'],

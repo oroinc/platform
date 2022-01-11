@@ -21,6 +21,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInterface
 {
     public const UNIDIRECTIONAL_ASSOCIATIONS = 'unidirectional_associations';
+    public const UNIDIRECTIONAL_ASSOCIATIONS_READONLY = 'unidirectional_associations_readonly';
 
     private const UNIDIRECTIONAL_ASSOCIATION_PREFIX = 'unidirectionalAssociation:';
 
@@ -54,6 +55,13 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
             return false;
         }
 
+        $formOptions = $field->getFormOptions();
+        if ($formOptions && isset($formOptions['mapped']) && false === $formOptions['mapped']) {
+            $readonlyAssociations = $definition->get(self::UNIDIRECTIONAL_ASSOCIATIONS_READONLY, []);
+            $readonlyAssociations[] = $fieldName;
+            $definition->set(self::UNIDIRECTIONAL_ASSOCIATIONS_READONLY, $readonlyAssociations);
+        }
+
         $targetAssociationName = $this->completeUnidirectionalAssociation(
             $metadata,
             $field,
@@ -62,9 +70,9 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
             $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType)
         );
 
-        $fieldNames = $definition->get(self::UNIDIRECTIONAL_ASSOCIATIONS, []);
-        $fieldNames[$fieldName] = $targetAssociationName;
-        $definition->set(self::UNIDIRECTIONAL_ASSOCIATIONS, $fieldNames);
+        $associations = $definition->get(self::UNIDIRECTIONAL_ASSOCIATIONS, []);
+        $associations[$fieldName] = $targetAssociationName;
+        $definition->set(self::UNIDIRECTIONAL_ASSOCIATIONS, $associations);
 
         return true;
     }

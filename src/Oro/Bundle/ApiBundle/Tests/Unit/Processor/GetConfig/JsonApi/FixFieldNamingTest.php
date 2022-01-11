@@ -348,7 +348,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
 
     public function testProcessWhenIdFieldWithGuessedNameAlreadyExists()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
             'The "id" reserved word cannot be used as a field name'
             . ' and it cannot be renamed to "classId" because a field with this name already exists.'
@@ -370,7 +370,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
 
     public function testProcessWhenTypeFieldWithGuessedNameAlreadyExists()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
             'The "type" reserved word cannot be used as a field name'
             . ' and it cannot be renamed to "classType" because a field with this name already exists.'
