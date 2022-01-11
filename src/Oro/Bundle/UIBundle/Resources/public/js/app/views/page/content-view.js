@@ -1,11 +1,10 @@
-define([
-    'jquery',
-    'underscore',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    './../base/page-region-view'
-], function($, _, mediator, tools, PageRegionView) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+    const PageRegionView = require('./../base/page-region-view');
 
     /**
      * Finds first container that has active scrollbar and sets focus on it for ability of scrolling it by keyboard
@@ -55,8 +54,8 @@ define([
         render: function() {
             PageContentView.__super__.render.call(this);
 
-            // @TODO discuss if scripts section is still in use
             const data = this.getTemplateData();
+
             if (data && data.scripts) {
                 this.$el.append(data.scripts);
             }
@@ -86,14 +85,17 @@ define([
          */
         initFocus: function() {
             const activeElement = document.activeElement;
-            if (tools.isTouchDevice() || $(activeElement).is('[autofocus]')) {
+
+            if (!$(activeElement).is('body') || tools.isTouchDevice() || $(activeElement).is('[autofocus]')) {
                 return;
             }
 
-            const delay = 200;
-            this.$('form:first').focusFirstInput();
-            if (!tools.isMobile() && activeElement === document.activeElement) {
-                _.delay(focusScrollElement, delay);
+            const $form = this.$('form:first');
+
+            if ($form.length) {
+                $form.focusFirstInput();
+            } else {
+                _.delay(focusScrollElement, 200);
             }
         }
     });
