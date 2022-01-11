@@ -6,6 +6,12 @@ body {
     text-align: left;
 }
 
+a {
+    &:focus {
+        outline: $input-focus-border-color auto 1px;
+    }
+}
+
 // Bad practices, should be removed in future
 ul,
 ol {

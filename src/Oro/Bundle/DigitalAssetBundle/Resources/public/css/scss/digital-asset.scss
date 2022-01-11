@@ -3,36 +3,7 @@
 .digital-asset {
     &-item {
         display: flex;
-
-        > .digital-asset-filename {
-            @include text-line-truncate($dam-section-width);
-
-            display: inline-block;
-            padding: $dam-file-inner-offset;
-
-            > picture > img {
-                display: inline-block;
-                overflow: hidden;
-                width: 16px;
-                height: 16px;
-            }
-        }
-
-        [class^='fa-'],
-        [class*='fa-'] {
-            margin-left: $dam-item-fa-right;
-            margin-top: $content-padding-small;
-
-            &.fa-edit {
-                margin-top: $content-padding-small + 1;
-            }
-
-            &:hover {
-                &::after {
-                    color: $primary-550;
-                }
-            }
-        }
+        align-items: center;
     }
 
     &-thumbnail {
@@ -62,7 +33,50 @@
         }
     }
 
+    &-value {
+        width: $dam-section-width;
+        padding: 0 10px;
+        display: flex;
+
+        &:empty {
+            display: none;
+        }
+    }
+
     &-controls {
         white-space: nowrap;
+    }
+}
+
+.digital-asset-filename {
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    &__preview {
+        width: 16px;
+        flex-shrink: 0;
+        flex-grow: 0;
+    }
+
+    &__text {
+        // ~18px Special value for correct vertical align
+        line-height: 1.286;
+        flex-grow: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    picture {
+        display: block;
+    }
+
+    img {
+        display: block;
+        width: 16px;
+        height: 16px;
+        overflow: hidden;
     }
 }

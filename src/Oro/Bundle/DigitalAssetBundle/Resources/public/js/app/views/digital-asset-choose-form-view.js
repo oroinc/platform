@@ -19,6 +19,7 @@ define(function(require) {
                 digitalAssetInput: null,
                 filename: '[data-role="digital-asset-filename"]',
                 controls: '[data-role="digital-asset-controls"]',
+                value: '[data-role="digital-asset-value"]',
                 chooseAnother: '[data-role="digital-asset-choose-another"]',
                 choose: '[data-role="digital-asset-choose"]',
                 remove: '[data-role="digital-asset-remove"]'
@@ -76,7 +77,7 @@ define(function(require) {
         onGridRowSelect: function(data) {
             const previewMetadata = data.model.get('previewMetadata');
             this.findElement('filename').remove();
-            this.findElement('controls').before(this.previewElementTemplate({
+            this.findElement('value').html(this.previewElementTemplate({
                 previewMetadata: previewMetadata,
                 isImageType: this.options.isImageType
             }));
@@ -125,7 +126,7 @@ define(function(require) {
                 this.findElement('controls').removeClass('hide');
             } else {
                 this.findElement('choose').removeClass('hide');
-                this.findElement('filename').remove();
+                this.findElement('value').empty();
                 this.findElement('controls').addClass('hide');
             }
         },
