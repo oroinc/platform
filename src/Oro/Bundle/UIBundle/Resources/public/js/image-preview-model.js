@@ -2,7 +2,6 @@ import $ from 'jquery';
 import __ from 'orotranslation/js/translator';
 import ModalView from 'oroui/js/modal';
 import template from 'tpl-loader!oroui/templates/image-preview-modal.html';
-import tools from 'oroui/js/tools';
 import 'slick';
 
 const ImagePreviewModal = ModalView.extend({
@@ -24,18 +23,11 @@ const ImagePreviewModal = ModalView.extend({
     hasOpenModal: false,
 
     /**
-     * Is browser support WebP
-     * @property boolean
-     */
-    supportWebp: tools.isSupportWebp(),
-
-    /**
      * @inheritdoc
      */
     events: {
         ...ModalView.prototype.events(),
         'beforeChange .images-list': 'onBeforeSlideChange',
-        'lazyLoaded .images-list': 'onLazyLoaded',
         'click .print': 'printSlide',
         'click .download': 'downloadSlide',
         'click': 'onClickSlide',
@@ -66,20 +58,7 @@ const ImagePreviewModal = ModalView.extend({
         data.counterCurrent = this.options.currentSlide + 1;
         data.counterAll = this.options.images.length;
         data.images = this.options.images;
-        data.getSourceSrc = this.getSourceForLazyLoading.bind(this);
         return data;
-    },
-
-    getSourceForLazyLoading(image) {
-        const webP = image.sources.find(({type}) => {
-            return type === 'image/webp';
-        });
-
-        if (webP && this.supportWebp) {
-            return webP.srcset;
-        }
-
-        return image.src;
     },
 
     onModalHidden() {
@@ -114,6 +93,14 @@ const ImagePreviewModal = ModalView.extend({
         });
     },
 
+    delegateEvents() {
+        ImagePreviewModal.__super__.delegateEvents.call(this);
+
+        this.$('.images-list__item').one(`load${this.eventNamespace()}`, this.onLazyLoaded.bind(this));
+
+        return this;
+    },
+
     /**
      * Add specific className to backdrop
      * @param {function} callback
@@ -145,13 +132,9 @@ const ImagePreviewModal = ModalView.extend({
     /**
      * Remove lazy className after load image
      * @param {Event} event
-     * @param {object} slick
      */
-    onLazyLoaded(event, slick) {
-        const current = slick.$slides[slick.getCurrent()];
-        if (current.querySelector('[src]')) {
-            current.classList.remove('lazy-loading');
-        }
+    onLazyLoaded(event) {
+        $(event.target).closest('.slick-active').removeClass('lazy-loading');
     },
 
     downloadSlide(event) {

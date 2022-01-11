@@ -67,46 +67,58 @@
                 }
             }) }}
         >
-            {% if dam_widget.is_valid_digital_asset %}
-                {% if dam_widget.preview_metadata %}
-                    <a href="{{ dam_widget.preview_metadata.download }}" class="no-hash digital-asset-filename"
-                       title="{{ dam_widget.preview_metadata.title }}" data-role="digital-asset-filename">
-                        {% if dam_widget.is_image_type and dam_widget.preview_metadata.preview %}
-                            {% if dam_widget.preview_metadata.preview_webp is defined %}
-                                {% set sources = [{
-                                    srcset: dam_widget.preview_metadata.preview_webp,
-                                    type: 'image/webp',
-                                }] %}
-                            {% endif %}
-                            {% include '@OroAttachment/Twig/picture.html.twig' with {
-                                sources: sources|default([]),
-                                img_attrs: {
-                                    src: dam_widget.preview_metadata.preview,
-                                    alt: dam_widget.preview_metadata.title,
-                                }
-                            } %}
-                        {% else %}
-                            <i class="{{ dam_widget.preview_metadata.icon }}"></i>
-                        {% endif %}
-                        {{ dam_widget.preview_metadata.filename }}
+            <div class="digital-asset-value" data-role="digital-asset-value">
+                {%- if dam_widget.is_valid_digital_asset -%}
+                    {% if dam_widget.preview_metadata %}
+                        <a href="{{ dam_widget.preview_metadata.download }}" class="no-hash digital-asset-filename"
+                        title="{{ dam_widget.preview_metadata.title }}" data-role="digital-asset-filename">
+                            <span class="digital-asset-filename__preview">
+                                {% if dam_widget.is_image_type and dam_widget.preview_metadata.preview %}
+                                    {% if dam_widget.preview_metadata.preview_webp is defined %}
+                                        {% set sources = [{
+                                            srcset: dam_widget.preview_metadata.preview_webp,
+                                            type: 'image/webp',
+                                        }] %}
+                                    {% endif %}
+                                    {% include '@OroAttachment/Twig/picture.html.twig' with {
+                                        sources: sources|default([]),
+                                        img_attrs: {
+                                            src: dam_widget.preview_metadata.preview,
+                                            alt: dam_widget.preview_metadata.title,
+                                        }
+                                    } %}
+                                {% else %}
+                                    <span class="{{ dam_widget.preview_metadata.icon }}" aria-hidden="true"></span>
+                                {% endif %}
+                            </span>
+                            <span class="digital-asset-filename__text">{{- dam_widget.preview_metadata.filename -}}</span>
+                        </a>
+                    {% endif %}
+                {%- else -%}
+                    <a href="#" class="no-hash digital-asset-filename" data-role="digital-asset-filename">
+                        <span class="digital-asset-filename__preview">
+                            <span class="fa-file-o" aria-hidden="true"></span>
+                        </span>
+                        <span class="digital-asset-filename__text">{{- 'oro.digitalasset.dam.form.invalid_digital_asset'|trans -}}</span>
                     </a>
-                {% endif %}
-            {% else %}
-                <a href="#" class="no-hash digital-asset-filename" data-role="digital-asset-filename">
-                    <i class="fa-file-o"></i>
-                    {{ 'oro.digitalasset.dam.form.invalid_digital_asset'|trans }}
-                </a>
-            {% endif %}
+                {%- endif -%}
+            </div>
 
             <div class="digital-asset-controls hide" data-role="digital-asset-controls">
-                <a href="#" role="button" data-role="digital-asset-update" class="btn-square-lighter fa-edit"
-                   title="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}"></a>
+                <a href="#" role="button" data-role="digital-asset-update" class="btn btn-icon btn-square-lighter"
+                   title="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}"
+                   aria-label="{{ 'oro.digitalasset.dam.form.choose_another.label'|trans }}">
+                    <span class="fa-edit" aria-hidden="true"></span>
+                </a>
 
                 {% if form.emptyFile is defined %}
                     {{ form_row(form.emptyFile) }}
 
-                    <a href="#" role="button" data-role="digital-asset-remove" class="btn-square-lighter fa-close"
-                       title="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}"></a>
+                    <a href="#" role="button" data-role="digital-asset-remove" class="btn btn-icon btn-square-lighter"
+                       title="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}"
+                       aria-label="{{ 'oro.digitalasset.dam.form.remove.label'|trans }}">
+                        <span class="fa-close" aria-hidden="true"></span>
+                    </a>
                 {% endif %}
             </div>
 

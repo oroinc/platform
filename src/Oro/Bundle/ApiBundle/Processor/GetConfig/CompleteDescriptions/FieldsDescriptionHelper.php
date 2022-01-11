@@ -273,7 +273,8 @@ class FieldsDescriptionHelper
                 if (!$fieldDescription) {
                     $fieldDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
                 }
-                $commonDescription = $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
+                $commonDescription = $field->getDescription()
+                    ?: $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
                 if ($commonDescription) {
                     if (InheritDocUtil::hasInheritDoc($commonDescription)) {
                         $commonDescription = InheritDocUtil::replaceInheritDoc($commonDescription, $fieldDescription);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeFormData;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Form\Handler\UnidirectionalAssociationHandler;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -33,10 +34,8 @@ class HandleUnidirectionalAssociations implements ProcessorInterface
             return;
         }
 
-        $unidirectionalAssociations = $config->get(
-            UnidirectionalAssociationCompleter::UNIDIRECTIONAL_ASSOCIATIONS
-        );
-        if (empty($unidirectionalAssociations)) {
+        $unidirectionalAssociations = $this->getUnidirectionalAssociations($config);
+        if (!$unidirectionalAssociations) {
             // there are no unidirectional associations
             return;
         }
@@ -47,5 +46,25 @@ class HandleUnidirectionalAssociations implements ProcessorInterface
             $unidirectionalAssociations,
             $context->getRequestType()
         );
+    }
+
+    private function getUnidirectionalAssociations(EntityDefinitionConfig $config): ?array
+    {
+        $associations = $config->get(UnidirectionalAssociationCompleter::UNIDIRECTIONAL_ASSOCIATIONS);
+        if (!$associations) {
+            return null;
+        }
+
+        $readonlyFields = $config->get(UnidirectionalAssociationCompleter::UNIDIRECTIONAL_ASSOCIATIONS_READONLY);
+        if ($readonlyFields) {
+            foreach ($readonlyFields as $name) {
+                unset($associations[$name]);
+            }
+        }
+        if (!$associations) {
+            return null;
+        }
+
+        return $associations;
     }
 }
