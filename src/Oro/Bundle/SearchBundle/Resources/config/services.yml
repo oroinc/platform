@@ -178,6 +178,7 @@ services:
             - '@oro_search.mapping_configuration.provider'
             - '@oro_search.cache.mapping_configuration'
             - 'oro_search.mapping_config'
+            - "@=service('oro_search.engine.parameters').getEngineName()"
             - 'oro_search.search_mapping_collect'
 
     oro_search.cache.search_mapping.warmer:

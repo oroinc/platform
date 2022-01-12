@@ -2,6 +2,13 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 5.0.0
+
+### Changed
+
+#### OroSearchBundle
+* Changed search engine configuration: `search_engine_dsn` parameter is used instead of `search_engine_name`, `search_engine_host`, `search_engine_port`, `search_engine_index_prefix`, `search_engine_username`, `search_engine_password`, `search_engine_ssl_verification`, `search_engine_ssl_cert`,  `search_engine_ssl_cert_password`, `search_engine_ssl_key`, `search_engine_ssl_key_password`.
+
 ## 5.0.0-rc (2021-12-07)
 [Show detailed list of changes](incompatibilities-5-0-rc.md)
 

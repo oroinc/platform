@@ -174,7 +174,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with('oro_search.mapping_config')
+            ->with('oro_search.mapping_config:search_engine')
             ->willReturn(false);
 
         $this->eventDispatcher->expects($this->once())
@@ -190,7 +190,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('save')
-            ->with('oro_search.mapping_config', [$configTimestamp, []]);
+            ->with('oro_search.mapping_config:search_engine', [$configTimestamp, []]);
 
         $provider = $this->getProvider(false);
         $this->assertEquals([], $provider->getMappingConfig());
@@ -212,7 +212,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with('oro_search.mapping_config')
+            ->with('oro_search.mapping_config:search_engine')
             ->willReturn([$cacheTimestamp, []]);
 
         $this->eventDispatcher->expects($this->once())
@@ -228,7 +228,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('save')
-            ->with('oro_search.mapping_config', [$configTimestamp, []]);
+            ->with('oro_search.mapping_config:search_engine', [$configTimestamp, []]);
 
         $provider = $this->getProvider(false);
         $this->assertEquals([], $provider->getMappingConfig());
@@ -248,7 +248,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('fetch')
-            ->with('oro_search.mapping_config')
+            ->with('oro_search.mapping_config:search_engine')
             ->willReturn([$cacheTimestamp, []]);
 
         $this->eventDispatcher->expects($this->never())
@@ -266,7 +266,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache->expects(self::once())
             ->method('delete')
-            ->with('oro_search.mapping_config');
+            ->with('oro_search.mapping_config:search_engine');
 
         $this->cache->expects($this->any())
             ->method('fetch')
@@ -292,10 +292,10 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache->expects(self::once())
             ->method('delete')
-            ->with('oro_search.mapping_config');
+            ->with('oro_search.mapping_config:search_engine');
         $this->cache->expects(self::once())
             ->method('fetch')
-            ->with('oro_search.mapping_config')
+            ->with('oro_search.mapping_config:search_engine')
             ->willReturn(false);
         $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
@@ -327,6 +327,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
             $this->configProvider,
             $this->cache,
             'oro_search.mapping_config',
+            'search_engine',
             'oro_search.search_mapping_collect'
         );
         if ($mockFetch) {
@@ -336,7 +337,7 @@ class SearchMappingProviderTest extends \PHPUnit\Framework\TestCase
                 ->willReturn(true);
             $this->cache->expects($this->once())
                 ->method('fetch')
-                ->with('oro_search.mapping_config')
+                ->with('oro_search.mapping_config:search_engine')
                 ->willReturn([null, $this->testMapping]);
         }
 

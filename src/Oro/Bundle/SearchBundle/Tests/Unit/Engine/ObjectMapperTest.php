@@ -209,6 +209,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             $configProvider,
             $cache,
             'test',
+            'test',
             'test'
         );
 

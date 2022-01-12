@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
-use Oro\Component\Config\Loader\ContainerBuilderAdapter;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\NullCumulativeFileLoader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -19,7 +16,7 @@ class OroSearchExtension extends Extension
     {
         $config = $this->processConfiguration(new Configuration(), $configs);
 
-        $container->setParameter('oro_search.engine', $config['engine']);
+        $container->setParameter('oro_search.engine_dsn', $config['engine_dsn']);
         $container->setParameter('oro_search.required_plugins', $config['required_plugins']);
         $container->setParameter('oro_search.engine_parameters', $config['engine_parameters']);
         $container->setParameter('oro_search.log_queries', $config['log_queries']);
@@ -32,15 +29,7 @@ class OroSearchExtension extends Extension
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
-
-        $configLoader = new CumulativeConfigLoader(
-            'oro_search',
-            new NullCumulativeFileLoader('Resources/config/oro/search_engine/' . $config['engine'] . '.yml')
-        );
-        $resources = $configLoader->load(new ContainerBuilderAdapter($container));
-        foreach ($resources as $resource) {
-            $loader->load($resource->path);
-        }
+        $loader->load('search.yml');
     }
 
     /**

@@ -23,7 +23,10 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
     public function testShouldCreateIndexForEntity()
     {
-        if ($this->getContainer()->getParameter('oro_search.engine') !== 'orm') {
+        $engine = $this->getContainer()
+            ->get('oro_search.engine.parameters')
+            ->getEngineName();
+        if ($engine !== 'orm') {
             $this->markTestIncomplete('BAP-12226: This test doesn\'t work with current search engine');
         }
 

@@ -10,7 +10,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    public const DEFAULT_ENGINE = 'orm';
+    public const DEFAULT_ENGINE_DSN = 'orm:';
 
     /**
      * {@inheritdoc}
@@ -22,9 +22,9 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('engine')
+                ->scalarNode('engine_dsn')
                     ->cannotBeEmpty()
-                    ->defaultValue(self::DEFAULT_ENGINE)
+                    ->defaultValue(self::DEFAULT_ENGINE_DSN)
                 ->end()
                 ->arrayNode('required_plugins')
                     ->prototype('scalar')->end()
