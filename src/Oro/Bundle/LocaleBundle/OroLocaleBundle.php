@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle;
 
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\EntityFallbackFieldsStoragePass;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -26,7 +26,7 @@ class OroLocaleBundle extends Bundle
             'alias'
         ));
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
-        $container->addCompilerPass(new DefaultFallbackExtensionPass([
+        $container->addCompilerPass(new EntityFallbackFieldsStoragePass([
             'Oro\Bundle\LocaleBundle\Entity\Localization' => [
                 'title' => 'titles'
             ]

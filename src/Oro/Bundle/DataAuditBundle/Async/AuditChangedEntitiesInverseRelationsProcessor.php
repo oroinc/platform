@@ -8,6 +8,7 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -20,23 +21,24 @@ use Oro\Component\MessageQueue\Util\JSON;
  */
 class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /** @var EntityChangesToAuditEntryConverter */
-    private $entityChangesToAuditEntryConverter;
+    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
 
-    /** @var AuditConfigProvider */
-    private $auditConfigProvider;
+    private AuditConfigProvider $auditConfigProvider;
+
+    private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     public function __construct(
         ManagerRegistry $doctrine,
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
-        AuditConfigProvider $auditConfigProvider
+        AuditConfigProvider $auditConfigProvider,
+        EntityAuditStrategyProcessorInterface $strategyProcessor
     ) {
         $this->doctrine = $doctrine;
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->auditConfigProvider = $auditConfigProvider;
+        $this->strategyProcessor = $strategyProcessor;
     }
 
     /**
@@ -94,6 +96,11 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
             if (empty($sourceEntityData['change_set'])) {
+                continue;
+            }
+
+            $strategy = $this->strategyProcessor->processInverseRelations($sourceEntityData);
+            if (empty($strategy)) {
                 continue;
             }
 

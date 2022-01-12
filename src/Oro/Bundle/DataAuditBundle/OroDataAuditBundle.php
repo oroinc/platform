@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\DependencyInjection\CompilerPass\EntityAuditStrategyPass;
 use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -35,5 +36,7 @@ class OroDataAuditBundle extends Bundle
                 )
             );
         }
+
+        $container->addCompilerPass(new EntityAuditStrategyPass());
     }
 }

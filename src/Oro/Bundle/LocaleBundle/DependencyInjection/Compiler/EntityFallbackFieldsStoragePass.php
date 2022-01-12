@@ -8,10 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Registers default fallback fields mapping.
  */
-class DefaultFallbackExtensionPass implements CompilerPassInterface
+class EntityFallbackFieldsStoragePass implements CompilerPassInterface
 {
-    /** @var array */
-    private $classes;
+    private array $classes;
 
     /**
      * @param array $classes [class name => [singular field name => field name, ...], ...]
@@ -24,10 +23,10 @@ class DefaultFallbackExtensionPass implements CompilerPassInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $generatorExtensionDef = $container->getDefinition('oro_locale.entity_generator.extension');
-        $fieldMap = $generatorExtensionDef->getArgument(0);
+        $storage = $container->getDefinition('oro_locale.storage.entity_fallback_fields_storage');
+        $fieldMap = $storage->getArgument(0);
         foreach ($this->classes as $class => $fields) {
             if (!$fields) {
                 continue;
@@ -38,6 +37,6 @@ class DefaultFallbackExtensionPass implements CompilerPassInterface
                 $fieldMap[$class] = array_merge($fieldMap[$class], $fields);
             }
         }
-        $generatorExtensionDef->setArgument(0, $fieldMap);
+        $storage->setArgument(0, $fieldMap);
     }
 }

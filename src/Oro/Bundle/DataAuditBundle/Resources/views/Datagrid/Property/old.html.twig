@@ -14,7 +14,7 @@
         {%- elseif fieldValue.collectionDiffs is defined and fieldValue.collectionDiffs is not empty -%}
             <li>
                 <b>{{- dataAudit.renderFieldName(record.getValue('objectClass'), fieldKey, fieldValue) -}}</b>
-                <s>{{- dataAudit.renderCollection(record.getValue('objectClass'), fieldKey, fieldValue, ['removed']) -}}</s>
+                {{- dataAudit.renderCollection(record.getValue('objectClass'), fieldKey, fieldValue, ['changed', 'removed']) -}}
             </li>
         {%- else -%}
             <li>
