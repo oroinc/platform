@@ -110,4 +110,12 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     {
         return $prefix . \ucfirst($this->inflector->camelize($fieldName));
     }
+
+    /**
+     * @return array
+     */
+    public function getFieldMap(): array
+    {
+        return $this->fieldMap;
+    }
 }

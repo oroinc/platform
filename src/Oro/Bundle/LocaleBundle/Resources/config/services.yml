@@ -476,3 +476,30 @@ services:
             - '@property_accessor'
         tags:
             - { name: oro_formatter, formatter: oro_locale.localized_fallback_value_formatter }
+
+    oro_locale.provider.localized_fallback_value_name:
+        class: 'Oro\Bundle\LocaleBundle\Provider\LocalizedFallbackValueNameProvider'
+        arguments:
+            - '@translator'
+        tags:
+            - { name: oro_entity.name_provider, priority: 100 }
+
+    oro_locale.strategy_processor.localized_fallback_value_audit_strategy:
+        class: 'Oro\Bundle\LocaleBundle\Strategy\Processor\LocalizedFallbackValueAuditStrategyProcessor'
+        arguments:
+            - '@doctrine'
+            - '@oro_locale.entity_generator.extension'
+        tags:
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue }
+
+    oro_locale.strategy_processor.abstract_localized_audit_strategy:
+        class: 'Oro\Bundle\LocaleBundle\Strategy\Processor\AbstractLocalizedAuditStrategyProcessor'
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\CatalogBundle\Entity\CategoryTitle }
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\CatalogBundle\Entity\CategoryShortDescription }
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\CatalogBundle\Entity\CategoryLongDescription }
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\ProductBundle\Entity\ProductName }
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\ProductBundle\Entity\ProductShortDescription }
+            - { name: oro_dataaudit.entity_strategy_processor, entityName: Oro\Bundle\ProductBundle\Entity\ProductDescription }
