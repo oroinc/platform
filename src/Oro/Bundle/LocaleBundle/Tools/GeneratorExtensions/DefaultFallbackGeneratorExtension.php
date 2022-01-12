@@ -8,6 +8,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\ExtendFallback;
 use Oro\Bundle\LocaleBundle\Provider\DefaultFallbackMethodsNamesProvider;
+use Oro\Bundle\LocaleBundle\Storage\EntityFallbackFieldsStorage;
 use Oro\Component\PhpUtils\ClassGenerator;
 
 /**
@@ -15,25 +16,21 @@ use Oro\Component\PhpUtils\ClassGenerator;
  */
 class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
 {
-    /** @var array [class name => [singular field name => field name, ...], ...] */
-    private array $fieldMap;
+    private EntityFallbackFieldsStorage $storage;
 
     private DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider;
 
-    /**
-     * @param array $fieldMap [class name => [singular field name => field name, ...], ...]
-     */
     public function __construct(
-        array $fieldMap,
+        EntityFallbackFieldsStorage $storage,
         DefaultFallbackMethodsNamesProvider $defaultFallbackMethodsNamesProvider
     ) {
-        $this->fieldMap = $fieldMap;
+        $this->storage = $storage;
         $this->defaultFallbackMethodsNamesProvider = $defaultFallbackMethodsNamesProvider;
     }
 
     public function supports(array $schema): bool
     {
-        return isset($schema['class'], $this->fieldMap[$schema['class']]);
+        return isset($schema['class'], $this->storage->getFieldMap()[$schema['class']]);
     }
 
     public function generate(array $schema, ClassGenerator $class): void
@@ -42,7 +39,7 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             return;
         }
 
-        $fields = $this->fieldMap[$schema['class']];
+        $fields = $this->storage->getFieldMap()[$schema['class']];
         if (empty($fields)) {
             return;
         }

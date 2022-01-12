@@ -5,6 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -20,18 +21,20 @@ use Oro\Component\MessageQueue\Util\JSON;
  */
 class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
-    /** @var EntityChangesToAuditEntryConverter */
-    private $entityChangesToAuditEntryConverter;
+    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
 
-    /** @var MessageProducerInterface */
-    private $messageProducer;
+    private MessageProducerInterface $messageProducer;
+
+    private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     public function __construct(
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
-        MessageProducerInterface $messageProducer
+        MessageProducerInterface $messageProducer,
+        EntityAuditStrategyProcessorInterface $strategyProcessor
     ) {
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->messageProducer = $messageProducer;
+        $this->strategyProcessor = $strategyProcessor;
     }
 
     /**
@@ -50,8 +53,9 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
 
         try {
             if ($body['entities_inserted']) {
+                $map = $this->processEntityStrategy($body['entities_inserted']);
                 $this->entityChangesToAuditEntryConverter->convert(
-                    $body['entities_inserted'],
+                    $map,
                     $transactionId,
                     $loggedAt,
                     $user,
@@ -63,8 +67,9 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
             }
 
             if ($body['entities_updated']) {
+                $map = $this->processEntityStrategy($body['entities_updated']);
                 $this->entityChangesToAuditEntryConverter->convert(
-                    $body['entities_updated'],
+                    $map,
                     $transactionId,
                     $loggedAt,
                     $user,
@@ -76,8 +81,9 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
             }
 
             if ($body['entities_deleted']) {
+                $map = $this->processEntityStrategy($body['entities_deleted']);
                 $this->entityChangesToAuditEntryConverter->convert(
-                    $body['entities_deleted'],
+                    $map,
                     $transactionId,
                     $loggedAt,
                     $user,
@@ -107,5 +113,19 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
     public static function getSubscribedTopics()
     {
         return [Topics::ENTITIES_CHANGED];
+    }
+
+    private function processEntityStrategy(array $entitiesChanged): array
+    {
+        $map = [];
+        foreach ($entitiesChanged as $key => $entityChanged) {
+            $return = $this->strategyProcessor->processChangedEntities($entityChanged);
+
+            if (!empty($return)) {
+                $map[$key] = $entityChanged;
+            }
+        }
+
+        return $map;
     }
 }

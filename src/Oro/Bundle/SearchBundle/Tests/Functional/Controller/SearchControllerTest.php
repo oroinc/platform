@@ -29,7 +29,9 @@ class SearchControllerTest extends SearchBundleWebTestCase
     {
         $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         if (array_key_exists('supported_engines', $request)) {
-            $engine = $this->getContainer()->getParameter('oro_search.engine');
+            $engine = $this->getContainer()
+                ->get('oro_search.engine.parameters')
+                ->getEngineName();
             if (!in_array($engine, $request['supported_engines'])) {
                 $this->markTestIncomplete('Test should not be executed on this engine');
             }

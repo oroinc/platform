@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\EntityFallbackFieldsStoragePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class DefaultFallbackExtensionPassTest extends \PHPUnit\Framework\TestCase
+class EntityFallbackFieldsStoragePassTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContainerBuilder */
     private $container;
@@ -13,22 +13,17 @@ class DefaultFallbackExtensionPassTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();
-        $this->container->register('oro_locale.entity_generator.extension')
+        $this->container->register('oro_locale.storage.entity_fallback_fields_storage')
             ->addArgument([]);
     }
 
-    /**
-     * @param array $classes
-     *
-     * @return DefaultFallbackExtensionPass
-     */
-    private function runCompiler(array $classes)
+    private function runCompiler(array $classes): void
     {
-        $compiler = new DefaultFallbackExtensionPass($classes);
+        $compiler = new EntityFallbackFieldsStoragePass($classes);
         $compiler->process($this->container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->runCompiler([]);
         $this->runCompiler(['Test\Entity1' => ['name' => 'names']]);
@@ -41,7 +36,7 @@ class DefaultFallbackExtensionPassTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity1' => ['name' => 'names'],
                 'Test\Entity2' => ['name' => 'names', 'description' => 'descriptions']
             ],
-            $this->container->getDefinition('oro_locale.entity_generator.extension')->getArgument(0)
+            $this->container->getDefinition('oro_locale.storage.entity_fallback_fields_storage')->getArgument(0)
         );
     }
 }

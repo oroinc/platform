@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler;
-use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\DefaultFallbackExtensionPass;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\EntityFallbackFieldsStoragePass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -42,7 +42,7 @@ class OroEntityConfigBundle extends Bundle
             )
         );
 
-        $container->addCompilerPass(new DefaultFallbackExtensionPass([
+        $container->addCompilerPass(new EntityFallbackFieldsStoragePass([
             'Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily' => [
                 'label' => 'labels'
             ],

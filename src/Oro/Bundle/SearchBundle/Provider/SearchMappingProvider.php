@@ -38,13 +38,14 @@ class SearchMappingProvider extends AbstractSearchMappingProvider implements
         EventDispatcherInterface $dispatcher,
         MappingConfigurationProviderAbstract $mappingConfigProvider,
         Cache $cache,
-        string $cacheKey,
+        string $cacheKeyPrefix,
+        string $searchEngineName,
         string $eventName
     ) {
         $this->dispatcher = $dispatcher;
         $this->mappingConfigProvider = $mappingConfigProvider;
         $this->cache = $cache;
-        $this->cacheKey = $cacheKey;
+        $this->cacheKey = $cacheKeyPrefix . ':' . $searchEngineName;
         $this->eventName = $eventName;
     }
 
