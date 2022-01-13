@@ -51,16 +51,18 @@ define(function(require) {
         },
 
         _bindEvents() {
-            const self = this;
-
             this._bindButtonEvents();
             this._bindMenuEvents();
             this._bindHeaderEvents();
 
+            const events = ['mousedown', 'clearMenus']
+                .map(eventName => `${eventName}.${this._namespaceID}`)
+                .join(' ');
+
             // close each widget when clicking on any other element/anywhere else on the page
-            $(document).on('mousedown.' + self._namespaceID, function(event) {
-                if (self._isOpen && self._isExcluded(event.target)) {
-                    self.close();
+            $(document).on(events, event => {
+                if (this._isOpen && this._isExcluded(event.target)) {
+                    this.close();
                 }
             });
 
@@ -68,8 +70,8 @@ define(function(require) {
             // restored to their defaultValue prop on form reset, and the reset
             // handler fires before the form is actually reset.  delaying it a bit
             // gives the form inputs time to clear.
-            $(this.element[0].form).on('reset.' + this._namespaceID, function() {
-                setTimeout(self.refresh.bind(self), 10);
+            $(this.element[0].form).on(`reset.${this._namespaceID}`, () => {
+                setTimeout(this.refresh.bind(this), 10);
             });
         },
 
@@ -174,6 +176,7 @@ define(function(require) {
             }
 
             this.menu.attr('tabindex', '-1');
+            this.button.trigger('clearMenus'); // hides all opened dropdown menus
             this._trigger('opened');
         },
 

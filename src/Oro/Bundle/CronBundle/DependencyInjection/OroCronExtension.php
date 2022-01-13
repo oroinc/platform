@@ -23,6 +23,7 @@ class OroCronExtension extends Extension
         $loader->load('services.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('mq_topics.yml');
 
         if ($container->getParameter('kernel.environment') === 'test') {
             $loader->load('services_test.yml');

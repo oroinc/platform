@@ -339,7 +339,7 @@ define(function(require, exports, module) {
     });
 
     Dropdown._clearMenus = function(event) {
-        if (event && event.type === 'click') {
+        if (event && (event.type === 'click' || event.type === 'clearMenus')) {
             const $target = $(event.target);
             if ($target.closest('[data-toggle]').length && $target.closest('.dropdown-menu.show').length) {
                 // click on toggle element inside active dropdown-menu

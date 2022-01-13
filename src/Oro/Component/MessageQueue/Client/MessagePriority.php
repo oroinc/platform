@@ -15,12 +15,20 @@ class MessagePriority
     public const VERY_HIGH = 'oro.message_queue.client.very_high_message_priority';
 
     /** @var array */
-    public static $map = [
+    public static array $map = [
         MessagePriority::VERY_LOW => 0,
         MessagePriority::LOW => 1,
         MessagePriority::NORMAL => 2,
         MessagePriority::HIGH => 3,
         MessagePriority::VERY_HIGH => 4,
+    ];
+
+    private static array $nameMap = [
+        MessagePriority::VERY_LOW => 'Very Low',
+        MessagePriority::LOW => 'Low',
+        MessagePriority::NORMAL => 'Normal',
+        MessagePriority::HIGH => 'High',
+        MessagePriority::VERY_HIGH => 'Very High',
     ];
 
     public static function getMessagePriority(string $priority): int
@@ -33,5 +41,18 @@ class MessagePriority
         }
 
         return self::$map[$priority];
+    }
+
+    public static function getMessagePriorityName(string $priority): string
+    {
+        if (!array_key_exists($priority, self::$nameMap)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Unknown priority %s, expected one of %s',
+                $priority,
+                implode(', ', self::$nameMap)
+            ));
+        }
+
+        return self::$nameMap[$priority];
     }
 }

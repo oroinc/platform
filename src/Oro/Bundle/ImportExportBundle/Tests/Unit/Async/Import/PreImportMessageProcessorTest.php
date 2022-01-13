@@ -15,7 +15,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -337,7 +337,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE,
+                SendEmailNotificationTemplateTopic::getName(),
                 [
                     'from' => $expectedSender->toString(),
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
@@ -347,7 +347,6 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                             'Please check its integrity and try again!',
                     ],
                     'recipientUserId' => self::USER_ID,
-                    'contentType' => 'text/html',
                 ]
             );
 

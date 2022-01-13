@@ -1,15 +1,18 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async;
 
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationTopic;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that adds an association to a single email.
+ */
 class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -22,19 +25,12 @@ class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, 
      */
     private $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     public function __construct(
         AssociationManager $associationManager,
-        JobRunner $jobRunner,
-        LoggerInterface $logger
+        JobRunner $jobRunner
     ) {
         $this->associationManager = $associationManager;
         $this->jobRunner = $jobRunner;
-        $this->logger = $logger;
     }
 
     /**
@@ -42,13 +38,7 @@ class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, 
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['jobId'], $data['emailId'], $data['targetClass'], $data['targetId'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         $result = $this->jobRunner->runDelayed($data['jobId'], function () use ($data) {
             $this->associationManager->processAddAssociation(
@@ -68,6 +58,6 @@ class AddEmailAssociationMessageProcessor implements MessageProcessorInterface, 
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ADD_ASSOCIATION_TO_EMAIL];
+        return [AddEmailAssociationTopic::getName()];
     }
 }

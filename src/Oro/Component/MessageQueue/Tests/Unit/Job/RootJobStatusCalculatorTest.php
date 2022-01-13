@@ -11,7 +11,7 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\RootJobStatusCalculator;
-use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\StatusCalculator\AbstractStatusCalculator;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
@@ -144,7 +144,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::ROOT_JOB_STOPPED, new Message(['jobId' => 1], MessagePriority::HIGH));
+            ->with(RootJobStoppedTopic::getName(), new Message(['jobId' => 1], MessagePriority::HIGH));
 
         $this->rootJobStatusCalculator->calculate($job);
 
@@ -185,7 +185,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer
             ->expects($this->once())
             ->method('send')
-            ->with(Topics::ROOT_JOB_STOPPED, new Message(['jobId' => 1], MessagePriority::HIGH));
+            ->with(RootJobStoppedTopic::getName(), new Message(['jobId' => 1], MessagePriority::HIGH));
 
         // Because all consumers wait until at least one consumer updates the status of the 'job'
         // and unlocks the record, we can simulate parallel processors due to the loop.

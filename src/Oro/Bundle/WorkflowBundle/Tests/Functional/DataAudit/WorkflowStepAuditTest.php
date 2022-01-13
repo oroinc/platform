@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataAudit;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
-use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAuditField;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
@@ -17,7 +17,6 @@ use Oro\Bundle\WorkflowBundle\EventListener\SendWorkflowStepChangesToAuditListen
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowSteps;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\Assert\ArrayContainsConstraint;
 
 /**
@@ -54,7 +53,7 @@ class WorkflowStepAuditTest extends WebTestCase
         );
 
         $message = new Message();
-        $message->setBody(JSON::encode($messageBody));
+        $message->setBody($messageBody);
 
         /** @var AuditChangedEntitiesProcessor $processor */
         $processor = self::getContainer()->get('oro_dataaudit.async.audit_changed_entities');
@@ -137,7 +136,7 @@ class WorkflowStepAuditTest extends WebTestCase
                 ]
             ]
         ];
-        $messageBody = self::getSentMessage(Topics::ENTITIES_CHANGED)->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName())->getBody();
         self::assertThat(
             $messageBody['entities_updated'],
             new ArrayContainsConstraint($expectedChanges)
@@ -176,7 +175,7 @@ class WorkflowStepAuditTest extends WebTestCase
                 ]
             ]
         ];
-        $messageBody = self::getSentMessage(Topics::ENTITIES_CHANGED)->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName())->getBody();
         self::assertThat(
             $messageBody['entities_updated'],
             new ArrayContainsConstraint($expectedChanges)
@@ -219,7 +218,7 @@ class WorkflowStepAuditTest extends WebTestCase
                 ]
             ]
         ];
-        $messageBody = self::getSentMessage(Topics::ENTITIES_CHANGED)->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName())->getBody();
         self::assertThat(
             $messageBody['entities_updated'],
             new ArrayContainsConstraint($expectedChanges)

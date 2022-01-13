@@ -18,3 +18,17 @@ services:
     oro_attachment.tests.imagine.provider.url:
         alias: oro_attachment.imagine.provider.url
         public: true
+
+    oro_attachment.tests.checker.voter.webp_feature_voter.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\WebpFeatureVoterStub
+        decorates: oro_attachment.checker.voter.webp_feature_voter
+        decoration_priority: -256 # should be at the top of the decoration chain
+        arguments:
+            - '@.inner'
+
+    oro_attachment.tests.tools.webp_configuration.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\WebpConfigurationStub
+        decorates: oro_attachment.tools.webp_configuration
+        decoration_priority: -256 # should be at the top of the decoration chain
+        arguments:
+            - '@.inner'

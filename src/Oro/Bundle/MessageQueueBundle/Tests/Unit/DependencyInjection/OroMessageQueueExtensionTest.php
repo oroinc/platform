@@ -17,9 +17,11 @@ use Oro\Component\MessageQueue\Client\DbalDriver;
 use Oro\Component\MessageQueue\Client\Meta\DestinationsCommand;
 use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
 use Oro\Component\MessageQueue\Client\NoopMessageProcessor;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -63,6 +65,13 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             ['oro_message_queue.consumption.extension' => [['persistent' => true]]],
             $container->getDefinition('oro_message_queue.consumption.signal_extension')->getTags()
+        );
+
+        $autoconfiguration = $container->getAutoconfiguredInstanceof();
+        self::assertArrayHasKey(TopicInterface::class, $autoconfiguration);
+        self::assertEquals(
+            (new ChildDefinition(''))->addTag('oro_message_queue.topic'),
+            $autoconfiguration[TopicInterface::class]
         );
     }
 

@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\CronBundle\Async;
 
+use Oro\Bundle\CronBundle\Async\Topic\RunCommandDelayedTopic;
+use Oro\Bundle\CronBundle\Async\Topic\RunCommandTopic;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
@@ -25,11 +26,9 @@ class CommandRunnerProcessor implements
 {
     use LoggerAwareTrait;
 
-    /** @var JobRunner */
-    private $jobRunner;
+    private JobRunner $jobRunner;
 
-    /** @var CommandRunnerInterface */
-    private $commandRunner;
+    private CommandRunnerInterface $commandRunner;
 
     public function __construct(JobRunner $jobRunner, CommandRunnerInterface $commandRunner)
     {
@@ -42,30 +41,12 @@ class CommandRunnerProcessor implements
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
-        if (!isset($body['command'])) {
-            $this->logger->critical('Got invalid message: empty command');
-
-            return self::REJECT;
-        }
-        $commandArguments = [];
-        if (isset($body['arguments'])) {
-            $commandArguments = $body['arguments'];
-        }
-        if (!is_array($commandArguments)) {
-            $this->logger->critical(
-                'Got invalid message: "arguments" must be of type array',
-                ['message' => $message]
-            );
-
-            return self::REJECT;
-        }
+        $body = $message->getBody();
 
         if (array_key_exists('jobId', $body)) {
-            $result = $this->runDelayedJob($body['jobId'], $body['command'], $commandArguments);
+            $result = $this->runDelayedJob($body['jobId'], $body['command'], $body['arguments']);
         } else {
-            $result = $this->runUniqueJob($message->getMessageId(), $body['command'], $commandArguments);
+            $result = $this->runUniqueJob($message->getMessageId(), $body['command'], $body['arguments']);
         }
 
         return $result ? self::ACK : self::REJECT;
@@ -82,7 +63,7 @@ class CommandRunnerProcessor implements
     {
         $jobName = sprintf('oro:cron:run_command:%s', $commandName);
         if ($commandArguments) {
-            array_walk($commandArguments, function ($item, $key) use (&$jobName) {
+            array_walk($commandArguments, static function ($item, $key) use (&$jobName) {
                 if (is_array($item)) {
                     $item = implode(',', $item);
                 }
@@ -134,6 +115,6 @@ class CommandRunnerProcessor implements
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::RUN_COMMAND, Topics::RUN_COMMAND_DELAYED];
+        return [RunCommandTopic::getName(), RunCommandDelayedTopic::getName()];
     }
 }

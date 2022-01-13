@@ -6,18 +6,19 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Async\IndexEntityMessageProcessor;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntityTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredAttributes()
     {
+        $this->expectNotToPerformAssertions();
+
         new IndexEntityMessageProcessor(
             $this->createMock(IndexerInterface::class),
             $this->createMock(ManagerRegistry::class),
@@ -28,54 +29,10 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnSubscribedTopics()
     {
         $expectedSubscribedTopics = [
-            Topics::INDEX_ENTITY,
+            IndexEntityTopic::getName(),
         ];
 
         $this->assertEquals($expectedSubscribedTopics, IndexEntityMessageProcessor::getSubscribedTopics());
-    }
-
-    public function testShouldRejectMessageIfMessageHasNoClass()
-    {
-        $indexer = $this->createMock(IndexerInterface::class);
-
-        $doctrine = $this->createMock(ManagerRegistry::class);
-
-        $message = new Message();
-        $message->setBody(JSON::encode([
-            'key' => 'value',
-        ]));
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Class was not found.');
-
-        $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageIfMessageHasNoId()
-    {
-        $indexer = $this->createMock(IndexerInterface::class);
-
-        $doctrine = $this->createMock(ManagerRegistry::class);
-
-        $message = new Message();
-        $message->setBody(JSON::encode([
-            'class' => 'class-name',
-        ]));
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('error')
-            ->with('Message is invalid. Id was not found.');
-
-        $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldRejectMessageIfEntityMangerWasNotFoundForClass()
@@ -92,10 +49,10 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Entity manager is not defined for class: "class-name"');
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'class' => 'class-name',
             'id' => 'id',
-        ]));
+        ]);
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -134,10 +91,10 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error');
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'class' => 'class-name',
             'id' => 'id',
-        ]));
+        ]);
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -180,10 +137,10 @@ class IndexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error');
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'class' => 'class-name',
             'id' => 'id',
-        ]));
+        ]);
 
         $processor = new IndexEntityMessageProcessor($indexer, $doctrine, $logger);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));

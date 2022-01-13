@@ -4,7 +4,8 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsChunkProcessor;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsProcessor;
-use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsChunkTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsTopic;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\DataFixtures\LoadTestAuditDataWithOneToManyData;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
@@ -15,7 +16,6 @@ use Oro\Component\MessageQueue\Client\Message as ClientMessage;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
 {
@@ -58,10 +58,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         ]);
 
         $this->processor->process($message, $this->getConnection()->createSession());
-        $this->assertMessagesEmpty(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS);
-
-        $this->chunkProcessor->process($message, $this->getConnection()->createSession());
-        $this->assertMessagesEmpty(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS_CHUNK);
+        $this->assertMessagesEmpty(AuditChangedEntitiesInverseCollectionsTopic::getName());
     }
 
     public function testProcessorSplitCollectionToChunkAndSaveAudit(): void
@@ -88,7 +85,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         $this->processor->setBatchSize($batchSize);
         $this->processor->process($message, $this->getConnection()->createSession());
 
-        $this->assertMessagesCount(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS_CHUNK, $expectedCount);
+        $this->assertMessagesCount(AuditChangedEntitiesInverseCollectionsChunkTopic::getName(), $expectedCount);
         $this->assertMessagesCreatedAndEntityIdsIsSplitting($batchSize);
 
         $this->processedMessages();
@@ -103,7 +100,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         foreach (self::getSentMessages() as $sentMessage) {
             /** @var ClientMessage $message */
             $message = $sentMessage['message'];
-            $this->chunkProcessor->process($session->createMessage(JSON::encode($message->getBody())), $session);
+            $this->chunkProcessor->process($session->createMessage($message->getBody()), $session);
         }
     }
 
@@ -117,7 +114,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
             $countIds = count($body['entityData']['fields']['childrenOneToMany']['entity_ids']);
 
             $this->assertEquals($batchSize, $countIds);
-            $this->assertEquals(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS_CHUNK, $topic);
+            $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkTopic::getName(), $topic);
         }
     }
 
@@ -144,7 +141,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
     private function createMessage(array $body): MessageInterface
     {
         $message = new Message();
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
         $message->setMessageId('some_message_id');
 
         return $message;

@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic: ~
+    Oro\Bundle\SearchBundle\Async\Topic\IndexEntityTopic: ~
+    Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic: ~
+    Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByRangeTopic: ~
+    Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic: ~

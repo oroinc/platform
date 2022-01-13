@@ -29,9 +29,9 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider createFromJsonExceptionProvider
      */
-    public function testCreateFromJsonException(mixed $json, string $expectedMessage)
+    public function testCreateFromJsonException(mixed $json, string $exceptionClass, string $expectedMessage)
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException($exceptionClass);
         $this->expectExceptionMessage($expectedMessage);
 
         TransitionTriggerMessage::createFromJson($json);
@@ -42,18 +42,22 @@ class TransitionTriggerMessageTest extends \PHPUnit\Framework\TestCase
         return [
             [
                 'json' => null,
-                'expectedMessage' => 'Accept only string argument but got: "NULL"'
+                'exceptionClass' => \InvalidArgumentException::class,
+                'expectedMessage' => 'Given json should not be empty'
             ],
             [
                 'json' => new \stdClass(),
-                'expectedMessage' => 'Accept only string argument but got: "stdClass"'
+                'exceptionClass' => \InvalidArgumentException::class,
+                'expectedMessage' => 'Given json should not be empty'
             ],
             [
                 'json' => 'data',
-                'expectedMessage' => 'The malformed json given'
+                'exceptionClass' => \JsonException::class,
+                'expectedMessage' => 'Syntax error'
             ],
             [
                 'json' => '',
+                'exceptionClass' => \InvalidArgumentException::class,
                 'expectedMessage' => 'Given json should not be empty'
             ]
         ];

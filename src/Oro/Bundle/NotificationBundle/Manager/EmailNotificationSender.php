@@ -4,7 +4,8 @@ namespace Oro\Bundle\NotificationBundle\Manager;
 
 use Oro\Bundle\EmailBundle\Model\EmailTemplateInterface;
 use Oro\Bundle\EmailBundle\Model\SenderAwareInterface;
-use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendMassEmailNotificationTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotificationInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -37,7 +38,7 @@ class EmailNotificationSender
      */
     public function send(TemplateEmailNotificationInterface $notification, EmailTemplateInterface $template): void
     {
-        $this->sendNotification($notification, $template, Topics::SEND_NOTIFICATION_EMAIL);
+        $this->sendNotification($notification, $template, SendEmailNotificationTopic::getName());
     }
 
     /**
@@ -47,7 +48,7 @@ class EmailNotificationSender
      */
     public function sendMass(TemplateEmailNotificationInterface $notification, EmailTemplateInterface $template): void
     {
-        $this->sendNotification($notification, $template, Topics::SEND_MASS_NOTIFICATION_EMAIL);
+        $this->sendNotification($notification, $template, SendMassEmailNotificationTopic::getName());
     }
 
     /**

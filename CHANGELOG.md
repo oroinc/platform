@@ -4,7 +4,42 @@ The current file describes significant changes in the code that may affect the u
 
 ## 5.0.0
 
+### Added
+
+#### AttachmentBundle
+* Added `oro_attachment.webp_strategy` configuration node to the bundle config to control whether to convert images to WebP format.
+* Added `Oro\Bundle\AttachmentBundle\Manager\WebpAwareImageResizeManager` that additionally converts image to WebP format if needed.
+* Added `Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigDefaultProvider`
+  to provide LiipImagine filter runtime configuration for using in `Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider`.
+* Added `Oro\Bundle\AttachmentBundle\Provider\WebpAwareFilterRuntimeConfigProvider` to provide LiipImagine filter runtime configuration
+  for WebP format.
+* Added `Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface` and `Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider`
+  to generate URL for static images.
+* Added `Oro\Bundle\AttachmentBundle\Imagine\Provider\WebpAwareImagineUrlProvider` to generate URLs for static images in WebP format.
+* Added `Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider` to generate filename taking into account current WebP strategy.
+* Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
+  to provider image sources to be used in <picture> tag.
+
 ### Changed
+
+#### AttachmentBundle
+* Changed `Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface::getResizedImageUrl()`,
+  `Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface::getFilteredImageUrl()`,
+  `Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface::getPathForResizedImage()`,
+  `Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface::getPathForFilteredImage()`:
+  added `$format` argument to specify the resized image format.
+* Changed `Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface`:
+  added `getFilteredImageName()`, `getResizedImageName()` that should be used for getting names 
+  for filtered and resized images correspondingly.
+* Changed `Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider::getFilteredImage()`,
+  `Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider::getResizedImage()`,
+  `Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager::resize()`,
+  `Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager::applyFilter()`:
+  added `$format` argument to specify the resized image format.
+
+#### Config component
+* Added sorting by depth to `Oro\Component\Config\Loader\FolderContentCumulativeLoader::getDirectoryContents()`
+  to ensure that result is not affected by an operating system.
 
 #### OroSearchBundle
 * Changed search engine configuration: `search_engine_dsn` parameter is used instead of `search_engine_name`, `search_engine_host`, `search_engine_port`, `search_engine_index_prefix`, `search_engine_username`, `search_engine_password`, `search_engine_ssl_verification`, `search_engine_ssl_cert`,  `search_engine_ssl_cert_password`, `search_engine_ssl_key`, `search_engine_ssl_key_password`.

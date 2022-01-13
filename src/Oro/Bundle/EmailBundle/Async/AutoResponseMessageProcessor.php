@@ -1,8 +1,10 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponseTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -10,9 +12,11 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that sends auto response for single email.
+ */
 class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -52,13 +56,7 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['jobId'], $data['id'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         /** @var Email $email */
         $email = $this->getEmailRepository()->find($data['id']);
@@ -90,6 +88,6 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SEND_AUTO_RESPONSE];
+        return [SendAutoResponseTopic::getName()];
     }
 }

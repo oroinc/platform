@@ -7,12 +7,12 @@ use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -43,10 +43,7 @@ class SendEmailNotificationTemplateProcessor implements
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $messageBody = $this->getMessageBody($message);
-        if (!$messageBody) {
-            return MessageProcessorInterface::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         $recipient = $this->getRecipient($messageBody);
         if (!$recipient) {
@@ -57,8 +54,8 @@ class SendEmailNotificationTemplateProcessor implements
             ->sendTemplateEmail(
                 From::emailAddress($messageBody['from']),
                 [$recipient],
-                new EmailTemplateCriteria($messageBody['template'], $messageBody['templateEntity'] ?? null),
-                $messageBody['templateParams'] ?? []
+                new EmailTemplateCriteria($messageBody['template'], $messageBody['templateEntity']),
+                $messageBody['templateParams']
             );
 
         if (!$sentCount) {
@@ -66,40 +63,6 @@ class SendEmailNotificationTemplateProcessor implements
         }
 
         return self::ACK;
-    }
-
-    private function getMessageBody(MessageInterface $message): array
-    {
-        $messageBody = array_merge(
-            [
-                'from' => null,
-                'recipientUserId' => null,
-                'template' => null,
-                'templateEntity' => null,
-                'templateParams' => [],
-            ],
-            JSON::decode($message->getBody())
-        );
-
-        if (empty($messageBody['from']) || empty($messageBody['recipientUserId'])
-            || empty($messageBody['template'])) {
-            $this->logger->critical(
-                sprintf(
-                    'Message properties %s were not expected to be empty',
-                    implode(', ', ['from', 'recipientUserId', 'template'])
-                )
-            );
-
-            return [];
-        }
-
-        if (!is_array($messageBody['templateParams'])) {
-            $this->logger->critical('Message property "templateParams" was expected to be array');
-
-            return [];
-        }
-
-        return $messageBody;
     }
 
     private function getRecipient(array $messageBody): ?EmailHolderInterface
@@ -120,6 +83,6 @@ class SendEmailNotificationTemplateProcessor implements
      */
     public static function getSubscribedTopics(): array
     {
-        return [Topics::SEND_NOTIFICATION_EMAIL_TEMPLATE];
+        return [SendEmailNotificationTemplateTopic::getName()];
     }
 }

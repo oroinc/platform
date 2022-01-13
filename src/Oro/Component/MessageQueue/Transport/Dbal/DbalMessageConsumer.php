@@ -152,7 +152,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
 
         if ($requeue) {
             $dbalMessage = [
-                'body' => $message->getBody(),
+                'body' => JSON::encode($message->getBody()),
                 'headers' => JSON::encode($message->getHeaders()),
                 'properties' => JSON::encode($message->getProperties()),
                 'priority' => $message->getPriority(),
@@ -222,7 +222,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
         $message = $this->session->createMessage();
 
         $message->setId($dbalMessage['id']);
-        $message->setBody((string)$dbalMessage['body']);
+        $message->setBody(JSON::decode($dbalMessage['body'], false) ?? $dbalMessage['body']);
         $message->setPriority((int)$dbalMessage['priority']);
         $message->setRedelivered((bool)$dbalMessage['redelivered']);
 

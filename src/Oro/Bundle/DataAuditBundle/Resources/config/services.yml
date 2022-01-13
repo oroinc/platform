@@ -192,7 +192,6 @@ services:
         class: 'Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesRelationsProcessor'
         arguments:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -221,7 +220,6 @@ services:
         arguments:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.job.runner'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
