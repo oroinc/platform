@@ -1,0 +1,8 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\ImapBundle\Async\Topic\ClearInactiveMailboxTopic: ~
+    Oro\Bundle\ImapBundle\Async\Topic\SyncEmailsTopic: ~
+    Oro\Bundle\ImapBundle\Async\Topic\SyncEmailTopic: ~

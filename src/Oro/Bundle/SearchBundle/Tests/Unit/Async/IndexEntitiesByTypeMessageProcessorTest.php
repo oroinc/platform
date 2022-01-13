@@ -5,13 +5,12 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -20,6 +19,8 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
 
     public function testCouldBeConstructedWithRequiredAttributes()
     {
+        $this->expectNotToPerformAssertions();
+
         new IndexEntitiesByTypeMessageProcessor(
             $this->createMock(ManagerRegistry::class),
             $this->createMock(JobRunner::class),
@@ -32,7 +33,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
     {
         $this->assertEquals(
             [
-                Topics::INDEX_ENTITY_TYPE
+                IndexEntitiesByTypeTopic::getName()
             ],
             IndexEntitiesByTypeMessageProcessor::getSubscribedTopics()
         );
@@ -58,10 +59,10 @@ class IndexEntitiesByTypeMessageProcessorTest extends \PHPUnit\Framework\TestCas
             });
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'entityClass' => 'entity-name',
             'jobId' => 12345,
-        ]));
+        ]);
 
         $processor = new IndexEntitiesByTypeMessageProcessor(
             $doctrine,

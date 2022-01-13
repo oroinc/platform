@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Async\MessageFilter;
 
-use Oro\Bundle\ImapBundle\Async\Topics;
+use Oro\Bundle\ImapBundle\Async\Topic\ClearInactiveMailboxTopic;
 use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
 use Oro\Bundle\MessageQueueBundle\Client\MessageFilterInterface;
 
@@ -16,12 +16,12 @@ class ClearInactiveMailboxMessageFilter implements MessageFilterInterface
      */
     public function apply(MessageBuffer $buffer): void
     {
-        if (!$buffer->hasMessagesForTopic(Topics::CLEAR_INACTIVE_MAILBOX)) {
+        if (!$buffer->hasMessagesForTopic(ClearInactiveMailboxTopic::getName())) {
             return;
         }
 
         $processedMessages = [];
-        $messages = $buffer->getMessagesForTopic(Topics::CLEAR_INACTIVE_MAILBOX);
+        $messages = $buffer->getMessagesForTopic(ClearInactiveMailboxTopic::getName());
         foreach ($messages as $messageId => $message) {
             $messageKey = isset($message['id']) ? (string)$message['id'] : '_';
             if (isset($processedMessages[$messageKey])) {

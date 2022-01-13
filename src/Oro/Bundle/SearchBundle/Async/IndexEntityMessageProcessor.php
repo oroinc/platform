@@ -4,14 +4,17 @@ namespace Oro\Bundle\SearchBundle\Async;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntityTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that indexes a single entity by id.
+ */
 class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -41,19 +44,7 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
-        if (empty($body['class'])) {
-            $this->logger->error('Message is invalid. Class was not found.');
-
-            return self::REJECT;
-        }
-
-        if (empty($body['id'])) {
-            $this->logger->error('Message is invalid. Id was not found.');
-
-            return self::REJECT;
-        }
+        $body = $message->getBody();
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->doctrine->getManagerForClass($body['class']);
@@ -82,6 +73,6 @@ class IndexEntityMessageProcessor implements MessageProcessorInterface, TopicSub
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::INDEX_ENTITY];
+        return [IndexEntityTopic::getName()];
     }
 }

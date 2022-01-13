@@ -183,3 +183,8 @@ services:
             - '@oro_platform.optional_listeners.manager'
         tags:
             - { name: oro_message_queue.consumption.extension, persistent: true }
+
+    oro_message_queue.topic.registry:
+        class: Oro\Component\MessageQueue\Topic\TopicRegistry
+        arguments:
+            - !tagged_locator { tag: oro_message_queue.topic, index_by: topicName, default_index_method: getName }

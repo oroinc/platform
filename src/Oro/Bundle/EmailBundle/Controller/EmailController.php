@@ -9,7 +9,7 @@ use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
@@ -106,7 +106,7 @@ class EmailController extends AbstractController
      */
     public function purgeEmailsAttachmentsAction()
     {
-        $this->getMessageProducer()->send(Topics::PURGE_EMAIL_ATTACHMENTS, []);
+        $this->getMessageProducer()->send(PurgeEmailAttachmentsTopic::getName(), []);
 
         return new JsonResponse([
             'message'    => $this->get(TranslatorInterface::class)->trans('oro.email.controller.job_scheduled.message'),

@@ -15,7 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
-use Oro\Component\MessageQueue\Job\Topics as JobTopics;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -96,7 +96,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
             $exportMessageData
         );
 
-        $rootJobStoppedData = $this->getOneSentMessageWithTopic(JobTopics::ROOT_JOB_STOPPED);
+        $rootJobStoppedData = $this->getOneSentMessageWithTopic(RootJobStoppedTopic::getName());
         $this->assertMessageProcessorExecuted(
             'oro_message_queue.job.dependent_job_processor',
             $rootJobStoppedData
@@ -210,7 +210,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
         $message = new TransportMessage();
 
         $message->setMessageId('abc');
-        $message->setBody(json_encode($messageData, JSON_THROW_ON_ERROR));
+        $message->setBody($messageData);
 
         return $message;
     }

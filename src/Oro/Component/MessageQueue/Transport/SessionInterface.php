@@ -12,7 +12,11 @@ interface SessionInterface
     /**
      * Creates a transport Message object.
      */
-    public function createMessage(string $body = '', array $properties = [], array $headers = []): MessageInterface;
+    public function createMessage(
+        mixed $body = '',
+        array $properties = [],
+        array $headers = []
+    ): MessageInterface;
 
     /**
      * Creates a queue identity given a Queue name.

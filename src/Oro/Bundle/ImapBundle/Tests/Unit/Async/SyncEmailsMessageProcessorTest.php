@@ -3,58 +3,38 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Async;
 
 use Oro\Bundle\ImapBundle\Async\SyncEmailsMessageProcessor;
-use Oro\Bundle\ImapBundle\Async\Topics;
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailsTopic;
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\LoggerInterface;
 
 class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new SyncEmailsMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(MessageProducerInterface::class)
         );
-    }
-
-    public function testShouldRejectMessageIfInvalidMessage()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new Message();
-        $message->setBody(json_encode(['key' => 'value'], JSON_THROW_ON_ERROR));
-
-        $processor = new SyncEmailsMessageProcessor($this->createMock(MessageProducerInterface::class), $logger);
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldSendMessagesToSyncEmailTopic()
     {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->never())
-            ->method('critical');
-
         $producer = $this->createMock(MessageProducerInterface::class);
         $producer->expects($this->exactly(2))
             ->method('send')
             ->withConsecutive(
-                [Topics::SYNC_EMAIL, $this->identicalTo(['id' => 1])],
-                [Topics::SYNC_EMAIL, $this->identicalTo(['id' => 2])]
+                [SyncEmailTopic::getName(), $this->identicalTo(['id' => 1])],
+                [SyncEmailTopic::getName(), $this->identicalTo(['id' => 2])]
             );
 
         $message = new Message();
-        $message->setBody(json_encode(['ids' => [1,2]], JSON_THROW_ON_ERROR));
+        $message->setBody(['ids' => [1, 2]]);
 
-        $processor = new SyncEmailsMessageProcessor($producer, $logger);
+        $processor = new SyncEmailsMessageProcessor($producer);
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -64,7 +44,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [Topics::SYNC_EMAILS],
+            [SyncEmailsTopic::getName()],
             SyncEmailsMessageProcessor::getSubscribedTopics()
         );
     }

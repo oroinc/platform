@@ -2,23 +2,33 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Client;
 
+use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageBodyResolver;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\Router\Envelope;
 use Oro\Component\MessageQueue\Client\Router\MessageRouterInterface;
+use Oro\Component\MessageQueue\Consumption\Exception\InvalidMessageBodyException;
 use Oro\Component\MessageQueue\Exception\InvalidArgumentException;
+use Oro\Component\MessageQueue\Tests\Unit\Stub\TopicStub;
+use Oro\Component\MessageQueue\Topic\NullTopic;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Oro\Component\MessageQueue\Transport\Queue;
-use Oro\Component\MessageQueue\Util\JSON;
 
 class MessageProducerTest extends \PHPUnit\Framework\TestCase
 {
+    use LoggerAwareTraitTestTrait;
+
     private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
 
     private MessageRouterInterface|\PHPUnit\Framework\MockObject\MockObject $messageRouter;
 
     private MessageProducer $producer;
+
+    private TopicInterface $topic;
 
     /**
      * {@inheritdoc}
@@ -28,7 +38,19 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->driver = $this->createMock(DriverInterface::class);
         $this->messageRouter = $this->createMock(MessageRouterInterface::class);
 
-        $this->producer = new MessageProducer($this->driver, $this->messageRouter);
+        $topicRegistry = $this->createMock(TopicRegistry::class);
+
+        $this->topic = new NullTopic();
+        $topicRegistry
+            ->expects(self::any())
+            ->method('get')
+            ->willReturnCallback(fn () => $this->topic);
+
+        $messageBodyResolver = new MessageBodyResolver($topicRegistry);
+
+        $this->producer = new MessageProducer($this->driver, $this->messageRouter, $messageBodyResolver, true);
+
+        $this->setUpLoggerMock($this->producer);
     }
 
     /**
@@ -73,35 +95,13 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->send('topic.name', $message);
     }
 
-    /**
-     * @dataProvider invalidMessageDataProvider
-     *
-     * @param mixed $message
-     * @param string $expectException
-     * @param string $expectExceptionMessage
-     */
-    public function testSendWInvalidMessage(
-        mixed $message,
-        string $expectException,
-        string $expectExceptionMessage
-    ): void {
-        $this->messageRouter
-            ->expects(self::never())
-            ->method('handle');
-
-        $this->expectException($expectException);
-        $this->expectExceptionMessage($expectExceptionMessage);
-
-        $this->producer->send('topic.name', $message);
-    }
-
     public function validMessageDataProvider(): array
     {
         return [
             'message object with array body' => [
                 'message' => new Message(['key' => 'value']),
                 'expectedMessage' => $this->getExpectedMessage()
-                    ->setBody(JSON::encode(['key' => 'value']))
+                    ->setBody(['key' => 'value'])
                     ->setContentType('application/json'),
             ],
             'message object with string body' => [
@@ -143,26 +143,40 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
                     return ['key' => 'value'];
                 }),
                 'expectedMessage' => $this->getExpectedMessage()
-                    ->setBody(JSON::encode(['key' => 'value']))
+                    ->setBody(['key' => 'value'])
                     ->setContentType('application/json'),
             ],
         ];
     }
 
-    public function invalidMessageDataProvider(): array
+    public function testSendWhenInvalidContentType(): void
     {
-        return [
-            'invalid content type' => [
-                'message' => (new Message([]))->setContentType('text/plain'),
-                'expectException' => InvalidArgumentException::class,
-                'expectExceptionMessage' => 'When body is array content type must be "application/json".',
-            ],
-            'invalid body' => [
-                'message' => new Message(new \stdClass()),
-                'expectException' => InvalidArgumentException::class,
-                'expectExceptionMessage' => 'The message\'s body must be either null, scalar or array. Got: stdClass',
-            ],
-        ];
+        $this->topic = new TopicStub();
+
+        $this->messageRouter
+            ->expects(self::never())
+            ->method('handle');
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('When body is array content type must be "application/json".');
+
+        $this->producer->send('topic.name', (new Message([]))->setContentType('text/plain'));
+    }
+
+    public function testSendWhenInvalidBody(): void
+    {
+        $this->topic = new TopicStub();
+
+        $this->messageRouter
+            ->expects(self::never())
+            ->method('handle');
+
+        $this->expectException(InvalidMessageBodyException::class);
+        $this->expectExceptionMessage('Message of topic "topic.name" has invalid body');
+
+        $this->assertLoggerErrorMethodCalled();
+
+        $this->producer->send('topic.name', new Message(['missing_option' => 'sample_value']));
     }
 
     private function getExpectedMessage(): Message
@@ -172,7 +186,6 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         $expectedMessage->setContentType('text/plain');
         $expectedMessage->setMessageId('message.id');
         $expectedMessage->setTimestamp(1);
-        $expectedMessage->setPriority('oro.message_queue.client.normal_message_priority');
         $expectedMessage->setProperties(['oro.message_queue.client.topic_name' => 'topic.name']);
 
         return $expectedMessage;

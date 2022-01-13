@@ -156,7 +156,6 @@ services:
         arguments:
             - '@mailer'
             - '@oro_email.embedded_images.handler.symfony_email'
-            - '@validator'
         calls:
             - [setLogger, ['@logger']]
         tags:
@@ -167,7 +166,6 @@ services:
         arguments:
             - '@oro_notification.mailer.mass_notifications'
             - '@oro_email.embedded_images.handler.symfony_email'
-            - '@validator'
         calls:
             - [setLogger, ['@logger']]
         tags:

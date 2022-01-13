@@ -54,29 +54,6 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithInvalidMessage(): void
-    {
-        $this->jobRepository
-            ->expects($this->never())
-            ->method('findJobById');
-
-        $this->rootJobStatusCalculator
-            ->expects($this->never())
-            ->method('calculate');
-
-        $this->logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message. Job id is missing.');
-
-        $message = new Message();
-        $message->setBody(\json_encode([]));
-        $session = $this->createMock(SessionInterface::class);
-        $result = $this->processor->process($message, $session);
-
-        $this->assertEquals('oro.message_queue.consumption.reject', $result);
-    }
-
     public function testProcessJobNotFound(): void
     {
         $this->jobRepository
@@ -95,7 +72,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Job was not found. id: "47"');
 
         $message = new Message();
-        $message->setBody(\json_encode(['jobId' => 47]));
+        $message->setBody(['jobId' => 47]);
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process($message, $session);
 
@@ -123,7 +100,7 @@ class CalculateRootJobStatusProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical');
 
         $message = new Message();
-        $message->setBody(\json_encode(['jobId' => 47]));
+        $message->setBody(['jobId' => 47]);
         $session = $this->createMock(SessionInterface::class);
         $result = $this->processor->process($message, $session);
 

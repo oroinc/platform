@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesRelationsTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic;
 use Oro\Bundle\DataAuditBundle\Entity\AbstractAudit;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
@@ -12,7 +16,6 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * Process inserted, updated and deleted entities and create audit logs
@@ -40,8 +43,7 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
+        $body = $message->getBody();
         $loggedAt = $this->getLoggedAt($body);
         $transactionId = $this->getTransactionId($body);
         $user = $this->getUserReference($body);
@@ -97,10 +99,10 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
 
         $nextMessage = new Message($body, MessagePriority::VERY_LOW);
         if ($body['collections_updated']) {
-            $this->messageProducer->send(Topics::ENTITIES_RELATIONS_CHANGED, $nextMessage);
+            $this->messageProducer->send(AuditChangedEntitiesRelationsTopic::getName(), $nextMessage);
         }
-        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, $nextMessage);
-        $this->messageProducer->send(Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS, $nextMessage);
+        $this->messageProducer->send(AuditChangedEntitiesInverseRelationsTopic::getName(), $nextMessage);
+        $this->messageProducer->send(AuditChangedEntitiesInverseCollectionsTopic::getName(), $nextMessage);
 
         return self::ACK;
     }
@@ -110,7 +112,7 @@ class AuditChangedEntitiesProcessor extends AbstractAuditProcessor implements To
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ENTITIES_CHANGED];
+        return [AuditChangedEntitiesTopic::getName()];
     }
 
     private function processEntityStrategy(array $entitiesChanged): array

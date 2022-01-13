@@ -3,9 +3,7 @@
 namespace Oro\Bundle\EmailBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
-use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler;
-use Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass;
 use Oro\Component\PhpUtils\ClassLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -51,20 +49,6 @@ class OroEmailBundle extends Bundle
             'oro_email.emailtemplate.variable_processor',
             'alias'
         ));
-
-        $addTopicPass = AddTopicDescriptionPass::create()
-            ->add(Topics::SEND_AUTO_RESPONSE, 'Send auto response for single email')
-            ->add(Topics::SEND_AUTO_RESPONSES, 'Send auto response for multiple emails')
-            ->add(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, 'Update associations to emails')
-            ->add(Topics::ADD_ASSOCIATION_TO_EMAIL, 'Add association to single email')
-            ->add(Topics::ADD_ASSOCIATION_TO_EMAILS, 'Add association to multiple emails')
-            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATION, 'Updates single email for email owner')
-            ->add(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, 'Updates multiple emails for email owner')
-            ->add(Topics::SYNC_EMAIL_SEEN_FLAG, 'Synchronization email flags')
-            ->add(Topics::PURGE_EMAIL_ATTACHMENTS, 'Purge email attachments')
-            ->add(Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS, 'Purge email attachments by ids');
-
-        $container->addCompilerPass($addTopicPass);
     }
 
     /**

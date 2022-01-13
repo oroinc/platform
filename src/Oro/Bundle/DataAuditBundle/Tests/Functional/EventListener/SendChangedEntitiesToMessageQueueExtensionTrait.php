@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Proxy\Proxy;
-use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -83,7 +83,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 
         //guard
         $this->assertGreaterThanOrEqual(1, count($messages));
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $messages[0]['topic']);
+        $this->assertEquals(AuditChangedEntitiesTopic::getName(), $messages[0]['topic']);
 
         return $messages[0]['message'];
     }

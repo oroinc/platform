@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Workflow\Action;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SendEmailTemplateTopic;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Workflow\Action\ScheduleSendEmailTemplate;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -327,7 +327,7 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::SEND_EMAIL_TEMPLATE,
+                SendEmailTemplateTopic::getName(),
                 [
                     'from' => $expected['from'],
                     'templateName' => $options['template'],

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Async;
 
+use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -52,6 +53,6 @@ class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, T
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::JS_TRANSLATIONS_DUMP];
+        return [DumpJsTranslationsTopic::getName()];
     }
 }

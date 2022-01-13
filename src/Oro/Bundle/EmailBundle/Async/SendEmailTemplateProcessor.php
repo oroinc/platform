@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Async\Topic\SendEmailTemplateTopic;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
@@ -10,12 +11,9 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Uses {@see AggregatedEmailTemplatesSender} to send localized emails to specified recipients using specified email
@@ -27,16 +25,12 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
 
     private ManagerRegistry $managerRegistry;
 
-    private ValidatorInterface $validator;
-
     private AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender;
 
     public function __construct(
         ManagerRegistry $managerRegistry,
-        ValidatorInterface $validator,
         AggregatedEmailTemplatesSender $aggregatedEmailTemplatesSender
     ) {
-        $this->validator = $validator;
         $this->managerRegistry = $managerRegistry;
         $this->aggregatedEmailTemplatesSender = $aggregatedEmailTemplatesSender;
         $this->logger = new NullLogger();
@@ -47,24 +41,7 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $messageBody = array_merge(
-            ['from' => null, 'templateName' => null, 'recipients' => [], 'entity' => []],
-            JSON::decode($message->getBody())
-        );
-
-        $from = $messageBody['from'];
-        if (!$this->validateAddress($from)) {
-            $this->logger->error(sprintf('Parameter "from" must contain a valid email address, got "%s".', $from));
-
-            return self::REJECT;
-        }
-
-        $templateName = $messageBody['templateName'];
-        if (!$templateName) {
-            $this->logger->error('Parameter "templateName" must contain a valid template name.');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         $recipients = $this->getRecipients($messageBody);
         if (!$recipients) {
@@ -77,7 +54,12 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
         }
 
         try {
-            $this->aggregatedEmailTemplatesSender->send($entity, $recipients, From::emailAddress($from), $templateName);
+            $this->aggregatedEmailTemplatesSender->send(
+                $entity,
+                $recipients,
+                From::emailAddress($messageBody['from']),
+                $messageBody['templateName']
+            );
         } catch (\Exception $exception) {
             $this->logger->error('Cannot send email template.', ['exception' => $exception]);
 
@@ -90,23 +72,8 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
     private function getRecipients(array $messageBody): array
     {
         $recipients = [];
-        if (is_array($messageBody['recipients'])) {
-            foreach ($messageBody['recipients'] as $recipient) {
-                if (!$this->validateAddress($recipient)) {
-                    $this->logger->error(
-                        sprintf('Parameter "recipients" must contain only valid email addresses, got "%s".', $recipient)
-                    );
-
-                    $recipients = [];
-                    break;
-                }
-
-                $recipients[] = new Recipient($recipient);
-            }
-        }
-
-        if (!$recipients) {
-            $this->logger->error('Recipients list is empty');
+        foreach ($messageBody['recipients'] as $recipient) {
+            $recipients[] = new Recipient($recipient);
         }
 
         return $recipients;
@@ -114,17 +81,6 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
 
     private function getEntity(array $messageBody): ?object
     {
-        if (!is_array($messageBody['entity']) || count($messageBody['entity']) !== 2) {
-            $this->logger->error(
-                sprintf(
-                    'Parameter "entity" must be an array [string $entityClass, int $entityId], got "%s".',
-                    json_encode($messageBody['entity'])
-                )
-            );
-
-            return null;
-        }
-
         [$entityClass, $entityId] = $messageBody['entity'];
         $entity = $this->managerRegistry->getManagerForClass($entityClass)->find($entityClass, $entityId);
         if (!$entity) {
@@ -138,23 +94,11 @@ class SendEmailTemplateProcessor implements MessageProcessorInterface, TopicSubs
         return $entity;
     }
 
-    private function validateAddress(?string $email): bool
-    {
-        static $emailConstraint;
-        if (!$emailConstraint) {
-            $emailConstraint = new EmailConstraint();
-        }
-
-        $errorList = $this->validator->validate($email, $emailConstraint);
-
-        return !$errorList->count();
-    }
-
     /**
      * {@inheritdoc}
      */
     public static function getSubscribedTopics(): array
     {
-        return [Topics::SEND_EMAIL_TEMPLATE];
+        return [SendEmailTemplateTopic::getName()];
     }
 }

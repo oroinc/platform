@@ -43,6 +43,12 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
             new LoggerExtension($logger)
         ]));
 
-        self::assertFalse($logger->hasErrorRecords());
+        self::assertFalse(
+            $logger->hasErrorRecords(),
+            sprintf(
+                'Error log records were expected to be empty, got %s',
+                var_export($logger->getLogsByLevel('error'), true)
+            )
+        );
     }
 }

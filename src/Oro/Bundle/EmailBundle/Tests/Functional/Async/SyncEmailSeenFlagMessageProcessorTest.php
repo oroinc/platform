@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
 use Monolog\Handler\TestHandler;
 use Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SyncEmailSeenFlagTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -14,7 +14,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Util\JSON;
 use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 use Symfony\Bridge\Monolog\Logger;
 
@@ -46,13 +45,13 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $emailUser->setSeen(true);
         $this->getEntityManager()->flush();
 
-        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => $emailUser->getId(), 'seen' => true]);
+        $this->assertMessageSent(SyncEmailSeenFlagTopic::getName(), ['id' => $emailUser->getId(), 'seen' => true]);
 
         // setUnseen
         $emailUser->setSeen(false);
         $this->getEntityManager()->flush();
 
-        $this->assertMessageSent(Topics::SYNC_EMAIL_SEEN_FLAG, ['id' => $emailUser->getId(), 'seen' => false]);
+        $this->assertMessageSent(SyncEmailSeenFlagTopic::getName(), ['id' => $emailUser->getId(), 'seen' => false]);
     }
 
     public function testProcessWithEmptyFoldersCollection()
@@ -67,10 +66,10 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
         $session = $connection->createSession();
 
-        $messageData = $this->getSentMessage(Topics::SYNC_EMAIL_SEEN_FLAG);
+        $messageData = $this->getSentMessage(SyncEmailSeenFlagTopic::getName());
 
         $message = new Message();
-        $message->setBody(JSON::encode($messageData));
+        $message->setBody($messageData);
 
         $this->assertEquals(SyncEmailSeenFlagMessageProcessor::ACK, $processor->process($message, $session));
     }
@@ -99,10 +98,10 @@ class SyncEmailSeenFlagMessageProcessorTest extends WebTestCase
         $connection = $this->getContainer()->get('oro_message_queue.transport.connection');
         $session = $connection->createSession();
 
-        $messageData = $this->getSentMessage(Topics::SYNC_EMAIL_SEEN_FLAG);
+        $messageData = $this->getSentMessage(SyncEmailSeenFlagTopic::getName());
 
         $message = new Message();
-        $message->setBody(JSON::encode($messageData));
+        $message->setBody($messageData);
 
         /** @var Logger $logger */
         $logger = $this->getContainer()->get('logger');

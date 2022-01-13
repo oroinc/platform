@@ -4,19 +4,20 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByRangeMessageProcessor;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByRangeTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredAttributes()
     {
+        $this->expectNotToPerformAssertions();
+
         new IndexEntitiesByRangeMessageProcessor(
             $this->createMock(ManagerRegistry::class),
             $this->createMock(IndexerInterface::class),
@@ -29,7 +30,7 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
     {
         $this->assertEquals(
             [
-                Topics::INDEX_ENTITY_BY_RANGE
+                IndexEntitiesByRangeTopic::getName()
             ],
             IndexEntitiesByRangeMessageProcessor::getSubscribedTopics()
         );
@@ -40,11 +41,11 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'offset' => 123,
             'limit' => 1000,
             'jobId' => 12345,
-        ]));
+        ]);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -71,11 +72,11 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'entityClass' => 'entity-name',
             'limit' => 6789,
             'jobId' => 12345,
-        ]));
+        ]);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -103,11 +104,11 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $doctrine = $this->createMock(ManagerRegistry::class);
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'entityClass' => 'entity-name',
             'offset' => 6789,
             'jobId' => 12345,
-        ]));
+        ]);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -137,12 +138,12 @@ class IndexEntitiesByRangeMessageProcessorTest extends \PHPUnit\Framework\TestCa
             ->method('getManagerForClass');
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'entityClass' => 'entity-name',
             'offset' => 1235,
             'limit' => 6789,
             'jobId' => 12345,
-        ]));
+        ]);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
