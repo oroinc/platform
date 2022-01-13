@@ -77,7 +77,7 @@ class HtmlTagProviderTest extends WebTestCase
         'section',
         'small',
         'strike',
-        'source[srcset|media]',
+        'source[srcset|type|media|sizes]',
         'sub',
         'sup',
         'time',
