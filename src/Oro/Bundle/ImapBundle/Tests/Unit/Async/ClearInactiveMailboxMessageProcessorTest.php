@@ -3,19 +3,20 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Async;
 
 use Oro\Bundle\ImapBundle\Async\ClearInactiveMailboxMessageProcessor;
-use Oro\Bundle\ImapBundle\Async\Topics;
+use Oro\Bundle\ImapBundle\Async\Topic\ClearInactiveMailboxTopic;
 use Oro\Bundle\ImapBundle\Manager\ImapClearManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredAttributes()
     {
+        $this->expectNotToPerformAssertions();
+
         new ClearInactiveMailboxMessageProcessor(
             $this->createMock(ImapClearManager::class),
             $this->createMock(JobRunner::class),
@@ -26,7 +27,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
     public function testShouldBeSubscribedForTopics()
     {
         $expectedSubscribedTopics = [
-            Topics::CLEAR_INACTIVE_MAILBOX
+            ClearInactiveMailboxTopic::getName()
         ];
 
         $this->assertEquals($expectedSubscribedTopics, ClearInactiveMailboxMessageProcessor::getSubscribedTopics());
@@ -43,7 +44,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
 
         $message = new Message();
         $message->setMessageId('12345');
-        $message->setBody(JSON::encode([]));
+        $message->setBody([]);
 
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())

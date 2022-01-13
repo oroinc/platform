@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponsesTopic;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureCheckerHolderTrait;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureToggleableInterface;
@@ -52,7 +52,7 @@ class AutoResponseListener extends MailboxEmailListener implements
 
         /** @var MessageProducerInterface $producer */
         $producer = $this->container->get(MessageProducerInterface::class);
-        $producer->send(Topics::SEND_AUTO_RESPONSES, ['ids' => $emailIds]);
+        $producer->send(SendAutoResponsesTopic::getName(), ['ids' => $emailIds]);
     }
 
     /**

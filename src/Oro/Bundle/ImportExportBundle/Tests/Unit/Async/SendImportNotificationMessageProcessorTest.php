@@ -10,7 +10,7 @@ use Oro\Bundle\ImportExportBundle\Async\Topics;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -161,11 +161,10 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
         $producer->expects(self::once())
             ->method('send')
             ->with(
-                NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE,
+                SendEmailNotificationTemplateTopic::getName(),
                 [
                     'from' => $sender->toString(),
                     'templateParams' => ['data' => 'summary import information'],
-                    'contentType' => 'text/html',
                     'recipientUserId' => 1,
                     'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
                 ]

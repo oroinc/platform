@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalSession;
 use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -130,9 +131,10 @@ class DbalMessageConsumerTest extends WebTestCase
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
 
+        $messageBody = 'message';
         $dbal->insert('message_queue', [
             'priority' => 1,
-            'body' => 'message',
+            'body' => JSON::encode($messageBody),
             'queue' => 'default',
         ]);
         $id = (int) $dbal->lastInsertId('message_queue_id_seq');
@@ -148,7 +150,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         $this->assertInstanceOf(DbalMessage::class, $message);
         $this->assertEquals($id, $message->getId());
-        $this->assertEquals('message', $message->getBody());
+        $this->assertEquals($messageBody, $message->getBody());
     }
 
     public function testShouldReceiveMessageWithHighestPriorityFirst(): void

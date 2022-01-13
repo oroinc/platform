@@ -30,6 +30,7 @@ class OroSearchExtension extends Extension
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
         $loader->load('search.yml');
+        $loader->load('mq_topics.yml');
     }
 
     /**

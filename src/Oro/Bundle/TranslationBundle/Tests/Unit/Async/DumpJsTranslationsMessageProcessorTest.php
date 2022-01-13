@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Async;
 
 use Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageProcessor;
-use Oro\Bundle\TranslationBundle\Async\Topics;
+use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -13,11 +13,9 @@ use Symfony\Component\Filesystem\Exception\IOException;
 
 class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
-    private $dumper;
+    private JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject $dumper;
 
-    /** @var DumpJsTranslationsMessageProcessor */
-    private $processor;
+    private DumpJsTranslationsMessageProcessor $processor;
 
     protected function setUp(): void
     {
@@ -32,7 +30,7 @@ class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetSubscribedTopics()
     {
-        $this->assertEquals([Topics::JS_TRANSLATIONS_DUMP], $this->processor->getSubscribedTopics());
+        $this->assertEquals([DumpJsTranslationsTopic::getName()], $this->processor->getSubscribedTopics());
     }
 
     public function testProcess()

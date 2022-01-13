@@ -8,7 +8,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
@@ -38,40 +37,6 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $this->commandRunnerProcessor->setLogger($this->logger);
     }
 
-    public function testProcessWithoutCommand()
-    {
-        $message = new Message();
-        $message->setBody('');
-
-        $this->logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message: empty command');
-
-        $session = $this->createMock(SessionInterface::class);
-        $result = $this->commandRunnerProcessor->process($message, $session);
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    /**
-     * @dataProvider argumentsDataProvider
-     */
-    public function testProcessInvalidArguments($arguments)
-    {
-        $message = new Message();
-        $message->setBody(JSON::encode([
-            'command' => 'test:command',
-            'arguments' => $arguments
-        ]));
-
-        $this->logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message: "arguments" must be of type array', ['message' => $message]);
-
-        $session = $this->createMock(SessionInterface::class);
-        $result = $this->commandRunnerProcessor->process($message, $session);
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
     /**
      * @dataProvider jobDataProvider
      *
@@ -84,10 +49,10 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $commandArguments = ['argKey' => 'argVal'];
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'command' => $commandName,
             'arguments' => $commandArguments,
-        ]));
+        ]);
 
         $this->logger->expects($this->never())
             ->method('critical');
@@ -122,11 +87,11 @@ class CommandRunnerProcessorTest extends \PHPUnit\Framework\TestCase
         $commandArguments = ['argKey' => 'argVal'];
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'jobId' => $jobId,
             'command' => $commandName,
             'arguments' => $commandArguments,
-        ]));
+        ]);
 
         $this->logger->expects($this->never())
             ->method('critical');

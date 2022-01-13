@@ -62,8 +62,7 @@ class ExecuteProcessJobProcessorTest extends \PHPUnit\Framework\TestCase
         $message = new Message();
         $message->setBody('{]');
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The malformed json given.');
+        $this->expectException(\JsonException::class);
 
         $session = $this->createMock(SessionInterface::class);
         $processor->process($message, $session);

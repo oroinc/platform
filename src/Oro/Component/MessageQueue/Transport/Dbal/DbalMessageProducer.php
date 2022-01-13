@@ -33,7 +33,7 @@ class DbalMessageProducer implements MessageProducerInterface
     public function send(QueueInterface $queue, MessageInterface $message): void
     {
         $dbalMessage = [
-            'body' => $message->getBody(),
+            'body' => JSON::encode($message->getBody()),
             'headers' => JSON::encode($message->getHeaders()),
             'properties' => JSON::encode($message->getProperties()),
             'priority' => $message->getPriority(),

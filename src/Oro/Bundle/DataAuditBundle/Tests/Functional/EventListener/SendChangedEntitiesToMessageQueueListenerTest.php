@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic;
 use Oro\Bundle\DataAuditBundle\EventListener\SendChangedEntitiesToMessageQueueListener;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
@@ -66,7 +66,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
     private static function assertSentChanges(array $expectedChanges): void
     {
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
         self::assertEquals(
             $expectedChanges,
@@ -94,7 +94,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        self::assertMessagesCount(Topics::ENTITIES_CHANGED, 1);
+        self::assertMessagesCount(AuditChangedEntitiesTopic::getName(), 1);
     }
 
     public function testShouldDoNothingIfListenerDisabled()
@@ -109,7 +109,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($owner);
         $em->flush();
 
-        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+        self::assertMessagesEmpty(AuditChangedEntitiesTopic::getName());
     }
 
     /**
@@ -138,7 +138,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
         $this->assertInstanceOf(Message::class, $message);
 
@@ -171,7 +171,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         self::assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
     }
 
@@ -190,7 +190,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('timestamp', $body);
@@ -215,7 +215,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('transaction_id', $body);
@@ -591,7 +591,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $toBeSetChild->setOwner($owner);
         $em->flush();
 
-        self::assertMessagesEmpty(Topics::ENTITIES_CHANGED);
+        self::assertMessagesEmpty(AuditChangedEntitiesTopic::getName());
     }
 
     public function testShouldSendEntitySetToManyToOneAssociation()
@@ -804,7 +804,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        self::assertMessageSent(Topics::ENTITIES_CHANGED);
+        self::assertMessageSent(AuditChangedEntitiesTopic::getName());
     }
 
     public function testShouldSendInBatches()
@@ -836,7 +836,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $sentMessages = self::getSentMessagesByTopic(Topics::ENTITIES_CHANGED);
+        $sentMessages = self::getSentMessagesByTopic(AuditChangedEntitiesTopic::getName());
 
         self::assertCount(2, $sentMessages);
     }
@@ -856,7 +856,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayNotHasKey('user_id', $body);
@@ -881,7 +881,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('user_id', $body);
@@ -909,7 +909,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('owner_description', $body);
@@ -934,7 +934,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('organization_id', $body);
@@ -960,7 +960,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('impersonation_id', $body);
@@ -987,7 +987,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $sentMessages = self::getSentMessages();
         $this->assertCount(2, $sentMessages);
         $additionalMessage = end($sentMessages);
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $additionalMessage['topic']);
+        $this->assertEquals(AuditChangedEntitiesTopic::getName(), $additionalMessage['topic']);
         $expectedEntitiesUpdated = [
             spl_object_hash($entity) => [
                 'entity_class' => TestAuditDataOwner::class,
@@ -1088,7 +1088,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $sentMessages = self::getSentMessages();
         $this->assertCount(2, $sentMessages);
         $additionalMessage = end($sentMessages);
-        $this->assertEquals(Topics::ENTITIES_CHANGED, $additionalMessage['topic']);
+        $this->assertEquals(AuditChangedEntitiesTopic::getName(), $additionalMessage['topic']);
         $expectedEntitiesUpdated = [
             spl_object_hash($entity) => [
                 'entity_class' => TestAuditDataOwner::class,
@@ -1234,7 +1234,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('owner_description', $body);
@@ -1257,7 +1257,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->flush();
 
         /** @var Message $message */
-        $message = self::getSentMessage(Topics::ENTITIES_CHANGED);
+        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         $body = $message->getBody();
 
         self::assertArrayHasKey('owner_description', $body);

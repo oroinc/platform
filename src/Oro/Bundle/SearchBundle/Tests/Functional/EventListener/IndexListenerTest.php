@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -33,7 +33,7 @@ class IndexListenerTest extends WebTestCase
         $em->persist($item);
         $em->flush();
 
-        self::assertMessageSent(Topics::INDEX_ENTITIES, [
+        self::assertMessageSent(IndexEntitiesByIdTopic::getName(), [
             'class' => Item::class,
             'entityIds' => [$item->getId() => $item->getId()],
         ]);
@@ -52,7 +52,7 @@ class IndexListenerTest extends WebTestCase
         $item->stringValue = 'value';
         $em->flush();
 
-        self::assertMessageSent(Topics::INDEX_ENTITIES, [
+        self::assertMessageSent(IndexEntitiesByIdTopic::getName(), [
             'class' => Item::class,
             'entityIds' => [$item->getId() => $item->getId()],
         ]);
@@ -75,7 +75,7 @@ class IndexListenerTest extends WebTestCase
         $em->remove($item);
         $em->flush();
 
-        self::assertMessageSent(Topics::INDEX_ENTITIES, [
+        self::assertMessageSent(IndexEntitiesByIdTopic::getName(), [
             'class' => Item::class,
             'entityIds' => [$itemId => $itemId],
         ]);

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
 use Oro\Bundle\EmailBundle\Async\AddEmailAssociationsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -17,83 +17,13 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new AddEmailAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
             $this->createMock(JobRunner::class),
             $this->createMock(LoggerInterface::class)
         );
-    }
-
-    public function testShouldRejectMessageIfEmailIdsIsMissing()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new Message();
-        $message->setBody(json_encode([
-            'targetClass' => 'class',
-            'targetId' => 123,
-        ], JSON_THROW_ON_ERROR));
-
-        $processor = new AddEmailAssociationsMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(JobRunner::class),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageIfTargetClassMissing()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new Message();
-        $message->setBody(json_encode([
-            'emailIds' => [],
-            'targetId' => 123,
-        ], JSON_THROW_ON_ERROR));
-
-        $processor = new AddEmailAssociationsMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(JobRunner::class),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageIfTargetIdMissing()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new Message();
-        $message->setBody(json_encode([
-            'emailIds' => [],
-            'targetClass' => 'class',
-        ], JSON_THROW_ON_ERROR));
-
-        $processor = new AddEmailAssociationsMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(JobRunner::class),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldProcessAddAssociation()
@@ -136,7 +66,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
         ];
 
         $message = new Message();
-        $message->setBody(json_encode($body, JSON_THROW_ON_ERROR));
+        $message->setBody($body);
         $message->setMessageId('message-id');
 
         $jobRunner = $this->createMock(JobRunner::class);
@@ -184,7 +114,7 @@ class AddEmailAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCa
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [Topics::ADD_ASSOCIATION_TO_EMAILS],
+            [AddEmailAssociationsTopic::getName()],
             AddEmailAssociationsMessageProcessor::getSubscribedTopics()
         );
     }

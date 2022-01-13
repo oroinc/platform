@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponsesTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\EventListener\AutoResponseListener;
@@ -45,7 +45,7 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->producer->expects($this->once())
             ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [123, 12345]]);
+            ->with(SendAutoResponsesTopic::getName(), ['ids' => [123, 12345]]);
 
         $email1 = new Email();
         ReflectionUtil::setId($email1, 123);
@@ -97,7 +97,7 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->producer->expects($this->once())
             ->method('send')
-            ->with(Topics::SEND_AUTO_RESPONSES, ['ids' => [12345]]);
+            ->with(SendAutoResponsesTopic::getName(), ['ids' => [12345]]);
 
         $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }

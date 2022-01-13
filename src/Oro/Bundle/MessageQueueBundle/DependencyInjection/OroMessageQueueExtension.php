@@ -7,6 +7,7 @@ use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestBufferedMessa
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\Environment\TestMessageBufferManager;
 use Oro\Component\MessageQueue\Client\DbalDriver;
 use Oro\Component\MessageQueue\Client\TraceableMessageProducer;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -45,6 +46,7 @@ class OroMessageQueueExtension extends Extension
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
 
         if (isset($config['client'])) {
             $loader->load('client.yml');
@@ -86,6 +88,10 @@ class OroMessageQueueExtension extends Extension
         $this->setPersistenceServicesAndProcessors($config, $container);
         $this->setSecurityAgnosticTopicsAndProcessors($config, $container);
         $this->setJobConfigurationProvider($config, $container);
+
+        $container
+            ->registerForAutoconfiguration(TopicInterface::class)
+            ->addTag('oro_message_queue.topic');
 
         if ('test' === $environment) {
             $loader->load('services_test.yml');

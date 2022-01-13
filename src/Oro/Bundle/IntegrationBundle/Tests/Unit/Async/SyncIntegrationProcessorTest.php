@@ -91,8 +91,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldThrowIfMessageBodyInvalidJson()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('The malformed json given.');
+        $this->expectException(\JsonException::class);
 
         $processor = new SyncIntegrationProcessor(
             $this->createDoctrine(),

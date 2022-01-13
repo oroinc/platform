@@ -6,28 +6,36 @@ use Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider;
 use Oro\Component\MessageQueue\Client\Meta\TopicMeta;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\TopicsCommand;
+use Oro\Component\MessageQueue\Tests\Unit\Stub\TopicStub;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 {
-    private TopicMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $topicRegistry;
+    private TopicRegistry|\PHPUnit\Framework\MockObject\MockObject $topicRegistry;
+
+    private TopicMetaRegistry|\PHPUnit\Framework\MockObject\MockObject $topicMetaRegistry;
 
     private TopicDescriptionProvider|\PHPUnit\Framework\MockObject\MockObject $topicDescriptionProvider;
 
     private TopicsCommand $command;
 
-
     protected function setUp(): void
     {
-        $this->topicRegistry = $this->createMock(TopicMetaRegistry::class);
+        $this->topicRegistry = $this->createMock(TopicRegistry::class);
+        $this->topicMetaRegistry = $this->createMock(TopicMetaRegistry::class);
         $this->topicDescriptionProvider = $this->createMock(TopicDescriptionProvider::class);
 
-        $this->command = new TopicsCommand($this->topicRegistry, $this->topicDescriptionProvider);
+        $this->command = new TopicsCommand(
+            $this->topicRegistry,
+            $this->topicMetaRegistry,
+            $this->topicDescriptionProvider
+        );
     }
 
     public function testShouldShowMessageFoundZeroTopicsIfAnythingInRegistry(): void
     {
-        $this->topicRegistry->expects(self::once())
+        $this->topicMetaRegistry->expects(self::once())
             ->method('getTopicsMeta')
             ->willReturn([]);
 
@@ -38,7 +46,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldShowMessageFoundTwoTopics(): void
     {
-        $this->topicRegistry->expects(self::once())
+        $this->topicMetaRegistry->expects(self::once())
             ->method('getTopicsMeta')
             ->willReturn(
                 [
@@ -47,6 +55,11 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $this->topicRegistry
+            ->expects(self::exactly(2))
+            ->method('get')
+            ->willReturn(new TopicStub());
+
         $output = $this->executeCommand();
 
         self::assertStringContainsString('Found 2 topics', $output);
@@ -54,7 +67,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldShowInfoAboutTopics(): void
     {
-        $this->topicRegistry
+        $this->topicMetaRegistry
             ->expects(self::once())
             ->method('getTopicsMeta')
             ->willReturn(
@@ -63,6 +76,11 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
                     new TopicMeta('sample_topic2', ['sample_queue'], ['sample_queue' => 'sample_processor2']),
                 ]
             );
+
+        $this->topicRegistry
+            ->expects(self::exactly(2))
+            ->method('get')
+            ->willReturn(new TopicStub());
 
         $this->topicDescriptionProvider
             ->expects(self::exactly(2))
@@ -82,6 +100,7 @@ class TopicsCommandTest extends \PHPUnit\Framework\TestCase
         self::assertStringContainsString('sample_topic2', $output);
         self::assertStringContainsString('sample_description2', $output);
         self::assertStringContainsString('sample_processor2', $output);
+        self::assertStringContainsString('Normal', $output);
     }
 
     /**

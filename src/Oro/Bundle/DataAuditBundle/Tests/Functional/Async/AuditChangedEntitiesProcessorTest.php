@@ -4,7 +4,8 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesProcessor;
-use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesRelationsTopic;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
@@ -15,7 +16,6 @@ use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -108,16 +108,16 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
                 ]
             ],
         ]);
-        $expectedBody = json_decode($message->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $expectedBody = $message->getBody();
 
         $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertMessageSent(
-            Topics::ENTITIES_RELATIONS_CHANGED,
+            AuditChangedEntitiesRelationsTopic::getName(),
             $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
         );
         $this->assertMessageSent(
-            Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
+            AuditChangedEntitiesInverseRelationsTopic::getName(),
             $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
         );
     }
@@ -132,12 +132,12 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
             'entities_deleted' => [],
             'collections_updated' => [],
         ]);
-        $expectedBody = json_decode($message->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        $expectedBody = $message->getBody();
 
         $this->processor->process($message, $this->getConnection()->createSession());
 
         $this->assertMessageSent(
-            Topics::ENTITIES_INVERSED_RELATIONS_CHANGED,
+            AuditChangedEntitiesInverseRelationsTopic::getName(),
             $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
         );
     }
@@ -792,7 +792,7 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     private function createMessage(array $body): TransportMessage
     {
         $message = new TransportMessage();
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
 
         return $message;
     }

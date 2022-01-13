@@ -7,6 +7,8 @@ use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 
 /**
  * Knows about the list of queues associated with the topic, returns the list of recipients.
@@ -15,18 +17,22 @@ class MessageRouter implements MessageRouterInterface
 {
     private DriverInterface $driver;
 
+    private TopicRegistry $topicRegistry;
+
     private TopicMetaRegistry $topicMetaRegistry;
 
     private DestinationMetaRegistry $destinationMetaRegistry;
 
     public function __construct(
         DriverInterface $driver,
+        TopicRegistry $topicRegistry,
         TopicMetaRegistry $topicMetaRegistry,
         DestinationMetaRegistry $destinationMetaRegistry
     ) {
         $this->driver = $driver;
-        $this->destinationMetaRegistry = $destinationMetaRegistry;
+        $this->topicRegistry = $topicRegistry;
         $this->topicMetaRegistry = $topicMetaRegistry;
+        $this->destinationMetaRegistry = $destinationMetaRegistry;
     }
 
     /**
@@ -41,19 +47,25 @@ class MessageRouter implements MessageRouterInterface
             );
         }
 
+        $topic = $this->topicRegistry->get($topicName);
         $topicMeta = $this->topicMetaRegistry->getTopicMeta($topicName);
         foreach ($topicMeta->getQueueNames() as $queueName) {
-            $transportQueueName = $this->destinationMetaRegistry
-                ->getDestinationMeta($queueName)
-                ->getTransportQueueName();
-
-            yield $this->createEnvelope($message, $transportQueueName);
+            yield $this->createEnvelope($message, $topic, $queueName);
         }
     }
 
-    private function createEnvelope(Message $message, string $transportQueueName): Envelope
+    private function createEnvelope(Message $message, TopicInterface $topic, string $queueName): Envelope
     {
         $newMessage = clone $message;
+
+        if (!$message->getPriority()) {
+            $newMessage->setPriority($topic->getDefaultPriority($queueName));
+        }
+
+        $transportQueueName = $this->destinationMetaRegistry
+            ->getDestinationMeta($queueName)
+            ->getTransportQueueName();
+
         $newMessage->setProperty(Config::PARAMETER_QUEUE_NAME, $transportQueueName);
 
         $queue = $this->driver->createQueue($transportQueueName);

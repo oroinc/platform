@@ -42,6 +42,10 @@ services:
         arguments:
             - '@oro_message_queue.client.driver'
             - '@oro_message_queue.router.message_router'
+            - '@oro_message_queue.client.message_body_resolver'
+            - '%kernel.debug%'
+        calls:
+            - [setLogger, ['@logger']]
 
     Oro\Component\MessageQueue\Client\MessageProducerInterface:
         alias: 'oro_message_queue.client.message_producer'
@@ -54,6 +58,7 @@ services:
         class: 'Oro\Component\MessageQueue\Client\Router\MessageRouter'
         arguments:
             - '@oro_message_queue.client.driver'
+            - '@oro_message_queue.topic.registry'
             - '@oro_message_queue.client.meta.topic_meta_registry'
             - '@oro_message_queue.client.meta.destination_meta_registry'
 
@@ -79,7 +84,7 @@ services:
     oro_message_queue.client.meta.topic_description_provider:
         class: 'Oro\Component\MessageQueue\Client\Meta\TopicDescriptionProvider'
         arguments:
-            - [] # !abstract defined in AddTopicDescriptionPass
+            - '@oro_message_queue.topic.registry'
 
     oro_message_queue.client.noop_message_processor:
         class: 'Oro\Component\MessageQueue\Client\NoopMessageProcessor'
@@ -93,6 +98,15 @@ services:
             - '@oro_message_queue.client.created_queues'
         tags:
             - { name: 'oro_message_queue.consumption.extension', priority: -10 }
+
+    oro_message_queue.client.extension.message_body_resolver:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageBodyResolverExtension'
+        arguments:
+            - '@oro_message_queue.topic.registry'
+            - '@oro_message_queue.client.message_body_resolver'
+        tags:
+            # Priority should be high enough to ensure that extensions which need message body are called later.
+            - { name: 'oro_message_queue.consumption.extension', persistent: true, priority: 250 }
 
     oro_message_queue.client.extension.message_processor_router:
         class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageProcessorRouterExtension'
@@ -171,3 +185,8 @@ services:
             - '@oro_message_queue.client.buffered_message_producer'
         tags:
             - { name: oro_message_queue.consumption.extension, priority: 255 }
+
+    oro_message_queue.client.message_body_resolver:
+        class: Oro\Component\MessageQueue\Client\MessageBodyResolver
+        arguments:
+            - '@oro_message_queue.topic.registry'

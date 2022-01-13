@@ -10,7 +10,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -79,7 +78,7 @@ class AuditChangedEntitiesInverseRelationsProcessorTest extends WebTestCase
     private function createMessage(array $body): MessageInterface
     {
         $message = new Message();
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
         $message->setMessageId('some_message_id');
 
         return $message;

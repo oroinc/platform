@@ -10,7 +10,7 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -183,7 +183,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('send')
             ->withConsecutive(
                 [
-                    NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE,
+                    SendEmailNotificationTemplateTopic::getName(),
                     self::callback(function ($message) {
                         return !empty($message['recipientUserId']) && $message['recipientUserId'] === self::USER_ID;
                     })

@@ -5,7 +5,8 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\Indexer;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByIdTopic;
+use Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic;
 use Oro\Bundle\SearchBundle\Transformer\MessageTransformer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -70,7 +71,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $result = $indexer->save(null);
 
         $this->assertFalse($result);
-        self::assertMessagesEmpty(Topics::INDEX_ENTITIES);
+        self::assertMessagesEmpty(IndexEntitiesByIdTopic::getName());
     }
 
     public function testDeleteShouldReturnFalseIfEntityIsNull()
@@ -87,7 +88,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $result = $indexer->delete(null);
 
         $this->assertFalse($result);
-        self::assertMessagesEmpty(Topics::INDEX_ENTITIES);
+        self::assertMessagesEmpty(IndexEntitiesByIdTopic::getName());
     }
 
     public function testSaveShouldAcceptSingleEntityAndSendMessageToProducer()
@@ -113,7 +114,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -141,7 +142,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -169,7 +170,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -197,7 +198,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITIES,
+            IndexEntitiesByIdTopic::getName(),
             ['class' => 'entity-name', 'entityIds' => [35 => 35]]
         );
     }
@@ -214,7 +215,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
         $indexer->reindex($class);
 
-        self::assertMessageSent(Topics::REINDEX, ['class-name']);
+        self::assertMessageSent(ReindexTopic::getName(), ['class-name']);
     }
 
     public function testReindexShouldAcceptArrayOfEntityClassesAndSendMessageToProducer()
@@ -229,7 +230,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
         $indexer->reindex($classes);
 
-        self::assertMessageSent(Topics::REINDEX, ['class-name']);
+        self::assertMessageSent(ReindexTopic::getName(), ['class-name']);
     }
 
     public function testReindexShouldAcceptNullAndSendMessageToProducer()
@@ -244,7 +245,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         );
         $indexer->reindex($classes);
 
-        self::assertMessageSent(Topics::REINDEX, []);
+        self::assertMessageSent(ReindexTopic::getName(), []);
     }
 
     public function testReindexShouldNotAcceptInvalidEntity()

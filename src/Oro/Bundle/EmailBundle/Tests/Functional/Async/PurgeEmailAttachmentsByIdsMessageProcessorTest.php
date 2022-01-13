@@ -11,7 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -60,7 +59,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $jobEm->flush();
 
         $message = new Message();
-        $message->setBody(JSON::encode(['jobId' => $subJob->getId(), 'ids' => $ids]));
+        $message->setBody(['jobId' => $subJob->getId(), 'ids' => $ids]);
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
 
@@ -101,7 +100,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $jobEm->flush();
 
         $message = new Message();
-        $message->setBody(JSON::encode(['jobId' => $subJob->getId(), 'ids' => $ids, 'size' => 3]));
+        $message->setBody(['jobId' => $subJob->getId(), 'ids' => $ids, 'size' => 3]);
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
 

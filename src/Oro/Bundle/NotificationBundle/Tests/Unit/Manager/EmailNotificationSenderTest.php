@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Model\EmailTemplate;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTopic;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationSender;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
@@ -56,7 +57,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
+            SendEmailNotificationTopic::getName(),
             [
                 'from'        => $sender->toString(),
                 'toEmail'     => $testReceiverEmail->getEmail(),
@@ -95,7 +96,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
+            SendEmailNotificationTopic::getName(),
             [
                 'from'        => $sender->toString(),
                 'toEmail'     => $testReceiverEmail->getEmail(),
@@ -129,7 +130,7 @@ class EmailNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->send($notification, $emailTemplateModel);
 
         self::assertMessageSent(
-            \Oro\Bundle\NotificationBundle\Async\Topics::SEND_NOTIFICATION_EMAIL,
+            SendEmailNotificationTopic::getName(),
             [
                 'from'        => $sender->toString(),
                 'toEmail'     => $testReceiverEmail->getEmail(),

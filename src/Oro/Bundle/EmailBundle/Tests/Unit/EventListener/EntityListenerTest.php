@@ -8,7 +8,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
@@ -145,10 +145,13 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->producer->expects($this->once())
             ->method('send')
-            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
-                'ownerClass' => TestEmailOwner::class,
-                'ownerIds' => [123],
-            ]);
+            ->with(
+                UpdateEmailOwnerAssociationsTopic::getName(),
+                [
+                    'ownerClass' => TestEmailOwner::class,
+                    'ownerIds' => [123],
+                ]
+            );
 
         $this->entityRepository->expects($this->any())
             ->method('findOneBy')
@@ -231,10 +234,13 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->producer->expects($this->once())
             ->method('send')
-            ->with(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
-                'ownerClass' => TestEmailOwner::class,
-                'ownerIds' => [123],
-            ]);
+            ->with(
+                UpdateEmailOwnerAssociationsTopic::getName(),
+                [
+                    'ownerClass' => TestEmailOwner::class,
+                    'ownerIds' => [123],
+                ]
+            );
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);

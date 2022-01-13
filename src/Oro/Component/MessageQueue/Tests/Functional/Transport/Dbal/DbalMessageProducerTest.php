@@ -58,7 +58,7 @@ class DbalMessageProducerTest extends WebTestCase
 
         $this->assertCount(1, $messages);
         $this->assertNotEmpty($messages[0]['id']);
-        $this->assertEquals('body', $messages[0]['body']);
+        $this->assertEquals('"body"', $messages[0]['body']);
         $this->assertEquals('{"hkey":"hvalue"}', $messages[0]['headers']);
         $this->assertEquals('{"pkey":"pvalue"}', $messages[0]['properties']);
         $this->assertNull($messages[0]['consumer_id']);

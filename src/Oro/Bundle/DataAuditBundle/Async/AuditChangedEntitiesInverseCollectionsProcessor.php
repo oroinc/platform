@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsChunkTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsTopic;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -10,7 +13,6 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -56,14 +58,13 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $body = JSON::decode($message->getBody());
         $messageId = $message->getMessageId();
         try {
-            return $this->processCollections($body, $messageId) ? self::ACK : self::REJECT;
+            return $this->processCollections($message->getBody(), $messageId) ? self::ACK : self::REJECT;
         } catch (\Exception $e) {
             $this->logger->error(
                 'Unexpected exception occurred during queue message processing',
-                ['topic' => Topics::ENTITIES_INVERSED_RELATIONS_CHANGED, 'exception' => $e]
+                ['topic' => AuditChangedEntitiesInverseRelationsTopic::getName(), 'exception' => $e]
             );
 
             return self::REJECT;
@@ -78,7 +79,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
      */
     protected function processCollections(array $body, string $messageId)
     {
-        $jobName = uniqid(sprintf('%s_', Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS));
+        $jobName = uniqid(sprintf('%s_', AuditChangedEntitiesInverseCollectionsTopic::getName()));
         $collectionsData = array_merge(
             $this->processEntityFromCollection($body['entities_inserted'], 'inserted'),
             $this->processEntityFromCollection($body['entities_updated'], 'changed'),
@@ -129,7 +130,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
                         $body['entityData'] = $entityData;
                         $body['jobId'] = $child->getId();
                         $this->producer->send(
-                            Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS_CHUNK,
+                            AuditChangedEntitiesInverseCollectionsChunkTopic::getName(),
                             new Message($body)
                         );
                     }
@@ -163,6 +164,6 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
      */
     public static function getSubscribedTopics(): array
     {
-        return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED_COLLECTIONS];
+        return [AuditChangedEntitiesInverseCollectionsTopic::getName()];
     }
 }

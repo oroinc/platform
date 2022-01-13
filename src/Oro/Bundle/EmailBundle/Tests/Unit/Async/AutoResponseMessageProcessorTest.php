@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponseTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -18,34 +18,14 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new AutoResponseMessageProcessor(
             $this->createMock(Registry::class),
             $this->createMock(AutoResponseManager::class),
             $this->createMock(JobRunner::class),
             $this->createMock(LoggerInterface::class)
         );
-    }
-
-    public function testShouldRejectMessageIfBodyIsInvalid()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $processor = new AutoResponseMessageProcessor(
-            $this->createMock(Registry::class),
-            $this->createMock(AutoResponseManager::class),
-            $this->createMock(JobRunner::class),
-            $logger
-        );
-
-        $message = new Message();
-        $message->setBody(json_encode(['key' => 'value'], JSON_THROW_ON_ERROR));
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldSendAutoResponse()
@@ -70,7 +50,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->identicalTo($email));
 
         $message = new Message();
-        $message->setBody(json_encode(['id' => 123, 'jobId' => 4321], JSON_THROW_ON_ERROR));
+        $message->setBody(['id' => 123, 'jobId' => 4321]);
 
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
@@ -125,7 +105,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(json_encode(['id' => 123, 'jobId' => 4321], JSON_THROW_ON_ERROR));
+        $message->setBody(['id' => 123, 'jobId' => 4321]);
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -134,6 +114,6 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnSubscribedTopics()
     {
-        $this->assertEquals([Topics::SEND_AUTO_RESPONSE], AutoResponseMessageProcessor::getSubscribedTopics());
+        $this->assertEquals([SendAutoResponseTopic::getName()], AutoResponseMessageProcessor::getSubscribedTopics());
     }
 }

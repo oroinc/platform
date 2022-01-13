@@ -6,7 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -115,12 +115,11 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
         $message = [
             'from' => $this->notificationSettings->getSender()->toString(),
             'recipientUserId' => $userId,
-            'contentType' => 'text/html',
             'template' => $template,
             'templateParams' => $templateParams,
         ];
 
-        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $message);
+        $this->producer->send(SendEmailNotificationTemplateTopic::getName(), $message);
 
         $this->logger->info('Sent notification message.');
     }

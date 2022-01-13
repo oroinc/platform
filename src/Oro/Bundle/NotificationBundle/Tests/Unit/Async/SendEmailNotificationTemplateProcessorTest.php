@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Manager\EmailTemplateManager;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\NotificationBundle\Async\SendEmailNotificationTemplateProcessor;
-use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -49,83 +49,8 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
     public function testGetSubscribedTopics(): void
     {
         self::assertEquals(
-            [Topics::SEND_NOTIFICATION_EMAIL_TEMPLATE],
+            [SendEmailNotificationTemplateTopic::getName()],
             SendEmailNotificationTemplateProcessor::getSubscribedTopics()
-        );
-    }
-
-    /**
-     * @dataProvider processRejectsMessageWhenBodyIsInvalidDataProvider
-     *
-     * @param array $messageBody
-     */
-    public function testProcessRejectsMessageWhenBodyIsInvalid(array $messageBody): void
-    {
-        $this->loggerMock->expects(self::once())
-            ->method('critical')
-            ->with('Message properties from, recipientUserId, template were not expected to be empty');
-
-        $this->emailTemplateManager->expects(self::never())
-            ->method(self::anything());
-
-        $message = new Message();
-        $message->setBody(json_encode($messageBody));
-
-        self::assertEquals(
-            MessageProcessorInterface::REJECT,
-            $this->processor->process($message, $this->createMock(SessionInterface::class))
-        );
-    }
-
-    public function processRejectsMessageWhenBodyIsInvalidDataProvider(): array
-    {
-        return [
-            'empty message body' => [[]],
-            'from present' => [['from' => 'from@example.com']],
-            'recipientUserId present' => [['recipientUserId' => 142]],
-            'template present' => [['template' => 'sample_template']],
-            'from missing' => [
-                [
-                    'recipientUserId' => 142,
-                    'template' => 'sample_template',
-                ],
-            ],
-            'recipientUserId missing' => [
-                [
-                    'from' => 'from@example.com',
-                    'template' => 'sample_template',
-                ],
-            ],
-            'template missing' => [
-                [
-                    'from' => 'from@example.com',
-                    'recipientUserId' => 142,
-                ],
-            ],
-        ];
-    }
-
-    public function testProcessRejectsMessageWhenTemplateParamsIsNotArray(): void
-    {
-        $this->loggerMock->expects(self::once())
-            ->method('critical')
-            ->with('Message property "templateParams" was expected to be array');
-
-        $this->emailTemplateManager->expects(self::never())
-            ->method(self::anything());
-
-        $message = new Message();
-        $messageBody = [
-            'from' => 'from@example.com',
-            'recipientUserId' => 142,
-            'template' => 'sample_template',
-            'templateParams' => 'invalid_params',
-        ];
-        $message->setBody(json_encode($messageBody));
-
-        self::assertEquals(
-            MessageProcessorInterface::REJECT,
-            $this->processor->process($message, $this->createMock(SessionInterface::class))
         );
     }
 
@@ -145,7 +70,7 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
             'template' => 'sample_template',
             'templateParams' => [],
         ];
-        $message->setBody(json_encode($messageBody));
+        $message->setBody($messageBody);
 
         self::assertEquals(
             MessageProcessorInterface::REJECT,
@@ -186,7 +111,7 @@ class SendEmailNotificationTemplateProcessorTest extends \PHPUnit\Framework\Test
             ->willReturn($sentCount);
 
         $message = new Message();
-        $message->setBody(json_encode($messageBody));
+        $message->setBody($messageBody);
 
         self::assertEquals(
             $expectedStatus,

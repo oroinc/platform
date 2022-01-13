@@ -302,14 +302,18 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 
         $deleteStatement->expects(static::once())->method('rowCount')->willReturn(1);
 
+        $messageBody = 'message.body';
+        $messageHeaders = ['header.key' => 'header.value'];
+        $messageProperties = ['property.key' => 'property.value'];
+
         $this->dbal->expects(static::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
         $this->dbal->expects(static::once())->method('prepare')->willReturn($deleteStatement);
         $this->dbal->expects(static::once())
             ->method('insert')
             ->with('oro_message_queue', [
-                'body' => 'message.body',
-                'headers' => '{"header.key":"header.value","priority":"1"}',
-                'properties' => '{"property.key":"property.value"}',
+                'body' => JSON::encode($messageBody),
+                'headers' => JSON::encode(array_merge($messageHeaders, ['priority' => '1'])),
+                'properties' => JSON::encode($messageProperties),
                 'priority' => 1,
                 'queue' => 'test_queue',
                 'redelivered' => true,
@@ -327,9 +331,9 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 
         $message = new DbalMessage();
         $message->setId(25);
-        $message->setBody('message.body');
-        $message->setHeaders(['header.key' => 'header.value']);
-        $message->setProperties(['property.key' => 'property.value']);
+        $message->setBody($messageBody);
+        $message->setHeaders($messageHeaders);
+        $message->setProperties($messageProperties);
         $message->setPriority(1);
         $message->setRedelivered(true);
 
@@ -365,10 +369,14 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
         $this->dbal->expects(static::once())->method('getDatabasePlatform')->willReturn(new MySqlPlatform());
         $this->dbal->expects(static::once())->method('prepare')->willReturn($deleteStatement);
 
+        $messageBody = 'message.body';
+        $messageHeaders = ['header.key' => 'header.value'];
+        $messageProperties = ['property.key' => 'property.value'];
+
         $dbalMessage = [
-            'body' => 'message.body',
-            'headers' => '{"header.key":"header.value","priority":"1"}',
-            'properties' => '{"property.key":"property.value"}',
+            'body' => JSON::encode($messageBody),
+            'headers' => JSON::encode(array_merge($messageHeaders, ['priority' => '1'])),
+            'properties' => JSON::encode($messageProperties),
             'priority' => 1,
             'queue' => 'test_queue',
             'redelivered' => true,
@@ -390,9 +398,9 @@ class DbalMessageConsumerTest extends \PHPUnit\Framework\TestCase
 
         $message = new DbalMessage();
         $message->setId(25);
-        $message->setBody('message.body');
-        $message->setHeaders(['header.key' => 'header.value']);
-        $message->setProperties(['property.key' => 'property.value']);
+        $message->setBody($messageBody);
+        $message->setHeaders($messageHeaders);
+        $message->setProperties($messageProperties);
         $message->setPriority(1);
         $message->setRedelivered(true);
 
