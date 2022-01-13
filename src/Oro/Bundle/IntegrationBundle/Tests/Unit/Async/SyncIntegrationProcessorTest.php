@@ -14,8 +14,8 @@ use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\SyncProcessorRegistry;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Authentication\Token\IntegrationTokenAwareTestTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\JobRunner;
@@ -34,6 +34,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
+    use IntegrationTokenAwareTestTrait;
 
     public function testShouldImplementMessageProcessorInterface()
     {
@@ -247,16 +248,11 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
 
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->expects($this->once())
-            ->method('setToken')
-            ->with($this->isInstanceOf(OrganizationToken::class));
-
         $syncProcessorRegistry = $this->createSyncProcessorRegistry($this->createSyncProcessor());
 
         $processor = new SyncIntegrationProcessor(
             $this->createDoctrine($entityManager),
-            $tokenStorage,
+            $this->getTokenStorageMock(),
             $syncProcessorRegistry,
             new JobRunner(),
             $this->createMock(LoggerInterface::class)

@@ -14,6 +14,7 @@ use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor;
 use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Tests\Unit\Authentication\Token\IntegrationTokenAwareTestTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -32,6 +33,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use ClassExtensionTrait;
+    use IntegrationTokenAwareTestTrait;
 
     public function testShouldImplementMessageProcessorInterface()
     {
@@ -238,7 +240,17 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $status);
     }
 
-    public function testShouldRunSyncAsUniqueJob()
+    public function testShouldRunSyncAsUniqueJobEmptyToken(): void
+    {
+        $this->shouldRunSyncAsUniqueJob($this->createMock(TokenStorageInterface::class));
+    }
+
+    public function testShouldRunSyncAsUniqueJobWithToken(): void
+    {
+        $this->shouldRunSyncAsUniqueJob($this->getTokenStorageMock());
+    }
+
+    private function shouldRunSyncAsUniqueJob(TokenStorageInterface $tokenStorage): void
     {
         $integration = new Integration();
         $integration->setEnabled(true);
@@ -263,7 +275,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
             $this->createReversSyncProcessor(),
             $typeRegistry,
             $jobRunner,
-            $this->createMock(TokenStorageInterface::class),
+            $tokenStorage,
             $this->createMock(LoggerInterface::class)
         );
 
