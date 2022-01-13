@@ -61,6 +61,9 @@ class ControlGroup extends Element
 
         switch ($expectedValueType) {
             case 'string':
+                if ('' === $expectedValue) {
+                    return '' === trim($actualValue);
+                }
                 return false !== stripos($actualValue, $expectedValue);
             case 'array':
                 sort($expectedValue);
