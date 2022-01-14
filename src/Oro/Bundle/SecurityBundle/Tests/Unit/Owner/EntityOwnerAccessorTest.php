@@ -84,7 +84,7 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
         $org = new \stdClass();
         $obj = new TestEntity(1, null, $org);
-        $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata(null, null, null, 'organization'));
+        $metadataProvider->setMetadata(get_class($obj), new OwnershipMetadata('', '', '', 'organization'));
         $this->assertSame($org, $accessor->getOrganization($obj));
     }
 }

@@ -65,7 +65,7 @@ class EmailBody
             $originalContentType = $originalContentType->getType();
         }
 
-        $this->originalContentType = strtolower($originalContentType);
+        $this->originalContentType = $originalContentType ? strtolower($originalContentType) : '';
 
         return $this;
     }

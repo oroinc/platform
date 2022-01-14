@@ -179,7 +179,7 @@ final class BigDecimal extends BigNumber
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         if ($this->getTargetObject() !== null) {
             throw new \LogicException('unserialize() must not be called directly.');

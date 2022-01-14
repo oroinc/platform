@@ -37,7 +37,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *      }
  * )
  */
-class File extends ExtendFile implements FileExtensionInterface, \Serializable
+class File extends ExtendFile implements FileExtensionInterface
 {
     /**
      * @var integer
@@ -451,28 +451,22 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         $this->parentEntityId = null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->id,
             $this->filename,
             $this->uuid,
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         [
             $this->id,
             $this->filename,
-            $this->uuid
-        ] = unserialize($serialized);
+            $this->uuid,
+        ] = $serialized;
     }
 
     /**

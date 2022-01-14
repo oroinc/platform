@@ -24,7 +24,6 @@ use Symfony\Component\Security\Core\User\UserInterface as SymfonyUserInterface;
 abstract class AbstractUser implements
     UserInterface,
     LoginInfoInterface,
-    \Serializable,
     OrganizationAwareInterface,
     PasswordRecoveryInterface,
     EquatableInterface
@@ -255,27 +254,19 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(
-            [
-                $this->password,
-                $this->salt,
-                $this->username,
-                $this->enabled,
-                $this->confirmationToken,
-                $this->id,
-            ]
-        );
+        return [
+            $this->password,
+            $this->salt,
+            $this->username,
+            $this->enabled,
+            $this->confirmationToken,
+            $this->id,
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         [
             $this->password,
@@ -283,8 +274,8 @@ abstract class AbstractUser implements
             $this->username,
             $this->enabled,
             $this->confirmationToken,
-            $this->id
-            ] = unserialize($serialized);
+            $this->id,
+        ] = $serialized;
     }
 
     /**

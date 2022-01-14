@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 /**
  * Represents security metadata for a field.
  */
-class FieldSecurityMetadata implements \Serializable
+class FieldSecurityMetadata
 {
     /** @var string */
     private $fieldName;
@@ -109,34 +109,28 @@ class FieldSecurityMetadata implements \Serializable
         return $this->isHidden;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->fieldName,
             $this->label,
             $this->permissions,
             $this->description,
             $this->alias,
             $this->isHidden
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->fieldName,
             $this->label,
             $this->permissions,
             $this->description,
             $this->alias,
             $this->isHidden
-        ) = unserialize($serialized);
+        ] = $serialized;
     }
 
     /**

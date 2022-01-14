@@ -11,7 +11,7 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
  * Represents a resource which can be located in any bundle
  * and does not required any special registration in a bundle.
  */
-class CumulativeResource implements ResourceInterface, \Serializable, SelfCheckingResourceInterface
+class CumulativeResource implements ResourceInterface, SelfCheckingResourceInterface
 {
     /** @var string */
     private $resource;
@@ -126,19 +126,13 @@ class CumulativeResource implements ResourceInterface, \Serializable, SelfChecki
         return (string)$this->resource;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->resource, $this->found, $this->resourceLoaders]);
+        return [$this->resource, $this->found, $this->resourceLoaders];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($this->resource, $this->found, $this->resourceLoaders) = unserialize($serialized);
+        [$this->resource, $this->found, $this->resourceLoaders] = $serialized;
     }
 }

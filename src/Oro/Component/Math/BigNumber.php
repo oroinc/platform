@@ -13,7 +13,7 @@ use Brick\Math\BigRational as BrickBigRational;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-abstract class BigNumber implements \Serializable, \JsonSerializable
+abstract class BigNumber implements \JsonSerializable
 {
     /**
      * @var string Target Brick library class;
@@ -541,9 +541,9 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
      * @link http://php.net/manual/en/serializable.serialize.php
      * @return string the string representation of the object or null
      */
-    public function serialize()
+    public function __serialize(): array
     {
-        return $this->getTargetObject()->serialize();
+        return $this->getTargetObject()->__serialize();
     }
 
     /**
@@ -578,7 +578,7 @@ abstract class BigNumber implements \Serializable, \JsonSerializable
      * </p>
      * @return void
      */
-    abstract public function unserialize($serialized);
+    abstract public function __unserialize(array $serialized): void;
 
     /**
      * Returns target Brick BigNumber object for this instance

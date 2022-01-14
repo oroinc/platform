@@ -104,12 +104,12 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 $relatedClassName = $field['related_entity_name'];
                 $relatedFieldName = $dotPosition
                     ? substr($initialFieldName, $dotPosition + 1, strlen($initialFieldName))
-                    : null;
+                    : '';
 
                 return
                     $this->getFieldHeader($entityClassName, $field) .
                     $this->relationDelimiter .
-                    $this->getFieldHeaderWithRelation($relatedClassName, $relatedFieldName, $relatedFieldName === null);
+                    $this->getFieldHeaderWithRelation($relatedClassName, $relatedFieldName, $relatedFieldName === '');
             }
 
             return $this->getFieldHeader($entityClassName, $field);

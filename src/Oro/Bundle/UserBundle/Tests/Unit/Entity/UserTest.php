@@ -456,7 +456,7 @@ class UserTest extends AbstractUserTest
         ];
 
         $user = $this->getUser();
-        $user->unserialize(serialize($serialized));
+        $user->__unserialize($serialized);
 
         self::assertEquals($serialized[0], $user->getPassword());
         self::assertEquals($serialized[1], $user->getSalt());

@@ -7,7 +7,6 @@ use Oro\Bundle\IntegrationBundle\EventListener\MultiAttemptsClientDecoratorListe
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Decorator\MultiAttemptsClientDecorator;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\RestClientInterface;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Transport\RestTransportSettingsInterface;
-use Oro\Bundle\IntegrationBundle\Utils\MultiAttemptsConfigTrait;
 use Psr\Log\LoggerInterface;
 
 class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCase
@@ -46,7 +45,7 @@ class MultiAttemptsClientDecoratorListenerTest extends \PHPUnit\Framework\TestCa
 
     public function testDecoratorNotAttached()
     {
-        $configuration = MultiAttemptsConfigTrait::getMultiAttemptsDisabledConfig();
+        $configuration = MultiAttemptsClientDecoratorListener::getMultiAttemptsDisabledConfig();
 
         $client = $this->createMock(RestClientInterface::class);
         $transport = $this->createMock(RestTransportSettingsInterface::class);

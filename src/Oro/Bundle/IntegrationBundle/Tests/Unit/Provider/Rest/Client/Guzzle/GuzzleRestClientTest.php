@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Stream;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestClient;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
@@ -235,9 +236,14 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
         $response->expects(self::any())
             ->method('getStatusCode')
             ->willReturn(200);
+
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, '{"foo":"data"}');
+        rewind($stream);
+
         $response->expects(self::once())
             ->method('getBody')
-            ->willReturn('{"foo":"data"}');
+            ->willReturn(new Stream($stream));
 
         self::assertEquals($expectedResult, $this->client->getJSON($url, $params, $headers, $options));
     }

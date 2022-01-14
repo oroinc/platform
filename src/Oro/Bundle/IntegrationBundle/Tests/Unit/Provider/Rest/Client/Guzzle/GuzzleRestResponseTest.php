@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Provider\Rest\Client\Guzzle;
 
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Stream;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestException;
 use Oro\Bundle\IntegrationBundle\Provider\Rest\Client\Guzzle\GuzzleRestResponse;
 
@@ -36,9 +37,13 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     public function testGetBodyAsString()
     {
         $body = 'test';
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, $body);
+        rewind($stream);
+
         $this->sourceResponse->expects(self::once())
             ->method('getBody')
-            ->willReturn($body);
+            ->willReturn(new Stream($stream));
 
         $this->assertSame($body, $this->response->getBodyAsString());
     }
@@ -68,7 +73,7 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
     public function testGetHeader()
     {
         $name = 'someHeader';
-        $value = 'test';
+        $value = ['test'];
         $this->sourceResponse->expects(self::once())
             ->method('getHeader')
             ->with($name)
@@ -258,9 +263,13 @@ class GuzzleRestResponseTest extends \PHPUnit\Framework\TestCase
 
     public function testJson()
     {
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, '{"key": "val"}');
+        rewind($stream);
+
         $this->sourceResponse->expects(self::once())
             ->method('getBody')
-            ->willReturn('{"key": "val"}');
+            ->willReturn(new Stream($stream));
 
         $this->assertSame(['key' => 'val'], $this->response->json());
     }

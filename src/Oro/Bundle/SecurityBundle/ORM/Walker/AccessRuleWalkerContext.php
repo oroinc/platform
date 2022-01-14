@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 /**
  * Represents a context in which AccessRuleWalker works in.
  */
-class AccessRuleWalkerContext implements \Serializable
+class AccessRuleWalkerContext
 {
     /** @var AccessRuleExecutor Not serializable */
     private $accessRuleExecutor;
@@ -154,28 +154,20 @@ class AccessRuleWalkerContext implements \Serializable
         unset($this->options[$key]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return \json_encode(
-            \array_merge(
-                $this->options,
-                [
-                    'permission'      => $this->permission,
-                    'user_class'      => $this->userClass,
-                    'user_id'         => $this->userId,
-                    'organization_id' => $this->organizationId,
-                ]
-            )
+        return array_merge(
+            $this->options,
+            [
+                'permission'      => $this->permission,
+                'user_class'      => $this->userClass,
+                'user_id'         => $this->userId,
+                'organization_id' => $this->organizationId,
+            ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         throw new \RuntimeException('Not supported');
     }

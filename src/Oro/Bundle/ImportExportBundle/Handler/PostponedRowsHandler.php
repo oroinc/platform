@@ -142,7 +142,7 @@ class PostponedRowsHandler
     {
         $suffix = 'postponed:';
         $jobName = $currentJob->getName();
-        if (preg_match('/' . $suffix . '\d+$/', $jobName)) {
+        if ($jobName && preg_match('/' . $suffix . '\d+$/', $jobName)) {
             return preg_replace('/' . $suffix . '(\d+)$/', $suffix . $attempts, $jobName);
         }
 

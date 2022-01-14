@@ -28,7 +28,7 @@ class SoapClientTest extends \PHPUnit\Framework\TestCase
         $soapOptions = ['1', '2'];
         $settings = new SoapClientSettings($wsdlFilePath, $methodName, $soapOptions);
 
-        $soapResult = 'result';
+        $soapResult = true;
         $soapData = ['1', '2'];
 
         $soapClient = $this->createMock(\SoapClient::class);

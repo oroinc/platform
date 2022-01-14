@@ -18,7 +18,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param string $allowedElements
-     * @param string $expected
+     * @param array $expected
      *
      * @dataProvider elementsDataProvider
      */
@@ -33,7 +33,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     public function elementsDataProvider(): array
     {
         return [
-            [null, []],
+            ['', []],
             ['', []],
             ['p', ['p']],
             ['b/strong', ['b', 'strong']],
@@ -66,7 +66,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     public function attributesDataProvider(): array
     {
         return [
-            [null, []],
+            ['', []],
             ['', []],
             ['p', []],
             ['b/strong', []],

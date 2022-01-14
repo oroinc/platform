@@ -8,7 +8,7 @@ namespace Oro\Bundle\SecurityBundle\Annotation;
  * @Annotation
  * @Target({"METHOD", "CLASS"})
  */
-class Acl implements \Serializable
+class Acl
 {
     /** @var string */
     private $id;
@@ -191,12 +191,9 @@ class Acl implements \Serializable
         $this->category = $category;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->id,
             $this->type,
             $this->class,
@@ -206,15 +203,12 @@ class Acl implements \Serializable
             $this->label,
             $this->description,
             $this->category
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized):void
     {
-        list(
+        [
             $this->id,
             $this->type,
             $this->class,
@@ -224,7 +218,7 @@ class Acl implements \Serializable
             $this->label,
             $this->description,
             $this->category
-            ) = unserialize($serialized);
+        ] = $serialized;
     }
 
     /**
