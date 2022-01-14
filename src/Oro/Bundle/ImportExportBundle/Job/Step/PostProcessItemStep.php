@@ -29,7 +29,7 @@ class PostProcessItemStep extends ItemStep
     /**
      * @param string $jobName
      */
-    public function setPostProcessingJobs($jobName)
+    public function setPostProcessingJobs(string $jobName)
     {
         $this->postProcessingJobs = $this->scalarToArray($jobName);
     }
@@ -37,7 +37,7 @@ class PostProcessItemStep extends ItemStep
     /**
      * @param string $contextSharedKeys
      */
-    public function setContextSharedKeys($contextSharedKeys)
+    public function setContextSharedKeys(string $contextSharedKeys)
     {
         $this->contextSharedKeys = $this->scalarToArray($contextSharedKeys);
     }
@@ -84,7 +84,7 @@ class PostProcessItemStep extends ItemStep
      * @param string $scalar
      * @return array
      */
-    protected function scalarToArray($scalar)
+    protected function scalarToArray(string $scalar)
     {
         $result = explode(',', $scalar);
         $result = array_map('trim', $result);

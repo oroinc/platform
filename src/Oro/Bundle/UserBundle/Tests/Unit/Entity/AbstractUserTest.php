@@ -172,7 +172,7 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
     {
         $user = $this->getUser();
         $clone = clone $user;
-        $data = $user->serialize();
+        $data = $user->__serialize();
 
         self::assertNotEmpty($data);
 
@@ -181,7 +181,7 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
             ->setConfirmationToken('token')
             ->setUsername('new-name');
 
-        $user->unserialize($data);
+        $user->__unserialize($data);
 
         self::assertEquals($clone, $user);
     }
@@ -213,7 +213,7 @@ class AbstractUserTest extends \PHPUnit\Framework\TestCase
             'confirmation_token',
             10
         ];
-        $user->unserialize(serialize($serialized));
+        $user->__unserialize($serialized);
 
         self::assertEquals($serialized[0], $user->getPassword());
         self::assertEquals($serialized[1], $user->getSalt());

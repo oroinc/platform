@@ -56,6 +56,7 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
                 if ($sql === 'DROP TABLE oro_privileges_check') {
                     throw new \Exception();
                 }
+                return false;
             });
 
         $this->assertPgSqlPrivilegesFetch($dbName, $pdo);

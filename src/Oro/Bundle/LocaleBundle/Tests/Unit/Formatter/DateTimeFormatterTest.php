@@ -548,8 +548,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     {
         return new \IntlDateFormatter(
             $lang,
-            null,
-            null,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
             $timeZone,
             \IntlDateFormatter::GREGORIAN,
             $pattern

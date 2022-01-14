@@ -178,8 +178,8 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         if (!isset($this->cachedFormatters[$key])) {
             $this->cachedFormatters[$key] = new \IntlDateFormatter(
                 $this->localeSettings->getLanguage(),
-                null,
-                null,
+                \IntlDateFormatter::NONE,
+                \IntlDateFormatter::NONE,
                 $timeZone,
                 \IntlDateFormatter::GREGORIAN,
                 $pattern

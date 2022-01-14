@@ -42,9 +42,9 @@ class CumulativeResourceTest extends \PHPUnit\Framework\TestCase
             )
         );
         $resource->addFound('bundle', 'path');
-        $serializedData = $resource->serialize();
+        $serializedData = $resource->__serialize();
         $unserializedResource = new CumulativeResource('test1', new CumulativeResourceLoaderCollection());
-        $unserializedResource->unserialize($serializedData);
+        $unserializedResource->__unserialize($serializedData);
 
         $this->assertEquals($resource, $unserializedResource);
     }

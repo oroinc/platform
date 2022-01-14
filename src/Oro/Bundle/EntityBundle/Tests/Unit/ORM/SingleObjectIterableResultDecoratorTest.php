@@ -33,19 +33,23 @@ class SingleObjectIterableResultDecoratorTest extends \PHPUnit\Framework\TestCas
         $sampleObject = new \stdClass();
 
         $this->iterableResult->expects($this->once())
-            ->method('next')
+            ->method('next');
+        $this->iterableResult->expects($this->once())
+            ->method('current')
             ->willReturn([$sampleObject]);
-
-        $this->assertEquals($sampleObject, $this->iterableResultDecorator->next());
+        $this->iterableResultDecorator->next();
+        $this->assertEquals($sampleObject, $this->iterableResultDecorator->current());
     }
 
     public function testNextWhenNotArrayIsReturned()
     {
         $this->iterableResult->expects($this->once())
-            ->method('next')
+            ->method('next');
+        $this->iterableResult->expects($this->once())
+            ->method('current')
             ->willReturn(false);
-
-        $this->assertEquals(false, $this->iterableResultDecorator->next());
+        $this->iterableResultDecorator->next();
+        $this->assertEquals(false, $this->iterableResultDecorator->current());
     }
 
     public function testCurrent()

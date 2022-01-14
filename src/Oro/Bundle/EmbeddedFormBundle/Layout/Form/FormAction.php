@@ -131,17 +131,15 @@ class FormAction implements \ArrayAccess, ContextItemInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
-        return isset($this->data[$name])
-            ? $this->data[$name]
-            : null;
+        return $this->data[$name] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return isset($this->data[$name]);
     }
@@ -153,7 +151,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
      * @param mixed  $value
      * @throws \BadMethodCallException always as changing data is not allowed
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
@@ -164,7 +162,7 @@ class FormAction implements \ArrayAccess, ContextItemInterface
      * @param string $name
      * @throws \BadMethodCallException always as removing data is not allowed
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');
     }

@@ -25,11 +25,14 @@ class EmailAddressHelper
      *    email address: <john@example.com> (Contact); 'pure' email address john@example.com
      *    email address: john@example.com; 'pure' email address john@example.com
      *
-     * @param string $fullEmailAddress
+     * @param string|null $fullEmailAddress
      * @return string
      */
     public function extractPureEmailAddress($fullEmailAddress)
     {
+        if ($fullEmailAddress === null) {
+            return '';
+        }
         $atPos = strrpos($fullEmailAddress, '@');
         if ($atPos === false) {
             return $fullEmailAddress;

@@ -7,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Doctrine repository for AbstractEnumValue entity.
+ */
 class EnumValueRepository extends EntityRepository
 {
     /**

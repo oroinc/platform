@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Metadata;
 /**
  * Represents an entity metadata for configurable entities.
  */
-final class EntityMetadata implements \Serializable
+final class EntityMetadata
 {
     public string $name;
     public ?string $mode = null;
@@ -40,12 +40,9 @@ final class EntityMetadata implements \Serializable
         $this->fieldMetadata[$metadata->name] = $metadata;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->name,
             $this->mode,
             $this->defaultValues,
@@ -54,13 +51,10 @@ final class EntityMetadata implements \Serializable
             $this->routeCreate,
             $this->routes,
             $this->fieldMetadata
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($str)
+    public function __unserialize(array $serialized): void
     {
         [
             $this->name,
@@ -71,7 +65,7 @@ final class EntityMetadata implements \Serializable
             $this->routeCreate,
             $this->routes,
             $this->fieldMetadata
-        ] = unserialize($str, ['allowed_classes' => [FieldMetadata::class]]);
+        ] = $serialized;
     }
 
     /**

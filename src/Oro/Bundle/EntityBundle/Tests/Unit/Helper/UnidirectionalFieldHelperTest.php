@@ -29,7 +29,7 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'expected' => false,
             ],
             'null' => [
-                'fieldName' => null,
+                'fieldName' => '',
                 'expected' => false,
             ],
             '2 delimiters' => [
@@ -62,8 +62,8 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
                 'expected' => 'not_unidirectional_field',
             ],
             'null' => [
-                'fieldName' => null,
-                'expected' => null,
+                'fieldName' => '',
+                'expected' => '',
             ],
             '2 delimiters' => [
                 'fieldName' => implode(UnidirectionalFieldHelper::DELIMITER, ['some', 'test', 'field']),
@@ -92,15 +92,15 @@ class UnidirectionalFieldHelperTest extends \PHPUnit\Framework\TestCase
             ],
             'not unidirectional' => [
                 'fieldName' => 'not_unidirectional_field',
-                'expected' => null,
+                'expected' => '',
             ],
             'null' => [
-                'fieldName' => null,
-                'expected' => null,
+                'fieldName' => '',
+                'expected' => '',
             ],
             '2 delimiters' => [
                 'fieldName' => implode(UnidirectionalFieldHelper::DELIMITER, ['some', 'test', 'field']),
-                'expected' => null,
+                'expected' => '',
             ],
         ];
     }

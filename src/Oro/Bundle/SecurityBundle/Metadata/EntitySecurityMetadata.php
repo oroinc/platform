@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 /**
  * Represents security metadata for an entity.
  */
-class EntitySecurityMetadata implements ClassSecurityMetadata, \Serializable
+class EntitySecurityMetadata implements ClassSecurityMetadata
 {
     /** @var string */
     private $securityType;
@@ -129,12 +129,9 @@ class EntitySecurityMetadata implements ClassSecurityMetadata, \Serializable
         return $this->fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->securityType,
             $this->className,
             $this->group,
@@ -143,15 +140,12 @@ class EntitySecurityMetadata implements ClassSecurityMetadata, \Serializable
             $this->description,
             $this->category,
             $this->fields
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->securityType,
             $this->className,
             $this->group,
@@ -160,7 +154,7 @@ class EntitySecurityMetadata implements ClassSecurityMetadata, \Serializable
             $this->description,
             $this->category,
             $this->fields
-            ) = unserialize($serialized);
+        ] = $serialized;
     }
 
     /**
