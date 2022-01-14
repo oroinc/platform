@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\ORM;
 /**
  * Represents a brief information about a manageable entity.
  */
-class ShortClassMetadata implements \Serializable
+class ShortClassMetadata
 {
     /**
      * READ-ONLY: The name of the entity class.
@@ -35,10 +35,7 @@ class ShortClassMetadata implements \Serializable
         $this->hasAssociations = $hasAssociations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         $flag = 0;
         if ($this->isMappedSuperclass) {
@@ -48,15 +45,12 @@ class ShortClassMetadata implements \Serializable
             $flag |= 2;
         }
 
-        return serialize([$this->name, $flag]);
+        return [$this->name, $flag];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        [$this->name, $flag] = unserialize($serialized);
+        [$this->name, $flag] = $serialized;
         $this->isMappedSuperclass = ($flag & 1) !== 0;
         $this->hasAssociations = ($flag & 2) !== 0;
     }

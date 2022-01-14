@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 /**
  * Represents security metadata for a workflow.
  */
-class WorkflowAclMetadata implements ClassSecurityMetadata, \Serializable
+class WorkflowAclMetadata implements ClassSecurityMetadata
 {
     /** @var string */
     private $workflowName;
@@ -100,34 +100,28 @@ class WorkflowAclMetadata implements ClassSecurityMetadata, \Serializable
         return $this->transitions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->workflowName,
             $this->group,
             $this->label,
             $this->description,
             $this->category,
             $this->transitions
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->workflowName,
             $this->group,
             $this->label,
             $this->description,
             $this->category,
             $this->transitions
-            ) = unserialize($serialized);
+        ] = $serialized;
     }
 
     /**

@@ -6,7 +6,7 @@ namespace Oro\Component\PropertyAccess\Tests\Unit\Fixtures;
  * This class is a hand written simplified version of PHP native `ArrayObject`
  * class, to show that it behaves differently than the PHP native implementation.
  */
-class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializable
+class NonTraversableArrayObject implements \ArrayAccess, \Countable
 {
     private $array;
 
@@ -44,13 +44,13 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
         return count($this->array);
     }
 
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->array);
+        return $this->array;
     }
 
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $this->array = (array)unserialize((string)$serialized);
+        $this->array = $serialized;
     }
 }

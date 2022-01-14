@@ -1197,9 +1197,9 @@ class User extends ExtendUser implements
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        parent::unserialize($serialized);
+        parent::__unserialize($serialized);
 
         $this->setUsername($this->username);
     }

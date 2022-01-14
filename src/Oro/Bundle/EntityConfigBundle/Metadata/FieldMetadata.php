@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Metadata;
 /**
  * Represents an entity field metadata for configurable entities.
  */
-final class FieldMetadata implements \Serializable
+final class FieldMetadata
 {
     public string $class;
     public string $name;
@@ -18,29 +18,23 @@ final class FieldMetadata implements \Serializable
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->class,
             $this->name,
             $this->mode,
             $this->defaultValues
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($str)
+    public function __unserialize(array $serialized): void
     {
         [
             $this->class,
             $this->name,
             $this->mode,
             $this->defaultValues
-        ] = unserialize($str, ['allowed_classes' => false]);
+        ] = $serialized;
     }
 }

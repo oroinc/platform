@@ -30,7 +30,7 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testDoExecute(string|int|null $jobName, string|int|null $contextKeys)
+    public function testDoExecute(string $jobName, string $contextKeys)
     {
         $stepExecution = $this->createMock(StepExecution::class);
 
@@ -61,9 +61,7 @@ class PostProcessItemStepTest extends \PHPUnit\Framework\TestCase
     public function executeDataProvider(): array
     {
         return [
-            'empty job' => [null, null],
             'invalid job' => ['', ''],
-            'int names' => [1, 1],
             'single job' => ['job_name', 'context_key'],
             'multiple jobs' => ['job_name, job_name2', 'context_key ,another_context_key']
         ];

@@ -7,7 +7,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 /**
  * This class represents the entity ownership metadata
  */
-class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
+class OwnershipMetadata implements OwnershipMetadataInterface
 {
     const OWNER_TYPE_NONE          = 0;
     const OWNER_TYPE_ORGANIZATION  = 1;
@@ -39,13 +39,13 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        $ownerType = null,
+        $ownerType = '',
         $ownerFieldName = '',
         $ownerColumnName = '',
         $organizationFieldName = '',
         $organizationColumnName = ''
     ) {
-        $constantName = $this->getConstantName($ownerType);
+        $constantName = $this->getConstantName((string)$ownerType);
 
         if (defined($constantName)) {
             $this->ownerType = constant($constantName);
@@ -75,7 +75,7 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
      *
      * @return string
      */
-    protected function getConstantName($ownerType)
+    protected function getConstantName(string $ownerType)
     {
         return sprintf('static::OWNER_TYPE_%s', strtoupper($ownerType));
     }
@@ -181,34 +181,26 @@ class OwnershipMetadata implements \Serializable, OwnershipMetadataInterface
         return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize(
-            [
-                $this->ownerType,
-                $this->ownerFieldName,
-                $this->ownerColumnName,
-                $this->organizationFieldName,
-                $this->organizationColumnName,
-            ]
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
-    {
-        list(
+        return [
             $this->ownerType,
             $this->ownerFieldName,
             $this->ownerColumnName,
             $this->organizationFieldName,
-            $this->organizationColumnName
-            ) = unserialize($serialized);
+            $this->organizationColumnName,
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->ownerType,
+            $this->ownerFieldName,
+            $this->ownerColumnName,
+            $this->organizationFieldName,
+            $this->organizationColumnName,
+        ] = $serialized;
     }
 
     /**

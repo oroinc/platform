@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Provider;
 
 use Exception;
+use GuzzleHttp\Psr7\Message;
 use GuzzleHttp\Psr7\Uri;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Exception\InvalidConfigurationException;
@@ -188,7 +189,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     protected function getLastResponseStatusCode(): ?int
     {
         try {
-            $response = \GuzzleHttp\Psr7\parse_response($this->client->__getLastResponseHeaders()."\n");
+            $response = Message::parseResponse($this->client->__getLastResponseHeaders()."\n");
 
             return $response->getStatusCode();
         } catch (\InvalidArgumentException $e) {

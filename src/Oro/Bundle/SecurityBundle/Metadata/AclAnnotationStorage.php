@@ -8,7 +8,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor as AclAnnotationAncestor;
 /**
  * The storage for ACL annotations and bindings.
  */
-class AclAnnotationStorage implements \Serializable
+class AclAnnotationStorage
 {
     /** @var AclAnnotation[] [annotation id => annotation object, ...] */
     private $annotations = [];
@@ -248,30 +248,24 @@ class AclAnnotationStorage implements \Serializable
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         $data = [];
         foreach ($this->annotations as $annotation) {
-            $data[] = $annotation->serialize();
+            $data[] = $annotation->__serialize();
         }
 
-        return \serialize([$data, $this->classes]);
+        return [$data, $this->classes];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($data, $this->classes) = \unserialize($serialized);
+        [$data, $this->classes] = $serialized;
 
         $this->annotations = [];
         foreach ($data as $d) {
             $annotation = new AclAnnotation();
-            $annotation->unserialize($d);
+            $annotation->__unserialize($d);
             $this->annotations[$annotation->getId()] = $annotation;
         }
     }

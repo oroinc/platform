@@ -28,7 +28,9 @@ class CalendarTest extends TestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if ($this->defaultLocale) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     /**
@@ -154,8 +156,8 @@ class CalendarTest extends TestCase
         ];
         $formatter = new \IntlDateFormatter(
             $locale,
-            null,
-            null,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
             'UTC',
             \IntlDateFormatter::GREGORIAN,
             $widthToPatternMap[$width ? : Calendar::WIDTH_WIDE]

@@ -82,7 +82,7 @@ class LocaleListener implements EventSubscriberInterface
     /**
      * @param string $locale
      */
-    public function setPhpDefaultLocale($locale)
+    public function setPhpDefaultLocale(string $locale)
     {
         \Locale::setDefault($locale);
     }
@@ -115,7 +115,7 @@ class LocaleListener implements EventSubscriberInterface
         }
 
         try {
-            $locale = $this->localeSettings->getLocale();
+            $locale = (string)$this->localeSettings->getLocale();
             $language = $this->localeSettings->getLanguage();
         } catch (DBALException $exception) {
             // application is not installed

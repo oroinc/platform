@@ -137,9 +137,10 @@ class AccessRuleWalkerContextTest extends TestCase
         $context->setOption('parameter2', 'value2');
 
         $this->assertEquals(
-            '{"parameter1":"value1","parameter2":"value2","permission":"EDIT",'
-                .'"user_class":"Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\User","user_id":75,"organization_id":2}',
-            $context->serialize()
+            'O:60:"Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalkerContext":6:{s:10:"parameter1";' .
+            's:6:"value1";s:10:"parameter2";s:6:"value2";s:10:"permission";s:4:"EDIT";s:10:"user_class";' .
+            's:33:"Oro\Bundle\UserBundle\Entity\User";s:7:"user_id";i:75;s:15:"organization_id";i:2;}',
+            serialize($context)
         );
     }
 
@@ -149,7 +150,7 @@ class AccessRuleWalkerContextTest extends TestCase
         $context = new AccessRuleWalkerContext(
             $this->createMock(AccessRuleExecutor::class)
         );
-        $context->unserialize('');
+        $context->__unserialize([]);
     }
 
     public function testGetOptions()

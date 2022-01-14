@@ -153,74 +153,47 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, CumulativeResource $resource, $timestamp)
     {
+        if ($this->fileResourceLoaders === null) {
+            return true;
+        }
         foreach ($this->fileResourceLoaders as $loader) {
-            $pathKey = (string)$loader->getResource();
-            $split = $this->preparedRelativeFilePaths[$pathKey];
-            if (!$split['folder']) {
-                if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
-                    return false;
-                }
-            }
-
-            if (array_key_exists($pathKey, $this->registeredRelativeFilePaths)) {
-                /** @var array $registeredRelativeFilePaths */
-                $registeredRelativeFilePaths = $this->registeredRelativeFilePaths[$pathKey];
-
-                $dir = $bundleDir . $split['baseDir'];
-                if ($this->isNewDirectoryCreated($dir, $split, $registeredRelativeFilePaths)) {
-                    return false;
-                }
-
-                $originalRelativeFilePath = $loader->getRelativeFilePath();
-                foreach ($registeredRelativeFilePaths as $relativeFilePath => $value) {
-                    try {
-                        $loader->setRelativeFilePath($relativeFilePath);
-                        if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
-                            $loader->setRelativeFilePath($originalRelativeFilePath);
-
-                            return false;
-                        }
-                    } catch (\Exception $e) {
-                        $loader->setRelativeFilePath($originalRelativeFilePath);
-                        throw $e;
-                    }
-                }
-
-                $loader->setRelativeFilePath($originalRelativeFilePath);
+            if (!$this->isLoaderResourceFresh(
+                $loader,
+                $bundleClass,
+                $bundleDir,
+                $bundleAppDir,
+                $resource,
+                $timestamp
+            )) {
+                return false;
             }
         }
 
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->folderPlaceholder,
             $this->folderPattern,
             $this->fileResourceLoaders,
             $this->registeredRelativeFilePaths
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->folderPlaceholder,
             $this->folderPattern,
             $this->fileResourceLoaders,
             $this->registeredRelativeFilePaths
-            ) = unserialize($serialized);
-        $this->initialize();
+        ] = $serialized[0];
     }
 
     /**
@@ -341,5 +314,60 @@ class FolderingCumulativeFileLoader implements CumulativeResourceLoader
         }
 
         return false;
+    }
+
+    /**
+     * @param CumulativeFileLoader $loader
+     * @param string $bundleClass
+     * @param string $bundleDir
+     * @param string $bundleAppDir
+     * @param CumulativeResource $resource
+     * @param int $timestamp
+     * @return bool
+     * @throws \Exception
+     */
+    private function isLoaderResourceFresh(
+        CumulativeFileLoader $loader,
+        string $bundleClass,
+        string $bundleDir,
+        string $bundleAppDir,
+        CumulativeResource $resource,
+        int $timestamp
+    ): bool {
+        $pathKey = (string)$loader->getResource();
+        $split = $this->preparedRelativeFilePaths[$pathKey];
+        if (!$split['folder'] &&
+            !$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
+            return false;
+        }
+
+        if (array_key_exists($pathKey, $this->registeredRelativeFilePaths)) {
+            /** @var array $registeredRelativeFilePaths */
+            $registeredRelativeFilePaths = $this->registeredRelativeFilePaths[$pathKey];
+
+            $dir = $bundleDir . $split['baseDir'];
+            if ($this->isNewDirectoryCreated($dir, $split, $registeredRelativeFilePaths)) {
+                return false;
+            }
+
+            $originalRelativeFilePath = $loader->getRelativeFilePath();
+            foreach ($registeredRelativeFilePaths as $relativeFilePath => $value) {
+                try {
+                    $loader->setRelativeFilePath($relativeFilePath);
+                    if (!$loader->isResourceFresh($bundleClass, $bundleDir, $bundleAppDir, $resource, $timestamp)) {
+                        $loader->setRelativeFilePath($originalRelativeFilePath);
+
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    $loader->setRelativeFilePath($originalRelativeFilePath);
+                    throw $e;
+                }
+            }
+
+            $loader->setRelativeFilePath($originalRelativeFilePath);
+        }
+
+        return true;
     }
 }

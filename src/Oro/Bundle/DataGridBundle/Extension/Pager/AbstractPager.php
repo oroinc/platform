@@ -3,11 +3,13 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
 /**
+ * Provides abstract description for pager functionality for datagrids based on ORM data source.
+ *
  * Class AbstractPager
  * @package Oro\Bundle\DataGridBundle\Extension\Pager
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-abstract class AbstractPager implements \Iterator, \Countable, \Serializable, PagerInterface
+abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
 {
     protected $page = 1;
     protected $maxPerPage = 0;
@@ -445,24 +447,14 @@ abstract class AbstractPager implements \Iterator, \Countable, \Serializable, Pa
         return $this->getNbResults();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        $vars = get_object_vars($this);
-
-        return serialize($vars);
+        return get_object_vars($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $array = unserialize($serialized);
-
-        foreach ($array as $name => $values) {
+        foreach ($serialized as $name => $values) {
             $this->$name = $values;
         }
     }

@@ -50,20 +50,14 @@ class TransitionLabel extends Label
         return sprintf(self::TRANSITION_LABEL_TEMPLATE, $transition, $fromStep, $toStep);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([$this->label, $this->toLabel, $this->fromLabel]);
+        return [$this->label, $this->toLabel, $this->fromLabel];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($this->label, $this->toLabel, $this->fromLabel) = unserialize($serialized);
+        [$this->label, $this->toLabel, $this->fromLabel] = $serialized;
     }
 
     /**

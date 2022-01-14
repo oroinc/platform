@@ -38,8 +38,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  */
 class Organization extends ExtendOrganization implements
     OrganizationInterface,
-    NotificationEmailInterface,
-    \Serializable
+    NotificationEmailInterface
 {
     /**
      * @var integer
@@ -368,35 +367,22 @@ class Organization extends ExtendOrganization implements
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * Serializes organization
-     *
-     * @return string
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        $result = serialize(
-            array(
-                $this->name,
-                $this->enabled,
-                $this->id,
-            )
-        );
-        return $result;
-    }
-
-    /**
-     * Unserializes organization
-     *
-     * @param string $serialized
-     */
-    public function unserialize($serialized)
-    {
-        list(
+        return [
             $this->name,
             $this->enabled,
             $this->id,
-            ) = unserialize($serialized);
+        ];
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        [
+            $this->name,
+            $this->enabled,
+            $this->id,
+        ] = $serialized;
     }
 
     /**

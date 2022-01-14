@@ -57,7 +57,7 @@ class NotBlankDefaultLocalizedFallbackValueValidator extends ConstraintValidator
         $notEmptyValues = array_filter(
             [$localizedFallbackValue->getString(), $localizedFallbackValue->getText()],
             static function ($value) {
-                $value = trim($value);
+                $value = trim($value ?? '');
 
                 return '0' === $value || !empty($value);
             }
