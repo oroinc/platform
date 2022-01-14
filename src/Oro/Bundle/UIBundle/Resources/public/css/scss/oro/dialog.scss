@@ -114,7 +114,6 @@
     .ui-dialog-messages {
         padding: $dialog-ui-dialog-messages-inner-offset;
         background: $primary-inverse;
-        max-width: $dialog-ui-dialog-messages-max-width;
 
         &:empty {
             display: none;
