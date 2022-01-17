@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @dbIsolationPerTest
@@ -12,7 +13,7 @@ class NullValuesTest extends DefaultAndNullTestCase
     /**
      * {@inheritdoc}
      */
-    protected function sendCreateRequest(array $data, $assertValid = true)
+    protected function sendCreateRequest(array $data, bool $assertValid = true): Response
     {
         $data['data']['attributes']['withNotBlank'] = 'value';
         $data['data']['attributes']['withNotNull'] = 'value';
@@ -23,7 +24,7 @@ class NullValuesTest extends DefaultAndNullTestCase
     /**
      * {@inheritdoc}
      */
-    protected function sendUpdateRequest($entityId, array $data, $assertValid = true)
+    protected function sendUpdateRequest(int $entityId, array $data, bool $assertValid = true): Response
     {
         $data['data']['attributes']['withNotBlank'] = 'value';
         $data['data']['attributes']['withNotNull'] = 'value';

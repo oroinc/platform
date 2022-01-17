@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDataTypeHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ExpandRelatedEntities;
@@ -82,7 +83,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 
     public function testProcessForDisabledInclusion()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException::class);
+        $this->expectException(NotSupportedConfigOperationException::class);
         $this->expectExceptionMessage(
             'Requested unsupported operation "expand_related_entities" when building config for "Test\Class".'
         );
@@ -129,31 +130,29 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 
         $this->configProvider->expects(self::exactly(3))
             ->method('getConfig')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
-                    [
-                        'Test\Association1Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
-                    ],
-                    [
-                        'Test\Association2Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
-                    ],
-                    [
-                        'Test\Association3Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject(['exclusion_policy' => 'all'])
-                    ]
+                    'Test\Association1Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
+                ],
+                [
+                    'Test\Association2Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
+                ],
+                [
+                    'Test\Association3Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject(['exclusion_policy' => 'all'])
                 ]
-            );
+            ]);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -207,25 +206,21 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::exactly(5))
             ->method('hasAssociation')
-            ->willReturnMap(
-                [
-                    ['field1', false],
-                    ['association1', true],
-                    ['association2', true],
-                    ['realAssociation3', true],
-                    ['association4', true]
-                ]
-            );
+            ->willReturnMap([
+                ['field1', false],
+                ['association1', true],
+                ['association2', true],
+                ['realAssociation3', true],
+                ['association4', true]
+            ]);
         $rootEntityMetadata->expects(self::exactly(4))
             ->method('getAssociationTargetClass')
-            ->willReturnMap(
-                [
-                    ['association1', 'Test\Association1Target'],
-                    ['association2', 'Test\Association2Target'],
-                    ['realAssociation3', 'Test\Association3Target'],
-                    ['association4', 'Test\Association4Target']
-                ]
-            );
+            ->willReturnMap([
+                ['association1', 'Test\Association1Target'],
+                ['association2', 'Test\Association2Target'],
+                ['realAssociation3', 'Test\Association3Target'],
+                ['association4', 'Test\Association4Target']
+            ]);
         $association1Metadata = new ClassMetadata('Test\Association1Target');
         $association2Metadata = new ClassMetadata('Test\Association2Target');
         $association3Metadata = new ClassMetadata('Test\Association3Target');
@@ -247,38 +242,36 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 
         $this->configProvider->expects(self::exactly(4))
             ->method('getConfig')
-            ->willReturnMap(
+            ->willReturnMap([
                 [
-                    [
-                        'Test\Association1Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
-                    ],
-                    [
-                        'Test\Association2Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
-                    ],
-                    [
-                        'Test\Association3Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject(['exclusion_policy' => 'all'])
-                    ],
-                    [
-                        'Test\Association4Target',
-                        $this->context->getVersion(),
-                        $this->context->getRequestType(),
-                        $this->context->getPropagableExtras(),
-                        $this->createRelationConfigObject()
-                    ]
+                    'Test\Association1Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
+                ],
+                [
+                    'Test\Association2Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
+                ],
+                [
+                    'Test\Association3Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject(['exclusion_policy' => 'all'])
+                ],
+                [
+                    'Test\Association4Target',
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    $this->context->getPropagableExtras(),
+                    $this->createRelationConfigObject()
                 ]
-            );
+            ]);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);

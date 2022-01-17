@@ -69,11 +69,6 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $message;
     }
 
-    private function getSession(): SessionInterface
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
     private function getUnlinkedIncludedDataError(string $sectionName, int $itemIndex): BatchError
     {
         $error = BatchError::createValidationError(
@@ -102,7 +97,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message.');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -144,7 +139,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -194,7 +189,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }

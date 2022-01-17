@@ -20,14 +20,12 @@ use Symfony\Component\Routing\Route;
  */
 trait DocumentationTestTrait
 {
-    /** @var int */
-    private static $resourceErrorCount = 3;
+    private static int $resourceErrorCount = 3;
 
     /**
      * @see \Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider::TEMPLATES
-     * @var array
      */
-    private static $defaultDocumentation = [
+    private static array $defaultDocumentation = [
         ApiAction::GET                 => 'Get an entity',
         ApiAction::GET_LIST            => 'Get a list of entities',
         ApiAction::DELETE              => 'Delete an entity',
@@ -59,13 +57,7 @@ trait DocumentationTestTrait
         ]
     ];
 
-    /**
-     * @param string $entityClass
-     * @param string $entityType
-     *
-     * @return bool
-     */
-    private function isSkippedEntity($entityClass, $entityType)
+    private function isSkippedEntity(string $entityClass, string $entityType): bool
     {
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)
@@ -79,24 +71,12 @@ trait DocumentationTestTrait
             );
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    private function isSkippedField($entityClass, $fieldName)
+    private function isSkippedField(string $entityClass, string $fieldName): bool
     {
         return false;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    private function isTestField($entityClass, $fieldName)
+    private function isTestField(string $entityClass, string $fieldName): bool
     {
         if (str_starts_with($fieldName, ExtendConfigDumper::DEFAULT_PREFIX)) {
             return $this->isTestField(
@@ -115,26 +95,17 @@ trait DocumentationTestTrait
         return str_starts_with($label, 'extend.entity.test');
     }
 
-    /**
-     * @return ApiDocExtractor
-     */
-    private function getExtractor()
+    private function getExtractor(): ApiDocExtractor
     {
         return self::getContainer()->get('nelmio_api_doc.extractor.api_doc_extractor');
     }
 
-    /**
-     * @return FormatterInterface
-     */
-    private function getSimpleFormatter()
+    private function getSimpleFormatter(): FormatterInterface
     {
         return self::getContainer()->get('nelmio_api_doc.formatter.simple_formatter');
     }
 
-    /**
-     * @return ConfigManager
-     */
-    private function getEntityConfigManager()
+    private function getEntityConfigManager(): ConfigManager
     {
         return self::getContainer()->get('oro_entity_config.config_manager');
     }
@@ -149,7 +120,7 @@ trait DocumentationTestTrait
         return reset($item);
     }
 
-    private function warmUpDocumentationCache()
+    private function warmUpDocumentationCache(): void
     {
         $apiDocExtractor = $this->getExtractor();
         if ($apiDocExtractor instanceof CachingApiDocExtractor) {
@@ -157,7 +128,7 @@ trait DocumentationTestTrait
         }
     }
 
-    private function checkDocumentation()
+    private function checkDocumentation(): void
     {
         $missingDocs = [];
         $docs = $this->getExtractor()->all(self::VIEW);
@@ -188,18 +159,15 @@ trait DocumentationTestTrait
     }
 
     /**
-     * @param array  $definition
-     * @param string $entityClass
-     * @param string $action
-     * @param string $association
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function checkApiResource(array $definition, $entityClass, $action, $association)
-    {
+    private function checkApiResource(
+        array $definition,
+        string $entityClass,
+        string $action,
+        ?string $association
+    ): array {
         $missingDocs = [];
         if (empty($definition['description'])) {
             $missingDocs[] = 'Empty description';
@@ -277,12 +245,7 @@ trait DocumentationTestTrait
         return $missingDocs;
     }
 
-    /**
-     * @param string $documentation
-     *
-     * @return bool
-     */
-    private function hasDuplicates($documentation)
+    private function hasDuplicates(string $documentation): bool
     {
         $delimiter = strpos($documentation, '.');
         if (false === $delimiter) {
@@ -296,12 +259,7 @@ trait DocumentationTestTrait
             && false !== strpos($documentation, $firstSentence, $delimiter);
     }
 
-    /**
-     * @param array $missingDocs
-     *
-     * @return string
-     */
-    private function buildFailMessage(array $missingDocs)
+    private function buildFailMessage(array $missingDocs): string
     {
         $message = sprintf(
             'Missing documentation for %s entit%s.' . PHP_EOL . PHP_EOL,
@@ -328,13 +286,7 @@ trait DocumentationTestTrait
         return $message;
     }
 
-    /**
-     * @param string $entityType
-     * @param string $action
-     *
-     * @return array
-     */
-    private function getEntityDocsForAction($entityType, $action)
+    private function getEntityDocsForAction(string $entityType, string $action): array
     {
         return $this->filterDocs(
             $this->getExtractor()->all(self::VIEW),
@@ -346,14 +298,7 @@ trait DocumentationTestTrait
         );
     }
 
-    /**
-     * @param string $entityType
-     * @param string $subresource
-     * @param string $action
-     *
-     * @return array
-     */
-    private function getSubresourceEntityDocsForAction($entityType, $subresource, $action)
+    private function getSubresourceEntityDocsForAction(string $entityType, string $subresource, string $action): array
     {
         return $this->filterDocs(
             $this->getExtractor()->all(self::VIEW),
@@ -372,7 +317,7 @@ trait DocumentationTestTrait
      *
      * @return array
      */
-    private function filterDocs(array $docs, $filter)
+    private function filterDocs(array $docs, callable $filter): array
     {
         $result = [];
         foreach ($docs as $doc) {
@@ -386,10 +331,7 @@ trait DocumentationTestTrait
         return $result;
     }
 
-    /**
-     * @param string $entityType
-     */
-    private function checkOptionsDocumentationForEntity($entityType)
+    private function checkOptionsDocumentationForEntity(string $entityType): void
     {
         $docs = $this->getEntityDocsForAction($entityType, ApiAction::OPTIONS);
         $data = $this->getSimpleFormatter()->format($docs);
@@ -399,11 +341,7 @@ trait DocumentationTestTrait
         }
     }
 
-    /**
-     * @param string $resource
-     * @param string $resourceData
-     */
-    private function checkOptionsDocumentationForResource($resource, array $resourceData)
+    private function checkOptionsDocumentationForResource(string $resource, array $resourceData): void
     {
         self::assertArrayContains(
             [

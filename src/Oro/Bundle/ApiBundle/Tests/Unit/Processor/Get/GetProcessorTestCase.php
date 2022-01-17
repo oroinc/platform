@@ -12,11 +12,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var GetContext */
-    protected $context;
+    protected GetContext $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;

@@ -45,20 +45,13 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $context
-     * @param string                                   $firewallName
-     * @param object[]                                 $listeners
-     * @param object                                   $exceptionListener
-     * @param object                                   $logoutListener
-     */
     private function setFirewallContextExpectations(
-        $context,
-        $firewallName,
-        $listeners,
-        $exceptionListener,
-        $logoutListener
-    ) {
+        FirewallContext|\PHPUnit\Framework\MockObject\MockObject $context,
+        string $firewallName,
+        iterable $listeners,
+        object $exceptionListener,
+        object $logoutListener
+    ): void {
         $context->expects(self::once())
             ->method('getConfig')
             ->willReturn(new FirewallConfig($firewallName, 'user_checker'));

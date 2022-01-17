@@ -23,13 +23,11 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
 
         $this->entityNameResolver->expects(self::any())
             ->method('prepareNameDQL')
-            ->willReturnCallback(
-                function ($expr, $castToString) {
-                    self::assertTrue($castToString);
+            ->willReturnCallback(function ($expr, $castToString) {
+                self::assertTrue($castToString);
 
-                    return $expr ?: '\'\'';
-                }
-            );
+                return $expr ?: '\'\'';
+            });
 
         $this->entityTitleProvider = new EntityTitleProvider(
             $this->doctrineHelper,
@@ -174,12 +172,10 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
 
         $this->entityNameResolver->expects(self::exactly(2))
             ->method('getNameDQL')
-            ->willReturnMap(
-                [
-                    [Entity\Product::class, 'e', null, null, 'e.name'],
-                    [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')']
-                ]
-            );
+            ->willReturnMap([
+                [Entity\Product::class, 'e', null, null, 'e.name'],
+                [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')']
+            ]);
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
@@ -234,13 +230,11 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
 
         $this->entityNameResolver->expects(self::exactly(3))
             ->method('getNameDQL')
-            ->willReturnMap(
-                [
-                    [Entity\Product::class, 'e', null, null, 'e.name'],
-                    [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')'],
-                    [Entity\Category::class, 'e', null, null, 'e.label']
-                ]
-            );
+            ->willReturnMap([
+                [Entity\Product::class, 'e', null, null, 'e.name'],
+                [Entity\User::class, 'e', null, null, 'COALESCE(e.name, \'\')'],
+                [Entity\Category::class, 'e', null, null, 'e.label']
+            ]);
 
         $this->addQueryExpectation(
             'SELECT entity.id_2 AS id, entity.sclr_0 AS entity, entity.name_1 AS title'

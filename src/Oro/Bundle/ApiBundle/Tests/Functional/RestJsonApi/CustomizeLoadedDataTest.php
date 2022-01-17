@@ -17,13 +17,9 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
         'fields[testapientity2]' => 'name,computedName,computedIds,biM2OOwners,biM2MOwners,biO2MOwner'
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/customize_loaded_data.yml'
@@ -49,13 +45,7 @@ class CustomizeLoadedDataTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param string $entityClass
-     * @param int[]  $ids
-     *
-     * @return string
-     */
-    private function getComputedIds($entityClass, ...$ids)
+    private function getComputedIds(string $entityClass, int ...$ids): string
     {
         sort($ids);
 

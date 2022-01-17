@@ -36,15 +36,11 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new NormalizeRequestData($entityIdTransformerRegistry);
     }
 
-    /**
-     * @param string $associationName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    private function createAssociationMetadata($associationName, $targetClass, $isCollection)
-    {
+    private function createAssociationMetadata(
+        string $associationName,
+        string $targetClass,
+        bool $isCollection
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
@@ -139,12 +135,10 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
-            ->willReturnMap(
-                [
-                    ['val1', $associationMetadata->getTargetMetadata(), 'normalizedVal1'],
-                    ['val2', $associationMetadata->getTargetMetadata(), 'normalizedVal2']
-                ]
-            );
+            ->willReturnMap([
+                ['val1', $associationMetadata->getTargetMetadata(), 'normalizedVal1'],
+                ['val2', $associationMetadata->getTargetMetadata(), 'normalizedVal2']
+            ]);
 
         $this->context->setRequestData([['val1', 'val2']]);
         $this->context->setAssociationName(self::ASSOCIATION_NAME);
@@ -317,15 +311,13 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    if ('val1' === $value) {
-                        return null;
-                    }
-
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                if ('val1' === $value) {
+                    return null;
                 }
-            );
+
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData([['val1', 'val2']]);
         $this->context->setAssociationName(self::ASSOCIATION_NAME);

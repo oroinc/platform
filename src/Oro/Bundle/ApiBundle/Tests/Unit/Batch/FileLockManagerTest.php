@@ -27,10 +27,7 @@ class FileLockManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileLockManager = new FileLockManager($this->doctrine, self::CONNECTION_NAME);
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Connection
-     */
-    private function expectGetConnection(): Connection
+    private function expectGetConnection(): Connection|\PHPUnit\Framework\MockObject\MockObject
     {
         $connection = $this->createMock(Connection::class);
         $this->doctrine->expects(self::once())

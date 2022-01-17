@@ -24,13 +24,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);
     }
 
-    /**
-     * @param array $data
-     * @param array $context
-     *
-     * @return array
-     */
-    public function handlerCallback(array $data, array $context)
+    public function handlerCallback(array $data, array $context): array
     {
         $data['callbackKey'] = sprintf('callbackValue for "%s" action', $context['action']);
 
@@ -89,7 +83,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -133,15 +127,13 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    $contextData['anotherKey'] = 'anotherValue';
-                    $context->setResult($contextData);
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                $contextData['anotherKey'] = 'anotherValue';
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -187,15 +179,13 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    $contextData['anotherKey'] = 'anotherValue';
-                    $context->setResult($contextData);
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                $contextData['anotherKey'] = 'anotherValue';
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             [
                 'key'         => 'value',
@@ -243,19 +233,17 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if ('1.2' === $context->getVersion()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif ('1.0' === $context->getVersion()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if ('1.2' === $context->getVersion()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif ('1.0' === $context->getVersion()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -299,19 +287,17 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if ('test' === (string)$context->getRequestType()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif ('test1' === (string)$context->getRequestType()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if ('test' === (string)$context->getRequestType()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif ('test1' === (string)$context->getRequestType()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -355,19 +341,17 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::exactly(2))
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    if (Entity\User::class === $context->getClassName()) {
-                        $contextData['anotherKey'] = 'anotherValue';
-                    } elseif (Entity\Account::class === $context->getClassName()) {
-                        $contextData['previousKey'] = 'previousValue';
-                    }
-                    $context->setResult($contextData);
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                if (Entity\User::class === $context->getClassName()) {
+                    $contextData['anotherKey'] = 'anotherValue';
+                } elseif (Entity\Account::class === $context->getClassName()) {
+                    $contextData['previousKey'] = 'previousValue';
                 }
-            );
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -407,15 +391,13 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    $contextData = $context->getResult();
-                    $contextData['anotherKey'] = 'anotherValue';
-                    $context->setResult($contextData);
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                $contextData = $context->getResult();
+                $contextData['anotherKey'] = 'anotherValue';
+                $context->setResult($contextData);
+            });
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'previousKey' => 'previousValue', 'anotherKey' => 'anotherValue'],
             $handledData
@@ -451,13 +433,11 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    self::assertTrue($context->isIdentifierOnly());
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                self::assertTrue($context->isIdentifierOnly());
+            });
 
-        \call_user_func($handler, $data, $context);
+        $handler($data, $context);
     }
 
     public function testForIdentifierOnlyWithCompositeIdentifier()
@@ -490,13 +470,11 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    self::assertTrue($context->isIdentifierOnly());
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                self::assertTrue($context->isIdentifierOnly());
+            });
 
-        \call_user_func($handler, $data, $context);
+        $handler($data, $context);
     }
 
     public function testForOneFieldThatIsNotIdentifier()
@@ -528,13 +506,11 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    self::assertFalse($context->isIdentifierOnly());
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                self::assertFalse($context->isIdentifierOnly());
+            });
 
-        \call_user_func($handler, $data, $context);
+        $handler($data, $context);
     }
 
     public function testForEntityWithoutIdentifier()
@@ -565,13 +541,11 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new CustomizeLoadedDataContext());
         $this->customizationProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeLoadedDataContext $context) {
-                    self::assertFalse($context->isIdentifierOnly());
-                }
-            );
+            ->willReturnCallback(function (CustomizeLoadedDataContext $context) {
+                self::assertFalse($context->isIdentifierOnly());
+            });
 
-        \call_user_func($handler, $data, $context);
+        $handler($data, $context);
     }
 
     public function testForCollectionHandler()
@@ -626,7 +600,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
-        $handledData = \call_user_func($handler, $data, $context);
+        $handledData = $handler($data, $context);
         self::assertEquals(
             ['key' => 'value', 'anotherKey' => 'anotherValue'],
             $handledData

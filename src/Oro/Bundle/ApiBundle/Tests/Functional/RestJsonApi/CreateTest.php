@@ -14,13 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  */
 class CreateTest extends RestJsonApiTestCase
 {
-    /**
-     * @param string $entityClass
-     * @param string $entityType
-     *
-     * @return bool
-     */
-    private function isSkippedEntity($entityClass, $entityType)
+    private function isSkippedEntity(string $entityClass, string $entityType): bool
     {
         /** @var SkippedEntityProviderInterface $provider */
         $provider = self::getContainer()->get('oro_api.tests.skipped_entity_provider');

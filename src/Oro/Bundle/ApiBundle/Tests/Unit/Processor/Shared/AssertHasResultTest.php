@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\AssertHasResult;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,7 @@ class AssertHasResultTest extends GetProcessorTestCase
 
     public function testProcessWhenResultDoesNotExistAndNoResponseStatusCode()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result does not exist.');
 
         $this->processor->process($this->context);
@@ -34,7 +35,7 @@ class AssertHasResultTest extends GetProcessorTestCase
 
     public function testProcessWhenResultDoesNotExistAndResponseShouldHaveContext()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result does not exist.');
 
         $this->context->setResponseStatusCode(Response::HTTP_BAD_REQUEST);

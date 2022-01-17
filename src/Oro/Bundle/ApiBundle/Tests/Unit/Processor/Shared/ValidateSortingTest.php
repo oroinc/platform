@@ -53,6 +53,57 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
+    private function getConfig(array $fieldNames = [], array $sortFieldNames = []): Config
+    {
+        $config = new Config();
+        $config->setDefinition($this->getEntityDefinitionConfig($fieldNames));
+        $config->setSorters($this->getSortersConfig($sortFieldNames));
+
+        return $config;
+    }
+
+    private function getEntityDefinitionConfig(array $fieldNames = []): EntityDefinitionConfig
+    {
+        $config = new EntityDefinitionConfig();
+        foreach ($fieldNames as $fieldName) {
+            $config->addField($fieldName);
+        }
+
+        return $config;
+    }
+
+    private function getSortersConfig(array $fieldNames = []): SortersConfig
+    {
+        $config = new SortersConfig();
+        foreach ($fieldNames as $fieldName) {
+            $config->addField($fieldName);
+        }
+
+        return $config;
+    }
+
+    private function prepareFilters(string $sortBy = '-id'): void
+    {
+        $filterValues = $this->context->getFilterValues();
+        $filterValues->set('sort', new FilterValue('sort', $sortBy));
+
+        // emulate sort normalizer
+        $orderBy = [];
+        $items = explode(',', $sortBy);
+        foreach ($items as $item) {
+            $item = trim($item);
+            if (str_starts_with($item, '-')) {
+                $orderBy[substr($item, 1)] = 'DESC';
+            } else {
+                $orderBy[$item] = 'ASC';
+            }
+        }
+        $filterValues->get('sort')->setValue($orderBy);
+
+        $this->context->setFilterValues($filterValues);
+        $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
+    }
+
     public function testProcessWhenQueryIsAlreadyBuilt()
     {
         $query = new \stdClass();
@@ -434,75 +485,5 @@ class ValidateSortingTest extends GetListProcessorOrmRelatedTestCase
             ],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @param string $sortBy
-     */
-    private function prepareFilters($sortBy = '-id')
-    {
-        $filterValues = $this->context->getFilterValues();
-        $filterValues->set('sort', new FilterValue('sort', $sortBy));
-
-        // emulate sort normalizer
-        $orderBy = [];
-        $items = explode(',', $sortBy);
-        foreach ($items as $item) {
-            $item = trim($item);
-            if (str_starts_with($item, '-')) {
-                $orderBy[substr($item, 1)] = 'DESC';
-            } else {
-                $orderBy[$item] = 'ASC';
-            }
-        }
-        $filterValues->get('sort')->setValue($orderBy);
-
-        $this->context->setFilterValues($filterValues);
-        $this->context->getFilters()->add('sort', new SortFilter(DataType::ORDER_BY));
-    }
-
-    /**
-     * @param string[] $fields
-     * @param string[] $sortFields
-     *
-     * @return Config
-     */
-    private function getConfig(array $fields = [], array $sortFields = [])
-    {
-        $config = new Config();
-        $config->setDefinition($this->getEntityDefinitionConfig($fields));
-        $config->setSorters($this->getSortersConfig($sortFields));
-
-        return $config;
-    }
-
-    /**
-     * @param string[] $fields
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function getEntityDefinitionConfig(array $fields = [])
-    {
-        $config = new EntityDefinitionConfig();
-        foreach ($fields as $field) {
-            $config->addField($field);
-        }
-
-        return $config;
-    }
-
-    /**
-     * @param string[] $fields
-     *
-     * @return SortersConfig
-     */
-    private function getSortersConfig(array $fields = [])
-    {
-        $config = new SortersConfig();
-        foreach ($fields as $field) {
-            $config->addField($field);
-        }
-
-        return $config;
     }
 }

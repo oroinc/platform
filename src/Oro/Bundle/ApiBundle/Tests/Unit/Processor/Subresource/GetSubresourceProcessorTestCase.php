@@ -10,11 +10,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetSubresourceProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var SubresourceContext */
-    protected $context;
+    protected SubresourceContext $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;

@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\Request\ParamConverter\DoctrineParamConverterDecorat
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,7 +54,7 @@ class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWithOutOfRangeException(): void
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('stdClass object not found.');
 
         $request = new Request(['param1' => 'value1']);
@@ -74,7 +75,7 @@ class DoctrineParamConverterDecoratorTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyWithOtherException(): void
     {
-        $this->expectException(\Doctrine\DBAL\Exception\DriverException::class);
+        $this->expectException(DriverException::class);
         $this->expectExceptionMessage('out of range');
 
         $request = new Request(['param1' => 'value1']);

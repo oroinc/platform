@@ -224,7 +224,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider completeErrorWithPropertyPathButWithoutMetadataDataProvider
      */
-    public function testCompleteErrorWithPropertyPathButWithoutMetadata($property, $expectedResult)
+    public function testCompleteErrorWithPropertyPathButWithoutMetadata(string $property, array $expectedResult)
     {
         $error = new Error();
         $error->setDetail('test detail');

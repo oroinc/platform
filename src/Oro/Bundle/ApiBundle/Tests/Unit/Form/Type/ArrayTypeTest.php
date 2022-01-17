@@ -10,7 +10,7 @@ class ArrayTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider validValuesDataProvider
      */
-    public function testWithValidValue($value, $expected)
+    public function testWithValidValue(array $value, array $expected)
     {
         $form = $this->factory->create(ArrayType::class);
         $form->submit($value);
@@ -18,7 +18,7 @@ class ArrayTypeTest extends ApiFormTypeTestCase
         self::assertSame($expected, $form->getData());
     }
 
-    public function validValuesDataProvider()
+    public function validValuesDataProvider(): array
     {
         return [
             [[], []],
@@ -30,14 +30,14 @@ class ArrayTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testWithInvalidValue($value)
+    public function testWithInvalidValue(mixed $value)
     {
         $form = $this->factory->create(ArrayType::class);
         $form->submit($value);
         self::assertFalse($form->isSynchronized());
     }
 
-    public function invalidValuesDataProvider()
+    public function invalidValuesDataProvider(): array
     {
         return [
             ['test'],

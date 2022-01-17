@@ -21,9 +21,9 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getConstraintStatusCodeDataProvider()
+     * @dataProvider getConstraintStatusCodeDataProvider
      */
-    public function testGetConstraintStatusCode(Constraint $constraint, $expectedStatusCode)
+    public function testGetConstraintStatusCode(Constraint $constraint, int $expectedStatusCode)
     {
         self::assertEquals(
             $expectedStatusCode,
@@ -31,7 +31,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getConstraintStatusCodeDataProvider()
+    public function getConstraintStatusCodeDataProvider(): array
     {
         return [
             [new Blank(), 400],
@@ -50,7 +50,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConstraintTypeDataProvider
      */
-    public function testConstraintType(Constraint $constraint, $expectedType)
+    public function testConstraintType(Constraint $constraint, string $expectedType)
     {
         self::assertEquals(
             $expectedType,
@@ -58,7 +58,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getConstraintTypeDataProvider()
+    public function getConstraintTypeDataProvider(): array
     {
         return [
             [new Blank(), 'blank constraint'],

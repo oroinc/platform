@@ -75,14 +75,6 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         return $message;
     }
 
-    /**
-     * @return SessionInterface
-     */
-    private function getSession(): SessionInterface
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
     public function testGetSubscribedTopics()
     {
         self::assertEquals(
@@ -99,7 +91,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
             ->method('critical')
             ->with('Got invalid message.');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -125,7 +117,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
             ->method('critical')
             ->with('The root job does not exist.');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -186,7 +178,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
                 $aggregateTime
             );
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -246,7 +238,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
             ->method('incrementAggregateTime')
             ->with($operationId, $aggregateTime + 100);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -306,7 +298,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
             ->method('incrementAggregateTime')
             ->with($operationId, $aggregateTime + 100);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }

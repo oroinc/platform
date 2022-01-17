@@ -20,15 +20,13 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
-        $this->transformer = new EntityClassToEntityTypeTransformer(
-            $this->valueNormalizer
-        );
+        $this->transformer = new EntityClassToEntityTypeTransformer($this->valueNormalizer);
     }
 
     /**
      * @dataProvider emptyValueProvider
      */
-    public function testTransformEmptyValue($value)
+    public function testTransformEmptyValue(?string $value)
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
@@ -39,7 +37,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function emptyValueProvider()
+    public function emptyValueProvider(): array
     {
         return [
             [null],

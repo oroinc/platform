@@ -93,11 +93,6 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         return $message;
     }
 
-    private function getSession(): SessionInterface
-    {
-        return $this->createMock(SessionInterface::class);
-    }
-
     private function createBatchSummaryFromArray(array $summaryData): BatchSummary
     {
         $summary = new BatchSummary();
@@ -126,7 +121,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('critical')
             ->with('Got invalid message.');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -189,7 +184,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -253,7 +248,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -317,7 +312,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -381,7 +376,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -450,7 +445,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -526,7 +521,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('error')
             ->with('Cannot get data encoder. Request Type: testRequest.');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -619,7 +614,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 . ' Failed to update the info file "api_123_info" because the lock cannot be acquired.'
             );
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -720,7 +715,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 ['exception' => $exception]
             );
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -841,7 +836,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -906,7 +901,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertEquals($expectedJobData, $job->getData());
@@ -1021,7 +1016,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->method('info')
             ->with('The retry requested. Reason: test retry reason');
 
-        $this->processor->process($message, $this->getSession());
+        $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals($expectedJobData, $job->getData());
     }
@@ -1109,7 +1104,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->logger->expects(self::never())
             ->method(self::anything());
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertEquals($expectedJobData, $job->getData());

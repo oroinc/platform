@@ -9,58 +9,36 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DefaultAndNullTestCase extends RestJsonApiTestCase
 {
-    /**
-     * @param array $data
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function sendCreateRequest(array $data, $assertValid = true)
+    protected function sendCreateRequest(array $data, bool $assertValid = true): Response
     {
         $entityType = $this->getEntityType(TestDefaultAndNull::class);
 
         $data['data']['type'] = $entityType;
 
-        $response = $this->post(
+        return $this->post(
             ['entity' => $entityType],
             $data,
             [],
             $assertValid
         );
-
-        return $response;
     }
 
-    /**
-     * @param int   $entityId
-     * @param array $data
-     * @param bool  $assertValid
-     *
-     * @return Response
-     */
-    protected function sendUpdateRequest($entityId, array $data, $assertValid = true)
+    protected function sendUpdateRequest(int $entityId, array $data, bool $assertValid = true): Response
     {
         $entityType = $this->getEntityType(TestDefaultAndNull::class);
 
         $data['data']['type'] = $entityType;
         $data['data']['id'] = (string)$entityId;
 
-        $response = $this->patch(
+        return $this->patch(
             ['entity' => $entityType, 'id' => (string)$entityId],
             $data,
             [],
             $assertValid
         );
-
-        return $response;
     }
 
-    /**
-     * @param int $entityId
-     *
-     * @return TestDefaultAndNull
-     */
-    protected function loadTestEntity($entityId)
+    protected function loadTestEntity(int $entityId): TestDefaultAndNull
     {
         $em = $this->getEntityManager();
         $em->clear();
@@ -73,7 +51,7 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
         return $entity;
     }
 
-    protected function saveTestEntity(TestDefaultAndNull $entity)
+    protected function saveTestEntity(TestDefaultAndNull $entity): void
     {
         $em = $this->getEntityManager();
         $em->persist($entity);
@@ -81,10 +59,7 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
         $em->clear();
     }
 
-    /**
-     * @return bool
-     */
-    protected function isPostgreSql()
+    protected function isPostgreSql(): bool
     {
         return $this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }

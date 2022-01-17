@@ -87,23 +87,21 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getExcludedActions');
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $context->getResult()->add(new ApiResource('Test\Entity2'));
-                    $context->getResult()->add(new ApiResource('Test\Entity3'));
-                    $context->getResult()->add(new ApiResource('Test\Entity4'));
-                    $context->getResult()->add(new ApiResource('Test\Entity5'));
+                $context->getResult()->add(new ApiResource('Test\Entity1'));
+                $context->getResult()->add(new ApiResource('Test\Entity2'));
+                $context->getResult()->add(new ApiResource('Test\Entity3'));
+                $context->getResult()->add(new ApiResource('Test\Entity4'));
+                $context->getResult()->add(new ApiResource('Test\Entity5'));
 
-                    $context->setAccessibleResources(['Test\Entity2', 'Test\Entity4']);
-                    $context->setAccessibleAsAssociationResources(['Test\Entity2', 'Test\Entity5']);
+                $context->setAccessibleResources(['Test\Entity2', 'Test\Entity4']);
+                $context->setAccessibleAsAssociationResources(['Test\Entity2', 'Test\Entity5']);
 
-                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
-                }
-            );
+                $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResourcesWithoutIdentifier')
             ->with($version, self::identicalTo($requestType))
@@ -176,40 +174,38 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $context->getResult()->add(new ApiResource('Test\Entity2'));
-                    $context->getResult()->add(new ApiResource('Test\Entity3'));
-                    $context->getResult()->add(new ApiResource('Test\Entity4'));
-                    $context->getResult()->add(new ApiResource('Test\Entity5'));
+                $context->getResult()->add(new ApiResource('Test\Entity1'));
+                $context->getResult()->add(new ApiResource('Test\Entity2'));
+                $context->getResult()->add(new ApiResource('Test\Entity3'));
+                $context->getResult()->add(new ApiResource('Test\Entity4'));
+                $context->getResult()->add(new ApiResource('Test\Entity5'));
 
-                    $context->setAccessibleResources([]);
-                    $context->setAccessibleAsAssociationResources([]);
+                $context->setAccessibleResources([]);
+                $context->setAccessibleAsAssociationResources([]);
 
-                    $entity2Actions = new ActionsConfig();
-                    $entity2Actions->addAction(ApiAction::UPDATE_LIST)->setExcluded();
-                    $entity3Actions = new ActionsConfig();
-                    $entity3Actions->addAction(ApiAction::UPDATE_LIST)->setExcluded(false);
-                    $entity4Actions = new ActionsConfig();
-                    $entity4Actions->addAction(ApiAction::UPDATE_LIST);
-                    $entity5Actions = new ActionsConfig();
-                    $entity5Actions->addAction(ApiAction::CREATE);
-                    $entity5Actions->addAction(ApiAction::GET)->setExcluded();
-                    $context->set(
-                        AddExcludedActions::ACTIONS_CONFIG_KEY,
-                        [
-                            'Test\Entity2' => $entity2Actions,
-                            'Test\Entity3' => $entity3Actions,
-                            'Test\Entity4' => $entity4Actions,
-                            'Test\Entity5' => $entity5Actions
-                        ]
-                    );
-                }
-            );
+                $entity2Actions = new ActionsConfig();
+                $entity2Actions->addAction(ApiAction::UPDATE_LIST)->setExcluded();
+                $entity3Actions = new ActionsConfig();
+                $entity3Actions->addAction(ApiAction::UPDATE_LIST)->setExcluded(false);
+                $entity4Actions = new ActionsConfig();
+                $entity4Actions->addAction(ApiAction::UPDATE_LIST);
+                $entity5Actions = new ActionsConfig();
+                $entity5Actions->addAction(ApiAction::CREATE);
+                $entity5Actions->addAction(ApiAction::GET)->setExcluded();
+                $context->set(
+                    AddExcludedActions::ACTIONS_CONFIG_KEY,
+                    [
+                        'Test\Entity2' => $entity2Actions,
+                        'Test\Entity3' => $entity3Actions,
+                        'Test\Entity4' => $entity4Actions,
+                        'Test\Entity5' => $entity5Actions
+                    ]
+                );
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResources')
             ->with($version, self::identicalTo($requestType))
@@ -336,57 +332,55 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getExcludedActions');
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $excludedGetAction = new ApiResource('Test\Entity2');
-                    $excludedGetAction->addExcludedAction(ApiAction::GET);
-                    $context->getResult()->add($excludedGetAction);
-                    $excludedGetAndGetListActions = new ApiResource('Test\Entity3');
-                    $excludedGetAndGetListActions->addExcludedAction(ApiAction::GET);
-                    $excludedGetAndGetListActions->addExcludedAction(ApiAction::GET_LIST);
-                    $context->getResult()->add($excludedGetAndGetListActions);
-                    $excludedGetActionButEnabledDeleteAction = new ApiResource('Test\Entity4');
-                    $excludedGetActionButEnabledDeleteAction->addExcludedAction(ApiAction::GET);
-                    $context->getResult()->add($excludedGetActionButEnabledDeleteAction);
-                    $excludedGetAndGetListActionsButEnabledDeleteListAction = new ApiResource('Test\Entity5');
-                    $excludedGetAndGetListActionsButEnabledDeleteListAction->addExcludedAction(ApiAction::GET);
-                    $excludedGetAndGetListActionsButEnabledDeleteListAction->addExcludedAction(ApiAction::GET_LIST);
-                    $context->getResult()->add($excludedGetAndGetListActionsButEnabledDeleteListAction);
-                    $context->getResult()->add(new ApiResource('Test\Entity6'));
+                $context->getResult()->add(new ApiResource('Test\Entity1'));
+                $excludedGetAction = new ApiResource('Test\Entity2');
+                $excludedGetAction->addExcludedAction(ApiAction::GET);
+                $context->getResult()->add($excludedGetAction);
+                $excludedGetAndGetListActions = new ApiResource('Test\Entity3');
+                $excludedGetAndGetListActions->addExcludedAction(ApiAction::GET);
+                $excludedGetAndGetListActions->addExcludedAction(ApiAction::GET_LIST);
+                $context->getResult()->add($excludedGetAndGetListActions);
+                $excludedGetActionButEnabledDeleteAction = new ApiResource('Test\Entity4');
+                $excludedGetActionButEnabledDeleteAction->addExcludedAction(ApiAction::GET);
+                $context->getResult()->add($excludedGetActionButEnabledDeleteAction);
+                $excludedGetAndGetListActionsButEnabledDeleteListAction = new ApiResource('Test\Entity5');
+                $excludedGetAndGetListActionsButEnabledDeleteListAction->addExcludedAction(ApiAction::GET);
+                $excludedGetAndGetListActionsButEnabledDeleteListAction->addExcludedAction(ApiAction::GET_LIST);
+                $context->getResult()->add($excludedGetAndGetListActionsButEnabledDeleteListAction);
+                $context->getResult()->add(new ApiResource('Test\Entity6'));
 
-                    $context->setAccessibleResources([
-                        'Test\Entity1',
-                        'Test\Entity2',
-                        'Test\Entity3',
-                        'Test\Entity4',
-                        'Test\Entity5',
-                        'Test\Entity6'
-                    ]);
-                    $context->setAccessibleAsAssociationResources([
-                        'Test\Entity1',
-                        'Test\Entity2',
-                        'Test\Entity3',
-                        'Test\Entity4',
-                        'Test\Entity5'
-                    ]);
+                $context->setAccessibleResources([
+                    'Test\Entity1',
+                    'Test\Entity2',
+                    'Test\Entity3',
+                    'Test\Entity4',
+                    'Test\Entity5',
+                    'Test\Entity6'
+                ]);
+                $context->setAccessibleAsAssociationResources([
+                    'Test\Entity1',
+                    'Test\Entity2',
+                    'Test\Entity3',
+                    'Test\Entity4',
+                    'Test\Entity5'
+                ]);
 
-                    $entity4Actions = new ActionsConfig();
-                    $entity4Actions->addAction(ApiAction::DELETE)->setExcluded(false);
-                    $entity5Actions = new ActionsConfig();
-                    $entity5Actions->addAction(ApiAction::DELETE_LIST)->setExcluded(false);
-                    $context->set(
-                        AddExcludedActions::ACTIONS_CONFIG_KEY,
-                        [
-                            'Test\Entity4' => $entity4Actions,
-                            'Test\Entity5' => $entity5Actions
-                        ]
-                    );
-                }
-            );
+                $entity4Actions = new ActionsConfig();
+                $entity4Actions->addAction(ApiAction::DELETE)->setExcluded(false);
+                $entity5Actions = new ActionsConfig();
+                $entity5Actions->addAction(ApiAction::DELETE_LIST)->setExcluded(false);
+                $context->set(
+                    AddExcludedActions::ACTIONS_CONFIG_KEY,
+                    [
+                        'Test\Entity4' => $entity4Actions,
+                        'Test\Entity5' => $entity5Actions
+                    ]
+                );
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResourcesWithoutIdentifier')
             ->with($version, self::identicalTo($requestType))
@@ -525,20 +519,18 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getExcludedActions');
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $context->getResult()->add(new ApiResource('Test\Entity2'));
+                $context->getResult()->add(new ApiResource('Test\Entity1'));
+                $context->getResult()->add(new ApiResource('Test\Entity2'));
 
-                    $context->setAccessibleResources(['Test\Entity2']);
-                    $context->setAccessibleAsAssociationResources(['Test\Entity2']);
+                $context->setAccessibleResources(['Test\Entity2']);
+                $context->setAccessibleAsAssociationResources(['Test\Entity2']);
 
-                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
-                }
-            );
+                $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResourcesWithoutIdentifier')
             ->with($version, self::identicalTo($requestType))
@@ -679,20 +671,18 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getExcludedActions');
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $context->getResult()->add(new ApiResource('Test\Entity2'));
+                $context->getResult()->add(new ApiResource('Test\Entity1'));
+                $context->getResult()->add(new ApiResource('Test\Entity2'));
 
-                    $context->setAccessibleResources(['Test\Entity2']);
-                    $context->setAccessibleAsAssociationResources(['Test\Entity2']);
+                $context->setAccessibleResources(['Test\Entity2']);
+                $context->setAccessibleAsAssociationResources(['Test\Entity2']);
 
-                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
-                }
-            );
+                $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResourcesWithoutIdentifier')
             ->with($version, self::identicalTo($requestType))
@@ -831,20 +821,18 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getExcludedActions');
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $context->getResult()->add(new ApiResource('Test\Entity2'));
+                $context->getResult()->add(new ApiResource('Test\Entity1'));
+                $context->getResult()->add(new ApiResource('Test\Entity2'));
 
-                    $context->setAccessibleResources(['Test\Entity2']);
-                    $context->setAccessibleAsAssociationResources(['Test\Entity2']);
+                $context->setAccessibleResources(['Test\Entity2']);
+                $context->setAccessibleAsAssociationResources(['Test\Entity2']);
 
-                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
-                }
-            );
+                $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResourcesWithoutIdentifier')
             ->with($version, self::identicalTo($requestType))
@@ -959,23 +947,21 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(null);
         $this->processor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CollectResourcesContext $context) use ($version, $requestType) {
-                    self::assertEquals($version, $context->getVersion());
-                    self::assertEquals($requestType, $context->getRequestType());
+            ->willReturnCallback(function (CollectResourcesContext $context) use ($version, $requestType) {
+                self::assertEquals($version, $context->getVersion());
+                self::assertEquals($requestType, $context->getRequestType());
 
-                    $resource1 = new ApiResource('Test\Entity1');
-                    $context->getResult()->add($resource1);
-                    $resource3 = new ApiResource('Test\Entity2');
-                    $resource3->addExcludedAction('delete');
-                    $context->getResult()->add($resource3);
+                $resource1 = new ApiResource('Test\Entity1');
+                $context->getResult()->add($resource1);
+                $resource3 = new ApiResource('Test\Entity2');
+                $resource3->addExcludedAction('delete');
+                $context->getResult()->add($resource3);
 
-                    $context->setAccessibleResources(['Test\Entity2']);
-                    $context->setAccessibleAsAssociationResources(['Test\Entity2']);
+                $context->setAccessibleResources(['Test\Entity2']);
+                $context->setAccessibleAsAssociationResources(['Test\Entity2']);
 
-                    $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
-                }
-            );
+                $context->set(AddExcludedActions::ACTIONS_CONFIG_KEY, []);
+            });
         $this->resourcesCache->expects(self::once())
             ->method('getResourcesWithoutIdentifier')
             ->with($version, self::identicalTo($requestType))

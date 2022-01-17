@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeFeature;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ValidateEntityTypeFeatureTest extends GetListProcessorTestCase
 {
@@ -25,7 +26,7 @@ class ValidateEntityTypeFeatureTest extends GetListProcessorTestCase
 
     public function testProcessDisabled()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $className = 'Test\Class';
 
         $this->featureChecker->expects(self::once())

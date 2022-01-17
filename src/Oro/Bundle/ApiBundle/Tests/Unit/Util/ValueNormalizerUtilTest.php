@@ -13,7 +13,7 @@ class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider humanizeClassNameDataProvider
      */
-    public function testHumanizeClassName($className, $classSuffix, $expected)
+    public function testHumanizeClassName(string $className, ?string $classSuffix, string $expected)
     {
         self::assertEquals(
             $expected,
@@ -21,7 +21,7 @@ class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function humanizeClassNameDataProvider()
+    public function humanizeClassNameDataProvider(): array
     {
         return [
             [\Exception::class, null, 'exception'],

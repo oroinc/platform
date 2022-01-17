@@ -108,12 +108,10 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['1', 'integer', $this->context->getRequestType(), false, false, 1],
-                    ['test', 'string', $this->context->getRequestType(), false, false, 'test']
-                ]
-            );
+            ->willReturnMap([
+                ['1', 'integer', $this->context->getRequestType(), false, false, 1],
+                ['test', 'string', $this->context->getRequestType(), false, false, 'test']
+            ]);
         $this->entityIdTransformerRegistry->expects(self::never())
             ->method('getEntityIdTransformer');
 
