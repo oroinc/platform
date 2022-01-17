@@ -9,3 +9,9 @@ styles:
 
         - 'bundles/orodatagrid/blank/scss/components/data-blank-content.scss'
         - 'bundles/orodatagrid/blank/scss/styles.scss'
+
+datagrid_5_0_styles:
+    inputs:
+        - 'bundles/orodatagrid/blank/scss/settings/global-settings-5-0.scss'
+        - 'bundles/orodatagrid/blank/scss/components/datagrid-body-cell-5-0.scss'
+    output: 'css/datagrid_5.0.css'

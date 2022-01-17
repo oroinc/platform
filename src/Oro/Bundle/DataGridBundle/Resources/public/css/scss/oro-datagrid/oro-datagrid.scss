@@ -4,6 +4,7 @@
     margin: $oro-datagrid-offset;
 
     @import "grid";
+    @import "grid-row-link-enabled";
     @import "grid-no-data";
     @import "grid-action-columns";
     @import "board-view/board";

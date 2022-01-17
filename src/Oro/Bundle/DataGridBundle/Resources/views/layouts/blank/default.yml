@@ -2,3 +2,11 @@ layout:
     actions:
         - '@setBlockTheme':
             themes: 'OroDataGridBundle:layouts:blank/default.html.twig'
+
+        - '@add':
+              id: oro_datagrid_5_0_styles
+              parentId: head
+              blockType: style
+              options:
+                  src: '=data["asset"].getUrl(data["theme"].getStylesOutput(context["theme"], "datagrid_5_0_styles"))'
+                  visible: '=data["system_config_provider"].getValue("oro_data_grid.row_link_enabled")'
