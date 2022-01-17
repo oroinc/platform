@@ -3,9 +3,9 @@
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit;
 
 use Gaufrette\Filesystem;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Finder\Finder;

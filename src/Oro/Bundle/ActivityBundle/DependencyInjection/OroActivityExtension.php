@@ -17,10 +17,16 @@ class OroActivityExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        $config = $this->processConfiguration(new Configuration(), $configs);
+
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('services_api.yml');
         $loader->load('form.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
+
+        $container->getDefinition('oro_activity.api.activity_association_provider')
+            ->setArgument(0, $config['api']['activity_association_names']);
     }
 }

@@ -6,15 +6,17 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that purges emails attachments.
+ */
 class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     const LIMIT = 100;
@@ -29,16 +31,10 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
      */
     private $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(ManagerRegistry $doctrine, JobRunner $jobRunner, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $doctrine, JobRunner $jobRunner)
     {
         $this->doctrine = $doctrine;
         $this->jobRunner = $jobRunner;
-        $this->logger = $logger;
     }
 
     /**
@@ -46,13 +42,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
-        if (! isset($body['jobId'], $body['ids']) || ! is_array($body['ids'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $body = $message->getBody();
 
         $result = $this->jobRunner->runDelayed($body['jobId'], function () use ($body) {
             $em = $this->getEntityManager();
@@ -78,7 +68,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS];
+        return [PurgeEmailAttachmentsByIdsTopic::getName()];
     }
 
     /**

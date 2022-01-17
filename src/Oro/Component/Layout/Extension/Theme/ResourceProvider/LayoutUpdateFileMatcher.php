@@ -32,21 +32,15 @@ class LayoutUpdateFileMatcher extends ByFileNameMatcher
             && !$this->isFileExcluded($file);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([parent::serialize(), $this->excludeFilePathPatterns]);
+        return [parent::__serialize(), $this->excludeFilePathPatterns];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($serializedParent, $this->excludeFilePathPatterns) = unserialize($serialized);
-        parent::unserialize($serializedParent);
+        [$serializedParent, $this->excludeFilePathPatterns] = $serialized;
+        parent::__unserialize($serializedParent);
     }
 
     private function isFileExcluded(\SplFileInfo $file): bool

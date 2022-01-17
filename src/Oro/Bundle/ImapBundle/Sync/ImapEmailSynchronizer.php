@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
-use Oro\Bundle\ImapBundle\Async\Topics;
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailsTopic;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -30,7 +30,7 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
     /** @var string */
-    protected static $messageQueueTopic = Topics::SYNC_EMAILS;
+    protected static $messageQueueTopic = SyncEmailsTopic::NAME;
 
     /** @var ImapEmailSynchronizationProcessorFactory */
     protected $syncProcessorFactory;

@@ -78,11 +78,11 @@ class DatagridExportConnector implements
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         $this->ensureSourceDataInitialized();
 
-        return $this->totalCount;
+        return $this->totalCount !== null ? $this->totalCount : 0;
     }
 
     /**

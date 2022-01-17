@@ -7,6 +7,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepLabelTemplate;
 use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\WorkflowLabelTemplate;
 
+/**
+ * Iterates over workflow definition translations
+ */
 class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTranslationFieldsIterator
 {
     /**
@@ -27,7 +30,7 @@ class WorkflowDefinitionTranslationFieldsIterator extends AbstractWorkflowTransl
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $context = new \ArrayObject([]);
         $context['workflow_name'] = $this->workflowDefinition->getName();

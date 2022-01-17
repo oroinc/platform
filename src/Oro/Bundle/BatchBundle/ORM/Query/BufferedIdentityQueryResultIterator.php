@@ -119,7 +119,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     /**
      * {@inheritDoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -127,7 +127,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     /**
      * {@inheritDoc}
      */
-    public function next()
+    public function next(): void
     {
         if (null === $this->identifiers) {
             $this->rewind();
@@ -152,7 +152,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     /**
      * {@inheritDoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->offset = -1;
         $this->page = -1;
@@ -168,7 +168,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         if ($this->totalCount === null) {
             if ($this->useCountWalker || $this->maxResults) {

@@ -30,7 +30,7 @@ class WorkflowConfigurationTranslationFieldsIterator extends AbstractWorkflowTra
      * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $context = new \ArrayObject([]);
         $context['workflow_name'] = $this->workflowName;

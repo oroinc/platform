@@ -26,7 +26,7 @@ class LocaleListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $locale = str_replace('-', '_', $request->query->get('locale'));
+        $locale = str_replace('-', '_', $request->query->get('locale', ''));
         if ($locale && $this->isApiRequest($request)) {
             $request->setLocale($locale);
             $this->translatableListener->setTranslatableLocale($locale);

@@ -367,8 +367,7 @@ class EmailModelBuilder
     protected function getRecipients(EmailModel $emailModel, $type, $excludeCurrentUser = false)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-
-        $address = trim($request->get($type));
+        $address = trim((string)$request->get($type, ''));
         if ($address) {
             $this->helper->preciseFullEmailAddress(
                 $address,
@@ -384,8 +383,8 @@ class EmailModelBuilder
     protected function applySubject(EmailModel $model)
     {
         $request = $this->request ?? $this->requestStack->getCurrentRequest();
-
-        $subject = trim($request->get('subject'));
+        $subject = $request->get('subject');
+        $subject = $subject ? trim($subject) : '';
         if ($subject) {
             $model->setSubject($subject);
         }

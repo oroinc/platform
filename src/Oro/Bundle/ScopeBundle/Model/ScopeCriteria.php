@@ -115,7 +115,7 @@ class ScopeCriteria implements \IteratorAggregate
      * Returns an iterator by parameters are sorted by priority.
      * The higher the priority, the earlier the parameter is returned by the iterator.
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->parameters);
     }

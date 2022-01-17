@@ -9,6 +9,15 @@ use Symfony\Component\ErrorHandler\ErrorHandler as BaseErrorHandler;
  */
 class ErrorHandler extends BaseErrorHandler
 {
+    public static function register(BaseErrorHandler $handler = null, bool $replace = true): BaseErrorHandler
+    {
+        $errorLevel = error_reporting();
+        // Silence all PHP deprecation notices as many of them are triggered all over the ORO and vendor code
+        error_reporting($errorLevel & ~\E_DEPRECATED);
+
+        return parent::register($handler, $replace);
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -21,11 +30,8 @@ class ErrorHandler extends BaseErrorHandler
             }
 
             // silence deprecation from ReflectionType::__toString()
-            if (PHP_VERSION_ID >= 70400
-                && (
-                    str_contains($message, 'Function ReflectionType::__toString() is deprecated')
-                    || str_contains($message, 'a ? b : c ? d : e')
-                )
+            if (str_contains($message, 'Function ReflectionType::__toString() is deprecated')
+                || str_contains($message, 'a ? b : c ? d : e')
             ) {
                 return true;
             }

@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -116,7 +116,6 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                     ],
                 ],
                 'recipientUserId' => 1,
-                'contentType' => 'text/html',
                 'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]
         );
@@ -180,7 +179,6 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
                     ],
                 ],
                 'recipientUserId' => 1,
-                'contentType' => 'text/html',
                 'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_RESULT,
             ]
         );
@@ -232,7 +230,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             $this->getRouter()->generate('oro_importexport_job_error_log', ['jobId' => $rootJob->getId()]);
         $notificationExpectedMessage['templateParams']['data']['downloadLogUrl'] = $url;
 
-        $this->assertMessageSent(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $notificationExpectedMessage);
+        $this->assertMessageSent(SendEmailNotificationTemplateTopic::getName(), $notificationExpectedMessage);
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 

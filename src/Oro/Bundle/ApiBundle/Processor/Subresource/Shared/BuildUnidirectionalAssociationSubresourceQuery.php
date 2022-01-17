@@ -44,7 +44,7 @@ class BuildUnidirectionalAssociationSubresourceQuery implements ProcessorInterfa
         $unidirectionalAssociations = $parentConfig->get(
             UnidirectionalAssociationCompleter::UNIDIRECTIONAL_ASSOCIATIONS
         );
-        if (!isset($unidirectionalAssociations[$associationName])) {
+        if (!$unidirectionalAssociations || !isset($unidirectionalAssociations[$associationName])) {
             // not unidirectional association
             return;
         }

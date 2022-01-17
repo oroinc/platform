@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Tools;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Adds to logger entity config log
+ */
 class ConfigLogger extends AbstractLogger
 {
     /**
@@ -69,7 +72,7 @@ class ConfigLogger extends AbstractLogger
         if (is_bool($val)) {
             return $val ? 'true' : 'false';
         }
-        if (is_object($val) && $val instanceof \Serializable) {
+        if (is_object($val) && is_callable([$val, '__serialize'])) {
             return serialize($val);
         }
 

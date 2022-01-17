@@ -20,11 +20,10 @@ use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
-use Oro\Component\MessageQueue\Job\Topics as JobTopics;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -107,7 +106,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     {
         $message = new Message();
         $message->setMessageId(UUIDGenerator::v4());
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
 
         $token = $this->getTokenStorage()->getToken();
         if ($token instanceof TokenInterface) {
@@ -134,8 +133,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
 
     protected function extractJobIdFromMessage(MessageInterface $message): int
     {
-        $messageBody = self::jsonToArray($message->getBody());
-        $jobId = $messageBody['jobId'];
+        $jobId = $message->getBody()['jobId'];
         self::assertIsInt($jobId);
 
         return $jobId;
@@ -350,9 +348,9 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         }
 
         self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(JobTopics::ROOT_JOB_STOPPED, true);
-        self::getMessageCollector()->clearTopicMessages(JobTopics::ROOT_JOB_STOPPED);
-        self::assertCount(1, $messages, JobTopics::ROOT_JOB_STOPPED);
+        $messages = self::getSentMessagesByTopic(RootJobStoppedTopic::getName(), true);
+        self::getMessageCollector()->clearTopicMessages(RootJobStoppedTopic::getName());
+        self::assertCount(1, $messages, RootJobStoppedTopic::getName());
         foreach ($messages as $body) {
             $this->processMessage('oro_message_queue.job.dependent_job_processor', $this->createMessage($body));
         }

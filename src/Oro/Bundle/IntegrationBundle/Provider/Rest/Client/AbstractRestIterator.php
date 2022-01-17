@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Provider\Rest\Client;
 
+/**
+ * Iterates rows using REST API Client
+ */
 abstract class AbstractRestIterator implements \Iterator
 {
     /**
@@ -57,7 +60,7 @@ abstract class AbstractRestIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->current;
     }
@@ -65,7 +68,7 @@ abstract class AbstractRestIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->offset++;
 
@@ -80,7 +83,7 @@ abstract class AbstractRestIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -88,7 +91,7 @@ abstract class AbstractRestIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         if (!$this->firstLoaded) {
             $this->rewind();
@@ -100,7 +103,7 @@ abstract class AbstractRestIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->firstLoaded  = false;
         $this->totalCount   = null;

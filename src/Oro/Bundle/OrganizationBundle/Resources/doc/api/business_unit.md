@@ -257,3 +257,18 @@ Example:
 #### delete_relationship
 
 Remove user records from a specific business unit record.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}

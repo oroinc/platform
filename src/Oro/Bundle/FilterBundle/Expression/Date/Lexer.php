@@ -50,20 +50,20 @@ class Lexer
             }
 
             $current = $string[$cursor];
-            if (preg_match(self::REGEXP_DATETIME . 'A', $string, $match, null, $cursor)) {
+            if (preg_match(self::REGEXP_DATETIME . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 // integers
                 $tokens[] = new Token(Token::TYPE_DATE, $match[2]);
                 if (!empty($match[3])) {
                     $tokens[] = new Token(Token::TYPE_TIME, $match[3]);
                 }
                 $cursor += strlen($match[0]);
-            } elseif (preg_match(self::REGEXP_DAYMONTH . 'A', $string, $match, null, $cursor)) {
+            } elseif (preg_match(self::REGEXP_DAYMONTH . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 $tokens[] = new Token(Token::TYPE_DAYMONTH, $match[0]);
                 $cursor += strlen($match[0]);
-            } elseif (preg_match(self::REGEXP_TIME . 'A', $string, $match, null, $cursor)) {
+            } elseif (preg_match(self::REGEXP_TIME . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 $tokens[] = new Token(Token::TYPE_TIME, $match[0]);
                 $cursor += strlen($match[0]);
-            } elseif (preg_match(self::REGEXP_VARIABLE . 'A', $string, $match, null, $cursor)) {
+            } elseif (preg_match(self::REGEXP_VARIABLE . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 // variables
                 $tokens[] = new Token(
                     Token::TYPE_VARIABLE,
@@ -71,17 +71,17 @@ class Lexer
                     $this->translator->trans($this->provider->getVariableKey($match[1]))
                 );
                 $cursor += strlen($match[0]);
-            } elseif (preg_match(self::REGEXP_INTEGER . 'A', $string, $match, null, $cursor)) {
+            } elseif (preg_match(self::REGEXP_INTEGER . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 // integers
                 $tokens[] = new Token(Token::TYPE_INTEGER, $match[0]);
                 $cursor += strlen($match[0]);
-            } elseif (false !== strpos('(', $current)) {
+            } elseif (str_contains('(', $current)) {
                 // opening bracket
                 $brackets[] = $current;
 
                 $tokens[] = new Token(Token::TYPE_PUNCTUATION, $current);
                 ++$cursor;
-            } elseif (false !== strpos(')', $current)) {
+            } elseif (str_contains(')', $current)) {
                 // closing bracket
                 if (null === array_pop($brackets)) {
                     throw new SyntaxException(sprintf('Unexpected "%s"', $current));
@@ -89,7 +89,7 @@ class Lexer
 
                 $tokens[] = new Token(Token::TYPE_PUNCTUATION, $current);
                 ++$cursor;
-            } elseif (preg_match(self::REGEXP_OPERATOR . 'A', $string, $match, null, $cursor)) {
+            } elseif (preg_match(self::REGEXP_OPERATOR . 'A', $string, $match, PREG_NO_ERROR, $cursor)) {
                 // operators
                 $tokens[] = new Token(Token::TYPE_OPERATOR, $match[0]);
                 ++$cursor;

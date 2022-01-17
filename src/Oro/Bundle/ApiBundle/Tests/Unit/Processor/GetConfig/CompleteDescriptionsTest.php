@@ -22,6 +22,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocPar
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\ProductPrice as TestEntity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile as TestEntityWithInherit;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -56,6 +57,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     private const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
     private const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
+    private $resourcesProvider;
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDescriptionProvider */
     private $entityDocProvider;
 
@@ -84,6 +88,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
+        $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
         $this->entityDocProvider = $this->createMock(EntityDescriptionProvider::class);
         $this->resourceDocProvider = $this->createMock(ResourceDocProvider::class);
         $this->resourceDocParserRegistry = $this->createMock(ResourceDocParserRegistry::class);
@@ -104,7 +109,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $identifierDescriptionHelper = new IdentifierDescriptionHelper($this->doctrineHelper);
 
         $this->processor = new CompleteDescriptions(
-            $this->createMock(ResourcesProvider::class),
+            $this->resourcesProvider,
             new EntityDescriptionHelper(
                 $this->entityDocProvider,
                 $this->translator,
@@ -1147,27 +1152,28 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItAndCommonDescriptionExistInDocFileAndContainsInheritDocPlaceholder()
+    public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholderAndWhenItExistsInConfig()
     {
-        $entityClass = TestEntity::class;
+        $entityClass = TestEntityWithInherit::class;
         $targetAction = 'get_list';
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
-                'testField' => null
+                'testField' => [
+                    'description' => 'field description from config'
+                ]
             ]
         ];
 
-        $this->resourceDocParser->expects(self::exactly(2))
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceKnown')
+            ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->resourceDocParser->expects(self::once())
             ->method('getFieldDocumentation')
-            ->willReturnMap([
-                [$entityClass, 'testField', null, 'common field description. {@inheritdoc}'],
-                [$entityClass, 'testField', $targetAction, 'action field description. {@inheritdoc}']
-            ]);
-        $this->entityDocProvider->expects(self::once())
-            ->method('getFieldDocumentation')
-            ->with($entityClass, 'testField')
-            ->willReturn('field description from the entity config');
+            ->with($entityClass, 'testField', $targetAction)
+            ->willReturn('action field description. {@inheritdoc}');
 
         $this->context->setClassName($entityClass);
         $this->context->setTargetAction($targetAction);
@@ -1180,8 +1186,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'identifier_description' => self::ID_DESCRIPTION,
                 'fields'                 => [
                     'testField' => [
-                        'description' => 'action field description. common field description. '
-                            . 'field description from the entity config'
+                        'description' => 'action field description. field description from config'
                     ]
                 ]
             ],

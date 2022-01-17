@@ -4,7 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
-use Oro\Bundle\NotificationBundle\Async\Topics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -36,7 +36,7 @@ trait MessageProcessTrait
 
         $sentMessages = $this->getSentMessages();
         foreach ($sentMessages as $messageData) {
-            if (Topics::SEND_NOTIFICATION_EMAIL_TEMPLATE === $messageData['topic']) {
+            if (SendEmailNotificationTemplateTopic::getName() === $messageData['topic']) {
                 break;
             }
         }

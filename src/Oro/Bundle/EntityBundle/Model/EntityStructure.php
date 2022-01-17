@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Model;
 /**
  * Represents detailed information about an entity type.
  */
-class EntityStructure implements \Serializable
+class EntityStructure
 {
     /** @var string */
     private $id;
@@ -230,12 +230,9 @@ class EntityStructure implements \Serializable
         $this->routes = $routes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->id,
             $this->className,
             $this->label,
@@ -246,15 +243,12 @@ class EntityStructure implements \Serializable
             $this->routes,
             $this->options,
             $this->fields
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->id,
             $this->className,
             $this->label,
@@ -265,6 +259,6 @@ class EntityStructure implements \Serializable
             $this->routes,
             $this->options,
             $this->fields
-            ) = unserialize($serialized, ['allowed_classes' => [EntityFieldStructure::class]]);
+        ] = $serialized;
     }
 }

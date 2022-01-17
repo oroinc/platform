@@ -1,8 +1,10 @@
 <?php
+
 namespace Oro\Bundle\EmailBundle\Async;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Oro\Bundle\EmailBundle\Async\Topic\SyncEmailSeenFlagTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
@@ -10,9 +12,11 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that synchronizes the "seen" flag of the specified email.
+ */
 class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
     /**
@@ -42,13 +46,7 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $data = JSON::decode($message->getBody());
-
-        if (! isset($data['id'], $data['seen'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         /** @var EmailUser $emailUser */
         $emailUser = $this->getUserEmailRepository()->find($data['id']);
@@ -74,7 +72,7 @@ class SyncEmailSeenFlagMessageProcessor implements MessageProcessorInterface, To
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SYNC_EMAIL_SEEN_FLAG];
+        return [SyncEmailSeenFlagTopic::getName()];
     }
 
     /**

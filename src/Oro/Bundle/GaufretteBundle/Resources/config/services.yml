@@ -1,3 +1,6 @@
+parameters:
+    knp_gaufrette.filesystem_map.class: Oro\Bundle\GaufretteBundle\FilesystemMap
+
 services:
     oro_gaufrette.file_manager:
         class: Oro\Bundle\GaufretteBundle\FileManager

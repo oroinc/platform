@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 {
@@ -40,7 +39,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $this->assertCount(3, $allAttachments);
 
         $message = new Message();
-        $message->setBody(JSON::encode(['size' => null, 'all' => true]));
+        $message->setBody(['size' => null, 'all' => true]);
         $message->setMessageId('SomeId');
 
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments');
@@ -49,7 +48,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         $this->assertMessageSent(
-            Topics::PURGE_EMAIL_ATTACHMENTS_BY_IDS,
+            PurgeEmailAttachmentsByIdsTopic::getName(),
             [
                 'ids' => [
                     $allAttachments[0]->getId(),

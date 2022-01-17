@@ -130,20 +130,14 @@ class Config implements ConfigInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return \serialize([$this->id, $this->values]);
+        return [$this->id, $this->values];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list($this->id, $this->values) = \unserialize($serialized);
+        [$this->id, $this->values] = $serialized;
     }
 
     /**

@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
-use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesTopic;
 use Oro\Bundle\DataAuditBundle\Model\AdditionalEntityChangesToAuditStorage;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\AuditMessageBodyProvider;
@@ -163,7 +163,7 @@ class SendChangedEntitiesToMessageQueueListener implements OptionalListenerInter
 
                 if (!empty($body)) {
                     $this->messageProducer->send(
-                        Topics::ENTITIES_CHANGED,
+                        AuditChangedEntitiesTopic::getName(),
                         new Message($body, MessagePriority::VERY_LOW)
                     );
                 }

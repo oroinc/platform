@@ -502,7 +502,7 @@ class CountQueryBuilderOptimizer
             $alias = $from->getAlias();
             foreach ($this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames() as $item) {
                 $fieldName = $alias . '.' . $item;
-                if (stripos($distinctField, $fieldName) === false) {
+                if ($distinctField === null || stripos($distinctField, $fieldName) === false) {
                     $fieldsToSelect[] = $fieldName;
                 }
             }

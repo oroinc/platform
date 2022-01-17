@@ -8,8 +8,7 @@ namespace Oro\Component\MessageQueue\Transport;
  */
 class Message implements MessageInterface
 {
-    /** @var string */
-    private $body = '';
+    private mixed $body = '';
 
     /** @var array */
     private $properties = [];
@@ -20,18 +19,12 @@ class Message implements MessageInterface
     /** @var bool */
     private $redelivered = false;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setBody(string $body): void
+    public function setBody(mixed $body): void
     {
         $this->body = $body;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBody(): string
+    public function getBody(): mixed
     {
         return $this->body;
     }

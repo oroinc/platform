@@ -163,7 +163,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->has($offset);
     }
@@ -171,7 +171,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): ?FilterInterface
     {
         return $this->get($offset);
     }
@@ -179,7 +179,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->set($offset, $value);
     }
@@ -187,7 +187,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->remove($offset);
     }
@@ -195,7 +195,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->filters);
     }
@@ -203,7 +203,7 @@ class FilterCollection implements \IteratorAggregate, \Countable, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->filters);
     }

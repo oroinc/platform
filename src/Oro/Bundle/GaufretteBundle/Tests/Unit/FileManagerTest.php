@@ -10,11 +10,11 @@ use Gaufrette\Stream;
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\Stream\Local as LocalStream;
 use Gaufrette\StreamMode;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Bundle\GaufretteBundle\Exception\FlushFailedException;
 use Oro\Bundle\GaufretteBundle\Exception\ProtocolConfigurationException;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**

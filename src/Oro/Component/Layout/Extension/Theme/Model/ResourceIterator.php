@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+/**
+ * Recursively iterates over layout update files
+ */
 class ResourceIterator implements \Iterator
 {
     /** @var int */
@@ -21,7 +24,7 @@ class ResourceIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->iterator->current();
     }
@@ -29,7 +32,7 @@ class ResourceIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->currentKey;
     }
@@ -37,7 +40,7 @@ class ResourceIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->iterator->valid();
     }
@@ -45,7 +48,7 @@ class ResourceIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->currentKey++;
         $this->iterator->next();
@@ -54,7 +57,7 @@ class ResourceIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->currentKey = 0;
         $this->iterator->rewind();

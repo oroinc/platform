@@ -103,6 +103,7 @@ dynamic-imports:
         - orodatagrid/js/app/views/toggle-group-view
         - orodatagrid/js/app/views/toggle-pagination-view
         - orodatagrid/js/appearance/builder
+        - orodatagrid/js/cell-links/builder
         - orodatagrid/js/datagrid/builder/html-templates-preloader
         - orodatagrid/js/datagrid/listener/action-form-listener
         - orodatagrid/js/datagrid/listener/callback-listener

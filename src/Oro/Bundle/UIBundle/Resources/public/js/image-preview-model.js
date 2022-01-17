@@ -35,7 +35,6 @@ const ImagePreviewModal = ModalView.extend({
     events: {
         ...ModalView.prototype.events(),
         'beforeChange .images-list': 'onBeforeSlideChange',
-        'lazyLoaded .images-list': 'onLazyLoaded',
         'click .print': 'printSlide',
         'click .download': 'downloadSlide',
         'click': 'onClickSlide',
@@ -66,7 +65,6 @@ const ImagePreviewModal = ModalView.extend({
         data.counterCurrent = this.options.currentSlide + 1;
         data.counterAll = this.options.images.length;
         data.images = this.options.images;
-        data.getSourceSrc = this.getSourceForLazyLoading.bind(this);
         return data;
     },
 
@@ -114,6 +112,14 @@ const ImagePreviewModal = ModalView.extend({
         });
     },
 
+    delegateEvents() {
+        ImagePreviewModal.__super__.delegateEvents.call(this);
+
+        this.$('.images-list__item').one(`load${this.eventNamespace()}`, this.onLazyLoaded.bind(this));
+
+        return this;
+    },
+
     /**
      * Add specific className to backdrop
      * @param {function} callback
@@ -145,13 +151,9 @@ const ImagePreviewModal = ModalView.extend({
     /**
      * Remove lazy className after load image
      * @param {Event} event
-     * @param {object} slick
      */
-    onLazyLoaded(event, slick) {
-        const current = slick.$slides[slick.getCurrent()];
-        if (current.querySelector('[src]')) {
-            current.classList.remove('lazy-loading');
-        }
+    onLazyLoaded(event) {
+        $(event.target).closest('.slick-active').removeClass('lazy-loading');
     },
 
     downloadSlide(event) {

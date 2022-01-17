@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\GaufretteBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\GaufretteBundle\DependencyInjection\Compiler\SetGaufretteFilesystemsLazyPass;
+use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;

@@ -5,7 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Metadata;
 /**
  * Represents security metadata for an action (another name is capability).
  */
-class ActionSecurityMetadata implements ClassSecurityMetadata, \Serializable
+class ActionSecurityMetadata implements ClassSecurityMetadata
 {
     /** @var string */
     private $name;
@@ -86,32 +86,29 @@ class ActionSecurityMetadata implements ClassSecurityMetadata, \Serializable
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->name,
             $this->group,
             $this->label,
             $this->description,
             $this->category
-        ]);
+        ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->name,
             $this->group,
             $this->label,
             $this->description,
             $this->category
-            ) = unserialize($serialized);
+        ] = $serialized;
     }
 
     /**

@@ -32,7 +32,7 @@ use Oro\Bundle\UserBundle\Model\ExtendRole;
  *      }
  * )
  */
-class Role extends ExtendRole implements \Serializable
+class Role extends ExtendRole
 {
     const PREFIX_ROLE = 'ROLE_';
 
@@ -172,28 +172,22 @@ class Role extends ExtendRole implements \Serializable
         return $this->users;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         $dataForSerialization = [$this->id, $this->role, $this->label];
         if (property_exists($this, 'organization')) {
             $dataForSerialization[] =  is_object($this->organization) ? clone $this->organization : $this->organization;
         }
 
-        return serialize($dataForSerialization);
+        return $dataForSerialization;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
         if (property_exists($this, 'organization')) {
-            [$this->id, $this->role, $this->label, $this->organization] = unserialize($serialized);
+            [$this->id, $this->role, $this->label, $this->organization] = $serialized;
         } else {
-            [$this->id, $this->role, $this->label] = unserialize($serialized);
+            [$this->id, $this->role, $this->label] = $serialized;
         }
     }
 }

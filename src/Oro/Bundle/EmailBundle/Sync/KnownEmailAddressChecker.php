@@ -312,7 +312,11 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
      */
     protected function normalizeEmailAddress($email)
     {
-        return strtolower($this->emailAddressHelper->extractPureEmailAddress($email));
+        $normalizedEmail = $this->emailAddressHelper->extractPureEmailAddress($email);
+        if ($normalizedEmail === null) {
+            return '';
+        }
+        return strtolower($normalizedEmail);
     }
 
     /**

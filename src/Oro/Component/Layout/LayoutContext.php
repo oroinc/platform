@@ -167,7 +167,7 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return \array_key_exists($name, $this->items);
     }
@@ -175,7 +175,7 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         if (!\array_key_exists($name, $this->items)) {
             throw new \OutOfBoundsException(sprintf('Undefined index: %s.', $name));
@@ -187,7 +187,7 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         $this->set($name, $value);
     }
@@ -195,7 +195,7 @@ class LayoutContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         $this->remove($name);
     }

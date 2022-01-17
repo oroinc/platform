@@ -37,19 +37,13 @@ class ByFileNameMatcher implements FileMatcherInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->fileNamePatterns);
+        return $this->fileNamePatterns;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $this->fileNamePatterns = unserialize($serialized);
+        $this->fileNamePatterns = $serialized;
     }
 }

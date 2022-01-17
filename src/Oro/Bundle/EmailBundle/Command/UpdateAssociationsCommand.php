@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailAssociationsTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,7 +47,7 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->producer->send(Topics::UPDATE_ASSOCIATIONS_TO_EMAILS, []);
+        $this->producer->send(UpdateEmailAssociationsTopic::getName(), []);
 
         $output->writeln('<info>Update of associations has been scheduled.</info>');
 

@@ -138,6 +138,10 @@ class NumberFormatter
         bool $fixedFraction = false
     ): string {
         if (!$value || ((int)$value == $value) || $fixedFraction) {
+            if ($value === null) {
+                $value = 0;
+            }
+
             return $currencyFormatter->formatCurrency($value, $currencyCode);
         }
         $decimalObject = BigDecimal::of($value);
@@ -390,9 +394,9 @@ class NumberFormatter
     protected function formatDefaultDuration($value)
     {
         return
-            str_pad(floor($value / 3600), 2, '0', STR_PAD_LEFT) . ':' .
-            str_pad((floor($value / 60)) % 60, 2, '0', STR_PAD_LEFT) . ':' .
-            str_pad($value % 60, 2, '0', STR_PAD_LEFT);
+            str_pad((string)floor($value / 3600), 2, '0', STR_PAD_LEFT) . ':' .
+            str_pad((string)(floor($value / 60)) % 60, 2, '0', STR_PAD_LEFT) . ':' .
+            str_pad((string)((int)$value) % 60, 2, '0', STR_PAD_LEFT);
     }
 
     /**

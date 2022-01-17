@@ -1,4 +1,3 @@
-@regression
 @fixture-OroUserBundle:user.yml
 Feature: Change user username to another user username
   As an Administrator

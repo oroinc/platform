@@ -10,9 +10,9 @@ namespace Oro\Component\MessageQueue\Transport;
  */
 interface MessageInterface
 {
-    public function getBody(): string;
+    public function getBody(): mixed;
 
-    public function setBody(string $body): void;
+    public function setBody(mixed $body): void;
 
     public function setProperties(array $properties): void;
 

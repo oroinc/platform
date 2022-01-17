@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
@@ -52,8 +53,11 @@ class LanguageProviderTest extends \PHPUnit\Framework\TestCase
                 [true, $enabledLanguages],
             ]);
 
-        self::assertSame(array_keys($allLanguages), $this->provider->getAvailableLanguageCodes(false));
-        self::assertSame(array_keys($enabledLanguages), $this->provider->getAvailableLanguageCodes(true));
+        self::assertEqualsCanonicalizing(array_keys($allLanguages), $this->provider->getAvailableLanguageCodes(false));
+        self::assertEqualsCanonicalizing(
+            array_keys($enabledLanguages),
+            $this->provider->getAvailableLanguageCodes(true)
+        );
     }
 
     public function testGetAvailableLanguagesByCurrentUser(): void

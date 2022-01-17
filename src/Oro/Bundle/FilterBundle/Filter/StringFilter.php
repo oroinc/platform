@@ -193,7 +193,11 @@ class StringFilter extends AbstractFilter
      */
     protected function isCompositeField(FilterDatasourceAdapterInterface $ds, $fieldName)
     {
-        return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $ds->getFieldByAlias($fieldName));
+        $filter = $ds->getFieldByAlias($fieldName);
+        if ($filter === null) {
+            return false;
+        }
+        return (bool)preg_match('/(?<![\w:.])(CONCAT)\s*\(/im', $filter);
     }
 
     protected function setCaseSensitivity(FilterDatasourceAdapterInterface $ds)

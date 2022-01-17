@@ -138,6 +138,9 @@ class ExtendHelper
      */
     public static function getRelationType($relationKey)
     {
+        if ($relationKey === null) {
+            return null;
+        }
         $parts = explode('|', $relationKey);
         $numberOfParts = count($parts);
         if ($numberOfParts < 4 || $numberOfParts > 5) {
@@ -242,7 +245,7 @@ class ExtendHelper
      */
     public static function buildEnumValueId($enumValueName, $throwExceptionIfInvalidName = true)
     {
-        if (strlen($enumValueName) === 0) {
+        if ($enumValueName === '') {
             if (!$throwExceptionIfInvalidName) {
                 return '';
             }

@@ -179,7 +179,7 @@ class OptionsResolver implements Options
      * @return mixed
      * @throws \Exception
      */
-    public function offsetGet($option)
+    public function offsetGet($option): mixed
     {
         return $this->optionsResolver->offsetGet($option);
     }
@@ -188,17 +188,17 @@ class OptionsResolver implements Options
      * @param $option
      * @return bool
      */
-    public function offsetExists($option)
+    public function offsetExists($option): bool
     {
         return $this->optionsResolver->offsetExists($option);
     }
 
-    public function offsetSet($option, $value)
+    public function offsetSet($option, $value): void
     {
         $this->optionsResolver->offsetSet($option, $value);
     }
 
-    public function offsetUnset($option)
+    public function offsetUnset($option): void
     {
         $this->optionsResolver->offsetUnset($option);
     }
@@ -206,7 +206,7 @@ class OptionsResolver implements Options
     /**
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return $this->optionsResolver->count();
     }

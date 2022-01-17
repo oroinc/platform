@@ -4,22 +4,38 @@ namespace Oro\Component\MessageQueue\Client;
 
 use Oro\Component\MessageQueue\Client\Router\MessageRouterInterface;
 use Oro\Component\MessageQueue\Exception\InvalidArgumentException;
-use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
 /**
  * Message producer that used when messages are sending to the queue.
  * Prepares a message before sending, forward the message to all queues associated with the current topic.
  */
-class MessageProducer implements MessageProducerInterface
+class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private DriverInterface $driver;
 
     private MessageRouterInterface $messageRouter;
 
-    public function __construct(DriverInterface $driver, MessageRouterInterface $messageRouter)
-    {
+    private MessageBodyResolverInterface $messageBodyResolver;
+
+    private bool $debug;
+
+    public function __construct(
+        DriverInterface $driver,
+        MessageRouterInterface $messageRouter,
+        MessageBodyResolverInterface $messageBodyResolver,
+        bool $debug = false
+    ) {
         $this->driver = $driver;
         $this->messageRouter = $messageRouter;
+        $this->messageBodyResolver = $messageBodyResolver;
+        $this->debug = $debug;
+
+        $this->logger = new NullLogger();
     }
 
     /**
@@ -27,9 +43,24 @@ class MessageProducer implements MessageProducerInterface
      */
     public function send($topic, $message): void
     {
-        $message = $this->createMessage($topic, $message);
-        foreach ($this->messageRouter->handle($message) as $envelope) {
-            $this->driver->send($envelope->getQueue(), $envelope->getMessage());
+        try {
+            $message = $this->createMessage($topic, $message);
+            foreach ($this->messageRouter->handle($message) as $envelope) {
+                $this->driver->send($envelope->getQueue(), $envelope->getMessage());
+            }
+        } catch (\RuntimeException $exception) {
+            $this->logger->error(
+                sprintf(
+                    'Failed to send the message with topic %s to message queue: %s',
+                    $topic,
+                    $exception->getMessage()
+                ),
+                ['exception' => $exception, 'topic' => $topic, 'message' => $message]
+            );
+
+            if ($this->debug) {
+                throw $exception;
+            }
         }
     }
 
@@ -52,7 +83,7 @@ class MessageProducer implements MessageProducerInterface
         }
 
         $message->setContentType($this->getContentType($message));
-        $message->setBody($this->getBody($message));
+        $message->setBody($this->messageBodyResolver->resolveBody($topicName, $message->getBody()));
 
         if (!$message->getMessageId()) {
             $message->setMessageId(uniqid('oro.', true));
@@ -60,15 +91,15 @@ class MessageProducer implements MessageProducerInterface
         if (!$message->getTimestamp()) {
             $message->setTimestamp(time());
         }
-        if (!$message->getPriority()) {
-            $message->setPriority(MessagePriority::NORMAL);
-        }
 
         $message->setProperty(Config::PARAMETER_TOPIC_NAME, $topicName);
 
         return $message;
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function getContentType(Message $message): string
     {
         $body = $message->getBody();
@@ -82,25 +113,5 @@ class MessageProducer implements MessageProducerInterface
         }
 
         return $contentType ?: 'text/plain';
-    }
-
-    private function getBody(Message $message): string
-    {
-        $body = $message->getBody();
-
-        if (null === $body || is_scalar($body)) {
-            return (string)$body;
-        }
-
-        if (is_array($body)) {
-            return JSON::encode($body);
-        }
-
-        throw new InvalidArgumentException(
-            sprintf(
-                'The message\'s body must be either null, scalar or array. Got: %s',
-                get_debug_type($body)
-            )
-        );
     }
 }

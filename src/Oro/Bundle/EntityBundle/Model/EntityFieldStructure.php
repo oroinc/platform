@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityBundle\Model;
 /**
  * Represents detailed information about an entity field.
  */
-class EntityFieldStructure implements \Serializable
+class EntityFieldStructure
 {
     /** @var string */
     private $name;
@@ -146,33 +146,27 @@ class EntityFieldStructure implements \Serializable
         return isset($this->options[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize([
+        return [
             $this->name,
             $this->type,
             $this->label,
             $this->relationType,
             $this->relatedEntityName,
             $this->options
-        ]);
+        ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        list(
+        [
             $this->name,
             $this->type,
             $this->label,
             $this->relationType,
             $this->relatedEntityName,
             $this->options
-            ) = unserialize($serialized, ['allowed_classes' => false]);
+        ] = $serialized;
     }
 }

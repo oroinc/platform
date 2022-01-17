@@ -182,7 +182,8 @@ class EmailTemplateTranslationType extends AbstractType
             static function ($data) {
                 // Clear empty input
                 if ($data instanceof EmailTemplateTranslation) {
-                    if (!trim($data->getSubject())) {
+                    $subject = $data->getSubject();
+                    if ($subject === null || trim($subject) === '') {
                         $data->setSubject(null);
                     }
 

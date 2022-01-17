@@ -139,6 +139,16 @@ trait DocumentationTestTrait
         return self::getContainer()->get('oro_entity_config.config_manager');
     }
 
+    private function getResourceData(array $data): array
+    {
+        if (!$data) {
+            self::fail('The formatted documentation data must be not empty.');
+        }
+        $item = reset($data);
+
+        return reset($item);
+    }
+
     private function warmUpDocumentationCache()
     {
         $apiDocExtractor = $this->getExtractor();

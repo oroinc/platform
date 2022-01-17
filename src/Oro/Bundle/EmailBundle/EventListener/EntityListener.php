@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
@@ -164,7 +164,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         }
 
         foreach ($entitiesIdsByClass as $class => $ids) {
-            $this->producer->send(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS, [
+            $this->producer->send(UpdateEmailOwnerAssociationsTopic::getName(), [
                 'ownerClass' => $class,
                 'ownerIds' => $ids,
             ]);

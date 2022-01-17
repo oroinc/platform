@@ -4,7 +4,8 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Async;
 
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\ReindexEntityMessageProcessor;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByTypeTopic;
+use Oro\Bundle\SearchBundle\Async\Topic\ReindexTopic;
 use Oro\Bundle\SearchBundle\Engine\IndexerInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -12,7 +13,6 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,6 +20,8 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new ReindexEntityMessageProcessor(
             $this->createMock(IndexerInterface::class),
             $this->createMock(JobRunner::class),
@@ -29,7 +31,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldReturnSubscribedTopics()
     {
-        $expectedSubscribedTopics = [Topics::REINDEX];
+        $expectedSubscribedTopics = [ReindexTopic::getName()];
 
         $this->assertEquals($expectedSubscribedTopics, ReindexEntityMessageProcessor::getSubscribedTopics());
     }
@@ -46,7 +48,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
             ->method('runUnique')
-            ->with('message-id', Topics::REINDEX)
+            ->with('message-id', ReindexTopic::getName())
             ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
@@ -71,7 +73,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITY_TYPE,
+            IndexEntitiesByTypeTopic::getName(),
             ['entityClass' => 'class-name', 'jobId' => 12345]
         );
     }
@@ -90,7 +92,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
             ->method('runUnique')
-            ->with('message-id', Topics::REINDEX)
+            ->with('message-id', ReindexTopic::getName())
             ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
@@ -108,16 +110,14 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $message = new Message();
         $message->setMessageId('message-id');
-        $message->setBody(JSON::encode(
-            'class-name'
-        ));
+        $message->setBody('class-name');
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITY_TYPE,
+            IndexEntitiesByTypeTopic::getName(),
             ['entityClass' => 'class-name', 'jobId' => 12345]
         );
     }
@@ -136,7 +136,7 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $jobRunner = $this->createMock(JobRunner::class);
         $jobRunner->expects($this->once())
             ->method('runUnique')
-            ->with('message-id', Topics::REINDEX)
+            ->with('message-id', ReindexTopic::getName())
             ->willReturnCallback(function ($ownerId, $name, $callback) use ($jobRunner) {
                 $callback($jobRunner);
 
@@ -154,16 +154,14 @@ class ReindexEntityMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         $message = new Message();
         $message->setMessageId('message-id');
-        $message->setBody(JSON::encode(
-            ['class-name']
-        ));
+        $message->setBody(['class-name']);
 
         $processor = new ReindexEntityMessageProcessor($indexer, $jobRunner, self::getMessageProducer());
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
-            Topics::INDEX_ENTITY_TYPE,
+            IndexEntitiesByTypeTopic::getName(),
             ['entityClass' => 'class-name', 'jobId' => 12345]
         );
     }

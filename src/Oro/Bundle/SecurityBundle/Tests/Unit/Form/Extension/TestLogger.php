@@ -24,6 +24,11 @@ class TestLogger extends BaseTestLogger implements DebugLoggerInterface
         return $this->records;
     }
 
+    public function getLogsByLevel(string $level): array
+    {
+        return $this->recordsByLevel[$level] ?? [];
+    }
+
     /**
      * {@inheritDoc}
      */

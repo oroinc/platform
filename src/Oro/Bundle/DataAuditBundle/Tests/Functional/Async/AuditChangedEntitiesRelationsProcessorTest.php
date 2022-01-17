@@ -11,7 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -29,7 +28,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
         $this->processor = $this->getContainer()->get('oro_dataaudit.async.audit_changed_entities_relations');
     }
 
-    public function testShouldReturnRejectWhenNoCollectionsUpdated()
+    public function testShouldDoNothingWhenNoCollectionsUpdated()
     {
         $message = $this->createMessage([
             'timestamp' => time(),
@@ -42,7 +41,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
 
         $result = $this->processor->process($message, $this->getConnection()->createSession());
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        $this->assertEquals(MessageProcessorInterface::ACK, $result);
         $this->assertStoredAuditCount(0);
     }
 
@@ -77,7 +76,7 @@ class AuditChangedEntitiesRelationsProcessorTest extends WebTestCase
     private function createMessage(array $body): Message
     {
         $message = new Message();
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
 
         return $message;
     }

@@ -7,7 +7,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Represents a translatable string.
  */
-class Label implements \Serializable
+class Label
 {
     /** @var string */
     protected $label;
@@ -29,20 +29,14 @@ class Label implements \Serializable
         return $translator->trans($this->label);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->label);
+        return [$this->label];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $this->label = unserialize($serialized);
+        [$this->label] = $serialized;
     }
 
     /**

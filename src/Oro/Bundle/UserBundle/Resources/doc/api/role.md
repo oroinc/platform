@@ -199,3 +199,18 @@ Example:
 #### delete_relationship
 
 Remove user records from a specific user role record.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "users",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}

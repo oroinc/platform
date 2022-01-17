@@ -6,7 +6,6 @@ use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInSymfonyEmailHandler;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -14,8 +13,6 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address as SymfonyAddress;
 use Symfony\Component\Mime\Email as SymfonyEmail;
-use Symfony\Component\Validator\Constraints\Email as EmailConstraint;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Sends email notification.
@@ -28,16 +25,12 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
 
     private EmbeddedImagesInSymfonyEmailHandler $embeddedImagesInSymfonyEmailHandler;
 
-    private ValidatorInterface $validator;
-
     public function __construct(
         MailerInterface $mailer,
-        EmbeddedImagesInSymfonyEmailHandler $embeddedImagesInSymfonyEmailHandler,
-        ValidatorInterface $validator
+        EmbeddedImagesInSymfonyEmailHandler $embeddedImagesInSymfonyEmailHandler
     ) {
         $this->mailer = $mailer;
         $this->embeddedImagesInSymfonyEmailHandler = $embeddedImagesInSymfonyEmailHandler;
-        $this->validator = $validator;
         $this->logger = new NullLogger();
     }
 
@@ -46,12 +39,7 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $messageBody = $this->getMessageBody($message);
-        if (!$messageBody) {
-            return MessageProcessorInterface::REJECT;
-        }
-
-        $symfonyEmail = $this->createEmailMessage($messageBody);
+        $symfonyEmail = $this->createEmailMessage($message->getBody());
         $sentCount = $this->sendEmailMessage($symfonyEmail);
 
         if (!$sentCount) {
@@ -59,46 +47,6 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
         }
 
         return self::ACK;
-    }
-
-    private function getMessageBody(MessageInterface $message): array
-    {
-        $messageBody = array_merge(
-            [
-                'from' => null,
-                'toEmail' => null,
-                'subject' => null,
-                'body' => null,
-                'contentType' => null,
-            ],
-            JSON::decode($message->getBody())
-        );
-
-        if (empty($messageBody['from']) || empty($messageBody['toEmail']) || empty($messageBody['subject'])
-            || empty($messageBody['body'])) {
-            $this->logger->critical(
-                sprintf(
-                    'Message properties %s were not expected to be empty',
-                    implode(', ', ['from', 'toEmail', 'subject', 'body'])
-                )
-            );
-
-            return [];
-        }
-
-        if (!$this->validateAddress($messageBody['from'])) {
-            $this->logger->error(sprintf('Email address "%s" is not valid', $messageBody['from']));
-
-            return [];
-        }
-
-        if (!$this->validateAddress($messageBody['toEmail'])) {
-            $this->logger->error(sprintf('Email address "%s" is not valid', $messageBody['toEmail']));
-
-            return [];
-        }
-
-        return $messageBody;
     }
 
     private function createEmailMessage(array $messageBody): SymfonyEmail
@@ -141,17 +89,5 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
         }
 
         return $sentCount;
-    }
-
-    private function validateAddress(?string $email): bool
-    {
-        static $emailConstraint;
-        if (!$emailConstraint) {
-            $emailConstraint = new EmailConstraint();
-        }
-
-        $errorList = $this->validator->validate($email, $emailConstraint);
-
-        return !$errorList->count();
     }
 }

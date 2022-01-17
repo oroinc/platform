@@ -2,28 +2,27 @@
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
+
 /**
  * Provides description for message queue topics.
  */
 class TopicDescriptionProvider
 {
-    /**
-     * @var array
-     *  [
-     *      'topic_name1' => 'Topic description 1',
-     *      'topic_name2' => 'Topic description 2',
-     *      // ...
-     *  ]
-     */
-    private array $topicDescriptions;
+    private TopicRegistry $topicRegistry;
 
-    public function __construct(array $topicDescriptions)
+    public function __construct(TopicRegistry $topicRegistry)
     {
-        $this->topicDescriptions = $topicDescriptions;
+        $this->topicRegistry = $topicRegistry;
     }
 
     public function getTopicDescription(string $topicName): string
     {
-        return $this->topicDescriptions[strtolower($topicName)] ?? '';
+        $topicName = strtolower($topicName);
+        if ($this->topicRegistry->has($topicName)) {
+            return $this->topicRegistry->get($topicName)->getDescription();
+        }
+
+        return '';
     }
 }
