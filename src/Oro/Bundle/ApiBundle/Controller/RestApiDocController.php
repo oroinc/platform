@@ -54,6 +54,11 @@ class RestApiDocController
         return $response;
     }
 
+    public function notAllowedAction(): Response
+    {
+        return new Response(null, Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => 'GET']);
+    }
+
     private function getApiResource(string $view, string $resource): ?ApiDoc
     {
         $apiResource = null;

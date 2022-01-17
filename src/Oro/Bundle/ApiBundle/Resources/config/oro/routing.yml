@@ -7,10 +7,24 @@ nelmio_api_doc_index:
     defaults:
         view: rest_json_api
 
+oro_api_doc_index_not_allowed:
+    path: '%oro_api.rest.prefix%doc/{view}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiDocController::notAllowedAction
+    requirements:
+        view: '[\w-]+'
+    defaults:
+        view: rest_json_api
+
 oro_rest_api_doc_resource:
     path: '%oro_api.rest.prefix%doc/{view}/{resource}'
     controller: Oro\Bundle\ApiBundle\Controller\RestApiDocController::resourceAction
     methods: [GET]
+    requirements:
+        view: '[\w-]+'
+
+oro_rest_api_doc_resource_not_allowed:
+    path: '%oro_api.rest.prefix%doc/{view}/{resource}'
+    controller: Oro\Bundle\ApiBundle\Controller\RestApiDocController::notAllowedAction
     requirements:
         view: '[\w-]+'
 
