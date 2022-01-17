@@ -9,13 +9,9 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganizatio
 
 class GetWithTableInheritanceTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadOrganization::class,
             LoadBusinessUnit::class,
@@ -24,12 +20,9 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
     }
 
     /**
-     * @param array        $params
-     * @param array|string $expects
-     *
-     * @dataProvider getParamsAndExpectation
+     * @dataProvider getParamsAndExpectationDataProvider
      */
-    public function testGetEntityWithTableInheritance($params, $expects)
+    public function testGetEntityWithTableInheritance(array $params, array|string $expects)
     {
         /** @var TestDepartment $department */
         $department = $this->getReference('test_department');
@@ -57,10 +50,7 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getParamsAndExpectation()
+    public function getParamsAndExpectationDataProvider(): array
     {
         return [
             'Related entity with table inheritance'            => [

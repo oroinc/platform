@@ -13,11 +13,10 @@ use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 
 class GetProcessorOrmRelatedTestCase extends OrmRelatedTestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var GetContext */
-    protected $context;
+    protected GetContext $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;

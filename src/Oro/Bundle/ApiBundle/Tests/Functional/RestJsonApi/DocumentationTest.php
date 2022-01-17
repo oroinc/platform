@@ -21,13 +21,7 @@ class DocumentationTest extends RestJsonApiTestCase
     /** @var string used in DocumentationTestTrait */
     private const VIEW = 'rest_json_api';
 
-    /**
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    private function isSkippedField($entityClass, $fieldName)
+    private function isSkippedField(string $entityClass, string $fieldName): bool
     {
         return
             // remove this after CRM-8214 fix

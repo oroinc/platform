@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueTransformer;
@@ -198,7 +199,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
 
     public function testProcessNestedObjectWithNotSupportedPropertyPath()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "field1.field11" property path is not supported.');
 
         $config = new EntityDefinitionConfig();

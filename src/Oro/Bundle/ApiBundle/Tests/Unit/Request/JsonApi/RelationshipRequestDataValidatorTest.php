@@ -22,14 +22,14 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceIdentifierObjectProvider
      */
-    public function testValidResourceIdentifierObject($requestData)
+    public function testValidResourceIdentifierObject(array $requestData)
     {
         $errors = $this->validator->validateResourceIdentifierObject($requestData);
 
         self::assertEmpty($errors);
     }
 
-    public function validResourceIdentifierObjectProvider()
+    public function validResourceIdentifierObjectProvider(): array
     {
         return [
             [
@@ -62,14 +62,14 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceIdentifierObjectCollectionProvider
      */
-    public function testValidResourceIdentifierObjectCollection($requestData)
+    public function testValidResourceIdentifierObjectCollection(array $requestData)
     {
         $errors = $this->validator->validateResourceIdentifierObjectCollection($requestData);
 
         self::assertEmpty($errors);
     }
 
-    public function validResourceIdentifierObjectCollectionProvider()
+    public function validResourceIdentifierObjectCollectionProvider(): array
     {
         return [
             [
@@ -102,7 +102,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidResourceIdentifierObjectProvider
      */
-    public function testInvalidResourceIdentifierObject($requestData, $expectedErrors)
+    public function testInvalidResourceIdentifierObject(array $requestData, array $expectedErrors)
     {
         $errors = $this->validator->validateResourceIdentifierObject($requestData);
 
@@ -117,7 +117,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceIdentifierObjectProvider()
+    public function invalidResourceIdentifierObjectProvider(): array
     {
         return [
             [
@@ -227,7 +227,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidResourceIdentifierObjectCollectionProvider
      */
-    public function testInvalidResourceIdentifierObjectCollection($requestData, $expectedErrors)
+    public function testInvalidResourceIdentifierObjectCollection(array $requestData, array $expectedErrors)
     {
         $errors = $this->validator->validateResourceIdentifierObjectCollection($requestData);
 
@@ -242,7 +242,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceIdentifierObjectCollectionProvider()
+    public function invalidResourceIdentifierObjectCollectionProvider(): array
     {
         return [
             [

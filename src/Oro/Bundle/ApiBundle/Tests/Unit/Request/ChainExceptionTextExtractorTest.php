@@ -18,12 +18,8 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $firstExtractor = $this->getMockBuilder(ExceptionTextExtractorInterface::class)
-            ->setMockClassName('FirstExceptionTextExtractor')
-            ->getMock();
-        $secondExtractor = $this->getMockBuilder(ExceptionTextExtractorInterface::class)
-            ->setMockClassName('SecondExceptionTextExtractor')
-            ->getMock();
+        $firstExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
+        $secondExtractor = $this->createMock(ExceptionTextExtractorInterface::class);
 
         $this->extractors = [$firstExtractor, $secondExtractor];
         $this->chainExtractor = new ChainExceptionTextExtractor($this->extractors);

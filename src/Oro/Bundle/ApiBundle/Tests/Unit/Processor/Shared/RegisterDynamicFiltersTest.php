@@ -66,12 +66,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return RestFilterValueAccessor
-     */
-    private function getRestFilterValueAccessor(Request $request)
+    private function getRestFilterValueAccessor(Request $request): RestFilterValueAccessor
     {
         return new RestFilterValueAccessor(
             $request,
@@ -80,13 +75,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    /**
-     * @param string $dataType
-     * @param bool   $isCollection
-     *
-     * @return ComparisonFilter
-     */
-    private function getComparisonFilter($dataType, $isCollection = false)
+    private function getComparisonFilter(string $dataType, bool $isCollection = false): ComparisonFilter
     {
         $filter = new ComparisonFilter($dataType);
         $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
@@ -95,58 +84,37 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         return $filter;
     }
 
-    /**
-     * @param string[] $fields
-     * @param array    $filterFields
-     *
-     * @return Config
-     */
-    private function getConfig(array $fields = [], array $filterFields = [])
+    private function getConfig(array $fieldNames = [], array $filterFields = []): Config
     {
         $config = new Config();
-        $config->setDefinition($this->getEntityDefinitionConfig($fields));
+        $config->setDefinition($this->getEntityDefinitionConfig($fieldNames));
         $config->setFilters($this->getFiltersConfig($filterFields));
 
         return $config;
     }
 
-    /**
-     * @param string[] $fields
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function getEntityDefinitionConfig(array $fields = [])
+    private function getEntityDefinitionConfig(array $fieldNames = []): EntityDefinitionConfig
     {
         $config = new EntityDefinitionConfig();
-        foreach ($fields as $field) {
-            $config->addField($field);
+        foreach ($fieldNames as $fieldName) {
+            $config->addField($fieldName);
         }
 
         return $config;
     }
 
-    /**
-     * @param array $filterFields
-     *
-     * @return FiltersConfig
-     */
-    private function getFiltersConfig(array $filterFields = [])
+    private function getFiltersConfig(array $filterFields = []): FiltersConfig
     {
         $config = new FiltersConfig();
         $config->setExcludeAll();
-        foreach ($filterFields as $field => $dataType) {
-            $config->addField($field)->setDataType($dataType);
+        foreach ($filterFields as $fieldName => $dataType) {
+            $config->addField($fieldName)->setDataType($dataType);
         }
 
         return $config;
     }
 
-    /**
-     * @param $queryString
-     *
-     * @return Request
-     */
-    private function getRequest($queryString)
+    private function getRequest(string $queryString): Request
     {
         return new Request([], [], [], [], [], ['QUERY_STRING' => $queryString]);
     }

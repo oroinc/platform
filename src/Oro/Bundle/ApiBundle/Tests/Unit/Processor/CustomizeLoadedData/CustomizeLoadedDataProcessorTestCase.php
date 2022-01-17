@@ -8,11 +8,10 @@ use Oro\Component\ChainProcessor\ParameterBag;
 
 class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var CustomizeLoadedDataContext */
-    protected $context;
+    protected CustomizeLoadedDataContext $context;
 
     protected function setUp(): void
     {
@@ -22,10 +21,7 @@ class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->context->setSharedData(new ParameterBag());
     }
 
-    /**
-     * @return CustomizeLoadedDataContext
-     */
-    protected function createContext()
+    protected function createContext(): CustomizeLoadedDataContext
     {
         return new CustomizeLoadedDataContext();
     }

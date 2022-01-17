@@ -413,12 +413,10 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
 
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    ['Test\TargetClass1', true, $target1EntityMetadata],
-                    ['Test\TargetClass2', true, $target2EntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\TargetClass1', true, $target1EntityMetadata],
+                ['Test\TargetClass2', true, $target2EntityMetadata]
+            ]);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -509,12 +507,10 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
 
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    ['Test\TargetClass1', true, $target1EntityMetadata],
-                    ['Test\TargetClass2', true, $target2EntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\TargetClass1', true, $target1EntityMetadata],
+                ['Test\TargetClass2', true, $target2EntityMetadata]
+            ]);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')
@@ -603,12 +599,10 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
 
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    ['Test\TargetClass1', true, $target1EntityMetadata],
-                    ['Test\TargetClass2', true, $target2EntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\TargetClass1', true, $target1EntityMetadata],
+                ['Test\TargetClass2', true, $target2EntityMetadata]
+            ]);
 
         $this->configProvider->expects(self::once())
             ->method('getConfig')

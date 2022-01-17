@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\UpdateList\CreateAsyncOperation;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class CreateAsyncOperationTest extends UpdateListProcessorTestCase
 {
@@ -56,7 +57,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
 
     public function testProcessWhenNoCreatePermissionForAsyncOperation()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to create the asynchronous operation.');
 
         $this->authorizationChecker->expects(self::once())
@@ -75,7 +76,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
 
     public function testProcessWhenNoViewPermissionForAsyncOperation()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to create the asynchronous operation.');
 
         $this->authorizationChecker->expects(self::exactly(2))

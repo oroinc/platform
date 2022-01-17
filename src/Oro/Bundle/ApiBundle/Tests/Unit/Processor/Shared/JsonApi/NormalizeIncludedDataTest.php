@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
@@ -76,12 +77,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return Config
-     */
-    private function getConfig(EntityDefinitionConfig $definition)
+    private function getConfig(EntityDefinitionConfig $definition): Config
     {
         $config = new Config();
         $config->setDefinition($definition);
@@ -90,7 +86,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
     }
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidElement()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "/included/0" element should be an array.');
 
         $includedData = [
@@ -103,7 +99,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidSchema()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "/included/0" element should have "data" property.');
 
         $includedData = [
@@ -116,7 +112,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
 
     public function testProcessForAlreadyNormalizedIncludedDataButTheyHaveInvalidDataElement()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "data" property of "/included/0" element should be an array.');
 
         $includedData = [

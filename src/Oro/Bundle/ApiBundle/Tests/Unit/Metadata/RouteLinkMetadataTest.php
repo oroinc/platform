@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException;
 use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
@@ -167,7 +168,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndInvalidParameterExceptionIsThrown()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException::class);
+        $this->expectException(LinkHrefResolvingFailedException::class);
         $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
 
         $exception = new InvalidParameterException('an error');
@@ -205,7 +206,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndMissingMandatoryParametersExceptionIsThrown()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException::class);
+        $this->expectException(LinkHrefResolvingFailedException::class);
         $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
 
         $exception = new MissingMandatoryParametersException('an error');

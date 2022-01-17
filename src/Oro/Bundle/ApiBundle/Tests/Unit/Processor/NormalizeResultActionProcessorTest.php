@@ -54,10 +54,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return NormalizeResultContext
-     */
-    private function getContext()
+    private function getContext(): NormalizeResultContext
     {
         $context = new NormalizeResultContext();
         $context->setAction(self::TEST_ACTION);
@@ -68,10 +65,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @return BufferingLogger
-     */
-    private function setLogger()
+    private function setLogger(): BufferingLogger
     {
         $logger = new BufferingLogger();
         $this->processor->setLogger($logger);
@@ -278,11 +272,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -339,11 +331,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor2->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -395,11 +385,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -457,11 +445,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor2->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -631,11 +617,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -707,11 +691,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor2->expects(self::never())
             ->method('process');
         $processor3->expects(self::never())
@@ -1096,11 +1078,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor11->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -1140,11 +1120,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor10->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
         $processor11->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context));
@@ -1351,11 +1329,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (NormalizeResultContext $context) use ($error) {
-                    $context->addError($error);
-                }
-            );
+            ->willReturnCallback(function (NormalizeResultContext $context) use ($error) {
+                $context->addError($error);
+            });
 
         $this->processor->process($context);
 

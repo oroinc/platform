@@ -7,6 +7,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Handler\AsyncOperationDeleteHandler;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
+use Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteAccessDeniedExceptionFactory;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtension;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionRegistry;
@@ -97,7 +98,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleDeleteWhenExceptionOccurredOnFindFiles()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException::class);
+        $this->expectException(DeleteAsyncOperationException::class);
         $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
 
         $operation = $this->getAsyncOperation(234);
@@ -129,7 +130,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleDeleteWhenExceptionOccurredOnDeleteFiles()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException::class);
+        $this->expectException(DeleteAsyncOperationException::class);
         $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
 
         $operation = $this->getAsyncOperation(234);

@@ -88,20 +88,16 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
 
         $this->customizationProcessor->expects(self::any())
             ->method('createContext')
-            ->willReturnCallback(
-                function () {
-                    return new CustomizeFormDataContext();
-                }
-            );
+            ->willReturnCallback(function () {
+                return new CustomizeFormDataContext();
+            });
         $this->customizationProcessor->expects(self::any())
             ->method('process')
-            ->willReturnCallback(
-                function (CustomizeFormDataContext $context) {
-                    if (Entity\Account::class === $context->getClassName()) {
-                        $this->processor->process($context);
-                    }
+            ->willReturnCallback(function (CustomizeFormDataContext $context) {
+                if (Entity\Account::class === $context->getClassName()) {
+                    $this->processor->process($context);
                 }
-            );
+            });
 
         $this->formValidationHandler = new FormValidationHandler(
             $this->validator,
@@ -113,7 +109,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getFormExtensions()
+    protected function getFormExtensions(): array
     {
         return [
             new PreloadedExtension(
@@ -128,12 +124,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         ];
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return FormBuilderInterface
-     */
-    private function getFormBuilder(?EntityDefinitionConfig $config)
+    private function getFormBuilder(?EntityDefinitionConfig $config): FormBuilderInterface
     {
         $this->formContext->setConfig($config);
 
@@ -148,22 +139,13 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         );
     }
 
-    /**
-     * @param EntityDefinitionConfig|null $config
-     * @param Entity\Account              $data
-     * @param array                       $submittedData
-     * @param array                       $itemOptions
-     * @param string                      $entryType
-     *
-     * @return FormInterface
-     */
     private function processForm(
         ?EntityDefinitionConfig $config,
         Entity\Account $data,
         array $submittedData,
         array $itemOptions = [],
         string $entryType = NameContainerType::class
-    ) {
+    ): FormInterface {
         $formBuilder = $this->getFormBuilder($config);
         $formBuilder->add('enabledRole', null, array_merge(['mapped' => false], $itemOptions));
         $formBuilder->add(
@@ -186,21 +168,14 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         return $form;
     }
 
-    private function validateForm(FormInterface $form)
+    private function validateForm(FormInterface $form): void
     {
         $this->formValidationHandler->preValidate($form);
         $this->formValidationHandler->validate($form);
         $this->formValidationHandler->postValidate($form);
     }
 
-    /**
-     * @param Entity\Account $data
-     * @param string         $name
-     * @param bool           $enabled
-     *
-     * @return Entity\Role
-     */
-    private function addRole(Entity\Account $data, $name, $enabled)
+    private function addRole(Entity\Account $data, string $name, bool $enabled): Entity\Role
     {
         $role = new Entity\Role();
         $role->setName($name);

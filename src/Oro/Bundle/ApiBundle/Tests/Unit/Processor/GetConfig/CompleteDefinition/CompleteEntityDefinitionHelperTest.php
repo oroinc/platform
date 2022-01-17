@@ -83,12 +83,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return ConfigInterface
-     */
-    private function getEntityConfig(array $config)
+    private function getEntityConfig(array $config): ConfigInterface
     {
         return new Config(
             new EntityConfigId('extend', self::TEST_CLASS_NAME),
@@ -96,12 +91,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    /**
-     * @param array $config
-     *
-     * @return ConfigInterface
-     */
-    private function getFieldConfig($fieldName, array $config)
+    private function getFieldConfig(string $fieldName, array $config): ConfigInterface
     {
         return new Config(
             new FieldConfigId('extend', self::TEST_CLASS_NAME, $fieldName, 'int'),
@@ -142,16 +132,14 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->willReturn($exclusionProvider);
         $exclusionProvider->expects(self::exactly(6))
             ->method('isIgnoredField')
-            ->willReturnMap(
-                [
-                    [$rootEntityMetadata, 'id', false],
-                    [$rootEntityMetadata, 'field1', false],
-                    [$rootEntityMetadata, 'field3', true],
-                    [$rootEntityMetadata, 'field4', false],
-                    [$rootEntityMetadata, 'realField6', false],
-                    [$rootEntityMetadata, 'realField7', true]
-                ]
-            );
+            ->willReturnMap([
+                [$rootEntityMetadata, 'id', false],
+                [$rootEntityMetadata, 'field1', false],
+                [$rootEntityMetadata, 'field3', true],
+                [$rootEntityMetadata, 'field4', false],
+                [$rootEntityMetadata, 'realField6', false],
+                [$rootEntityMetadata, 'realField7', true]
+            ]);
 
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
@@ -1972,10 +1960,10 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
      * @dataProvider completeCustomIdentifierDataProvider
      */
     public function testCompleteCustomIdentifier(
-        $targetAction,
-        $usesIdGenerator,
-        $config,
-        $expectedConfig
+        string $targetAction,
+        bool $usesIdGenerator,
+        array $config,
+        array $expectedConfig
     ) {
         $config = $this->createConfigObject($config);
         $context = new ConfigContext();
@@ -2012,7 +2000,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function completeCustomIdentifierDataProvider()
+    public function completeCustomIdentifierDataProvider(): array
     {
         return [
             'CREATE action, id generator, configured custom id'              => [

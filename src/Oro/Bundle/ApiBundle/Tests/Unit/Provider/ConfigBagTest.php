@@ -59,7 +59,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfigProvider
      */
-    public function testGetConfig($className, $version, $expectedConfig)
+    public function testGetConfig(string $className, string $version, array $expectedConfig)
     {
         $configBag = $this->getConfigBag();
 
@@ -68,7 +68,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedConfig, $configBag->getConfig($className, $version));
     }
 
-    public function getConfigProvider()
+    public function getConfigProvider(): array
     {
         return [
             ['Test\Class1', '1.0', ['fields' => ['class1_v0' => []]]],

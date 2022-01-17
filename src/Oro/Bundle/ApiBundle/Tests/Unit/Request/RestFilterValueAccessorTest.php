@@ -14,12 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param Request $request
-     *
-     * @return RestFilterValueAccessor
-     */
-    private function getRestFilterValueAccessor(Request $request)
+    private function getRestFilterValueAccessor(Request $request): RestFilterValueAccessor
     {
         return new RestFilterValueAccessor(
             $request,
@@ -43,15 +38,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $path
-     * @param mixed  $value
-     * @param string $operator
-     * @param string $sourceKey
-     *
-     * @return FilterValue
-     */
-    private function getFilterValue($path, $value, $operator, $sourceKey)
+    private function getFilterValue(string $path, mixed $value, string $operator, string $sourceKey): FilterValue
     {
         return FilterValue::createFromSource($sourceKey, $path, $value, $operator);
     }

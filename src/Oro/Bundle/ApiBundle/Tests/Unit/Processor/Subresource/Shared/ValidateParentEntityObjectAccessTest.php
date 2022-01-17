@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityObject
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTestCase
 {
@@ -48,7 +49,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
 
     public function testProcessWhenAccessDenied()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access by "VIEW" permission to the parent entity.');
 
         $parentEntity = new Product();

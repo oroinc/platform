@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Create\NormalizeEntityId;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -36,7 +37,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
     /**
      * {@inheritdoc}
      */
-    protected function createContext()
+    protected function createContext(): FormContext
     {
         return new CreateContext($this->configProvider, $this->metadataProvider);
     }

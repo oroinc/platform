@@ -23,7 +23,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loadConfigurationDataProvider
      */
-    public function testLoadConfiguration(array $config, array $expected, $error = null)
+    public function testLoadConfiguration(array $config, array $expected, string $error = null)
     {
         if (null !== $error) {
             $this->expectException(InvalidConfigurationException::class);
@@ -48,7 +48,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function loadConfigurationDataProvider()
+    public function loadConfigurationDataProvider(): array
     {
         $result = [];
 
