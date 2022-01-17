@@ -134,6 +134,9 @@ class ScopeDataAccessor
         if (false !== $data && isset($data[$resultKey])) {
             return $data[$resultKey];
         }
+        if ($data === false) {
+            $data = [];
+        }
 
         $ids = $this->loadIdentifiersByCriteriaWithPriority($criteria);
         $data[$resultKey] = $ids;

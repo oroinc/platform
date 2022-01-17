@@ -110,7 +110,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): ProcessorInterface
     {
         return $this->processorRegistry->getProcessor($this->processors[$this->index][0]);
     }
@@ -118,7 +118,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->nextApplicable();
     }
@@ -126,7 +126,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->index;
     }
@@ -134,7 +134,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->index <= $this->maxIndex;
     }
@@ -142,7 +142,7 @@ class ProcessorIterator implements \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->index = -1;
         $this->maxIndex = \count($this->processors) - 1;

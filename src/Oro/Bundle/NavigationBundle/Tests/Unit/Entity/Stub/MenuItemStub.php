@@ -36,35 +36,35 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
     }
 
@@ -494,7 +494,7 @@ class MenuItemStub implements ItemInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
     }
 }

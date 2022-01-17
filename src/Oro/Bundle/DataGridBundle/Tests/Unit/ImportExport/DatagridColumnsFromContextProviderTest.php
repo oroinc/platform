@@ -178,9 +178,7 @@ class DatagridColumnsFromContextProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($datagridConfig = $this->createMock(DatagridConfiguration::class));
 
         $datagridConfig->expects(self::once())
-            ->method('offsetSet')
-            ->with(Configuration::COLUMNS_KEY)
-            ->willReturn($gridColumns);
+            ->method('offsetSet');
 
         $this->columnsStateProvider->expects(self::once())
             ->method('getState')

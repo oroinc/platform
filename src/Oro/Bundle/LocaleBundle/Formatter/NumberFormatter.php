@@ -138,6 +138,10 @@ class NumberFormatter
         bool $fixedFraction = false
     ): string {
         if (!$value || ((int)$value == $value) || $fixedFraction) {
+            if ($value === null) {
+                $value = 0;
+            }
+
             return $currencyFormatter->formatCurrency($value, $currencyCode);
         }
         $decimalObject = BigDecimal::of($value);

@@ -111,7 +111,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function key()
+    public function key(): int
     {
         return $this->position;
     }
@@ -119,7 +119,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->offset++;
 
@@ -134,7 +134,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         // reset total count only if at least one item was loaded by this iterator
         // for example if we call count method and then start iteration the total count must be calculated once
@@ -153,7 +153,7 @@ class BufferedQueryResultIterator extends AbstractBufferedQueryResultIterator
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         if (null === $this->totalCount) {
             $query = $this->cloneQuery($this->getQuery());
