@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Form\FormExtensionState;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
@@ -14,15 +15,10 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 
 class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param string[]                                                                        $switchCalls
-     * @param SwitchableDependencyInjectionExtension|\PHPUnit\Framework\MockObject\MockObject $extension
-     * @param FormExtensionState|\PHPUnit\Framework\MockObject\MockObject                     $formExtensionState
-     */
     private function expectSwitchFormExtension(
         array &$switchCalls,
-        $extension,
-        $formExtensionState
+        SwitchableDependencyInjectionExtension|\PHPUnit\Framework\MockObject\MockObject $extension,
+        FormExtensionState|\PHPUnit\Framework\MockObject\MockObject $formExtensionState
     ): void {
         $switchCalls = [];
         $extension->expects(self::exactly(2))
@@ -240,7 +236,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTypeShouldThrowExceptionForNotKnownApiFormType()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The form type "Oro\Bundle\ApiBundle\Form\Type\BooleanType" is not configured to be used in API.'
         );

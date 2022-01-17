@@ -19,7 +19,7 @@ class DataAccessorStub extends DataAccessor
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         return $this->data[$name];
     }
@@ -27,7 +27,7 @@ class DataAccessorStub extends DataAccessor
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return array_key_exists($name, $this->data);
     }

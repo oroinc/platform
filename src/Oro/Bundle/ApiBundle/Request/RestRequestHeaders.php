@@ -124,7 +124,7 @@ class RestRequestHeaders extends AbstractParameterBag
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         if (null === $this->parameters) {
             return count($this->getHeaderNames());

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
@@ -593,7 +594,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetIdentifierValueForEntityWithoutId()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group" does not have identifier field(s).'
         );
@@ -639,10 +640,10 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetIdentifierValueForEntityWithSingleIdWhenIdPropertyDoesNotExist()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'The class "%s" does not have property "unknownProperty".',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::class
+            Group::class
         ));
 
         $entity = new Group();
@@ -691,10 +692,10 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetIdentifierValueForEntityWithRenamedCompositeIdWhenIdPropertyDoesNotExist()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'The class "%s" does not have property "unknownProperty".',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::class
+            Group::class
         ));
 
         $entity = new Group();

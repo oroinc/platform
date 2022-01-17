@@ -368,12 +368,10 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field1Target', true, $field1TargetEntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Field1Target', true, $field1TargetEntityMetadata]
+            ]);
 
         $configObject = $this->createConfigObject($config);
         $this->context->setMaxRelatedEntities($limit);
@@ -462,14 +460,12 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(4))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata],
-                    ['Test\Field23Target', true, $field23TargetEntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Field2Target', true, $field2TargetEntityMetadata],
+                ['Test\Field22Target', true, $field22TargetEntityMetadata],
+                ['Test\Field23Target', true, $field23TargetEntityMetadata]
+            ]);
 
         $configObject = $this->createConfigObject($config);
         $this->context->setMaxRelatedEntities($limit);
@@ -563,13 +559,11 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(3))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Field2Target', true, $field2TargetEntityMetadata],
+                ['Test\Field22Target', true, $field22TargetEntityMetadata]
+            ]);
 
         $configObject = $this->createConfigObject($config);
         $this->context->setMaxRelatedEntities($limit);
@@ -661,13 +655,11 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(3))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Field2Target', true, $field2TargetEntityMetadata],
-                    ['Test\Field22Target', true, $field22TargetEntityMetadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Field2Target', true, $field2TargetEntityMetadata],
+                ['Test\Field22Target', true, $field22TargetEntityMetadata]
+            ]);
 
         $configObject = $this->createConfigObject($config);
         $this->context->setMaxRelatedEntities($limit);

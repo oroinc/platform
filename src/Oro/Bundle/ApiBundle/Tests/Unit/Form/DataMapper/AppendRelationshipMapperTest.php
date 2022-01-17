@@ -34,17 +34,11 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->propertyAccessor = $this->createMock(PropertyAccessorInterface::class);
+
         $this->mapper = new AppendRelationshipMapper($this->propertyAccessor);
     }
 
-    /**
-     * @param FormConfigInterface $config
-     * @param bool                $synchronized
-     * @param bool                $submitted
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|Form
-     */
-    private function getForm(FormConfigInterface $config, $synchronized = true, $submitted = true)
+    private function getForm(FormConfigInterface $config, bool $synchronized = true, bool $submitted = true): Form
     {
         $form = $this->getMockBuilder(Form::class)
             ->setConstructorArgs([$config])

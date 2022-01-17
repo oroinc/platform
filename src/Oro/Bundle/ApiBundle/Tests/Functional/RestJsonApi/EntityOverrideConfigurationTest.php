@@ -56,10 +56,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function apiActionsProvider()
+    public function apiActionsProvider(): array
     {
         return [
             [ApiAction::GET],
@@ -90,7 +87,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     /**
      * @dataProvider apiActionsProvider
      */
-    public function testConfigurationOfOverrideModelAndOverriddenEntityShouldBeEqual($action)
+    public function testConfigurationOfOverrideModelAndOverriddenEntityShouldBeEqual(string $action)
     {
         $overriddenEntityConfig = $this->getConfig(TestOverrideClassOwner::class, $action);
         $overrideModelConfig = $this->getConfig(TestOverrideClassOwnerModel::class, $action);
@@ -105,7 +102,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     /**
      * @dataProvider apiActionsProvider
      */
-    public function testMetadataOfOverrideModelAndOverriddenEntityShouldBeEqual($action)
+    public function testMetadataOfOverrideModelAndOverriddenEntityShouldBeEqual(string $action)
     {
         $overriddenEntityMetadata = $this->getMetadata(TestOverrideClassOwner::class, $action);
         $overrideModelMetadata = $this->getMetadata(TestOverrideClassOwnerModel::class, $action);
@@ -145,7 +142,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     /**
      * @dataProvider apiActionsProvider
      */
-    public function testConfigurationForModelInheritedFromEntity($action)
+    public function testConfigurationForModelInheritedFromEntity(string $action)
     {
         $parentEntityConfig = $this->getConfig(TestDepartment::class, $action);
         $modelConfig = $this->getConfig(TestCurrentDepartment::class, $action);
@@ -160,7 +157,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     /**
      * @dataProvider apiActionsProvider
      */
-    public function testMetadataForModelInheritedFromEntity($action)
+    public function testMetadataForModelInheritedFromEntity(string $action)
     {
         $parentEntityMetadata = $this->getMetadata(TestDepartment::class, $action);
         $modelMetadata = $this->getMetadata(TestCurrentDepartment::class, $action);
@@ -176,7 +173,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     /**
      * @dataProvider apiActionsProvider
      */
-    public function testConfigurationForEntityWithAssociationToEntityThatHasModelInheritedFromIt($action)
+    public function testConfigurationForEntityWithAssociationToEntityThatHasModelInheritedFromIt(string $action)
     {
         $entityConfig = $this->getConfig(TestEmployee::class, $action);
 
@@ -187,7 +184,7 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
     /**
      * @dataProvider apiActionsProvider
      */
-    public function testMetadataForEntityWithAssociationToEntityThatHasModelInheritedFromIt($action)
+    public function testMetadataForEntityWithAssociationToEntityThatHasModelInheritedFromIt(string $action)
     {
         $entityMetadata = $this->getMetadata(TestEmployee::class, $action);
 

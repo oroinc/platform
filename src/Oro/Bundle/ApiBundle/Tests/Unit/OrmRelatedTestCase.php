@@ -38,24 +38,20 @@ class OrmRelatedTestCase extends OrmTestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
-            ->willReturnCallback(
-                function ($class) {
-                    return !in_array($class, $this->notManageableClassNames, true)
-                        ? $this->em
-                        : null;
-                }
-            );
+            ->willReturnCallback(function ($class) {
+                return !in_array($class, $this->notManageableClassNames, true)
+                    ? $this->em
+                    : null;
+            });
         $this->doctrine->expects(self::any())
             ->method('getAliasNamespace')
-            ->willReturnCallback(
-                function ($alias) {
-                    if ('Test' !== $alias) {
-                        throw ORMException::unknownEntityNamespace($alias);
-                    }
-
-                    return 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity';
+            ->willReturnCallback(function ($alias) {
+                if ('Test' !== $alias) {
+                    throw ORMException::unknownEntityNamespace($alias);
                 }
-            );
+
+                return 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity';
+            });
 
         $this->doctrineHelper = new DoctrineHelper($this->doctrine);
     }

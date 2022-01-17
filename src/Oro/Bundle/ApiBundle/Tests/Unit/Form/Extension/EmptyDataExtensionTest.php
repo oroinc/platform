@@ -23,12 +23,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         $this->emptyDataExtension = new EmptyDataExtension($this->entityInstantiator);
     }
 
-    /**
-     * @param array $options
-     *
-     * @return \Closure
-     */
-    private function expectBuildForm($options)
+    private function expectBuildForm(array $options): \Closure
     {
         $emptyDataNormalizer = null;
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -50,8 +45,11 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider scalarValueProvider
      */
-    public function testEmptyDataNormalizerForScalarField($expected, $viewData, $emptyData)
-    {
+    public function testEmptyDataNormalizerForScalarField(
+        string|int|null $expected,
+        ?string $viewData,
+        mixed $emptyData
+    ) {
         $options = [
             'data_class' => null,
             'empty_data' => $emptyData
@@ -64,7 +62,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expected, $emptyDataNormalizer($form, $viewData));
     }
 
-    public function scalarValueProvider()
+    public function scalarValueProvider(): array
     {
         return [
             'null, null'                           => [

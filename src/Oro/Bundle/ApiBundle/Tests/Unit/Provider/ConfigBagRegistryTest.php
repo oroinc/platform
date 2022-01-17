@@ -31,12 +31,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $configBags
-     *
-     * @return ConfigBagRegistry
-     */
-    private function getRegistry(array $configBags)
+    private function getRegistry(array $configBags): ConfigBagRegistry
     {
         return new ConfigBagRegistry(
             $configBags,

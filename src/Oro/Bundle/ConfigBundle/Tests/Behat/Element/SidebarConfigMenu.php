@@ -24,7 +24,8 @@ class SidebarConfigMenu extends Element
         self::assertNotNull($context, 'System configuration not found');
         $lastLink = array_pop($items);
 
-        while ($item = trim(array_shift($items))) {
+        while ($item = array_shift($items)) {
+            $item = trim($item);
             $link = $context->findLink($item);
             self::assertNotNull($link, sprintf('Link "%s" was not found in configuration menu', $item));
 

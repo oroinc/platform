@@ -12,7 +12,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validAliasDataProvider
      */
-    public function testValidateValidEntityAlias($value)
+    public function testValidateValidEntityAlias(string $value)
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -25,7 +25,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function validAliasDataProvider()
+    public function validAliasDataProvider(): array
     {
         return [
             ['alias'],
@@ -37,7 +37,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityAlias($value)
+    public function testValidateInvalidEntityAlias(string $value)
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -61,7 +61,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityPluralAlias($value)
+    public function testValidateInvalidEntityPluralAlias(string $value)
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -82,7 +82,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidAliasDataProvider()
+    public function invalidAliasDataProvider(): array
     {
         return [
             ['Alias'],

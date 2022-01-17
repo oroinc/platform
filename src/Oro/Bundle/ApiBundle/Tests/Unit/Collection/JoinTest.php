@@ -30,13 +30,13 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider conditionTypeNormalizationDataProvider
      */
-    public function testConditionTypeNormalization($conditionType, $condition)
+    public function testConditionTypeNormalization(string $conditionType, ?string $condition)
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity', $conditionType, $condition);
         self::assertNull($join->getConditionType());
     }
 
-    public function conditionTypeNormalizationDataProvider()
+    public function conditionTypeNormalizationDataProvider(): array
     {
         return [
             ['', null],
@@ -51,13 +51,13 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider conditionNormalizationDataProvider
      */
-    public function testConditionNormalization($condition)
+    public function testConditionNormalization(?string $condition)
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity', Join::WITH, $condition);
         self::assertNull($join->getCondition());
     }
 
-    public function conditionNormalizationDataProvider()
+    public function conditionNormalizationDataProvider(): array
     {
         return [
             [null],
@@ -68,13 +68,13 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider indexByNormalizationDataProvider
      */
-    public function testIndexByNormalization($indexBy)
+    public function testIndexByNormalization(?string $indexBy)
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity', Join::WITH, 'condition', $indexBy);
         self::assertNull($join->getIndexBy());
     }
 
-    public function indexByNormalizationDataProvider()
+    public function indexByNormalizationDataProvider(): array
     {
         return [
             [null],
@@ -117,16 +117,16 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider equalsDataProvider
      */
-    public function testEquals(Join $join1, Join $join2, $expectedResult)
+    public function testEquals(Join $join1, Join $join2, bool $expectedResult)
     {
-        self::assertEquals($expectedResult, $join1->equals($join2));
-        self::assertEquals($expectedResult, $join2->equals($join1));
+        self::assertSame($expectedResult, $join1->equals($join2));
+        self::assertSame($expectedResult, $join2->equals($join1));
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function equalsDataProvider()
+    public function equalsDataProvider(): array
     {
         return [
             [

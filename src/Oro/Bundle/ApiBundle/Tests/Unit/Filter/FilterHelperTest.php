@@ -128,14 +128,12 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->filterValues->expects(self::any())
             ->method('get')
-            ->willReturnMap(
-                [
-                    ['page[number]', new FilterValue('page[number]', 2)],
-                    ['page[size]', new FilterValue('page[size]', 20)],
-                    ['sorting', new FilterValue('sorting', ['id' => 'DESC'])],
-                    ['filter[test]', new FilterValue('filter[test]', true)]
-                ]
-            );
+            ->willReturnMap([
+                ['page[number]', new FilterValue('page[number]', 2)],
+                ['page[size]', new FilterValue('page[size]', 20)],
+                ['sorting', new FilterValue('sorting', ['id' => 'DESC'])],
+                ['filter[test]', new FilterValue('filter[test]', true)]
+            ]);
 
         self::assertEquals(
             new FilterValue('filter[test]', true),

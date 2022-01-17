@@ -14,7 +14,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|RequestStack $requestStack;
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
+    private $requestStack;
 
     protected function setUp(): void
     {

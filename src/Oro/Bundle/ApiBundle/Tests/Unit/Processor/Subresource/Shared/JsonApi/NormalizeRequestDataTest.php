@@ -153,20 +153,16 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
-                ]
-            );
+            ->willReturnMap([
+                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+            ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
-            ->willReturnMap(
-                [
-                    ['val1', $associationTargetMetadata, 'normalizedVal1'],
-                    ['val2', $associationTargetMetadata, 'normalizedVal2']
-                ]
-            );
+            ->willReturnMap([
+                ['val1', $associationTargetMetadata, 'normalizedVal1'],
+                ['val2', $associationTargetMetadata, 'normalizedVal2']
+            ]);
 
         $this->context->setRequestData(
             [
@@ -234,20 +230,16 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
-                ]
-            );
+            ->willReturnMap([
+                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+            ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
-            ->willReturnMap(
-                [
-                    ['val1', $associationTargetMetadata, 'normalizedVal1'],
-                    ['val2', $associationTargetMetadata, 'normalizedVal2']
-                ]
-            );
+            ->willReturnMap([
+                ['val1', $associationTargetMetadata, 'normalizedVal1'],
+                ['val2', $associationTargetMetadata, 'normalizedVal2']
+            ]);
 
         $this->context->setRequestData(
             [
@@ -422,12 +414,10 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
-                ]
-            );
+            ->willReturnMap([
+                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+            ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
             ->willThrowException(new \Exception('cannot normalize id'));
@@ -521,23 +511,19 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
         $this->valueNormalizer->expects(self::exactly(2))
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
-                    ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
-                ]
-            );
+            ->willReturnMap([
+                ['entity1', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class1'],
+                ['entity2', DataType::ENTITY_CLASS, $this->context->getRequestType(), false, false, 'Test\Class2']
+            ]);
         $this->entityIdTransformer->expects(self::exactly(2))
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    if ('val1' === $value) {
-                        return null;
-                    }
-
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                if ('val1' === $value) {
+                    return null;
                 }
-            );
+
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData(
             [

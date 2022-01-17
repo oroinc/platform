@@ -11,12 +11,14 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\DataMapper\PropertyPathMapper;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
@@ -85,7 +87,7 @@ class FormTest extends WebTestCase
 
     public function testApiFormWithFormTypeThatDoesNotExistInApi()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The form type "Symfony\Component\Form\Extension\Core\Type\HiddenType" is not configured to be used in API.'
         );
@@ -220,7 +222,7 @@ class FormTest extends WebTestCase
 
     public function testApiFormShouldNotHaveCsrfExtension()
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException::class);
+        $this->expectException(UndefinedOptionsException::class);
 
         $this->switchToApiFormExtension();
 
@@ -271,33 +273,28 @@ class FormTest extends WebTestCase
         self::assertSame('test', $object->getTitle());
     }
 
-    protected function switchToDefaultFormExtension()
+    private function switchToDefaultFormExtension(): void
     {
         /** @var FormExtensionSwitcherInterface $formExtensionSwitcher */
-        $formExtensionSwitcher = $this->getContainer()->get('form.registry');
+        $formExtensionSwitcher = self::getContainer()->get('form.registry');
         $formExtensionSwitcher->switchToDefaultFormExtension();
     }
 
-    protected function switchToApiFormExtension()
+    private function switchToApiFormExtension(): void
     {
         /** @var FormExtensionSwitcherInterface $formExtensionSwitcher */
-        $formExtensionSwitcher = $this->getContainer()->get('form.registry');
+        $formExtensionSwitcher = self::getContainer()->get('form.registry');
         $formExtensionSwitcher->switchToApiFormExtension();
     }
 
-    protected function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null)
+    private function setMetadataAccessor(MetadataAccessorInterface $metadataAccessor = null): void
     {
         /** @var MetadataTypeGuesser $metadataTypeGuesser */
-        $metadataTypeGuesser = $this->getContainer()->get('oro_api.form.guesser.metadata');
+        $metadataTypeGuesser = self::getContainer()->get('oro_api.form.guesser.metadata');
         $metadataTypeGuesser->setMetadataAccessor($metadataAccessor);
     }
 
-    /**
-     * @param array $options
-     *
-     * @return FormInterface
-     */
-    protected function getForm(array $options = [])
+    private function getForm(array $options = []): FormInterface
     {
         $form = $this->getRootForm($options);
         $form->add('id', IntegerType::class);
@@ -307,12 +304,7 @@ class FormTest extends WebTestCase
         return $form;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return FormInterface
-     */
-    protected function getFormWithGuessedTypes(array $options = [])
+    private function getFormWithGuessedTypes(array $options = []): FormInterface
     {
         $form = $this->getRootForm($options);
         $form->add('id');
@@ -321,28 +313,20 @@ class FormTest extends WebTestCase
         return $form;
     }
 
-    /**
-     * @param array $options
-     *
-     * @return FormInterface
-     */
-    protected function getRootForm(array $options = [])
+    private function getRootForm(array $options = []): FormInterface
     {
         if (!isset($options['data_class'])) {
             $options['data_class'] = TestObject::class;
         }
         $options['extra_fields_message'] = FormHelper::EXTRA_FIELDS_MESSAGE;
 
-        return $this->getContainer()->get('form.factory')
+        return self::getContainer()->get('form.factory')
             ->createBuilder(FormType::class, null, $options)
             ->setDataMapper(new PropertyPathMapper(new FormPropertyAccessor(new PropertyAccessor())))
             ->getForm();
     }
 
-    /**
-     * @return EntityMetadata
-     */
-    protected function getEntityMetadata()
+    private function getEntityMetadata(): EntityMetadata
     {
         $metadata = new EntityMetadata();
         $metadata->setClassName(TestObject::class);

@@ -16,33 +16,22 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FiltersByFieldsTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/supported_data_types.yml'
         ]);
     }
 
-    /**
-     * @param array  $expectedRows
-     * @param string $entityType
-     */
-    private function prepareExpectedRows(array &$expectedRows, $entityType)
+    private function prepareExpectedRows(array &$expectedRows, string $entityType): void
     {
         foreach ($expectedRows as &$row) {
             $row['type'] = $entityType;
         }
     }
 
-    /**
-     * @return bool
-     */
-    private function isPostgreSql()
+    private function isPostgreSql(): bool
     {
         return $this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }
@@ -76,7 +65,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function equalFilterDataProvider()
+    public function equalFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@TestItem2->id)>']];
 
@@ -200,7 +189,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function notEqualFilterDataProvider()
+    public function notEqualFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -297,7 +286,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function equalArrayFilterDataProvider()
+    public function equalArrayFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -373,7 +362,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function rangeFilterDataProvider()
+    public function rangeFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem2->id)>'],
@@ -459,7 +448,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function notInRangeFilterDataProvider()
+    public function notInRangeFilterDataProvider(): array
     {
         $expectedRows1 = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -592,7 +581,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     /**
      * @dataProvider existsFilterDataProvider
      */
-    public function testExistsFilter($filterFieldName, array $expectedRows)
+    public function testExistsFilter(string $filterFieldName, array $expectedRows)
     {
         $filter = ['filters' => sprintf('filter[%s]*true', $filterFieldName)];
 
@@ -613,7 +602,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     /**
      * @dataProvider existsFilterDataProvider
      */
-    public function testExistsFilterAlternativeSyntax($filterFieldName, array $expectedRows)
+    public function testExistsFilterAlternativeSyntax(string $filterFieldName, array $expectedRows)
     {
         $filter = [$filterFieldName => ['exists' => 'true']];
 
@@ -711,7 +700,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function existsFilterDataProvider()
+    public function existsFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -803,7 +792,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     /**
      * @dataProvider notExistsFilterDataProvider
      */
-    public function testNotExistsFilter($filterFieldName, array $expectedRows)
+    public function testNotExistsFilter(string $filterFieldName, array $expectedRows)
     {
         $filter = ['filters' => sprintf('filter[%s]*false', $filterFieldName)];
 
@@ -824,7 +813,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     /**
      * @dataProvider notExistsFilterDataProvider
      */
-    public function testNotExistsFilterAlternativeSyntax($filterFieldName, array $expectedRows)
+    public function testNotExistsFilterAlternativeSyntax(string $filterFieldName, array $expectedRows)
     {
         $filter = [$filterFieldName => ['exists' => 'false']];
 
@@ -902,7 +891,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function notExistsFilterDataProvider()
+    public function notExistsFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@NullItem->id)>']];
 
@@ -1018,7 +1007,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function notEqualOrNullFilterDataProvider()
+    public function notEqualOrNullFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -1235,7 +1224,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function containsFilterDataProvider()
+    public function containsFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -1297,7 +1286,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function notContainsFilterDataProvider()
+    public function notContainsFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@AnotherItem->id)>']];
 
@@ -1355,7 +1344,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function startsWithFilterDataProvider()
+    public function startsWithFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -1417,7 +1406,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function notStartsWithFilterDataProvider()
+    public function notStartsWithFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@AnotherItem->id)>']];
 
@@ -1475,7 +1464,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function endsWithFilterDataProvider()
+    public function endsWithFilterDataProvider(): array
     {
         $expectedRows = [
             ['id' => '<toString(@TestItem1->id)>'],
@@ -1537,7 +1526,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
-    public function notEndsWithFilterDataProvider()
+    public function notEndsWithFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@AnotherItem->id)>']];
 

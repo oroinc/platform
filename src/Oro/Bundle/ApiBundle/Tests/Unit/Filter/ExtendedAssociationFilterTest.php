@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
@@ -69,7 +71,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testSearchFilterKeyWhenAssociationTargetWasNotSpecified()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectException(InvalidFilterValueKeyException::class);
         $this->expectExceptionMessage('The target type of an association is not specified.');
 
         $filterValues = [
@@ -83,7 +85,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testSearchFilterKeyWhenAssociationTargetIsEmpty()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectException(InvalidFilterValueKeyException::class);
         $this->expectExceptionMessage('The target type of an association is not specified.');
 
         $filterValues = [
@@ -97,7 +99,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testSearchFilterKeyWhenAssociationTargetPlaceholderWasNotReplacedWithAssociationType()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterValueKeyException::class);
+        $this->expectException(InvalidFilterValueKeyException::class);
         $this->expectExceptionMessage('Replace "type" placeholder with the target type of an association.');
 
         $filterValues = [
@@ -179,7 +181,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyFilterWhenAssociationTargetIsNotSupported()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('An association with "users" is not supported.');
 
         $filterValue = new FilterValue('target.users', '123');

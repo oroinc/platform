@@ -15,6 +15,7 @@ use Oro\Bundle\SSOBundle\Security\OAuthToken;
 use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 class OAuthProviderTest extends \PHPUnit\Framework\TestCase
@@ -85,7 +86,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAuthenticateIfTokenFactoryIsNotSet()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Token Factory is not set in OAuthProvider.');
 
         $token = new OAuthToken('token');
@@ -94,7 +95,7 @@ class OAuthProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testAuthenticateIfOrganizationGuesserIsNotSet()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AuthenticationException::class);
+        $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Organization Guesser is not set in OAuthProvider.');
 
         $this->oauthProvider->setTokenFactory($this->tokenFactory);

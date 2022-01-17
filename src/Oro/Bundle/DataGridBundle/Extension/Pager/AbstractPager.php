@@ -388,7 +388,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         $this->initializeIteratorIfNotInitialized();
 
@@ -398,7 +398,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         $this->initializeIteratorIfNotInitialized();
 
@@ -408,31 +408,31 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->initializeIteratorIfNotInitialized();
 
         --$this->resultsCounter;
 
-        return next($this->results);
+        next($this->results);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->initializeIteratorIfNotInitialized();
 
         $this->resultsCounter = count($this->results);
 
-        return reset($this->results);
+        reset($this->results);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         $this->initializeIteratorIfNotInitialized();
 
@@ -442,7 +442,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->getNbResults();
     }

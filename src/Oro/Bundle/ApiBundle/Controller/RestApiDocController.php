@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Controller;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\ApiDocExtractor;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
@@ -13,14 +14,9 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  */
 class RestApiDocController
 {
-    /** @var ApiDocExtractor */
-    private $extractor;
-
-    /** @var FormatterInterface */
-    private $formatter;
-
-    /** @var SessionInterface */
-    private $session;
+    private ApiDocExtractor $extractor;
+    private FormatterInterface $formatter;
+    private SessionInterface $session;
 
     public function __construct(ApiDocExtractor $extractor, FormatterInterface $formatter, SessionInterface $session)
     {
@@ -29,8 +25,12 @@ class RestApiDocController
         $this->session = $session;
     }
 
-    public function indexAction(string $view = ApiDoc::DEFAULT_VIEW): Response
+    public function indexAction(Request $request, string $view = ApiDoc::DEFAULT_VIEW): Response
     {
+        if ($request->getMethod() !== Request::METHOD_GET) {
+            return $this->getNotAllowedResponse();
+        }
+
         $response = $this->getHtmlResponse(
             $this->formatter->format($this->extractor->all($view))
         );
@@ -39,8 +39,12 @@ class RestApiDocController
         return $response;
     }
 
-    public function resourceAction(string $view, string $resource): Response
+    public function resourceAction(Request $request, string $view, string $resource): Response
     {
+        if ($request->getMethod() !== Request::METHOD_GET) {
+            return $this->getNotAllowedResponse();
+        }
+
         $apiResource = $this->getApiResource($view, $resource);
         if (null === $apiResource) {
             return $this->getResourceNotFoundResponse();
@@ -84,6 +88,11 @@ class RestApiDocController
             Response::HTTP_OK,
             ['Content-Type' => 'text/html']
         );
+    }
+
+    private function getNotAllowedResponse(): Response
+    {
+        return new Response(null, Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => 'GET']);
     }
 
     private function getResourceNotFoundResponse(): Response

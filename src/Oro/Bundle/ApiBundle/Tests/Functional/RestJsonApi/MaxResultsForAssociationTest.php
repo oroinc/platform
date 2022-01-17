@@ -11,7 +11,6 @@ class MaxResultsForAssociationTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/max_results_for_association.yml']);
     }
 

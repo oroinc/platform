@@ -9,11 +9,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class UnhandledErrorProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var Context */
-    protected $context;
+    protected Context $context;
 
     protected function setUp(): void
     {

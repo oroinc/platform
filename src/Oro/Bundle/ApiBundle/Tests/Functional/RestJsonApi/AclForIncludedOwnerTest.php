@@ -19,13 +19,9 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
 {
     use RolePermissionExtension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/test_entity_with_user_ownership.yml',
             LoadUser::class

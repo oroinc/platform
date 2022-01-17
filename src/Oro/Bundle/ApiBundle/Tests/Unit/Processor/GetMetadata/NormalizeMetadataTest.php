@@ -53,13 +53,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
     }
 
-    /**
-     * @param string      $fieldName
-     * @param string|null $dataType
-     *
-     * @return FieldMetadata
-     */
-    protected function createFieldMetadata($fieldName, $dataType = null)
+    protected function createFieldMetadata(string $fieldName, string $dataType = null): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -71,26 +65,15 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string        $associationName
-     * @param string        $targetClass
-     * @param string        $associationType
-     * @param bool|null     $isCollection
-     * @param string|null   $dataType
-     * @param string[]|null $acceptableTargetClasses
-     * @param bool          $collapsed
-     *
-     * @return AssociationMetadata
-     */
     protected function createAssociationMetadata(
-        $associationName,
-        $targetClass,
-        $associationType = null,
-        $isCollection = null,
-        $dataType = null,
-        $acceptableTargetClasses = null,
-        $collapsed = false
-    ) {
+        string $associationName,
+        string $targetClass,
+        string $associationType = null,
+        bool $isCollection = null,
+        string $dataType = null,
+        array $acceptableTargetClasses = null,
+        bool $collapsed = false
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);

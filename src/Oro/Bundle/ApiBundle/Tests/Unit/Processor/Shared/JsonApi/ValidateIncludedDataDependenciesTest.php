@@ -23,6 +23,20 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $this->processor = new ValidateIncludedDataDependencies();
     }
 
+    private function createValidationError(int $includedObjectIndex): Error
+    {
+        $error = Error::createValidationError(
+            Constraint::REQUEST_DATA,
+            'The entity should have a relationship with the primary entity'
+            . ' and this should be explicitly specified in the request'
+        );
+        $error->setSource(
+            ErrorSource::createByPointer(sprintf('/included/%s', $includedObjectIndex))
+        );
+
+        return $error;
+    }
+
     public function testProcessWithoutIncludedData()
     {
         $requestData = [
@@ -618,24 +632,5 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
-    }
-
-    /**
-     * @param int $includedObjectIndex
-     *
-     * @return Error
-     */
-    private function createValidationError($includedObjectIndex)
-    {
-        $error = Error::createValidationError(
-            Constraint::REQUEST_DATA,
-            'The entity should have a relationship with the primary entity'
-            . ' and this should be explicitly specified in the request'
-        );
-        $error->setSource(
-            ErrorSource::createByPointer(sprintf('/included/%s', $includedObjectIndex))
-        );
-
-        return $error;
     }
 }

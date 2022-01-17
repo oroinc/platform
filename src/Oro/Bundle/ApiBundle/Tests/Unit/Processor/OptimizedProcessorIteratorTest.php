@@ -17,20 +17,12 @@ use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
  */
 class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array                           $processors
-     * @param string[]                        $groups
-     * @param Context                         $context
-     * @param ApplicableCheckerInterface|null $applicableChecker
-     *
-     * @return OptimizedProcessorIterator
-     */
     private function getOptimizedProcessorIterator(
         array $processors,
         array $groups,
         Context $context,
         ApplicableCheckerInterface $applicableChecker = null
-    ) {
+    ): OptimizedProcessorIterator {
         $chainApplicableChecker = new ChainApplicableChecker();
         if ($applicableChecker) {
             $chainApplicableChecker->addChecker($applicableChecker);
@@ -52,10 +44,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return Context
-     */
-    private function getContext()
+    private function getContext(): Context
     {
         $context = new Context();
         $context->setAction('test');
@@ -63,19 +52,14 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface
-     */
-    private function getProcessorRegistry()
+    private function getProcessorRegistry(): ProcessorRegistryInterface
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $processorRegistry->expects(self::any())
             ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) {
-                    return new ProcessorMock($processorId);
-                }
-            );
+            ->willReturnCallback(function ($processorId) {
+                return new ProcessorMock($processorId);
+            });
 
         return $processorRegistry;
     }

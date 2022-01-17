@@ -13,13 +13,17 @@ class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
 {
     private const LIST_ROUTE_NAME = 'list_route';
 
-    private Request $request;
+    /** @var Request */
+    private $request;
 
-    private RequestEvent $event;
+    /** @var RequestEvent */
+    private $event;
 
-    private BodyListenerInterface|\PHPUnit\Framework\MockObject\MockObject $bodyListener;
+    /** @var BodyListenerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $bodyListener;
 
-    private UpdateListBodyListenerDecorator $decorator;
+    /** @var UpdateListBodyListenerDecorator */
+    private $decorator;
 
     protected function setUp(): void
     {

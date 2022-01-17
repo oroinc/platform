@@ -287,7 +287,7 @@ class ImportLayoutManipulator implements LayoutManipulatorInterface
      */
     protected function replaceNamespace(&$id, $namespace = null)
     {
-        if ($this->hasNamespacePlaceholder($id)) {
+        if ($id !== null && $this->hasNamespacePlaceholder($id)) {
             $replacement = '';
             if ($namespace === null) {
                 $namespace = $this->getNamespace($this->import);

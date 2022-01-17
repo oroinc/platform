@@ -19,26 +19,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NotAccessibleResourceTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/not_accessible_resource.yml'
         ]);
     }
 
     /**
-     * @param string $method
-     * @param string $route
-     * @param array  $routeParameters
-     *
      * @dataProvider notAccessibleResourceActionsProvider
      */
-    public function testNotAccessibleResource($method, $route, array $routeParameters = [])
+    public function testNotAccessibleResource(string $method, string $route, array $routeParameters = [])
     {
         $entityType = $this->getEntityType(EntityIdentifier::class);
         $response = $this->request(
@@ -55,10 +47,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function notAccessibleResourceActionsProvider()
+    public function notAccessibleResourceActionsProvider(): array
     {
         return [
             ['GET', $this->getItemRouteName(), ['id' => 123]],
@@ -76,13 +65,9 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     }
 
     /**
-     * @param string $method
-     * @param string $route
-     * @param array  $routeParameters
-     *
      * @dataProvider unknownResourceActionsProvider
      */
-    public function testUnknownResource($method, $route, array $routeParameters = [])
+    public function testUnknownResource(string $method, string $route, array $routeParameters = [])
     {
         $entityType = 'unknown_entity';
         $response = $this->request(
@@ -102,10 +87,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function unknownResourceActionsProvider()
+    public function unknownResourceActionsProvider(): array
     {
         return [
             ['HEAD', $this->getItemRouteName(), ['id' => 123]],

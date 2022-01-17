@@ -30,12 +30,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $entityAliasResolvers
-     *
-     * @return EntityAliasResolverRegistry
-     */
-    private function getRegistry(array $entityAliasResolvers)
+    private function getRegistry(array $entityAliasResolvers): EntityAliasResolverRegistry
     {
         return new EntityAliasResolverRegistry(
             $entityAliasResolvers,

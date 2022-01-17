@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DistributionBundle\Tests\Unit\Error;
 
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
-use Psr\Log\LoggerInterface;
 
 class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -55,36 +54,9 @@ class ErrorHandlerTest extends \PHPUnit\Framework\TestCase
      */
     public function testSilenceReflectionToString(string $message): void
     {
-        if (PHP_VERSION_ID < 70400) {
-            $this->markTestSkipped('Only for PHP >= 7.4');
-        }
-
         $this->assertTrue($this->handler->handleError(E_DEPRECATED, $message, '', 0));
 
         // This error must not logged
-        trigger_error($message, E_USER_DEPRECATED);
-    }
-
-    /**
-     * @dataProvider silinceDataProvider
-     */
-    public function testNotSilenceReflectionToString(string $message): void
-    {
-        if (PHP_VERSION_ID >= 70400) {
-            $this->markTestSkipped('Only for PHP < 7.4');
-        }
-
-        $this->assertFalse($this->handler->handleError(E_DEPRECATED, $message, '', 0));
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('log')
-            ->with('info', 'User Deprecated: ' . $message, $this->isType('array'));
-
-        $this->handler->setLoggers([
-            E_USER_DEPRECATED => [$logger]
-        ]);
-
         trigger_error($message, E_USER_DEPRECATED);
     }
 

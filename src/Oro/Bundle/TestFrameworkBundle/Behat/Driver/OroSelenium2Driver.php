@@ -101,7 +101,8 @@ class OroSelenium2Driver extends Selenium2Driver
     {
         $element = $this->findElement($xpath);
         $elementName = strtolower($element->name());
-        $elementType = strtolower($element->attribute('type'));
+        $type = $element->attribute('type');
+        $elementType = $type ? strtolower($type) : null;
 
         if ($elementName === 'input' && $elementType !== 'checkbox' && $elementType !== 'radio') {
             $script = 'return ({{ELEMENT}}).value;';

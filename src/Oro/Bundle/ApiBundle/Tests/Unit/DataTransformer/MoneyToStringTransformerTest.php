@@ -17,12 +17,12 @@ class MoneyToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform($value, $expected)
+    public function testTransform(?string $value, ?string $expected)
     {
         self::assertSame($expected, $this->transformer->transform($value, [], []));
     }
 
-    public function transformDataProvider()
+    public function transformDataProvider(): array
     {
         return [
             [null, null],

@@ -6,6 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLength;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\FieldNameLengthValidator;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
@@ -42,7 +43,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidateException()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             sprintf('Expected argument of type "%s", "%s" given', FieldNameLength::class, Length::class)
         );
@@ -76,10 +77,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function validateMaxLengthDataProvider()
+    public function validateMaxLengthDataProvider(): array
     {
         return [
             [substr(self::STRING, 0, 21), false],
@@ -110,10 +108,7 @@ class FieldNameLengthValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function validateMinLengthDataProvider()
+    public function validateMinLengthDataProvider(): array
     {
         return [
             ['A', true],

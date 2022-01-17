@@ -67,7 +67,7 @@ class BaseUserManager
     public function updatePassword(UserInterface $user): void
     {
         $password = $user->getPlainPassword();
-        if (0 !== strlen($password)) {
+        if ($password !== null && 0 !== strlen($password)) {
             $encoder = $this->encoderFactory->getEncoder($user);
             $user->setPassword($encoder->encodePassword($password, $user->getSalt()));
             $user->eraseCredentials();

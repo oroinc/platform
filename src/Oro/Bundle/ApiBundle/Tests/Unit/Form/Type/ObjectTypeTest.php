@@ -28,7 +28,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new PreloadedExtension(
@@ -38,10 +38,7 @@ class ObjectTypeTest extends ApiFormTypeTestCase
         ];
     }
 
-    /**
-     * @return FormHelper
-     */
-    protected function getFormHelper()
+    private function getFormHelper(): FormHelper
     {
         return new FormHelper(
             $this->createMock(FormFactoryInterface::class),

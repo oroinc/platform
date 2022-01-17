@@ -41,11 +41,6 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         );
     }
 
-    /**
-     * @param string[] $identifierFieldNames
-     *
-     * @return EntityDefinitionConfig
-     */
     private function getConfig(array $identifierFieldNames = ['id']): EntityDefinitionConfig
     {
         $config = new EntityDefinitionConfig();

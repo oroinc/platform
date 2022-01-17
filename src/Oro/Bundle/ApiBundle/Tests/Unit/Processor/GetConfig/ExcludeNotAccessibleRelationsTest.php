@@ -148,21 +148,17 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
         $rootEntityMetadata->expects(self::exactly(3))
             ->method('hasAssociation')
-            ->willReturnMap(
-                [
-                    ['field1', false],
-                    ['association1', true],
-                    ['realAssociation3', true]
-                ]
-            );
+            ->willReturnMap([
+                ['field1', false],
+                ['association1', true],
+                ['realAssociation3', true]
+            ]);
         $rootEntityMetadata->expects(self::exactly(2))
             ->method('getAssociationMapping')
-            ->willReturnMap(
-                [
-                    ['association1', ['targetEntity' => 'Test\Association1Target']],
-                    ['realAssociation3', ['targetEntity' => 'Test\Association3Target']]
-                ]
-            );
+            ->willReturnMap([
+                ['association1', ['targetEntity' => 'Test\Association1Target']],
+                ['realAssociation3', ['targetEntity' => 'Test\Association3Target']]
+            ]);
 
         $association1Metadata = $this->getClassMetadataMock('Test\Association1Target');
         $association3Metadata = $this->getClassMetadataMock('Test\Association3Target');
@@ -173,21 +169,17 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(3))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata],
-                    ['Test\Association3Target', true, $association3Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata],
+                ['Test\Association3Target', true, $association3Metadata]
+            ]);
         $this->resourcesProvider->expects(self::exactly(2))
             ->method('isResourceAccessibleAsAssociation')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
-                    ['Test\Association3Target', $this->context->getVersion(), $this->context->getRequestType(), true]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
+                ['Test\Association3Target', $this->context->getVersion(), $this->context->getRequestType(), true]
+            ]);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -241,12 +233,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessibleAsAssociation')
             ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
@@ -297,12 +287,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceKnown')
             ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
@@ -353,12 +341,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceKnown')
             ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
@@ -410,12 +396,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::exactly(2))
             ->method('isResourceAccessibleAsAssociation')
             ->willReturnMap([
@@ -468,12 +452,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::exactly(2))
             ->method('isResourceKnown')
             ->willReturnMap([
@@ -526,20 +508,16 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::exactly(2))
             ->method('isResourceAccessibleAsAssociation')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
-                    ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), false]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), false]
+            ]);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -588,20 +566,16 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
         $this->resourcesProvider->expects(self::exactly(2))
             ->method('isResourceKnown')
-            ->willReturnMap(
-                [
-                    ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
-                    ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), false]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), false],
+                ['Test\Association1Target1', $this->context->getVersion(), $this->context->getRequestType(), false]
+            ]);
 
         $this->context->setResult($this->createConfigObject($config));
         $this->processor->process($this->context);
@@ -647,12 +621,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
 
         $this->entityOverrideProvider->expects(self::once())
             ->method('getSubstituteEntityClass')
@@ -706,12 +678,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
 
         $this->entityOverrideProvider->expects(self::once())
             ->method('getSubstituteEntityClass')
@@ -767,12 +737,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
 
         $this->entityOverrideProvider->expects(self::exactly(2))
             ->method('getSubstituteEntityClass')
@@ -837,12 +805,10 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             ->willReturn(true);
         $this->doctrineHelper->expects(self::exactly(2))
             ->method('getEntityMetadataForClass')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
-                    ['Test\Association1Target', true, $association1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $association1Metadata]
+            ]);
 
         $this->entityOverrideProvider->expects(self::exactly(2))
             ->method('getSubstituteEntityClass')

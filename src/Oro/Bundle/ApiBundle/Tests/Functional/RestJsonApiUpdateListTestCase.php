@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Doctrine\Persistence\Mapping\MappingException;
 use Oro\Bundle\ApiBundle\Batch\Async\Topics;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
@@ -76,10 +75,6 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return self::getContainer()->get('oro_security.token_serializer');
     }
 
-    /**
-     * @throws InvalidSecurityTokenException
-     * @throws MappingException
-     */
     private function processMessage(string $processorServiceId, MessageInterface $message): string
     {
         $this->getEntityManager()->clear();
@@ -298,13 +293,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         self::assertSame($hasErrors, $operation->isHasErrors(), 'Operation hasErrors');
     }
 
-    /**
-     * @param string       $entityClass
-     * @param array|string $data
-     *
-     * @return int
-     */
-    protected function sendUpdateListRequest(string $entityClass, $data): int
+    protected function sendUpdateListRequest(string $entityClass, array|string $data): int
     {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
         $operationId = $this->extractOperationIdFromContentLocationHeader($response);
@@ -369,14 +358,7 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $result;
     }
 
-    /**
-     * @param string       $entityClass
-     * @param array|string $data
-     * @param bool         $assertNoErrors
-     *
-     * @return int
-     */
-    protected function processUpdateList(string $entityClass, $data, bool $assertNoErrors = true): int
+    protected function processUpdateList(string $entityClass, array|string $data, bool $assertNoErrors = true): int
     {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
@@ -388,8 +370,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         return $operationId;
     }
 
-    protected function processUpdateListAndValidateJobs(string $entityClass, array $data, array $expectedJobs): int
-    {
+    protected function processUpdateListAndValidateJobs(
+        string $entityClass,
+        array|string $data,
+        array $expectedJobs
+    ): int {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
         $processedUpdateListChunkMessages = $this->processUpdateListChunkMessages();

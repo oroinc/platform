@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\UpdateItem;
 
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetInitializeGroups;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
@@ -21,7 +22,7 @@ class SetInitializeGroupsTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWithoutTargetAction()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target action is not defined.');
 
         $this->processor->process($this->context);
@@ -29,7 +30,7 @@ class SetInitializeGroupsTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWithoutTargetContext()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target context is not defined.');
 
         $this->context->setTargetAction('test');

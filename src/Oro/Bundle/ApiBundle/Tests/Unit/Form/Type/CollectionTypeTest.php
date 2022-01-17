@@ -16,7 +16,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [
             new ValidatorExtension(Validation::createValidator()),
@@ -68,7 +68,6 @@ class CollectionTypeTest extends ApiFormTypeTestCase
 
     public function testShouldUseRemover()
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|User $entity */
         $entity = $this->getMockBuilder(User::class)
             ->onlyMethods(['addGroup', 'removeGroup'])
             ->getMock();

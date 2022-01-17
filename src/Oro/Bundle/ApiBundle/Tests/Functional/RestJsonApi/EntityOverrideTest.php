@@ -18,13 +18,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class EntityOverrideTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/entities_with_override_class.yml'

@@ -29,20 +29,18 @@ class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($value, $expected)
+    public function testReverseTransform(array|string|null $value, ArrayCollection $expected)
     {
         $this->elementTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($element) {
-                    return 'transformed_' . $element;
-                }
-            );
+            ->willReturnCallback(function ($element) {
+                return 'transformed_' . $element;
+            });
 
         self::assertEquals($expected, $this->transformer->reverseTransform($value));
     }
 
-    public function reverseTransformDataProvider()
+    public function reverseTransformDataProvider(): array
     {
         return [
             [null, new ArrayCollection()],

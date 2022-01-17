@@ -3,20 +3,17 @@
 namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @dataProvider loadExceptionProvider
-     *
-     * @param string $param
-     * @param mixed $value
-     * @param string $expected
      */
-    public function testLoadException(string $param, $value, string $expected)
+    public function testLoadException(string $param, mixed $value, string $expected)
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expected);
 
         $container = new ContainerBuilder();

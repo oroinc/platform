@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -130,7 +131,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNestedObjectAssociationShouldThrowExceptionWhenNoDataClassFormOption()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The "data_class" form option should be specified for the nested object'
             . ' when the "inherit_data" form option is not specified. Field: Test\Class::testField.'
@@ -161,7 +162,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testAddNestedObjectAssociationShouldThrowExceptionWhenDataClassFormOptionUsedWithInheritData()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The "data_class" form option should not be specified for the nested object'
             . ' together with the "inherit_data" form option. Field: Test\Class::testField.'
@@ -193,7 +194,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociationField()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The "association.field1" property path is not supported for the nested object.'
             . ' Parent Field: Test\ParentClass::parentField. Target Field: targetField.'
@@ -221,7 +222,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociation()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'An association is not supported for the nested object.'
             . ' Parent Field: Test\ParentClass::parentField. Target Field: targetField.'
