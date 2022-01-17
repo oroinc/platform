@@ -61,7 +61,7 @@ class ParameterBag extends AbstractParameterBag
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->items);
     }

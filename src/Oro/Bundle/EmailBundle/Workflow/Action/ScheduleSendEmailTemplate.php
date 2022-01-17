@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\SendEmailTemplateTopic;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -49,7 +49,7 @@ class ScheduleSendEmailTemplate extends AbstractSendEmailTemplate
         $entity = $this->contextAccessor->getValue($context, $this->options['entity']);
 
         $this->messageProducer->send(
-            Topics::SEND_EMAIL_TEMPLATE,
+            SendEmailTemplateTopic::getName(),
             [
                 'from' => $this->getEmailAddress($context, $this->options['from']),
                 'templateName' => $this->contextAccessor->getValue($context, $this->options['template']),

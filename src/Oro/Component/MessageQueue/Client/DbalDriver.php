@@ -39,7 +39,7 @@ class DbalDriver implements DriverInterface
         $headers['content_type'] = $message->getContentType();
 
         $transportMessage = $this->createTransportMessage();
-        $transportMessage->setBody((string)$message->getBody());
+        $transportMessage->setBody($message->getBody());
         $transportMessage->setHeaders($headers);
         $transportMessage->setProperties($properties);
 

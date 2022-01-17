@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Async\UpdateEmailOwnerAssociationsMessageProcessor;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -16,57 +16,13 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new UpdateEmailOwnerAssociationsMessageProcessor(
             $this->createMock(MessageProducerInterface::class),
             $this->createMock(JobRunner::class),
             $this->createMock(LoggerInterface::class)
         );
-    }
-
-    public function testShouldRejectMessageIfOwnerClassIsMissing()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new Message();
-        $message->setBody(json_encode([
-            'ownerIds' => [1],
-        ], JSON_THROW_ON_ERROR));
-
-        $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(JobRunner::class),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectMessageIfOwnerIdsIsMissing()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new Message();
-        $message->setBody(json_encode([
-            'ownerClass' => 'class',
-        ], JSON_THROW_ON_ERROR));
-
-        $processor = new UpdateEmailOwnerAssociationsMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(JobRunner::class),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldProcessUpdateEmailOwner()
@@ -98,7 +54,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
         ];
 
         $message = new Message();
-        $message->setBody(json_encode($body, JSON_THROW_ON_ERROR));
+        $message->setBody($body);
         $message->setMessageId('message-id');
 
         $jobRunner = $this->createMock(JobRunner::class);
@@ -146,7 +102,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS],
+            [UpdateEmailOwnerAssociationsTopic::getName()],
             UpdateEmailOwnerAssociationsMessageProcessor::getSubscribedTopics()
         );
     }

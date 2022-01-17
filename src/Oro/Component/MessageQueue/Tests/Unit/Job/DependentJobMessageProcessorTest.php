@@ -9,7 +9,7 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobMessageProcessor;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRepositoryInterface;
-use Oro\Component\MessageQueue\Job\Topics;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\Transport\Message as TransportMessage;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Psr\Log\LoggerInterface;
@@ -59,24 +59,9 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
     public function testShouldReturnSubscribedTopicNames(): void
     {
         $this->assertEquals(
-            [Topics::ROOT_JOB_STOPPED],
+            [RootJobStoppedTopic::getName()],
             DependentJobMessageProcessor::getSubscribedTopics()
         );
-    }
-
-    public function testShouldLogCriticalAndRejectMessageIfJobIdIsNotSet(): void
-    {
-        $this->logger
-            ->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = new TransportMessage();
-        $message->setBody(json_encode(['key' => 'value']));
-
-        $result = $this->processor->process($message, $this->createSessionMock());
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldLogCriticalAndRejectMessageIfJobEntityWasNotFound(): void
@@ -92,7 +77,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Job was not found. id: "12345"');
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -116,7 +101,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Expected root job but got child. id: "12345"');
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -138,7 +123,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('send');
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -171,7 +156,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with('Got invalid dependent job data. job: "123", dependentJob: "[]"');
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -207,7 +192,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
              'job: "123", dependentJob: "{"topic":"topic-name"}"');
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -244,7 +229,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -285,7 +270,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 
@@ -321,7 +306,7 @@ class DependentJobMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
 
         $message = new TransportMessage();
-        $message->setBody(json_encode(['jobId' => 12345]));
+        $message->setBody(['jobId' => 12345]);
 
         $result = $this->processor->process($message, $this->createSessionMock());
 

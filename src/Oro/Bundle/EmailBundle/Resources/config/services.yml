@@ -173,7 +173,6 @@ services:
         arguments:
             - '@oro_message_queue.client.message_producer'
             - '@oro_message_queue.job.runner'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -191,7 +190,6 @@ services:
         arguments:
             - '@oro_email.async.manager.association_manager'
             - '@oro_message_queue.job.runner'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -200,7 +198,6 @@ services:
         arguments:
             - '@oro_email.async.manager.association_manager'
             - '@oro_message_queue.job.runner'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -209,7 +206,6 @@ services:
         arguments:
             - '@oro_email.async.manager.association_manager'
             - '@oro_message_queue.job.runner'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -246,7 +242,6 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_message_queue.job.runner'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -1329,7 +1324,6 @@ services:
         class: 'Oro\Bundle\EmailBundle\Async\SendEmailTemplateProcessor'
         arguments:
             - '@doctrine'
-            - '@validator'
             - '@oro_email.sender.aggregated_email_templates'
         calls:
             - [setLogger, ['@logger']]

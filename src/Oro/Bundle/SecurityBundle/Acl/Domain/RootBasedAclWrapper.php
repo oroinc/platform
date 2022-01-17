@@ -149,6 +149,16 @@ class RootBasedAclWrapper implements AclInterface
         throw new \LogicException('Not supported.');
     }
 
+    public function __serialize(): array
+    {
+        throw new \LogicException('Not supported.');
+    }
+
+    public function __unserialize(array $serialized): void
+    {
+        throw new \LogicException('Not supported.');
+    }
+
     /**
      * @return PermissionGrantingStrategy
      */

@@ -5,10 +5,13 @@ namespace Oro\Component\MessageQueue\Tests\Unit\Client\Router;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\Meta\DestinationMetaRegistry;
 use Oro\Component\MessageQueue\Client\Meta\TopicMetaRegistry;
 use Oro\Component\MessageQueue\Client\Router\Envelope;
 use Oro\Component\MessageQueue\Client\Router\MessageRouter;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Oro\Component\MessageQueue\Transport\Queue;
 
 /**
@@ -16,10 +19,13 @@ use Oro\Component\MessageQueue\Transport\Queue;
  */
 class MessageRouterTest extends \PHPUnit\Framework\TestCase
 {
+    private const TOPIC_NAME = 'sample.topic';
     private const TRANSPORT_PREFIX = 'sample_prefix';
     private const QUEUE_NAME = 'sample_queue';
 
     private MessageRouter $messageRouter;
+
+    private TopicInterface|\PHPUnit\Framework\MockObject\MockObject $topic;
 
     protected function setUp(): void
     {
@@ -29,7 +35,15 @@ class MessageRouterTest extends \PHPUnit\Framework\TestCase
             ->method('createQueue')
             ->willReturnCallback(static fn ($queueName) => new Queue($queueName));
 
-        $topicMetaRegistry = new TopicMetaRegistry(['sample_topic' => [self::QUEUE_NAME]], []);
+        $topicRegistry = $this->createMock(TopicRegistry::class);
+        $this->topic = $this->createMock(TopicInterface::class);
+        $topicRegistry
+            ->expects(self::any())
+            ->method('get')
+            ->with(self::TOPIC_NAME)
+            ->willReturn($this->topic);
+
+        $topicMetaRegistry = new TopicMetaRegistry([self::TOPIC_NAME => [self::QUEUE_NAME]], []);
         $destinationMetaRegistry = new DestinationMetaRegistry(
             new Config(self::TRANSPORT_PREFIX, 'default_queue'),
             []
@@ -37,6 +51,7 @@ class MessageRouterTest extends \PHPUnit\Framework\TestCase
 
         $this->messageRouter = new MessageRouter(
             $driver,
+            $topicRegistry,
             $topicMetaRegistry,
             $destinationMetaRegistry
         );
@@ -53,19 +68,50 @@ class MessageRouterTest extends \PHPUnit\Framework\TestCase
         iterator_to_array($result);
     }
 
-    public function testHandle(): void
+    public function testHandleSetsDefaultTopicPriorityWhenNotSetInMessage(): void
     {
-        $topicName = 'sample_topic';
         $message = (new Message(['sample_key' => 'sample_value']))
-            ->setProperty(Config::PARAMETER_TOPIC_NAME, $topicName);
+            ->setProperty(Config::PARAMETER_TOPIC_NAME, self::TOPIC_NAME);
+
+        $this->topic
+            ->expects(self::once())
+            ->method('getDefaultPriority')
+            ->with(self::QUEUE_NAME)
+            ->willReturn(MessagePriority::LOW);
 
         $expectedMessage = (new Message($message->getBody()))
             ->setProperties(
                 [
-                    Config::PARAMETER_TOPIC_NAME => $topicName,
+                    Config::PARAMETER_TOPIC_NAME => self::TOPIC_NAME,
                     Config::PARAMETER_QUEUE_NAME => self::TRANSPORT_PREFIX . '.' . self::QUEUE_NAME,
                 ]
-            );
+            )
+            ->setPriority(MessagePriority::LOW);
+
+        $result = $this->messageRouter->handle($message);
+        $result = iterator_to_array($result);
+
+        self::assertEquals([new Envelope(new Queue('sample_prefix.sample_queue'), $expectedMessage)], $result);
+    }
+
+    public function testHandleUsesMessagePriorityWhenSetInMessage(): void
+    {
+        $message = (new Message(['sample_key' => 'sample_value']))
+            ->setProperty(Config::PARAMETER_TOPIC_NAME, self::TOPIC_NAME)
+            ->setPriority(MessagePriority::HIGH);
+
+        $this->topic
+            ->expects(self::never())
+            ->method('getDefaultPriority');
+
+        $expectedMessage = (new Message($message->getBody()))
+            ->setProperties(
+                [
+                    Config::PARAMETER_TOPIC_NAME => self::TOPIC_NAME,
+                    Config::PARAMETER_QUEUE_NAME => self::TRANSPORT_PREFIX . '.' . self::QUEUE_NAME,
+                ]
+            )
+            ->setPriority(MessagePriority::HIGH);
 
         $result = $this->messageRouter->handle($message);
         $result = iterator_to_array($result);

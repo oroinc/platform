@@ -74,6 +74,17 @@ define(function(require) {
             return result.join('&');
         },
 
+        createBlankObject() {
+            const {
+                hasOwnProperty,
+                isPrototypeOf,
+                toString,
+                valueOf
+            } = Object.getOwnPropertyDescriptors(Object.prototype);
+            const blankPrototype = Object.create(null, {hasOwnProperty, isPrototypeOf, toString, valueOf});
+            return Object.create(blankPrototype);
+        },
+
         /**
          * Unpack string to object. Reverse from packToQueryString.
          *
@@ -92,7 +103,7 @@ define(function(require) {
                 if (path.length > 1) {
                     const dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
-                        root[dir] = path[0] === '' ? [] : {};
+                        root[dir] = path[0] === '' ? [] : tools.createBlankObject();
                     }
                     setValue(root[dir], path, value);
                 } else {
@@ -104,7 +115,7 @@ define(function(require) {
                 }
             };
             const nvp = query.split('&');
-            const data = {};
+            const data = tools.createBlankObject();
             for (let i = 0; i < nvp.length; i++) {
                 const pair = nvp[i].split('=');
                 if (pair.length < 2) {
@@ -492,20 +503,6 @@ define(function(require) {
                 }
             });
             return versions;
-        },
-
-        /**
-         * Detect if browser support WebP images
-         * @returns {boolean}
-         */
-        isSupportWebp() {
-            let supports = false;
-            try {
-                const canvas = document.createElement('canvas');
-                supports = !!canvas && canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-            } catch (e) {}
-
-            return supports;
         }
     });
 

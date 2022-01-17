@@ -8,7 +8,6 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @nestTransactionsWithSavepoints
@@ -23,7 +22,10 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
     public function testShouldCreateIndexForEntity()
     {
-        if ($this->getContainer()->getParameter('oro_search.engine') !== 'orm') {
+        $engine = $this->getContainer()
+            ->get('oro_search.engine.parameters')
+            ->getEngineName();
+        if ($engine !== 'orm') {
             $this->markTestIncomplete('BAP-12226: This test doesn\'t work with current search engine');
         }
 
@@ -46,12 +48,12 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
         // test
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'entityClass' => Item::class,
             'offset' => 0,
             'limit' => 1000,
             'jobId' => $childJob->getId(),
-        ]));
+        ]);
 
         $this->getIndexEntitiesByRangeMessageProcessor()->process($message, $this->createQueueSessionMock());
 
@@ -80,12 +82,12 @@ class IndexEntitiesByRangeMessageProcessorTest extends WebTestCase
 
         // test
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'class' => Item::class,
             'offset' => 100000,
             'limit' => 1000,
             'jobId' => $childJob->getId(),
-        ]));
+        ]);
 
         $this->getIndexEntitiesByRangeMessageProcessor()->process($message, $this->createQueueSessionMock());
 

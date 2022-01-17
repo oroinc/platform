@@ -4,11 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Migration;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Gaufrette\Adapter\Local;
-use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentifierHydrator;
+use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\LayoutBundle\Loader\ImageFilterLoader;
 
 /**

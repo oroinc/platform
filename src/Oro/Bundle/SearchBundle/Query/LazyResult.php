@@ -266,7 +266,7 @@ class LazyResult extends Result
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         $this->initializeElements();
 
@@ -308,7 +308,7 @@ class LazyResult extends Result
      *
      * {@inheritDoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         $this->initializeElements();
 

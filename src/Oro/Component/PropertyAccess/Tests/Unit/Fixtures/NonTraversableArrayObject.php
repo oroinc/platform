@@ -6,7 +6,7 @@ namespace Oro\Component\PropertyAccess\Tests\Unit\Fixtures;
  * This class is a hand written simplified version of PHP native `ArrayObject`
  * class, to show that it behaves differently than the PHP native implementation.
  */
-class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializable
+class NonTraversableArrayObject implements \ArrayAccess, \Countable
 {
     private $array;
 
@@ -15,17 +15,17 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
         $this->array = $array ?: array();
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->array);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
             $this->array[] = $value;
@@ -34,23 +34,23 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable, \Serializab
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->array);
     }
 
-    public function serialize()
+    public function __serialize(): array
     {
-        return serialize($this->array);
+        return $this->array;
     }
 
-    public function unserialize($serialized)
+    public function __unserialize(array $serialized): void
     {
-        $this->array = (array)unserialize((string)$serialized);
+        $this->array = $serialized;
     }
 }

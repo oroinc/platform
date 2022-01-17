@@ -12,7 +12,7 @@ use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -262,7 +262,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $message = [
             'from' => $this->notificationSettings->getSender()->toString(),
             'recipientUserId' => $user->getId(),
-            'contentType' => 'text/html',
             'template' => ImportExportResultSummarizer::TEMPLATE_IMPORT_ERROR,
             'templateParams' => [
                 'originFileName' => $body['originFileName'],
@@ -271,7 +270,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
             ],
         ];
 
-        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $message);
+        $this->producer->send(SendEmailNotificationTemplateTopic::getName(), $message);
     }
 
     /**

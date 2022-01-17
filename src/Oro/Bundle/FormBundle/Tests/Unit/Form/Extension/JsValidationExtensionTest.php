@@ -175,7 +175,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => [$constraintWithNestedData],
                 'expectedAttributes' => [
-                    'data-validation' => '{"NotNull":{"message":{"array":{"integer":2},"integer":1},"payload":null}}'
+                    'data-validation' => '{"NotNull":{"payload":null,"message":{"array":{"integer":2},"integer":1}}}'
                 ]
             ],
             'set_custom_name' => [
@@ -192,8 +192,8 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 'expectedConstraints' => [new Constraints\NotBlank()],
                 'expectedAttributes' => [
                     'data-required'   => 1,
-                    'data-validation' => '{"NotBlank":{"message":"This value should not be blank.","allowNull":false,' .
-                        '"normalizer":null,"payload":null}}'
+                    'data-validation' => '{"NotBlank":{"payload":null,"message":"This value should not be blank.",' .
+                        '"allowNull":false,"normalizer":null}}'
                 ]
             ],
             'set_similar_constrains' => [
@@ -220,10 +220,10 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"Regex":[{"message":"Value should start with a symbol and contain only alphabetic symbols",' .
-                        '"pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,"normalizer":null,' .
-                        '"payload":null},{"message":"Value cannot be used as a field name.",' .
-                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"normalizer":null,"payload":null}' .
+                        '"Regex":[{"payload":null,"message":"Value should start with a symbol and contain only ' .
+                        'alphabetic symbols","pattern":"\/^[a-z]+[a-z]*$\/i","htmlPattern":null,"match":true,' .
+                        '"normalizer":null},{"payload":null,"message":"Value cannot be used as a field name.",' .
+                        '"pattern":"\/^id$\/i","htmlPattern":null,"match":false,"normalizer":null}' .
                         ']}',
                 ]
             ],
@@ -243,10 +243,10 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"NotNull":{"message":"This value should not be null."}},' .
-                        '"NotBlank":{"message":"This value should not be blank.","allowNull":false,"normalizer":null,' .
-                        '"payload":null}' .
+                        '"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null}' .
                         '}',
-                    'data-required'   => 1
+                    'data-required'   => true
                 ]
             ],
             'merge_with_json_string' => [
@@ -263,10 +263,10 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"NotBlank":{"message":"This value should not be blank.","allowNull":false,"normalizer":null,' .
-                        '"payload":null}' .
+                        '"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null}' .
                         '}',
-                    'data-required'   => 1
+                    'data-required'   => true
                 ]
             ],
             'override_invalid_value' => [
@@ -283,9 +283,9 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
                 'expectedAttributes' => [
                     'data-validation' =>
-                        '{"NotBlank":{"message":"This value should not be blank.","allowNull":false,' .
-                        '"normalizer":null,"payload":null}}',
-                    'data-required'   => 1
+                        '{"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
+                        '"normalizer":null}}',
+                    'data-required'   => true
                 ]
             ],
         ];

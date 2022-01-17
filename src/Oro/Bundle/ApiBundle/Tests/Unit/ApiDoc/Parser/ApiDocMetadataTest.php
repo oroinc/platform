@@ -56,6 +56,6 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize()
     {
-        self::assertSame('', $this->apiDocMetadata->serialize());
+        self::assertSame([], $this->apiDocMetadata->__serialize());
     }
 }

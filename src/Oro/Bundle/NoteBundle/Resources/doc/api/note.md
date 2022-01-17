@@ -123,8 +123,6 @@ Delete a collection of note records.
 
 ### activityTargets
 
-Records associated with the note record.
-
 #### create
 
 {@inheritdoc}
@@ -240,25 +238,3 @@ Example:
 }
 ```
 {@/request}
-
-### activityTargets
-
-#### get_subresource
-
-Retrieve records to which the note associated.
-
-#### get_relationship
-
-Retrieve the IDs of records to which the note associated.
-
-#### add_relationship
-
-Associate records with the note.
-
-#### update_relationship
-
-Completely replace association between records and the note.
-
-#### delete_relationship
-
-Delete association between records and the note.

@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Oro\Component\MessageQueue\Client\Meta;
 
+use Oro\Component\MessageQueue\Client\Config;
+use Oro\Component\MessageQueue\Client\MessagePriority;
+use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -17,16 +20,20 @@ class TopicsCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:message-queue:topics';
 
+    private TopicRegistry $topicRegistry;
+
     private TopicMetaRegistry $topicMetaRegistry;
 
     private TopicDescriptionProvider $topicDescriptionProvider;
 
     public function __construct(
+        TopicRegistry $topicRegistry,
         TopicMetaRegistry $topicMetaRegistry,
         TopicDescriptionProvider $topicDescriptionProvider
     ) {
         parent::__construct();
 
+        $this->topicRegistry = $topicRegistry;
         $this->topicMetaRegistry = $topicMetaRegistry;
         $this->topicDescriptionProvider = $topicDescriptionProvider;
     }
@@ -54,7 +61,7 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $table = new Table($output);
-        $table->setHeaders(['Topic', 'Description', 'Subscribers']);
+        $table->setHeaders(['Topic', 'Description', 'Default Priority', 'Subscribers']);
 
         $count = 0;
         $firstRow = true;
@@ -68,6 +75,7 @@ HELP
                 [
                     $topicName,
                     $this->topicDescriptionProvider->getTopicDescription($topicName),
+                    $this->getDefaultPriority($topicName),
                     implode(PHP_EOL, $topic->getAllMessageProcessors()),
                 ]
             );
@@ -81,5 +89,12 @@ HELP
         $table->render();
 
         return self::SUCCESS;
+    }
+
+    private function getDefaultPriority(string $topicName): string
+    {
+        $priority = $this->topicRegistry->get($topicName)->getDefaultPriority(Config::DEFAULT_QUEUE_NAME);
+
+        return MessagePriority::getMessagePriorityName($priority);
     }
 }

@@ -38,7 +38,7 @@ class HandleUnidirectionalAssociations implements ProcessorInterface
         $unidirectionalAssociations = $parentConfig->get(
             UnidirectionalAssociationCompleter::UNIDIRECTIONAL_ASSOCIATIONS
         );
-        if (empty($unidirectionalAssociations) || !isset($unidirectionalAssociations[$associationName])) {
+        if (!$unidirectionalAssociations || !isset($unidirectionalAssociations[$associationName])) {
             // not unidirectional association
             return;
         }

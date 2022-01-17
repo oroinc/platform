@@ -47,7 +47,14 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             ->method('fetch')
             ->willReturn(false);
         $eventDispatcher = $this->createMock(EventDispatcher::class);
-        $mappingProvider = new SearchMappingProvider($eventDispatcher, $configProvider, $cache, 'test', 'test');
+        $mappingProvider = new SearchMappingProvider(
+            $eventDispatcher,
+            $configProvider,
+            $cache,
+            'test',
+            'test',
+            'test'
+        );
 
         $securityProvider = $this->createMock(SecurityProvider::class);
         $securityProvider->expects($this->any())

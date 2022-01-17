@@ -5,9 +5,9 @@ namespace Oro\Component\MessageQueue\Job;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Topic\CalculateRootJobStatusTopic;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -47,13 +47,7 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $data = JSON::decode($message->getBody());
-
-        if (!isset($data['jobId'])) {
-            $this->logger->critical('Got invalid message. Job id is missing.');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         $job = $this->getJobRepository()->findJobById((int)$data['jobId']);
         if (!$job) {
@@ -72,7 +66,7 @@ class CalculateRootJobStatusProcessor implements MessageProcessorInterface, Topi
      */
     public static function getSubscribedTopics(): array
     {
-        return [Topics::CALCULATE_ROOT_JOB_STATUS];
+        return [CalculateRootJobStatusTopic::getName()];
     }
 
     private function getJobRepository(): JobRepositoryInterface

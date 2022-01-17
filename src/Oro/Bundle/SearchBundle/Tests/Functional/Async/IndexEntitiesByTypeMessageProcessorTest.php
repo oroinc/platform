@@ -4,14 +4,13 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
-use Oro\Bundle\SearchBundle\Async\Topics;
+use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByRangeTopic;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @nestTransactionsWithSavepoints
@@ -50,17 +49,17 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
 
         // test
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'entityClass' => Item::class,
             'jobId' => $childJob->getId(),
-        ]));
+        ]);
 
         $this->getSearchIndexer()->resetIndex(Item::class);
         self::getMessageCollector()->clear();
 
         $this->getIndexEntitiesByTypeMessageProcessor()->process($message, $this->createQueueSessionMock());
 
-        $messages = self::getSentMessagesByTopic(Topics::INDEX_ENTITY_BY_RANGE);
+        $messages = self::getSentMessagesByTopic(IndexEntitiesByRangeTopic::getName());
 
         $this->assertCount(1, $messages);
 

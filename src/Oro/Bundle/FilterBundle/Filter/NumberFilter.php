@@ -241,7 +241,11 @@ class NumberFilter extends AbstractFilter
      */
     protected function isAggregateField(FilterDatasourceAdapterInterface $ds, $fieldName)
     {
-        return (bool)preg_match('/(?<![\w:.])(\w+)\s*\(/im', $ds->getFieldByAlias($fieldName));
+        $filter = $ds->getFieldByAlias($fieldName);
+        if ($filter === null) {
+            return false;
+        }
+        return (bool)preg_match('/(?<![\w:.])(\w+)\s*\(/im', $filter);
     }
 
     /**

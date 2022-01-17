@@ -158,15 +158,12 @@ class Pager extends AbstractPager
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function serialize()
+    public function __serialize(): array
     {
         $vars = get_object_vars($this);
         unset($vars['qb']);
 
-        return serialize($vars);
+        return $vars;
     }
 
     /**

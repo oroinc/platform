@@ -11,10 +11,9 @@ class TagDefinitionConverter
      * @param string $allowedElements
      * @return string[]
      */
-    public function getElements($allowedElements)
+    public function getElements(string $allowedElements)
     {
         $tags = [];
-
         foreach (explode(',', $allowedElements) as $allowedElement) {
             if (str_contains($allowedElement, '@')) {
                 continue;
@@ -39,12 +38,11 @@ class TagDefinitionConverter
 
     /**
      * @param string $allowedElements
-     * @return string
+     * @return array
      */
-    public function getAttributes($allowedElements)
+    public function getAttributes(string $allowedElements)
     {
         $attributes = [];
-
         foreach (explode(',', $allowedElements) as $allowedElement) {
             $attributesConfiguration = $this->parseAttributes($allowedElement);
             if (!$attributesConfiguration) {

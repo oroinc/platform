@@ -73,12 +73,21 @@ class CsvFileReader extends AbstractFileReader
      */
     protected function isEof()
     {
-        if ($this->getFile()->eof()) {
-            $this->getFile()->rewind();
+        $file = $this->getFile();
+        if ($file->eof()) {
+            $file->rewind();
             $this->header = null;
 
             return true;
         }
+
+        $before = $file->ftell();
+        $file->fgetcsv();
+        if ($before === $file->ftell()) {
+            return true;
+        }
+
+        $file->fseek($before);
 
         return false;
     }

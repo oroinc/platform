@@ -68,8 +68,8 @@ class RoleTest extends \PHPUnit\Framework\TestCase
 
         $secondRole = new RoleStub();
 
-        $serializedString = $firstRole->serialize();
-        $secondRole->unserialize($serializedString);
+        $serializedString = $firstRole->__serialize();
+        $secondRole->__unserialize($serializedString);
         /** @var Organization $unserializedOrganization */
         $unserializedOrganization = $secondRole->getOrganization();
 
@@ -88,8 +88,8 @@ class RoleTest extends \PHPUnit\Framework\TestCase
 
         $secondRole = new Role();
 
-        $serializedString = $firstRole->serialize();
-        $secondRole->unserialize($serializedString);
+        $serializedString = $firstRole->__serialize();
+        $secondRole->__unserialize($serializedString);
 
         self::assertEquals($label, $secondRole->getLabel());
         self::assertStringContainsString($role, $secondRole->getRole());

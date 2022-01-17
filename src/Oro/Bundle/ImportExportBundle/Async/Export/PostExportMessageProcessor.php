@@ -9,7 +9,7 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
-use Oro\Bundle\NotificationBundle\Async\Topics as NotificationTopics;
+use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\NotificationBundle\Model\NotificationSettings;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -162,12 +162,11 @@ class PostExportMessageProcessor implements MessageProcessorInterface, TopicSubs
         $message = [
             'from' => $this->notificationSettings->getSender()->toString(),
             'recipientUserId' => $recipientUserId,
-            'contentType' => 'text/html',
             'template' => $templateName ?: ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
             'templateParams' => $summary,
         ];
 
-        $this->producer->send(NotificationTopics::SEND_NOTIFICATION_EMAIL_TEMPLATE, $message);
+        $this->producer->send(SendEmailNotificationTemplateTopic::getName(), $message);
 
         $this->logger->info('Sent notification email.');
     }

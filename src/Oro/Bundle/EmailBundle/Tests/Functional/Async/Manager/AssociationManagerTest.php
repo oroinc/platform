@@ -7,7 +7,8 @@ use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
 use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\AddEmailAssociationsTopic;
+use Oro\Bundle\EmailBundle\Async\Topic\UpdateEmailOwnerAssociationsTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
@@ -65,7 +66,7 @@ class AssociationManagerTest extends WebTestCase
         $owner = $this->getReference('simple_user');
 
         $this->assertMessageSent(
-            Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS,
+            UpdateEmailOwnerAssociationsTopic::getName(),
             [
                 'ownerClass' => User::class,
                 'ownerIds' => [$owner->getId()],
@@ -102,7 +103,7 @@ class AssociationManagerTest extends WebTestCase
 
         $this->assertDispatchedEvents([]);
 
-        $this->assertMessagesEmpty(Topics::UPDATE_EMAIL_OWNER_ASSOCIATIONS);
+        $this->assertMessagesEmpty(UpdateEmailOwnerAssociationsTopic::getName());
     }
 
     public function testProcessUpdateEmailOwnerAsync()
@@ -118,7 +119,7 @@ class AssociationManagerTest extends WebTestCase
         $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
 
         $this->assertMessageSent(
-            Topics::ADD_ASSOCIATION_TO_EMAILS,
+            AddEmailAssociationsTopic::getName(),
             [
                 'targetClass' => User::class,
                 'targetId' => $owner->getId(),
@@ -156,7 +157,7 @@ class AssociationManagerTest extends WebTestCase
 
         $this->assertDispatchedEvents([]);
 
-        $this->assertMessagesEmpty(Topics::ADD_ASSOCIATION_TO_EMAILS);
+        $this->assertMessagesEmpty(AddEmailAssociationsTopic::getName());
     }
 
     private function assertDispatchedEvents(array $expected)

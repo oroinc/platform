@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\UIBundle\Model;
 
+/**
+ * Image holder
+ */
 class Image implements \JsonSerializable
 {
     const TYPE_ICON = 'icon';
@@ -43,7 +46,7 @@ class Image implements \JsonSerializable
     /**
      * {@inheritdoc}
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'type' => $this->type,

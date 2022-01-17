@@ -107,7 +107,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->iterator->count();
     }
@@ -115,7 +115,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->batch[$this->iterationPos] ?? null;
     }
@@ -123,7 +123,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->iterationPos++;
 
@@ -141,7 +141,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return $this->iterationPos;
     }
@@ -149,7 +149,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset($this->batch[$this->iterationPos]);
     }
@@ -157,7 +157,7 @@ class ImapEmailIterator implements \Iterator, \Countable
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->iterationPos = 0;
         $this->batch        = [];

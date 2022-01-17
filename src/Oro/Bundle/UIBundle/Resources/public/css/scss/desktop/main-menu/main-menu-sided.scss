@@ -160,6 +160,25 @@
             position: static;
         }
 
+        .title-level-1 {
+            display: block;
+            padding: 13px 6px;
+
+            font-size: 11px;
+            line-height: 1.2;
+
+            color: $menu-item-first-level-text-color;
+
+            word-break: break-word;
+
+            .menu-icon {
+                display: block;
+                width: 100%;
+                margin: 0 0 5px;
+                font-size: 24px;
+            }
+        }
+
         // First level
         .dropdown-level-1 {
             text-align: center;
@@ -181,29 +200,9 @@
             &.active {
                 background-color: $menu-dropdown-background-color;
 
-                > .unclickable .title {
+                .title-level-1 {
                     color: $menu-minimized-item-first-level-text-color-active;
                 }
-            }
-        }
-
-        .title-level-1 {
-            display: block;
-            padding: 13px 6px;
-
-            font-size: 11px;
-            line-height: 1.2;
-
-            color: $menu-item-first-level-text-color;
-
-            word-break: break-word;
-
-            .menu-icon {
-                display: block;
-                width: 100%;
-                margin: 0 0 5px;
-
-                font-size: 24px;
             }
         }
     }

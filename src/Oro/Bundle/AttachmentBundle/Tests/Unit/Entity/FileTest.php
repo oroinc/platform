@@ -74,24 +74,25 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize(): void
     {
-        $this->assertSame(serialize([null, null, $this->entity->getUuid()]), $this->entity->serialize());
+        $this->assertSame([null, null, $this->entity->getUuid()], $this->entity->__serialize());
 
         $this->assertEquals(
-            serialize([1, 'sample_filename', 'test-uuid']),
+            [1, 'sample_filename', 'test-uuid'],
             $this->getEntity(
                 File::class,
                 ['id' => 1, 'filename' => 'sample_filename', 'uuid' => 'test-uuid']
-            )->serialize()
+            )->__serialize()
         );
     }
 
     public function testUnserialize(): void
     {
-        $this->entity->unserialize(serialize([1, 'sample_filename', 'test-uuid']));
-
-        $this->assertSame('sample_filename', $this->entity->getFilename());
-        $this->assertSame(1, $this->entity->getId());
-        $this->assertSame('test-uuid', $this->entity->getUuid());
+        $this->entity->__unserialize([1, 'sample_filename', 'test-uuid']);
+        $data = serialize($this->entity);
+        $entity = unserialize($data);
+        $this->assertSame('sample_filename', $entity->getFilename());
+        $this->assertSame(1, $entity->getId());
+        $this->assertSame('test-uuid', $entity->getUuid());
     }
 
     public function testClone(): void

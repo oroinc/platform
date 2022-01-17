@@ -8,6 +8,7 @@ use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\MessageQueue\Util\JSON;
@@ -47,12 +48,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
      */
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $data = JSON::decode($message->getBody());
-        if (!isset($data['jobId'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $data = $message->getBody();
 
         $job = $this->getJobRepository()->findJobById((int)$data['jobId']);
         if (null === $job) {
@@ -86,7 +82,7 @@ class DependentJobMessageProcessor implements MessageProcessorInterface, TopicSu
      */
     public static function getSubscribedTopics(): array
     {
-        return [Topics::ROOT_JOB_STOPPED];
+        return [RootJobStoppedTopic::getName()];
     }
 
     private function validateDependentJobs(array $dependentJobs, Job $job): bool

@@ -8,7 +8,6 @@ use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditData
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 trait AuditChangedEntitiesExtensionTrait
@@ -74,7 +73,7 @@ trait AuditChangedEntitiesExtensionTrait
         ], $body);
 
         $message = new Message();
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
         $message->setMessageId('some_message_id');
 
         return $message;

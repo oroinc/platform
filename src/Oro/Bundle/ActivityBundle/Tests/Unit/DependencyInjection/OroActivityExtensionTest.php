@@ -2,24 +2,39 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\ActivityBundle\Controller\Api\Rest as Api;
 use Oro\Bundle\ActivityBundle\DependencyInjection\OroActivityExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroActivityExtensionTest extends ExtensionTestCase
+class OroActivityExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoad(): void
+    public function testLoadForDefaultConfig(): void
     {
-        $this->loadExtension(new OroActivityExtension());
+        $container = new ContainerBuilder();
 
-        $expectedDefinitions = [
-            Api\ActivityContextController::class,
-            Api\ActivityController::class,
-            Api\ActivityEntityController::class,
-            Api\ActivitySearchController::class,
-            Api\ActivityTargetController::class,
+        $extension = new OroActivityExtension();
+        $extension->load([], $container);
+
+        self::assertSame(
+            [],
+            $container->getDefinition('oro_activity.api.activity_association_provider')->getArgument(0)
+        );
+    }
+
+    public function testLoadWithActivityAssociationNamesConfig(): void
+    {
+        $container = new ContainerBuilder();
+        $configs = [
+            ['api' => ['activity_association_names' => ['Test\Activity1' => 'association1']]],
+            ['api' => ['activity_association_names' => ['Test\Activity2' => 'association2']]],
+            ['api' => ['activity_association_names' => ['Test\Activity1' => 'association1new']]],
         ];
 
-        $this->assertDefinitionsLoaded($expectedDefinitions);
+        $extension = new OroActivityExtension();
+        $extension->load($configs, $container);
+
+        self::assertSame(
+            ['Test\Activity1' => 'association1new', 'Test\Activity2' => 'association2'],
+            $container->getDefinition('oro_activity.api.activity_association_provider')->getArgument(0)
+        );
     }
 }

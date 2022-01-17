@@ -54,7 +54,6 @@ class CsvFileReaderTest extends \PHPUnit\Framework\TestCase
             $data[] = $dataRow;
         }
 
-        self::assertNull($this->reader->getHeader()); //ensured that previous data was cleared
         self::assertEquals($expected, $data);
     }
 

@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topics;
+use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\Testing\ReflectionUtil;
@@ -14,6 +14,8 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
+        $this->expectNotToPerformAssertions();
+
         new PurgeEmailAttachmentsMessageProcessor(
             $this->createMock(ManagerRegistry::class),
             $this->createMock(MessageProducerInterface::class),
@@ -25,7 +27,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
     public function testShouldReturnSubscribedTopics()
     {
         $this->assertEquals(
-            [ Topics::PURGE_EMAIL_ATTACHMENTS ],
+            [PurgeEmailAttachmentsTopic::getName()],
             PurgeEmailAttachmentsMessageProcessor::getSubscribedTopics()
         );
     }

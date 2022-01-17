@@ -24,7 +24,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Config\Common\ConfigObject;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -2252,7 +2251,7 @@ class DataAuditTest extends WebTestCase
 
             foreach ($processor::getSubscribedTopics() as $topic) {
                 $message = $this->getSentMessage($topic);
-                $messageModel = $session->createMessage(JSON::encode($message->getBody()));
+                $messageModel = $session->createMessage($message->getBody());
                 $messageModel->setMessageId('oro_owner');
 
                 $processor->process($messageModel, $session);

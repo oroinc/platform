@@ -27,8 +27,11 @@ class DbalSession implements DbalSessionInterface
     /**
      * {@inheritdoc}
      */
-    public function createMessage(string $body = '', array $properties = [], array $headers = []): MessageInterface
-    {
+    public function createMessage(
+        mixed $body = '',
+        array $properties = [],
+        array $headers = []
+    ): MessageInterface {
         $message = new DbalMessage();
         $message->setBody($body);
         $message->setProperties($properties);

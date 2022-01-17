@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CronBundle\Tests\Unit\Async;
 
 use Oro\Bundle\CronBundle\Async\CommandRunner;
-use Oro\Bundle\CronBundle\Async\Topics;
+use Oro\Bundle\CronBundle\Async\Topic\RunCommandTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 class CommandRunnerTest extends \PHPUnit\Framework\TestCase
@@ -22,7 +22,7 @@ class CommandRunnerTest extends \PHPUnit\Framework\TestCase
         $producer->expects($this->once())
             ->method('send')
             ->with(
-                Topics::RUN_COMMAND,
+                RunCommandTopic::getName(),
                 [
                     'command' => $testCommandName,
                     'arguments' => $testCommandArguments

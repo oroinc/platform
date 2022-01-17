@@ -329,6 +329,21 @@ Example:
 
 Remove the business units that a specific user has access to.
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "businessunits",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
+
 ### groups
 
 #### get_subresource
@@ -388,6 +403,21 @@ Example:
 #### delete_relationship
 
 Remove the groups that a specific user belongs to.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "usergroups",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
 
 ### organization
 
@@ -484,6 +514,21 @@ Example:
 
 Remove the organizations that a specific user has access to.
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "organizations",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
+
 ### owner
 
 #### get_subresource
@@ -562,6 +607,21 @@ Example:
 #### delete_relationship
 
 Remove the roles that are assigned to a specific user.
+
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": [
+    {
+      "type": "userroles",
+      "id": "1"
+    }
+  ]
+}
+```
+{@/request}
 
 ### auth_status
 

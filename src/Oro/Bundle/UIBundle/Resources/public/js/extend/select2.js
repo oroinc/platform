@@ -494,6 +494,8 @@ define(function(require) {
                 $(window).on('scroll.select2Overlaps', preventOverlapSelectResults.bind(this));
             }
 
+            this.container.trigger('clearMenus'); // hides all opened dropdown menus
+
             return open.call(this);
         };
 

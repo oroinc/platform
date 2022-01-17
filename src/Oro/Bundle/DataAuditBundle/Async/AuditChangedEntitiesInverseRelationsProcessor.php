@@ -5,13 +5,14 @@ namespace Oro\Bundle\DataAuditBundle\Async;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
+use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseRelationsTopic;
 use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
+use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * Processes inverse relation that should be added to data audit.
@@ -20,23 +21,24 @@ use Oro\Component\MessageQueue\Util\JSON;
  */
 class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcessor implements TopicSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /** @var EntityChangesToAuditEntryConverter */
-    private $entityChangesToAuditEntryConverter;
+    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
 
-    /** @var AuditConfigProvider */
-    private $auditConfigProvider;
+    private AuditConfigProvider $auditConfigProvider;
+
+    private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     public function __construct(
         ManagerRegistry $doctrine,
         EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter,
-        AuditConfigProvider $auditConfigProvider
+        AuditConfigProvider $auditConfigProvider,
+        EntityAuditStrategyProcessorInterface $strategyProcessor
     ) {
         $this->doctrine = $doctrine;
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
         $this->auditConfigProvider = $auditConfigProvider;
+        $this->strategyProcessor = $strategyProcessor;
     }
 
     /**
@@ -44,8 +46,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
+        $body = $message->getBody();
         $loggedAt = $this->getLoggedAt($body);
         $transactionId = $this->getTransactionId($body);
         $user = $this->getUserReference($body);
@@ -94,6 +95,11 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
             $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
 
             if (empty($sourceEntityData['change_set'])) {
+                continue;
+            }
+
+            $strategy = $this->strategyProcessor->processInverseRelations($sourceEntityData);
+            if (empty($strategy)) {
                 continue;
             }
 
@@ -422,7 +428,7 @@ class AuditChangedEntitiesInverseRelationsProcessor extends AbstractAuditProcess
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED];
+        return [AuditChangedEntitiesInverseRelationsTopic::getName()];
     }
 
     /**

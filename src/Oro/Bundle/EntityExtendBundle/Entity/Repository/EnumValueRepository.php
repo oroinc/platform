@@ -7,6 +7,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Doctrine repository for AbstractEnumValue entity.
+ */
 class EnumValueRepository extends EntityRepository
 {
     /**
@@ -28,7 +31,7 @@ class EnumValueRepository extends EntityRepository
      */
     public function createEnumValue($name, $priority, $default, $id = null)
     {
-        if (strlen($name) === 0) {
+        if ($name === null || strlen($name) === 0) {
             throw new \InvalidArgumentException('$name must not be empty.');
         }
         if (!isset($id) || $id === '') {

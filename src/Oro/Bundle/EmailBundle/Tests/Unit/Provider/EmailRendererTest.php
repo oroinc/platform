@@ -119,7 +119,7 @@ class EmailRendererTest extends \PHPUnit\Framework\TestCase
         $content = 'test '
             . '<a href="http://example.com">test</a>'
             . ' {{ entity.getField1()|oro_html_sanitize }}'
-            . ' {{ entity.field2|trim|raw }}'
+            . ' {% if entity.field2 is not empty %}{{ entity.field2|trim|raw }}{% endif %}'
             . ' {{ max(0, 2) }}'
             . ' {{ system.testVar }}'
             . ' N/A';

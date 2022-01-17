@@ -22,9 +22,6 @@ class DataAccessor implements DataAccessorInterface
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function get($name)
     {
         return $this->offsetGet($name);
@@ -33,7 +30,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($name)
+    public function offsetGet($name): mixed
     {
         $dataProvider = $this->getDataProvider($name);
         if (null !== $dataProvider) {
@@ -49,7 +46,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($name)
+    public function offsetExists($name): bool
     {
         return
             null !== $this->getDataProvider($name)
@@ -59,7 +56,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($name, $value)
+    public function offsetSet($name, $value): void
     {
         throw new \BadMethodCallException('Not supported');
     }
@@ -67,7 +64,7 @@ class DataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($name)
+    public function offsetUnset($name): void
     {
         throw new \BadMethodCallException('Not supported');
     }

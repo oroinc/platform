@@ -1,31 +1,26 @@
 <?php
+
 namespace Oro\Bundle\ImapBundle\Async;
 
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailsTopic;
+use Oro\Bundle\ImapBundle\Async\Topic\SyncEmailTopic;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
-use Psr\Log\LoggerInterface;
 
+/**
+ * Message queue processor that synchronizes multiple emails via IMAP.
+ */
 class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ImapEmailSynchronizer
-     */
-    private $producer;
+    private MessageProducerInterface|ImapEmailSynchronizer $producer;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    public function __construct(MessageProducerInterface $producer, LoggerInterface $logger)
+    public function __construct(MessageProducerInterface $producer)
     {
         $this->producer = $producer;
-        $this->logger = $logger;
     }
 
     /**
@@ -33,16 +28,8 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
-
-        if (! isset($body['ids']) || ! is_array($body['ids'])) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
-
-        foreach ($body['ids'] as $id) {
-            $this->producer->send(Topics::SYNC_EMAIL, ['id' => $id]);
+        foreach ($message->getBody()['ids'] as $id) {
+            $this->producer->send(SyncEmailTopic::getName(), ['id' => $id]);
         }
 
         return self::ACK;
@@ -53,6 +40,6 @@ class SyncEmailsMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SYNC_EMAILS];
+        return [SyncEmailsTopic::getName()];
     }
 }

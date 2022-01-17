@@ -9,14 +9,13 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalMessage;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer;
 use Oro\Component\MessageQueue\Transport\Exception\RuntimeException;
 use Oro\Component\MessageQueue\Transport\Queue;
+use Oro\Component\MessageQueue\Util\JSON;
 
 class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DbalConnection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
+    private DbalConnection|\PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /** @var DbalMessageProducer */
-    private $messageProducer;
+    private DbalMessageProducer $messageProducer;
 
     /**
      * {@inheritdoc}
@@ -30,20 +29,20 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
     public function testSend(): void
     {
         $queue = new Queue('queue name');
-        $message = $this->getMessage('message body', [
-            'propertyKey' => 'propertyValue'
-        ]);
+        $messageBody = 'message body';
+        $messageProperties = ['propertyKey' => 'propertyValue'];
+        $message = $this->getMessage($messageBody, $messageProperties);
 
         $expectedMessage = [
-            'body' => 'message body',
+            'body' => JSON::encode($messageBody),
             'headers' => '[]',
-            'properties' => '{"propertyKey":"propertyValue"}',
+            'properties' => JSON::encode($messageProperties),
             'priority' => 0,
             'queue' => 'queue name',
         ];
 
         $dbalConnection = $this->createMock(Connection::class);
-        $dbalConnection->expects($this->once())
+        $dbalConnection->expects(self::once())
             ->method('insert')
             ->with('oro_message_queue', $expectedMessage, [
                 'body' => Types::TEXT,
@@ -55,12 +54,12 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getDBALConnection')
             ->willReturn($dbalConnection);
 
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
@@ -73,9 +72,9 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
         $message = $this->getMessage('', [], 10);
 
         $dbalConnection = $this->createMock(Connection::class);
-        $dbalConnection->expects($this->once())
+        $dbalConnection->expects(self::once())
             ->method('insert')
-            ->with('oro_message_queue', $this->arrayHasKey('delayed_until'), [
+            ->with('oro_message_queue', self::arrayHasKey('delayed_until'), [
                 'body' => Types::TEXT,
                 'headers' => Types::TEXT,
                 'properties' => Types::TEXT,
@@ -85,12 +84,12 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getDBALConnection')
             ->willReturn($dbalConnection);
 
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
@@ -100,13 +99,15 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
     public function testSendRuntimeException(): void
     {
         $queue = new Queue('queue name');
+        $messageBody = 'sample.message.body';
         $message = new DbalMessage();
+        $message->setBody($messageBody);
 
         $dbalConnection = $this->createMock(Connection::class);
-        $dbalConnection->expects($this->once())
+        $dbalConnection->expects(self::once())
             ->method('insert')
             ->with('oro_message_queue', [
-                'body' => '',
+                'body' => JSON::encode($messageBody),
                 'headers' => '[]',
                 'properties' => '[]',
                 'priority' => 0,
@@ -122,12 +123,12 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new \Exception());
 
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getDBALConnection')
             ->willReturn($dbalConnection);
 
         $this->connection
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getTableName')
             ->willReturn('oro_message_queue');
 
@@ -137,13 +138,6 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->send($queue, $message);
     }
 
-    /**
-     * @param string $messageBody
-     * @param array $properties
-     * @param int $delay
-     *
-     * @return DbalMessage
-     */
     private function getMessage(string $messageBody, array $properties, int $delay = null): DbalMessage
     {
         $message = new DbalMessage();

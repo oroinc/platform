@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -64,14 +63,12 @@ class FixFieldNaming implements ProcessorInterface
     {
         $newFieldName = lcfirst($this->getShortClassName($entityClass)) . ucfirst($fieldName);
         if ($definition->hasField($newFieldName)) {
-            throw new RuntimeException(
-                sprintf(
-                    'The "%s" reserved word cannot be used as a field name'
-                    . ' and it cannot be renamed to "%s" because a field with this name already exists.',
-                    $fieldName,
-                    $newFieldName
-                )
-            );
+            throw new \RuntimeException(sprintf(
+                'The "%s" reserved word cannot be used as a field name'
+                . ' and it cannot be renamed to "%s" because a field with this name already exists.',
+                $fieldName,
+                $newFieldName
+            ));
         }
 
         // do renaming

@@ -7,6 +7,7 @@ use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic;
 use Oro\Component\MessageQueue\StatusCalculator\StatusCalculatorResolver;
 
 /**
@@ -67,7 +68,7 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
 
         if ($this->jobStatusChecker->isJobStopped($rootJob)) {
             $message = new Message(['jobId' => $rootJob->getId()], MessagePriority::HIGH);
-            $this->messageProducer->send(Topics::ROOT_JOB_STOPPED, $message);
+            $this->messageProducer->send(RootJobStoppedTopic::getName(), $message);
         }
     }
 
