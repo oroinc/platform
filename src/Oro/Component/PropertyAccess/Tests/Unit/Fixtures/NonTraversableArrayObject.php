@@ -15,17 +15,17 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable
         $this->array = $array ?: array();
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->array);
     }
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->array[$offset];
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (null === $offset) {
             $this->array[] = $value;
@@ -34,12 +34,12 @@ class NonTraversableArrayObject implements \ArrayAccess, \Countable
         }
     }
 
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         unset($this->array[$offset]);
     }
 
-    public function count()
+    public function count(): int
     {
         return count($this->array);
     }

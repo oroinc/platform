@@ -140,7 +140,7 @@ abstract class AbstractFilter implements FilterInterface
         $defaultMetadata = [
             'name'    => $this->getName(),
             // use filter name if label not set
-            'label'   => ucfirst($this->name),
+            'label' => $this->name ? ucfirst($this->name) : '',
             'choices' => $typeView->vars['choices'],
         ];
 

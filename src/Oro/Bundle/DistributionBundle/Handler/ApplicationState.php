@@ -35,7 +35,7 @@ class ApplicationState
     {
         if (!$this->isInstalled()) {
             try {
-                $date = (new \DateTime(null, new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
+                $date = (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s');
                 $configId = $this->connection->fetchOne("SELECT id FROM oro_config WHERE entity = 'app'");
                 $this->connection->insert(
                     'oro_config_value',

@@ -59,7 +59,7 @@ class StatementMock implements \IteratorAggregate, \Doctrine\DBAL\Driver\Stateme
     {
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
     }
 }

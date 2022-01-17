@@ -49,7 +49,7 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return array_key_exists($offset, $this->options);
     }
@@ -57,7 +57,7 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->offsetExists($offset) ? $this->get($offset) : null;
     }
@@ -65,7 +65,7 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (is_array($value)) {
             $value = new self($value);
@@ -80,7 +80,7 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         if (array_key_exists($offset, $this->options)) {
             unset($this->options[$offset]);
@@ -131,15 +131,15 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
-        return reset($this->options);
+        reset($this->options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function current()
+    public function current(): mixed
     {
         return current($this->options);
     }
@@ -147,7 +147,7 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function key()
+    public function key(): mixed
     {
         return key($this->options);
     }
@@ -155,15 +155,15 @@ class Options implements \ArrayAccess, \Iterator
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
-        return next($this->options);
+        next($this->options);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return key($this->options) !== null;
     }

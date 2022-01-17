@@ -99,7 +99,7 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->resources);
     }
@@ -107,7 +107,7 @@ class ApiResourceCollection implements \Countable, \IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->resources);
     }

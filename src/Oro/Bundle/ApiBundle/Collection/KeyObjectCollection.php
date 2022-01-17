@@ -107,7 +107,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
      *
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count($this->objects);
     }
@@ -207,7 +207,7 @@ class KeyObjectCollection implements \Countable, \IteratorAggregate
      *
      * @return \Traversable
      */
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->objects);
     }

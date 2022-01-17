@@ -50,7 +50,8 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
 
         $this->cacheWarmer->expects(self::once())
             ->method('warmUp')
-            ->with($cacheDir);
+            ->with($cacheDir)
+            ->willReturn([]);
         $this->cacheWarmer->expects(self::never())
             ->method('enableOnlyOptionalWarmers');
         $this->cacheWarmer->expects(self::never())
@@ -72,7 +73,8 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
 
         $this->cacheWarmer->expects(self::once())
             ->method('warmUp')
-            ->with($cacheDir);
+            ->with($cacheDir)
+            ->willReturn([]);
         $this->cacheWarmer->expects(self::never())
             ->method('enableOnlyOptionalWarmers');
         $this->cacheWarmer->expects(self::once())
@@ -95,7 +97,8 @@ class CacheWarmerAggregateTest extends \PHPUnit\Framework\TestCase
 
         $this->cacheWarmer->expects(self::once())
             ->method('warmUp')
-            ->with($cacheDir);
+            ->with($cacheDir)
+            ->willReturn([]);
         $this->cacheWarmer->expects(self::once())
             ->method('enableOnlyOptionalWarmers');
         $this->cacheWarmer->expects(self::never())
