@@ -64,6 +64,11 @@ define(function(require) {
                     return module === 'orofilter/js/datafilter-builder';
                 });
             }
+
+            if (options.metadata.rowLinkEnabled) {
+                options.builders.push('orodatagrid/js/cell-links/builder');
+            }
+
             options.builders.push('orodatagrid/js/inline-editing/builder');
             options.builders.push('orodatagrid/js/appearance/builder');
 

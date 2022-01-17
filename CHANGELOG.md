@@ -46,6 +46,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### DataGridBundle
+
+* Added `orodatagrid/js/cell-links/builder` to provide behavior row as link. In customizations, it is not recommended to use selectors like `:first-child`, `:nth-child(n)` etc. Because it can affect this functionality. If necessary, wrap the cell content in a container.
+
 #### EmailBundle
 * Added `Oro\Bundle\EmailBundle\Mailer\Mailer` to send `Symfony\Component\Mime\Email` message.
 * Added `Oro\Bundle\EmailBundle\Sender\EmailModelSender` to send `Oro\Bundle\EmailBundle\Form\Model\Email` model.
