@@ -21,6 +21,7 @@ class Configuration implements ConfigurationInterface
             [
                 'default_per_page' => ['value' => 25],
                 'full_screen_layout_enabled' => ['type' => 'boolean', 'value' => true],
+                'row_link_enabled' => ['type' => 'boolean', 'value' => true],
             ]
         );
 
