@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\ORM\Mapping;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\Psr6\CacheAdapter;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Doctrine helper methods.
@@ -15,12 +13,12 @@ use Doctrine\Persistence\ManagerRegistry;
 class AdditionalMetadataProvider
 {
     protected ManagerRegistry $registry;
-    protected Cache $cacheDriver;
+    protected CacheItemPoolInterface $cacheAdapter;
 
-    public function __construct(ManagerRegistry $registry, CacheAdapter $cacheAdapter)
+    public function __construct(ManagerRegistry $registry, CacheItemPoolInterface $cacheAdapter)
     {
         $this->registry = $registry;
-        $this->cacheDriver = DoctrineProvider::wrap($cacheAdapter);
+        $this->cacheAdapter = $cacheAdapter;
     }
 
     /**
@@ -31,24 +29,24 @@ class AdditionalMetadataProvider
     public function getInversedUnidirectionalAssociationMappings($className)
     {
         $cacheKey = $this->createCacheKey($className);
-        if (false === ($result = $this->cacheDriver->fetch($cacheKey))) {
+        $cacheItem = $this->cacheAdapter->getItem($cacheKey);
+        if (!$cacheItem->isHit()) {
             $this->warmUpMetadata();
-
-            return $this->cacheDriver->fetch($cacheKey);
+            $cacheItem = $this->cacheAdapter->getItem($cacheKey);
         }
-
-        return $result;
+        return $cacheItem->isHit() ? $cacheItem->get() : [];
     }
 
     public function warmUpMetadata()
     {
         $allMetadata = $this->registry->getManager()->getMetadataFactory()->getAllMetadata();
         foreach ($allMetadata as $classMetadata) {
-            $this->cacheDriver->save(
-                $this->createCacheKey($classMetadata->name),
-                $this->createInversedUnidirectionalAssociationMappings($classMetadata, $allMetadata)
-            );
+            $cacheKey = $this->createCacheKey($classMetadata->name);
+            $poolItem = $this->cacheAdapter->getItem($cacheKey);
+            $poolItem->set($this->createInversedUnidirectionalAssociationMappings($classMetadata, $allMetadata));
+            $this->cacheAdapter->saveDeferred($poolItem);
         }
+        $this->cacheAdapter->commit();
     }
 
     /**

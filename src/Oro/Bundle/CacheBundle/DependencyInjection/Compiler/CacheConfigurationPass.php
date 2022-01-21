@@ -22,13 +22,12 @@ class CacheConfigurationPass implements CompilerPassInterface
 {
     /** this cache should be used to caching data which need to be shared between nodes in a web farm */
     public const DATA_CACHE_SERVICE = 'oro.cache.abstract';
-    /** the same as "oro.cache.abstract" but without additional in-memory caching */
-    public const DATA_CACHE_NO_MEMORY_SERVICE = 'oro.cache.abstract.without_memory_cache';
     /** data cache manager service */
     public const MANAGER_SERVICE_KEY = 'oro_cache.oro_data_cache_manager';
     /** the base service for static configuration providers */
     public const STATIC_CONFIG_PROVIDER_SERVICE = 'oro.static_config_provider.abstract';
     public const DATA_CACHE_POOL = 'oro.data.cache';
+    public const DATA_CACHE_POOL_WITHOUT_MEMORY_CACHE = 'oro.data.cache.without_memory_cache';
 
     /**
      * {@inheritdoc}
@@ -48,7 +47,6 @@ class CacheConfigurationPass implements CompilerPassInterface
         $cacheProvider = $this->getCacheProvider($container, static::DATA_CACHE_SERVICE);
 
         $container->setDefinition(self::DATA_CACHE_SERVICE, self::getMemoryCacheChain($cacheProvider));
-        $container->setDefinition(self::DATA_CACHE_NO_MEMORY_SERVICE, $cacheProvider);
     }
 
     /**
@@ -56,17 +54,13 @@ class CacheConfigurationPass implements CompilerPassInterface
      */
     private function configureDataCacheManagerAndStaticConfigCache(ContainerBuilder $container): void
     {
-        $parentServices = [
-            self::DATA_CACHE_SERVICE,
-            self::DATA_CACHE_NO_MEMORY_SERVICE
-        ];
         $managerDef  = $container->getDefinition(self::MANAGER_SERVICE_KEY);
         $definitions = $container->getDefinitions();
         foreach ($definitions as $serviceId => $def) {
             if (!$def instanceof ChildDefinition || $def->isAbstract()) {
                 continue;
             }
-            if (\in_array($def->getParent(), $parentServices, true)) {
+            if ($def->getParent() === self::DATA_CACHE_SERVICE) {
                 $managerDef->addMethodCall(
                     'registerCacheProvider',
                     [new Reference($serviceId)]

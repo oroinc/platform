@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -14,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
@@ -24,7 +24,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var DictionaryVirtualFieldProvider */
@@ -36,7 +36,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         $doctrine = $this->createMock(ManagerRegistry::class);
         $translator = $this->createMock(TranslatorInterface::class);
         $this->em = $this->createMock(EntityManager::class);
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(AbstractAdapter::class);
 
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
@@ -273,11 +273,9 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with('dictionaries')
             ->willReturn(['Acme\TestBundle\Entity\Dictionary3' => ['name']]);
-        $this->cache->expects($this->never())
-            ->method('save');
 
         $this->configManager->expects($this->never())
             ->method('getConfigs');
@@ -310,7 +308,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
     public function testClearCache()
     {
         $this->cache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->provider->clearCache();
     }
@@ -321,21 +319,15 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
      */
     private function initialize(ClassMetadata $metadata)
     {
-        $this->cache->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects(self::once())
+            ->method('get')
             ->with('dictionaries')
-            ->willReturn(false);
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(
-                'dictionaries',
-                [
+            ->willReturn([
                     'Acme\TestBundle\Entity\Dictionary1' => ['name'],
                     'Acme\TestBundle\Entity\Dictionary2' => ['id', 'name'],
                     'Acme\TestBundle\Entity\Dictionary3' => ['name'],
                     'Acme\TestBundle\Entity\Dictionary4' => ['code', 'label']
-                ]
-            );
+            ]);
 
         $this->configManager->expects($this->any())
             ->method('getConfigs')

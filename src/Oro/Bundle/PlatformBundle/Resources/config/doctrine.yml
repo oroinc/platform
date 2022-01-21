@@ -1,9 +1,9 @@
 services:
     doctrine.metadata.cache:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_metadata' }
 
     doctrine.query.cache:
         public: false
@@ -13,9 +13,9 @@ services:
 
     doctrine.metadata.cache.config:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata_config' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_metadata_config' }
 
     doctrine.query.cache.config:
         public: false

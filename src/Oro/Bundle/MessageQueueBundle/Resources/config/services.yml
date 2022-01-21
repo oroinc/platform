@@ -173,9 +173,9 @@ services:
             - { name: gos_web_socket.topic }
 
     oro_message_queue.cache.doctrine_metadata:
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata_message_queue' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_metadata_message_queue' }
 
     oro_message_queue.platform.optional_listener_extension:
         class: Oro\Bundle\MessageQueueBundle\Platform\OptionalListenerExtension

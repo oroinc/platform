@@ -195,10 +195,10 @@ services:
             - { name: oro_entity.virtual_field_provider }
 
     oro_entity.virtual_field_provider.cache.dictionary:
-        parent: oro.cache.abstract.without_memory_cache
+        parent: oro.data.cache.without_memory_cache
         public: false
-        calls:
-            - [ setNamespace, [ 'oro_dictionary_virtual_fields' ] ]
+        tags:
+              - { name: 'cache.pool', namespace: 'oro_dictionary_virtual_fields' }
 
     oro_entity.virtual_field_provider.dictionary:
         class: Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider
@@ -336,10 +336,10 @@ services:
         alias: oro_entity.entity_alias_resolver
 
     oro_entity.entity_alias_cache:
-        parent: oro.cache.abstract.without_memory_cache
+        parent: oro.data.cache.without_memory_cache
         public: false
-        calls:
-            - [ setNamespace, [ 'oro_entity_aliases' ] ]
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_aliases' }
 
     oro_entity.entity_alias_loader:
         class: Oro\Bundle\EntityBundle\Provider\EntityAliasLoader

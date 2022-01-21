@@ -234,9 +234,9 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_default']]
+                ['namespace' => 'oro_api_aliases_default']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.default')->getTag('cache.pool')
         );
         self::assertEquals(
             [
@@ -506,21 +506,22 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_default']]
+                ['namespace' => 'oro_api_aliases_default']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.default')->getTag('cache.pool')
+        );
+
+        self::assertEquals(
+            [
+                ['namespace' => 'oro_api_aliases_first']
+            ],
+            $container->getDefinition('oro_api.entity_alias_cache.first')->getTag('cache.pool')
         );
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_first']]
+                ['namespace' => 'oro_api_aliases_second']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.first')->getMethodCalls()
-        );
-        self::assertEquals(
-            [
-                ['setNamespace', ['oro_api_aliases_second']]
-            ],
-            $container->getDefinition('oro_api.entity_alias_cache.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.second')->getTag('cache.pool')
         );
         self::assertEquals(
             [
@@ -1168,21 +1169,21 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_default']]
+                ['namespace' => 'oro_api_aliases_default']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.default')->getTag('cache.pool')
         );
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_first']]
+                ['namespace' => 'oro_api_aliases_first']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.first')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.first')->getTag('cache.pool')
         );
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_second']]
+                ['namespace' => 'oro_api_aliases_second']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.second')->getTag('cache.pool')
         );
         self::assertEquals(
             [

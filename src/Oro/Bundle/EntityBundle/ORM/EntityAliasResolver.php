@@ -11,6 +11,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -24,7 +25,7 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
     /** @var EntityAliasLoader */
     private $loader;
 
-    /** @var Cache */
+    /** @var CacheItemPoolInterface */
     private $cache;
 
     /** @var LoggerInterface */
@@ -36,7 +37,7 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
     /** @var EntityAliasStorage|null */
     private $storage;
 
-    public function __construct(EntityAliasLoader $loader, Cache $cache, LoggerInterface $logger)
+    public function __construct(EntityAliasLoader $loader, CacheItemPoolInterface $cache, LoggerInterface $logger)
     {
         $this->loader = $loader;
         $this->cache = $cache;
@@ -183,7 +184,7 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
      */
     public function clearCache(): void
     {
-        $this->cache->delete(self::CACHE_KEY);
+        $this->cache->deleteItem(self::CACHE_KEY);
         $this->storage = null;
     }
 
@@ -217,9 +218,9 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
     private function fetchAliasesFromCache(): ?EntityAliasStorage
     {
         $storage = null;
-        $cachedData = $this->cache->fetch(self::CACHE_KEY);
-        if (false !== $cachedData) {
-            list($timestamp, $value) = $cachedData;
+        $cacheItem = $this->cache->getItem(self::CACHE_KEY);
+        if ($cacheItem->isHit()) {
+            list($timestamp, $value) = $cacheItem->get();
             if (null === $this->configCacheState || $this->configCacheState->isCacheFresh($timestamp)) {
                 $storage = $value;
             }
@@ -233,7 +234,9 @@ class EntityAliasResolver implements WarmableConfigCacheInterface, ClearableConf
         $timestamp = null === $this->configCacheState
             ? null
             : $this->configCacheState->getCacheTimestamp();
-        $this->cache->save(self::CACHE_KEY, [$timestamp, $storage]);
+        $cacheItem = $this->cache->getItem(self::CACHE_KEY);
+        $cacheItem->set([$timestamp, $storage]);
+        $this->cache->save($cacheItem);
     }
 
     /**
