@@ -322,9 +322,12 @@ class ConfigurationLoader
     ): string {
         $cacheServiceId = 'oro_api.entity_alias_cache.' . $configKey;
         $this->container
-            ->setDefinition($cacheServiceId, new ChildDefinition(CacheConfiguration::DATA_CACHE_NO_MEMORY_SERVICE))
+            ->setDefinition(
+                $cacheServiceId,
+                new ChildDefinition(CacheConfiguration::DATA_CACHE_POOL_WITHOUT_MEMORY_CACHE)
+            )
             ->setPublic(false)
-            ->addMethodCall('setNamespace', ['oro_api_aliases_' . $configKey]);
+            ->addTag('cache.pool', ['namespace' => 'oro_api_aliases_' . $configKey]);
 
         $providerServiceId = 'oro_api.entity_alias_provider.' . $configKey;
         $this->container

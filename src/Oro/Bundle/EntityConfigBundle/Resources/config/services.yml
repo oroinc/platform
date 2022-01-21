@@ -116,15 +116,15 @@ services:
 
     oro_entity_config.config_cache_impl:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [setNamespace, [ 'oro_entity_config' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_config' }
 
     oro_entity_config.model_cache_impl:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [setNamespace, [ 'oro_entity_config_model' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_config_model' }
 
     oro_entity_config.config_cache_warmer:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer

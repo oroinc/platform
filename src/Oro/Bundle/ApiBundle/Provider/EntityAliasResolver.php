@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver as BaseEntityAliasResolver;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -21,14 +21,14 @@ class EntityAliasResolver extends BaseEntityAliasResolver
     /**
      * @param EntityAliasLoader               $loader
      * @param EntityOverrideProviderInterface $entityOverrideProvider
-     * @param Cache                           $cache
+     * @param CacheItemPoolInterface          $cache
      * @param LoggerInterface                 $logger
      * @param string[]                        $configFiles
      */
     public function __construct(
         EntityAliasLoader $loader,
         EntityOverrideProviderInterface $entityOverrideProvider,
-        Cache $cache,
+        CacheItemPoolInterface $cache,
         LoggerInterface $logger,
         array $configFiles
     ) {

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Inflector\Inflector;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +11,7 @@ use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -28,7 +28,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     /** @var TranslatorInterface */
     private $translator;
 
-    /** @var CacheProvider */
+    /** @var CacheInterface */
     private $cache;
 
     /** @var array */
@@ -45,7 +45,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         ConfigManager $configManager,
         ManagerRegistry $doctrine,
         TranslatorInterface $translator,
-        CacheProvider $cache,
+        CacheInterface $cache,
         Inflector $inflector
     ) {
         $this->configManager = $configManager;
@@ -95,7 +95,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         $this->virtualFields = [];
         $this->virtualFieldQueries = [];
         $this->dictionaries = null;
-        $this->cache->deleteAll();
+        $this->cache->clear();
     }
 
     /**
@@ -207,11 +207,9 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     private function ensureDictionariesInitialized()
     {
         if (null === $this->dictionaries) {
-            $this->dictionaries = $this->cache->fetch('dictionaries');
-            if (false === $this->dictionaries) {
-                $this->dictionaries = $this->loadDictionaries();
-                $this->cache->save('dictionaries', $this->dictionaries);
-            }
+            $this->dictionaries = $this->cache->get('dictionaries', function () {
+                return $this->loadDictionaries();
+            });
         }
     }
 

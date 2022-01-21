@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * The cache for entity configs.
@@ -20,10 +20,10 @@ class ConfigCache
     private const ENTITY_CLASSES_KEY = '_entities';
     private const FIELD_NAMES_KEY    = '_fields_';
 
-    /** @var CacheProvider */
+    /** @var CacheItemPoolInterface */
     private $cache;
 
-    /** @var CacheProvider */
+    /** @var CacheItemPoolInterface */
     private $modelCache;
 
     /** @var string [scope => scope, ...] */
@@ -57,11 +57,11 @@ class ConfigCache
     private $toDelete;
 
     /**
-     * @param CacheProvider $cache
-     * @param CacheProvider $modelCache
+     * @param CacheItemPoolInterface $cache
+     * @param CacheItemPoolInterface $modelCache
      * @param string[]      $scopes
      */
-    public function __construct(CacheProvider $cache, CacheProvider $modelCache, array $scopes)
+    public function __construct(CacheItemPoolInterface $cache, CacheItemPoolInterface $modelCache, array $scopes)
     {
         $this->cache = $cache;
         $this->modelCache = $modelCache;
@@ -94,13 +94,13 @@ class ConfigCache
 
         try {
             if (!empty($this->toSaveModel)) {
-                $this->modelCache->saveMultiple($this->toSaveModel);
+                $this->saveMultiple($this->modelCache, $this->toSaveModel);
             }
             if (!empty($this->toSave)) {
-                $this->cache->saveMultiple($this->toSave);
+                $this->saveMultiple($this->cache, $this->toSave);
             }
             if (!empty($this->toDelete)) {
-                $this->cache->deleteMultiple(\array_keys($this->toDelete));
+                $this->cache->deleteItems(\array_keys($this->toDelete));
             }
         } finally {
             $this->toSaveModel = null;
@@ -403,7 +403,7 @@ class ConfigCache
         $this->listFields = [];
 
         if (!$localCacheOnly) {
-            $this->cache->deleteAll();
+            $this->cache->clear();
         }
     }
 
@@ -492,7 +492,7 @@ class ConfigCache
         $this->configurableFields = [];
 
         if (!$localCacheOnly) {
-            $this->modelCache->deleteAll();
+            $this->modelCache->clear();
         }
     }
 
@@ -585,7 +585,8 @@ class ConfigCache
             if (null !== $this->toSaveModel && isset($this->toSaveModel[$className])) {
                 $entry = $this->toSaveModel[$className];
             } else {
-                $entry = $this->modelCache->fetch($className);
+                $cacheItem = $this->modelCache->getItem($className);
+                $entry = $cacheItem->isHit() ? $cacheItem->get() : null;
             }
             // put to a local cache
             if (empty($entry)) {
@@ -614,7 +615,9 @@ class ConfigCache
         }
 
         if (null === $this->toSaveModel) {
-            $this->modelCache->save($className, $entry);
+            $cacheItem = $this->modelCache->getItem($className);
+            $cacheItem->set($entry);
+            $this->modelCache->save($cacheItem);
         } else {
             $this->toSaveModel[$className] = $entry;
         }
@@ -627,8 +630,9 @@ class ConfigCache
      */
     private function cacheFetch($key)
     {
+        $cacheItem = $this->cache->getItem($key);
         if (null === $this->toSave) {
-            return $this->cache->fetch($key);
+            return $cacheItem->isHit() ? $cacheItem->get() : false;
         }
 
         if (isset($this->toSave[$key])) {
@@ -639,7 +643,7 @@ class ConfigCache
             return false;
         }
 
-        return $this->cache->fetch($key);
+        return $cacheItem->isHit() ? $cacheItem->get() : false;
     }
 
     /**
@@ -649,7 +653,9 @@ class ConfigCache
     private function cacheSave($key, $value)
     {
         if (null === $this->toSave) {
-            $this->cache->save($key, $value);
+            $cacheItem = $this->cache->getItem($key);
+            $cacheItem->set($value);
+            $this->cache->save($cacheItem);
         } else {
             $this->toSave[$key] = $value;
             unset($this->toDelete[$key]);
@@ -662,11 +668,21 @@ class ConfigCache
     private function cacheDelete($key)
     {
         if (null === $this->toDelete) {
-            $this->cache->delete($key);
+            $this->cache->deleteItem($key);
         } else {
             $this->toDelete[$key] = true;
             unset($this->toSave[$key]);
         }
+    }
+
+    private function saveMultiple(CacheItemPoolInterface $cacheItemPool, array $cacheItems): void
+    {
+        foreach ($cacheItems as $cacheKey => $cacheItem) {
+            $poolItem = $cacheItemPool->getItem($cacheKey);
+            $poolItem->set($cacheItem);
+            $cacheItemPool->saveDeferred($poolItem);
+        }
+        $cacheItemPool->commit();
     }
 
     /**

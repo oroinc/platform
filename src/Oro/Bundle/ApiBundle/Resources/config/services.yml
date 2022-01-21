@@ -242,9 +242,9 @@ services:
             - '@oro_api.resources_cache.impl'
 
     oro_api.resources_cache.impl:
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'oro_api_resources' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_api_resources' }
 
     oro_api.resources_without_identifier_loader:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader

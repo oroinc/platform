@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -37,13 +38,17 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $modelCache;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    private $cacheItem;
+
     /** @var ConfigCache */
     private $configCache;
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(CacheProvider::class);
-        $this->modelCache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->modelCache = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
 
         $this->configCache = new ConfigCache(
             $this->cache,
@@ -58,9 +63,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(self::ENTITY_CLASSES_KEY, $entities);
-        $this->cache->expects($this->never())
-            ->method('fetch');
+            ->with($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::ENTITY_CLASSES_KEY)
+            ->willReturn($this->cacheItem);
 
         $this->configCache->saveEntities($entities);
 
@@ -76,9 +83,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS, $fields);
-        $this->cache->expects($this->never())
-            ->method('fetch');
+            ->with($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
 
         $this->configCache->saveFields(self::ENTITY_CLASS, $fields);
 
@@ -95,7 +104,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects($this->never())
             ->method('save');
         $this->cache->expects($this->never())
-            ->method('fetch');
+            ->method('getItem');
 
         $this->configCache->saveEntities($entities, true);
 
@@ -112,7 +121,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects($this->never())
             ->method('save');
         $this->cache->expects($this->never())
-            ->method('fetch');
+            ->method('getItem');
 
         $this->configCache->saveFields(self::ENTITY_CLASS, $fields, true);
 
@@ -127,8 +136,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASSES_KEY)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn($entities);
 
         $this->assertEquals(
@@ -147,8 +162,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn($fields);
 
         $this->assertEquals(
@@ -165,7 +186,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     public function testGetEntitiesLocalOnly()
     {
         $this->cache->expects($this->never())
-            ->method('fetch');
+            ->method('getItem');
 
         $this->assertNull(
             $this->configCache->getEntities(true)
@@ -175,7 +196,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     public function testGetFieldsLocalOnly()
     {
         $this->cache->expects($this->never())
-            ->method('fetch');
+            ->method('getItem');
 
         $this->assertNull(
             $this->configCache->getFields(self::ENTITY_CLASS, true)
@@ -185,8 +206,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     public function testGetEntitiesNotCached()
     {
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASSES_KEY)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
 
         $this->assertNull(
@@ -201,8 +225,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     public function testGetFieldsNotCached()
     {
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
 
         $this->assertNull(
@@ -219,7 +246,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
         $this->cache->expects($this->once())
-            ->method('delete')
+            ->method('save')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASSES_KEY)
+            ->willReturn($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('deleteItem')
             ->with(self::ENTITY_CLASSES_KEY);
 
         $this->configCache->saveEntities($entities);
@@ -235,7 +269,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
         $this->cache->expects($this->once())
-            ->method('delete')
+            ->method('save')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('deleteItem')
             ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS);
 
         $this->configCache->saveFields(self::ENTITY_CLASS, $fields);
@@ -250,8 +291,15 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $entities = ['Test\Entity1' => true, 'Test\Entity2' => true];
 
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASSES_KEY)
+            ->willReturn($this->cacheItem);
         $this->cache->expects($this->never())
-            ->method('delete');
+            ->method('deleteItem');
 
         $this->configCache->saveEntities($entities);
 
@@ -265,8 +313,15 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $fields = ['field1' => ['t' => 'integer', 'h' => true], 'field2' => ['t' => 'string', 'h' => false]];
 
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::FIELD_NAMES_KEY  . self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
         $this->cache->expects($this->never())
-            ->method('delete');
+            ->method('deleteItem');
 
         $this->configCache->saveFields(self::ENTITY_CLASS, $fields);
 
@@ -282,13 +337,19 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $config = new Config($configId, ['key1' => 'val1']);
         $cacheKey = self::SCOPE;
 
-        $this->cache->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
             ->with($cacheKey)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([$configId->getClassName() => $config->getValues()]);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with($cacheKey, [$configId->getClassName() => $config->getValues()]);
+            ->with($this->cacheItem);
 
         $this->configCache->saveConfig($config);
         // test local cache
@@ -307,21 +368,24 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $config = new Config($configId, ['key1' => 'val1']);
         $cacheKey = self::ENTITY_CLASS . '.' . self::SCOPE;
 
-        $this->cache->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
             ->with($cacheKey)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([
+                $configId->getFieldName() => [
+                    $config->getValues(),
+                    $configId->getFieldType()
+                ]
+            ]);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(
-                $cacheKey,
-                [
-                    $configId->getFieldName() => [
-                        $config->getValues(),
-                        $configId->getFieldType()
-                    ]
-                ]
-            );
+            ->with($this->cacheItem);
 
         $this->configCache->saveConfig($config);
         // test local cache
@@ -341,8 +405,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $config = new Config($configId);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
         $this->cache->expects($this->never())
             ->method('save');
@@ -364,8 +431,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $config = new Config($configId);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
         $this->cache->expects($this->never())
             ->method('save');
@@ -390,19 +460,25 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $anotherConfig = new Config($anotherConfigId, ['key2' => 'val2']);
         $cacheKey = self::SCOPE;
 
-        $this->cache->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
             ->with($cacheKey)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([$anotherConfigId->getClassName() => $anotherConfig->getValues()]);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([
+                $configId->getClassName()        => $config->getValues(),
+                $anotherConfigId->getClassName() => $anotherConfig->getValues()
+            ]);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(
-                $cacheKey,
-                [
-                    $configId->getClassName()        => $config->getValues(),
-                    $anotherConfigId->getClassName() => $anotherConfig->getValues()
-                ]
-            );
+            ->with($this->cacheItem);
 
         $this->configCache->saveConfig($config);
         // test local cache
@@ -435,10 +511,28 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $anotherConfig = new Config($anotherConfigId, ['key2' => 'val2']);
         $cacheKey = self::ENTITY_CLASS . '.' . self::SCOPE;
 
-        $this->cache->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
             ->with($cacheKey)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([
+                $anotherConfigId->getFieldName() => [
+                    $anotherConfig->getValues(),
+                    $anotherConfigId->getFieldType()
+                ]
+            ]);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([
+                $configId->getFieldName()        => [
+                    $config->getValues(),
+                    $configId->getFieldType()
+                ],
                 $anotherConfigId->getFieldName() => [
                     $anotherConfig->getValues(),
                     $anotherConfigId->getFieldType()
@@ -446,19 +540,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ]);
         $this->cache->expects($this->once())
             ->method('save')
-            ->with(
-                $cacheKey,
-                [
-                    $configId->getFieldName()        => [
-                        $config->getValues(),
-                        $configId->getFieldType()
-                    ],
-                    $anotherConfigId->getFieldName() => [
-                        $anotherConfig->getValues(),
-                        $anotherConfigId->getFieldType()
-                    ]
-                ]
-            );
+            ->with($this->cacheItem);
 
         $this->configCache->saveConfig($config);
         // test local cache
@@ -496,15 +578,15 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cache->expects($this->once())
             ->method('save')
-            ->willReturnCallback(function ($key, $data) use ($values) {
-                $this->assertEquals(self::SCOPE, $key);
-                $this->assertEquals($values, $data);
-
-                return true;
-            });
-        $this->cache->expects($this->never())
-            ->method('fetch');
+            ->with($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with($values);
 
         $this->configCache->saveEntityConfigValues($values, self::SCOPE);
 
@@ -548,15 +630,15 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cache->expects($this->once())
             ->method('save')
-            ->willReturnCallback(function ($key, $data) use ($values) {
-                $this->assertEquals(self::ENTITY_CLASS . '.' . self::SCOPE, $key);
-                $this->assertEquals($values, $data);
-
-                return true;
-            });
-        $this->cache->expects($this->never())
-            ->method('fetch');
+            ->with($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with($values);
 
         $this->configCache->saveFieldConfigValues($values, self::SCOPE, self::ENTITY_CLASS);
 
@@ -585,8 +667,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $config = new Config($configId, ['key1' => 'val1']);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([$configId->getClassName() => $config->getValues()]);
 
         $this->assertEquals(
@@ -615,8 +703,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([
                 $configId->getFieldName() => [
                     $config->getValues(),
@@ -648,8 +742,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
 
         $this->assertNull(
@@ -672,8 +769,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
 
         $this->assertNull(
@@ -700,8 +800,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $anotherConfig = new Config($anotherConfigId, ['key2' => 'val2']);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([$anotherConfigId->getClassName() => $anotherConfig->getValues()]);
 
         $this->assertNull(
@@ -738,8 +844,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $anotherConfig = new Config($anotherConfigId, ['key2' => 'val2']);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([
                 $anotherConfigId->getFieldName() => [
                     $anotherConfig->getValues(),
@@ -777,7 +889,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
         $this->cache->expects($this->exactly(4))
-            ->method('delete')
+            ->method('deleteItem')
             ->withConsecutive(
                 [self::ENTITY_CLASSES_KEY],
                 [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
@@ -792,10 +904,18 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $configId = new EntityConfigId(self::SCOPE, self::ENTITY_CLASS);
 
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+
         $this->configCache->saveConfig(new Config($configId), true);
 
         $this->cache->expects($this->exactly(4))
-            ->method('delete')
+            ->method('deleteItem')
             ->withConsecutive(
                 [self::ENTITY_CLASSES_KEY],
                 [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
@@ -812,20 +932,29 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $anotherConfigId = new EntityConfigId(self::SCOPE, self::ANOTHER_ENTITY_CLASS);
         $anotherConfig = new Config($anotherConfigId, ['key2' => 'val2']);
 
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([$anotherConfigId->getClassName() => $anotherConfig->getValues()]);
         $this->configCache->saveConfig(new Config($configId), true);
         $this->configCache->saveConfig($anotherConfig, true);
 
         $this->cache->expects($this->exactly(3))
-            ->method('delete')
+            ->method('deleteItem')
             ->withConsecutive(
                 [self::ENTITY_CLASSES_KEY],
                 [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
                 [self::ANOTHER_SCOPE]
             );
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(self::SCOPE, [$anotherConfigId->getClassName() => $anotherConfig->getValues()]);
-
         $this->configCache->deleteEntityConfig($configId->getClassName());
     }
 
@@ -834,7 +963,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
         $this->cache->expects($this->exactly(3))
-            ->method('delete')
+            ->method('deleteItem')
             ->withConsecutive(
                 [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
                 [self::ENTITY_CLASS . '.' . self::SCOPE],
@@ -848,10 +977,17 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     {
         $configId = new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, self::FIELD_NAME, self::FIELD_TYPE);
 
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
         $this->configCache->saveConfig(new Config($configId), true);
 
         $this->cache->expects($this->exactly(3))
-            ->method('delete')
+            ->method('deleteItem')
             ->withConsecutive(
                 [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
                 [self::ENTITY_CLASS . '.' . self::SCOPE],
@@ -872,25 +1008,32 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
         $anotherConfig = new Config($anotherConfigId, ['key2' => 'val2']);
 
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS . '.' . self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(false);
+        $this->cache->expects($this->once())
+            ->method('save')
+            ->with($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([
+                $anotherConfigId->getFieldName() => [
+                    $anotherConfig->getValues(),
+                    $anotherConfigId->getFieldType()
+                ]
+            ]);
         $this->configCache->saveConfig(new Config($configId), true);
         $this->configCache->saveConfig($anotherConfig, true);
 
         $this->cache->expects($this->exactly(2))
-            ->method('delete')
+            ->method('deleteItem')
             ->withConsecutive(
                 [self::FIELD_NAMES_KEY . self::ENTITY_CLASS],
                 [self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE]
-            );
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(
-                self::ENTITY_CLASS . '.' . self::SCOPE,
-                [
-                    $anotherConfigId->getFieldName() => [
-                        $anotherConfig->getValues(),
-                        $anotherConfigId->getFieldType()
-                    ]
-                ]
             );
 
         $this->configCache->deleteFieldConfig($configId->getClassName(), $configId->getFieldName());
@@ -902,11 +1045,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             new EntityConfigId(self::SCOPE, self::ENTITY_CLASS),
             ['key1' => 'val1']
         );
-
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
         $this->configCache->saveConfig($config, true);
 
         $this->cache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->configCache->deleteAllConfigs();
         // check that a local cache is cleaned up as well
@@ -922,10 +1068,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ['key1' => 'val1']
         );
 
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
         $this->configCache->saveConfig($config, true);
 
         $this->cache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->configCache->deleteAllConfigs(true);
         // check that a local cache is cleaned up
@@ -939,13 +1089,22 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
      */
     public function testSaveConfigurable(array|false $fetchVal, ?bool $flag, ?string $fieldName, array $saveValue)
     {
-        $this->modelCache->expects($this->once())
-            ->method('fetch')
+        $this->modelCache->expects($this->exactly(3))
+            ->method('getItem')
             ->with(self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn($fetchVal);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->with($this->identicalTo($saveValue));
         $this->modelCache->expects($this->exactly(2))
             ->method('save')
-            ->with(self::ENTITY_CLASS, $this->identicalTo($saveValue));
+            ->with($this->cacheItem);
 
         $this->configCache->saveConfigurable($flag, self::ENTITY_CLASS, $fieldName);
         // test local cache
@@ -983,8 +1142,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     public function testGetConfigurable(array|false $fetchVal, ?string $fieldName, ?bool $expectedFlag)
     {
         $this->modelCache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with(self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn($fetchVal);
 
         $this->assertSame($expectedFlag, $this->configCache->getConfigurable(self::ENTITY_CLASS, $fieldName));
@@ -1013,10 +1178,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllConfigurable()
     {
+        $this->modelCache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
         $this->configCache->saveConfigurable(true, self::ENTITY_CLASS, null, true);
 
         $this->modelCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->configCache->deleteAllConfigurable();
         // test that a local cache is cleaned up as well
@@ -1027,10 +1196,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllConfigurableLocalCacheOnly()
     {
+        $this->modelCache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
         $this->configCache->saveConfigurable(true, self::ENTITY_CLASS, null, true);
 
         $this->modelCache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->configCache->deleteAllConfigurable(true);
         // test that a local cache is cleaned up
@@ -1041,6 +1214,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAll()
     {
+        $this->modelCache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
         $this->configCache->saveConfigurable(true, self::ENTITY_CLASS, null, true);
         $this->configCache->saveConfig(
             new Config(
@@ -1051,9 +1232,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->modelCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
         $this->cache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->configCache->deleteAll();
         // test that a local cache is cleaned up as well
@@ -1067,6 +1248,14 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllLocalCacheOnly()
     {
+        $this->modelCache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
         $this->configCache->saveConfigurable(true, self::ENTITY_CLASS, null, true);
         $this->configCache->saveConfig(
             new Config(
@@ -1077,9 +1266,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->modelCache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
         $this->cache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->configCache->deleteAll(true);
         // test that a local cache is cleaned up as well
@@ -1142,24 +1331,27 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveConfigurableInBatch()
     {
-        $this->modelCache->expects($this->once())
-            ->method('fetch')
+        $this->modelCache->expects($this->exactly(2))
+            ->method('getItem')
             ->with(self::ENTITY_CLASS)
-            ->willReturn(false);
-        $this->modelCache->expects($this->once())
-            ->method('saveMultiple')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
             ->with([
-                self::ENTITY_CLASS => [
-                    true,
-                    [self::FIELD_NAME => true]
-                ]
+                true,
+                [self::FIELD_NAME => true]
             ]);
+        $this->modelCache->expects($this->once())
+            ->method('saveDeferred')
+            ->with($this->cacheItem);
+        $this->modelCache->expects($this->once())
+            ->method('commit');
         $this->modelCache->expects($this->never())
             ->method('save');
         $this->cache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->cache->expects($this->never())
-            ->method('deleteMultiple');
+            ->method('clear');
 
         $this->configCache->beginBatch();
         $this->configCache->saveConfigurable(true, self::ENTITY_CLASS);
@@ -1169,19 +1361,24 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveEntitiesInBatch()
     {
-        $this->cache->expects($this->never())
-            ->method('fetch');
         $this->cache->expects($this->once())
-            ->method('saveMultiple')
+            ->method('getItem')
+            ->with(self::ENTITY_CLASSES_KEY)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
             ->with([
-                self::ENTITY_CLASSES_KEY => [
-                    self::ANOTHER_ENTITY_CLASS => ['i' => 2, 'h' => true]
-                ]
+                self::ANOTHER_ENTITY_CLASS => ['i' => 2, 'h' => true]
             ]);
+        $this->cache->expects($this->once())
+            ->method('saveDeferred')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('commit');
         $this->cache->expects($this->never())
-            ->method('deleteMultiple');
+            ->method('clear');
         $this->modelCache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->cache->expects($this->never())
             ->method('save');
 
@@ -1197,19 +1394,24 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveFieldsInBatch()
     {
-        $this->cache->expects($this->never())
-            ->method('fetch');
         $this->cache->expects($this->once())
-            ->method('saveMultiple')
+            ->method('getItem')
+            ->with(self::FIELD_NAMES_KEY . self::ENTITY_CLASS)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
             ->with([
-                self::FIELD_NAMES_KEY . self::ENTITY_CLASS => [
-                    self::ANOTHER_FIELD_NAME => ['i' => 1, 'h' => false, 't' => self::ANOTHER_FIELD_TYPE]
-                ]
+                self::ANOTHER_FIELD_NAME => ['i' => 1, 'h' => false, 't' => self::ANOTHER_FIELD_TYPE]
             ]);
+        $this->cache->expects($this->once())
+            ->method('saveDeferred')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('commit');
         $this->cache->expects($this->never())
-            ->method('deleteMultiple');
+            ->method('clear');
         $this->modelCache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->cache->expects($this->never())
             ->method('save');
 
@@ -1227,23 +1429,31 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveConfigInBatch()
     {
-        $this->cache->expects($this->exactly(2))
-            ->method('fetch')
+        $this->cache->expects($this->exactly(4))
+            ->method('getItem')
+            ->withConsecutive([self::SCOPE], [self::ENTITY_CLASS . '.' . self::SCOPE])
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('isHit')
             ->willReturn(false);
-        $this->cache->expects($this->once())
-            ->method('saveMultiple')
-            ->with([
-                self::SCOPE                            => [
-                    self::ENTITY_CLASS => ['key1' => 'val1']
-                ],
-                self::ENTITY_CLASS . '.' . self::SCOPE => [
-                    self::FIELD_NAME => [['key10' => 'val10'], self::FIELD_TYPE]
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->withConsecutive(
+                [self::SCOPE => [self::ENTITY_CLASS => ['key1' => 'val1']]],
+                [
+                    self::ENTITY_CLASS . '.' . self::SCOPE =>
+                    [
+                        self::FIELD_NAME => [['key10' => 'val10'], self::FIELD_TYPE]
+                    ]
                 ]
-            ]);
+            );
+        $this->cache->expects($this->exactly(2))
+            ->method('saveDeferred')
+            ->with($this->cacheItem);
         $this->cache->expects($this->never())
-            ->method('deleteMultiple');
+            ->method('clear');
         $this->modelCache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->cache->expects($this->never())
             ->method('save');
 
@@ -1265,10 +1475,8 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteConfigInBatch()
     {
-        $this->cache->expects($this->never())
-            ->method('fetch');
         $this->cache->expects($this->once())
-            ->method('deleteMultiple')
+            ->method('deleteItems')
             ->with([
                 self::ENTITY_CLASSES_KEY,
                 self::FIELD_NAMES_KEY . self::ENTITY_CLASS,
@@ -1278,13 +1486,13 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
                 self::ENTITY_CLASS . '.' . self::ANOTHER_SCOPE
             ]);
         $this->cache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->modelCache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->cache->expects($this->never())
             ->method('save');
         $this->cache->expects($this->never())
-            ->method('delete');
+            ->method('deleteItem');
 
         $this->configCache->beginBatch();
         $this->configCache->deleteEntityConfig(self::ENTITY_CLASS);
@@ -1294,19 +1502,27 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testLastSaveOrDeleteOperationShouldWinInBatch()
     {
-        $this->cache->expects($this->once())
-            ->method('fetch')
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->with(self::SCOPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
-        $this->cache->expects($this->once())
-            ->method('saveMultiple')
+        $this->cacheItem->expects($this->once())
+            ->method('set')
             ->with([
-                self::SCOPE => [
-                    'Test\Entity1' => ['key1' => 'val1'],
-                    'Test\Entity3' => ['key3' => 'val3']
-                ]
+                'Test\Entity1' => ['key1' => 'val1'],
+                'Test\Entity3' => ['key3' => 'val3']
             ]);
         $this->cache->expects($this->once())
-            ->method('deleteMultiple')
+            ->method('saveDeferred')
+            ->with($this->cacheItem);
+        $this->cache->expects($this->once())
+            ->method('commit');
+
+        $this->cache->expects($this->once())
+            ->method('deleteItems')
             ->with([
                 self::ENTITY_CLASSES_KEY,
                 self::FIELD_NAMES_KEY . 'Test\Entity2',
@@ -1314,11 +1530,11 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
                 self::FIELD_NAMES_KEY . 'Test\Entity3'
             ]);
         $this->modelCache->expects($this->never())
-            ->method('saveMultiple');
+            ->method('saveDeferred');
         $this->cache->expects($this->never())
             ->method('save');
         $this->cache->expects($this->never())
-            ->method('delete');
+            ->method('clear');
 
         $this->configCache->beginBatch();
         $this->configCache->saveConfig(
