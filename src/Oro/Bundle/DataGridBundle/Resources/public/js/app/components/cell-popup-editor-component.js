@@ -84,6 +84,7 @@ define(function(require) {
             this.listenTo(this.options.plugin, 'lockUserActions', function(value) {
                 this.lockUserActions = value;
             });
+            this.listenTo(this.options.cell, 'dispose', () => this.dispose());
             CellPopupEditorComponent.__super__.initialize.call(this, options);
             this.enterEditMode();
         },
