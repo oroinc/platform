@@ -22,14 +22,11 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
+    private MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
 
-    /** @var DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $deletedAttributeProvider;
+    private DeletedAttributeProviderInterface|\PHPUnit\Framework\MockObject\MockObject $deletedAttributeProvider;
 
-    /** @var DeletedAttributeRelationListener */
-    private $listener;
+    private DeletedAttributeRelationListener $listener;
 
     protected function setUp(): void
     {
@@ -42,7 +39,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnFlush()
+    public function testOnFlush(): void
     {
         $attributeFamilyId = 333;
         $movedAttributeId = 777;
@@ -55,11 +52,11 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $uow->addDeletion(new \stdClass());
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
 
-        $this->deletedAttributeProvider->expects($this->once())
+        $this->deletedAttributeProvider->expects(self::once())
             ->method('getAttributesByIds')
             ->with([$deletedAttributeId])
             ->willReturn([new FieldConfigModel('field_name')]);
@@ -67,13 +64,13 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         $event = new OnFlushEventArgs($entityManager);
         $this->listener->onFlush($event);
 
-        $this->assertEquals(
-            [$attributeFamilyId => ['fieldName']],
+        self::assertEquals(
+            [$attributeFamilyId => ['field_name']],
             ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes')
         );
     }
 
-    public function testPostFlush()
+    public function testPostFlush(): void
     {
         $emptyFamilyId = 1;
         $filledFamilyId = 2;
@@ -90,7 +87,7 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->listener->setTopic($topicName);
-        $this->messageProducer->expects($this->once())
+        $this->messageProducer->expects(self::once())
             ->method('send')
             ->with(
                 $topicName,
@@ -101,15 +98,10 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->listener->postFlush();
-        $this->assertEmpty(ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes'));
+        self::assertEmpty(ReflectionUtil::getPropertyValue($this->listener, 'deletedAttributes'));
     }
 
-    /**
-     * @param int $attributeFamilyId
-     * @param int $movedAttributeId
-     * @return AttributeFamily
-     */
-    private function getFilledAttributeFamily($attributeFamilyId, $movedAttributeId)
+    private function getFilledAttributeFamily(int $attributeFamilyId, int $movedAttributeId): AttributeFamily
     {
         $attributeRelation = new AttributeGroupRelation();
         $attributeRelation->setEntityConfigFieldId($movedAttributeId);
@@ -124,13 +116,10 @@ class DeletedAttributeRelationListenerTest extends \PHPUnit\Framework\TestCase
         return $attributeFamily;
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param int $attributeId
-     * @return AttributeGroupRelation
-     */
-    private function getFilledAttributeGroupRelation(AttributeFamily $attributeFamily, $attributeId)
-    {
+    private function getFilledAttributeGroupRelation(
+        AttributeFamily $attributeFamily,
+        int $attributeId
+    ): AttributeGroupRelation {
         $attributeGroup = new AttributeGroup();
         $attributeGroup->setAttributeFamily($attributeFamily);
 
