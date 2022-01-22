@@ -184,6 +184,7 @@ class EntityOverrideTest extends RestJsonApiTestCase
                     'relationships' => [
                         'activityTargets' => [
                             'data' => [
+                                ['type' => 'testapioverrideclasstargets', 'id' => '<toString(@target_1->id)>'],
                                 ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_1->id)>']
                             ]
                         ]
@@ -619,7 +620,8 @@ class EntityOverrideTest extends RestJsonApiTestCase
                         'relationships' => [
                             'owners' => [
                                 'data' => [
-                                    ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_1->id)>']
+                                    ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_1->id)>'],
+                                    ['type' => 'testapioverrideclassowners', 'id' => '<toString(@owner_2->id)>']
                                 ]
                             ]
                         ]

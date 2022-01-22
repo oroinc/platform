@@ -95,6 +95,27 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function matchIndexedArray(array $expected, array $actual, array $path)
+    {
+        parent::matchIndexedArray($expected, $actual, $path);
+
+        // test items count for to-many relationship
+        $indexOfLastPathItem = count($path) - 1;
+        if ($indexOfLastPathItem >= 3
+            && JsonApiDoc::DATA === $path[$indexOfLastPathItem]
+            && JsonApiDoc::RELATIONSHIPS === $path[$indexOfLastPathItem - 2]
+        ) {
+            try {
+                \PHPUnit\Framework\Assert::assertCount(count($expected), $actual, 'Failed asserting items count.');
+            } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+                $this->errors[] = [$path, $e->getMessage()];
+            }
+        }
+    }
+
+    /**
      * @param array $data
      *
      * @return array [['type' => entity type, 'id' => entity id], ...]
