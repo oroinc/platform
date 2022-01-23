@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -20,14 +21,10 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  */
 class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var CompleteAssociationHelper */
-    private $associationHelper;
-
-    /** @var AssociationManager */
-    private $associationManager;
+    private DoctrineHelper $doctrineHelper;
+    private CompleteAssociationHelper $associationHelper;
+    private AssociationManager $associationManager;
+    private ExtendedAssociationProvider $extendedAssociationProvider;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -37,6 +34,11 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         $this->doctrineHelper = $doctrineHelper;
         $this->associationHelper = $associationHelper;
         $this->associationManager = $associationManager;
+    }
+
+    public function setExtendedAssociationProvider(ExtendedAssociationProvider $extendedAssociationProvider): void
+    {
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
     }
 
     /**
@@ -66,20 +68,13 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         return $result;
     }
 
-    /**
-     * @param string                      $entityClass
-     * @param string                      $fieldName
-     * @param EntityDefinitionFieldConfig $field
-     * @param string                      $version
-     * @param RequestType                 $requestType
-     */
     private function completeExtendedAssociation(
-        $entityClass,
-        $fieldName,
+        string $entityClass,
+        string $fieldName,
         EntityDefinitionFieldConfig $field,
-        $version,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         if ($field->hasTargetType()) {
             throw new \RuntimeException(sprintf(
                 'The "target_type" option cannot be configured for "%s::%s".',
@@ -95,7 +90,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
             ));
         }
 
-        list($associationType, $associationKind) = DataType::parseExtendedAssociation($field->getDataType());
+        [$associationType, $associationKind] = DataType::parseExtendedAssociation($field->getDataType());
         $targetClass = $field->getTargetClass();
         if (!$targetClass) {
             $targetClass = EntityIdentifier::class;
@@ -105,53 +100,34 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
 
         $this->associationHelper->completeAssociation($field, $targetClass, $version, $requestType);
 
-        $targets = $this->getExtendedAssociationTargets($entityClass, $associationType, $associationKind);
-        if (empty($targets)) {
-            $field->setFormOption('mapped', false);
+        $associationTargets = $this->extendedAssociationProvider->getExtendedAssociationTargets(
+            $entityClass,
+            $associationType,
+            $associationKind,
+            $version,
+            $requestType
+        );
+        if ($associationTargets) {
+            $field->setDependsOn(array_values($associationTargets));
+            $this->fixExtendedAssociationIdentifierDataType($field, array_keys($associationTargets));
         } else {
-            $field->setDependsOn(array_values($targets));
-            $this->fixExtendedAssociationIdentifierDataType($field, array_keys($targets));
+            $field->setFormOption('mapped', false);
         }
     }
 
-    /**
-     * @param string $associationType
-     *
-     * @return string
-     */
-    private function getExtendedAssociationTargetType($associationType)
+    private function getExtendedAssociationTargetType(string $associationType): string
     {
         $isCollection =
-            in_array($associationType, RelationType::$toManyRelations, true)
+            \in_array($associationType, RelationType::$toManyRelations, true)
             || RelationType::MULTIPLE_MANY_TO_ONE === $associationType;
 
         return $this->associationHelper->getAssociationTargetType($isCollection);
     }
 
-    /**
-     * @param string      $entityClass
-     * @param string      $associationType
-     * @param string|null $associationKind
-     *
-     * @return array [target entity class => field name, ...]
-     */
-    private function getExtendedAssociationTargets($entityClass, $associationType, $associationKind)
-    {
-        return $this->associationManager->getAssociationTargets(
-            $entityClass,
-            null,
-            $associationType,
-            $associationKind
-        );
-    }
-
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param string[]                    $targets
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    private function fixExtendedAssociationIdentifierDataType(EntityDefinitionFieldConfig $field, array $targets)
-    {
+    private function fixExtendedAssociationIdentifierDataType(
+        EntityDefinitionFieldConfig $field,
+        array $targetEntityClasses
+    ): void {
         $targetEntity = $field->getTargetEntity();
         if (null === $targetEntity) {
             return;
@@ -166,25 +142,32 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         }
 
         if (DataType::STRING === $idField->getDataType()) {
-            $idDataType = null;
-            foreach ($targets as $target) {
-                $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($target);
-                $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
-                if (1 !== count($targetIdFieldNames)) {
-                    $idDataType = null;
-                    break;
-                }
-                $dataType = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
-                if (null === $idDataType) {
-                    $idDataType = $dataType;
-                } elseif ($idDataType !== $dataType) {
-                    $idDataType = null;
-                    break;
-                }
-            }
+            $idDataType = $this->getIdDataType($targetEntityClasses);
             if ($idDataType) {
                 $idField->setDataType($idDataType);
             }
         }
+    }
+
+    private function getIdDataType(array $targetEntityClasses): ?string
+    {
+        $idDataType = null;
+        foreach ($targetEntityClasses as $targetEntityClass) {
+            $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetEntityClass);
+            $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+            if (1 !== count($targetIdFieldNames)) {
+                $idDataType = null;
+                break;
+            }
+            $dataType = $targetMetadata->getTypeOfField(reset($targetIdFieldNames));
+            if (null === $idDataType) {
+                $idDataType = $dataType;
+            } elseif ($idDataType !== $dataType) {
+                $idDataType = null;
+                break;
+            }
+        }
+
+        return $idDataType;
     }
 }

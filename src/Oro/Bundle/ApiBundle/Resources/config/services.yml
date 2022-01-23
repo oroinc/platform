@@ -890,6 +890,13 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_entity.entity_name_resolver'
 
+    oro_api.expanded_association_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider
+        arguments:
+            - '@oro_entity_extend.association_manager'
+            - '@oro_api.resources_provider'
+            - '@oro_api.entity_override_provider_registry'
+
     oro_api.expanded_association_extractor:
         class: Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor
 
