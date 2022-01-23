@@ -23,11 +23,11 @@ Oro\Bundle\NoteBundle\Entity\Note:
         owner: '@user'
         organization: '@organization'
     note2:
-        message: 'Note 1'
+        message: 'Note 2'
         owner: '@user'
         organization: '@organization'
     note3:
-        message: 'Note 1'
+        message: 'Note 3'
         owner: '@user'
         organization: '@organization'
 

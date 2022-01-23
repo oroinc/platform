@@ -26,6 +26,8 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
     /** @var AddActivityAssociationDescriptions */
     private $processor;
 
+    private bool $hasEntityDescription = true;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -44,13 +46,17 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
             ->method('getEntityDescription')
             ->with(self::isType('string'))
             ->willReturnCallback(function (string $className) {
-                return substr($className, strrpos($className, '\\') + 1) . ' (description)';
+                return $this->hasEntityDescription
+                    ? substr($className, strrpos($className, '\\') + 1) . ' (description)'
+                    : null;
             });
         $entityDescriptionProvider->expects(self::any())
             ->method('getEntityPluralDescription')
             ->with(self::isType('string'))
             ->willReturnCallback(function (string $className) {
-                return substr($className, strrpos($className, '\\') + 1) . ' (plural description)';
+                return $this->hasEntityDescription
+                    ? substr($className, strrpos($className, '\\') + 1) . ' (plural description)'
+                    : null;
             });
 
         $valueNormalizer = $this->createMock(ValueNormalizer::class);
@@ -67,6 +73,11 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
             $entityDescriptionProvider,
             $valueNormalizer
         );
+    }
+
+    public function hasEntityDescriptionDataProvider(): array
+    {
+        return [[true], [false]];
     }
 
     public function testProcessWhenNoTargetAction(): void
@@ -104,8 +115,12 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessForActivityEntity(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessForActivityEntity(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
@@ -138,12 +153,16 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $description = 'Description for "entity (description)".';
+        if (!$hasEntityDescription) {
+            $description = 'Description for "entity".';
+        }
         $this->assertConfig(
             [
                 'fields' => [
                     'activityTargets' => [
                         'data_type'   => 'association:manyToMany:activity',
-                        'description' => 'Description for "entity (description)".'
+                        'description' => $description
                     ]
                 ]
             ],
@@ -224,8 +243,12 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessForActivityEntityThatHasAssociationToAnotherActivity(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessForActivityEntityThatHasAssociationToAnotherActivity(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
@@ -281,18 +304,24 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $activityTargetsDescription = 'Description for "entity (description)".';
+        $activityFirstDescription = 'Description for "activity1 (plural description)"'
+            . ' associated with the "entity (description)".';
+        if (!$hasEntityDescription) {
+            $activityTargetsDescription = 'Description for "entity".';
+            $activityFirstDescription = 'Description for "activity1" associated with the "entity".';
+        }
         $this->assertConfig(
             [
                 'fields' => [
                     'activityTargets' => [
                         'data_type'   => 'association:manyToMany:activity',
-                        'description' => 'Description for "entity (description)".'
+                        'description' => $activityTargetsDescription
                     ],
                     'activityFirst'   => [
                         'target_class' => 'Test\Activity1',
                         'data_type'    => 'unidirectionalAssociation:association1',
-                        'description'  => 'Description for "activity1 (plural description)"'
-                            . ' associated with the "entity (description)".'
+                        'description'  => $activityFirstDescription
                     ]
                 ]
             ],
@@ -300,8 +329,12 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEntityWithActivityAssociations(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessForEntityWithActivityAssociations(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
@@ -339,14 +372,18 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $description = 'Description for "activity1 (plural description)"'
+            . ' associated with the "entity (description)".';
+        if (!$hasEntityDescription) {
+            $description = 'Description for "activity1" associated with the "entity".';
+        }
         $this->assertConfig(
             [
                 'fields' => [
                     'activityFirst' => [
                         'target_class' => 'Test\Activity1',
                         'data_type'    => 'unidirectionalAssociation:association1',
-                        'description'  => 'Description for "activity1 (plural description)"'
-                            . ' associated with the "entity (description)".'
+                        'description'  => $description
                     ]
                 ]
             ],
@@ -443,8 +480,12 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessSubresourceForActivityEntity(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessSubresourceForActivityEntity(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
         $associationName = 'activityTargets';
@@ -479,16 +520,25 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $documentation = 'Documentation for "parent (description)" (target: "target1").';
+        if (!$hasEntityDescription) {
+            $documentation = 'Documentation for "parent" (target: "target1").';
+        }
         $this->assertConfig(
             [
-                'documentation' => 'Documentation for "parent (description)" (target: "target1").'
+                'documentation' => $documentation
             ],
             $definition
         );
     }
 
-    public function testProcessSubresourceForActivityEntityWhenNoActivityTargetClasses(): void
-    {
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessSubresourceForActivityEntityWhenNoActivityTargetClasses(
+        bool $hasEntityDescription
+    ): void {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
         $associationName = 'activityTargets';
@@ -523,9 +573,13 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $documentation = 'Documentation for "parent (description)" (target: "users").';
+        if (!$hasEntityDescription) {
+            $documentation = 'Documentation for "parent" (target: "users").';
+        }
         $this->assertConfig(
             [
-                'documentation' => 'Documentation for "parent (description)" (target: "users").'
+                'documentation' => $documentation
             ],
             $definition
         );
@@ -606,8 +660,12 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessSubresourceForEntityWithActivityAssociations(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessSubresourceForEntityWithActivityAssociations(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
         $associationName = 'activityFirst';
@@ -645,10 +703,14 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $documentation = 'Documentation for "activity1 (plural description)"'
+            . ' associated with the "parent (description)" (target: "activity1").';
+        if (!$hasEntityDescription) {
+            $documentation = 'Documentation for "activity1" associated with the "parent" (target: "activity1").';
+        }
         $this->assertConfig(
             [
-                'documentation' => 'Documentation for "activity1 (plural description)"'
-                    . ' associated with the "parent (description)" (target: "activity1").'
+                'documentation' => $documentation
             ],
             $definition
         );
