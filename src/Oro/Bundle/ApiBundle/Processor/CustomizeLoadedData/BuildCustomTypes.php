@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueTransformer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -22,21 +22,16 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class BuildCustomTypes implements ProcessorInterface
 {
-    /** @var AssociationManager */
-    private $associationManager;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ValueTransformer */
-    private $valueTransformer;
+    private ExtendedAssociationProvider $extendedAssociationProvider;
+    private DoctrineHelper $doctrineHelper;
+    private ValueTransformer $valueTransformer;
 
     public function __construct(
-        AssociationManager $associationManager,
+        ExtendedAssociationProvider $extendedAssociationProvider,
         DoctrineHelper $doctrineHelper,
         ValueTransformer $valueTransformer
     ) {
-        $this->associationManager = $associationManager;
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
         $this->doctrineHelper = $doctrineHelper;
         $this->valueTransformer = $valueTransformer;
     }
@@ -83,31 +78,40 @@ class BuildCustomTypes implements ProcessorInterface
             } elseif ($this->isNestedObject($dataType)) {
                 $data[$fieldName] = $this->buildNestedObject($data, $field->getTargetEntity(), $config, $context);
             } elseif (DataType::isExtendedAssociation($dataType)) {
-                $data[$fieldName] = $this->buildExtendedAssociation($data, $entityClass, $dataType);
+                $data[$fieldName] = $this->buildExtendedAssociation(
+                    $data,
+                    $entityClass,
+                    $dataType,
+                    $field->getDependsOn()
+                );
             }
         }
 
         return $data;
     }
 
-    private function buildExtendedAssociation(array $data, string $entityClass, string $dataType): ?array
-    {
+    private function buildExtendedAssociation(
+        array $data,
+        string $entityClass,
+        string $dataType,
+        ?array $targetFieldNames
+    ): ?array {
         [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
         switch ($associationType) {
             case RelationType::MANY_TO_ONE:
                 return $this->buildManyToOneExtendedAssociation(
                     $data,
-                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind, $targetFieldNames)
                 );
             case RelationType::MANY_TO_MANY:
                 return $this->buildManyToManyExtendedAssociation(
                     $data,
-                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind, $targetFieldNames)
                 );
             case RelationType::MULTIPLE_MANY_TO_ONE:
                 return $this->buildMultipleManyToOneExtendedAssociation(
                     $data,
-                    $this->getAssociationTargets($entityClass, $associationType, $associationKind)
+                    $this->getAssociationTargets($entityClass, $associationType, $associationKind, $targetFieldNames)
                 );
             default:
                 throw new \LogicException(sprintf(
@@ -118,43 +122,43 @@ class BuildCustomTypes implements ProcessorInterface
     }
 
     /**
-     * @param string      $entityClass
-     * @param string      $associationType
-     * @param string|null $associationKind
+     * @param string        $entityClass
+     * @param string        $associationType
+     * @param string|null   $associationKind
+     * @param string[]|null $targetFieldNames
      *
      * @return array [target entity class => target field name, ...]
      */
     private function getAssociationTargets(
         string $entityClass,
         string $associationType,
-        ?string $associationKind
+        ?string $associationKind,
+        ?array $targetFieldNames
     ): array {
+        if (!$targetFieldNames) {
+            return [];
+        }
+
         $resolvedEntityClass = $this->doctrineHelper->resolveManageableEntityClass($entityClass);
         if ($resolvedEntityClass) {
             $entityClass = $resolvedEntityClass;
         }
 
-        return $this->associationManager->getAssociationTargets(
+        return $this->extendedAssociationProvider->filterExtendedAssociationTargets(
             $entityClass,
-            null,
             $associationType,
-            $associationKind
+            $associationKind,
+            $targetFieldNames
         );
     }
 
-    /**
-     * @param array $data
-     * @param array $associationTargets [target entity class => target field name]
-     *
-     * @return array|null
-     */
     private function buildManyToOneExtendedAssociation(array $data, array $associationTargets): ?array
     {
         $result = null;
-        foreach ($associationTargets as $entityClass => $fieldName) {
-            if (!empty($data[$fieldName])) {
-                $result = $data[$fieldName];
-                $result[ConfigUtil::CLASS_NAME] = $entityClass;
+        foreach ($associationTargets as $targetClass => $targetField) {
+            if (!empty($data[$targetField])) {
+                $result = $data[$targetField];
+                $result[ConfigUtil::CLASS_NAME] = $targetClass;
                 break;
             }
         }
@@ -162,19 +166,13 @@ class BuildCustomTypes implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array $data
-     * @param array $associationTargets [target entity class => target field name]
-     *
-     * @return array
-     */
     private function buildManyToManyExtendedAssociation(array $data, array $associationTargets): array
     {
         $result = [];
-        foreach ($associationTargets as $entityClass => $fieldName) {
-            if (!empty($data[$fieldName])) {
-                foreach ($data[$fieldName] as $item) {
-                    $item[ConfigUtil::CLASS_NAME] = $entityClass;
+        foreach ($associationTargets as $targetClass => $targetField) {
+            if (!empty($data[$targetField])) {
+                foreach ($data[$targetField] as $item) {
+                    $item[ConfigUtil::CLASS_NAME] = $targetClass;
                     $result[] = $item;
                 }
             }
@@ -183,19 +181,13 @@ class BuildCustomTypes implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array $data
-     * @param array $associationTargets [target entity class => target field name]
-     *
-     * @return array
-     */
     private function buildMultipleManyToOneExtendedAssociation(array $data, array $associationTargets): array
     {
         $result = [];
-        foreach ($associationTargets as $entityClass => $fieldName) {
-            if (!empty($data[$fieldName])) {
-                $item = $data[$fieldName];
-                $item[ConfigUtil::CLASS_NAME] = $entityClass;
+        foreach ($associationTargets as $targetClass => $targetField) {
+            if (!empty($data[$targetField])) {
+                $item = $data[$targetField];
+                $item[ConfigUtil::CLASS_NAME] = $targetClass;
                 $result[] = $item;
             }
         }
@@ -250,13 +242,7 @@ class BuildCustomTypes implements ProcessorInterface
         return $isEmpty ? null : $result;
     }
 
-    /**
-     * @param mixed       $value
-     * @param string|null $dataType
-     *
-     * @return bool
-     */
-    private function isEmptyValue($value, ?string $dataType): bool
+    private function isEmptyValue(mixed $value, ?string $dataType): bool
     {
         if (null === $dataType || DataType::STRING === $dataType) {
             return '' === $value;

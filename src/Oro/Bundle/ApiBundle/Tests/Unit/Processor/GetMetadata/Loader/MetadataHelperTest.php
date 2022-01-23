@@ -27,7 +27,10 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAssertDataTypeForEmptyDataType()
+    /**
+     * @dataProvider emptyDataTypeDataProvider
+     */
+    public function testAssertDataTypeForEmptyDataType(?string $dataType)
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -35,7 +38,15 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
             . ' for the "testField" field of the "Test\Class" entity.'
         );
 
-        $this->metadataHelper->assertDataType('', 'Test\Class', 'testField');
+        $this->metadataHelper->assertDataType($dataType, 'Test\Class', 'testField');
+    }
+
+    public function emptyDataTypeDataProvider(): array
+    {
+        return [
+            [''],
+            [null]
+        ];
     }
 
     /**

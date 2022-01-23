@@ -8,7 +8,7 @@ services:
     oro_api.customize_loaded_data.build_custom_types:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes
         arguments:
-            - '@oro_entity_extend.association_manager'
+            - '@oro_api.expanded_association_provider'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_transformer'
         tags:
