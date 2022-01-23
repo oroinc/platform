@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocPar
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -27,15 +29,18 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
     private CommentAssociationProvider $commentAssociationProvider;
     private ResourceDocParserProvider $resourceDocParserProvider;
     private EntityDescriptionProvider $entityDescriptionProvider;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(
         CommentAssociationProvider $commentAssociationProvider,
         ResourceDocParserProvider $resourceDocParserProvider,
-        EntityDescriptionProvider $entityDescriptionProvider
+        EntityDescriptionProvider $entityDescriptionProvider,
+        ValueNormalizer $valueNormalizer
     ) {
         $this->commentAssociationProvider = $commentAssociationProvider;
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->entityDescriptionProvider = $entityDescriptionProvider;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -118,7 +123,7 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         }
 
         $commentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%entity_name%' => $this->getEntityName($entityClass)
+            '%entity_name%' => $this->getEntityName($entityClass, $requestType)
         ]));
     }
 
@@ -136,7 +141,7 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         );
 
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%' => $this->getEntityName($entityClass)
+            '%entity_name%' => $this->getEntityName($entityClass, $requestType)
         ]));
     }
 
@@ -150,8 +155,18 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         return $docParser;
     }
 
-    private function getEntityName(string $entityClass): string
+    private function getEntityType(string $entityClass, RequestType $requestType): string
     {
-        return strtolower($this->entityDescriptionProvider->getEntityDescription($entityClass));
+        return ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType);
+    }
+
+    private function getEntityName(string $entityClass, RequestType $requestType): string
+    {
+        $result = $this->entityDescriptionProvider->getEntityDescription($entityClass);
+        if (!$result) {
+            return $this->getEntityType($entityClass, $requestType);
+        }
+
+        return strtolower($result);
     }
 }
