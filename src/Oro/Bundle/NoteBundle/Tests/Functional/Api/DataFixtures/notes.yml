@@ -1,0 +1,40 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+Oro\Bundle\UserBundle\Entity\User:
+    user1:
+        username: 'user1'
+        email: 'user1@example.com'
+        firstName: 'Jane'
+        lastName: 'Smith'
+        enabled: true
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        organization: '@organization'
+        organizations: ['@organization']
+        salt: 5ejjb5y9va4g4co8kco4o8wgkgcc48k
+        password: fhUh+Xk/mjDUR5xLb93SIL/QF/lEK3RcGE3l9dRh4+N4rQCNrOaOYyVtqWajPOBHQDqFGwl+Ran2HTdpbniEUQ==
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget:
+    targetEntity{1..3}:
+        string: 'Target Entity <current()>'
+
+Oro\Bundle\NoteBundle\Entity\Note:
+    note1:
+        message: 'Note 1'
+        updatedBy: '@user1'
+        owner: '@user'
+        organization: '@organization'
+        test_activity_target_96051c58: ['@targetEntity1']
+    note2:
+        message: 'Note 2'
+        owner: '@user'
+        updatedBy: '@user1'
+        organization: '@organization'
+        test_activity_target_96051c58: ['@targetEntity1', '@targetEntity2']
+    note3:
+        message: 'Note 3'
+        owner: '@user'
+        organization: '@organization'
