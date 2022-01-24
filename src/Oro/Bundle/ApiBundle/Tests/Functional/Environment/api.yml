@@ -382,6 +382,11 @@ api:
                 activityTargets:
                     data_type: association:manyToMany:activity
         Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestActivity: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget:
+            fields:
+                name:
+                    property_path: string
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestMagazine:
             fields:
                 articles:

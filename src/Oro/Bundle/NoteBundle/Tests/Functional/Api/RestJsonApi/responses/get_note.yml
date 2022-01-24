@@ -1,0 +1,29 @@
+data:
+    type: notes
+    id: '<toString(@note1->id)>'
+    attributes:
+        message: 'Note 1'
+        createdAt: '@note1->createdAt->format("Y-m-d\TH:i:s\Z")'
+        updatedAt: '@note1->updatedAt->format("Y-m-d\TH:i:s\Z")'
+    relationships:
+        owner:
+            data:
+                type: users
+                id: '<toString(@user->id)>'
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'
+        updatedBy:
+            data:
+                type: users
+                id: '<toString(@user1->id)>'
+        attachment:
+            data: null
+        activityTargets:
+            data:
+                -
+                    type: testactivitytargets
+                    id: '<toString(@targetEntity1->id)>'
+        comments:
+            data: []

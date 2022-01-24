@@ -165,7 +165,7 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         );
 
         $activityTargetsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%activity_entity_name%' => $this->getEntityName($activityEntityClass)
+            '%activity_entity_name%' => $this->getEntityName($activityEntityClass, $requestType)
         ]));
     }
 
@@ -192,7 +192,7 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             ? $this->getEntityType(reset($activityTargetEntityClasses), $requestType)
             : 'users';
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%activity_entity_name%'        => $this->getEntityName($activityEntityClass),
+            '%activity_entity_name%'        => $this->getEntityName($activityEntityClass, $requestType),
             '%activity_target_entity_type%' => $activityTargetEntityType
         ]));
     }
@@ -209,7 +209,7 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             self::ACTIVITY_ASSOCIATION
         );
 
-        $entityName = $this->getEntityName($entityClass);
+        $entityName = $this->getEntityName($entityClass, $requestType);
         foreach ($activityAssociations as $associationName => $activityAssociation) {
             $activityAssociationDefinition = $definition->getField($associationName);
             if (null === $activityAssociationDefinition) {
@@ -220,7 +220,10 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             }
             $activityAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
                 '%entity_name%'                 => $entityName,
-                '%activity_entity_plural_name%' => $this->getEntityPluralName($activityAssociation['className'])
+                '%activity_entity_plural_name%' => $this->getEntityPluralName(
+                    $activityAssociation['className'],
+                    $requestType
+                )
             ]));
         }
     }
@@ -240,8 +243,8 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         );
 
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%'                 => $this->getEntityName($entityClass),
-            '%activity_entity_plural_name%' => $this->getEntityPluralName($activityEntityClass),
+            '%entity_name%'                 => $this->getEntityName($entityClass, $requestType),
+            '%activity_entity_plural_name%' => $this->getEntityPluralName($activityEntityClass, $requestType),
             '%activity_entity_type%'        => $this->getEntityType($activityEntityClass, $requestType)
         ]));
     }
@@ -261,13 +264,23 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         return ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 
-    private function getEntityName(string $entityClass): string
+    private function getEntityName(string $entityClass, RequestType $requestType): string
     {
-        return strtolower($this->entityDescriptionProvider->getEntityDescription($entityClass));
+        $result = $this->entityDescriptionProvider->getEntityDescription($entityClass);
+        if (!$result) {
+            return $this->getEntityType($entityClass, $requestType);
+        }
+
+        return strtolower($result);
     }
 
-    private function getEntityPluralName(string $entityClass): string
+    private function getEntityPluralName(string $entityClass, RequestType $requestType): string
     {
-        return strtolower($this->entityDescriptionProvider->getEntityPluralDescription($entityClass));
+        $result = $this->entityDescriptionProvider->getEntityPluralDescription($entityClass);
+        if (!$result) {
+            return $this->getEntityType($entityClass, $requestType);
+        }
+
+        return strtolower($result);
     }
 }
