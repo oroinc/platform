@@ -64,7 +64,7 @@ class EnumAttributeType implements AttributeTypeInterface
         /** @var AbstractEnumValue $originalValue */
         $this->ensureSupportedType($originalValue);
 
-        $key = sprintf('%s_%s', $attribute->getFieldName(), $originalValue->getId());
+        $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $originalValue->getId());
 
         return [$key => 1];
     }
