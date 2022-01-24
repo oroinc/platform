@@ -356,12 +356,8 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         $finder->sort(static function (\SplFileInfo $file1, \SplFileInfo $file2) {
             $depth1 = substr_count($file1->getPath(), DIRECTORY_SEPARATOR);
             $depth2 = substr_count($file2->getPath(), DIRECTORY_SEPARATOR);
-
-            if ($depth1 === $depth2) {
-                return 0;
-            }
-
-            return $depth1 > $depth2 ? 1 : -1;
+            
+            return $depth1 <=> $depth2;
         });
 
         return $finder->files();

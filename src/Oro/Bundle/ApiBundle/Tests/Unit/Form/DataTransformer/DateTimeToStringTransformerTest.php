@@ -28,13 +28,13 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validValueForTransformDataProvider
      */
-    public function testTransformWithValidValue($value, $expected)
+    public function testTransformWithValidValue(string $value, string $expected)
     {
         $transformer = new DateTimeToStringTransformer();
         self::assertEquals($expected, $transformer->transform(new \DateTime($value)));
     }
 
-    public function validValueForTransformDataProvider()
+    public function validValueForTransformDataProvider(): array
     {
         return [
             'zero milliseconds with timezone'         => [
@@ -59,13 +59,13 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validValueForTransformDateDataProvider
      */
-    public function testTransformDateWithValidValue($value, $expected)
+    public function testTransformDateWithValidValue(string $value, string $expected)
     {
         $transformer = new DateTimeToStringTransformer(false);
         self::assertEquals($expected, $transformer->transform(new \DateTime($value)));
     }
 
-    public function validValueForTransformDateDataProvider()
+    public function validValueForTransformDateDataProvider(): array
     {
         return [
             'with timezone'     => [
@@ -82,13 +82,13 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validValueForTransformTimeDataProvider
      */
-    public function testTransformTimeWithValidValue($value, $expected)
+    public function testTransformTimeWithValidValue(string $value, string $expected)
     {
         $transformer = new DateTimeToStringTransformer(true, false);
         self::assertEquals($expected, $transformer->transform(new \DateTime($value)));
     }
 
-    public function validValueForTransformTimeDataProvider()
+    public function validValueForTransformTimeDataProvider(): array
     {
         return [
             'zero milliseconds with timezone'         => [
@@ -119,13 +119,13 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validValueForReverseTransformDataProvider
      */
-    public function testReverseTransformWithValidValue($value, $expected)
+    public function testReverseTransformWithValidValue(string $value, string $expected)
     {
         $transformer = new DateTimeToStringTransformer();
         self::assertEquals($expected, $transformer->reverseTransform($value)->format('Y-m-d\TH:i:s.vO'));
     }
 
-    public function validValueForReverseTransformDataProvider()
+    public function validValueForReverseTransformDataProvider(): array
     {
         return [
             'year only'                              => [
@@ -198,7 +198,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidValueForReverseTransformDataProvider
      */
-    public function testReverseTransformWithInvalidValue($value, $exceptionMessage = null)
+    public function testReverseTransformWithInvalidValue(string $value, string $exceptionMessage = null)
     {
         if (null === $exceptionMessage) {
             $exceptionMessage = sprintf('The value "%s" is not a valid datetime.', $value);
@@ -210,7 +210,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform($value);
     }
 
-    public function invalidValueForReverseTransformDataProvider()
+    public function invalidValueForReverseTransformDataProvider(): array
     {
         return [
             'without timezone'                        => [
@@ -288,13 +288,13 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validValueForReverseTransformDateDataProvider
      */
-    public function testReverseTransformDateWithValidValue($value, $expected)
+    public function testReverseTransformDateWithValidValue(string $value, string $expected)
     {
         $transformer = new DateTimeToStringTransformer(false);
         self::assertEquals($expected, $transformer->reverseTransform($value)->format('Y-m-d\TH:i:s.vO'));
     }
 
-    public function validValueForReverseTransformDateDataProvider()
+    public function validValueForReverseTransformDateDataProvider(): array
     {
         return [
             'full date'           => [
@@ -323,7 +323,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidValueForReverseTransformDateDataProvider
      */
-    public function testReverseTransformDateWithInvalidValue($value, $exceptionMessage = null)
+    public function testReverseTransformDateWithInvalidValue(string $value, string $exceptionMessage = null)
     {
         if (null === $exceptionMessage) {
             $exceptionMessage = sprintf('The value "%s" is not a valid date.', $value);
@@ -335,7 +335,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform($value);
     }
 
-    public function invalidValueForReverseTransformDateDataProvider()
+    public function invalidValueForReverseTransformDateDataProvider(): array
     {
         return [
             'with time'                      => [
@@ -386,13 +386,13 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validValueForReverseTransformTimeDataProvider
      */
-    public function testReverseTransformTimeWithValidValue($value, $expected)
+    public function testReverseTransformTimeWithValidValue(string $value, string $expected)
     {
         $transformer = new DateTimeToStringTransformer(true, false);
         self::assertEquals($expected, $transformer->reverseTransform($value)->format('Y-m-d\TH:i:s.vO'));
     }
 
-    public function validValueForReverseTransformTimeDataProvider()
+    public function validValueForReverseTransformTimeDataProvider(): array
     {
         return [
             'full time'            => [
@@ -425,7 +425,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidValueForReverseTransformTimeDataProvider
      */
-    public function testReverseTransformTimeWithInvalidValue($value, $exceptionMessage = null)
+    public function testReverseTransformTimeWithInvalidValue(string $value, string $exceptionMessage = null)
     {
         if (null === $exceptionMessage) {
             $exceptionMessage = sprintf('The value "%s" is not a valid time.', $value);
@@ -437,7 +437,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform($value);
     }
 
-    public function invalidValueForReverseTransformTimeDataProvider()
+    public function invalidValueForReverseTransformTimeDataProvider(): array
     {
         return [
             'with date'                 => [

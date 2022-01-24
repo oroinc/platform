@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -31,7 +32,7 @@ class UserProfileTest extends RestJsonApiTestCase
             $this->getUrl('oro_rest_api_user_profile')
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $user = $this->getCurrentUser();
         $this->assertResponseContains([
@@ -59,7 +60,7 @@ class UserProfileTest extends RestJsonApiTestCase
             ['HTTP_HATEOAS' => true]
         );
 
-        self::assertResponseStatusCodeEquals($response, 200);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         $user = $this->getCurrentUser();
         $this->assertResponseContains($this->getExpectedContent([

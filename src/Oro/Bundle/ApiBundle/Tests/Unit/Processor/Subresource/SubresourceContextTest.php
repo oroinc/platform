@@ -40,12 +40,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new SubresourceContext($this->configProvider, $this->metadataProvider);
     }
 
-    /**
-     * @param array $data
-     *
-     * @return Config
-     */
-    private function getConfig(array $data = [])
+    private function getConfig(array $data = []): Config
     {
         $result = new Config();
         foreach ($data as $sectionName => $config) {

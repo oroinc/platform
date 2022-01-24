@@ -2,24 +2,28 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM\Mapping;
 
-use Doctrine\Common\Cache\Psr6\CacheAdapter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadataFactory;
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
-use Oro\Component\Testing\Unit\Cache\CacheTrait;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    use CacheTrait;
 
     /** @var AdditionalMetadataProvider */
     private $additionalMetadataProvider;
 
     /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataFactory;
+
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheAdapter;
+
+    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheItem;
 
     protected function setUp(): void
     {
@@ -35,14 +39,59 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getManager')
             ->willReturn($em);
 
-        $cacheAdapter = CacheAdapter::wrap(new MemoryCacheChain($this->getArrayCache()));
+        $this->cacheAdapter = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
+
         $this->additionalMetadataProvider = new AdditionalMetadataProvider(
             $registry,
-            $cacheAdapter
+            $this->cacheAdapter
         );
     }
 
     public function testGetInversedUnidirectionalAssociationMappings()
+    {
+        $expectedMetadata = [
+            [
+                'fieldName' => 'foo_association',
+                'type' => ClassMetadata::ONE_TO_MANY,
+                'targetEntity' => 'Namespace\\EntityName',
+                'mappedBySourceEntity' => false,
+                '_generatedFieldName' => 'Namespace_FooEntity_foo_association',
+            ],
+            [
+                'fieldName' => 'bar_association',
+                'type' => ClassMetadata::ONE_TO_MANY,
+                'targetEntity' => 'Namespace\\EntityName',
+                'mappedBySourceEntity' => false,
+                '_generatedFieldName' => 'Namespace_BarEntity_bar_association',
+            ],
+            [
+                'fieldName' => 'bar_association',
+                'type' => ClassMetadata::ONE_TO_ONE,
+                'targetEntity' => 'Namespace\\EntityName',
+                'mappedBySourceEntity' => false,
+                '_generatedFieldName' => 'Namespace_FooBarEntity_bar_association',
+            ],
+        ];
+
+        $this->cacheAdapter->expects(self::once())
+            ->method('getItem')
+            ->with('oro_entity.additional_metadata.Namespace\EntityName')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects(self::exactly(2))
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects(self::once())
+            ->method('get')
+            ->willReturn($expectedMetadata);
+
+        $this->assertEquals(
+            $expectedMetadata,
+            $this->additionalMetadataProvider->getInversedUnidirectionalAssociationMappings('Namespace\EntityName')
+        );
+    }
+
+    public function testWarmUpMetadata()
     {
         $entityMetadata = new ClassMetadata('Namespace\EntityName');
 
@@ -93,34 +142,15 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->metadataFactory->expects($this->once())
             ->method('getAllMetadata')
             ->willReturn($allMetadata);
+        $this->cacheAdapter->expects(self::exactly(count($allMetadata)))
+            ->method('getItem')
+            ->willReturn($this->cacheItem);
+        $this->cacheAdapter->expects(self::exactly(count($allMetadata)))
+            ->method('saveDeferred')
+            ->with($this->cacheItem);
+        $this->cacheAdapter->expects(self::once())
+            ->method('commit');
 
-        $expectedMetadata = [
-            [
-                'fieldName' => 'foo_association',
-                'type' => ClassMetadata::ONE_TO_MANY,
-                'targetEntity' => 'Namespace\\EntityName',
-                'mappedBySourceEntity' => false,
-                '_generatedFieldName' => 'Namespace_FooEntity_foo_association',
-            ],
-            [
-                'fieldName' => 'bar_association',
-                'type' => ClassMetadata::ONE_TO_MANY,
-                'targetEntity' => 'Namespace\\EntityName',
-                'mappedBySourceEntity' => false,
-                '_generatedFieldName' => 'Namespace_BarEntity_bar_association',
-            ],
-            [
-                'fieldName' => 'bar_association',
-                'type' => ClassMetadata::ONE_TO_ONE,
-                'targetEntity' => 'Namespace\\EntityName',
-                'mappedBySourceEntity' => false,
-                '_generatedFieldName' => 'Namespace_FooBarEntity_bar_association',
-            ],
-        ];
-
-        $this->assertEquals(
-            $expectedMetadata,
-            $this->additionalMetadataProvider->getInversedUnidirectionalAssociationMappings('Namespace\EntityName')
-        );
+        $this->additionalMetadataProvider->warmUpMetadata();
     }
 }

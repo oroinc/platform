@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\RecognizeAssociationType;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
@@ -116,7 +117,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
 
     public function testProcessForExcludedAssociation()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException::class);
+        $this->expectException(ActionNotAllowedException::class);
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
 

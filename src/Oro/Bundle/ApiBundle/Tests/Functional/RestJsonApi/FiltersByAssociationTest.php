@@ -14,24 +14,16 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class FiltersByAssociationTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/association_filters.yml'
         ]);
     }
 
-    /**
-     * @param array  $expectedRows
-     * @param string $entityType
-     */
-    private function prepareExpectedRows(array &$expectedRows, $entityType = 'testapientity1')
+    private function prepareExpectedRows(array &$expectedRows, string $entityType = 'testapientity1'): void
     {
         foreach ($expectedRows as &$row) {
             $row['type'] = $entityType;

@@ -191,9 +191,9 @@ services:
 
     oro_search.cache.doctrine_metadata:
         public: false
-        parent: oro.cache.abstract.without_memory_cache
-        calls:
-            - [ setNamespace, [ 'doctrine_metadata_search' ] ]
+        parent: oro.data.cache.without_memory_cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_metadata_search' }
 
     oro_search.cache.doctrine_query:
         public: false

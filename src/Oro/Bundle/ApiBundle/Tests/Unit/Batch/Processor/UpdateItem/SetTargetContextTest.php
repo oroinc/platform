@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\UpdateItem;
 
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetTargetContext;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
@@ -36,7 +37,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWhenTargetProcessorIsNotSet()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target processor is not defined.');
 
         $this->processor->process($this->context);

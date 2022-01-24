@@ -190,17 +190,11 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param int                                                    $operationId
-     * @param array                                                  $summary
-     * @param \PHPUnit\Framework\MockObject\MockObject|ClassMetadata $metadata
-     * @param \PHPUnit\Framework\MockObject\MockObject|QueryBuilder  $qb
-     */
     private function expectIncreaseAggregateTimeQuery(
         int $operationId,
         array $summary,
-        ClassMetadata $metadata,
-        QueryBuilder $qb
+        ClassMetadata|\PHPUnit\Framework\MockObject\MockObject $metadata,
+        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb
     ): void {
         $query = $this->createMock(AbstractQuery::class);
         $qb->expects(self::once())
@@ -240,17 +234,11 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
     }
 
-    /**
-     * @param int                                                    $operationId
-     * @param array                                                  $summary
-     * @param \PHPUnit\Framework\MockObject\MockObject|ClassMetadata $metadata
-     * @param \PHPUnit\Framework\MockObject\MockObject|QueryBuilder  $qb
-     */
     private function expectAddErrorsQuery(
         int $operationId,
         array $summary,
-        ClassMetadata $metadata,
-        QueryBuilder $qb
+        ClassMetadata|\PHPUnit\Framework\MockObject\MockObject $metadata,
+        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb
     ): void {
         $query = $this->createMock(AbstractQuery::class);
         $qb->expects(self::once())
@@ -293,17 +281,11 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
     }
 
-    /**
-     * @param int                                                             $operationId
-     * @param array|null                                                      $summary
-     * @param \PHPUnit\Framework\MockObject\MockObject|EntityManagerInterface $em
-     * @param \PHPUnit\Framework\MockObject\MockObject|QueryBuilder           $qb
-     */
     private function expectSelectSummaryQuery(
         int $operationId,
         ?array $summary,
-        EntityManagerInterface $em,
-        QueryBuilder $qb
+        EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em,
+        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb
     ): void {
         $rawSummaryValue = null !== $summary ? 'raw summary value' : null;
 

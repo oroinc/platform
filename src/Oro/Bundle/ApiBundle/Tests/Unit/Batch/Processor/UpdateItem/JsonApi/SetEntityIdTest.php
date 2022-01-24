@@ -27,7 +27,7 @@ class SetEntityIdTest extends BatchUpdateItemProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData($data)
+    public function testProcessWithInvalidRequestData(array $data)
     {
         $this->context->setRequestData($data);
         $this->processor->process($this->context);
@@ -35,10 +35,7 @@ class SetEntityIdTest extends BatchUpdateItemProcessorTestCase
         self::assertNull($this->context->getId());
     }
 
-    /**
-     * @return array
-     */
-    public function invalidRequestDataProvider()
+    public function invalidRequestDataProvider(): array
     {
         return [
             [[]],

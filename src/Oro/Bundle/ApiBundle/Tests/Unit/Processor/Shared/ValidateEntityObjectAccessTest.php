@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateEntityObjectAccessTest extends GetProcessorTestCase
 {
@@ -51,7 +52,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
 
     public function testProcessWhenAccessDenied()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access by "VIEW" permission to the entity.');
 
         $entity = new Product();
@@ -87,7 +88,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
 
     public function testProcessWhenAccessDeniedByAclResource()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $entity = new Product();
         $config = new EntityDefinitionConfig();
         $config->setAclResource('test_acl_resource');

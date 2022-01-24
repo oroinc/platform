@@ -124,6 +124,6 @@ class DeletedAttributeRelationListener
      */
     protected function getAttributeName(FieldConfigModel $attribute): string
     {
-        return $this->inflector->camelize($attribute->getFieldName());
+        return $attribute->getFieldName();
     }
 }

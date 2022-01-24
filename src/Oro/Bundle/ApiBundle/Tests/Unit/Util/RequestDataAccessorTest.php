@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Util\RequestDataAccessor;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
 class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,7 +33,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueForNotExistingIndex()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\NoSuchIndexException::class);
+        $this->expectException(NoSuchIndexException::class);
         $requestData = ['key1' => 'value1'];
 
         $this->requestDataAccessor->getValue($requestData, 'key2');
@@ -39,7 +41,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetValueWhenValueWithinPathIsNotArray()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $requestData = ['key1' => 'value1'];
 
         $this->requestDataAccessor->getValue($requestData, 'key1.key2');
@@ -76,7 +78,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testSetValueWhenValueWithinPathIsNotArray()
     {
-        $this->expectException(\Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $requestData = ['key1' => 'value1'];
 
         $this->requestDataAccessor->setValue($requestData, 'key1.key2', 'val');

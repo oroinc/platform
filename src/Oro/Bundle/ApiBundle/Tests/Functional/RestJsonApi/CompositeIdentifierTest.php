@@ -11,31 +11,17 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class CompositeIdentifierTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/composite_identifier.yml'
         ]);
     }
 
-    /**
-     * @param string $key1
-     * @param int    $key2
-     *
-     * @return string
-     */
-    private function getEntityId($key1, $key2)
+    private function getEntityId(string $key1, int $key2): string
     {
-        return http_build_query(
-            ['renamedKey1' => $key1, 'key2' => $key2],
-            '',
-            ';'
-        );
+        return http_build_query(['renamedKey1' => $key1, 'key2' => $key2], '', ';');
     }
 
     public function testGetList()

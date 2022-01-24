@@ -30,13 +30,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $bundle3 = new Fixtures\FooBundle\FooBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(
-                [
-                    $bundle1->getName() => get_class($bundle1),
-                    $bundle2->getName() => get_class($bundle2),
-                    $bundle3->getName() => get_class($bundle3)
-                ]
-            );
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2),
+                $bundle3->getName() => get_class($bundle3)
+            ]);
     }
 
     protected function tearDown(): void
@@ -44,38 +42,25 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         CumulativeResourceManager::getInstance()->clear();
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     */
-    private static function assertServiceExists(ContainerBuilder $container, $serviceId)
+    private static function assertServiceExists(ContainerBuilder $container, string $serviceId): void
     {
         if (!$container->hasDefinition($serviceId)) {
             self::fail(sprintf('Service "%s" should be defined', $serviceId));
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     */
-    private static function assertServiceNotExists(ContainerBuilder $container, $serviceId)
+    private static function assertServiceNotExists(ContainerBuilder $container, string $serviceId): void
     {
         if ($container->hasDefinition($serviceId)) {
             self::fail(sprintf('Service "%s" should not be defined', $serviceId));
         }
     }
 
-    /**
-     * @param array            $serviceIds
-     * @param object           $serviceLocatorReference
-     * @param ContainerBuilder $container
-     */
     private static function assertServiceLocator(
         array $serviceIds,
-        $serviceLocatorReference,
+        object $serviceLocatorReference,
         ContainerBuilder $container
-    ) {
+    ): void {
         $services = [];
         foreach ($serviceIds as $serviceId) {
             $services[$serviceId] = new ServiceClosureArgument(new Reference($serviceId));
@@ -87,10 +72,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($services, $serviceLocatorDef->getArgument(0));
     }
 
-    /**
-     * @return ConfigExtensionRegistry
-     */
-    private function getConfigExtensionRegistry()
+    private function getConfigExtensionRegistry(): ConfigExtensionRegistry
     {
         $configExtensionRegistry = new ConfigExtensionRegistry(3);
         $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
@@ -99,12 +81,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         return $configExtensionRegistry;
     }
 
-    /**
-     * @param bool $devMode
-     *
-     * @return ContainerBuilder
-     */
-    private function getContainer(bool $devMode = false)
+    private function getContainer(bool $devMode = false): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', $devMode);
@@ -114,10 +91,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         return $container;
     }
 
-    /**
-     * @return array
-     */
-    public static function environmentDataProvider()
+    public static function environmentDataProvider(): array
     {
         return [
             'prod mode' => [false],
@@ -260,9 +234,9 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_default']]
+                ['namespace' => 'oro_api_aliases_default']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.default')->getTag('cache.pool')
         );
         self::assertEquals(
             [
@@ -532,21 +506,22 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_default']]
+                ['namespace' => 'oro_api_aliases_default']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.default')->getTag('cache.pool')
+        );
+
+        self::assertEquals(
+            [
+                ['namespace' => 'oro_api_aliases_first']
+            ],
+            $container->getDefinition('oro_api.entity_alias_cache.first')->getTag('cache.pool')
         );
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_first']]
+                ['namespace' => 'oro_api_aliases_second']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.first')->getMethodCalls()
-        );
-        self::assertEquals(
-            [
-                ['setNamespace', ['oro_api_aliases_second']]
-            ],
-            $container->getDefinition('oro_api.entity_alias_cache.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.second')->getTag('cache.pool')
         );
         self::assertEquals(
             [
@@ -1194,21 +1169,21 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_default']]
+                ['namespace' => 'oro_api_aliases_default']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.default')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.default')->getTag('cache.pool')
         );
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_first']]
+                ['namespace' => 'oro_api_aliases_first']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.first')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.first')->getTag('cache.pool')
         );
         self::assertEquals(
             [
-                ['setNamespace', ['oro_api_aliases_second']]
+                ['namespace' => 'oro_api_aliases_second']
             ],
-            $container->getDefinition('oro_api.entity_alias_cache.second')->getMethodCalls()
+            $container->getDefinition('oro_api.entity_alias_cache.second')->getTag('cache.pool')
         );
         self::assertEquals(
             [

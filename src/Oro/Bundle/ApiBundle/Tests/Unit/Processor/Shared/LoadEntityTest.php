@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadEntityTest extends GetProcessorTestCase
 {
@@ -167,7 +168,7 @@ class LoadEntityTest extends GetProcessorTestCase
 
     public function testProcessForManageableEntityWhenNoAccessToEntity()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the entity.');
 
         $entityClass = 'Test\Entity';

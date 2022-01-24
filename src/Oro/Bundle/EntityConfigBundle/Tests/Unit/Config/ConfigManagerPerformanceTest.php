@@ -21,7 +21,8 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\Factory\MetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\EntityConfig\Mock\ConfigurationHandlerMock;
-use Oro\Component\Testing\Unit\Cache\CacheTrait;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -35,8 +36,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
  */
 class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
 {
-    use CacheTrait;
-
     private const ENABLE_TESTS = false;
     private const ENABLE_ASSERTS = true;
     private const SHOW_DURATIONS = true;
@@ -426,12 +425,22 @@ class ConfigManagerPerformanceTest extends \PHPUnit\Framework\TestCase
 
         $databaseChecker = new ConfigDatabaseChecker($lockObject, $doctrine, [], $applicationState);
 
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $modelCache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cache->expects($this->any())
+            ->method('getItem')
+            ->willReturn($cacheItem);
+        $modelCache->expects($this->any())
+            ->method('getItem')
+            ->willReturn($cacheItem);
+
         return new ConfigManager(
             $this->createMock(EventDispatcher::class),
             $this->createMock(MetadataFactory::class),
             new ConfigModelManager($doctrine, $lockObject, $databaseChecker),
             new AuditManager($securityTokenStorage, $doctrine),
-            new ConfigCache($this->getArrayCache(), $this->getArrayCache(), ['test' => 'test']),
+            new ConfigCache($cache, $modelCache, ['test' => 'test']),
             ConfigurationHandlerMock::getInstance()
         );
     }

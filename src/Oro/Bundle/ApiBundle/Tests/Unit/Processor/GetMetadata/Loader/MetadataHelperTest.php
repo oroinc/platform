@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
@@ -26,21 +27,32 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAssertDataTypeForEmptyDataType()
+    /**
+     * @dataProvider emptyDataTypeDataProvider
+     */
+    public function testAssertDataTypeForEmptyDataType(?string $dataType)
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The "data_type" configuration attribute should be specified'
             . ' for the "testField" field of the "Test\Class" entity.'
         );
 
-        $this->metadataHelper->assertDataType('', 'Test\Class', 'testField');
+        $this->metadataHelper->assertDataType($dataType, 'Test\Class', 'testField');
+    }
+
+    public function emptyDataTypeDataProvider(): array
+    {
+        return [
+            [''],
+            [null]
+        ];
     }
 
     /**
      * @dataProvider getFormPropertyPathProvider
      */
-    public function testGetFormPropertyPath($expectedPropertyPath, $formOptions, $targetAction)
+    public function testGetFormPropertyPath(?string $expectedPropertyPath, ?array $formOptions, string $targetAction)
     {
         $field = new EntityDefinitionFieldConfig();
         $field->setFormOptions($formOptions);
@@ -51,7 +63,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getFormPropertyPathProvider()
+    public function getFormPropertyPathProvider(): array
     {
         return [
             [

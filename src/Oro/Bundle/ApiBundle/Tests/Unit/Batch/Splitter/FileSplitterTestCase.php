@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Splitter;
 
 use Gaufrette\Filesystem;
+use Gaufrette\Stream;
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\Stream\Local;
 use Gaufrette\StreamMode;
@@ -15,23 +16,16 @@ use Oro\Bundle\GaufretteBundle\FileManager;
 abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @param FileSplitterInterface $splitter
-     * @param string                $fileName
-     * @param string                $fileContent
-     * @param array                 $resultFileNames
-     * @param array                 $resultFileContents
-     * @param bool                  $withInMemoryBuffer
-     *
      * @return ChunkFile[]
      */
     protected function splitFile(
         FileSplitterInterface $splitter,
-        $fileName,
-        $fileContent,
+        string $fileName,
+        string $fileContent,
         array &$resultFileNames,
         array &$resultFileContents,
-        $withInMemoryBuffer = false
-    ) {
+        bool $withInMemoryBuffer = false
+    ): array {
         if ($withInMemoryBuffer) {
             [$srcFileManager, $destFileManager] = $this->getFileManagers(
                 $fileName,
@@ -60,18 +54,12 @@ abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param FileSplitterInterface $splitter
-     * @param string                $fileContext
-     * @param string                $exceptionClass
-     * @param string                $exceptionMessage
-     */
     protected function splitWithException(
         FileSplitterInterface $splitter,
-        $fileContext,
-        $exceptionClass,
-        $exceptionMessage
-    ) {
+        string $fileContext,
+        string $exceptionClass,
+        string $exceptionMessage
+    ): void {
         $fileName = 'temporaryFileName';
 
         $tmpFile = tmpfile();
@@ -99,44 +87,31 @@ abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
         $this->assertSplitterException($actualException, $exceptionClass, $exceptionMessage);
     }
 
-    /**
-     * @param string      $expectedFileName
-     * @param int         $expectedFileIndex
-     * @param int         $expectedFirstRecordOffset
-     * @param string|null $expectedSectionName
-     * @param ChunkFile   $file
-     */
     protected function assertChunkFile(
-        $expectedFileName,
-        $expectedFileIndex,
-        $expectedFirstRecordOffset,
-        $expectedSectionName,
+        string $expectedFileName,
+        int $expectedFileIndex,
+        int $expectedFirstRecordOffset,
+        ?string $expectedSectionName,
         ChunkFile $file
-    ) {
+    ): void {
         self::assertEquals($expectedFileName, $file->getFileName(), 'Assert file name.');
         self::assertSame($expectedFileIndex, $file->getFileIndex(), 'Assert file index.');
         self::assertSame($expectedFirstRecordOffset, $file->getFirstRecordOffset(), 'Assert first record offset.');
         self::assertSame($expectedSectionName, $file->getSectionName(), 'Assert section name.');
     }
 
-    /**
-     * @param array  $expectedContent
-     * @param string $fileContent
-     */
-    protected function assertChunkContent($expectedContent, $fileContent)
+    protected function assertChunkContent(array $expectedContent, string $fileContent): void
     {
         $actualContent = JsonUtil::decode($fileContent);
         self::assertNotNull($actualContent, 'Error in input JSON fixture OR during split operation.');
         self::assertEquals($expectedContent, $actualContent, 'Assert content.');
     }
 
-    /**
-     * @param \Exception|null $exception
-     * @param string          $innerExceptionClass
-     * @param string          $innerExceptionMessage
-     */
-    protected function assertSplitterException($exception, $innerExceptionClass, $innerExceptionMessage)
-    {
+    protected function assertSplitterException(
+        \Exception $exception,
+        string $innerExceptionClass,
+        string $innerExceptionMessage
+    ): void {
         self::assertThat(
             $exception,
             new \PHPUnit\Framework\Constraint\Exception(FileSplitterException::class)
@@ -153,12 +128,7 @@ abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param resource|string $tmpFile
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|Local
-     */
-    private function getTmpFileStreamMock($tmpFile)
+    private function getTmpFileStream(mixed $tmpFile): Stream
     {
         if (is_string($tmpFile)) {
             $fs = $this->createMock(Filesystem::class);
@@ -192,8 +162,8 @@ abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
      * @return array [srcFileManager, destFileManager]
      */
     private function getFileManagers(
-        $fileName,
-        $tmpFile,
+        string $fileName,
+        mixed $tmpFile,
         array &$resultFileNames,
         array &$resultFileContents
     ): array {
@@ -202,16 +172,14 @@ abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
         $srcFileManager->expects(self::once())
             ->method('getStream')
             ->with($fileName)
-            ->willReturn($this->getTmpFileStreamMock($tmpFile));
+            ->willReturn($this->getTmpFileStream($tmpFile));
         $destFileManager->expects(self::any())
             ->method('writeToStorage')
             ->withAnyParameters()
-            ->willReturnCallback(
-                function ($fileContent, $fileName) use (&$resultFileNames, &$resultFileContents) {
-                    $resultFileNames[] = $fileName;
-                    $resultFileContents[] = $fileContent;
-                }
-            );
+            ->willReturnCallback(function ($fileContent, $fileName) use (&$resultFileNames, &$resultFileContents) {
+                $resultFileNames[] = $fileName;
+                $resultFileContents[] = $fileContent;
+            });
 
         return [$srcFileManager, $destFileManager];
     }

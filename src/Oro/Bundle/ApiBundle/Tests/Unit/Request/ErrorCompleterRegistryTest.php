@@ -18,12 +18,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $errorCompleters
-     *
-     * @return ErrorCompleterRegistry
-     */
-    private function getErrorCompleterRegistry(array $errorCompleters)
+    private function getErrorCompleterRegistry(array $errorCompleters): ErrorCompleterRegistry
     {
         return new ErrorCompleterRegistry(
             $errorCompleters,

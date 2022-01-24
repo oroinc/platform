@@ -67,7 +67,7 @@ services:
         class: Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory
         arguments:
             - '@oro_api.value_normalizer'
-            - '@oro_entity_extend.association_manager'
+            - '@oro_api.expanded_association_provider'
             - '@oro_api.entity_override_provider_registry'
 
     oro_api.query.expression_visitor_factory:

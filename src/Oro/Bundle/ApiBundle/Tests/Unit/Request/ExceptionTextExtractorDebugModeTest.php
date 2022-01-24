@@ -58,11 +58,11 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider getExceptionStatusCodeDataProvider()
+     * @dataProvider getExceptionStatusCodeDataProvider
      */
-    public function testGetExceptionStatusCode(\Exception $exception, $expectedStatusCode): void
+    public function testGetExceptionStatusCode(\Exception $exception, int $expectedStatusCode): void
     {
-        self::assertEquals(
+        self::assertSame(
             $expectedStatusCode,
             $this->exceptionTextExtractor->getExceptionStatusCode($exception)
         );
@@ -96,7 +96,7 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionTypeDataProvider
      */
-    public function testExceptionType(\Exception $exception, $expectedType): void
+    public function testExceptionType(\Exception $exception, string $expectedType): void
     {
         self::assertEquals(
             $expectedType,
@@ -130,9 +130,9 @@ class ExceptionTextExtractorDebugModeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getExceptionTextDataProvider
      */
-    public function testExceptionText(\Exception $exception, $expectedType): void
+    public function testExceptionText(\Exception $exception, ?string $expectedType): void
     {
-        self::assertEquals(
+        self::assertSame(
             $expectedType,
             $this->exceptionTextExtractor->getExceptionText($exception)
         );

@@ -34,7 +34,7 @@ class ApiFormTypeTestCase extends \PHPUnit\Framework\TestCase
         $formExtensionChecker->expects(self::any())
             ->method('isApiFormExtensionActivated')
             ->willReturn(true);
-        $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
             ->addTypeExtensions($this->getTypeExtensions())
@@ -47,7 +47,7 @@ class ApiFormTypeTestCase extends \PHPUnit\Framework\TestCase
         $this->builder = new ApiFormBuilder('', null, $this->dispatcher, $this->factory);
     }
 
-    protected function getApiTypeExtensions()
+    protected function getApiTypeExtensions(): array
     {
         $customizationProcessor = $this->createMock(ActionProcessorInterface::class);
         $customizationProcessor->expects(self::any())
@@ -71,22 +71,22 @@ class ApiFormTypeTestCase extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         return [];
     }
 
-    protected function getTypeExtensions()
+    protected function getTypeExtensions(): array
     {
         return [];
     }
 
-    protected function getTypes()
+    protected function getTypes(): array
     {
         return [];
     }
 
-    protected function getTypeGuessers()
+    protected function getTypeGuessers(): array
     {
         return [];
     }

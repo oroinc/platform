@@ -31,10 +31,8 @@ class UpdateWithTableInheritanceTest extends RestJsonApiTestCase
 
     /**
      * @depends testCreate
-     *
-     * @param integer $id
      */
-    public function testUpdate($id)
+    public function testUpdate(string $id)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
 

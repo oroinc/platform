@@ -2,23 +2,28 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheStateRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheAccessor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheProvider */
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemPoolInterface */
     private $cache;
+
+    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemInterface */
+    private $cacheItem;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateRegistry */
     private $configCacheStateRegistry;
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
         $this->configCacheStateRegistry = $this->createMock(ConfigCacheStateRegistry::class);
     }
 
@@ -35,7 +40,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
     public function testClear()
     {
         $this->cache->expects(self::once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $cacheAccessor = $this->getCacheAccessor();
 
@@ -49,8 +54,11 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $id = 'test';
 
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('getItem')
             ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
             ->willReturn(false);
 
         $this->configCacheStateRegistry->expects(self::never())
@@ -70,10 +78,16 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $id = 'test';
         $data = ['key' => 'value'];
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('test1.2rest')
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects(self::once())
+            ->method('get')
             ->willReturn([null, $data]);
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
 
         $cacheAccessor = $this->getCacheAccessor(true);
 
@@ -90,10 +104,16 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $id = 'test';
         $data = ['key' => 'value'];
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('test1.2rest')
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects(self::once())
+            ->method('get')
             ->willReturn([null, $data]);
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
 
         $configCacheState = $this->createMock(ConfigCacheStateInterface::class);
         $this->configCacheStateRegistry->expects(self::once())
@@ -121,10 +141,16 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $timestamp = 123;
         $data = ['key' => 'value'];
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('test1.2rest')
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects(self::once())
+            ->method('get')
             ->willReturn([$timestamp, $data]);
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
 
         $configCacheState = $this->createMock(ConfigCacheStateInterface::class);
         $this->configCacheStateRegistry->expects(self::once())
@@ -152,10 +178,16 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $timestamp = 123;
         $data = ['key' => 'value'];
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with('test1.2rest')
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects(self::once())
+            ->method('get')
             ->willReturn([$timestamp, $data]);
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
 
         $configCacheState = $this->createMock(ConfigCacheStateInterface::class);
         $this->configCacheStateRegistry->expects(self::once())
@@ -182,8 +214,15 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $data = ['key' => 'value'];
 
         $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([null, $data]);
+        $this->cache->expects(self::once())
             ->method('save')
-            ->with('test1.2rest', [null, $data]);
+            ->with($this->cacheItem);
 
         $cacheAccessor = $this->getCacheAccessor(true);
 
@@ -199,8 +238,15 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $data = ['key' => 'value'];
 
         $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('test1.2rest')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('set')
+            ->with([$timestamp, $data]);
+        $this->cache->expects(self::once())
             ->method('save')
-            ->with('test1.2rest', [$timestamp, $data]);
+            ->with($this->cacheItem);
 
         $configCacheState = $this->createMock(ConfigCacheStateInterface::class);
         $this->configCacheStateRegistry->expects(self::once())

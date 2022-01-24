@@ -24,6 +24,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 /**
@@ -33,27 +34,38 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class OwnerValidatorTest extends ConstraintValidatorTestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    private \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface $ownershipMetadataProvider;
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
 
-    private \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface $authorizationChecker;
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
 
-    private \PHPUnit\Framework\MockObject\MockObject|TokenAccessorInterface $tokenAccessor;
+    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenAccessor;
 
-    private \PHPUnit\Framework\MockObject\MockObject|OwnerTreeProviderInterface $ownerTreeProvider;
+    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownerTreeProvider;
 
-    private \PHPUnit\Framework\MockObject\MockObject|AclVoter $aclVoter;
+    /** @var AclVoter|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclVoter;
 
-    private \PHPUnit\Framework\MockObject\MockObject|AclGroupProviderInterface $aclGroupProvider;
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclGroupProvider;
 
-    private \PHPUnit\Framework\MockObject\MockObject|BusinessUnitManager $businessUnitManager;
+    /** @var BusinessUnitManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $businessUnitManager;
 
-    private Entity $testEntity;
+    /** @var Entity */
+    private $testEntity;
 
-    private User $currentUser;
+    /** @var User */
+    private $currentUser;
 
-    private Organization $currentOrg;
+    /** @var Organization */
+    private $currentOrg;
 
     protected function setUp(): void
     {
@@ -102,12 +114,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    /**
-     * @param string $ownerType
-     *
-     * @return OwnershipMetadata
-     */
-    private function createOwnershipMetadata($ownerType)
+    private function createOwnershipMetadata(string $ownerType): OwnershipMetadata
     {
         return new OwnershipMetadata($ownerType, 'owner', 'owner', 'organization', 'organization');
     }
@@ -123,12 +130,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         return parent::createContext();
     }
 
-    /**
-     * @param int $id
-     *
-     * @return User
-     */
-    private function createUser($id): User
+    private function createUser(int $id): User
     {
         $user = new User();
         $user->setId($id);
@@ -136,12 +138,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         return $user;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return BusinessUnit
-     */
-    private function createBusinessUnit($id): BusinessUnit
+    private function createBusinessUnit(int $id): BusinessUnit
     {
         $businessUnit = new BusinessUnit();
         $businessUnit->setId($id);
@@ -149,12 +146,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         return $businessUnit;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Organization
-     */
-    private function createOrganization($id): Organization
+    private function createOrganization(int $id): Organization
     {
         $organization = new Organization();
         $organization->setId($id);
@@ -162,13 +154,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         return $organization;
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|ClassMetadata $entityMetadata
-     * @param array                                                  $originalEntityData
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|UnitOfWork
-     */
-    private function expectManageableEntity(ClassMetadata $entityMetadata, array $originalEntityData)
+    private function expectManageableEntity(ClassMetadata $entityMetadata, array $originalEntityData): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
@@ -188,14 +174,9 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
             ->method('getOriginalEntityData')
             ->with($this->testEntity)
             ->willReturn($originalEntityData);
-
-        return $uow;
     }
 
-    /**
-     * @param int $accessLevel
-     */
-    private function expectAddOneShotIsGrantedObserver($accessLevel): void
+    private function expectAddOneShotIsGrantedObserver(?int $accessLevel): void
     {
         $this->aclVoter->expects(self::once())
             ->method('addOneShotIsGrantedObserver')
@@ -217,7 +198,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidateForInvalidConstraintType(): void
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->validator->validate($this->testEntity, $this->createMock(Constraint::class));
     }
 

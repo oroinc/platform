@@ -15,18 +15,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_CLASS_NAME   = 'Test\Class';
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_CLASS_NAME = 'Test\Class';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var MetadataContext */
-    protected $context;
-
-    /** @var ConfigExtensionRegistry */
-    protected $configExtensionRegistry;
-
-    /** @var ConfigLoaderFactory */
-    protected $configLoaderFactory;
+    protected MetadataContext $context;
+    protected ConfigExtensionRegistry $configExtensionRegistry;
+    protected ConfigLoaderFactory $configLoaderFactory;
 
     protected function setUp(): void
     {
@@ -42,23 +37,14 @@ class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return EntityDefinitionConfig
-     */
-    protected function createConfigObject(array $config)
+    protected function createConfigObject(array $config): EntityDefinitionConfig
     {
         return $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 
-    /**
-     * @param string|null $className
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
-     */
-    protected function getClassMetadataMock($className = null)
-    {
+    protected function getClassMetadataMock(
+        string $className = null
+    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])

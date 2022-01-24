@@ -23,7 +23,6 @@ use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 abstract class EntitySerializerTestCase extends OrmTestCase
 {
@@ -82,7 +81,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
         $this->container = $this->createMock(ContainerInterface::class);
         $doctrineHelper = new DoctrineHelper($doctrine);
-        $dataAccessor = new EntityDataAccessor(new PropertyAccessor());
+        $dataAccessor = new EntityDataAccessor();
         $fieldAccessor = new FieldAccessor($doctrineHelper, $dataAccessor, $this->entityFieldFilter);
         $this->serializer = new EntitySerializer(
             $doctrineHelper,
@@ -96,30 +95,20 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         );
     }
 
-    /**
-     * @param array  $expected
-     * @param array  $actual
-     * @param string $message
-     */
-    protected function assertArrayEquals(array $expected, array $actual, $message = '')
+    protected function assertArrayEquals(array $expected, array $actual, string $message = ''): void
     {
         $this->sortByKeyRecursive($expected);
         $this->sortByKeyRecursive($actual);
         $this->assertSame($expected, $actual, $message);
     }
 
-    /**
-     * @param string $expected
-     * @param string $actual
-     * @param string $message
-     */
-    protected function assertDqlEquals($expected, $actual, $message = '')
+    protected function assertDqlEquals(string $expected, string $actual, string $message = ''): void
     {
         $expected = str_replace('Test:', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\\', $expected);
         $this->assertEquals($expected, $actual, $message);
     }
 
-    protected function sortByKeyRecursive(array &$array)
+    protected function sortByKeyRecursive(array &$array): void
     {
         ksort($array);
         foreach ($array as &$val) {
@@ -129,12 +118,7 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         }
     }
 
-    /**
-     * @param array $checkRules
-     *
-     * @return FieldFilterInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getFieldFilter(array $checkRules)
+    protected function getFieldFilter(array $checkRules): FieldFilterInterface
     {
         $filter = $this->createMock(FieldFilterInterface::class);
         $filter->expects(self::any())

@@ -111,7 +111,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider readErrorsDataProvider
      */
-    public function testReadErrors($offset, $limit, $operationId, $indexesInvolved, array $result)
+    public function testReadErrors(int $offset, int $limit, int $operationId, int $indexesInvolved, array $result)
     {
         $indexContent = file_get_contents('Fixtures/error_manager/read_index.json', true);
 
@@ -149,7 +149,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($result, $errors);
     }
 
-    public function readErrorsDataProvider()
+    public function readErrorsDataProvider(): array
     {
         return [
             'first 4 records'                    => [
@@ -270,8 +270,13 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider writeErrorsDataProvider
      */
-    public function testWriteErrors($operationId, $chunkFileName, $chunkFileIndex, array $errors, array $data)
-    {
+    public function testWriteErrors(
+        int $operationId,
+        string $chunkFileName,
+        int $chunkFileIndex,
+        array $errors,
+        array $data
+    ) {
         foreach ($data as &$testFile) {
             $testFile = rtrim(file_get_contents(__DIR__ . '/Fixtures/error_manager/' . $testFile), "\n\n");
         }
@@ -314,7 +319,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function writeErrorsDataProvider()
+    public function writeErrorsDataProvider(): array
     {
         return [
             'no index file'   => [

@@ -88,7 +88,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ->getSingleScalarResult();
     }
 
-    protected function createBatchError(
+    private function createBatchError(
         string $id,
         int $statusCode,
         string $title,
@@ -686,7 +686,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
-    public function invalidDataProvider()
+    public function invalidDataProvider(): array
     {
         return [
             'invalid data'                              => [

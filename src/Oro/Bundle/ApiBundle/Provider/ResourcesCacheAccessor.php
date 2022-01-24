@@ -2,21 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Helper class to load/write entries from/to API resources cache.
  */
 class ResourcesCacheAccessor
 {
-    /** @var CacheProvider */
-    private $cache;
+    private CacheItemPoolInterface $cache;
+    private ?ConfigCacheStateRegistry $configCacheStateRegistry = null;
 
-    /** @var ConfigCacheStateRegistry|null */
-    private $configCacheStateRegistry;
-
-    public function __construct(CacheProvider $cache)
+    public function __construct(CacheItemPoolInterface $cache)
     {
         $this->cache = $cache;
     }
@@ -31,7 +29,7 @@ class ResourcesCacheAccessor
      */
     public function clear(): void
     {
-        $this->cache->deleteAll();
+        $this->cache->clear();
     }
 
     /**
@@ -45,18 +43,17 @@ class ResourcesCacheAccessor
      */
     public function fetch(string $version, RequestType $requestType, string $id)
     {
-        $data = false;
-        $cachedData = $this->cache->fetch($this->getCacheKey($version, $requestType, $id));
-        if (false !== $cachedData) {
-            list($timestamp, $value) = $cachedData;
+        $cacheKey = $this->getCacheKey($version, $requestType, $id);
+        $cacheItem = $this->cache->getItem($cacheKey);
+        if ($cacheItem->isHit()) {
+            list($timestamp, $value) = $cacheItem->get();
             if (null === $this->configCacheStateRegistry
-                || $this->configCacheStateRegistry->getConfigCacheState($requestType)->isCacheFresh($timestamp)
+                || $this->getConfigCacheState($requestType)->isCacheFresh($timestamp)
             ) {
-                $data = $value;
+                return $value;
             }
         }
-
-        return $data;
+        return false;
     }
 
     /**
@@ -72,12 +69,20 @@ class ResourcesCacheAccessor
     {
         $timestamp = null === $this->configCacheStateRegistry
             ? null
-            : $this->configCacheStateRegistry->getConfigCacheState($requestType)->getCacheTimestamp();
-        $this->cache->save($this->getCacheKey($version, $requestType, $id), [$timestamp, $data]);
+            : $this->getConfigCacheState($requestType)->getCacheTimestamp();
+        $cacheKey = $this->getCacheKey($version, $requestType, $id);
+        $cacheItem = $this->cache->getItem($cacheKey);
+        $cacheItem->set([$timestamp, $data]);
+        $this->cache->save($cacheItem);
     }
 
     private function getCacheKey(string $version, RequestType $requestType, string $id): string
     {
         return $id . $version . (string)$requestType;
+    }
+
+    private function getConfigCacheState(RequestType $requestType): ConfigCacheStateInterface
+    {
+        return $this->configCacheStateRegistry->getConfigCacheState($requestType);
     }
 }

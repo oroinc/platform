@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestBuyer;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestOwner;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestTarget;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,26 +21,18 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class NotAccessibleResourceTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/not_accessible_resource.yml'
         ]);
     }
 
     /**
-     * @param string $method
-     * @param string $route
-     * @param array  $routeParameters
-     *
      * @dataProvider notAccessibleResourceActionsProvider
      */
-    public function testNotAccessibleResource($method, $route, array $routeParameters = [])
+    public function testNotAccessibleResource(string $method, string $route, array $routeParameters = [])
     {
         $entityType = $this->getEntityType(EntityIdentifier::class);
         $response = $this->request(
@@ -55,10 +49,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function notAccessibleResourceActionsProvider()
+    public function notAccessibleResourceActionsProvider(): array
     {
         return [
             ['GET', $this->getItemRouteName(), ['id' => 123]],
@@ -76,13 +67,9 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
     }
 
     /**
-     * @param string $method
-     * @param string $route
-     * @param array  $routeParameters
-     *
      * @dataProvider unknownResourceActionsProvider
      */
-    public function testUnknownResource($method, $route, array $routeParameters = [])
+    public function testUnknownResource(string $method, string $route, array $routeParameters = [])
     {
         $entityType = 'unknown_entity';
         $response = $this->request(
@@ -102,10 +89,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         }
     }
 
-    /**
-     * @return array
-     */
-    public function unknownResourceActionsProvider()
+    public function unknownResourceActionsProvider(): array
     {
         return [
             ['HEAD', $this->getItemRouteName(), ['id' => 123]],
@@ -1624,5 +1608,101 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
         self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
         self::assertResponseContentTypeEquals($response, self::JSON_API_CONTENT_TYPE);
         self::assertEmpty($response->getContent());
+    }
+
+    public function testGetForExtendedAssociationWithUnaccessibleTarget()
+    {
+        $this->appendEntityConfig(TestTarget::class, ['actions' => false], true);
+        $response = $this->get(
+            ['entity' => 'testapiactivities', 'id' => '<toString(@test_activity->id)>'],
+            ['include' => 'activityTargets']
+        );
+        $this->assertResponseContains(
+            [
+                'data'     => [
+                    'type'          => 'testapiactivities',
+                    'id'            => '<toString(@test_activity->id)>',
+                    'relationships' => [
+                        'activityTargets' => [
+                            'data' => [
+                                ['type' => 'testapiowners', 'id' => '<toString(@test_owner1->id)>']
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'testapiowners',
+                        'id'            => '<toString(@test_owner1->id)>',
+                        'relationships' => [
+                            'activityTestActivities' => [
+                                'data' => [
+                                    ['type' => 'testapiactivities', 'id' => '<toString(@test_activity->id)>']
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $responseData = self::jsonToArray($response->getContent());
+        self::assertCount(1, $responseData['included']);
+        self::assertArrayNotHasKey('target', $responseData['included'][0]['relationships']);
+        self::assertArrayNotHasKey('targets', $responseData['included'][0]['relationships']);
+    }
+
+    public function testGetForExtendedAssociationWhenAllTargetsAreUnaccessible()
+    {
+        $this->appendEntityConfig(TestTarget::class, ['actions' => false], true);
+        $this->appendEntityConfig(TestOwner::class, ['actions' => false], true);
+        $response = $this->get(
+            ['entity' => 'testapiactivities', 'id' => '<toString(@test_activity->id)>'],
+            ['include' => 'activityTargets']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'          => 'testapiactivities',
+                    'id'            => '<toString(@test_activity->id)>',
+                    'relationships' => [
+                        'activityTargets' => [
+                            'data' => []
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $responseData = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('included', $responseData);
+    }
+
+    public function testGetRelationshipForExtendedAssociationWhenAllTargetsAreUnaccessible()
+    {
+        $this->appendEntityConfig(TestTarget::class, ['actions' => false], true);
+        $this->appendEntityConfig(TestOwner::class, ['actions' => false], true);
+        $response = $this->getRelationship(
+            [
+                'entity'      => 'testapiactivities',
+                'id'          => '<toString(@test_activity->id)>',
+                'association' => 'activityTargets'
+            ]
+        );
+        $this->assertResponseContains(['data' => []], $response);
+    }
+
+    public function testGetSubresourceForExtendedAssociationWhenAllTargetsAreUnaccessible()
+    {
+        $this->appendEntityConfig(TestTarget::class, ['actions' => false], true);
+        $this->appendEntityConfig(TestOwner::class, ['actions' => false], true);
+        $response = $this->getSubresource(
+            [
+                'entity'      => 'testapiactivities',
+                'id'          => '<toString(@test_activity->id)>',
+                'association' => 'activityTargets'
+            ]
+        );
+        $this->assertResponseContains(['data' => []], $response);
     }
 }

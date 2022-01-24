@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
@@ -49,7 +50,7 @@ class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithoutAlias()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The attribute "alias" is required for "oro_security.acl.group_provider" tag. Service: "provider1".'
         );

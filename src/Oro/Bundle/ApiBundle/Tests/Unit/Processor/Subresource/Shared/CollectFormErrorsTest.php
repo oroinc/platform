@@ -34,6 +34,16 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         );
     }
 
+    private function createErrorObject(string $title, string $detail, string $propertyPath = null): Error
+    {
+        $error = Error::createValidationError($title, $detail);
+        if (null !== $propertyPath) {
+            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
+        }
+
+        return $error;
+    }
+
     public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError()
     {
         $associationName = 'testAssociation';
@@ -84,22 +94,5 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
             [$this->createErrorObject('not blank constraint', 'This value should not be blank.', '1')],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @param string      $title
-     * @param string      $detail
-     * @param string|null $propertyPath
-     *
-     * @return Error
-     */
-    protected function createErrorObject($title, $detail, $propertyPath = null)
-    {
-        $error = Error::createValidationError($title, $detail);
-        if (null !== $propertyPath) {
-            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
-        }
-
-        return $error;
     }
 }

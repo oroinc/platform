@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
@@ -97,7 +98,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
 
     public function testProcessForNotAccessibleEntityType()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException::class);
+        $this->expectException(ResourceNotAccessibleException::class);
 
         $entityType = 'test';
 

@@ -20,6 +20,16 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
   to provider image sources to be used in <picture> tag.
 
+#### MessageQueue Component
+* Added `Oro\Component\MessageQueue\Topic\TopicInterface` to declare topic name, description, message default priority 
+  and message body structure for the MQ topics.
+* Added `oro_message_queue.topic` tag for declaring MQ topic in a service container.
+* Added `Oro\Component\MessageQueue\Topic\TopicRegistry` that contains MQ topics declared as services with tag `oro_message_queue.topic`.
+* Added `Oro\Component\MessageQueue\Client\MessageBodyResolverInterface` and `Oro\Component\MessageQueue\Client\MessageBodyResolver`
+  to validate the topic message body structure.
+* Added `Oro\Component\MessageQueue\Client\ConsumptionExtension\MessageBodyResolverExtension` MQ extension 
+  that resolves message body before it is passed to MQ processor.
+
 ### Changed
 
 #### AttachmentBundle
@@ -43,6 +53,48 @@ The current file describes significant changes in the code that may affect the u
 
 #### OroSearchBundle
 * Changed search engine configuration: `search_engine_dsn` parameter is used instead of `search_engine_name`, `search_engine_host`, `search_engine_port`, `search_engine_index_prefix`, `search_engine_username`, `search_engine_password`, `search_engine_ssl_verification`, `search_engine_ssl_cert`,  `search_engine_ssl_cert_password`, `search_engine_ssl_key`, `search_engine_ssl_key_password`.
+
+#### MessageQueue Component
+* Changed `\Oro\Component\MessageQueue\Transport\MessageInterface::getBody()`, `\Oro\Component\MessageQueue\Transport\MessageInterface::setBody()`
+  signature - `$body` argument is `mixed` now, i.e. can be of any type returned by `json_decode()`.
+* Moved JSON encoding of message body from client message producer to transport level `Oro\Component\MessageQueue\Transport\MessageProducerInterface` -
+  to `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageProducer`.
+* Moved JSON decoding of message body to transport level `Oro\Component\MessageQueue\Transport\MessageConsumerInterface` - 
+  to `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer`.
+* Added the validation of message body to `Oro\Component\MessageQueue\Client\MessageProducer` using `Oro\Component\MessageQueue\Client\MessageBodyResolverInterface`.
+
+### Removed
+
+#### MessageQueueBundle
+* Removed `Oro\Bundle\MessageQueueBundle\DependencyInjection\Compiler\AddTopicDescriptionPass`, declare topic 
+  via `Oro\Component\MessageQueue\Topic\TopicInterface` as a service with tag `oro_message_queue.topic` instead.
+
+#### MessageQueue Component
+* Removed `Oro\Component\MessageQueue\Job\Topics`, use getName() of corresponding topic class from `Oro\Component\MessageQueue\Job\Topic` namespace instead.
+
+#### DataAuditBundle
+* Removed `Oro\Bundle\DataAuditBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\DataAuditBundle\Async\Topic` namespace instead.
+
+#### EmailBundle 
+* Removed `Oro\Bundle\EmailBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\EmailBundle\Async\Topic` namespace instead.
+
+#### NotificationBundle 
+* Removed `Oro\Bundle\NotificationBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\NotificationBundle\Async\Topic` namespace instead.
+
+#### ImapBundle 
+* Removed `Oro\Bundle\ImapBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\ImapBundle\Async\Topic` namespace instead.
+
+#### MessageQueueBundle 
+* Removed `Oro\Bundle\MessageQueueBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\MessageQueueBundle\Async\Topic` namespace instead.
+
+#### TranslationBundle 
+* Removed `Oro\Bundle\TranslationBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\TranslationBundle\Async\Topic` namespace instead.
+
+#### SearchBundle 
+* Removed `Oro\Bundle\SearchBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\SearchBundle\Async\Topic` namespace instead.
+
+#### CronBundle 
+* Removed `Oro\Bundle\CronBundle\Async\Topics`, use getName() of corresponding topic class from `Oro\Bundle\CronBundle\Async\Topic` namespace instead.
 
 ## 5.0.0-rc (2021-12-07)
 [Show detailed list of changes](incompatibilities-5-0-rc.md)

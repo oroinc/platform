@@ -16,11 +16,7 @@ class CustomFieldsTest extends RestJsonApiTestCase
         ]);
     }
 
-    /**
-     * @param Response $response
-     * @param int      $entityId
-     */
-    private function assertHasCustomField(Response $response, $entityId)
+    private function assertHasCustomField(Response $response, int $entityId): void
     {
         $this->assertResponseContains(
             [
@@ -37,11 +33,7 @@ class CustomFieldsTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param Response $response
-     * @param int      $entityId
-     */
-    private function assertNotHasCustomField(Response $response, $entityId)
+    private function assertNotHasCustomField(Response $response, int $entityId): void
     {
         $this->assertResponseContains(
             [

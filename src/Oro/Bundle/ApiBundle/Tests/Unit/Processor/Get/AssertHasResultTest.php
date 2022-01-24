@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 
 use Oro\Bundle\ApiBundle\Processor\Get\AssertHasResult;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AssertHasResultTest extends GetProcessorTestCase
 {
@@ -24,7 +25,7 @@ class AssertHasResultTest extends GetProcessorTestCase
 
     public function testProcessOnEmptyResult()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Unsupported request.');
 
         $this->processor->process($this->context);
@@ -32,7 +33,7 @@ class AssertHasResultTest extends GetProcessorTestCase
 
     public function testProcessOnNullResult()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('An entity with the requested identifier does not exist.');
 
         $this->context->setResult(null);

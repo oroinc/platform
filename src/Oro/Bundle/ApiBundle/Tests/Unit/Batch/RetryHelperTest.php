@@ -96,7 +96,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function hasItemsToRetryDataProvider()
+    public function hasItemsToRetryDataProvider(): array
     {
         return [
             'NOT_PROCESSED'                             => [
@@ -181,7 +181,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getChunksToRetryDataProvider()
+    public function getChunksToRetryDataProvider(): array
     {
         return [
             'NOT_PROCESSED'                                                         => [

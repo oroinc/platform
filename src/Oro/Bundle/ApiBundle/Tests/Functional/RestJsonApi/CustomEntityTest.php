@@ -11,20 +11,16 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class CustomEntityTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/custom_entities.yml'
         ]);
     }
 
-    protected function renameTestEntity1Fields()
+    private function renameTestEntity1Fields(): void
     {
         $this->appendEntityConfig(
             TestEntity1::class,

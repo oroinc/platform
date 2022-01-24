@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Bundle\CommentBundle\Api\Processor\AddCommentAssociationDescriptions;
@@ -21,6 +23,8 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
 
     /** @var AddCommentAssociationDescriptions */
     private $processor;
+
+    private bool $hasEntityDescription = true;
 
     protected function setUp(): void
     {
@@ -40,14 +44,30 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
             ->method('getEntityDescription')
             ->with(self::isType('string'))
             ->willReturnCallback(function (string $className) {
-                return substr($className, strrpos($className, '\\') + 1) . ' (description)';
+                return $this->hasEntityDescription
+                    ? substr($className, strrpos($className, '\\') + 1) . ' (description)'
+                    : null;
+            });
+
+        $valueNormalizer = $this->createMock(ValueNormalizer::class);
+        $valueNormalizer->expects(self::any())
+            ->method('normalizeValue')
+            ->with(self::isType('string'), DataType::ENTITY_TYPE, $this->context->getRequestType())
+            ->willReturnCallback(function (string $className) {
+                return strtolower(substr($className, strrpos($className, '\\') + 1));
             });
 
         $this->processor = new AddCommentAssociationDescriptions(
             $this->commentAssociationProvider,
             $resourceDocParserProvider,
-            $entityDescriptionProvider
+            $entityDescriptionProvider,
+            $valueNormalizer
         );
+    }
+
+    public function hasEntityDescriptionDataProvider(): array
+    {
+        return [[true], [false]];
     }
 
     public function testProcessWhenNoTargetAction(): void
@@ -81,8 +101,12 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessForEntityWithCommentsAssociation(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessForEntityWithCommentsAssociation(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
@@ -118,13 +142,17 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $description = 'Description for comments associated with the "entity (description)".';
+        if (!$hasEntityDescription) {
+            $description = 'Description for comments associated with the "entity".';
+        }
         $this->assertConfig(
             [
                 'fields' => [
                     'comments' => [
                         'target_class' => Comment::class,
                         'data_type'    => 'unidirectionalAssociation:association1',
-                        'description'  => 'Description for comments associated with the "entity (description)".'
+                        'description'  => $description
                     ]
                 ]
             ],
@@ -132,8 +160,13 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEntityWithCommentsAssociationAndHasOwnDescriptionForTargetAction(): void
-    {
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessForEntityWithCommentsAssociationAndHasOwnDescriptionForTargetAction(
+        bool $hasEntityDescription
+    ): void {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
@@ -163,14 +196,17 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $description = 'Description for comments associated with the "entity (description)" for target action.';
+        if (!$hasEntityDescription) {
+            $description = 'Description for comments associated with the "entity" for target action.';
+        }
         $this->assertConfig(
             [
                 'fields' => [
                     'comments' => [
                         'target_class' => Comment::class,
                         'data_type'    => 'unidirectionalAssociation:association1',
-                        'description'  => 'Description for comments associated with the "entity (description)"'
-                            . ' for target action.'
+                        'description'  => $description
                     ]
                 ]
             ],
@@ -245,8 +281,12 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessSubresourceForEntityWithCommentsAssociation(): void
+    /**
+     * @dataProvider hasEntityDescriptionDataProvider
+     */
+    public function testProcessSubresourceForEntityWithCommentsAssociation(bool $hasEntityDescription): void
     {
+        $this->hasEntityDescription = $hasEntityDescription;
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
         $associationName = 'comments';
@@ -273,9 +313,13 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setTargetAction($targetAction);
         $this->processor->process($this->context);
 
+        $documentation = 'Documentation for comments associated with the "parent (description)".';
+        if (!$hasEntityDescription) {
+            $documentation = 'Documentation for comments associated with the "parent".';
+        }
         $this->assertConfig(
             [
-                'documentation' => 'Documentation for comments associated with the "parent (description)".'
+                'documentation' => $documentation
             ],
             $definition
         );

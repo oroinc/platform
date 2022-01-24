@@ -19,7 +19,6 @@ class UnidirectionalAssociationsTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/unidirectional_associations.yml'
         ]);

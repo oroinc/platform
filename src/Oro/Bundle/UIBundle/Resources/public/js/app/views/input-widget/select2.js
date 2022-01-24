@@ -154,7 +154,7 @@ define(function(require) {
             const minimumResultsForSearch = this.initializeOptions.minimumResultsForSearch;
             const optionsLength = select.find('option').length;
 
-            if (tools.isMobile() && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
+            if ((tools.isMobile() || tools.isIOS()) && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
                 selectContainer.find('.select2-search, .select2-focusser').hide();
             }
         }

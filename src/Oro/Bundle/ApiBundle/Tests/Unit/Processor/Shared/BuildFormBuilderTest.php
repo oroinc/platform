@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -60,12 +61,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         );
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return MetaPropertyMetadata
-     */
-    private function createMetaPropertyMetadata($fieldName)
+    private function createMetaPropertyMetadata(string $fieldName): MetaPropertyMetadata
     {
         $fieldMetadata = new MetaPropertyMetadata();
         $fieldMetadata->setName($fieldName);
@@ -73,12 +69,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return FieldMetadata
-     */
-    private function createFieldMetadata($fieldName)
+    private function createFieldMetadata(string $fieldName): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -86,12 +77,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string $associationName
-     *
-     * @return AssociationMetadata
-     */
-    private function createAssociationMetadata($associationName)
+    private function createAssociationMetadata(string $associationName): AssociationMetadata
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
@@ -120,7 +106,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
     public function testProcessWhenNoEntity()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The entity object must be added to the context before creation of the form builder.'
         );
