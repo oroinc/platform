@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\BuildCustomTypes;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueTransformer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
@@ -21,13 +23,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
-    private $associationManager;
+    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendedAssociationProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
+    /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $dataTransformer;
 
     /** @var BuildCustomTypes */
@@ -37,7 +39,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
     {
         parent::setUp();
 
-        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->extendedAssociationProvider = $this->createMock(ExtendedAssociationProvider::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->dataTransformer = $this->createMock(DataTransformerInterface::class);
 
@@ -48,13 +50,14 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             });
 
         $this->processor = new BuildCustomTypes(
-            $this->associationManager,
+            $this->createMock(AssociationManager::class),
             $this->doctrineHelper,
             new ValueTransformer(
                 $this->createMock(DataTransformerRegistry::class),
                 new DataTransformer($this->createMock(ContainerInterface::class))
             )
         );
+        $this->processor->setExtendedAssociationProvider($this->extendedAssociationProvider);
     }
 
     public function testProcessWithoutConfig()
@@ -198,7 +201,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
 
     public function testProcessNestedObjectWithNotSupportedPropertyPath()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "field1.field11" property path is not supported.');
 
         $config = new EntityDefinitionConfig();
@@ -390,18 +393,20 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         $config = new EntityDefinitionConfig();
         $association = $config->addField('association');
         $association->setDataType('association:manyToOne:kind');
+        $association->setDependsOn(['association1', 'association2']);
         $association->setExcluded();
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'manyToOne', 'kind')
-            ->willReturn(
-                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'manyToOne', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -430,17 +435,19 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         $config = new EntityDefinitionConfig();
         $association = $config->addField('association');
         $association->setDataType('association:manyToOne:kind');
+        $association->setDependsOn(['association1', 'association2']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'manyToOne', 'kind')
-            ->willReturn(
-                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'manyToOne', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -466,10 +473,12 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association1' => ['id' => 1]
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:manyToOne:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToOne:kind');
+        $association->setDependsOn(['association1']);
 
-        $this->associationManager->expects(self::never())
-            ->method('getAssociationTargets');
+        $this->extendedAssociationProvider->expects(self::never())
+            ->method('filterExtendedAssociationTargets');
 
         $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
@@ -494,10 +503,12 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association2' => ['id' => 2]
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:unknown:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:unknown:kind');
+        $association->setDependsOn(['association1']);
 
-        $this->associationManager->expects(self::never())
-            ->method('getAssociationTargets');
+        $this->extendedAssociationProvider->expects(self::never())
+            ->method('filterExtendedAssociationTargets');
 
         $this->context->setClassName('Test\Class');
         $this->context->setResult($data);
@@ -512,18 +523,21 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association2' => ['id' => 2]
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:manyToOne:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToOne:kind');
+        $association->setDependsOn(['association1', 'association2']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with(UserProfile::class)
             ->willReturn(User::class);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with(User::class, null, 'manyToOne', 'kind')
-            ->willReturn(
-                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with(User::class, 'manyToOne', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName(UserProfile::class);
         $this->context->setResult($data);
@@ -550,18 +564,21 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association2' => ['id' => 2]
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:manyToOne:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToOne:kind');
+        $association->setDependsOn(['association1', 'association2']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'manyToOne', 'kind')
-            ->willReturn(
-                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'manyToOne', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -588,18 +605,21 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association2' => null
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:manyToOne:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToOne:kind');
+        $association->setDependsOn(['association1', 'association2']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'manyToOne', 'kind')
-            ->willReturn(
-                ['Test\Target1' => 'association1', 'Test\Target2' => 'association2']
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'manyToOne', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -615,6 +635,36 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
+    public function testProcessForManyToOneExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    {
+        $entityClass = 'Test\Class';
+        $data = [
+            'association1' => null,
+            'association2' => ['id' => 2]
+        ];
+        $config = new EntityDefinitionConfig();
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToOne:kind');
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+        $this->extendedAssociationProvider->expects(self::never())
+            ->method('filterExtendedAssociationTargets');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'association1' => null,
+                'association2' => ['id' => 2],
+                'association'  => null
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testProcessForManyToManyExtendedAssociation()
     {
         $entityClass = 'Test\Class';
@@ -624,22 +674,22 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association3' => [['id' => 3]]
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:manyToMany:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToMany:kind');
+        $association->setDependsOn(['association1', 'association2', 'association3']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'manyToMany', 'kind')
-            ->willReturn(
-                [
-                    'Test\Target1' => 'association1',
-                    'Test\Target2' => 'association2',
-                    'Test\Target3' => 'association3'
-                ]
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'manyToMany', 'kind', ['association1', 'association2', 'association3'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2',
+                'Test\Target3' => 'association3'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -667,21 +717,21 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association2' => []
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:manyToMany:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToMany:kind');
+        $association->setDependsOn(['association1', 'association2']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'manyToMany', 'kind')
-            ->willReturn(
-                [
-                    'Test\Target1' => 'association1',
-                    'Test\Target2' => 'association2'
-                ]
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'manyToMany', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -697,6 +747,38 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
+    public function testProcessForManyToManyExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    {
+        $entityClass = 'Test\Class';
+        $data = [
+            'association1' => [],
+            'association2' => [['id' => 2]],
+            'association3' => [['id' => 3]]
+        ];
+        $config = new EntityDefinitionConfig();
+        $association = $config->addField('association');
+        $association->setDataType('association:manyToMany:kind');
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+        $this->extendedAssociationProvider->expects(self::never())
+            ->method('filterExtendedAssociationTargets');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'association1' => [],
+                'association2' => [['id' => 2]],
+                'association3' => [['id' => 3]],
+                'association'  => []
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testProcessForMultipleManyToOneExtendedAssociation()
     {
         $entityClass = 'Test\Class';
@@ -706,22 +788,22 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association3' => ['id' => 3]
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:multipleManyToOne:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:multipleManyToOne:kind');
+        $association->setDependsOn(['association1', 'association2', 'association3']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'multipleManyToOne', 'kind')
-            ->willReturn(
-                [
-                    'Test\Target1' => 'association1',
-                    'Test\Target2' => 'association2',
-                    'Test\Target3' => 'association3'
-                ]
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'multipleManyToOne', 'kind', ['association1', 'association2', 'association3'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2',
+                'Test\Target3' => 'association3'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -749,21 +831,21 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             'association2' => null
         ];
         $config = new EntityDefinitionConfig();
-        $config->addField('association')->setDataType('association:multipleManyToOne:kind');
+        $association = $config->addField('association');
+        $association->setDataType('association:multipleManyToOne:kind');
+        $association->setDependsOn(['association1', 'association2']);
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
             ->with($entityClass)
             ->willReturn($entityClass);
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with($entityClass, null, 'multipleManyToOne', 'kind')
-            ->willReturn(
-                [
-                    'Test\Target1' => 'association1',
-                    'Test\Target2' => 'association2'
-                ]
-            );
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with($entityClass, 'multipleManyToOne', 'kind', ['association1', 'association2'])
+            ->willReturn([
+                'Test\Target1' => 'association1',
+                'Test\Target2' => 'association2'
+            ]);
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($data);
@@ -773,6 +855,38 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
             [
                 'association1' => null,
                 'association2' => null,
+                'association'  => []
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForMultipleManyToOneExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    {
+        $entityClass = 'Test\Class';
+        $data = [
+            'association1' => null,
+            'association2' => ['id' => 2],
+            'association3' => ['id' => 3]
+        ];
+        $config = new EntityDefinitionConfig();
+        $association = $config->addField('association');
+        $association->setDataType('association:multipleManyToOne:kind');
+
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
+        $this->extendedAssociationProvider->expects(self::never())
+            ->method('filterExtendedAssociationTargets');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setResult($data);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        self::assertEquals(
+            [
+                'association1' => null,
+                'association2' => ['id' => 2],
+                'association3' => ['id' => 3],
                 'association'  => []
             ],
             $this->context->getResult()

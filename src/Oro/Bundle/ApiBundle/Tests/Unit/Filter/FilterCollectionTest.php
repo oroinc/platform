@@ -12,9 +12,6 @@ class FilterCollectionTest extends \PHPUnit\Framework\TestCase
     /** @var FilterCollection */
     private $filterCollection;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->filterCollection = new FilterCollection();

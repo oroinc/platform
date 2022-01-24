@@ -9,17 +9,16 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class UpdateListProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
+
+    protected UpdateListContext $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     protected $metadataProvider;
-
-    /** @var UpdateListContext */
-    protected $context;
 
     protected function setUp(): void
     {

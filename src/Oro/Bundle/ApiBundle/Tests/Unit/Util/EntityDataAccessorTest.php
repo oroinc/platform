@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,7 +12,7 @@ class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityDataAccessor = new EntityDataAccessor(new PropertyAccessor());
+        $this->entityDataAccessor = new EntityDataAccessor();
     }
 
     public function testHasGetterForProperty()

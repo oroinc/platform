@@ -18,12 +18,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $documentBuilders
-     *
-     * @return DocumentBuilderFactory
-     */
-    private function getDocumentBuilderFactory(array $documentBuilders)
+    private function getDocumentBuilderFactory(array $documentBuilders): DocumentBuilderFactory
     {
         return new DocumentBuilderFactory(
             $documentBuilders,

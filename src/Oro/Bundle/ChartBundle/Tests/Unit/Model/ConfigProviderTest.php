@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ChartBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ChartBundle\Model\ConfigProvider;
 use Oro\Bundle\ChartBundle\Tests\Unit\Fixtures\FirstTestBundle\FirstTestBundle;
 use Oro\Bundle\ChartBundle\Tests\Unit\Fixtures\SecondTestBundle\SecondTestBundle;
@@ -19,9 +20,6 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $cacheFile;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('ChartConfigurationProvider');
@@ -129,7 +127,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetChartConfigForUnknownChart()
     {
-        $this->expectException(\Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage("Can't find configuration for chart: unknown");
 
         $this->configurationProvider->getChartConfig('unknown');

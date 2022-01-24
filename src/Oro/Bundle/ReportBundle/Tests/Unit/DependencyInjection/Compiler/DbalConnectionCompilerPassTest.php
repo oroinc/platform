@@ -5,6 +5,7 @@ namespace Oro\Bundle\ReportBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ReportBundle\DependencyInjection\Compiler\DbalConnectionCompilerPass;
 use Oro\Bundle\ReportBundle\Grid\ReportQueryExecutor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
 class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
@@ -58,7 +59,7 @@ class DbalConnectionCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithReportDbalConnectionParameterButDbalConnectionWasNotConfigured(): void
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The "reports" DBAL connection specified for "oro_report.connection" is not configured.'
         );

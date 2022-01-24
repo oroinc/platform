@@ -21,7 +21,6 @@ use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -53,18 +52,13 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ),
             new DoctrineHelper($doctrine),
             new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
-            new EntityDataAccessor(new PropertyAccessor()),
+            new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()
         );
     }
 
-    /**
-     * @param mixed $object
-     *
-     * @return mixed
-     */
-    private function normalizeObject($object)
+    private function normalizeObject(object $object): array
     {
         $normalizedObjects = $this->objectNormalizer->normalizeObjects(
             [$object],
@@ -75,10 +69,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         return reset($normalizedObjects);
     }
 
-    /**
-     * @return Entity\Product
-     */
-    private function createProductObject()
+    private function createProductObject(): Entity\Product
     {
         $product = new Entity\Product();
         $product->setId(123);

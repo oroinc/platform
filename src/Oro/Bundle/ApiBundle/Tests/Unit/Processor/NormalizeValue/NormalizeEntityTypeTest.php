@@ -22,6 +22,11 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         $this->processor = new NormalizeEntityType($this->entityAliasResolverRegistry);
     }
 
+    private function getArrayRequirement(string $requirement): string
+    {
+        return sprintf('%1$s(,%1$s)*', $requirement);
+    }
+
     public function testProcess()
     {
         $context = new NormalizeValueContext();
@@ -57,12 +62,10 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityAliasResolver);
         $entityAliasResolver->expects(self::exactly(2))
             ->method('getPluralAlias')
-            ->willReturnMap(
-                [
-                    ['Test\Class1', 'alias1'],
-                    ['Test\Class2', 'alias2']
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Class1', 'alias1'],
+                ['Test\Class2', 'alias2']
+            ]);
 
         $this->processor->process($context);
 
@@ -108,10 +111,5 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals('test', $context->getRequirement());
-    }
-
-    protected function getArrayRequirement($requirement)
-    {
-        return sprintf('%1$s(,%1$s)*', $requirement);
     }
 }

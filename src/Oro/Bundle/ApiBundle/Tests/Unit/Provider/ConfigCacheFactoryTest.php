@@ -60,10 +60,7 @@ class ConfigCacheFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function getCacheProvider()
+    public function getCacheProvider(): array
     {
         return [
             [false],

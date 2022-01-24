@@ -179,11 +179,7 @@ class ResourceWithoutIdentifierTest extends RestJsonApiTestCase
         $this->assertNotAllowedMethod('HEAD', 'OPTIONS, PATCH, POST, DELETE');
     }
 
-    /**
-     * @param string $method
-     * @param string $expectedAllowedMethods
-     */
-    private function assertNotAllowedMethod($method, $expectedAllowedMethods)
+    private function assertNotAllowedMethod(string $method, string $expectedAllowedMethods): void
     {
         $entityType = $this->getEntityType(TestResourceWithoutIdentifier::class);
         $response = $this->request(

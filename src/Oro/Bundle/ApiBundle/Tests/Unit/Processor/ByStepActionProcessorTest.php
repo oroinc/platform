@@ -42,10 +42,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return ApiContext
-     */
-    private function getContext()
+    private function getContext(): ApiContext
     {
         $context = new CustomizeLoadedDataContext();
         $context->setAction(self::TEST_ACTION);
@@ -61,9 +58,9 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessors(array $processors)
+    private function addProcessors(array $processors): array
     {
         $createdProcessors = [];
         $processorRegistryMap = [];
@@ -159,11 +156,9 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         $processor1->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($context))
-            ->willReturnCallback(
-                function (ApiContext $context) {
-                    self::assertFalse($context->hasSkippedGroups());
-                }
-            );
+            ->willReturnCallback(function (ApiContext $context) {
+                self::assertFalse($context->hasSkippedGroups());
+            });
 
         $this->processor->process($context);
         self::assertFalse($context->hasSkippedGroups());

@@ -26,13 +26,6 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         $this->fileLockManager = $this->createMock(FileLockManager::class);
     }
 
-    /**
-     * @param string[]|null $lockFileNames
-     * @param array         $items
-     * @param array         $processedItems
-     *
-     * @return IncludedData
-     */
     private function getIncludedData(?array $lockFileNames, array $items, array $processedItems): IncludedData
     {
         return new IncludedData(

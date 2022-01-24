@@ -40,21 +40,21 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    private const ID_DESCRIPTION                 = 'The unique identifier of a resource.';
-    private const REQUIRED_ID_DESCRIPTION        = '<p>The unique identifier of a resource.</p>'
+    private const ID_DESCRIPTION = 'The unique identifier of a resource.';
+    private const REQUIRED_ID_DESCRIPTION = '<p>The unique identifier of a resource.</p>'
     . '<p><strong>The required field.</strong></p>';
-    private const CREATED_AT_DESCRIPTION         = 'The date and time of resource record creation.';
-    private const UPDATED_AT_DESCRIPTION         = 'The date and time of the last update of the resource record.';
-    private const OWNER_DESCRIPTION              = 'An owner record represents'
+    private const CREATED_AT_DESCRIPTION = 'The date and time of resource record creation.';
+    private const UPDATED_AT_DESCRIPTION = 'The date and time of the last update of the resource record.';
+    private const OWNER_DESCRIPTION = 'An owner record represents'
     . ' the ownership capabilities of the record.';
-    private const ORGANIZATION_DESCRIPTION       = 'An organization record represents'
+    private const ORGANIZATION_DESCRIPTION = 'An organization record represents'
     . ' a real enterprise, business, firm, company or another organization to which the users belong.';
-    private const ENUM_NAME_DESCRIPTION          = 'The human readable name of the option.';
-    private const ENUM_DEFAULT_DESCRIPTION       = 'Determines if this option is selected by default'
+    private const ENUM_NAME_DESCRIPTION = 'The human readable name of the option.';
+    private const ENUM_DEFAULT_DESCRIPTION = 'Determines if this option is selected by default'
     . ' for new records.';
-    private const ENUM_PRIORITY_DESCRIPTION      = 'The order in which options are ranked.'
+    private const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked.'
     . ' First appears the option with the higher number of the priority.';
-    private const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
+    private const FIELD_FILTER_DESCRIPTION = 'Filter records by \'%s\' field.';
     private const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
@@ -2406,9 +2406,9 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
      * @dataProvider preventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedTextProvider
      */
     public function testPreventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedText(
-        $mainText,
-        $inheritDocText,
-        $expectedText
+        string $mainText,
+        ?string $inheritDocText,
+        string $expectedText
     ) {
         $entityClass = TestEntity::class;
         $config = [
@@ -2436,7 +2436,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function preventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedTextProvider()
+    public function preventingDoubleParagraphTagWhenInheritDocPlaceholderIsReplacedWithInheritedTextProvider(): array
     {
         return [
             'no paragraph tag'                                   => [

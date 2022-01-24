@@ -26,10 +26,18 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var BatchUpdateItemProcessor */
     private $processor;
 
-    /**
-     * @return BatchUpdateItemContext
-     */
-    private function getContext()
+    protected function setUp(): void
+    {
+        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
+        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
+        $this->processorBagConfigBuilder->addGroup('initialize', 'batch_update_item', -1);
+        $this->processorBagConfigBuilder->addGroup(ApiActionGroup::NORMALIZE_RESULT, 'batch_update_item', -2);
+
+        $this->processor = new BatchUpdateItemProcessor($this->processorBag, 'batch_update_item');
+    }
+
+    private function getContext(): BatchUpdateItemContext
     {
         $context = new BatchUpdateItemContext();
         $context->setAction('batch_update_item');
@@ -41,10 +49,7 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @return BufferingLogger
-     */
-    private function setLogger()
+    private function setLogger(): BufferingLogger
     {
         $logger = new BufferingLogger();
         $this->processor->setLogger($logger);
@@ -55,9 +60,9 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return \PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
      */
-    private function addProcessors(array $processors)
+    private function addProcessors(array $processors): array
     {
         $createdProcessors = [];
         $processorRegistryMap = [];
@@ -77,17 +82,6 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturnMap($processorRegistryMap);
 
         return $createdProcessors;
-    }
-
-    protected function setUp(): void
-    {
-        $this->processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
-        $this->processorBagConfigBuilder = new ProcessorBagConfigBuilder();
-        $this->processorBag = new ProcessorBag($this->processorBagConfigBuilder, $this->processorRegistry);
-        $this->processorBagConfigBuilder->addGroup('initialize', 'batch_update_item', -1);
-        $this->processorBagConfigBuilder->addGroup(ApiActionGroup::NORMALIZE_RESULT, 'batch_update_item', -2);
-
-        $this->processor = new BatchUpdateItemProcessor($this->processorBag, 'batch_update_item');
     }
 
     public function testCreateContextObject()

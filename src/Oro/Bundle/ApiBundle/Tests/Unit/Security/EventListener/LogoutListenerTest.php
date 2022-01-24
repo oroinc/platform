@@ -12,11 +12,14 @@ use Symfony\Component\Security\Http\HttpUtils;
 
 class LogoutListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private HttpUtils|\PHPUnit\Framework\MockObject\MockObject $httpUtils;
+    /** @var HttpUtils|\PHPUnit\Framework\MockObject\MockObject */
+    private $httpUtils;
 
-    private RestDocUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $restDocUrlGenerator;
+    /** @var RestDocUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $restDocUrlGenerator;
 
-    private LogoutListener $listener;
+    /** @var LogoutListener */
+    private $listener;
 
     protected function setUp(): void
     {

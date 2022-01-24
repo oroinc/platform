@@ -18,15 +18,13 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         $hierarchyProvider = $this->createMock(EntityHierarchyProviderInterface::class);
         $hierarchyProvider->expects(self::any())
             ->method('getHierarchyForClassName')
-            ->willReturnMap(
-                [
-                    ['Test\Entity\Entity1', ['Test\Entity\BaseEntity1']],
-                    ['Test\Entity\Entity2', []],
-                    ['Test\Entity\Entity3', []],
-                    ['Test\Entity\Entity4', []],
-                    ['Test\Entity\Entity5', []]
-                ]
-            );
+            ->willReturnMap([
+                ['Test\Entity\Entity1', ['Test\Entity\BaseEntity1']],
+                ['Test\Entity\Entity2', []],
+                ['Test\Entity\Entity3', []],
+                ['Test\Entity\Entity4', []],
+                ['Test\Entity\Entity5', []]
+            ]);
 
         $configCache = $this->createMock(ConfigCache::class);
         $configCache->expects(self::any())
@@ -98,7 +96,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityProvider
      */
-    public function testIsIgnoredEntity($className, $expected)
+    public function testIsIgnoredEntity(string $className, bool $expected)
     {
         self::assertSame(
             $expected,
@@ -106,7 +104,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function entityProvider()
+    public function entityProvider(): array
     {
         return [
             ['Test\Entity\Entity1', false],
@@ -120,7 +118,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testIsIgnoredField($metadata, $fieldName, $expected)
+    public function testIsIgnoredField(ClassMetadata $metadata, string $fieldName, bool $expected)
     {
         self::assertSame(
             $expected,
@@ -131,7 +129,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testIsIgnoredRelation($metadata, $associationName, $expected)
+    public function testIsIgnoredRelation(ClassMetadata $metadata, string $associationName, bool $expected)
     {
         self::assertSame(
             $expected,
@@ -139,7 +137,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function fieldProvider()
+    public function fieldProvider(): array
     {
         $entity1 = new ClassMetadata('Test\Entity\Entity1');
         $entity2 = new ClassMetadata('Test\Entity\Entity2');

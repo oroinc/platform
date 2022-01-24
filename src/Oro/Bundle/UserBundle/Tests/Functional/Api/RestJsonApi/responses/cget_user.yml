@@ -37,7 +37,10 @@ data:
                         type: organizations
                         id: '<toString(@organization->id)>'
             userRoles:
-                data: []
+                data:
+                    -
+                        type: userroles
+                        id: '<toString(@ROLE_USER->id)>'
             organization:
                 data:
                     type: organizations

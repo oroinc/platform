@@ -69,6 +69,8 @@ services:
             - '@oro_api.value_normalizer'
             - '@oro_entity_extend.association_manager'
             - '@oro_api.entity_override_provider_registry'
+        calls:
+            - [setExtendedAssociationProvider, ['@oro_api.expanded_association_provider']]
 
     oro_api.query.expression_visitor_factory:
         class: Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitorFactory

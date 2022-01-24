@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\FileLocator;
 
 class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
@@ -35,7 +36,7 @@ class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDocumentationForNotExistingFile()
     {
-        $this->expectException(\Symfony\Component\Config\Exception\FileLocatorFileNotFoundException::class);
+        $this->expectException(FileLocatorFileNotFoundException::class);
         $documentationProvider = new DocumentationProvider('not_existing.md', $this->getFileLocator());
 
         $documentationProvider->getDocumentation(new RequestType([RequestType::REST]));

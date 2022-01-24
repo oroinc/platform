@@ -35,12 +35,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor = new NormalizeRequestData($entityIdTransformerRegistry);
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return FieldMetadata
-     */
-    private function createFieldMetadata($fieldName)
+    private function createFieldMetadata(string $fieldName): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -48,15 +43,11 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string $associationName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    private function createAssociationMetadata($associationName, $targetClass, $isCollection)
-    {
+    private function createAssociationMetadata(
+        string $associationName,
+        string $targetClass,
+        bool $isCollection
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
@@ -97,11 +88,9 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
-                }
-            );
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
@@ -211,15 +200,13 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    if ('val1' === $value) {
-                        return null;
-                    }
-
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                if ('val1' === $value) {
+                    return null;
                 }
-            );
+
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AssertResultSchema;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
@@ -25,7 +26,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
 
     public function testProcessWhenResultIsNotArray()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result must be an array.');
 
         $this->context->setResult(null);
@@ -34,7 +35,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
 
     public function testProcessWhenResultIsEmptyArray()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The result must contain at least one of the following sections: data, errors, meta.'
         );
@@ -45,7 +46,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
 
     public function testProcessWhenResultDoesNotContainAnyRequiresSection()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The result must contain at least one of the following sections: data, errors, meta.'
         );
@@ -74,7 +75,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
 
     public function testProcessWhenResultContainsBothDataAndErrorsSections()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The sections "data" and "errors" must not coexist in the result.');
 
         $this->context->setResult([JsonApiDoc::DATA => [], JsonApiDoc::ERRORS => []]);
@@ -83,7 +84,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
 
     public function testProcessWhenResultContainsIncludedSectionButDoesNotContainDataSection()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The result can contain the "included" section only together with the "data" section.'
         );

@@ -29,13 +29,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         $this->processor = new BuildCriteria();
     }
 
-    /**
-     * @param string $dataType
-     * @param string $propertyPath
-     *
-     * @return ComparisonFilter
-     */
-    private function getComparisonFilter($dataType, $propertyPath)
+    private function getComparisonFilter(string $dataType, string $propertyPath): ComparisonFilter
     {
         $filter = new ComparisonFilter($dataType);
         $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);

@@ -12,14 +12,14 @@ use Oro\Bundle\ApiBundle\Request\RequestQueryStringNormalizer;
 class RequestQueryStringNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider testNormalizeQueryStringDataProvider
+     * @dataProvider normalizeQueryStringDataProvider
      */
     public function testNormalizeQueryString(string $query, string $expectedQuery, string $msg): void
     {
-        $this->assertSame($expectedQuery, RequestQueryStringNormalizer::normalizeQueryString($query), $msg);
+        self::assertSame($expectedQuery, RequestQueryStringNormalizer::normalizeQueryString($query), $msg);
     }
 
-    public function testNormalizeQueryStringDataProvider(): array
+    public function normalizeQueryStringDataProvider(): array
     {
         return [
             ['foo', 'foo', 'works with valueless parameters'],

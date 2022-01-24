@@ -99,12 +99,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         });
     }
 
-    /**
-     * @param string   $entityType
-     * @param mixed    $id
-     * @param string[] $excludedActions
-     */
-    private function checkDeleteRequest($entityType, $id, $excludedActions)
+    private function checkDeleteRequest(string $entityType, mixed $id, array $excludedActions): void
     {
         $response = $this->request(
             'DELETE',
@@ -119,12 +114,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         }
     }
 
-    /**
-     * @param string  $entityType
-     * @param mixed   $id
-     * @param integer $expectedStatus
-     */
-    private function checkGetRequest($entityType, $id, $expectedStatus)
+    private function checkGetRequest(string $entityType, mixed $id, int $expectedStatus): void
     {
         $response = $this->request(
             'GET',
@@ -133,13 +123,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         self::assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $content
-     *
-     * @return mixed
-     */
-    private function getFirstEntityId($entityClass, $content)
+    private function getFirstEntityId(string $entityClass, array $content): mixed
     {
         if (count($content) !== 1) {
             return null;
@@ -153,13 +137,7 @@ class GetAndDeleteTest extends RestPlainApiTestCase
         return $content[0][$idFieldName];
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $action
-     *
-     * @return string|null
-     */
-    private function getEntityIdFieldName($entityClass, $action)
+    private function getEntityIdFieldName(string $entityClass, string $action): ?string
     {
         $metadata = $this->getApiMetadata($entityClass, $action, true);
         if (null === $metadata) {

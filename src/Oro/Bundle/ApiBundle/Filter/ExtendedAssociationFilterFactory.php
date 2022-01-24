@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
@@ -20,6 +21,9 @@ class ExtendedAssociationFilterFactory
     /** @var EntityOverrideProviderRegistry */
     private $entityOverrideProviderRegistry;
 
+    /** @var ExtendedAssociationProvider */
+    private $extendedAssociationProvider;
+
     public function __construct(
         ValueNormalizer $valueNormalizer,
         AssociationManager $associationManager,
@@ -28,6 +32,11 @@ class ExtendedAssociationFilterFactory
         $this->valueNormalizer = $valueNormalizer;
         $this->associationManager = $associationManager;
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
+    }
+
+    public function setExtendedAssociationProvider(ExtendedAssociationProvider $extendedAssociationProvider)
+    {
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
     }
 
     /**
@@ -39,6 +48,7 @@ class ExtendedAssociationFilterFactory
         $filter->setValueNormalizer($this->valueNormalizer);
         $filter->setAssociationManager($this->associationManager);
         $filter->setEntityOverrideProviderRegistry($this->entityOverrideProviderRegistry);
+        $filter->setExtendedAssociationProvider($this->extendedAssociationProvider);
 
         return $filter;
     }

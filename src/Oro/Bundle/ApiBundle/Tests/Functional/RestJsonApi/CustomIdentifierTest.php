@@ -11,24 +11,15 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class CustomIdentifierTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/custom_identifier.yml'
         ]);
     }
 
-    /**
-     * @param string $key
-     *
-     * @return string
-     */
-    private function getEntityId($key)
+    private function getEntityId(string $key): string
     {
         return $key;
     }

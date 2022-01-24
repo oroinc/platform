@@ -11,15 +11,14 @@ use Oro\Component\Testing\Assert\ArrayContainsConstraint;
  */
 class JsonApiDocContainsConstraint extends ArrayContainsConstraint
 {
-    /** @var bool */
-    protected $strictPrimaryData;
+    private bool $strictPrimaryData;
 
     /**
      * @param array $expected          The expected array
      * @param bool  $strict            Whether the order of elements in an array is important
      * @param bool  $strictPrimaryData Whether the order of elements in the primary data is important
      */
-    public function __construct(array $expected, $strict = true, $strictPrimaryData = true)
+    public function __construct(array $expected, bool $strict = true, bool $strictPrimaryData = true)
     {
         parent::__construct($expected, $strict);
         $this->strictPrimaryData = $strictPrimaryData;
@@ -96,11 +95,32 @@ class JsonApiDocContainsConstraint extends ArrayContainsConstraint
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function matchIndexedArray(array $expected, array $actual, array $path)
+    {
+        parent::matchIndexedArray($expected, $actual, $path);
+
+        // test items count for to-many relationship
+        $indexOfLastPathItem = count($path) - 1;
+        if ($indexOfLastPathItem >= 3
+            && JsonApiDoc::DATA === $path[$indexOfLastPathItem]
+            && JsonApiDoc::RELATIONSHIPS === $path[$indexOfLastPathItem - 2]
+        ) {
+            try {
+                \PHPUnit\Framework\Assert::assertCount(count($expected), $actual, 'Failed asserting items count.');
+            } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+                $this->errors[] = [$path, $e->getMessage()];
+            }
+        }
+    }
+
+    /**
      * @param array $data
      *
      * @return array [['type' => entity type, 'id' => entity id], ...]
      */
-    private function getDataItems(array $data)
+    private function getDataItems(array $data): array
     {
         $result = [];
         foreach ($data as $item) {

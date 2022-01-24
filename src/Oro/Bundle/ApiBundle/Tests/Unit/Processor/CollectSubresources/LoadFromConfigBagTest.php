@@ -75,12 +75,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
-    /**
-     * @param ApiResource $resource
-     *
-     * @return ApiResourceSubresourcesCollection
-     */
-    private function getApiResourceSubresources(ApiResource $resource)
+    private function getApiResourceSubresources(ApiResource $resource): ApiResourceSubresourcesCollection
     {
         $entitySubresources = new ApiResourceSubresources($resource->getEntityClass());
         $subresources = new ApiResourceSubresourcesCollection();

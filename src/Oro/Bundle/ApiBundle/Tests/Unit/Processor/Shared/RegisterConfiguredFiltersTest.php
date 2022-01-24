@@ -40,13 +40,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    /**
-     * @param string $dataType
-     * @param bool   $isCollection
-     *
-     * @return ComparisonFilter
-     */
-    private function getComparisonFilter($dataType, $isCollection = false)
+    private function getComparisonFilter(string $dataType, bool $isCollection = false): ComparisonFilter
     {
         $filter = new ComparisonFilter($dataType);
         $filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
@@ -142,11 +136,9 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('someFilter', ['some_option' => 'val', 'data_type' => 'integer'])
-            ->willReturnCallback(
-                function ($filterType, array $options) {
-                    return $this->getComparisonFilter($options['data_type']);
-                }
-            );
+            ->willReturnCallback(function ($filterType, array $options) {
+                return $this->getComparisonFilter($options['data_type']);
+            });
 
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfigOfFilters($filtersConfig);
@@ -177,17 +169,15 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('someFilter', ['data_type' => 'string'])
-            ->willReturnCallback(
-                function ($filterType, array $options) {
-                    $filter = $this->getComparisonFilter($options['data_type']);
-                    $filter->setDescription('default filter description');
-                    $filter->setArrayAllowed(true);
-                    $filter->setRangeAllowed(true);
-                    $filter->setSupportedOperators(['=']);
+            ->willReturnCallback(function ($filterType, array $options) {
+                $filter = $this->getComparisonFilter($options['data_type']);
+                $filter->setDescription('default filter description');
+                $filter->setArrayAllowed(true);
+                $filter->setRangeAllowed(true);
+                $filter->setSupportedOperators(['=']);
 
-                    return $filter;
-                }
-            );
+                return $filter;
+            });
 
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfigOfFilters($filtersConfig);
@@ -223,17 +213,15 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->filterFactory->expects(self::once())
             ->method('createFilter')
             ->with('someFilter', ['data_type' => 'string'])
-            ->willReturnCallback(
-                function ($filterType, array $options) {
-                    $filter = $this->getComparisonFilter($options['data_type']);
-                    $filter->setDescription('default filter description');
-                    $filter->setArrayAllowed(true);
-                    $filter->setRangeAllowed(true);
-                    $filter->setSupportedOperators(['=']);
+            ->willReturnCallback(function ($filterType, array $options) {
+                $filter = $this->getComparisonFilter($options['data_type']);
+                $filter->setDescription('default filter description');
+                $filter->setArrayAllowed(true);
+                $filter->setRangeAllowed(true);
+                $filter->setSupportedOperators(['=']);
 
-                    return $filter;
-                }
-            );
+                return $filter;
+            });
 
         $this->context->setClassName(Entity\Category::class);
         $this->context->setConfigOfFilters($filtersConfig);

@@ -16,7 +16,6 @@ class GetWithFiltersTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/filters.yml']);
     }
 

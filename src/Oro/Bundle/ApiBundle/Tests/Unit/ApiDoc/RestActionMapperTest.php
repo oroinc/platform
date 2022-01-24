@@ -9,9 +9,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class RestActionMapperTest extends \PHPUnit\Framework\TestCase
 {
-    private const ITEM_ROUTE         = 'item_route';
-    private const LIST_ROUTE         = 'list_route';
-    private const SUBRESOURCE_ROUTE  = 'subresource_route';
+    private const ITEM_ROUTE = 'item_route';
+    private const LIST_ROUTE = 'list_route';
+    private const SUBRESOURCE_ROUTE = 'subresource_route';
     private const RELATIONSHIP_ROUTE = 'relationship_route';
 
     /** @var RestActionMapper */
@@ -31,12 +31,12 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getActionsDataProvider
      */
-    public function testGetActions($templateRouteName, $expectedAction)
+    public function testGetActions(string $templateRouteName, array $expectedActions)
     {
-        self::assertEquals($expectedAction, $this->actionMapper->getActions($templateRouteName));
+        self::assertEquals($expectedActions, $this->actionMapper->getActions($templateRouteName));
     }
 
-    public function getActionsDataProvider()
+    public function getActionsDataProvider(): array
     {
         return [
             [
@@ -103,12 +103,12 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMethodDataProvider
      */
-    public function testGetMethod($action, $expectedMethod)
+    public function testGetMethod(string $action, string $expectedMethod)
     {
         self::assertEquals($expectedMethod, $this->actionMapper->getMethod($action));
     }
 
-    public function getMethodDataProvider()
+    public function getMethodDataProvider(): array
     {
         return [
             [ApiAction::OPTIONS, Request::METHOD_OPTIONS],

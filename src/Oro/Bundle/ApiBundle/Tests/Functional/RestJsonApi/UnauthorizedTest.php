@@ -12,7 +12,7 @@ class UnauthorizedTest extends RestJsonApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getWsseAuthHeader()
+    protected function getWsseAuthHeader(): array
     {
         return self::generateWsseAuthHeader('NotExistingUser');
     }

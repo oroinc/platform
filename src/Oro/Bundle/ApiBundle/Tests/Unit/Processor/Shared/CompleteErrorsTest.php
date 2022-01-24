@@ -58,11 +58,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
                 self::identicalTo($this->context->getRequestType()),
                 self::identicalTo($metadata)
             )
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('Test\Entity');
@@ -82,11 +80,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->processor->process($this->context);
@@ -104,11 +100,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('test');
@@ -130,11 +124,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('Test\Entity');
@@ -156,11 +148,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::once())
             ->method('complete')
             ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
-            ->willReturnCallback(
-                function (Error $error) {
-                    $error->setDetail($error->getInnerException()->getMessage());
-                }
-            );
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
 
         $this->context->addError($error);
         $this->context->setClassName('Test\Entity');

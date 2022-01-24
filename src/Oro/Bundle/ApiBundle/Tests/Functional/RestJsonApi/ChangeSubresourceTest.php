@@ -13,13 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ChangeSubresourceTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/change_subresource.yml'
         ]);

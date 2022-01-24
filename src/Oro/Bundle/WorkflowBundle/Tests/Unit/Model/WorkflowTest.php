@@ -16,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord;
 use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -371,7 +372,7 @@ class WorkflowTest extends \PHPUnit\Framework\TestCase
 
     public function testTransitException(): void
     {
-        $this->expectException(\Oro\Bundle\WorkflowBundle\Exception\WorkflowException::class);
+        $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow "test" does not have step entity "stepTwo"');
 
         $workflowStepOne = new WorkflowStep();

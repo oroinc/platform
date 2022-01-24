@@ -15,7 +15,7 @@ class ConfigLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testLoaders($configType, $config, $expected)
+    public function testLoaders(string $configType, array $config, array $expected)
     {
         $configLoaderFactory = new ConfigLoaderFactory($this->createConfigExtensionRegistry());
 
@@ -23,7 +23,7 @@ class ConfigLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $result->toArray());
     }
 
-    public function dataProvider()
+    public function dataProvider(): array
     {
         $result = [];
 

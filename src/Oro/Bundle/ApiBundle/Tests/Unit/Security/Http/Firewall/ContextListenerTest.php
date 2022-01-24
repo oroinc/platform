@@ -20,7 +20,8 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
     private const SESSION_NAME = 'TEST_SESSION_ID';
     private const SESSION_ID = 'o595fqdg5214u4e4nfcs3uc923';
 
-    private BaseContextListener|\PHPUnit\Framework\MockObject\MockObject $innerListener;
+    /** @var BaseContextListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $innerListener;
 
     protected function setUp(): void
     {

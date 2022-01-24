@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\UpdateItem;
 
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetTargetProcessor;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
@@ -38,7 +39,7 @@ class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWhenTargetActionIsNotSet()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target action is not defined.');
 
         $this->processor->process($this->context);
