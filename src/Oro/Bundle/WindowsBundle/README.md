@@ -12,8 +12,3 @@ User Interface, Dialogs
 - [jquery ui](http://jqueryui.com)
 - [backbone.js](http://backbonejs.org)
 - [underscore.js](http://underscorejs.org)
-
-## Table of Contents
-
-- [JavaScript windows components](./Resources/doc/javascript_window_components.md)
-- [Windows as Widget](./Resources/doc/windows_as_widget.md)
