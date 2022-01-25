@@ -2,7 +2,7 @@ services:
     oro_datagrid.extension.mass_action.factory:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionFactory
         arguments:
-            - ~ # service locator for mass actions
+            - !abstract '$actionContainer defined in Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ActionsPass'
 
     oro_datagrid.extension.mass_action.metadata_factory:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory

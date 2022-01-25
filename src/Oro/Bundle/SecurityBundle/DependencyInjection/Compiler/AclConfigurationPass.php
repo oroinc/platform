@@ -49,8 +49,8 @@ class AclConfigurationPass implements CompilerPassInterface
         $extensions = $this->inverseSortByPriorityAndFlatten($extensions);
 
         $container->getDefinition('oro_security.acl.extension_selector')
-            ->setArgument(0, array_keys($extensions))
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $extensions));
+            ->setArgument('$extensionNames', array_keys($extensions))
+            ->setArgument('$extensionContainer', ServiceLocatorTagPass::register($container, $extensions));
     }
 
     private function configureDefaultAclProvider(ContainerBuilder $container): void

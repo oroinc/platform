@@ -121,9 +121,9 @@ services:
     oro_ui.content_provider.manager:
         class: Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
         arguments:
-            - [] # provider names
-            - ~ # service locator
-            - [] # enabled provider names
+            - !abstract '$providerNames defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
+            - !abstract '$providerContainer defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
+            - !abstract '$enabledProviderNames defined in Oro\Bundle\UIBundle\DependencyInjection\Compiler\ContentProviderPass'
 
     oro_ui.content_provider.manager.twig:
         class: Oro\Bundle\UIBundle\ContentProvider\TwigContentProviderManager

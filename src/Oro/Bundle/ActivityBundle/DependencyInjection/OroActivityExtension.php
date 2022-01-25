@@ -27,6 +27,6 @@ class OroActivityExtension extends Extension
         $loader->load('controllers_api.yml');
 
         $container->getDefinition('oro_activity.api.activity_association_provider')
-            ->setArgument(0, $config['api']['activity_association_names']);
+            ->setArgument('$activityAssociationNames', $config['api']['activity_association_names']);
     }
 }

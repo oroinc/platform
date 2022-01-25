@@ -173,7 +173,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
-            ->setArgument(1, $config['api_doc_cache']['excluded_features']);
+            ->setArgument('$excludedFeatures', $config['api_doc_cache']['excluded_features']);
     }
 
     private function configureApiDocFormatters(ContainerBuilder $container)
@@ -239,8 +239,8 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
 
         $container->getDefinition(self::API_DOC_DATA_TYPE_CONVERTER)
-            ->setArgument(0, $defaultMapping)
-            ->setArgument(1, $viewMappings);
+            ->setArgument('$defaultMapping', $defaultMapping)
+            ->setArgument('$viewMappings', $viewMappings);
     }
 
     private function registerRoutingOptionsResolvers(ContainerBuilder $container)

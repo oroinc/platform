@@ -70,8 +70,8 @@ class ResourceDocParserCompilerPass implements CompilerPassInterface
 
         // register
         $container->getDefinition(self::RESOURCE_DOC_PARSER_REGISTRY_SERVICE_ID)
-            ->setArgument(0, $resourceDocParsers)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$parsers', $resourceDocParsers)
+            ->setArgument('$container', ServiceLocatorTagPass::register($container, $services));
     }
 
     private function getApiDocViews(ContainerBuilder $container): array

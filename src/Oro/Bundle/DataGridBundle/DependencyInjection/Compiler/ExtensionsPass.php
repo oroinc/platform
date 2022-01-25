@@ -21,7 +21,7 @@ class ExtensionsPass implements CompilerPassInterface
     {
         $container->getDefinition('oro_datagrid.datagrid.builder')
             ->setArgument(
-                4,
+                '$extensions',
                 new IteratorArgument($this->findAndSortTaggedServices('oro_datagrid.extension', $container))
             );
     }

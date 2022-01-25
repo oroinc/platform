@@ -27,7 +27,8 @@ class EntityAliasCompilerPass implements CompilerPassInterface
     {
         $classProviders = $this->getProviders($container, self::CLASS_PROVIDER_TAG_NAME);
         $aliasProviders = $this->getProviders($container, self::ALIAS_PROVIDER_TAG_NAME);
-        $resolvers = $container->getDefinition(self::ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID)->getArgument(0);
+        $resolvers = $container->getDefinition(self::ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID)
+            ->getArgument('$entityAliasResolvers');
         foreach ($resolvers as $resolver) {
             $loaderServiceId = (string)$container->getDefinition($resolver[0])->getArgument(0);
             $this->addProviders($container, $loaderServiceId, 0, $classProviders);

@@ -11,14 +11,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $chainProvider;
+    private Definition $chainProvider;
 
-    /** @var ActivityListProviderPass */
-    private $compiler;
+    private ActivityListProviderPass $compiler;
 
     protected function setUp(): void
     {
@@ -28,21 +25,21 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new ActivityListProviderPass();
     }
 
-    public function testProcessWhenNoTaggedServices()
+    public function testProcessWhenNoTaggedServices(): void
     {
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->chainProvider->getArgument(0));
-        self::assertEquals([], $this->chainProvider->getArgument(1));
+        self::assertEquals([], $this->chainProvider->getArgument('$activityClasses'));
+        self::assertEquals([], $this->chainProvider->getArgument('$activityAclClasses'));
 
-        $serviceLocatorReference = $this->chainProvider->getArgument(2);
+        $serviceLocatorReference = $this->chainProvider->getArgument('$providerContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcessWithoutNameAttribute()
+    public function testProcessWithoutNameAttribute(): void
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -55,7 +52,7 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testProcessWithPriority()
+    public function testProcessWithPriority(): void
     {
         $this->container->setDefinition('provider_1', new Definition())
             ->addTag('oro_activity_list.provider', ['class' => 'Class1', 'acl_class' => 'AclClass1']);
@@ -68,14 +65,14 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             ['Class3', 'Class1', 'Class2'],
-            $this->chainProvider->getArgument(0)
+            $this->chainProvider->getArgument('$activityClasses')
         );
         self::assertEquals(
             ['Class1' => 'AclClass1'],
-            $this->chainProvider->getArgument(1)
+            $this->chainProvider->getArgument('$activityAclClasses')
         );
 
-        $serviceLocatorReference = $this->chainProvider->getArgument(2);
+        $serviceLocatorReference = $this->chainProvider->getArgument('$providerContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -89,7 +86,7 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOverrideByClass()
+    public function testProcessOverrideByClass(): void
     {
         $this->container->setDefinition('provider_1', new Definition())
             ->addTag('oro_activity_list.provider', ['class' => 'Class2']);
@@ -98,10 +95,10 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($this->container);
 
-        self::assertEquals(['Class2'], $this->chainProvider->getArgument(0));
-        self::assertEquals([], $this->chainProvider->getArgument(1));
+        self::assertEquals(['Class2'], $this->chainProvider->getArgument('$activityClasses'));
+        self::assertEquals([], $this->chainProvider->getArgument('$activityAclClasses'));
 
-        $serviceLocatorReference = $this->chainProvider->getArgument(2);
+        $serviceLocatorReference = $this->chainProvider->getArgument('$providerContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());

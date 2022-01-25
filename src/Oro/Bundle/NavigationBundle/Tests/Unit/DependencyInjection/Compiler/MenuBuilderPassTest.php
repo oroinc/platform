@@ -11,17 +11,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $chainMenuBuilder;
+    private Definition $chainMenuBuilder;
 
-    /** @var Definition */
-    private $itemFactory;
+    private Definition $itemFactory;
 
-    /** @var MenuBuilderPass */
-    private $compiler;
+    private MenuBuilderPass $compiler;
 
     protected function setUp(): void
     {
@@ -32,26 +28,26 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new MenuBuilderPass();
     }
 
-    public function testProcessWhenNoTaggedServices()
+    public function testProcessWhenNoTaggedServices(): void
     {
         $this->compiler->process($this->container);
 
-        $this->assertEquals([], $this->chainMenuBuilder->getArgument(0));
+        self::assertEquals([], $this->chainMenuBuilder->getArgument('$builders'));
 
-        $serviceLocatorReference = $this->chainMenuBuilder->getArgument(1);
+        $serviceLocatorReference = $this->chainMenuBuilder->getArgument('$builderContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
 
-        $serviceLocatorReference = $this->itemFactory->getArgument(0);
+        $serviceLocatorReference = $this->itemFactory->getArgument('$builders');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcessMenu()
+    public function testProcessMenu(): void
     {
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag('oro_menu.builder', ['alias' => 'item1']);
@@ -66,16 +62,16 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($this->container);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'item1' => ['tagged_service_1'],
                 'item2' => ['tagged_service_4', 'tagged_service_2'],
                 'item3' => ['tagged_service_3', 'tagged_service_5']
             ],
-            $this->chainMenuBuilder->getArgument(0)
+            $this->chainMenuBuilder->getArgument('$builders')
         );
 
-        $serviceLocatorReference = $this->chainMenuBuilder->getArgument(1);
+        $serviceLocatorReference = $this->chainMenuBuilder->getArgument('$builderContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -91,7 +87,7 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessItems()
+    public function testProcessItems(): void
     {
         $this->container->setDefinition('tagged_service_1', new Definition())
             ->addTag('oro_navigation.item.builder', ['alias' => 'item1']);
@@ -106,7 +102,7 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($this->container);
 
-        $serviceLocatorReference = $this->itemFactory->getArgument(0);
+        $serviceLocatorReference = $this->itemFactory->getArgument('$builders');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -119,23 +115,23 @@ class MenuBuilderPassTest extends \PHPUnit\Framework\TestCase
             $serviceLocatorDef->getArgument(0)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             ['item1'],
             $this->container->getDefinition('tagged_service_1')->getArguments()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->container->getDefinition('tagged_service_2')->getArguments()
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['item3'],
             $this->container->getDefinition('tagged_service_3')->getArguments()
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['item2'],
             $this->container->getDefinition('tagged_service_4')->getArguments()
         );
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->container->getDefinition('tagged_service_5')->getArguments()
         );
