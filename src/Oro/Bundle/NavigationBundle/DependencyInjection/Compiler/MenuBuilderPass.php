@@ -42,8 +42,8 @@ class MenuBuilderPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_menu.builder_chain')
-            ->setArgument(0, $builders)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$builders', $builders)
+            ->setArgument('$builderContainer', ServiceLocatorTagPass::register($container, $services));
     }
 
     private function processItems(ContainerBuilder $container): void
@@ -58,7 +58,7 @@ class MenuBuilderPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_navigation.item.factory')
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$builders', ServiceLocatorTagPass::register($container, $services));
     }
 
     /**

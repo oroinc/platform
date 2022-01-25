@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $registry = $container->setDefinition('oro_form.autocomplete.search_registry', new Definition());
@@ -28,7 +28,7 @@ class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compiler = new AutocompleteCompilerPass();
         $compiler->process($container);
 
-        $serviceLocatorReference = $registry->getArgument(0);
+        $serviceLocatorReference = $registry->getArgument('$searchHandlers');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -41,12 +41,12 @@ class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
             $serviceLocatorDef->getArgument(0)
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'tag1' => 'acl_resource_2',
                 'tag3' => 'acl_resource_3'
             ],
-            $security->getArgument(0)
+            $security->getArgument('$autocompleteAclResources')
         );
     }
 }

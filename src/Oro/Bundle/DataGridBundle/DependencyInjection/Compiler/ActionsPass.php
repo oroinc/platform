@@ -40,6 +40,6 @@ class ActionsPass implements CompilerPassInterface
         }
 
         $container->getDefinition($this->factoryServiceId)
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$actionContainer', ServiceLocatorTagPass::register($container, $services));
     }
 }

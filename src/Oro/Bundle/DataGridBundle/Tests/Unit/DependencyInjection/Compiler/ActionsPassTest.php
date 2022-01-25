@@ -14,30 +14,23 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
     private const FACTORY_SERVICE_ID = 'oro_datagrid.extension.action.factory';
     private const TAG_NAME           = 'oro_datagrid.extension.action.type';
 
-    /** @var ActionsPass */
-    private $actionsPass;
+    private ActionsPass $actionsPass;
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $actionFactory;
-
-    /** @var Definition */
-    private $iterableResultFactoryRegistry;
+    private Definition $actionFactory;
 
     protected function setUp(): void
     {
         $this->actionsPass = new ActionsPass(self::FACTORY_SERVICE_ID, self::TAG_NAME);
 
         $this->actionFactory = new Definition();
-        $this->iterableResultFactoryRegistry = new Definition();
 
         $this->container = new ContainerBuilder();
         $this->container->setDefinition(self::FACTORY_SERVICE_ID, $this->actionFactory);
     }
 
-    public function testProcessActions()
+    public function testProcessActions(): void
     {
         $this->container->register('action1')
             ->setShared(false)
@@ -48,7 +41,7 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
 
         $this->actionsPass->process($this->container);
 
-        $serviceLocatorReference = $this->actionFactory->getArgument(0);
+        $serviceLocatorReference = $this->actionFactory->getArgument('$actionContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -61,7 +54,7 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessSharedAction()
+    public function testProcessSharedAction(): void
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
         $this->expectExceptionMessage('The service "action1" should not be shared.');

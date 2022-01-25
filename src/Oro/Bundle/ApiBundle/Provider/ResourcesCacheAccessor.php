@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -78,7 +79,8 @@ class ResourcesCacheAccessor
 
     private function getCacheKey(string $version, RequestType $requestType, string $id): string
     {
-        return $id . $version . (string)$requestType;
+        $cacheKey = $id . $version . (string)$requestType;
+        return UniversalCacheKeyGenerator::normalizeCacheKey($cacheKey);
     }
 
     private function getConfigCacheState(RequestType $requestType): ConfigCacheStateInterface

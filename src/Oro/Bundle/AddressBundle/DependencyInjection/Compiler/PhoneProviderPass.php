@@ -43,7 +43,7 @@ class PhoneProviderPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_address.provider.phone')
-            ->setArgument(0, $map)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$phoneProviderMap', $map)
+            ->setArgument('$phoneProviderContainer', ServiceLocatorTagPass::register($container, $services));
     }
 }

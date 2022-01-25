@@ -2,8 +2,8 @@ services:
     oro_address.provider.phone:
         class: Oro\Bundle\AddressBundle\Provider\PhoneProvider
         arguments:
-            - [] # phone providers map
-            - ~ # service locator for phone providers
+            - !abstract '$phoneProviderMap defined in Oro\Bundle\AddressBundle\DependencyInjection\Compiler\PhoneProviderPass'
+            - !abstract '$phoneProviderContainer defined in Oro\Bundle\AddressBundle\DependencyInjection\Compiler\PhoneProviderPass'
             - '@oro_entity_config.provider.extend'
 
     oro_address.provider.country:

@@ -2,7 +2,7 @@ services:
     oro_datagrid.extension.action.factory:
         class: Oro\Bundle\DataGridBundle\Extension\Action\ActionFactory
         arguments:
-            - ~ # service locator for actions
+            - !abstract '$actionContainer defined in Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ActionsPass'
 
     oro_datagrid.extension.action.metadata_factory:
         class: Oro\Bundle\DataGridBundle\Extension\Action\ActionMetadataFactory

@@ -23,7 +23,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     private const FIELD_NAMES_KEY    = '_fields_';
 
     private const SCOPE        = 'testScope';
-    private const ENTITY_CLASS = 'Test\Entity';
+    private const ENTITY_CLASS = 'Test_Entity';
     private const FIELD_NAME   = 'testField';
     private const FIELD_TYPE   = 'integer';
 
@@ -1525,9 +1525,9 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
             ->method('deleteItems')
             ->with([
                 self::ENTITY_CLASSES_KEY,
-                self::FIELD_NAMES_KEY . 'Test\Entity2',
+                self::FIELD_NAMES_KEY . 'Test%5CEntity2',
                 self::ANOTHER_SCOPE,
-                self::FIELD_NAMES_KEY . 'Test\Entity3'
+                self::FIELD_NAMES_KEY . 'Test%5CEntity3'
             ]);
         $this->modelCache->expects($this->never())
             ->method('saveDeferred');

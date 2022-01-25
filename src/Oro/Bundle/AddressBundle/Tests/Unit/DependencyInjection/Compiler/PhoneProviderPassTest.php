@@ -12,14 +12,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $phoneProvider;
+    private Definition $phoneProvider;
 
-    /** @var PhoneProviderPass */
-    private $compiler;
+    private PhoneProviderPass $compiler;
 
     protected function setUp(): void
     {
@@ -32,20 +29,20 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new PhoneProviderPass();
     }
 
-    public function testProcessWhenNoProviders()
+    public function testProcessWhenNoProviders(): void
     {
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->phoneProvider->getArgument(0));
+        self::assertEquals([], $this->phoneProvider->getArgument('$phoneProviderMap'));
 
-        $serviceLocatorReference = $this->phoneProvider->getArgument(1);
+        $serviceLocatorReference = $this->phoneProvider->getArgument('$phoneProviderContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcessNoClass()
+    public function testProcessNoClass(): void
     {
         $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -58,7 +55,7 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($this->container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->container->register('provider1')
             ->addTag('oro_address.phone_provider', ['class' => 'Test\Class1']);
@@ -76,10 +73,10 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
                 'Test\Class1' => ['provider4', 'provider1', 'provider3'],
                 'Test\Class2' => ['provider2']
             ],
-            $this->phoneProvider->getArgument(0)
+            $this->phoneProvider->getArgument('$phoneProviderMap')
         );
 
-        $serviceLocatorReference = $this->phoneProvider->getArgument(1);
+        $serviceLocatorReference = $this->phoneProvider->getArgument('$phoneProviderContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
