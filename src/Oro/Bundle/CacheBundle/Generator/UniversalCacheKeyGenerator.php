@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CacheBundle\Generator;
 
+use Symfony\Contracts\Cache\ItemInterface;
+
 /**
  * This is the main entry point for generating a cache key from the provided arguments.
  */
@@ -57,5 +59,17 @@ class UniversalCacheKeyGenerator
         }
 
         return implode(self::DELIMITER, $cacheKey);
+    }
+
+    /**
+     * Adopt cache key to be valid for Symfony Cache adapters
+     * @param string $cacheKey
+     * @return string
+     */
+    public static function normalizeCacheKey(string $cacheKey) : string
+    {
+        return false !== strpbrk($cacheKey, ItemInterface::RESERVED_CHARACTERS)
+            ? rawurlencode($cacheKey)
+            : $cacheKey;
     }
 }
