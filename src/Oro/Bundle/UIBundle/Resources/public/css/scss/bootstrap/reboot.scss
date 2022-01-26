@@ -64,3 +64,8 @@ select {
     appearance: textfield;
     outline-offset: -2px;
 }
+
+button {
+    // default padding from Chrome
+    padding: 1px 6px;
+}
