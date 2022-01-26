@@ -4,6 +4,11 @@
 
 @use 'sass:math';
 
+select[multiple] {
+    height: $input-size;
+    padding: 4px 8px;
+}
+
 .input,
 .selector,
 .uneditable-input {
@@ -188,5 +193,12 @@
 
     .form-buttons {
         margin-bottom: $form-container-control-row-space;
+    }
+}
+
+@include non-touch-device {
+    select[multiple] {
+        height: $select-multiple-height;
+        padding: $select-multiple-inner-offset;
     }
 }
