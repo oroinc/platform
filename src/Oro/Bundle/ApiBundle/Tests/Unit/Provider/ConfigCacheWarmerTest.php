@@ -530,7 +530,6 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity5',
                 'Test\Entity13',
                 'Test\Entity1',
-                'Test\Entity6',
                 'Test\Entity11'
             ],
             'exclusions'        => [
@@ -538,7 +537,6 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 ['entity' => 'Test\Entity5'],
                 ['entity' => 'Test\Entity13'],
                 ['entity' => 'Test\Entity1'],
-                ['entity' => 'Test\Entity6'],
                 ['entity' => 'Test\Entity11']
             ],
             'inclusions'        => [
@@ -546,7 +544,6 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 ['entity' => 'Test\Entity6'],
                 ['entity' => 'Test\Entity12'],
                 ['entity' => 'Test\Entity2', 'field' => 'field2'],
-                ['entity' => 'Test\Entity5'],
                 ['entity' => 'Test\Entity10']
             ]
         ];
