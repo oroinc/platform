@@ -93,7 +93,7 @@
         "knplabs/knp-menu-bundle": "~3.2.0",
         "friendsofsymfony/rest-bundle": "~3.0.5",
         "friendsofsymfony/jsrouting-bundle": "2.7.*",
-        "oro/api-doc-bundle": "2.x-dev",
+        "oro/api-doc-bundle": "2.0.0",
         "nelmio/security-bundle": "~2.10.2",
         "ass/xmlsecurity": "1.1.1",
         "stof/doctrine-extensions-bundle": "~1.7.0",
