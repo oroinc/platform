@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
- * Excludes some test entities to test that globally excluded entities  can be used in API
+ * Excludes some test entities to test that globally excluded entities can be used in API
  * when "exclude: false" is set in api.yml.
  */
 class EntityExclusionProvider implements ExclusionProviderInterface

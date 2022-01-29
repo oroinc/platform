@@ -14,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
-use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
@@ -84,7 +83,6 @@ class User extends ExtendUser implements
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
-    NotificationEmailInterface,
     AdvancedApiUserInterface
 {
     const ROLE_DEFAULT = 'ROLE_USER';
@@ -848,14 +846,6 @@ class User extends ExtendUser implements
         $this->owner = $owningBusinessUnit;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNotificationEmails()
-    {
-        return new ArrayCollection([$this->getEmail()]);
     }
 
     /**
