@@ -30,23 +30,21 @@ abstract class ApiTestCase extends WebTestCase
 
     abstract protected function getRequestType(): RequestType;
 
-    protected function getEntityType(string $entityClass, bool $throwException = true): string
+    protected function getEntityType(string $entityClass): string
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->getValueNormalizer(),
             $entityClass,
-            $this->getRequestType(),
-            $throwException
+            $this->getRequestType()
         );
     }
 
-    protected function getEntityClass(string $entityType, bool $throwException = true): string
+    protected function getEntityClass(string $entityType): string
     {
         return ValueNormalizerUtil::convertToEntityClass(
             $this->getValueNormalizer(),
             $entityType,
-            $this->getRequestType(),
-            $throwException
+            $this->getRequestType()
         );
     }
 

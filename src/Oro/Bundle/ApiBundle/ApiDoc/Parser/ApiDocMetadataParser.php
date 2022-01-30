@@ -206,19 +206,11 @@ class ApiDocMetadataParser implements ParserInterface
 
     private function getEntityType(string $entityClass, RequestType $requestType): ?string
     {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $requestType,
-            false
-        );
+        return ValueNormalizerUtil::tryConvertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 
     private function getApiDocDataType(string $dataType): string
     {
-        return $this->dataTypeConverter->convertDataType(
-            $dataType,
-            $this->docViewDetector->getView()
-        );
+        return $this->dataTypeConverter->convertDataType($dataType, $this->docViewDetector->getView());
     }
 }

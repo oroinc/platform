@@ -228,19 +228,12 @@ class NormalizeIncludedData implements ProcessorInterface
         return $flag;
     }
 
-    /**
-     * @param string $pointer
-     * @param string $entityType
-     *
-     * @return string|null
-     */
-    protected function getEntityClass($pointer, $entityType)
+    protected function getEntityClass(string $pointer, string $entityType): ?string
     {
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
+        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $this->context->getRequestType(),
-            false
+            $this->context->getRequestType()
         );
         if ($entityClass) {
             return $entityClass;
