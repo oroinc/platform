@@ -34,11 +34,10 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
         $this->validator = new TypedRequestDataValidator(function ($entityType) {
-            return ValueNormalizerUtil::convertToEntityClass(
+            return ValueNormalizerUtil::tryConvertToEntityClass(
                 $this->valueNormalizer,
                 $entityType,
-                $this->requestType,
-                false
+                $this->requestType
             );
         });
 

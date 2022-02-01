@@ -451,8 +451,8 @@ services:
             - [addConstraints, ['decimal', [{ Type: {type: 'numeric'} }]]]
             - [addConstraints, ['money', [{ Type: {type: 'numeric'} }]]]
             - [addConstraints, ['percent', [{ Type: {type: 'numeric'} }]]]
-            - [addConstraints, ['date', [{ Type: {type: '\DateTimeInterface'} }]]]
-            - [addConstraints, ['datetime', [{ Type: {type: '\DateTimeInterface'} }]]]
+            - [addConstraints, ['date', [{ Type: {type: 'DateTimeInterface', payload: {jsValidation: {type: Date}}}}]]]
+            - [addConstraints, ['datetime', [{ Type: {type: 'DateTimeInterface', payload: {jsValidation: {type: DateTime}}}}]]]
 
     oro_entity_extend.listener.extend_field_value_render:
         class: Oro\Bundle\EntityExtendBundle\EventListener\ExtendFieldValueRenderListener

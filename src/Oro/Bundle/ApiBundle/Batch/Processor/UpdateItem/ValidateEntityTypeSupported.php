@@ -57,11 +57,10 @@ class ValidateEntityTypeSupported implements ProcessorInterface
 
     private function getEntityType(string $entityClass, RequestType $requestType): string
     {
-        $entityType = ValueNormalizerUtil::convertToEntityType(
+        $entityType = ValueNormalizerUtil::tryConvertToEntityType(
             $this->valueNormalizer,
             $entityClass,
-            $requestType,
-            false
+            $requestType
         );
         if (!$entityType) {
             $entityType = $entityClass;

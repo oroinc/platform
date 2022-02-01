@@ -72,11 +72,10 @@ class NormalizeEntityClass implements ProcessorInterface
 
     private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
     {
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
+        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $requestType,
-            false
+            $requestType
         );
         if (!$entityClass) {
             return null;
