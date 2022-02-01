@@ -63,6 +63,13 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     protected $nameSuffix;
 
     /**
+     * @var \DateTime|null
+     *
+     * @ORM\Column(name="contacted_at", type="datetime", nullable=true)
+     */
+    protected $contactedAt;
+
+    /**
      * @var string
      *
      * @ORM\Column(name="related_class", type="string", nullable=true)
@@ -134,7 +141,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function getName()
     {
         if (!$this->name) {
-            $this->name = new TestNestedName($this->firstName, $this->lastName);
+            $this->name = new TestNestedName($this->firstName, $this->lastName, $this->contactedAt);
         }
 
         return $this->name;
@@ -150,6 +157,7 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
         $this->name = $name;
         $this->firstName = $this->name->getFirstName();
         $this->lastName = $this->name->getLastName();
+        $this->contactedAt = $this->name->getContactedAt();
 
         return $this;
     }
@@ -250,6 +258,26 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     public function setNameSuffix($nameSuffix)
     {
         $this->nameSuffix = $nameSuffix;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getContactedAt()
+    {
+        return $this->contactedAt;
+    }
+
+    /**
+     * @param \DateTime|null $contactedAt
+     *
+     * @return self
+     */
+    public function setContactedAt($contactedAt)
+    {
+        $this->contactedAt = $contactedAt;
 
         return $this;
     }
