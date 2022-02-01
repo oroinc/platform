@@ -17,8 +17,7 @@ class ValidateRequestData implements ProcessorInterface
 {
     public const OPERATION_NAME = 'validate_request_data';
 
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
+    private ValueNormalizer $valueNormalizer;
 
     public function __construct(ValueNormalizer $valueNormalizer)
     {
@@ -53,12 +52,7 @@ class ValidateRequestData implements ProcessorInterface
     {
         $requestType = $context->getRequestType();
         $validator = new TypedRequestDataValidator(function ($entityType) use ($requestType) {
-            return ValueNormalizerUtil::convertToEntityClass(
-                $this->valueNormalizer,
-                $entityType,
-                $requestType,
-                false
-            );
+            return ValueNormalizerUtil::tryConvertToEntityClass($this->valueNormalizer, $entityType, $requestType);
         });
 
         if ($context->hasIdentifierFields()) {

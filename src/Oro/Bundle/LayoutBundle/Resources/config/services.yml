@@ -151,7 +151,7 @@ services:
     oro_layout.expression.encoder_registry:
         class: Oro\Component\Layout\ExpressionLanguage\Encoder\ExpressionEncoderRegistry
         arguments:
-            - {}
+            - !abstract '$encoders defined in Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\ExpressionCompilerPass'
 
     oro_layout.expression_language.expression_manipulator:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionManipulator

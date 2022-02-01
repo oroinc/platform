@@ -172,11 +172,10 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
 
     protected function normalizeEntityClass(string $pointer, string $entityType): string
     {
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
+        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $this->context->getRequestType(),
-            false
+            $this->context->getRequestType()
         );
         if (null === $entityClass) {
             $this->addValidationError(Constraint::ENTITY_TYPE, $pointer)

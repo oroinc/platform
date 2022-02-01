@@ -47,7 +47,7 @@ class UserCaseInsensitiveUsernameTest extends RestJsonApiTestCase
     {
         return [
             'data' => [
-                'type'       => $this->getEntityType(User::class),
+                'type'       => 'users',
                 'attributes' => [
                     'username'  => 'System_user_2',
                     'email'     => 'System_User_3@Example.Com',

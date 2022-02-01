@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Model\ExtendOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -36,9 +35,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *      }
  * )
  */
-class Organization extends ExtendOrganization implements
-    OrganizationInterface,
-    NotificationEmailInterface
+class Organization extends ExtendOrganization implements OrganizationInterface
 {
     /**
      * @var integer
@@ -310,21 +307,6 @@ class Organization extends ExtendOrganization implements
         }
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getNotificationEmails()
-    {
-        $emails = [];
-        $this->businessUnits->forAll(
-            function (BusinessUnit $bu) use (&$emails) {
-                $emails = array_merge($emails, $bu->getNotificationEmails());
-            }
-        );
-
-        return new ArrayCollection($emails);
     }
 
     /**

@@ -59,8 +59,8 @@ class QueryHintResolverPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_entity.query_hint_resolver')
-            ->setArgument(0, $walkers)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $providers))
-            ->setArgument(2, $aliases);
+            ->setArgument('$walkers', $walkers)
+            ->setArgument('$walkerHintProviders', ServiceLocatorTagPass::register($container, $providers))
+            ->setArgument('$aliases', $aliases);
     }
 }

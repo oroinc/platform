@@ -74,4 +74,26 @@ class UniversalCacheKeyGeneratorTest extends \PHPUnit\Framework\TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider normalizeDataProvider
+     * @param string $expectedCacheKey
+     * @param string $actualCacheKey
+     * @return void
+     */
+    public function testNormalizeCacheKey(string $expectedCacheKey, string $actualCacheKey): void
+    {
+        $this->assertEquals($expectedCacheKey, UniversalCacheKeyGenerator::normalizeCacheKey($actualCacheKey));
+    }
+
+    public function normalizeDataProvider(): array
+    {
+        return [
+            ['key111', 'key111'],
+            ['%7Bkey111%7D', '{key111}'],
+            ['%28key111%29', '(key111)'],
+            ['%2Fkey%5C111', '/key\111'],
+            ['%40key111', '@key111']
+        ];
+    }
 }

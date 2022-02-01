@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\ORM\Mapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
@@ -69,7 +70,7 @@ class AdditionalMetadataProvider
 
             foreach ($associationMappings as $fieldName => $associationMapping) {
                 if ((isset($associationMapping['type']) &&
-                    $associationMapping['type'] === ClassMetadataInfo::MANY_TO_MANY) ||
+                        $associationMapping['type'] === ClassMetadataInfo::MANY_TO_MANY) ||
                     isset($associationMapping['mappedBy'])
                 ) {
                     // Skip "mapped by" and many-to-many as it's included on other side.
@@ -107,6 +108,9 @@ class AdditionalMetadataProvider
      */
     protected function createCacheKey($className)
     {
-        return sprintf('oro_entity.additional_metadata.%s', $className);
+        return sprintf(
+            'oro_entity.additional_metadata.%s',
+            UniversalCacheKeyGenerator::normalizeCacheKey($className)
+        );
     }
 }
