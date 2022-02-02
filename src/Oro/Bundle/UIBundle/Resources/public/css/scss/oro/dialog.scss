@@ -99,9 +99,13 @@
         }
 
         .widget-content {
-            max-width: $dialog-content-widget-content-max-width;
             position: $dialog-content-widget-content-position;
             margin: $dialog-content-inner-offset;
+
+            .flash-messages {
+                max-width: $dialog-content-flash-messages-max-width;
+                min-width: $dialog-content-flash-messages-min-width;
+            }
         }
     }
 

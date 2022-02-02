@@ -4,7 +4,6 @@ namespace Oro\Bundle\CommentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\CommentBundle\Entity\Comment;
-use Oro\Bundle\NoteBundle\Entity\Note;
 
 /**
  * @dbIsolationPerTest
@@ -20,9 +19,9 @@ class CommentTest extends RestJsonApiTestCase
         ]);
     }
 
-    private function getTargetId(Comment $comment, string $targetClass): ?int
+    private function getTargetId(Comment $comment): ?int
     {
-        $target = $comment->getTarget($targetClass);
+        $target = $comment->getTarget();
         if (null === $target) {
             return null;
         }
@@ -135,7 +134,7 @@ class CommentTest extends RestJsonApiTestCase
         /** @var Comment $comment */
         $comment = $this->getEntityManager()->find(Comment::class, $commentId);
         self::assertEquals('Message for test comment', $comment->getMessage());
-        self::assertEquals($note1Id, $this->getTargetId($comment, Note::class));
+        self::assertEquals($note1Id, $this->getTargetId($comment));
     }
 
     public function testUpdate(): void
@@ -165,7 +164,7 @@ class CommentTest extends RestJsonApiTestCase
         /** @var Comment $comment */
         $comment = $this->getEntityManager()->find(Comment::class, $commentId);
         self::assertEquals('New message for test comment', $comment->getMessage());
-        self::assertEquals($note31Id, $this->getTargetId($comment, Note::class));
+        self::assertEquals($note31Id, $this->getTargetId($comment));
     }
 
     public function testDelete(): void
@@ -254,7 +253,7 @@ class CommentTest extends RestJsonApiTestCase
         );
         /** @var Comment $comment */
         $comment = $this->getEntityManager()->find(Comment::class, $commentId);
-        self::assertEquals($note2Id, $this->getTargetId($comment, Note::class));
+        self::assertEquals($note2Id, $this->getTargetId($comment));
     }
 
     public function testTryToCreateWithoutTarget(): void

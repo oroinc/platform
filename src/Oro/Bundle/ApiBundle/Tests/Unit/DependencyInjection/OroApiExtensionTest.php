@@ -1606,7 +1606,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $apiConfig = DependencyInjectionUtil::getConfig($container);
         self::assertEquals(
             [
-                'excluded_features' => ['web_api']
+                'excluded_features'   => ['web_api'],
+                'resettable_services' => []
             ],
             $apiConfig['api_doc_cache']
         );
@@ -1619,12 +1620,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $configs = [
             [
                 'api_doc_cache' => [
-                    'excluded_features' => ['feature1']
+                    'excluded_features'   => ['feature1'],
+                    'resettable_services' => ['service1']
                 ]
             ],
             [
                 'api_doc_cache' => [
-                    'excluded_features' => ['feature2']
+                    'excluded_features'   => ['feature2'],
+                    'resettable_services' => ['service2']
                 ]
             ]
         ];
@@ -1635,7 +1638,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $apiConfig = DependencyInjectionUtil::getConfig($container);
         self::assertEquals(
             [
-                'excluded_features' => ['feature1', 'feature2']
+                'excluded_features'   => ['feature1', 'feature2'],
+                'resettable_services' => ['service1', 'service2']
             ],
             $apiConfig['api_doc_cache']
         );

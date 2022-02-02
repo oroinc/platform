@@ -18,9 +18,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DateRangeFilterTest extends WebTestCase
 {
-    private const TODAY = '2020-02-02';
-    private const YESTERDAY = '2020-02-01';
-
     /**
      * {@inheritdoc}
      */
@@ -102,7 +99,7 @@ class DateRangeFilterTest extends WebTestCase
                     return [
                         'type' => DateRangeFilterType::TYPE_EQUAL,
                         'value' => [
-                            'start' => self::YESTERDAY,
+                            'start' => $this->getUser()->getCreatedAt()->format('Y-m-d'),
                             'end' => ''
                         ]
                     ];
@@ -117,7 +114,7 @@ class DateRangeFilterTest extends WebTestCase
                         'type' => DateRangeFilterType::TYPE_NOT_EQUAL,
                         'value' => [
                             'start' => '',
-                            'end' => self::YESTERDAY
+                            'end' => $this->getUser()->getCreatedAt()->format('Y-m-d')
                         ]
                     ];
                 },
@@ -132,8 +129,8 @@ class DateRangeFilterTest extends WebTestCase
                     return [
                         'type' => DateRangeFilterType::TYPE_BETWEEN,
                         'value' => [
-                            'start' => self::YESTERDAY,
-                            'end' => self::YESTERDAY
+                            'start' => $this->getUser()->getCreatedAt()->format('Y-m-d'),
+                            'end' => $this->getUser()->getCreatedAt()->format('Y-m-d')
                         ]
                     ];
                 },
@@ -146,8 +143,8 @@ class DateRangeFilterTest extends WebTestCase
                     return [
                         'type' => DateRangeFilterType::TYPE_NOT_BETWEEN,
                         'value' => [
-                            'start' => self::YESTERDAY,
-                            'end' => self::YESTERDAY
+                            'start' => $this->getUser()->getCreatedAt()->format('Y-m-d'),
+                            'end' => $this->getUser()->getCreatedAt()->format('Y-m-d')
                         ]
                     ];
                 },
@@ -254,6 +251,7 @@ class DateRangeFilterTest extends WebTestCase
         $result = $ds->getQueryBuilder()->getQuery()->getResult();
         self::assertSame(
             [
+                ['username' => 'admin'],
                 ['username' => 'u1'],
                 ['username' => 'u2'],
                 ['username' => 'u3']
@@ -316,9 +314,10 @@ class DateRangeFilterTest extends WebTestCase
         $em = $this->getUserEntityManager();
         $user = $this->getUser();
         if ($today) {
-            $date = new \DateTime(self::TODAY, new \DateTimeZone('UTC'));
+            $date = new \DateTime('now', new \DateTimeZone('UTC'));
         } else {
-            $date = new \DateTime(self::YESTERDAY, new \DateTimeZone('UTC'));
+            $dateFilter = clone $user->getCreatedAt();
+            $date = $dateFilter->modify('-1 day');
         }
         $user->setCreatedAt($date);
         $em->persist($user);

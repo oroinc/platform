@@ -15,14 +15,11 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagProvider;
+    private HtmlTagProvider|\PHPUnit\Framework\MockObject\MockObject $htmlTagProvider;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var HtmlTagHelper */
-    private $helper;
+    private HtmlTagHelper $helper;
 
     protected function setUp(): void
     {
@@ -165,7 +162,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
             'without errors' => [
                 'htmlValue' => '<div><h1>Hello World!</h1></div>',
                 'allowedElements' => ['div', 'h1'],
-                'expectedResult' => []
+                'expectedResult' => [],
             ],
         ];
     }
@@ -179,8 +176,8 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 'expectedResult' => [
                     [1, 1, 'Unrecognized <h1> tag removed', []],
                     [1, 1, 'Unrecognized </h1> tag removed', []],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -193,14 +190,14 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 'allowedElements' => ['iframe[id|allowfullscreen|src]'],
                 'allowedTags' => '<iframe></iframe>',
                 'expectedResult' => '<iframe id="video-iframe" allowfullscreen src="https://www.youtube.com/embed/' .
-                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>'
+                    'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
             ],
             'iframe invalid src' => [
                 'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
                     'XWyzuVHRe0A?rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
                 'allowedElements' => ['iframe[id|allowfullscreen|src]'],
                 'allowedTags' => '<iframe></iframe>',
-                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>'
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>',
             ],
             'iframe bypass src' => [
                 'value' => '<iframe id="video-iframe" allowfullscreen="" src="https://www.scam.com/embed/' .
@@ -208,7 +205,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                     'rel=0&amp;iv_load_policy=3&amp;modestbranding=1"></iframe>',
                 'allowedElements' => ['iframe[id|allowfullscreen|src]'],
                 'allowedTags' => '<iframe></iframe>',
-                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>'
+                'expectedResult' => '<iframe id="video-iframe" allowfullscreen></iframe>',
             ],
         ];
     }
@@ -225,7 +222,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
             'image' => ['<IMG SRC="javascript:alert(\'XSS\');">', [], [], ''],
             'script' => ['<script>alert(\'xss\');</script>', [], [], ''],
             'coded' => [$str, [], [], ''],
-            'css expr' => ['<IMG STYLE="xss:expression(alert(\'XSS\'))">', [], [], '']
+            'css expr' => ['<IMG STYLE="xss:expression(alert(\'XSS\'))">', [], [], ''],
         ];
     }
 
@@ -248,31 +245,31 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 '<p class="class">sometext</p><span data-attr="mixed">',
                 ['p[class]'],
                 [],
-                '<p class="class">sometext</p>'
+                '<p class="class">sometext</p>',
             ],
             'prepare allowed' => [
                 '<a>first text</a><c>second text</c>',
                 ['a', 'b'],
                 [],
-                '<a>first text</a>second text'
+                '<a>first text</a>second text',
             ],
             'rel attribute allowed' => [
                 '<a rel="alternate">first text</a>',
                 ['a[rel]'],
                 ['alternate'],
-                '<a rel="alternate">first text</a>'
+                '<a rel="alternate">first text</a>',
             ],
             'rel attribute disallowed' => [
                 '<a rel="alternate">first text</a>',
                 ['a'],
                 ['alternate'],
-                '<a>first text</a>'
+                '<a>first text</a>',
             ],
             'rel attribute not listed' => [
                 '<a rel="appendix">first text</a>',
                 ['a[rel]'],
                 ['alternate'],
-                '<a>first text</a>'
+                '<a>first text</a>',
             ],
             'prepare not allowed' => ['<p>sometext</p>', ['a[class]'], [], 'sometext'],
             'prepare with allowed' => ['<p>sometext</p>', ['a', 'p[class]'], [], '<p>sometext</p>'],
@@ -286,18 +283,18 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
                 '<div id="test" data-id="test2">sometext</div>',
                 ['div[id]'],
                 [],
-                '<div id="test">sometext</div>'
+                '<div id="test">sometext</div>',
             ],
             'map element' => [
                 $mapHtml,
                 [
                     'img[src|width|height|alt|usemap]',
                     'map[name]',
-                    'area[shape|coords|href|alt|tabindex]'
+                    'area[shape|coords|href|alt|tabindex]',
                 ],
                 [],
-                $mapHtml
-            ]
+                $mapHtml,
+            ],
         ];
     }
 
@@ -470,25 +467,25 @@ HTML;
                     'M7Gho8HnScfSQ2B1gfuIUQ9rDXb6vrh2BezrwcVXPQdQMCgQoB5cYm8YKx5He4HV' .
                     'gEXFa4viVaXVWGnsEniZicMuiEARBlDrbJV6d4XfIvUVN98jx8RqBDnLH B2lq8s' .
                     'tnBZ8UgofSwwyELB9E7q5c1Oo91GWyNYBmAYCo0Q4lzL3ZtqBF5ciXleGPPJ2zRO' .
-                    'RryyZqPxOBS5Q4EZSwbOgxB2'
+                    'RryyZqPxOBS5Q4EZSwbOgxB2',
             ],
             [
                 'value' => 'single',
-                'expected' => 'single'
+                'expected' => 'single',
             ],
             [
                 'value' => 'double   stripped',
-                'expected' => 'double stripped'
-            ]
+                'expected' => 'double stripped',
+            ],
         ];
     }
 
     public function testSanitizeWithTranslator(): void
     {
-        $htmlValue = '<div><h1>Hello World!</h1></div>';
+        $htmlValue = "<div>\n    <h1>Hello World!</h1>\n    </div>";
         $expectedResult = [
-            new Error('Unrecognized <h1> tag removed', '<h1>Hello World!</h1></di'),
-            new Error('Unrecognized </h1> tag removed', '</h1></div>'),
+            new Error("Unrecognized <h1> tag removed", ">\n    <h1>Hello World!</h"),
+            new Error("Unrecognized </h1> tag removed", "World!</h1>\n    </div>"),
         ];
 
         $this->htmlTagProvider->expects($this->any())
@@ -499,5 +496,30 @@ HTML;
 
         $this->assertNotNull($this->helper->getLastErrorCollector());
         $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
+    }
+
+    public function testSanitizeReturnsSameContent(): void
+    {
+        $htmlValue = "<ul style=\"margin-bottom:0px;\">\n    <li>Hello world</li>\n</ul>";
+
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['ul[style]', 'li']);
+
+        // When error collection disabled.
+        self::assertEquals(
+            $htmlValue,
+            $this->helper->sanitize($htmlValue, 'default', false)
+        );
+
+        $this->assertNull($this->helper->getLastErrorCollector());
+
+        // When error collection disabled.
+        self::assertEquals(
+            $htmlValue,
+            $this->helper->sanitize($htmlValue, 'default', true)
+        );
+
+        $this->assertEquals([], $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
     }
 }
