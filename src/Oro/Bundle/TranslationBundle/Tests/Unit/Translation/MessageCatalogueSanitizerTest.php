@@ -5,16 +5,13 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizer;
 use Oro\Bundle\TranslationBundle\Translation\SanitizationErrorInformation;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\MessageCatalogueInterface;
 
-class MessageCatalogueSanitizerTest extends TestCase
+class MessageCatalogueSanitizerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var HtmlTagHelper|MockObject
-     */
-    private $htmlTagHelper;
+    /** HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private HtmlTagHelper $htmlTagHelper;
+
     private MessageCatalogueSanitizer $sanitizer;
 
     protected function setUp(): void
@@ -23,10 +20,10 @@ class MessageCatalogueSanitizerTest extends TestCase
         $this->sanitizer = new MessageCatalogueSanitizer($this->htmlTagHelper);
     }
 
-    public function testSanitizeCatalogue()
+    public function testSanitizeCatalogue(): void
     {
         $catalogue = $this->createMock(MessageCatalogueInterface::class);
-        $catalogue->expects($this->any())
+        $catalogue->expects(self::any())
             ->method('getLocale')
             ->willReturn('en');
 
@@ -37,16 +34,16 @@ class MessageCatalogueSanitizerTest extends TestCase
                 . ' data-a2="{{val2}}" data-a2-s="{{ val2s }}" data-a3="%a3%">refresh</a>',
             'sanitized_message' => 'Hello <> <script>alert(1)</script>'
         ];
-        $catalogue->expects($this->once())
+        $catalogue->expects(self::once())
             ->method('all')
             ->willReturn(['messages' => $messages]);
 
-        $this->htmlTagHelper->expects($this->exactly(3))
+        $this->htmlTagHelper->expects(self::exactly(3))
             ->method('sanitize')
             ->withConsecutive(
-                [$messages['message_with_unsanitized_tags']],
-                [$messages['message_with_sanitized_variables_in_attrs']],
-                ['Hello &lt;&gt; <script>alert(1)</script>']
+                [$messages['message_with_unsanitized_tags'], 'default', false],
+                [$messages['message_with_sanitized_variables_in_attrs'], 'default', false],
+                ['Hello &lt;&gt; <script>alert(1)</script>', 'default', false]
             )
             ->willReturnOnConsecutiveCalls(
                 '<b>Hello</b>',
@@ -58,9 +55,9 @@ class MessageCatalogueSanitizerTest extends TestCase
         $this->sanitizer->sanitizeCatalogue($catalogue);
         $errors = $this->sanitizer->getSanitizationErrors();
 
-        $this->assertNotEmpty($errors);
-        $this->assertCount(1, $errors);
-        $this->assertEquals(
+        self::assertNotEmpty($errors);
+        self::assertCount(1, $errors);
+        self::assertEquals(
             [
                 new SanitizationErrorInformation(
                     'en',

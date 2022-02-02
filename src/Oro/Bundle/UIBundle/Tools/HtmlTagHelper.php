@@ -260,11 +260,12 @@ class HtmlTagHelper implements TranslatorAwareInterface
 
     private function getPurifier(string $scope, bool $collectErrors): HTMLPurifier
     {
-        if (!array_key_exists($scope, $this->htmlPurifiers)) {
-            $this->htmlPurifiers[$scope] = $this->buildPurifier($scope, $collectErrors);
+        $key = $scope . '|' . ($collectErrors ? '1' : '0');
+        if (!array_key_exists($key, $this->htmlPurifiers)) {
+            $this->htmlPurifiers[$key] = $this->buildPurifier($scope, $collectErrors);
         }
 
-        return $this->htmlPurifiers[$scope];
+        return $this->htmlPurifiers[$key];
     }
 
     private function buildPurifier(string $scope, bool $collectErrors): HTMLPurifier
@@ -273,6 +274,8 @@ class HtmlTagHelper implements TranslatorAwareInterface
         $config = \HTMLPurifier_Config::create($html5Config);
 
         $config->set('Core.CollectErrors', $collectErrors);
+        // Fixes losing line breaks and whitespace caused by the disabled Core.CollectErrors.
+        $config->set('Core.MaintainLineNumbers', true);
 
         // Disabled `rel` attribute transformer.
         $config->set('HTML.TargetNoopener', false);

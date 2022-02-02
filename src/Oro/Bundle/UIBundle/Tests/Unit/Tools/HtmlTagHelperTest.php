@@ -531,4 +531,29 @@ HTML;
         $this->assertNotNull($this->helper->getLastErrorCollector());
         $this->assertEquals($expectedResult, $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
     }
+
+    public function testSanitizeReturnsSameContent(): void
+    {
+        $htmlValue = "<ul style=\"margin-bottom:0px;\">\n    <li>Hello world</li>\n</ul>";
+
+        $this->htmlTagProvider->expects($this->any())
+            ->method('getAllowedElements')
+            ->willReturn(['ul[style]', 'li']);
+
+        // When error collection disabled.
+        self::assertEquals(
+            $htmlValue,
+            $this->helper->sanitize($htmlValue, 'default', false)
+        );
+
+        $this->assertNull($this->helper->getLastErrorCollector());
+
+        // When error collection enabled.
+        self::assertEquals(
+            $htmlValue,
+            $this->helper->sanitize($htmlValue, 'default', true)
+        );
+
+        $this->assertEquals([], $this->helper->getLastErrorCollector()->getErrorsList($htmlValue));
+    }
 }
