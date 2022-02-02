@@ -51,6 +51,7 @@ services:
             - '@oro_search.handler.type_cast.type_casting_handler_registry'
             - '@event_dispatcher'
             - '@oro_ui.html_tag_helper'
+            - '@oro_search.formatter.datetime_formatter'
 
     oro_search.text_filtered_mapper:
         class: Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper

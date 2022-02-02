@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper;
+use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -20,7 +21,8 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->dispatcher,
-            $this->htmlTagHelper
+            $this->htmlTagHelper,
+            new DateTimeFormatter()
         );
     }
 
@@ -59,6 +61,9 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
             ],
             'integer' => [
                 'count' => $this->product->getCount()
+            ],
+            'datetime' => [
+                'createDate' => $this->product->getCreateDate()
             ]
         ];
 

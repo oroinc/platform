@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
@@ -25,16 +26,21 @@ class ObjectMapper extends AbstractMapper
     /** @var HtmlTagHelper */
     protected $htmlTagHelper;
 
+    /** @var DateTimeFormatter */
+    protected $dateTimeFormatter;
+
     public function __construct(
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,
         TypeCastingHandlerRegistry $handlerRegistry,
         EventDispatcherInterface $dispatcher,
-        HtmlTagHelper $htmlTagHelper
+        HtmlTagHelper $htmlTagHelper,
+        DateTimeFormatter $dateTimeFormatter
     ) {
         parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry);
         $this->dispatcher = $dispatcher;
         $this->htmlTagHelper = $htmlTagHelper;
+        $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
     /**
@@ -209,6 +215,10 @@ class ObjectMapper extends AbstractMapper
                 } elseif ($type === Query::TYPE_DECIMAL) {
                     $value = (float)$value;
                 }
+            }
+
+            if ($value instanceof \DateTime) {
+                $value = $this->dateTimeFormatter->format($value);
             }
 
             $result[$dataField] = $value;
