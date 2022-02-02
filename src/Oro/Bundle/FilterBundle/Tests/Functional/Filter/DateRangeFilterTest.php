@@ -18,8 +18,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class DateRangeFilterTest extends WebTestCase
 {
-    private const TODAY = '2020-02-02';
-    private const YESTERDAY = '2020-02-01';
+    private const TODAY = '2020-01-02';
+    private const YESTERDAY = '2020-01-01';
 
     /**
      * {@inheritdoc}
