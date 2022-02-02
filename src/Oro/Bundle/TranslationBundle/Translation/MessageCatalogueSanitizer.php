@@ -19,7 +19,7 @@ class MessageCatalogueSanitizer implements MessageCatalogueSanitizerInterface
         $this->htmlTagHelper = $htmlTagHelper;
     }
 
-    public function sanitizeCatalogue(MessageCatalogueInterface  $catalogue): void
+    public function sanitizeCatalogue(MessageCatalogueInterface $catalogue): void
     {
         foreach ($catalogue->all() as $domain => $messages) {
             $hasChanges = false;
@@ -67,7 +67,10 @@ class MessageCatalogueSanitizer implements MessageCatalogueSanitizerInterface
     private function getSanitizedTranslationMessage(string $message): ?string
     {
         $message = $this->applyFixesBeforeSanitization($message);
-        $sanitizedMessage = $this->htmlTagHelper->sanitize($message);
+        // HtmlTagHelper should not collect errors (argument $collectErrors must be false) during sanitization
+        // as it leads to undesired calls to Translator that makes it try to initialize in the middle of previous
+        // initialization that leads to unpredictable behavior, e.g. losing fallback locales.
+        $sanitizedMessage = $this->htmlTagHelper->sanitize($message, 'default', false);
         $sanitizedMessage = $this->applyFixesAfterSanitization($sanitizedMessage);
 
         return $sanitizedMessage;
