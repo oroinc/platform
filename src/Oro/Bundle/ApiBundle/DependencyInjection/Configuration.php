@@ -367,6 +367,14 @@ class Configuration implements ConfigurationInterface
                         ->prototype('scalar')->cannotBeEmpty()->end()
                         ->defaultValue(['web_api'])
                     ->end()
+                    ->arrayNode('resettable_services')
+                        ->info(
+                            'The list of services that should be reset to its initial state'
+                            . ' after API documentation cache for a specific view is warmed up.'
+                        )
+                        ->example(['acme.api.some_provider'])
+                        ->prototype('scalar')->cannotBeEmpty()->end()
+                    ->end()
                 ->end()
             ->end();
     }

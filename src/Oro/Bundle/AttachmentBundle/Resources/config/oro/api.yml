@@ -5,13 +5,6 @@ api:
             fields:
                 target:
                     data_type: association:manyToOne
-            actions:
-                create:
-                    fields:
-                        target:
-                            form_options:
-                                constraints:
-                                    - NotNull: ~
 
         Oro\Bundle\AttachmentBundle\Entity\File:
             documentation_resource: '@OroAttachmentBundle/Resources/doc/api/file.md'

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityBundle\Api\Processor;
 
 use Oro\Bundle\ActivityBundle\Api\ActivityAssociationProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider;
@@ -33,9 +34,10 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
     private const ACTIVITY_ASSOCIATION = '%activity_association%';
 
     private ActivityAssociationProvider $activityAssociationProvider;
+    private ValueNormalizer $valueNormalizer;
     private ResourceDocParserProvider $resourceDocParserProvider;
     private EntityDescriptionProvider $entityDescriptionProvider;
-    private ValueNormalizer $valueNormalizer;
+    private EntityNameProvider $entityNameProvider;
 
     public function __construct(
         ActivityAssociationProvider $activityAssociationProvider,
@@ -47,6 +49,11 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->entityDescriptionProvider = $entityDescriptionProvider;
         $this->valueNormalizer = $valueNormalizer;
+    }
+
+    public function setEntityNameProvider(EntityNameProvider $entityNameProvider): void
+    {
+        $this->entityNameProvider = $entityNameProvider;
     }
 
     /**
@@ -151,10 +158,9 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         string $activityEntityClass
     ): void {
         $activityTargetsAssociationDefinition = $definition->getField(self::ACTIVITY_TARGETS_ASSOCIATION_NAME);
-        if (null === $activityTargetsAssociationDefinition) {
-            return;
-        }
-        if ($activityTargetsAssociationDefinition->hasDescription()) {
+        if (null === $activityTargetsAssociationDefinition
+            || $activityTargetsAssociationDefinition->hasDescription()
+        ) {
             return;
         }
 
@@ -163,9 +169,8 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             self::ACTIVITY_ENTITY,
             self::ACTIVITY_TARGETS_ASSOCIATION
         );
-
         $activityTargetsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%activity_entity_name%' => $this->getEntityName($activityEntityClass, $requestType)
+            '%activity_entity_name%' => $this->entityNameProvider->getEntityName($activityEntityClass, true)
         ]));
     }
 
@@ -182,7 +187,6 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             self::ACTIVITY_TARGETS_ASSOCIATION,
             $targetAction
         );
-
         $activityTargetEntityClasses = $this->activityAssociationProvider->getActivityTargetClasses(
             $activityEntityClass,
             $version,
@@ -192,7 +196,7 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             ? $this->getEntityType(reset($activityTargetEntityClasses), $requestType)
             : 'users';
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%activity_entity_name%'        => $this->getEntityName($activityEntityClass, $requestType),
+            '%activity_entity_name%'        => $this->entityNameProvider->getEntityName($activityEntityClass, true),
             '%activity_target_entity_type%' => $activityTargetEntityType
         ]));
     }
@@ -209,20 +213,17 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             self::ACTIVITY_ASSOCIATION
         );
 
-        $entityName = $this->getEntityName($entityClass, $requestType);
+        $entityName = $this->entityNameProvider->getEntityName($entityClass, true);
         foreach ($activityAssociations as $associationName => $activityAssociation) {
             $activityAssociationDefinition = $definition->getField($associationName);
-            if (null === $activityAssociationDefinition) {
-                continue;
-            }
-            if ($activityAssociationDefinition->hasDescription()) {
+            if (null === $activityAssociationDefinition || $activityAssociationDefinition->hasDescription()) {
                 continue;
             }
             $activityAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
                 '%entity_name%'                 => $entityName,
-                '%activity_entity_plural_name%' => $this->getEntityPluralName(
+                '%activity_entity_plural_name%' => $this->entityNameProvider->getEntityPluralName(
                     $activityAssociation['className'],
-                    $requestType
+                    true
                 )
             ]));
         }
@@ -243,10 +244,18 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         );
 
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%'                 => $this->getEntityName($entityClass, $requestType),
-            '%activity_entity_plural_name%' => $this->getEntityPluralName($activityEntityClass, $requestType),
+            '%entity_name%'                 => $this->entityNameProvider->getEntityName($entityClass, true),
+            '%activity_entity_plural_name%' => $this->entityNameProvider->getEntityPluralName(
+                $activityEntityClass,
+                true
+            ),
             '%activity_entity_type%'        => $this->getEntityType($activityEntityClass, $requestType)
         ]));
+    }
+
+    private function getEntityType(string $entityClass, RequestType $requestType): string
+    {
+        return ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 
     private function getDocumentationParser(
@@ -257,30 +266,5 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         $docParser->registerDocumentationResource($documentationResource);
 
         return $docParser;
-    }
-
-    private function getEntityType(string $entityClass, RequestType $requestType): string
-    {
-        return ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType);
-    }
-
-    private function getEntityName(string $entityClass, RequestType $requestType): string
-    {
-        $result = $this->entityDescriptionProvider->getEntityDescription($entityClass);
-        if (!$result) {
-            return $this->getEntityType($entityClass, $requestType);
-        }
-
-        return strtolower($result);
-    }
-
-    private function getEntityPluralName(string $entityClass, RequestType $requestType): string
-    {
-        $result = $this->entityDescriptionProvider->getEntityPluralDescription($entityClass);
-        if (!$result) {
-            return $this->getEntityType($entityClass, $requestType);
-        }
-
-        return strtolower($result);
     }
 }

@@ -2,6 +2,9 @@ Oro\Bundle\AttachmentBundle\Entity\Attachment:
     properties:
         file:
             - Valid: ~
+    getters:
+        target:
+            - NotBlank: ~
 
 Oro\Bundle\AttachmentBundle\Entity\FileItem:
     properties:

@@ -20,6 +20,7 @@ services:
             - '@oro_api.entity_description_provider'
         calls:
             - [setValueNormalizer, ['@oro_api.value_normalizer']]
+            - [setEntityNameProvider, ['@oro_api.entity_name_provider']]
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }
 
