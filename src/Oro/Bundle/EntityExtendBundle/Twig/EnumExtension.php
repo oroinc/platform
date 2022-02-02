@@ -82,7 +82,7 @@ class EnumExtension extends AbstractExtension implements ServiceSubscriberInterf
     public function transEnum($enumValueId, $enumValueEntityClassOrEnumCode)
     {
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
-        $label = array_search($enumValueId, $values);
+        $label = array_search($enumValueId, $values, true);
 
         return $label !== false ? $label : $enumValueId;
     }
