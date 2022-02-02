@@ -853,6 +853,12 @@ services:
             - '@oro_api.doctrine_helper'
             - '@translator'
 
+    oro_api.entity_name_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider
+        arguments:
+            - '@oro_api.entity_description_provider'
+            - '@Doctrine\Inflector\Inflector'
+
     oro_api.resource_doc_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
 

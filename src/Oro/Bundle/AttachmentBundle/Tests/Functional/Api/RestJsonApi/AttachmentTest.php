@@ -1,27 +1,27 @@
 <?php
 
-namespace Oro\Bundle\CommentBundle\Tests\Functional\Api\RestJsonApi;
+namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
 /**
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CommentTest extends RestJsonApiTestCase
+class AttachmentTest extends RestJsonApiTestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([
-            '@OroCommentBundle/Tests/Functional/Api/DataFixtures/comment_data.yml'
+            '@OroAttachmentBundle/Tests/Functional/Api/DataFixtures/attachment_data.yml'
         ]);
     }
 
-    private function getTargetId(Comment $comment): ?int
+    private function getTargetId(Attachment $attachment): ?int
     {
-        $target = $comment->getTarget();
+        $target = $attachment->getTarget();
         if (null === $target) {
             return null;
         }
@@ -31,43 +31,43 @@ class CommentTest extends RestJsonApiTestCase
 
     public function testGetList(): void
     {
-        $response = $this->cget(['entity' => 'comments']);
-        $this->assertResponseContains('cget_comment.yml', $response);
+        $response = $this->cget(['entity' => 'attachments']);
+        $this->assertResponseContains('cget_attachment.yml', $response);
     }
 
     public function testGetListWithTargetInIncludeFilter(): void
     {
         $response = $this->cget(
-            ['entity' => 'comments'],
+            ['entity' => 'attachments'],
             ['include' => 'target,target.organization']
         );
         $this->assertResponseContains(
             [
                 'data'     => [
                     [
-                        'type'          => 'comments',
-                        'id'            => '<toString(@comment1->id)>',
+                        'type'          => 'attachments',
+                        'id'            => '<toString(@attachment1->id)>',
                         'relationships' => [
                             'target' => [
-                                'data' => ['type' => 'notes', 'id' => '<toString(@note1->id)>']
+                                'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
                             ]
                         ]
                     ],
                     [
-                        'type'          => 'comments',
-                        'id'            => '<toString(@comment2->id)>',
+                        'type'          => 'attachments',
+                        'id'            => '<toString(@attachment2->id)>',
                         'relationships' => [
                             'target' => [
-                                'data' => ['type' => 'notes', 'id' => '<toString(@note1->id)>']
+                                'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
                             ]
                         ]
                     ],
                     [
-                        'type'          => 'comments',
-                        'id'            => '<toString(@comment3->id)>',
+                        'type'          => 'attachments',
+                        'id'            => '<toString(@attachment3->id)>',
                         'relationships' => [
                             'target' => [
-                                'data' => ['type' => 'notes', 'id' => '<toString(@note2->id)>']
+                                'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department2->id)>']
                             ]
                         ]
                     ]
@@ -81,17 +81,17 @@ class CommentTest extends RestJsonApiTestCase
                         ]
                     ],
                     [
-                        'type'       => 'notes',
-                        'id'         => '<toString(@note1->id)>',
+                        'type'       => 'testapidepartments',
+                        'id'         => '<toString(@department1->id)>',
                         'attributes' => [
-                            'message' => '<toString(@note1->message)>'
+                            'title' => '<toString(@department1->name)>'
                         ]
                     ],
                     [
-                        'type'       => 'notes',
-                        'id'         => '<toString(@note2->id)>',
+                        'type'       => 'testapidepartments',
+                        'id'         => '<toString(@department2->id)>',
                         'attributes' => [
-                            'message' => '<toString(@note2->message)>'
+                            'title' => '<toString(@department2->name)>'
                         ]
                     ]
                 ]
@@ -105,89 +105,89 @@ class CommentTest extends RestJsonApiTestCase
     public function testGet(): void
     {
         $response = $this->get(
-            ['entity' => 'comments', 'id' => '<toString(@comment1->id)>']
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>']
         );
-        $this->assertResponseContains('get_comment.yml', $response);
+        $this->assertResponseContains('get_attachment.yml', $response);
     }
 
     public function testCreate(): void
     {
-        $note1Id = $this->getReference('note1')->getId();
+        $department1Id = $this->getReference('department1')->getId();
         $response = $this->post(
-            ['entity' => 'comments'],
+            ['entity' => 'attachments'],
             [
                 'data' => [
-                    'type'          => 'comments',
+                    'type'          => 'attachments',
                     'attributes'    => [
-                        'message' => 'Message for test comment'
+                        'comment' => 'Comment for test attachment'
                     ],
                     'relationships' => [
                         'target' => [
-                            'data' => ['type' => 'notes', 'id' => '<toString(@note1->id)>']
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
                         ]
                     ]
                 ]
             ]
         );
 
-        $commentId = (int)$this->getResourceId($response);
-        /** @var Comment $comment */
-        $comment = $this->getEntityManager()->find(Comment::class, $commentId);
-        self::assertEquals('Message for test comment', $comment->getMessage());
-        self::assertEquals($note1Id, $this->getTargetId($comment));
+        $attachmentId = (int)$this->getResourceId($response);
+        /** @var Attachment $attachment */
+        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
+        self::assertEquals('Comment for test attachment', $attachment->getComment());
+        self::assertEquals($department1Id, $this->getTargetId($attachment));
     }
 
     public function testUpdate(): void
     {
-        $commentId = $this->getReference('comment1')->getId();
-        $note31Id = $this->getReference('note3')->getId();
+        $attachmentId = $this->getReference('attachment1')->getId();
+        $department31Id = $this->getReference('department3')->getId();
         $data = [
             'data' => [
-                'type'          => 'comments',
-                'id'            => (string)$commentId,
+                'type'          => 'attachments',
+                'id'            => (string)$attachmentId,
                 'attributes'    => [
-                    'message' => 'New message for test comment'
+                    'comment' => 'New comment for test attachment'
                 ],
                 'relationships' => [
                     'target' => [
-                        'data' => ['type' => 'notes', 'id' => '<toString(@note3->id)>']
+                        'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department3->id)>']
                     ]
                 ]
             ]
         ];
         $response = $this->patch(
-            ['entity' => 'comments', 'id' => (string)$commentId],
+            ['entity' => 'attachments', 'id' => (string)$attachmentId],
             $data
         );
         $this->assertResponseContains($data, $response);
 
-        /** @var Comment $comment */
-        $comment = $this->getEntityManager()->find(Comment::class, $commentId);
-        self::assertEquals('New message for test comment', $comment->getMessage());
-        self::assertEquals($note31Id, $this->getTargetId($comment));
+        /** @var Attachment $attachment */
+        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
+        self::assertEquals('New comment for test attachment', $attachment->getComment());
+        self::assertEquals($department31Id, $this->getTargetId($attachment));
     }
 
     public function testDelete(): void
     {
-        $commentId = $this->getReference('comment1')->getId();
+        $attachmentId = $this->getReference('attachment1')->getId();
         $this->delete(
-            ['entity' => 'comments', 'id' => (string)$commentId]
+            ['entity' => 'attachments', 'id' => (string)$attachmentId]
         );
-        self::assertTrue(null === $this->getEntityManager()->find(Comment::class, $commentId));
+        self::assertTrue(null === $this->getEntityManager()->find(Attachment::class, $attachmentId));
     }
 
     public function testGetSubresourceForTarget(): void
     {
         $response = $this->getSubresource(
-            ['entity' => 'comments', 'id' => '<toString(@comment1->id)>', 'association' => 'target']
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'target']
         );
         $this->assertResponseContains(
             [
                 'data' => [
-                    'type'       => 'notes',
-                    'id'         => '<toString(@note1->id)>',
+                    'type'       => 'testapidepartments',
+                    'id'         => '<toString(@department1->id)>',
                     'attributes' => [
-                        'message' => '<toString(@note1->message)>'
+                        'title' => '<toString(@department1->name)>'
                     ]
                 ]
             ],
@@ -199,16 +199,16 @@ class CommentTest extends RestJsonApiTestCase
     public function testGetSubresourceForTargetWithIncludeFilter(): void
     {
         $response = $this->getSubresource(
-            ['entity' => 'comments', 'id' => '<toString(@comment1->id)>', 'association' => 'target'],
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'target'],
             ['include' => 'organization']
         );
         $this->assertResponseContains(
             [
                 'data'     => [
-                    'type'       => 'notes',
-                    'id'         => '<toString(@note1->id)>',
+                    'type'       => 'testapidepartments',
+                    'id'         => '<toString(@department1->id)>',
                     'attributes' => [
-                        'message' => '<toString(@note1->message)>'
+                        'title' => '<toString(@department1->name)>'
                     ]
                 ],
                 'included' => [
@@ -231,10 +231,10 @@ class CommentTest extends RestJsonApiTestCase
     public function testGetRelationshipForTarget(): void
     {
         $response = $this->getRelationship(
-            ['entity' => 'comments', 'id' => '<toString(@comment1->id)>', 'association' => 'target']
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'target']
         );
         $this->assertResponseContains(
-            ['data' => ['type' => 'notes', 'id' => '<toString(@note1->id)>']],
+            ['data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']],
             $response,
             true
         );
@@ -245,26 +245,26 @@ class CommentTest extends RestJsonApiTestCase
 
     public function testUpdateRelationshipForTarget(): void
     {
-        $commentId = $this->getReference('comment1')->getId();
-        $note2Id = $this->getReference('note2')->getId();
+        $attachmentId = $this->getReference('attachment1')->getId();
+        $department2Id = $this->getReference('department2')->getId();
         $this->patchRelationship(
-            ['entity' => 'comments', 'id' => (string)$commentId, 'association' => 'target'],
-            ['data' => ['type' => 'notes', 'id' => (string)$note2Id]]
+            ['entity' => 'attachments', 'id' => (string)$attachmentId, 'association' => 'target'],
+            ['data' => ['type' => 'testapidepartments', 'id' => (string)$department2Id]]
         );
-        /** @var Comment $comment */
-        $comment = $this->getEntityManager()->find(Comment::class, $commentId);
-        self::assertEquals($note2Id, $this->getTargetId($comment));
+        /** @var Attachment $attachment */
+        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
+        self::assertEquals($department2Id, $this->getTargetId($attachment));
     }
 
     public function testTryToCreateWithoutTarget(): void
     {
         $response = $this->post(
-            ['entity' => 'comments'],
+            ['entity' => 'attachments'],
             [
                 'data' => [
-                    'type'       => 'comments',
+                    'type'       => 'attachments',
                     'attributes' => [
-                        'message' => 'Message for test comment'
+                        'comment' => 'Comment for test attachment'
                     ]
                 ]
             ],
@@ -284,12 +284,12 @@ class CommentTest extends RestJsonApiTestCase
     public function testTryToCreateWithNullTarget(): void
     {
         $response = $this->post(
-            ['entity' => 'comments'],
+            ['entity' => 'attachments'],
             [
                 'data' => [
-                    'type'          => 'comments',
+                    'type'          => 'attachments',
                     'attributes'    => [
-                        'message' => 'Message for test comment'
+                        'comment' => 'Comment for test attachment'
                     ],
                     'relationships' => [
                         'target' => [
@@ -314,11 +314,11 @@ class CommentTest extends RestJsonApiTestCase
     public function testTryToSetNullTarget(): void
     {
         $response = $this->patch(
-            ['entity' => 'comments', 'id' => '<toString(@comment1->id)>'],
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>'],
             [
                 'data' => [
-                    'type'          => 'comments',
-                    'id'            => '<toString(@comment1->id)>',
+                    'type'          => 'attachments',
+                    'id'            => '<toString(@attachment1->id)>',
                     'relationships' => [
                         'target' => [
                             'data' => null
@@ -342,7 +342,7 @@ class CommentTest extends RestJsonApiTestCase
     public function testTryToUpdateTargetAsRelationshipWithNullValue()
     {
         $response = $this->patchRelationship(
-            ['entity' => 'comments', 'id' => '<toString(@comment1->id)>', 'association' => 'target'],
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'target'],
             ['data' => null],
             [],
             false

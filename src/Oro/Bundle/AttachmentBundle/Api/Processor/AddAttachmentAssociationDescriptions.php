@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CommentBundle\Api\Processor;
+namespace Oro\Bundle\AttachmentBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
@@ -9,31 +9,32 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocPar
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
+use Oro\Bundle\AttachmentBundle\Api\AttachmentAssociationProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Adds human-readable descriptions for associations with the comment entity.
+ * Adds human-readable descriptions for associations with the attachment entity.
  */
-class AddCommentAssociationDescriptions implements ProcessorInterface
+class AddAttachmentAssociationDescriptions implements ProcessorInterface
 {
-    private const COMMENTS_ASSOCIATION_NAME = 'comments';
+    private const ATTACHMENTS_ASSOCIATION_NAME = 'attachments';
 
-    private const COMMENT_ASSOCIATION_DOC_RESOURCE = '@OroCommentBundle/Resources/doc/api/comment_association.md';
-    private const COMMENT_TARGET_ENTITY = '%comment_target_entity%';
-    private const COMMENTS_ASSOCIATION = '%comments_association%';
+    private const ATTACHMENT_ASSOCIATION_DOC_RESOURCE =
+        '@OroAttachmentBundle/Resources/doc/api/attachment_association.md';
+    private const ATTACHMENT_TARGET_ENTITY = '%attachment_target_entity%';
+    private const ATTACHMENTS_ASSOCIATION = '%attachments_association%';
 
-    private CommentAssociationProvider $commentAssociationProvider;
+    private AttachmentAssociationProvider $attachmentAssociationProvider;
     private ResourceDocParserProvider $resourceDocParserProvider;
     private EntityNameProvider $entityNameProvider;
 
     public function __construct(
-        CommentAssociationProvider $commentAssociationProvider,
+        AttachmentAssociationProvider $attachmentAssociationProvider,
         ResourceDocParserProvider $resourceDocParserProvider,
         EntityNameProvider $entityNameProvider
     ) {
-        $this->commentAssociationProvider = $commentAssociationProvider;
+        $this->attachmentAssociationProvider = $attachmentAssociationProvider;
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->entityNameProvider = $entityNameProvider;
     }
@@ -55,13 +56,13 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
 
-        $commentAssociationName = $this->commentAssociationProvider->getCommentAssociationName(
+        $attachmentAssociationName = $this->attachmentAssociationProvider->getAttachmentAssociationName(
             $entityClass,
             $version,
             $requestType
         );
-        if ($commentAssociationName) {
-            $this->addCommentAssociationDescriptions(
+        if ($attachmentAssociationName) {
+            $this->addAttachmentAssociationDescriptions(
                 $context->getResult(),
                 $requestType,
                 $targetAction,
@@ -71,7 +72,7 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         }
     }
 
-    private function addCommentAssociationDescriptions(
+    private function addAttachmentAssociationDescriptions(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
         string $targetAction,
@@ -79,8 +80,8 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         ?string $associationName
     ): void {
         if (!$associationName) {
-            $this->setDescriptionsForCommentsField($definition, $requestType, $entityClass, $targetAction);
-        } elseif (self::COMMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
+            $this->setDescriptionsForAttachmentsField($definition, $requestType, $entityClass, $targetAction);
+        } elseif (self::ATTACHMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
             $this->setDescriptionsForSubresource(
                 $definition,
                 $requestType,
@@ -90,30 +91,30 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         }
     }
 
-    private function setDescriptionsForCommentsField(
+    private function setDescriptionsForAttachmentsField(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
         string $entityClass,
         string $targetAction
     ): void {
-        $commentsAssociationDefinition = $definition->getField(self::COMMENTS_ASSOCIATION_NAME);
-        if (null === $commentsAssociationDefinition || $commentsAssociationDefinition->hasDescription()) {
+        $attachmentsAssociationDefinition = $definition->getField(self::ATTACHMENTS_ASSOCIATION_NAME);
+        if (null === $attachmentsAssociationDefinition || $attachmentsAssociationDefinition->hasDescription()) {
             return;
         }
 
-        $docParser = $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE);
+        $docParser = $this->getDocumentationParser($requestType, self::ATTACHMENT_ASSOCIATION_DOC_RESOURCE);
         $associationDocumentationTemplate = $docParser->getFieldDocumentation(
-            self::COMMENT_TARGET_ENTITY,
-            self::COMMENTS_ASSOCIATION,
+            self::ATTACHMENT_TARGET_ENTITY,
+            self::ATTACHMENTS_ASSOCIATION,
             $targetAction
         );
         if (!$associationDocumentationTemplate) {
             $associationDocumentationTemplate = $docParser->getFieldDocumentation(
-                self::COMMENT_TARGET_ENTITY,
-                self::COMMENTS_ASSOCIATION
+                self::ATTACHMENT_TARGET_ENTITY,
+                self::ATTACHMENTS_ASSOCIATION
             );
         }
-        $commentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
+        $attachmentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
             '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
@@ -124,10 +125,10 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         string $entityClass,
         string $targetAction
     ): void {
-        $docParser = $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE);
+        $docParser = $this->getDocumentationParser($requestType, self::ATTACHMENT_ASSOCIATION_DOC_RESOURCE);
         $subresourceDocumentationTemplate = $docParser->getSubresourceDocumentation(
-            self::COMMENT_TARGET_ENTITY,
-            self::COMMENTS_ASSOCIATION,
+            self::ATTACHMENT_TARGET_ENTITY,
+            self::ATTACHMENTS_ASSOCIATION,
             $targetAction
         );
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [

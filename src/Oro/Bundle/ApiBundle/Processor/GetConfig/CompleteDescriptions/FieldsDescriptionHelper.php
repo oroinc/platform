@@ -21,43 +21,32 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FieldsDescriptionHelper
 {
-    private const  CREATED_AT_DESCRIPTION    = 'The date and time of resource record creation.';
-    private const  UPDATED_AT_DESCRIPTION    = 'The date and time of the last update of the resource record.';
-    private const  OWNER_DESCRIPTION         = 'An owner record represents the ownership capabilities of the record.';
-    private const  ORGANIZATION_DESCRIPTION  = 'An organization record represents a real enterprise, business, firm,'
+    private const CREATED_AT_DESCRIPTION = 'The date and time of resource record creation.';
+    private const UPDATED_AT_DESCRIPTION = 'The date and time of the last update of the resource record.';
+    private const OWNER_DESCRIPTION = 'An owner record represents the ownership capabilities of the record.';
+    private const ORGANIZATION_DESCRIPTION = 'An organization record represents a real enterprise, business, firm,'
     . ' company or another organization to which the users belong.';
-    private const  ENUM_NAME_DESCRIPTION     = 'The human readable name of the option.';
-    private const  ENUM_DEFAULT_DESCRIPTION  = 'Determines if this option is selected by default for new records.';
-    private const  ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked.'
+    private const ENUM_NAME_DESCRIPTION = 'The human readable name of the option.';
+    private const ENUM_DEFAULT_DESCRIPTION = 'Determines if this option is selected by default for new records.';
+    private const ENUM_PRIORITY_DESCRIPTION = 'The order in which options are ranked.'
     . ' First appears the option with the higher number of the priority.';
 
-    /** @var EntityDescriptionProvider */
-    private $entityDocProvider;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var ResourceDocParserProvider */
-    private $resourceDocParserProvider;
-
-    /** @var DescriptionProcessor */
-    private $descriptionProcessor;
-
-    /** @var IdentifierDescriptionHelper */
-    private $identifierDescriptionHelper;
-
-    /** @var ConfigProvider */
-    private $ownershipConfigProvider;
+    private EntityDescriptionProvider $entityDescriptionProvider;
+    private TranslatorInterface $translator;
+    private ResourceDocParserProvider $resourceDocParserProvider;
+    private DescriptionProcessor $descriptionProcessor;
+    private IdentifierDescriptionHelper $identifierDescriptionHelper;
+    private ConfigProvider $ownershipConfigProvider;
 
     public function __construct(
-        EntityDescriptionProvider $entityDocProvider,
+        EntityDescriptionProvider $entityDescriptionProvider,
         TranslatorInterface $translator,
         ResourceDocParserProvider $resourceDocParserProvider,
         DescriptionProcessor $descriptionProcessor,
         IdentifierDescriptionHelper $identifierDescriptionHelper,
         ConfigProvider $ownershipConfigProvider
     ) {
-        $this->entityDocProvider = $entityDocProvider;
+        $this->entityDescriptionProvider = $entityDescriptionProvider;
         $this->translator = $translator;
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->descriptionProcessor = $descriptionProcessor;
@@ -149,11 +138,6 @@ class FieldsDescriptionHelper
         }
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     *
-     * @return string
-     */
     private function getIdentifierFieldName(EntityDefinitionConfig $definition): ?string
     {
         $identifierFieldNames = $definition->getIdentifierFieldNames();
@@ -316,7 +300,7 @@ class FieldsDescriptionHelper
             $propertyPath = $fieldPrefix . $propertyPath;
         }
 
-        return $this->entityDocProvider->getFieldDocumentation($entityClass, $propertyPath);
+        return $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath);
     }
 
     private function trans(Label $label): ?string

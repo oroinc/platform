@@ -1,32 +1,32 @@
 <?php
 
-namespace Oro\Bundle\CommentBundle\Tests\Unit\Api\Processor;
+namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Api\Processor;
 
 use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
-use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
-use Oro\Bundle\CommentBundle\Api\Processor\AddCommentAssociationDescriptions;
-use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\AttachmentBundle\Api\AttachmentAssociationProvider;
+use Oro\Bundle\AttachmentBundle\Api\Processor\AddAttachmentAssociationDescriptions;
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
-class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
+class AddAttachmentAssociationDescriptionsTest extends ConfigProcessorTestCase
 {
-    /** @var CommentAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $commentAssociationProvider;
+    /** @var AttachmentAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attachmentAssociationProvider;
 
     /** @var ResourceDocParserInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $docParser;
 
-    /** @var AddCommentAssociationDescriptions */
+    /** @var AddAttachmentAssociationDescriptions */
     private $processor;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->commentAssociationProvider = $this->createMock(CommentAssociationProvider::class);
+        $this->attachmentAssociationProvider = $this->createMock(AttachmentAssociationProvider::class);
         $this->docParser = $this->createMock(ResourceDocParserInterface::class);
 
         $resourceDocParserProvider = $this->createMock(ResourceDocParserProvider::class);
@@ -43,8 +43,8 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
                 return strtolower(substr($className, strrpos($className, '\\') + 1)) . ' (description)';
             });
 
-        $this->processor = new AddCommentAssociationDescriptions(
-            $this->commentAssociationProvider,
+        $this->processor = new AddAttachmentAssociationDescriptions(
+            $this->attachmentAssociationProvider,
             $resourceDocParserProvider,
             $entityNameProvider
         );
@@ -55,8 +55,8 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $entityClass = 'Test\Entity';
         $definition = $this->createConfigObject([]);
 
-        $this->commentAssociationProvider->expects(self::never())
-            ->method('getCommentAssociationName');
+        $this->attachmentAssociationProvider->expects(self::never())
+            ->method('getAttachmentAssociationName');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($definition);
@@ -70,8 +70,8 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $entityClass = 'Test\Entity';
         $definition = $this->createConfigObject([]);
 
-        $this->commentAssociationProvider->expects(self::never())
-            ->method('getCommentAssociationName');
+        $this->attachmentAssociationProvider->expects(self::never())
+            ->method('getAttachmentAssociationName');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($definition);
@@ -81,36 +81,36 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessForEntityWithCommentsAssociation(): void
+    public function testProcessForEntityWithAttachmentsAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
             'fields' => [
-                'comments' => [
-                    'target_class' => Comment::class,
+                'attachments' => [
+                    'target_class' => Attachment::class,
                     'data_type'    => 'unidirectionalAssociation:association1'
                 ]
             ]
         ]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
         $this->docParser->expects(self::once())
             ->method('registerDocumentationResource')
-            ->with('@OroCommentBundle/Resources/doc/api/comment_association.md');
+            ->with('@OroAttachmentBundle/Resources/doc/api/attachment_association.md');
         $this->docParser->expects(self::exactly(2))
             ->method('getFieldDocumentation')
             ->withConsecutive(
-                ['%comment_target_entity%', '%comments_association%', $targetAction],
-                ['%comment_target_entity%', '%comments_association%', null]
+                ['%attachment_target_entity%', '%attachments_association%', $targetAction],
+                ['%attachment_target_entity%', '%attachments_association%', null]
             )
             ->willReturnOnConsecutiveCalls(
                 null,
-                'Description for comments associated with the "%entity_name%".'
+                'Description for attachments associated with the "%entity_name%".'
             );
 
         $this->context->setClassName($entityClass);
@@ -121,10 +121,10 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'comments' => [
-                        'target_class' => Comment::class,
+                    'attachments' => [
+                        'target_class' => Attachment::class,
                         'data_type'    => 'unidirectionalAssociation:association1',
-                        'description'  => 'Description for comments associated with the "entity (description)".'
+                        'description'  => 'Description for attachments associated with the "entity (description)".'
                     ]
                 ]
             ],
@@ -132,31 +132,31 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEntityWithCommentsAssociationAndHasOwnDescriptionForTargetAction(): void
+    public function testProcessForEntityWithAttachmentsAssociationAndHasOwnDescriptionForTargetAction(): void
     {
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
             'fields' => [
-                'comments' => [
-                    'target_class' => Comment::class,
+                'attachments' => [
+                    'target_class' => Attachment::class,
                     'data_type'    => 'unidirectionalAssociation:association1'
                 ]
             ]
         ]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
         $this->docParser->expects(self::once())
             ->method('registerDocumentationResource')
-            ->with('@OroCommentBundle/Resources/doc/api/comment_association.md');
+            ->with('@OroAttachmentBundle/Resources/doc/api/attachment_association.md');
         $this->docParser->expects(self::once())
             ->method('getFieldDocumentation')
-            ->with('%comment_target_entity%', '%comments_association%', $targetAction)
-            ->willReturn('Description for comments associated with the "%entity_name%" for target action.');
+            ->with('%attachment_target_entity%', '%attachments_association%', $targetAction)
+            ->willReturn('Description for attachments associated with the "%entity_name%" for target action.');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($definition);
@@ -166,10 +166,10 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'comments' => [
-                        'target_class' => Comment::class,
+                    'attachments' => [
+                        'target_class' => Attachment::class,
                         'data_type'    => 'unidirectionalAssociation:association1',
-                        'description'  => 'Description for comments associated with the "entity (description)"'
+                        'description'  => 'Description for attachments associated with the "entity (description)"'
                             . ' for target action.'
                     ]
                 ]
@@ -178,29 +178,29 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEntityWithCommentsAssociationWhenAssociationAlreadyHasDescription(): void
+    public function testProcessForEntityWithAttachmentsAssociationWhenAssociationAlreadyHasDescription(): void
     {
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([
             'fields' => [
-                'comments' => [
-                    'target_class' => Comment::class,
+                'attachments' => [
+                    'target_class' => Attachment::class,
                     'data_type'    => 'unidirectionalAssociation:association1',
                     'description'  => 'Existing description.'
                 ]
             ]
         ]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
         $this->docParser->expects(self::never())
             ->method('registerDocumentationResource');
         $this->docParser->expects(self::never())
-            ->method('getFieldDocumentation');
+            ->method('getSubresourceDocumentation');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($definition);
@@ -210,8 +210,8 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig(
             [
                 'fields' => [
-                    'comments' => [
-                        'target_class' => Comment::class,
+                    'attachments' => [
+                        'target_class' => Attachment::class,
                         'data_type'    => 'unidirectionalAssociation:association1',
                         'description'  => 'Existing description.'
                     ]
@@ -221,21 +221,21 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEntityWithCommentsAssociationWhenAssociationDoesNotExist(): void
+    public function testProcessForEntityWithAttachmentsAssociationWhenAssociationDoesNotExist(): void
     {
         $entityClass = 'Test\Entity';
         $targetAction = ApiAction::UPDATE;
         $definition = $this->createConfigObject([]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
         $this->docParser->expects(self::never())
             ->method('registerDocumentationResource');
         $this->docParser->expects(self::never())
-            ->method('getFieldDocumentation');
+            ->method('getSubresourceDocumentation');
 
         $this->context->setClassName($entityClass);
         $this->context->setResult($definition);
@@ -245,26 +245,26 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->assertConfig([], $definition);
     }
 
-    public function testProcessSubresourceForEntityWithCommentsAssociation(): void
+    public function testProcessSubresourceForEntityWithAttachmentsAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
-        $associationName = 'comments';
+        $associationName = 'attachments';
         $targetAction = ApiAction::UPDATE_RELATIONSHIP;
         $definition = $this->createConfigObject([]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
         $this->docParser->expects(self::once())
             ->method('registerDocumentationResource')
-            ->with('@OroCommentBundle/Resources/doc/api/comment_association.md');
+            ->with('@OroAttachmentBundle/Resources/doc/api/attachment_association.md');
         $this->docParser->expects(self::once())
             ->method('getSubresourceDocumentation')
-            ->with('%comment_target_entity%', '%comments_association%', $targetAction)
-            ->willReturn('Documentation for comments associated with the "%entity_name%".');
+            ->with('%attachment_target_entity%', '%attachments_association%', $targetAction)
+            ->willReturn('Documentation for attachments associated with the "%entity_name%".');
 
         $this->context->setClassName($entityClass);
         $this->context->setParentClassName($parentEntityClass);
@@ -275,24 +275,24 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
 
         $this->assertConfig(
             [
-                'documentation' => 'Documentation for comments associated with the "parent (description)".'
+                'documentation' => 'Documentation for attachments associated with the "parent (description)".'
             ],
             $definition
         );
     }
 
-    public function testProcessSubresourceForEntityWithCommentsAssociationWhenItAlreadyHasDocumentation(): void
+    public function testProcessSubresourceForEntityWithAttachmentsAssociationWhenItAlreadyHasDocumentation(): void
     {
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
-        $associationName = 'comments';
+        $associationName = 'attachments';
         $targetAction = ApiAction::UPDATE_RELATIONSHIP;
         $definition = $this->createConfigObject([
             'documentation' => 'Existing documentation.'
         ]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
@@ -316,7 +316,7 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessSubresourceForEntityWithCommentsAssociationForNotCommentsAssociation(): void
+    public function testProcessSubresourceForEntityWithAttachmentsAssociationForNotAttachmentsAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\Parent';
@@ -324,8 +324,8 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
         $targetAction = ApiAction::UPDATE_RELATIONSHIP;
         $definition = $this->createConfigObject([]);
 
-        $this->commentAssociationProvider->expects(self::once())
-            ->method('getCommentAssociationName')
+        $this->attachmentAssociationProvider->expects(self::once())
+            ->method('getAttachmentAssociationName')
             ->with($parentEntityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn('association1');
 
