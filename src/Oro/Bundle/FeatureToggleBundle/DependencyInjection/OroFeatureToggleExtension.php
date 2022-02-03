@@ -21,6 +21,7 @@ class OroFeatureToggleExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('commands.yml');
 
         $container->getDefinition('oro_featuretoggle.checker.feature_checker')
             ->addArgument($config['strategy'])

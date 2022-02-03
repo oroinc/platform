@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        public: false
+
+    Oro\Bundle\FeatureToggleBundle\Command\ConfigDumpReferenceCommand:
+        arguments:
+            - '@oro_featuretoggle.configuration'
+        tags:
+            - { name: console.command }

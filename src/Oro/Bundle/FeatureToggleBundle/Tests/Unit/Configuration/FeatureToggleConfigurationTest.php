@@ -3,7 +3,10 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +15,19 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->configuration = new FeatureToggleConfiguration();
+        $extension = $this->createMock(ConfigurationExtensionInterface::class);
+        $extension->expects(self::any())
+            ->method('extendConfigurationTree')
+            ->willReturnCallback(function (NodeBuilder $node) {
+                $node->arrayNode('test_items')->prototype('variable')->end()->end();
+            });
+
+        $this->configuration = new FeatureToggleConfiguration([$extension]);
+    }
+
+    private function processConfiguration(array $inputData): array
+    {
+        return (new Processor())->processConfiguration($this->configuration, [$inputData]);
     }
 
     public function testProcessEmptyConfiguration(): void
@@ -37,16 +52,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'entities' => [],
                 'field_configs' => [],
                 'commands' => [],
-                'sidebar_widgets' => [],
-                'dashboard_widgets' => [],
-                'cron_jobs' => [],
-                'api_resources' => [],
-                'navigation_items' => [],
-                'operations' => [],
-                'workflows' => [],
-                'processes' => [],
-                'placeholder_items' => [],
-                'mq_topics' => []
+                'mq_topics' => [],
+                'test_items' => []
             ]
         ];
 
@@ -67,16 +74,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' => true,
-                'sidebar_widgets' => ['sidebar_widget1', 'sidebar_widget2'],
-                'dashboard_widgets' => ['dashboard_widget1', 'dashboard_widget2'],
-                'cron_jobs' => ['cron_job1', 'cron_job2'],
-                'api_resources' => ['api_resource1', 'api_resource2'],
-                'navigation_items' => ['navigation_item1', 'navigation_item2'],
-                'operations' => ['operation1', 'operation2'],
-                'workflows' => ['workflow1', 'workflow2'],
-                'processes' => ['processe1', 'processe2'],
-                'placeholder_items' => ['placeholder_item1', 'placeholder_item2'],
-                'mq_topics' => ['mq.topic1', 'mq.topic2']
+                'mq_topics' => ['mq.topic1', 'mq.topic2'],
+                'test_items' => ['item1', 'item2']
             ],
         ];
 
@@ -93,16 +92,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' => true,
                 'commands' => [],
-                'sidebar_widgets' => ['sidebar_widget1', 'sidebar_widget2'],
-                'dashboard_widgets' => ['dashboard_widget1', 'dashboard_widget2'],
-                'cron_jobs' => ['cron_job1', 'cron_job2'],
-                'api_resources' => ['api_resource1', 'api_resource2'],
-                'navigation_items' => ['navigation_item1', 'navigation_item2'],
-                'operations' => ['operation1', 'operation2'],
-                'workflows' => ['workflow1', 'workflow2'],
-                'processes' => ['processe1', 'processe2'],
-                'placeholder_items' => ['placeholder_item1', 'placeholder_item2'],
-                'mq_topics' => ['mq.topic1', 'mq.topic2']
+                'mq_topics' => ['mq.topic1', 'mq.topic2'],
+                'test_items' => ['item1', 'item2']
             ]
         ];
 
@@ -111,13 +102,10 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider processInvalidConfigurationProvider
-     *
-     * @param array $inputData
-     * @param string $expectedExceptionMessage
      */
-    public function testProcessInvalidConfiguration(array $inputData, $expectedExceptionMessage): void
+    public function testProcessInvalidConfiguration(array $inputData, string $expectedExceptionMessage): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
 
         $this->processConfiguration($inputData);
@@ -194,10 +182,15 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                         'strategy' => 'not supported'
                     ]
                 ],
-                'message' => 'The "strategy" can be "'
-                    . FeatureChecker::STRATEGY_AFFIRMATIVE
-                    . '", "' . FeatureChecker::STRATEGY_CONSENSUS. '" or "'
-                    . FeatureChecker::STRATEGY_UNANIMOUS. '.'
+                'message' => sprintf(
+                    'The value "not supported" is not allowed for path "features.feature1.strategy". ' .
+                    'Permissible values: "%s"',
+                    implode('", "', [
+                        FeatureChecker::STRATEGY_AFFIRMATIVE,
+                        FeatureChecker::STRATEGY_CONSENSUS,
+                        FeatureChecker::STRATEGY_UNANIMOUS
+                    ])
+                )
             ],
             'incorrect allow_if_all_abstain' => [
                 'input' => [
@@ -220,12 +213,5 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                              'Expected "bool", but got "string"'
             ],
         ];
-    }
-
-    protected function processConfiguration(array $inputData): array
-    {
-        $processor = new Processor();
-
-        return $processor->processConfiguration($this->configuration, [$inputData]);
     }
 }

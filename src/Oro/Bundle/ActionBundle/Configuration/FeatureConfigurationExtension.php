@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\Configuration;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
+/**
+ * Adds "operations" section to "Resources/config/oro/features.yml" configuration file.
+ */
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface
 {
     /**
@@ -14,6 +17,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface
     {
         $node
             ->arrayNode('operations')
+                ->info('A list of operation names.')
                 ->prototype('variable')
                 ->end()
             ->end();

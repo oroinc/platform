@@ -10,15 +10,14 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface
 {
-    public const API_RESOURCE_KEY = 'api_resources';
-
     /**
      * {@inheritdoc}
      */
     public function extendConfigurationTree(NodeBuilder $node)
     {
         $node
-            ->arrayNode(self::API_RESOURCE_KEY)
+            ->arrayNode('api_resources')
+                ->info('A list of entity FQCNs that are available as API resources.')
                 ->prototype('variable')
                 ->end()
             ->end();

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -30,10 +29,7 @@ class ValidateEntityTypeFeature implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if (!$this->featureChecker->isResourceEnabled(
-            $context->getClassName(),
-            FeatureConfigurationExtension::API_RESOURCE_KEY
-        )) {
+        if (!$this->featureChecker->isResourceEnabled($context->getClassName(), 'api_resources')) {
             throw new NotFoundHttpException();
         }
     }
