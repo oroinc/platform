@@ -377,10 +377,14 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      */
     protected function transformEntityField($field, &$value)
     {
+        $doctrineHelper = $this->get('oro_entity.doctrine_helper');
         if ($value instanceof Proxy && method_exists($value, '__toString')) {
             $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
+        } elseif (is_object($value) && method_exists($value, '__toString') &&
+            $doctrineHelper->isManageableEntity($value)) {
+            $value = (string)$value;
         }
     }
 
