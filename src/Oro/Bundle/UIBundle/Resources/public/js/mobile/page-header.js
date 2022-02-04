@@ -16,7 +16,9 @@ define(function(require, exports, module) {
     function showButtons() {
         const $container = $(containerSelector);
         if ($container.dropdownButtonProcessor('isGrouped')) {
-            $container.closest('.row').addClass('row__nowrap');
+            if (!$container.closest('.row').find('.dashboard-selector-container').length) {
+                $container.closest('.row').addClass('row__nowrap');
+            }
         }
         $container.show();
     }
