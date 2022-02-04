@@ -73,7 +73,7 @@ oro_behat_extension:
 
     Add Recent Emails widget:
       selector:
-        locator: '//h4[text()="Recent Emails"]/../../..//div[4]/button'
+        locator: '//em[text()="Recent Emails"]/../../..//button[@data-role="add-action"]'
         type: xpath
 
     Close Organization info popup:
