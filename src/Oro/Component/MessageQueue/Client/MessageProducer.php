@@ -20,19 +20,15 @@ class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
 
     private MessageRouterInterface $messageRouter;
 
-    private MessageBodyResolverInterface $messageBodyResolver;
-
     private bool $debug;
 
     public function __construct(
         DriverInterface $driver,
         MessageRouterInterface $messageRouter,
-        MessageBodyResolverInterface $messageBodyResolver,
         bool $debug = false
     ) {
         $this->driver = $driver;
         $this->messageRouter = $messageRouter;
-        $this->messageBodyResolver = $messageBodyResolver;
         $this->debug = $debug;
 
         $this->logger = new NullLogger();
@@ -83,7 +79,7 @@ class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
         }
 
         $message->setContentType($this->getContentType($message));
-        $message->setBody($this->messageBodyResolver->resolveBody($topicName, $message->getBody()));
+        $message->setBody($this->getBody($message));
 
         if (!$message->getMessageId()) {
             $message->setMessageId(uniqid('oro.', true));
@@ -113,5 +109,25 @@ class MessageProducer implements MessageProducerInterface, LoggerAwareInterface
         }
 
         return $contentType ?: 'text/plain';
+    }
+
+    private function getBody(Message $message): string|array
+    {
+        $body = $message->getBody();
+
+        if (null === $body || is_scalar($body)) {
+            return (string)$body;
+        }
+
+        if (is_array($body)) {
+            return $body;
+        }
+
+        throw new InvalidArgumentException(
+            sprintf(
+                'The message\'s body must be either null, scalar or array. Got: %s',
+                get_debug_type($body)
+            )
+        );
     }
 }
