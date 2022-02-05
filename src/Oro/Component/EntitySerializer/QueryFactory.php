@@ -65,7 +65,7 @@ class QueryFactory
     public function getToManyAssociationQueryBuilder(array $associationMapping, array $entityIds): QueryBuilder
     {
         $qb = $this->getNotInitializedToManyAssociationQueryBuilder($associationMapping);
-        $this->initializeToManyAssociationQueryBuilder($qb, $associationMapping['sourceEntity'], $entityIds);
+        $this->initializeAssociationQueryBuilder($qb, $associationMapping['sourceEntity'], $entityIds);
 
         return $qb;
     }
@@ -83,14 +83,15 @@ class QueryFactory
             ->innerJoin('e.' . $associationMapping['fieldName'], 'r');
     }
 
-    public function initializeToManyAssociationQueryBuilder(
+    public function initializeAssociationQueryBuilder(
         QueryBuilder $qb,
         string $entityClass,
-        array $entityIds
+        array $entityIds,
+        bool $forceIn = false
     ): void {
         $entityIdField = $this->doctrineHelper->getEntityIdFieldName($entityClass);
-        $qb->select(\sprintf('e.%s as entityId', $entityIdField));
-        $this->applyEntityIdentifierRestriction($qb, 'e', $entityIdField, $entityIds);
+        $qb->select(sprintf('e.%s as entityId', $entityIdField));
+        $this->applyEntityIdentifierRestriction($qb, 'e', $entityIdField, $entityIds, $forceIn);
     }
 
     /**
@@ -114,14 +115,14 @@ class QueryFactory
             $limit++;
         }
 
-        if (null !== $limit && $limit > 0 && \count($entityIds) > 1) {
-            $this->initializeToManyAssociationQueryBuilder($qb, $entityClass, [self::FAKE_ID]);
+        if (null !== $limit && $limit > 0 && count($entityIds) > 1) {
+            $this->initializeAssociationQueryBuilder($qb, $entityClass, [self::FAKE_ID]);
             $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
             $rows = $this->getRelatedItemsUnionAllQuery($query, $entityIds, $limit)
                 ->getQuery()
                 ->getScalarResult();
         } else {
-            $this->initializeToManyAssociationQueryBuilder($qb, $entityClass, $entityIds);
+            $this->initializeAssociationQueryBuilder($qb, $entityClass, $entityIds);
             $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
             if (null !== $limit && $limit >= 0) {
                 $query->setMaxResults($limit);
@@ -150,11 +151,11 @@ class QueryFactory
             if (!\is_string($id)) {
                 $fakeId = '\'' . $fakeId . '\'';
             }
-            $subQueries[] = \str_replace($fakeId, $id, $subQuerySqlTemplate);
+            $subQueries[] = str_replace($fakeId, $id, $subQuerySqlTemplate);
         }
 
         $subQueryMapping = $parsedSubQuery->getResultSetMapping();
-        $selectStmt = \sprintf(
+        $selectStmt = sprintf(
             'entity.%s AS entityId, entity.%s AS relatedEntityId',
             ResultSetMappingUtil::getColumnNameByAlias($subQueryMapping, 'entityId'),
             ResultSetMappingUtil::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
@@ -170,14 +171,14 @@ class QueryFactory
         $qb = new SqlQueryBuilder($subQueryTemplate->getEntityManager(), $rsm);
         $qb
             ->select($selectStmt)
-            ->from('(' . \implode(' UNION ALL ', $subQueries) . ')', 'entity');
+            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
 
         return $qb;
     }
 
     private function getRelatedItemsIdsQuery(QueryBuilder $qb, string $targetEntityClass, EntityConfig $config): Query
     {
-        $qb->addSelect(\sprintf(
+        $qb->addSelect(sprintf(
             'r.%s as relatedEntityId',
             $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
         ));
@@ -189,15 +190,16 @@ class QueryFactory
         QueryBuilder $qb,
         string $alias,
         string $entityIdField,
-        array $entityIds
+        array $entityIds,
+        bool $forceIn = false
     ): void {
-        if (\count($entityIds) === 1) {
+        if (!$forceIn && count($entityIds) === 1) {
             $qb
-                ->where(\sprintf('%s.%s = :id', $alias, $entityIdField))
-                ->setParameter('id', \reset($entityIds));
+                ->where(sprintf('%s.%s = :id', $alias, $entityIdField))
+                ->setParameter('id', reset($entityIds));
         } else {
             $qb
-                ->where(\sprintf('%s.%s IN (:ids)', $alias, $entityIdField))
+                ->where(sprintf('%s.%s IN (:ids)', $alias, $entityIdField))
                 ->setParameter('ids', $entityIds);
         }
     }

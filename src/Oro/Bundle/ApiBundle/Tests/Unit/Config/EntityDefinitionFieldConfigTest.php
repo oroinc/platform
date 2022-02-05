@@ -468,14 +468,4 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionFieldConfig();
         $config->setAssociationQuery($this->createMock(QueryBuilder::class));
     }
-
-    public function testSetAssociationQueryForNotCollectionValuedAssociation()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('An association query can be used only for collection valued associations.');
-
-        $config = new EntityDefinitionFieldConfig();
-        $config->setTargetClass('Test\Class');
-        $config->setAssociationQuery($this->createMock(QueryBuilder::class));
-    }
 }
