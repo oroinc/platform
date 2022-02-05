@@ -48,7 +48,10 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($convertedConfig->get('skip_acl_for_root_entity'));
     }
 
-    public function testConvertConfigWithAssociationQuery()
+    /**
+     * @dataProvider convertConfigWithAssociationQueryDataProvider
+     */
+    public function testConvertConfigWithAssociationQuery(?string $targetType)
     {
         $requestType = new RequestType(['test']);
         $associationName = 'association1';
@@ -64,6 +67,13 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
+        $isCollection = true;
+        if ($targetType) {
+            $config['fields'][$associationName]['target_type'] = $targetType;
+            if ('to-one' === $targetType) {
+                $isCollection = false;
+            }
+        }
 
         $entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
         $this->entityOverrideProviderRegistry->expects(self::once())
@@ -83,6 +93,16 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(AssociationQuery::class, $associationQuery);
         self::assertEquals($targetClass, $associationQuery->getTargetEntityClass());
         self::assertSame($qb, $associationQuery->getQueryBuilder());
+        self::assertSame($isCollection, $associationQuery->isCollection());
+    }
+
+    public function convertConfigWithAssociationQueryDataProvider(): array
+    {
+        return [
+            ['targetType' => null],
+            ['targetType' => 'to-many'],
+            ['targetType' => 'to-one']
+        ];
     }
 
     public function testConvertConfigWithAssociationQueryAndWhenTargetClassIsModelThatOverridesEntity()
@@ -121,6 +141,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(AssociationQuery::class, $associationQuery);
         self::assertEquals($targetEntityClass, $associationQuery->getTargetEntityClass());
         self::assertSame($qb, $associationQuery->getQueryBuilder());
+        self::assertTrue($associationQuery->isCollection());
     }
 
     public function testConvertConfigWithAssociationQueryButWithoutRequestType()
@@ -146,5 +167,6 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertInstanceOf(AssociationQuery::class, $associationQuery);
         self::assertEquals($targetClass, $associationQuery->getTargetEntityClass());
         self::assertSame($qb, $associationQuery->getQueryBuilder());
+        self::assertTrue($associationQuery->isCollection());
     }
 }

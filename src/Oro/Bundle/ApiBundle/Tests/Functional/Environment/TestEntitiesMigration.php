@@ -15,14 +15,12 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface, ActivityExtensionAwareInterface
 {
-    /** @var ExtendExtension */
-    private $extendExtension;
-
-    /** @var ActivityExtension */
-    private $activityExtension;
+    private ExtendExtension $extendExtension;
+    private ActivityExtension $activityExtension;
 
     /**
      * {@inheritdoc}
@@ -60,6 +58,7 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $this->createTestOrderTables($schema);
         $this->createTestOverrideClassEntityTables($schema);
         $this->createTestMagazineTables($schema);
+        $this->createTestCustomMagazineTables($schema);
         $this->createTestCollectionTables($schema);
     }
 
@@ -757,6 +756,39 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface,
         $tableMagazine->addForeignKeyConstraint($tableArticle, ['best_article_id'], ['id']);
 
         $tableMagazineArticles = $schema->createTable('test_api_magazine_articles');
+        $tableMagazineArticles->addColumn('magazine_id', 'integer');
+        $tableMagazineArticles->addColumn('article_id', 'integer');
+        $tableMagazineArticles->setPrimaryKey(['magazine_id', 'article_id']);
+        $tableMagazineArticles->addIndex(['magazine_id']);
+        $tableMagazineArticles->addIndex(['article_id']);
+        $tableMagazineArticles->addForeignKeyConstraint($tableMagazine, ['magazine_id'], ['id']);
+        $tableMagazineArticles->addForeignKeyConstraint($tableArticle, ['article_id'], ['id']);
+    }
+
+    /**
+     * Create test_api_custom_magazine and test_api_custom_article tables
+     */
+    private function createTestCustomMagazineTables(Schema $schema)
+    {
+        if ($schema->hasTable('test_api_custom_article') || $schema->hasTable('test_api_custom_magazine')) {
+            return;
+        }
+
+        $tableArticle = $schema->createTable('test_api_custom_article');
+        $tableArticle->addColumn('id', 'integer', ['autoincrement' => true]);
+        $tableArticle->addColumn('headline', 'string', ['length' => 255]);
+        $tableArticle->addColumn('body', 'text', ['notnull' => false]);
+        $tableArticle->setPrimaryKey(['id']);
+
+        $tableMagazine = $schema->createTable('test_api_custom_magazine');
+        $tableMagazine->addColumn('id', 'integer', ['autoincrement' => true]);
+        $tableMagazine->addColumn('name', 'string', ['length' => 255]);
+        $tableMagazine->addColumn('best_article_id', 'integer', ['notnull' => false]);
+        $tableMagazine->addIndex(['best_article_id']);
+        $tableMagazine->setPrimaryKey(['id']);
+        $tableMagazine->addForeignKeyConstraint($tableArticle, ['best_article_id'], ['id']);
+
+        $tableMagazineArticles = $schema->createTable('test_api_custom_magazine_articles');
         $tableMagazineArticles->addColumn('magazine_id', 'integer');
         $tableMagazineArticles->addColumn('article_id', 'integer');
         $tableMagazineArticles->setPrimaryKey(['magazine_id', 'article_id']);
