@@ -21,7 +21,7 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }
 
-    oro_attachment.collect_subresources.exclude_change_attachment_subresources:
+    oro_attachment.api.collect_subresources.exclude_change_attachment_subresources:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ExcludeChangeAttachmentSubresources
         arguments:
             - '@oro_attachment.api.attachment_association_provider'

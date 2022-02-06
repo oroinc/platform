@@ -38,7 +38,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityCommentsGet(): void
+    public function testTargetEntityComments(): void
     {
         $docs = $this->getEntityDocsForAction('notes', ApiAction::GET);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
@@ -48,7 +48,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityCommentsCreate(): void
+    public function testTargetEntityCommentsForCreate(): void
     {
         $docs = $this->getEntityDocsForAction('notes', ApiAction::CREATE);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
@@ -58,7 +58,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityCommentsUpdate(): void
+    public function testTargetEntityCommentsForUpdate(): void
     {
         $docs = $this->getEntityDocsForAction('notes', ApiAction::UPDATE);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
