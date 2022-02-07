@@ -23,19 +23,30 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
         owner: '@business_unit'
         organization: '@organization'
 
+Oro\Bundle\AttachmentBundle\Entity\File:
+    file{1..4}:
+        mimeType: 'image/jpeg'
+        fileName: 'testFile<current()>.jpg'
+
 Oro\Bundle\AttachmentBundle\Entity\Attachment:
     attachment1:
         comment: 'Attachment 1'
+        file: '@file1'
         owner: '@user'
         organization: '@organization'
-        test_department_663f22c0: '@department1'
+        __calls:
+            - setTarget: ['@department1']
     attachment2:
         comment: 'Attachment 2'
+        file: '@file2'
         owner: '@user1'
         organization: '@organization'
-        test_department_663f22c0: '@department1'
+        __calls:
+            - setTarget: ['@department1']
     attachment3:
         comment: 'Attachment 3'
+        file: '@file3'
         owner: '@user'
         organization: '@organization'
-        test_department_663f22c0: '@department2'
+        __calls:
+            - setTarget: ['@department2']

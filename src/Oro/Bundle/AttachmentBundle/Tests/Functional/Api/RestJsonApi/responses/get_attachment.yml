@@ -11,7 +11,9 @@ data:
                 type: organizations
                 id: '<toString(@organization->id)>'
         file:
-            data: null
+            data:
+                type: files
+                id: '<toString(@file1->id)>'
         owner:
             data:
                 type: users
