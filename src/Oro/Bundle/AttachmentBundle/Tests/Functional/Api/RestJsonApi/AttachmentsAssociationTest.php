@@ -209,10 +209,15 @@ class AttachmentsAssociationTest extends RestJsonApiTestCase
                 ],
                 'included' => [
                     [
-                        'type'       => 'attachments',
-                        'id'         => 'attachment1',
-                        'attributes' => [
+                        'type'          => 'attachments',
+                        'id'            => 'attachment1',
+                        'attributes'    => [
                             'comment' => 'Attachment for new department 1'
+                        ],
+                        'relationships' => [
+                            'file' => [
+                                'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                            ]
                         ]
                     ]
                 ]
