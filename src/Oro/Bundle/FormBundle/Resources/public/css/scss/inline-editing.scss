@@ -59,7 +59,7 @@
     position: absolute;
     padding-right: $inline-editor-action-item-fields-last-offset;
 
-    &[class*=-column-editor] {
+    &[class*='-column-editor'] {
         padding-right: 0;
     }
 

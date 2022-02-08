@@ -2,14 +2,14 @@
 
 $header-dropdown-menu-header-font-weight: font-weight('bold') !default;
 $header-dropdown-menu-header-margin-bottom: 12px !default;
-$header-dropdown-menu-box-shadow: -1px -1px 9px 3px rgba(0, 0, 0, .05) !default;
+$header-dropdown-menu-box-shadow: -1px -1px 9px 3px rgba(0 0 0 / 5%) !default;
 $header-dropdown-item-form-padding: 10px 0 20px !default;
 $header-search-dropdown-min-width: 400px !default;
 $header-search-dropdown-menu-background: $primary-inverse !default;
 $header-search-field-container-margin-end: 8px !default;
 $header-search-suggestion-list-separator-color: $primary-860 !default;
 $header-search-suggestion-list-separator-width: 1px !default;
-$header-search-suggestion-list-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$header-search-suggestion-list-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 $header-search-suggestion-item-description-color: $primary-200 !default;
 $header-search-suggestion-item-description-line-height: 1.5 !default;
 $header-search-suggestion-item-entity-color: $primary-550 !default;
