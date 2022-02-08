@@ -2,23 +2,22 @@
 
 namespace Oro\Bundle\CacheBundle\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Clears the cache when a specific event occurs.
  */
 class CacheClearListener
 {
-    /** @var CacheProvider */
-    private $cache;
+    private CacheInterface $cache;
 
-    public function __construct(CacheProvider $cache)
+    public function __construct(CacheInterface $cache)
     {
         $this->cache = $cache;
     }
 
     public function clearCache(): void
     {
-        $this->cache->deleteAll();
+        $this->cache->clear();
     }
 }

@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 $dialog-border-radius: 4px !default;
-$dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$dialog-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 $dialog-background: none !default;
 $dialog-z-index: $zindex-fixed !default;
 $dialog-outline: none !default;
@@ -131,4 +131,4 @@ $dialog-buttons-inner-cursor: pointer !default;
 $dialog-buttons-inner-border: 0 !default;
 
 $ui-widget-overlay-z-index: 150 !default;
-$ui-widget-overlay-background-color: rgba(255, 255, 255, .5) !default;
+$ui-widget-overlay-background-color: rgba(255 255 255 / 50%) !default;

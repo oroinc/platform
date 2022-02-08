@@ -520,14 +520,16 @@ class EntitySerializer
      * @param array        $entityIds
      * @param EntityConfig $config
      * @param array        $context
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function loadRelatedData(array &$result, $entityClass, $entityIds, EntityConfig $config, array $context)
     {
         $relatedData = [];
+        $toOneRelatedData = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $fields = $this->fieldAccessor->getFields($entityClass, $config);
         foreach ($fields as $field) {
-            $relatedValue = null;
             $associationQuery = $this->configAccessor->getAssociationQuery($config, $field);
             if (null !== $associationQuery) {
                 $relatedValue = $this->loadRelatedCollectionValuedAssociationDataForCustomAssociation(
@@ -538,6 +540,13 @@ class EntitySerializer
                     $entityIds,
                     $context
                 );
+                if (null !== $relatedValue) {
+                    if ($associationQuery->isCollection()) {
+                        $relatedData[$field] = $relatedValue;
+                    } else {
+                        $toOneRelatedData[$field] = $relatedValue;
+                    }
+                }
             } else {
                 $propertyPath = $this->configAccessor->getPropertyPath($field, $config->getField($field));
                 if ($entityMetadata->isCollectionValuedAssociation($propertyPath)) {
@@ -550,15 +559,18 @@ class EntitySerializer
                             $accessibleIds,
                             $context
                         );
+                        if (null !== $relatedValue) {
+                            $relatedData[$field] = $relatedValue;
+                        }
                     }
                 }
-            }
-            if (null !== $relatedValue) {
-                $relatedData[$field] = $relatedValue;
             }
         }
         if (!empty($relatedData)) {
             $this->applyRelatedData($result, $entityClass, $config, $relatedData);
+        }
+        if (!empty($toOneRelatedData)) {
+            $this->applyToOneRelatedData($result, $entityClass, $config, $toOneRelatedData);
         }
     }
 
@@ -625,16 +637,16 @@ class EntitySerializer
         $targetEntityClass = $associationQuery->getTargetEntityClass();
         $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
 
-        if ($this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
+        if (!$associationQuery->isCollection() || $this->isSingleStepLoading($targetEntityClass, $targetConfig)) {
             $dataQb = clone $associationQuery->getQueryBuilder();
-            $this->queryFactory->initializeToManyAssociationQueryBuilder($dataQb, $entityClass, $entityIds);
-
-            return $this->loadRelatedItemsForSimpleEntity(
+            $this->queryFactory->initializeAssociationQueryBuilder(
                 $dataQb,
-                $targetEntityClass,
-                $targetConfig,
-                $context
+                $entityClass,
+                $entityIds,
+                !$associationQuery->isCollection()
             );
+
+            return $this->loadRelatedItemsForSimpleEntity($dataQb, $targetEntityClass, $targetConfig, $context);
         }
 
         return $this->loadRelatedItems(
@@ -676,14 +688,12 @@ class EntitySerializer
      * @param string       $entityClass
      * @param EntityConfig $config
      * @param array        $relatedData [field => [entityId => [field => value, ...], ...], ...]
-     *
-     * @throws \RuntimeException
      */
     protected function applyRelatedData(array &$result, $entityClass, EntityConfig $config, $relatedData)
     {
         $entityIdFieldName = $this->fieldAccessor->getIdField($entityClass, $config);
         foreach ($result as &$resultItem) {
-            if (!array_key_exists($entityIdFieldName, $resultItem)) {
+            if (!\array_key_exists($entityIdFieldName, $resultItem)) {
                 throw new \RuntimeException(sprintf(
                     'The result item does not contain the entity identifier. Entity: %s.',
                     $entityClass
@@ -703,6 +713,31 @@ class EntitySerializer
                         $resultItem[$field][ConfigUtil::INFO_RECORD_KEY] = $items[ConfigUtil::INFO_RECORD_KEY];
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * @param array        $result
+     * @param string       $entityClass
+     * @param EntityConfig $config
+     * @param array        $relatedData [field => [entityId => [field => value, ...], ...], ...]
+     */
+    protected function applyToOneRelatedData(array &$result, $entityClass, EntityConfig $config, $relatedData)
+    {
+        $entityIdFieldName = $this->fieldAccessor->getIdField($entityClass, $config);
+        foreach ($result as &$resultItem) {
+            if (!\array_key_exists($entityIdFieldName, $resultItem)) {
+                throw new \RuntimeException(sprintf(
+                    'The result item does not contain the entity identifier. Entity: %s.',
+                    $entityClass
+                ));
+            }
+            $entityId = $resultItem[$entityIdFieldName];
+            foreach ($relatedData as $field => $relatedItems) {
+                $resultItem[$field] = !empty($relatedItems[$entityId])
+                    ? reset($relatedItems[$entityId])
+                    : null;
             }
         }
     }

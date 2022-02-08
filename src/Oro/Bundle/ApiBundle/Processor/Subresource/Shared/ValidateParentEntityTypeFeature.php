@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\Shared;
 
-use Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -30,10 +29,7 @@ class ValidateParentEntityTypeFeature implements ProcessorInterface
     {
         /** @var SubresourceContext $context */
 
-        if (!$this->featureChecker->isResourceEnabled(
-            $context->getParentClassName(),
-            FeatureConfigurationExtension::API_RESOURCE_KEY
-        )) {
+        if (!$this->featureChecker->isResourceEnabled($context->getParentClassName(), 'api_resources')) {
             throw new NotFoundHttpException();
         }
     }

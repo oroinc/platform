@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\CacheBundle\EventListener\CacheClearListener;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class CacheClearListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var CacheClearListener */
@@ -15,7 +15,7 @@ class CacheClearListenerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(AbstractAdapter::class);
 
         $this->listener = new CacheClearListener($this->cache);
     }
@@ -23,7 +23,7 @@ class CacheClearListenerTest extends \PHPUnit\Framework\TestCase
     public function testClearCache(): void
     {
         $this->cache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->clearCache();
     }

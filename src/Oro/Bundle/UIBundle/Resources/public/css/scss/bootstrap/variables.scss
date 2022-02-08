@@ -156,7 +156,7 @@ $modal-title-font-weight: font-weight('bold');
 $modal-title-line-height: 1;
 $modal-inner-padding: 28px;
 $modal-content-border-width: 0;
-$modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
+$modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%);
 $modal-footer-bg: $primary-900;
 $modal-footer-padding: 8px;
 
@@ -180,7 +180,7 @@ $alert-padding-x: $content-padding;
 // Popover
 $popover-font-size: 14px;
 $popover-max-width: 250px;
-$popover-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08);
+$popover-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%);
 $popover-border-width: 0px; /* stylelint-disable-line length-zero-no-unit */
 $popover-border-radius: 2px;
 $popover-border: none;
@@ -206,10 +206,10 @@ $popover-arrow-width: 12px;
 $popover-arrow-height: 10px;
 $popover-arrow-offset: 4px;
 
-$popover-arrow-top-shadow: 2px 3px 9px 0 rgba(0, 0, 0, .08);
-$popover-arrow-bottom-shadow: -2px -3px 9px 0 rgba(0, 0, 0, .08);
-$popover-arrow-left-shadow: 2px -3px 9px 0 rgba(0, 0, 0, .08);
-$popover-arrow-right-shadow: -2px 3px 9px 0 rgba(0, 0, 0, .08);
+$popover-arrow-top-shadow: 2px 3px 9px 0 rgba(0 0 0 / 8%);
+$popover-arrow-bottom-shadow: -2px -3px 9px 0 rgba(0 0 0 / 8%);
+$popover-arrow-left-shadow: 2px -3px 9px 0 rgba(0 0 0 / 8%);
+$popover-arrow-right-shadow: -2px 3px 9px 0 rgba(0 0 0 / 8%);
 
 $badge-font-size: 13px;
 $badge-font-weight: font-weight('light');

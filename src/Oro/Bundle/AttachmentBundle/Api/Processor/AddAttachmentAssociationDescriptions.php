@@ -102,18 +102,12 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
             return;
         }
 
-        $docParser = $this->getDocumentationParser($requestType, self::ATTACHMENT_ASSOCIATION_DOC_RESOURCE);
-        $associationDocumentationTemplate = $docParser->getFieldDocumentation(
+        $associationDocumentationTemplate = $this->getAssociationDocumentationTemplate(
+            $this->getDocumentationParser($requestType, self::ATTACHMENT_ASSOCIATION_DOC_RESOURCE),
             self::ATTACHMENT_TARGET_ENTITY,
             self::ATTACHMENTS_ASSOCIATION,
             $targetAction
         );
-        if (!$associationDocumentationTemplate) {
-            $associationDocumentationTemplate = $docParser->getFieldDocumentation(
-                self::ATTACHMENT_TARGET_ENTITY,
-                self::ATTACHMENTS_ASSOCIATION
-            );
-        }
         $attachmentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
             '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
@@ -144,5 +138,15 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
         $docParser->registerDocumentationResource($documentationResource);
 
         return $docParser;
+    }
+
+    private function getAssociationDocumentationTemplate(
+        ResourceDocParserInterface $docParser,
+        string $className,
+        string $fieldName,
+        string $targetAction
+    ): ?string {
+        return $docParser->getFieldDocumentation($className, $fieldName, $targetAction)
+            ?: $docParser->getFieldDocumentation($className, $fieldName);
     }
 }

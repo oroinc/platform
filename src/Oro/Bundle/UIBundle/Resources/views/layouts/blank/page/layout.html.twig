@@ -92,7 +92,6 @@
     {% endif %}
 {% endblock %}
 
-
 {% block _page_content_widget %}
     {% set visibleSidebarChildren = [] %}
     {% if blocks.page_sidebar is defined %}
@@ -104,8 +103,20 @@
     {% endif %}
 
     {% set attr = layout_attr_defaults(attr, {
-        '~class': ' page-content' ~ (visibleSidebarChildren|length > 0 ? ' page-content--has-sidebar')
+        '~class': ' page-content',
+        'data-role': 'page-content'
     }) %}
+
+    {% set sidebarIsVisible = visibleSidebarChildren|length > 0 %}
+    {% if sidebarExpanded is defined and sidebarExpanded == false %}
+        {% set sidebarIsVisible = false %}
+    {% endif %}
+
+    {% if sidebarIsVisible %}
+        {% set attr = layout_attr_defaults(attr, {
+            '~class': ' page-content--has-sidebar'
+        }) %}
+    {% endif %}
 
     <section {{ block('block_attributes') }}>
         {{ block_widget(block) }}
@@ -115,8 +126,15 @@
 {% block _page_sidebar_widget %}
     {% if block.count > 0 %}
         {% set attr = layout_attr_defaults(attr, {
-            '~class': ' page-sidebar'
+            '~class': ' page-sidebar',
+            'data-role': 'page-sidebar'
         }) %}
+
+        {% if sidebarExpanded is defined and sidebarExpanded == false %}
+            {% set attr = layout_attr_defaults(attr, {
+                '~class': ' hidden'
+            }) %}
+        {% endif %}
 
         <aside {{ block('block_attributes') }}>
             {{ block_widget(block) }}

@@ -29,16 +29,15 @@ use Doctrine\ORM\QueryBuilder;
  */
 class AssociationQuery
 {
-    /** @var QueryBuilder */
-    private $qb;
+    private QueryBuilder $qb;
+    private string $targetEntityClass;
+    private bool $collection;
 
-    /** @var string */
-    private $targetEntityClass;
-
-    public function __construct(QueryBuilder $qb, string $targetEntityClass)
+    public function __construct(QueryBuilder $qb, string $targetEntityClass, bool $collection = true)
     {
         $this->qb = $qb;
         $this->targetEntityClass = $targetEntityClass;
+        $this->collection = $collection;
     }
 
     public function getQueryBuilder(): QueryBuilder
@@ -49,5 +48,13 @@ class AssociationQuery
     public function getTargetEntityClass(): string
     {
         return $this->targetEntityClass;
+    }
+
+    /**
+     * Indicates whether this query represents to-many or to-one association.
+     */
+    public function isCollection(): bool
+    {
+        return $this->collection;
     }
 }

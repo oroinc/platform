@@ -624,7 +624,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Gets ORM query builder for a query that should be used to load data if the field is a to-many association.
+     * Gets ORM query builder for a query that should be used to load data if the field is an association.
      */
     public function getAssociationQuery(): ?QueryBuilder
     {
@@ -632,7 +632,7 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
-     * Sets ORM query builder for a query that should be used to load data if the field is a to-many association.
+     * Sets ORM query builder for a query that should be used to load data if the field is an association.
      *
      * IMPORTANT: the query builder must follow the rules described in AssociationQuery class.
      * @see \Oro\Component\EntitySerializer\AssociationQuery
@@ -645,11 +645,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
             if (!$this->getTargetClass()) {
                 throw new \InvalidArgumentException(
                     'The target class must be specified to be able to use an association query.'
-                );
-            }
-            if (!$this->isCollectionValuedAssociation()) {
-                throw new \InvalidArgumentException(
-                    'An association query can be used only for collection valued associations.'
                 );
             }
             $this->items[ConfigUtil::ASSOCIATION_QUERY] = $query;

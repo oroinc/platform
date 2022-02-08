@@ -122,6 +122,9 @@ class AttachmentTest extends RestJsonApiTestCase
                         'comment' => 'Comment for test attachment'
                     ],
                     'relationships' => [
+                        'file'   => [
+                            'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                        ],
                         'target' => [
                             'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
                         ]
@@ -135,6 +138,132 @@ class AttachmentTest extends RestJsonApiTestCase
         $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
         self::assertEquals('Comment for test attachment', $attachment->getComment());
         self::assertEquals($department1Id, $this->getTargetId($attachment));
+    }
+
+    public function testTryToCreateWithoutTarget(): void
+    {
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type'          => 'attachments',
+                    'attributes'    => [
+                        'comment' => 'Comment for test attachment'
+                    ],
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/target/data']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToCreateWithNullTarget(): void
+    {
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type'          => 'attachments',
+                    'attributes'    => [
+                        'comment' => 'Comment for test attachment'
+                    ],
+                    'relationships' => [
+                        'file'   => [
+                            'data' => ['type' => 'files', 'id' => '<toString(@file4->id)>']
+                        ],
+                        'target' => [
+                            'data' => null
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/target/data']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToCreateWithoutFile(): void
+    {
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type'          => 'attachments',
+                    'attributes'    => [
+                        'comment' => 'Comment for test attachment'
+                    ],
+                    'relationships' => [
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/file/data']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToCreateWithNullFile(): void
+    {
+        $response = $this->post(
+            ['entity' => 'attachments'],
+            [
+                'data' => [
+                    'type'          => 'attachments',
+                    'attributes'    => [
+                        'comment' => 'Comment for test attachment'
+                    ],
+                    'relationships' => [
+                        'file'   => [
+                            'data' => null
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/file/data']
+            ],
+            $response
+        );
     }
 
     public function testUpdate(): void
@@ -167,6 +296,62 @@ class AttachmentTest extends RestJsonApiTestCase
         self::assertEquals($department31Id, $this->getTargetId($attachment));
     }
 
+    public function testTryToUpdateTargetToNull(): void
+    {
+        $response = $this->patch(
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>'],
+            [
+                'data' => [
+                    'type'          => 'attachments',
+                    'id'            => '<toString(@attachment1->id)>',
+                    'relationships' => [
+                        'target' => [
+                            'data' => null
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/target/data']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToUpdateFileToNull(): void
+    {
+        $response = $this->patch(
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>'],
+            [
+                'data' => [
+                    'type'          => 'attachments',
+                    'id'            => '<toString(@attachment1->id)>',
+                    'relationships' => [
+                        'file' => [
+                            'data' => null
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/file/data']
+            ],
+            $response
+        );
+    }
+
     public function testDelete(): void
     {
         $attachmentId = $this->getReference('attachment1')->getId();
@@ -191,8 +376,7 @@ class AttachmentTest extends RestJsonApiTestCase
                     ]
                 ]
             ],
-            $response,
-            true
+            $response
         );
     }
 
@@ -221,8 +405,7 @@ class AttachmentTest extends RestJsonApiTestCase
                     ]
                 ]
             ],
-            $response,
-            true
+            $response
         );
         $responseContent = self::jsonToArray($response->getContent());
         self::assertCount(1, $responseContent['included']);
@@ -235,8 +418,7 @@ class AttachmentTest extends RestJsonApiTestCase
         );
         $this->assertResponseContains(
             ['data' => ['type' => 'testapidepartments', 'id' => '<toString(@department1->id)>']],
-            $response,
-            true
+            $response
         );
         $responseContent = self::jsonToArray($response->getContent());
         self::assertArrayNotHasKey('attributes', $responseContent['data']);
@@ -256,93 +438,73 @@ class AttachmentTest extends RestJsonApiTestCase
         self::assertEquals($department2Id, $this->getTargetId($attachment));
     }
 
-    public function testTryToCreateWithoutTarget(): void
-    {
-        $response = $this->post(
-            ['entity' => 'attachments'],
-            [
-                'data' => [
-                    'type'       => 'attachments',
-                    'attributes' => [
-                        'comment' => 'Comment for test attachment'
-                    ]
-                ]
-            ],
-            [],
-            false
-        );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'not blank constraint',
-                'detail' => 'This value should not be blank.',
-                'source' => ['pointer' => '/data/relationships/target/data']
-            ],
-            $response
-        );
-    }
-
-    public function testTryToCreateWithNullTarget(): void
-    {
-        $response = $this->post(
-            ['entity' => 'attachments'],
-            [
-                'data' => [
-                    'type'          => 'attachments',
-                    'attributes'    => [
-                        'comment' => 'Comment for test attachment'
-                    ],
-                    'relationships' => [
-                        'target' => [
-                            'data' => null
-                        ]
-                    ]
-                ]
-            ],
-            [],
-            false
-        );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'not blank constraint',
-                'detail' => 'This value should not be blank.',
-                'source' => ['pointer' => '/data/relationships/target/data']
-            ],
-            $response
-        );
-    }
-
-    public function testTryToSetNullTarget(): void
-    {
-        $response = $this->patch(
-            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>'],
-            [
-                'data' => [
-                    'type'          => 'attachments',
-                    'id'            => '<toString(@attachment1->id)>',
-                    'relationships' => [
-                        'target' => [
-                            'data' => null
-                        ]
-                    ]
-                ]
-            ],
-            [],
-            false
-        );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'not blank constraint',
-                'detail' => 'This value should not be blank.',
-                'source' => ['pointer' => '/data/relationships/target/data']
-            ],
-            $response
-        );
-    }
-
-    public function testTryToUpdateTargetAsRelationshipWithNullValue()
+    public function testTryToUpdateRelationshipForTargetToNull()
     {
         $response = $this->patchRelationship(
             ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'target'],
+            ['data' => null],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title'  => 'not blank constraint',
+                'detail' => 'This value should not be blank.'
+            ],
+            $response
+        );
+    }
+
+    public function testGetSubresourceForFile(): void
+    {
+        $response = $this->getSubresource(
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'file']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type'       => 'files',
+                    'id'         => '<toString(@file1->id)>',
+                    'attributes' => [
+                        'mimeType' => '<toString(@file1->mimeType)>'
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetRelationshipForFile(): void
+    {
+        $response = $this->getRelationship(
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'file']
+        );
+        $this->assertResponseContains(
+            ['data' => ['type' => 'files', 'id' => '<toString(@file1->id)>']],
+            $response
+        );
+        $responseContent = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('attributes', $responseContent['data']);
+        self::assertArrayNotHasKey('relationships', $responseContent['data']);
+    }
+
+    public function testUpdateRelationshipForFile(): void
+    {
+        $attachmentId = $this->getReference('attachment1')->getId();
+        $file4Id = $this->getReference('file2')->getId();
+        $this->patchRelationship(
+            ['entity' => 'attachments', 'id' => (string)$attachmentId, 'association' => 'file'],
+            ['data' => ['type' => 'files', 'id' => (string)$file4Id]]
+        );
+        /** @var Attachment $attachment */
+        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentId);
+        self::assertEquals($file4Id, $attachment->getFile()->getId());
+    }
+
+    public function testTryToUpdateRelationshipForFileToNull()
+    {
+        $response = $this->patchRelationship(
+            ['entity' => 'attachments', 'id' => '<toString(@attachment1->id)>', 'association' => 'file'],
             ['data' => null],
             [],
             false

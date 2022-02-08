@@ -38,7 +38,29 @@ class AttachmentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityAttachmentsGet(): void
+    public function testAttachmentTargetForCreate(): void
+    {
+        $docs = $this->getEntityDocsForAction('attachments', ApiAction::CREATE);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertEquals(
+            '<p>A record which the attachment record belongs to.</p>'
+            . '<p><strong>The required field.</strong></p>',
+            $resourceData['parameters']['target']['description']
+        );
+    }
+
+    public function testAttachmentTargetForUpdate(): void
+    {
+        $docs = $this->getEntityDocsForAction('attachments', ApiAction::UPDATE);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertEquals(
+            '<p>A record which the attachment record belongs to.</p>'
+            . '<p><strong>This field must not be empty, if it is passed.</strong></p>',
+            $resourceData['parameters']['target']['description']
+        );
+    }
+
+    public function testTargetEntityAttachments(): void
     {
         $docs = $this->getEntityDocsForAction('testapidepartments', ApiAction::GET);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
@@ -48,7 +70,7 @@ class AttachmentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityAttachmentsCreate(): void
+    public function testTargetEntityAttachmentsForCreate(): void
     {
         $docs = $this->getEntityDocsForAction('testapidepartments', ApiAction::CREATE);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
@@ -58,7 +80,7 @@ class AttachmentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityAttachmentsUpdate(): void
+    public function testTargetEntityAttachmentsForUpdate(): void
     {
         $docs = $this->getEntityDocsForAction('testapidepartments', ApiAction::UPDATE);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));

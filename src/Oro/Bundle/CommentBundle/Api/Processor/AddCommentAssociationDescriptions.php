@@ -101,18 +101,12 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
             return;
         }
 
-        $docParser = $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE);
-        $associationDocumentationTemplate = $docParser->getFieldDocumentation(
+        $associationDocumentationTemplate = $this->getAssociationDocumentationTemplate(
+            $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE),
             self::COMMENT_TARGET_ENTITY,
             self::COMMENTS_ASSOCIATION,
             $targetAction
         );
-        if (!$associationDocumentationTemplate) {
-            $associationDocumentationTemplate = $docParser->getFieldDocumentation(
-                self::COMMENT_TARGET_ENTITY,
-                self::COMMENTS_ASSOCIATION
-            );
-        }
         $commentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
             '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
@@ -143,5 +137,15 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         $docParser->registerDocumentationResource($documentationResource);
 
         return $docParser;
+    }
+
+    private function getAssociationDocumentationTemplate(
+        ResourceDocParserInterface $docParser,
+        string $className,
+        string $fieldName,
+        string $targetAction
+    ): ?string {
+        return $docParser->getFieldDocumentation($className, $fieldName, $targetAction)
+            ?: $docParser->getFieldDocumentation($className, $fieldName);
     }
 }

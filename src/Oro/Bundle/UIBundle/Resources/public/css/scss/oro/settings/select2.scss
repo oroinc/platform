@@ -287,8 +287,8 @@ $select2-drop-background: $primary-inverse !default;
 $select2-drop-color: $primary !default;
 $select2-drop-border: none !default;
 $select2-drop-border-radius: 0 0 4px 4px !default;
-$select2-drop-box-shadow: 1px 3px 9px 3px rgba(0, 0, 0, .08), 1px 3px 9px 3px rgba(0, 0, 0, .08) !default;
-$select2-drop-above-box-shadow: 1px 0 9px 3px rgba(0, 0, 0, .08), 1px 0 9px 3px rgba(0, 0, 0, .08) !default;
+$select2-drop-box-shadow: 1px 3px 9px 3px rgba(0 0 0 / 8%), 1px 3px 9px 3px rgba(0 0 0 / 8%) !default;
+$select2-drop-above-box-shadow: 1px 0 9px 3px rgba(0 0 0 / 8%), 1px 0 9px 3px rgba(0 0 0 / 8%) !default;
 
 $select2-drop-above-border-radius: 4px 4px 0 0 !default;
 

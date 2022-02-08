@@ -52,7 +52,8 @@ class ConfigConverter extends BaseConfigConverter
                 ConfigUtil::ASSOCIATION_QUERY,
                 new AssociationQuery(
                     $config[ConfigUtil::ASSOCIATION_QUERY],
-                    $this->getEntityClass($config[ConfigUtil::TARGET_CLASS])
+                    $this->getEntityClass($config[ConfigUtil::TARGET_CLASS]),
+                    $this->isCollection($config)
                 )
             );
         }
@@ -72,5 +73,12 @@ class ConfigConverter extends BaseConfigConverter
         }
 
         return $class;
+    }
+
+    private function isCollection(array $config): bool
+    {
+        return
+            !isset($config[ConfigUtil::TARGET_TYPE])
+            || ConfigUtil::TO_ONE !== $config[ConfigUtil::TARGET_TYPE];
     }
 }

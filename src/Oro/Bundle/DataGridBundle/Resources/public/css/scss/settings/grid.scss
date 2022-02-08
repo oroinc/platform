@@ -93,16 +93,16 @@ $oro-datagrid-card-border-color: 1px solid $primary-inverse !default;
 $oro-datagrid-card-color: $primary-200 !default;
 $oro-datagrid-card-border-color-hover: $primary-750 !default;
 $oro-datagrid-card-drag-over-border-color: $primary-800 !default;
-$oro-datagrid-card-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05) !default;
-$oro-datagrid-card-box-shadow-hover: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$oro-datagrid-card-box-shadow: 0 2px 4px 0 rgba(0 0 0 / 5%) !default;
+$oro-datagrid-card-box-shadow-hover: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 
-$oro-datagrid-card-transition-status-box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .05) !default;
+$oro-datagrid-card-transition-status-box-shadow: 0 2px 4px 0 rgba(0 0 0 / 5%) !default;
 $oro-datagrid-card-transition-status-error-background: $danger-ultra-light !default;
 $oro-datagrid-card-transition-status-success-background: $success-ultra-light !default;
 $oro-datagrid-card-transition-status-in-progress-background: $extra-300 !default;
 
 $oro-datagrid-card-sortable-helper-border-color: $primary-750 !default;
-$oro-datagrid-card-sortable-helper-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$oro-datagrid-card-sortable-helper-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 
 $oro-datagrid-card-card-amount-font-size: 16px !default;
 $oro-datagrid-card-card-amount-font-weight: font-weight('bold') !default;

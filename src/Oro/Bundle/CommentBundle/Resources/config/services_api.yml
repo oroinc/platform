@@ -21,7 +21,7 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }
 
-    oro_comment.collect_subresources.exclude_change_comment_subresources:
+    oro_comment.api.collect_subresources.exclude_change_comment_subresources:
         class: Oro\Bundle\CommentBundle\Api\Processor\ExcludeChangeCommentSubresources
         arguments:
             - '@oro_comment.api.comment_association_provider'
