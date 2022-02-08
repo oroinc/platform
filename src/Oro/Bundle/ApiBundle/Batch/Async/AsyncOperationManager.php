@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
@@ -88,28 +89,23 @@ class AsyncOperationManager
 
     public function incrementAggregateTime(int $operationId, int $milliseconds): void
     {
-        $em = $this->getEntityManager();
-        $summary = $em
-            ->createQueryBuilder()
-            ->from(AsyncOperation::class, 'o')
-            ->select('o.summary')
-            ->where('o.id = :id')
-            ->setParameter('id', $operationId)
-            ->getQuery()
-            ->getSingleScalarResult();
+        try {
+            $summary = $this->loadSummary($operationId);
+        } catch (NoResultException $e) {
+            $this->logger->error(
+                'The incrementation of an aggregate time failed because the asynchronous operation was not found.',
+                ['operationId' => $operationId]
+            );
+
+            return;
+        }
 
         if (null === $summary) {
-            $summary = [
-                'aggregateTime' => $milliseconds
-            ];
+            $summary = ['aggregateTime' => $milliseconds];
+        } elseif (isset($summary['aggregateTime'])) {
+            $summary['aggregateTime'] += $milliseconds;
         } else {
-            $metadata = $em->getClassMetadata(AsyncOperation::class);
-            $summary = $em->getConnection()->convertToPHPValue($summary, $metadata->getTypeOfField('summary'));
-            if (isset($summary['aggregateTime'])) {
-                $summary['aggregateTime'] += $milliseconds;
-            } else {
-                $summary['aggregateTime'] = $milliseconds;
-            }
+            $summary['aggregateTime'] = $milliseconds;
         }
         $this->updateOperation($operationId, function () use ($summary) {
             return [
@@ -130,22 +126,23 @@ class AsyncOperationManager
             return;
         }
 
+        try {
+            $summary = $this->loadSummary($operationId);
+        } catch (NoResultException $e) {
+            $this->logger->error(
+                'The adding an error failed because the asynchronous operation was not found.',
+                ['operationId' => $operationId]
+            );
+
+            return;
+        }
+
         $this->errorManager->writeErrors(
             $this->fileManager,
             $operationId,
             $errors,
             new ChunkFile($dataFileName, -1, 0)
         );
-
-        $em = $this->getEntityManager();
-        $summary = $em
-            ->createQueryBuilder()
-            ->from(AsyncOperation::class, 'o')
-            ->select('o.summary')
-            ->where('o.id = :id')
-            ->setParameter('id', $operationId)
-            ->getQuery()
-            ->getSingleScalarResult();
 
         $errorCountToAdd = count($errors);
         if (null === $summary) {
@@ -157,14 +154,10 @@ class AsyncOperationManager
                 'createCount'   => 0,
                 'updateCount'   => 0
             ];
+        } elseif (isset($summary['errorCount'])) {
+            $summary['errorCount'] += $errorCountToAdd;
         } else {
-            $metadata = $em->getClassMetadata(AsyncOperation::class);
-            $summary = $em->getConnection()->convertToPHPValue($summary, $metadata->getTypeOfField('summary'));
-            if (isset($summary['errorCount'])) {
-                $summary['errorCount'] += $errorCountToAdd;
-            } else {
-                $summary['errorCount'] = $errorCountToAdd;
-            }
+            $summary['errorCount'] = $errorCountToAdd;
         }
         $this->updateOperation($operationId, function () use ($summary) {
             return [
@@ -210,6 +203,31 @@ class AsyncOperationManager
         }
 
         return 0 !== $affectedRows;
+    }
+
+    /**
+     * @throws NoResultException when the operation does not exist
+     */
+    private function loadSummary(int $operationId): ?array
+    {
+        $em = $this->getEntityManager();
+        $rawData = $em
+            ->createQueryBuilder()
+            ->from(AsyncOperation::class, 'o')
+            ->select('o.summary')
+            ->where('o.id = :id')
+            ->setParameter('id', $operationId)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if (null === $rawData) {
+            return null;
+        }
+
+        return $em->getConnection()->convertToPHPValue(
+            $rawData,
+            $em->getClassMetadata(AsyncOperation::class)->getTypeOfField('summary')
+        );
     }
 
     private function getEntityManager(): EntityManagerInterface
