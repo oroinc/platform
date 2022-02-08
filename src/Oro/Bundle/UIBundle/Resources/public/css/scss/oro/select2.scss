@@ -21,6 +21,7 @@
         .validation-error & {
             border-color: $input-error-border-color;
             color: $input-error-border-color;
+            z-index: $select2-container-error-z-index;
         }
 
         &.select2-container-active {

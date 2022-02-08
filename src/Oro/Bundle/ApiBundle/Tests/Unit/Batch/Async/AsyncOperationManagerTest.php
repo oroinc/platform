@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
@@ -285,7 +286,8 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         int $operationId,
         ?array $summary,
         EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em,
-        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb
+        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb,
+        bool $operationNotFound = false
     ): void {
         $rawSummaryValue = null !== $summary ? 'raw summary value' : null;
 
@@ -309,10 +311,18 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
+
+        if ($operationNotFound) {
+            $query->expects(self::once())
+                ->method('getSingleScalarResult')
+                ->willThrowException(new NoResultException());
+
+            return;
+        }
+
         $query->expects(self::once())
             ->method('getSingleScalarResult')
             ->willReturn($rawSummaryValue);
-
         if (null === $summary) {
             $em->expects(self::never())
                 ->method('getConnection');
@@ -451,6 +461,33 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->incrementAggregateTime($operationId, $aggregateTime);
     }
 
+    public function testIncreaseAggregateTimeShouldNotThrowExceptionIfOperationWasNotFound()
+    {
+        $operationId = 123;
+        $aggregateTime = 100;
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $selectQb = $this->createMock(QueryBuilder::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(AsyncOperation::class)
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($selectQb);
+
+        $this->expectSelectSummaryQuery($operationId, null, $em, $selectQb, true);
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'The incrementation of an aggregate time failed because the asynchronous operation was not found.',
+                ['operationId' => $operationId]
+            );
+
+        $this->asyncOperationManager->incrementAggregateTime($operationId, $aggregateTime);
+    }
+
     public function testAddErrors()
     {
         $operationId = 123;
@@ -555,7 +592,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->addErrors($operationId, $dataFileName, $errors);
     }
 
-    public function testAddErrorsForEmptyErrorCollecion()
+    public function testAddErrorsForEmptyErrorCollection()
     {
         $this->errorManager->expects(self::never())
             ->method('writeErrors');
@@ -566,6 +603,40 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('error');
 
         $this->asyncOperationManager->addErrors(123, 'testFile', []);
+    }
+
+    public function testAddErrorsWhenNoSummaryShouldNotThrowExceptionIfOperationWasNotFound()
+    {
+        $operationId = 123;
+        $dataFileName = 'testFile';
+        $errors = [
+            BatchError::createValidationError('async operation exception', 'test error 1'),
+            BatchError::createValidationError('async operation exception', 'test error 2')
+        ];
+
+        $this->errorManager->expects(self::never())
+            ->method('writeErrors');
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $selectQb = $this->createMock(QueryBuilder::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(AsyncOperation::class)
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($selectQb);
+
+        $this->expectSelectSummaryQuery($operationId, null, $em, $selectQb, true);
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                'The adding an error failed because the asynchronous operation was not found.',
+                ['operationId' => $operationId]
+            );
+
+        $this->asyncOperationManager->addErrors($operationId, $dataFileName, $errors);
     }
 
     public function testMarkAsFailedWhenWriteErrorsThrowsException()

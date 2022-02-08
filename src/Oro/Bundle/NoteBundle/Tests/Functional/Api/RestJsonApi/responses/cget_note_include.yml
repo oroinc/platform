@@ -1,0 +1,96 @@
+data:
+    -
+        type: notes
+        id: '<toString(@note1->id)>'
+        attributes:
+            message: 'Note 1'
+        relationships:
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            activityTargets:
+                data:
+                    -
+                        type: testactivitytargets
+                        id: '<toString(@targetEntity1->id)>'
+    -
+        type: notes
+        id: '<toString(@note2->id)>'
+        attributes:
+            message: 'Note 2'
+        relationships:
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            activityTargets:
+                data:
+                    -
+                        type: testactivitytargets
+                        id: '<toString(@targetEntity1->id)>'
+                    -
+                        type: testactivitytargets
+                        id: '<toString(@targetEntity2->id)>'
+    -
+        type: notes
+        id: '<toString(@note3->id)>'
+        attributes:
+            message: 'Note 3'
+        relationships:
+            owner:
+                data:
+                    type: users
+                    id: '<toString(@user->id)>'
+            organization:
+                data:
+                    type: organizations
+                    id: '<toString(@organization->id)>'
+            activityTargets:
+                data: []
+included:
+    -
+        type: organizations
+        id: '<toString(@organization->id)>'
+        relationships:
+            users:
+                data:
+                    -
+                        type: users
+                        id: '<toString(@user->id)>'
+                    -
+                        type: users
+                        id: '<toString(@user1->id)>'
+    -
+        type: testactivitytargets
+        id: '<toString(@targetEntity1->id)>'
+        attributes:
+            name: 'Target Entity 1'
+        relationships:
+            activityNotes:
+                data:
+                    -
+                        type: notes
+                        id: '<toString(@note1->id)>'
+                    -
+                        type: notes
+                        id: '<toString(@note2->id)>'
+    -
+        type: testactivitytargets
+        id: '<toString(@targetEntity2->id)>'
+        attributes:
+            name: 'Target Entity 2'
+        relationships:
+            activityNotes:
+                data:
+                    -
+                        type: notes
+                        id: '<toString(@note2->id)>'

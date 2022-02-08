@@ -6,25 +6,24 @@ use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\MessageQueue\Client\CallbackMessageBuilder;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
-use Oro\Component\MessageQueue\Client\MessageBodyResolver;
 use Oro\Component\MessageQueue\Client\MessageProducer;
 use Oro\Component\MessageQueue\Client\Router\Envelope;
 use Oro\Component\MessageQueue\Client\Router\MessageRouterInterface;
-use Oro\Component\MessageQueue\Consumption\Exception\InvalidMessageBodyException;
 use Oro\Component\MessageQueue\Exception\InvalidArgumentException;
 use Oro\Component\MessageQueue\Tests\Unit\Stub\TopicStub;
 use Oro\Component\MessageQueue\Topic\NullTopic;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Oro\Component\MessageQueue\Topic\TopicRegistry;
 use Oro\Component\MessageQueue\Transport\Queue;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class MessageProducerTest extends \PHPUnit\Framework\TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
+    private DriverInterface|MockObject $driver;
 
-    private MessageRouterInterface|\PHPUnit\Framework\MockObject\MockObject $messageRouter;
+    private MessageRouterInterface|MockObject $messageRouter;
 
     private MessageProducer $producer;
 
@@ -46,9 +45,7 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturnCallback(fn () => $this->topic);
 
-        $messageBodyResolver = new MessageBodyResolver($topicRegistry);
-
-        $this->producer = new MessageProducer($this->driver, $this->messageRouter, $messageBodyResolver, true);
+        $this->producer = new MessageProducer($this->driver, $this->messageRouter, true);
 
         $this->setUpLoggerMock($this->producer);
     }
@@ -163,20 +160,42 @@ class MessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->producer->send('topic.name', (new Message([]))->setContentType('text/plain'));
     }
 
-    public function testSendWhenInvalidBody(): void
-    {
-        $this->topic = new TopicStub();
-
+    /**
+     * @dataProvider invalidMessageDataProvider
+     *
+     * @param mixed $message
+     * @param string $expectException
+     * @param string $expectExceptionMessage
+     */
+    public function testSendWInvalidMessage(
+        mixed $message,
+        string $expectException,
+        string $expectExceptionMessage
+    ): void {
         $this->messageRouter
             ->expects(self::never())
             ->method('handle');
 
-        $this->expectException(InvalidMessageBodyException::class);
-        $this->expectExceptionMessage('Message of topic "topic.name" has invalid body');
+        $this->expectException($expectException);
+        $this->expectExceptionMessage($expectExceptionMessage);
 
-        $this->assertLoggerErrorMethodCalled();
+        $this->producer->send('topic.name', $message);
+    }
 
-        $this->producer->send('topic.name', new Message(['missing_option' => 'sample_value']));
+    public function invalidMessageDataProvider(): array
+    {
+        return [
+            'invalid content type' => [
+                'message' => (new Message([]))->setContentType('text/plain'),
+                'expectException' => InvalidArgumentException::class,
+                'expectExceptionMessage' => 'When body is array content type must be "application/json".',
+            ],
+            'invalid body' => [
+                'message' => new Message(new \stdClass()),
+                'expectException' => InvalidArgumentException::class,
+                'expectExceptionMessage' => 'The message\'s body must be either null, scalar or array. Got: stdClass',
+            ],
+        ];
     }
 
     private function getExpectedMessage(): Message

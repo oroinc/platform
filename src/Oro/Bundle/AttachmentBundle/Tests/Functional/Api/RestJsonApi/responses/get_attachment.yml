@@ -1,0 +1,24 @@
+data:
+    type: attachments
+    id: '<toString(@attachment1->id)>'
+    attributes:
+        comment: 'Attachment 1'
+        createdAt: '@attachment1->createdAt->format("Y-m-d\TH:i:s\Z")'
+        updatedAt: '@attachment1->updatedAt->format("Y-m-d\TH:i:s\Z")'
+    relationships:
+        organization:
+            data:
+                type: organizations
+                id: '<toString(@organization->id)>'
+        file:
+            data:
+                type: files
+                id: '<toString(@file1->id)>'
+        owner:
+            data:
+                type: users
+                id: '<toString(@user->id)>'
+        target:
+            data:
+                type: testapidepartments
+                id: '<toString(@department1->id)>'

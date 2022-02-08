@@ -37,8 +37,14 @@
 
         &__item {
             flex-wrap: wrap;
+            position: relative;
+            padding-bottom: $widget-picker-mobile-item-padding-bottom;
         }
 
+        &__summary-row {
+            margin-bottom: $widget-picker-mobile-summary-row-margin-bottom;
+        }
+        
         &__item.loading .widget-picker__actions-column::after {
             margin-right: $content-padding;
         }
@@ -68,20 +74,21 @@
             flex-basis: 0;
             padding-right: 0;
             padding-bottom: 0;
-            padding-top: $content-padding;
             border-bottom: 0 none;
         }
 
         &__title-cell {
             display: flex;
+            align-items: center;
+        }
 
-            h4 {
-                flex-grow: 1;
-            }
+        &__title-text {
+            flex-grow: 1;
+            margin-bottom: 0;
         }
 
         &__description-cell {
-            margin-bottom: $content-padding-medium;
+            margin: $widget-picker-mobile-description-cell-margin;
         }
 
         &__added-badge {
@@ -89,10 +96,11 @@
         }
 
         &__actions-column {
-            flex-basis: 100%;
-            text-align: right;
-            padding-top: 0;
             padding-right: 0;
+            position: absolute;
+            bottom: $widget-picker-mobile-actions-column-bottom;
+            width: 100%;
+            text-align: right;
         }
     }
 }

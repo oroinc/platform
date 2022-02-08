@@ -2,6 +2,10 @@
 
 .schedule-intervals {
     .schedule-interval__row {
+        .fields-row {
+            display: flex;
+        }
+
         input[type='text'] {
             width: 40%;
         }

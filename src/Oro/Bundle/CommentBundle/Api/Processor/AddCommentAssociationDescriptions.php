@@ -3,12 +3,14 @@
 namespace Oro\Bundle\CommentBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -27,6 +29,8 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
     private CommentAssociationProvider $commentAssociationProvider;
     private ResourceDocParserProvider $resourceDocParserProvider;
     private EntityDescriptionProvider $entityDescriptionProvider;
+    private ValueNormalizer $valueNormalizer;
+    private EntityNameProvider $entityNameProvider;
 
     public function __construct(
         CommentAssociationProvider $commentAssociationProvider,
@@ -36,6 +40,16 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         $this->commentAssociationProvider = $commentAssociationProvider;
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->entityDescriptionProvider = $entityDescriptionProvider;
+    }
+
+    public function setValueNormalizer(ValueNormalizer $valueNormalizer): void
+    {
+        $this->valueNormalizer = $valueNormalizer;
+    }
+
+    public function setEntityNameProvider(EntityNameProvider $entityNameProvider): void
+    {
+        $this->entityNameProvider = $entityNameProvider;
     }
 
     /**
@@ -97,28 +111,18 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         string $targetAction
     ): void {
         $commentsAssociationDefinition = $definition->getField(self::COMMENTS_ASSOCIATION_NAME);
-        if (null === $commentsAssociationDefinition) {
-            return;
-        }
-        if ($commentsAssociationDefinition->hasDescription()) {
+        if (null === $commentsAssociationDefinition || $commentsAssociationDefinition->hasDescription()) {
             return;
         }
 
-        $docParser = $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE);
-        $associationDocumentationTemplate = $docParser->getFieldDocumentation(
+        $associationDocumentationTemplate = $this->getAssociationDocumentationTemplate(
+            $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE),
             self::COMMENT_TARGET_ENTITY,
             self::COMMENTS_ASSOCIATION,
             $targetAction
         );
-        if (!$associationDocumentationTemplate) {
-            $associationDocumentationTemplate = $docParser->getFieldDocumentation(
-                self::COMMENT_TARGET_ENTITY,
-                self::COMMENTS_ASSOCIATION
-            );
-        }
-
         $commentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%entity_name%' => $this->getEntityName($entityClass)
+            '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
 
@@ -134,9 +138,8 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
             self::COMMENTS_ASSOCIATION,
             $targetAction
         );
-
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%' => $this->getEntityName($entityClass)
+            '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
 
@@ -150,8 +153,13 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         return $docParser;
     }
 
-    private function getEntityName(string $entityClass): string
-    {
-        return strtolower($this->entityDescriptionProvider->getEntityDescription($entityClass));
+    private function getAssociationDocumentationTemplate(
+        ResourceDocParserInterface $docParser,
+        string $className,
+        string $fieldName,
+        string $targetAction
+    ): ?string {
+        return $docParser->getFieldDocumentation($className, $fieldName, $targetAction)
+            ?: $docParser->getFieldDocumentation($className, $fieldName);
     }
 }

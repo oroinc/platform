@@ -90,6 +90,7 @@
         font-size: $base-font-size--xl;
         font-weight: font-weight('light');
         display: inline;
+        word-break: break-all;
     }
 
     &__icon {

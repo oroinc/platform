@@ -35,7 +35,7 @@ $head-panel-min-width: 100% !default;
 $head-panel-max-height: 80vh !default;
 $head-panel-background-color: $head-panel-bg-color !default;
 $head-panel-box-sizing: border-box !default;
-$head-panel-box-shadow: 1px 1px 2px -1px rgba(0, 0, 0, .08) !default;
+$head-panel-box-shadow: 1px 1px 2px -1px rgba(0 0 0 / 8%) !default;
 $head-panel-position: relative !default;
 $head-panel-z-index: 998 !default;
 $head-panel-transition: max-height 100ms linear !default;
@@ -64,7 +64,7 @@ $head-panel-trigger-wrapper-left: 50% !default;
 $head-panel-trigger-wrapper-offset-left: -20px !default;
 $head-panel-trigger-wrapper-background-color: $head-panel-bg-color !default;
 $head-panel-trigger-wrapper-border-radius: 0 0 3px 3px !default;
-$head-panel-trigger-wrapper-box-shadow: 0 2px 3px 1px rgba(0, 0, 0, .08) !default;
+$head-panel-trigger-wrapper-box-shadow: 0 2px 3px 1px rgba(0 0 0 / 8%) !default;
 
 $head-panel-trigger-wrapper-transition: 100ms all linear !default;
 

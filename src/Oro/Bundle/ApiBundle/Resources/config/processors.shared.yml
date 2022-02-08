@@ -666,8 +666,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -100 }
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }
-            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -100 }
-            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -100 }
 
     oro_api.build_query.single:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
@@ -676,6 +674,14 @@ services:
             - '@oro_api.entity_id_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
+
+    oro_api.subresource.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -100 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -100 }
 
     oro_api.apply_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ApplyCriteria

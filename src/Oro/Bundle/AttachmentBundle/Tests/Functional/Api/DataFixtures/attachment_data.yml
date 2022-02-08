@@ -1,0 +1,52 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+Oro\Bundle\UserBundle\Entity\User:
+    user1:
+        username: 'user1'
+        email: 'user1@example.com'
+        firstName: 'John'
+        lastName: 'Doe'
+        enabled: true
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        organization: '@organization'
+        organizations: ['@organization']
+        salt: 5ejjb5y9va4g4co8kco4o8wgkgcc48k
+        password: fhUh+Xk/mjDUR5xLb93SIL/QF/lEK3RcGE3l9dRh4+N4rQCNrOaOYyVtqWajPOBHQDqFGwl+Ran2HTdpbniEUQ==
+
+Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
+    department{1..3}:
+        name: 'Department <current()>'
+        owner: '@business_unit'
+        organization: '@organization'
+
+Oro\Bundle\AttachmentBundle\Entity\File:
+    file{1..4}:
+        mimeType: 'image/jpeg'
+        fileName: 'testFile<current()>.jpg'
+
+Oro\Bundle\AttachmentBundle\Entity\Attachment:
+    attachment1:
+        comment: 'Attachment 1'
+        file: '@file1'
+        owner: '@user'
+        organization: '@organization'
+        __calls:
+            - setTarget: ['@department1']
+    attachment2:
+        comment: 'Attachment 2'
+        file: '@file2'
+        owner: '@user1'
+        organization: '@organization'
+        __calls:
+            - setTarget: ['@department1']
+    attachment3:
+        comment: 'Attachment 3'
+        file: '@file3'
+        owner: '@user'
+        organization: '@organization'
+        __calls:
+            - setTarget: ['@department2']

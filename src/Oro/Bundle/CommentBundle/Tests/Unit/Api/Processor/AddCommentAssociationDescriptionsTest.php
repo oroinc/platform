@@ -3,9 +3,11 @@
 namespace Oro\Bundle\CommentBundle\Tests\Unit\Api\Processor;
 
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\CommentBundle\Api\CommentAssociationProvider;
 use Oro\Bundle\CommentBundle\Api\Processor\AddCommentAssociationDescriptions;
@@ -35,19 +37,21 @@ class AddCommentAssociationDescriptionsTest extends ConfigProcessorTestCase
             ->with($this->context->getRequestType())
             ->willReturn($this->docParser);
 
-        $entityDescriptionProvider = $this->createMock(EntityDescriptionProvider::class);
-        $entityDescriptionProvider->expects(self::any())
-            ->method('getEntityDescription')
+        $entityNameProvider = $this->createMock(EntityNameProvider::class);
+        $entityNameProvider->expects(self::any())
+            ->method('getEntityName')
             ->with(self::isType('string'))
             ->willReturnCallback(function (string $className) {
-                return substr($className, strrpos($className, '\\') + 1) . ' (description)';
+                return strtolower(substr($className, strrpos($className, '\\') + 1)) . ' (description)';
             });
 
         $this->processor = new AddCommentAssociationDescriptions(
             $this->commentAssociationProvider,
             $resourceDocParserProvider,
-            $entityDescriptionProvider
+            $this->createMock(EntityDescriptionProvider::class)
         );
+        $this->processor->setValueNormalizer($this->createMock(ValueNormalizer::class));
+        $this->processor->setEntityNameProvider($entityNameProvider);
     }
 
     public function testProcessWhenNoTargetAction(): void

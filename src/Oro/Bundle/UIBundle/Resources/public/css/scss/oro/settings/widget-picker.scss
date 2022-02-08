@@ -18,9 +18,12 @@ $widget-picker-description-expand-icon: $fa-var-plus-square-o !default;
 $widget-picker-description-collapse-icon-color: $primary-550 !default;
 $widget-picker-description-cell-color: $primary-550 !default;
 $widget-picker-description-cell-line-height: 1.6 !default;
-$widget-picker-info-column-padding: 21px 20px 11px 0 !default;
+$widget-picker-description-cell-margin: 0 74px -11px 93px !default;
+$widget-picker-description-cell-vertical-offset: -4px !default;
 $widget-picker-actions-column-padding-end: 16px !default;
 $widget-picker-actions-column-width: 74px !default;
+$widget-picker-toggler-column-width: 45px !default;
+$widget-picker-icon-column-width: 48px !default;
 
 $widget-picker-loading-size: 16px !default;
 $widget-picker-loading-border-size: 4px !default;

@@ -34,7 +34,7 @@
         {% if prototype is defined %}
             {% set prototype_html = cronFormFields.schedule_interval_prototype(form) %}
         {% endif %}
-        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
+        {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection oro-item-collection__row--align-middle collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
         <div class="row-oro schedule-intervals"
              data-page-component-module="oroui/js/app/components/view-component"

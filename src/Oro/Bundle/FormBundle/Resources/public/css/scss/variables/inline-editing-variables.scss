@@ -29,11 +29,11 @@ $inline-editor-select2-divider-color: $primary-750 !default;
 
 $inline-editor-multi-select2-choices-width: 130px !default;
 
-$inline-editor-select2-drop-box-shadow: 1px 3px 9px 3px rgba(0, 0, 0, .08) !default;
-$inline-editor-select2-drop-above-box-shadow: 1px -3px 9px 3px rgba(0, 0, 0, .08) !default;
+$inline-editor-select2-drop-box-shadow: 1px 3px 9px 3px rgba(0 0 0/ 8%) !default;
+$inline-editor-select2-drop-above-box-shadow: 1px -3px 9px 3px rgba(0 0 0 / 8%) !default;
 
 $inline-editor-select2-border-color: $primary-inverse !default;
-$inline-editor-select2-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$inline-editor-select2-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 $inline-editor-select2-drop-placeholder-height: 4px !default;
 $inline-editor-select2-drop-placeholder-color: $primary-inverse !default;
 
@@ -45,4 +45,4 @@ $inline-editor-inner-fields-height: 100% !default;
 $inline-editor-inner-outer-offset: 68px !default;
 $inline-editor-inner-textarea-offset: 11px $inline-editor-inner-outer-offset 11px 9px !default;
 
-$inline-editor-checkboxes-shadow: 0 4px 5px rgba(0, 0, 0, .15) !default;
+$inline-editor-checkboxes-shadow: 0 4px 5px rgba(0 0 0 / 15%) !default;

@@ -48,13 +48,12 @@ class ConfigConverter extends BaseConfigConverter
     protected function setAssociationQuery(FieldConfig $result, array $config)
     {
         if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {
-            $result->set(
-                ConfigUtil::ASSOCIATION_QUERY,
-                new AssociationQuery(
-                    $config[ConfigUtil::ASSOCIATION_QUERY],
-                    $this->getEntityClass($config[ConfigUtil::TARGET_CLASS])
-                )
+            $associationQuery = new AssociationQuery(
+                $config[ConfigUtil::ASSOCIATION_QUERY],
+                $this->getEntityClass($config[ConfigUtil::TARGET_CLASS])
             );
+            $associationQuery->setCollection($this->isCollection($config));
+            $result->set(ConfigUtil::ASSOCIATION_QUERY, $associationQuery);
         }
     }
 
@@ -72,5 +71,12 @@ class ConfigConverter extends BaseConfigConverter
         }
 
         return $class;
+    }
+
+    private function isCollection(array $config): bool
+    {
+        return
+            !isset($config[ConfigUtil::TARGET_TYPE])
+            || ConfigUtil::TO_ONE !== $config[ConfigUtil::TARGET_TYPE];
     }
 }
