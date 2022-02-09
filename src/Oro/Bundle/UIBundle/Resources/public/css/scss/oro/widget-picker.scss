@@ -20,6 +20,10 @@
         overflow: auto;
     }
 
+    &__filter {
+        display: inline-flex;
+    }
+
     @at-root input#{&}__filter-search {
         width: $widget-picker-search-width;
     }
@@ -47,7 +51,7 @@
         line-height: $widget-picker-description-cell-line-height;
 
         color: $widget-picker-description-cell-color;
-        
+
         transform: translateY($widget-picker-description-cell-vertical-offset);
     }
 
