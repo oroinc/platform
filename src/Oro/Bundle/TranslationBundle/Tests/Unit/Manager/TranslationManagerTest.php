@@ -10,7 +10,6 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
-use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
@@ -262,9 +261,6 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testInvalidateCache($with)
     {
-        $this->eventDispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(new InvalidateTranslationCacheEvent($with), InvalidateTranslationCacheEvent::NAME);
         $this->dbTranslationMetadataCache->expects($this->once())->method('updateTimestamp')->with($with);
         $manager = $this->getTranslationManager();
         $manager->invalidateCache($with);

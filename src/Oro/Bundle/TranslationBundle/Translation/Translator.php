@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\ClearableCache;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
+use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Psr\Container\ContainerInterface;
@@ -330,10 +331,28 @@ class Translator extends BaseTranslator
     {
         $this->applyCurrentStrategy();
         $locales = array_unique($this->getFallbackLocales());
+
+        $affectedLocales = [];
+
         foreach ($locales as $locale) {
             $catalogueFile = $this->getCatalogueCachePath($locale);
             if ($this->isCatalogueCacheFileExits($catalogueFile)) {
+                // The file cache should be invalidated before removal
+                // @see https://bugs.php.net/bug.php?id=75939
+                if (function_exists('opcache_invalidate')) {
+                    opcache_invalidate($catalogueFile, true);
+                }
+                clearstatcache(true, $catalogueFile);
                 unlink($catalogueFile);
+                $affectedLocales[] = $locale;
+            }
+        }
+
+        if (!empty($affectedLocales) && $this->isApplicationInstalled()) {
+            if (count($locales) === 1) {
+                $this->dispatchInvalidateTranslationCacheEvent(reset($locales));
+            } else {
+                $this->dispatchInvalidateTranslationCacheEvent();
             }
         }
     }
@@ -404,6 +423,10 @@ class Translator extends BaseTranslator
         // restore translation strategy and apply it to make use of new cache
         $this->strategyProvider->setStrategy($currentStrategy);
         $this->applyCurrentStrategy();
+
+        if ($this->isApplicationInstalled()) {
+            $this->dispatchInvalidateTranslationCacheEvent();
+        }
     }
 
     /**
@@ -507,6 +530,8 @@ class Translator extends BaseTranslator
     {
         $this->ensureDynamicResourcesLoaded($locale);
 
+        $isAnyCatalogFileRemoved = false;
+
         // check if any dynamic resource is changed and update translation catalogue if needed
         if (!empty($this->dynamicResources[$locale])) {
             $catalogueFile = $this->getCatalogueCachePath($locale);
@@ -516,18 +541,29 @@ class Translator extends BaseTranslator
                     /** @var DynamicResourceInterface $dynamicResource */
                     $dynamicResource = $item['resource'];
                     if (!$dynamicResource->isFresh($time)) {
+                        // The file cache should be invalidated before removal
+                        // @see https://bugs.php.net/bug.php?id=75939
+                        if (function_exists('opcache_invalidate')) {
+                            opcache_invalidate($catalogueFile, true);
+                        }
+                        clearstatcache(true, $catalogueFile);
                         // remove translation catalogue to allow parent class to rebuild it
                         unlink($catalogueFile);
                         // make sure that translations will be loaded from source resources
                         if ($this->resourceCache instanceof ClearableCache) {
                             $this->resourceCache->deleteAll();
                         }
-                        clearstatcache(true, $catalogueFile);
+
+                        $isAnyCatalogFileRemoved = true;
 
                         break;
                     }
                 }
             }
+        }
+
+        if ($isAnyCatalogFileRemoved && $this->isApplicationInstalled()) {
+            $this->dispatchInvalidateTranslationCacheEvent($locale);
         }
     }
 
@@ -611,5 +647,16 @@ class Translator extends BaseTranslator
     private function isApplicationInstalled()
     {
         return !empty($this->installed);
+    }
+
+    /**
+     * @param string|null $locale
+     */
+    private function dispatchInvalidateTranslationCacheEvent($locale = null)
+    {
+        $this->eventDispatcher->dispatch(
+            new InvalidateTranslationCacheEvent($locale),
+            InvalidateTranslationCacheEvent::NAME
+        );
     }
 }

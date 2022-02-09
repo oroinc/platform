@@ -10,7 +10,6 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
-use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -259,10 +258,6 @@ class TranslationManager
      */
     public function invalidateCache($locale = null)
     {
-        $this->eventDispatcher->dispatch(
-            new InvalidateTranslationCacheEvent($locale),
-            InvalidateTranslationCacheEvent::NAME
-        );
         $this->dbTranslationMetadataCache->updateTimestamp($locale);
     }
 
