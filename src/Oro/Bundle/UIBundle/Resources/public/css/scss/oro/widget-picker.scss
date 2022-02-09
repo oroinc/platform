@@ -20,6 +20,10 @@
         overflow: auto;
     }
 
+    &__filter {
+        display: inline-flex;
+    }
+
     @at-root input#{&}__filter-search {
         width: $widget-picker-search-width;
     }
