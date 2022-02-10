@@ -1,6 +1,7 @@
 @ticket-BAP-9337
 @ticket-BAP-15577
 @automatically-ticket-tagged
+@waf-skip
 Feature: Show "Update Schema" button for entity fields
   In order to find out that schema update for custom entity fields is required, and be able to do it
   As a Site Administrator
