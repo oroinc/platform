@@ -124,19 +124,19 @@ services:
         arguments:
             - '@oro.cache.generator.object_cache_key'
 
-    oro.cache.provider.memory_cache.cache:
+    oro.cache.adapter.array:
         class: Symfony\Component\Cache\Adapter\ArrayAdapter
         shared: false
         arguments:
             - '%oro_cache.data_adapter_lifetime%' # $defaultLifetime
-            - false # $storeSerialized
+            - '%oro_cache.array_cache_store_serialized%' # $storeSerialized
 
     oro.cache.provider.memory_cache:
         class: Oro\Bundle\CacheBundle\Provider\MemoryCacheProvider
         abstract: true
         arguments:
             - '@oro.cache.generator.universal_cache_key'
-            - '@oro.cache.provider.memory_cache.cache'
+            - '@oro.cache.adapter.array'
 
     oro_cache.array_cache:
         class: Symfony\Component\Cache\Adapter\ArrayAdapter

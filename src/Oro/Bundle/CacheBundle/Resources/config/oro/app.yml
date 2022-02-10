@@ -12,7 +12,7 @@ framework:
                 provider: oro_cache.validator
             oro.data.cache:
                 adapters:
-                    - oro.cache.provider.memory_cache.cache
+                    - oro.cache.adapter.array
                     - oro_cache.data.adapter
             oro.data.cache.without_memory_cache:
                 adapter: oro_cache.data.adapter
