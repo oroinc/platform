@@ -23,6 +23,11 @@ services:
         arguments:
             - 'attachments'
             - '@oro_attachment.protocol_validator'
+        calls:
+            - ['setClientMimeTypeMapper', ['@oro_attachment.mapper.client_mime_type_mapper']]
+
+    oro_attachment.mapper.client_mime_type_mapper:
+        class: Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper
 
     oro_attachment.protocol_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator
