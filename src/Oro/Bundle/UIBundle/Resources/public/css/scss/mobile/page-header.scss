@@ -107,6 +107,12 @@
         }
     }
 
+    .title-buttons-container:not(.buttons-grouped) {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
     .title-buttons-container:not(:empty) {
         .btn-more-actions {
             @include fa-icon($page-title-btn-more-actions-icon, 'before', true) {
