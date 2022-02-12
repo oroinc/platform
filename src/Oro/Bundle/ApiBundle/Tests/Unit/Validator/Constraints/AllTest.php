@@ -9,12 +9,6 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class AllTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetTargets()
-    {
-        $constraint = new All(new NotNull());
-        self::assertEquals('property', $constraint->getTargets());
-    }
-
     public function testThatConstraintsPropertyIsSet()
     {
         $childConstraint = new NotNull();

@@ -15,34 +15,24 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    private AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject $attributeTypeRegistry;
+    /** @var AttributeTypeRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeTypeRegistry;
 
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $attributeConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $attributeConfigProvider;
 
-    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     protected function setUp(): void
     {
         $this->attributeTypeRegistry = $this->createMock(AttributeTypeRegistry::class);
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager = $this->createMock(ConfigManager::class);
-
         parent::setUp();
     }
 
-    protected function createContext()
-    {
-        $this->constraint = new AttributeConfiguration();
-        $this->propertyPath = '';
-        $this->value = null;
-
-        return parent::createContext();
-    }
-
-    /**
-     * @return AttributeConfigurationValidator
-     */
-    protected function createValidator()
+    protected function createValidator(): AttributeConfigurationValidator
     {
         return new AttributeConfigurationValidator(
             $this->attributeTypeRegistry,
@@ -59,8 +49,9 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ->method('getAttributeType');
         $this->configManager->expects($this->never())
             ->method('createFieldConfigByModel');
-        $this->validator->validate(new \stdClass(), $this->constraint);
 
+        $constraint = new AttributeConfiguration();
+        $this->validator->validate(new \stdClass(), $constraint);
         $this->assertNoViolation();
     }
 
@@ -84,8 +75,9 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ->method('createFieldConfigByModel');
         $this->attributeTypeRegistry->expects($this->never())
             ->method('getAttributeType');
-        $this->validator->validate($value, $this->constraint);
 
+        $constraint = new AttributeConfiguration();
+        $this->validator->validate($value, $constraint);
         $this->assertNoViolation();
     }
 
@@ -111,8 +103,9 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ->willReturn($this->createMock(ConfigInterface::class));
         $this->attributeTypeRegistry->expects($this->never())
             ->method('getAttributeType');
-        $this->validator->validate($value, $this->constraint);
 
+        $constraint = new AttributeConfiguration();
+        $this->validator->validate($value, $constraint);
         $this->assertNoViolation();
     }
 
@@ -151,8 +144,8 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
                 ['is_attribute', true, true],
             ]);
 
-        $this->validator->validate($value, $this->constraint);
-
+        $constraint = new AttributeConfiguration();
+        $this->validator->validate($value, $constraint);
         $this->assertNoViolation();
     }
 
@@ -194,12 +187,11 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
             ->method('is')
             ->willReturnMap($options);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new AttributeConfiguration();
+        $this->validator->validate($value, $constraint);
 
         $expectedViolationParams['{{ type }}'] = $fieldType;
-        $this->buildViolation($this->constraint->message)
-            ->atPath('')
-            ->setInvalidValue(null)
+        $this->buildViolation($constraint->message)
             ->setParameters($expectedViolationParams)
             ->assertRaised();
     }
@@ -280,25 +272,20 @@ class AttributeConfigurationValidatorTest extends ConstraintValidatorTestCase
                 ['searchable', true, true],
             ]);
 
-        $this->validator->validate($value, $this->constraint);
+        $constraint = new AttributeConfiguration();
+        $this->validator->validate($value, $constraint);
 
-        $this->buildViolation($this->constraint->message)
-            ->atPath('')
-            ->setInvalidValue(null)
+        $this->buildViolation($constraint->message)
             ->setParameters([
                 '{{ type }}' => $fieldType,
                 '{{ option }}' => 'filterable'
             ])
-            ->buildNextViolation($this->constraint->message)
-            ->atPath('')
-            ->setInvalidValue(null)
+            ->buildNextViolation($constraint->message)
             ->setParameters([
                 '{{ type }}' => $fieldType,
                 '{{ option }}' => 'sortable'
             ])
-            ->buildNextViolation($this->constraint->message)
-            ->atPath('')
-            ->setInvalidValue(null)
+            ->buildNextViolation($constraint->message)
             ->setParameters([
                 '{{ type }}' => $fieldType,
                 '{{ option }}' => 'searchable'

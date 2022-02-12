@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributes;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\GroupAttributesValidator;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class GroupAttributesValidatorTest extends ConstraintValidatorTestCase
@@ -23,7 +24,7 @@ class GroupAttributesValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
-    protected function createValidator()
+    protected function createValidator(): GroupAttributesValidator
     {
         return new GroupAttributesValidator($this->attributeManager);
     }
@@ -34,6 +35,12 @@ class GroupAttributesValidatorTest extends ConstraintValidatorTestCase
         ReflectionUtil::setId($model, $id);
 
         return $model;
+    }
+
+    public function testGetTargets()
+    {
+        $constraint = new GroupAttributes();
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidateWrongEntity()

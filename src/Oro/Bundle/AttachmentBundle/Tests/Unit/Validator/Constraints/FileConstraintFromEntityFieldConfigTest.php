@@ -3,7 +3,6 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfig;
-use Symfony\Component\Validator\Constraint;
 
 class FileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
@@ -18,11 +17,6 @@ class FileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework\TestCas
         $this->constraint = new FileConstraintFromEntityFieldConfig(
             ['entityClass' => self::SAMPLE_CLASS, 'fieldName' => self::SAMPLE_FIELD]
         );
-    }
-
-    public function testGetTargets(): void
-    {
-        $this->assertEquals(Constraint::PROPERTY_CONSTRAINT, $this->constraint->getTargets());
     }
 
     public function testConstructWhenNoEntityClass(): void

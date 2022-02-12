@@ -7,39 +7,38 @@ use Oro\Bundle\EntityBundle\Fallback\EntityFallbackResolver;
 use Oro\Bundle\EntityBundle\Validator\Constraints\RelatedEntityFieldFallbackValueConstraint;
 use Oro\Bundle\EntityBundle\Validator\Constraints\RelatedEntityFieldFallbackValueConstraintValidator;
 use Oro\Component\DoctrineUtils\Tests\Unit\Stub\DummyEntity;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Symfony\Component\Validator\Validator\ContextualValidatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextualValidator;
-
     /** @var EntityFallbackResolver|\PHPUnit\Framework\MockObject\MockObject */
     private $resolver;
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createValidator()
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $contextualValidator;
+
+    protected function setUp(): void
     {
         $this->resolver = $this->createMock(EntityFallbackResolver::class);
+        $this->contextualValidator = $this->createMock(ContextualValidatorInterface::class);
+        parent::setUp();
+    }
+
+    protected function createValidator(): RelatedEntityFieldFallbackValueConstraintValidator
+    {
         return new RelatedEntityFieldFallbackValueConstraintValidator($this->resolver);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
+    protected function createContext(): ExecutionContext
     {
-        $this->contextualValidator = $this->createMock(ContextualValidatorInterface::class);
         $context = parent::createContext();
-        /** @var \PHPUnit\Framework\MockObject\MockObject $validator */
+        /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator */
         $validator = $context->getValidator();
         $validator->expects($this->any())
             ->method('startContext')
@@ -47,21 +46,16 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
         $this->contextualValidator->expects($this->any())
             ->method('atPath')
             ->willReturnSelf();
+
         return $context;
     }
 
     /**
      * @dataProvider validationDataProvider
-     * @param string|null $fallbackId
-     * @param mixed $scalarValue
-     * @param boolean $isFallbackConfigured
-     * @param Constraint[] $constraints
-     * @param null|string $violationMessage
-     * @param array $parameters
      */
     public function testValidation(
         ?string $fallbackId,
-        $scalarValue,
+        mixed $scalarValue,
         bool $isFallbackConfigured,
         array $constraints,
         ?string $violationMessage = null,
@@ -100,8 +94,7 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
             null,
             new Assert\NotNull()
         );
-        $this->contextualValidator
-            ->expects($this->any())
+        $this->contextualValidator->expects($this->any())
             ->method('validate')
             ->with($scalarValue, $constraints)
             ->willReturnSelf();
@@ -109,7 +102,8 @@ class RelatedEntityFieldFallbackValueConstraintValidatorTest extends ConstraintV
             ->method('getViolations')
             ->willReturn(new ConstraintViolationList([$violation]));
 
-        $this->validator->validate($value, new RelatedEntityFieldFallbackValueConstraint($constraints));
+        $constraint = new RelatedEntityFieldFallbackValueConstraint($constraints);
+        $this->validator->validate($value, $constraint);
 
         if ($violationMessage) {
             $this->buildViolation($violationMessage)->setParameters($parameters)->assertRaised();

@@ -11,14 +11,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigFileValidator */
-    private $configValidator;
-
     /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $validator;
 
     /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fileConstraintsProvider;
+
+    /** @var ConfigFileValidator */
+    private $configValidator;
 
     protected function setUp(): void
     {
@@ -30,20 +30,19 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWhenNoFieldName(): void
     {
-        $this->fileConstraintsProvider
-            ->expects($this->once())
+        $dataClass = \stdClass::class;
+
+        $this->fileConstraintsProvider->expects($this->once())
             ->method('getAllowedMimeTypesForEntity')
-            ->with($dataClass = \stdClass::class)
+            ->with($dataClass)
             ->willReturn($mimeTypes = ['sample/type1']);
 
-        $this->fileConstraintsProvider
-            ->expects($this->once())
+        $this->fileConstraintsProvider->expects($this->once())
             ->method('getMaxSizeForEntity')
-            ->with($dataClass = \stdClass::class)
+            ->with($dataClass)
             ->willReturn($maxFileSize = 100);
 
-        $this->validator
-            ->expects($this->once())
+        $this->validator->expects($this->once())
             ->method('validate')
             ->with(
                 $componentFile = $this->createMock(ComponentFile::class),
@@ -59,20 +58,20 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateWhenFieldName(): void
     {
-        $this->fileConstraintsProvider
-            ->expects($this->once())
+        $dataClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
+        $this->fileConstraintsProvider->expects($this->once())
             ->method('getAllowedMimeTypesForEntityField')
-            ->with($dataClass = \stdClass::class, $fieldName = 'sampleField')
+            ->with($dataClass, $fieldName)
             ->willReturn($mimeTypes = ['sample/type1']);
 
-        $this->fileConstraintsProvider
-            ->expects($this->once())
+        $this->fileConstraintsProvider->expects($this->once())
             ->method('getMaxSizeForEntityField')
-            ->with($dataClass = \stdClass::class, $fieldName)
+            ->with($dataClass, $fieldName)
             ->willReturn($maxFileSize = 100);
 
-        $this->validator
-            ->expects($this->once())
+        $this->validator->expects($this->once())
             ->method('validate')
             ->with(
                 $componentFile = $this->createMock(ComponentFile::class),
