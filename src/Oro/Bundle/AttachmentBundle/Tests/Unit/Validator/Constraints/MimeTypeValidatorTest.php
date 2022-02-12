@@ -20,46 +20,40 @@ class MimeTypeValidatorTest extends ConstraintValidatorTestCase
         'image/png'
     ];
 
-    protected function createValidator()
+    protected function createValidator(): MimeTypeValidator
     {
         return new MimeTypeValidator(self::ALLOWED_FILE_MIME_TYPES, self::ALLOWED_IMAGE_MIME_TYPES);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
+    public function testGetTargets()
     {
-        $this->constraint = new MimeType();
-
-        return parent::createContext();
-    }
-
-    public function testConfiguration()
-    {
-        $this->assertEquals(MimeTypeValidator::class, $this->constraint->validatedBy());
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        $constraint = new MimeType();
+        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidMimeTypesForPartialListOfMimeTypes()
     {
-        $this->validator->validate(['application/vnd.ms-excel', 'image/png'], $this->constraint);
+        $constraint = new MimeType();
+        $this->validator->validate(['application/vnd.ms-excel', 'image/png'], $constraint);
         $this->assertNoViolation();
     }
 
     public function testValidMimeTypesForFullListOfMimeTypes()
     {
-        $this->validator->validate(self::ALLOWED_FILE_MIME_TYPES, $this->constraint);
+        $constraint = new MimeType();
+        $this->validator->validate(self::ALLOWED_FILE_MIME_TYPES, $constraint);
         $this->assertNoViolation();
     }
 
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testInvalidMimeType($value, $notAllowedMimeTypes, $plural)
+    public function testInvalidMimeType(array|string $value, string $notAllowedMimeTypes, int $plural)
     {
-        $this->validator->validate($value, $this->constraint);
-        $this->buildViolation($this->constraint->message)
+        $constraint = new MimeType();
+        $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->message)
             ->setParameters(['{{ notAllowedMimeTypes }}' => $notAllowedMimeTypes])
             ->setPlural($plural)
             ->assertRaised();
