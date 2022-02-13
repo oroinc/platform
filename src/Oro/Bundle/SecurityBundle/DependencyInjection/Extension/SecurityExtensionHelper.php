@@ -4,15 +4,15 @@ namespace Oro\Bundle\SecurityBundle\DependencyInjection\Extension;
 
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
+/**
+ * Provides static methods to manage configuration of the "security" extension.
+ */
 class SecurityExtensionHelper
 {
     /**
-     * Move specified firewall to the latest position, it should be done for the most general firewalls
-     *
-     * @param ExtendedContainerBuilder $container
-     * @param string $firewallName
+     * Moves the specified firewall configuration to the latest position.
      */
-    public static function makeFirewallLatest(ExtendedContainerBuilder $container, $firewallName)
+    public static function makeFirewallLatest(ExtendedContainerBuilder $container, string $firewallName): void
     {
         $securityConfig = $container->getExtensionConfig('security');
         if (!isset($securityConfig[0]['firewalls'][$firewallName])) {
@@ -23,7 +23,6 @@ class SecurityExtensionHelper
         unset($securityConfig[0]['firewalls'][$firewallName]);
         $securityConfig[0]['firewalls'][$firewallName] = $mainFirewall;
 
-        /** @var ExtendedContainerBuilder $container */
         $container->setExtensionConfig('security', $securityConfig);
     }
 }
