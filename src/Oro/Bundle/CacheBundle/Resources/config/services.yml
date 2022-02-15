@@ -7,7 +7,7 @@ parameters:
     oro_cache.data_adapter_directory: '%kernel.cache_dir%/oro_data'
 
 services:
-    oro_cache.data.adapter:
+    oro.cache.adapter.persistent:
         public: false
         class: Symfony\Component\Cache\Adapter\FilesystemAdapter
         arguments:
