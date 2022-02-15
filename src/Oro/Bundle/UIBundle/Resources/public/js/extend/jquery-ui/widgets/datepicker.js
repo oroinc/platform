@@ -23,8 +23,13 @@ const dropupClassName = 'ui-datepicker-dialog-is-above';
 
 $(document)
     .off('select2-open.dropdown.data-api')
-    .on('select2-open.dropdown.data-api', function() {
-        if ($.datepicker._curInst && $.datepicker._datepickerShowing && !($.datepicker._inDialog && $.blockUI)) {
+    .on('select2-open.dropdown.data-api', function(e) {
+        if (
+            !$.contains($.datepicker.dpDiv[0], e.target) &&
+            $.datepicker._curInst &&
+            $.datepicker._datepickerShowing &&
+            !($.datepicker._inDialog && $.blockUI)
+        ) {
             $.datepicker._hideDatepicker();
         }
     });
