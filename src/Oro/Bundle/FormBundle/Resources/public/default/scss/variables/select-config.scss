@@ -1,5 +1,7 @@
 /* @theme: default; */
 
+@use 'sass:string';
+
 $select-font-family: $base-font;
 $select-color: get-color('additional', 'dark');
 
@@ -9,11 +11,12 @@ $select-firefox-height: null;
 $select-firefox-line-height: null;
 $select-firefox-inner-offset-top: null;
 $select-firefox-inner-offset-bottom: null;
-$select-padding: 9px 18px 8px 11px;
-$select-padding--m: 8px 18px 8px 9px;
-$select-padding--s: 5px 18px 4px 8px;
+$select-padding: 9px 22px 8px 11px;
+$select-padding--m: 8px 22px 8px 9px;
+$select-padding--s: 5px 22px 4px 8px;
 $select-height--s: 32px;
-$select-bg: url('#{$global-url}/oroform/default/images/icons/arrow-down--gray.svg') no-repeat right 8px center get-color('additional', 'ultra');
+$select-arrow-color: get-color('additional', 'dark');
+$select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional', 'ultra');
 
 // Hover
 $select-border-color-hover-state: get-color('additional', 'dark');

@@ -18,8 +18,6 @@ use Oro\Bundle\SecurityBundle\Validator\Constraints\NotDangerousProtocolValidato
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 
 class MenuUpdateTypeTest extends FormIntegrationTestCase
 {
@@ -31,7 +29,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $registry = $this->createMock(ManagerRegistry::class);
 
@@ -50,10 +48,13 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function getValidators(): array
     {
         $uriSecurityHelper = $this->createMock(UriSecurityHelper::class);
-        $uriSecurityHelper
+        $uriSecurityHelper->expects($this->any())
             ->method('uriHasDangerousProtocol')
             ->willReturnMap([
                 ['javascript:alert(1)', true],
@@ -64,6 +65,7 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             ]);
 
         return [
+            MaxNestedLevelValidator::class => $this->createMock(MaxNestedLevelValidator::class),
             'oro_security.validator.constraints.not_dangerous_protocol' =>
                 new NotDangerousProtocolValidator($uriSecurityHelper)
         ];
@@ -240,34 +242,5 @@ class MenuUpdateTypeTest extends FormIntegrationTestCase
             // We don't have to check other variants like with html-, ascii-, utf- encoded characters etc because
             // all of them must be handled on the output by twig.
         ];
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface
-     */
-    protected function getConstraintValidatorFactory()
-    {
-        $factory = $this->createMock(ConstraintValidatorFactoryInterface::class);
-        $factory->expects($this->any())
-            ->method('getInstance')
-            ->willReturnCallback(
-                function (Constraint $constraint) {
-                    $className = $constraint->validatedBy();
-
-                    if ($className === MaxNestedLevelValidator::class) {
-                        $this->validators[$className] = $this->createMock(MaxNestedLevelValidator::class);
-                    }
-
-                    if (!isset($this->validators[$className]) ||
-                        $className === 'Symfony\Component\Validator\Constraints\CollectionValidator'
-                    ) {
-                        $this->validators[$className] = new $className();
-                    }
-
-                    return $this->validators[$className];
-                }
-            );
-
-        return $factory;
     }
 }

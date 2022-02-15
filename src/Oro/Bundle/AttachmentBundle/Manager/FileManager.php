@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Manager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\Manager\File\TemporaryFile;
+use Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapperInterface;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
@@ -18,13 +19,17 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class FileManager extends GaufretteFileManager
 {
-    /** @var ProtocolValidatorInterface */
-    private $protocolValidator;
+    private ProtocolValidatorInterface $protocolValidator;
+    private ClientMimeTypeMapperInterface $clientMimeTypeMapper;
 
-    public function __construct(string $filesystemName, ProtocolValidatorInterface $protocolValidator)
-    {
+    public function __construct(
+        string $filesystemName,
+        ProtocolValidatorInterface $protocolValidator,
+        ClientMimeTypeMapperInterface $clientMimeTypeMapper
+    ) {
         parent::__construct($filesystemName);
         $this->protocolValidator = $protocolValidator;
+        $this->clientMimeTypeMapper = $clientMimeTypeMapper;
     }
 
     /**
@@ -165,8 +170,9 @@ class FileManager extends GaufretteFileManager
         $file = $entity->getFile();
         if (null !== $file && $file->isFile()) {
             if ($file instanceof UploadedFile) {
+                $mimeType = $this->clientMimeTypeMapper->getMimeType($file->getClientMimeType());
                 $entity->setOriginalFilename($file->getClientOriginalName());
-                $entity->setMimeType($file->getClientMimeType());
+                $entity->setMimeType($mimeType);
                 $entity->setExtension($file->getClientOriginalExtension());
             } else {
                 $entity->setMimeType($file->getMimeType());

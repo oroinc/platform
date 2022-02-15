@@ -6,26 +6,15 @@ use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\Image;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ImageValidator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
-/**
- * @property Image $constraint
- */
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var File|MockObject */
+    /** @var File|\PHPUnit\Framework\MockObject\MockObject */
     private $image;
 
-    /** @var ConfigManager|MockObject */
-    private $configManager;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createValidator()
+    protected function setUp(): void
     {
         $this->image = $this->createMock(File::class);
 
@@ -34,29 +23,18 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->method('getPathname')
             ->willReturn(__FILE__);
 
-        $this->configManager = $this->createMock(ConfigManager::class);
-        $this->configManager->expects($this->any())
+        parent::setUp();
+    }
+
+    protected function createValidator(): ImageValidator
+    {
+        $configManager = $this->createMock(ConfigManager::class);
+        $configManager->expects($this->any())
             ->method('get')
             ->with('oro_attachment.upload_image_mime_types')
             ->willReturn(MimeTypesConverter::convertToString(['image/png', 'image/jpg', 'image/gif']));
 
-        return new ImageValidator($this->configManager);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
-    {
-        $this->constraint = new Image();
-
-        return parent::createContext();
-    }
-
-    public function testConfiguration(): void
-    {
-        $this->assertEquals('oro_attachment_image_validator', $this->constraint->validatedBy());
-        $this->assertEquals(Constraint::PROPERTY_CONSTRAINT, $this->constraint->getTargets());
+        return new ImageValidator($configManager);
     }
 
     public function testValidImage(): void
@@ -65,7 +43,8 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('image/jpg');
 
-        $this->validator->validate($this->image, $this->constraint);
+        $constraint = new Image();
+        $this->validator->validate($this->image, $constraint);
         $this->assertNoViolation();
     }
 
@@ -75,8 +54,10 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->method('getMimeType')
             ->willReturn('image/svg');
 
-        $this->validator->validate($this->image, $this->constraint);
-        $this->buildViolation($this->constraint->mimeTypesMessage)
+        $constraint = new Image();
+        $this->validator->validate($this->image, $constraint);
+
+        $this->buildViolation($constraint->mimeTypesMessage)
             ->setCode(Image::INVALID_MIME_TYPE_ERROR)
             ->setParameter('{{ file }}', '"' . __FILE__ . '"')
             ->setParameter('{{ types }}', '"image/png", "image/jpg", "image/gif"')

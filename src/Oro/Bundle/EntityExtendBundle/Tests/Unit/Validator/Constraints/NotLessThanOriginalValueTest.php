@@ -7,12 +7,6 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class NotLessThanOriginalValueTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetTargets()
-    {
-        $constraint = new NotLessThanOriginalValue(['scope' => 'extended', 'option' => 'length']);
-        self::assertEquals('property', $constraint->getTargets());
-    }
-
     public function testGetRequiredOptions()
     {
         $constraint = new NotLessThanOriginalValue(['scope' => 'extended', 'option' => 'length']);

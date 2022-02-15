@@ -26,15 +26,14 @@ class DefaultLocalizationValidatorTest extends ConstraintValidatorTestCase
         $this->setRoot($this->form);
     }
 
-    protected function createValidator()
+    protected function createValidator(): DefaultLocalizationValidator
     {
         return new DefaultLocalizationValidator($this->localizationManager);
     }
 
-    public function testConfiguration()
+    public function testGetTargets()
     {
         $constraint = new Constraints\DefaultLocalization();
-        $this->assertEquals('oro_locale.default_localization_validator', $constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 

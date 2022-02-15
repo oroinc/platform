@@ -17,21 +17,6 @@ $theme-fonts: (
     )
 ) !default;
 
-$base-font: arial, sans-serif !default;
-
-// include in assets
-$icon-font: 'FontAwesome' !default;
-
-$root-font-size: 14px !default;
-$base-font-size: 14px !default;
-$base-font-size--large: 16px;
-$base-font-size--xs: 11px !default;
-$base-font-size--s: 13px !default;
-$base-font-size--m: 20px !default;
-$base-font-size--l: 22px !default;
-$base-font-size--xl: 26px !default;
-$base-line-height: 1.35 !default;
-
 // Fonts weights
 $font-weights: (
     // Thin (Hairline)
@@ -53,6 +38,22 @@ $font-weights: (
     // Black (Heavy)
     'black': 900
 ) !default;
+
+$base-font: arial, sans-serif !default;
+
+// include in assets
+$icon-font: 'FontAwesome' !default;
+
+$root-font-size: 14px !default;
+$base-font-size: 14px !default;
+$base-font-size--large: 16px;
+$base-font-size--xs: 11px !default;
+$base-font-size--s: 13px !default;
+$base-font-size--m: 20px !default;
+$base-font-size--l: 22px !default;
+$base-font-size--xl: 26px !default;
+$base-font-weight: font-weight('normal') !default;
+$base-line-height: 1.35 !default;
 
 // Font smoothing
 $global-font-smoothing: true !default;

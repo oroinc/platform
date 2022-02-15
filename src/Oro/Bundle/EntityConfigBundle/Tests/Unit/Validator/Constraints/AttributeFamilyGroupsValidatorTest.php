@@ -5,13 +5,20 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroups;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\AttributeFamilyGroupsValidator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeFamilyGroupsValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): AttributeFamilyGroupsValidator
     {
         return new AttributeFamilyGroupsValidator();
+    }
+
+    public function testGetTargets()
+    {
+        $constraint = new AttributeFamilyGroups();
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testValidateWrongEntity()

@@ -7,26 +7,20 @@ use Oro\Bundle\LocaleBundle\Validator\Constraints;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\LocalizationValidator;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class LocalizationValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): LocalizationValidator
     {
         return new LocalizationValidator();
     }
 
-    public function testConfiguration()
+    public function testGetTargets()
     {
         $constraint = new Constraints\Localization();
-        $this->assertEquals('oro_locale.localization_validator', $constraint->validatedBy());
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
-    }
-
-    public function testGetDefaultOption()
-    {
-        $constraint = new Constraints\Localization();
-        $this->assertNull($constraint->getDefaultOption());
     }
 
     public function testValidateWithoutCircularReference()
@@ -79,7 +73,7 @@ class LocalizationValidatorTest extends ConstraintValidatorTestCase
 
     public function testUnexpectedValue()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "string" given'
         );
@@ -90,7 +84,7 @@ class LocalizationValidatorTest extends ConstraintValidatorTestCase
 
     public function testUnexpectedClass()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\LocaleBundle\Entity\Localization", "stdClass" given'
         );

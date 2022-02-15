@@ -13,29 +13,15 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ValidRegionValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function createValidator()
+    protected function createValidator(): ValidRegionValidator
     {
         return new ValidRegionValidator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
+    public function testGetTargets(): void
     {
-        $this->constraint = new ValidRegion();
-        $this->propertyPath = '';
-
-        return parent::createContext();
-    }
-
-    public function testConfiguration(): void
-    {
-        $this->assertEquals(ValidRegionValidator::class, $this->constraint->validatedBy());
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        $constraint = new ValidRegion();
+        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testAddressWithoutCountry(): void
@@ -43,7 +29,9 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry(null);
         $address->setRegion(null);
-        $this->validator->validate($address, $this->constraint);
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
         $this->assertNoViolation();
     }
 
@@ -52,7 +40,9 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($this->createMock(Country::class));
         $address->setRegion(null);
-        $this->validator->validate($address, $this->constraint);
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
         $this->assertNoViolation();
     }
 
@@ -73,7 +63,9 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($country);
         $address->setRegion($region);
-        $this->validator->validate($address, $this->constraint);
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
         $this->assertNoViolation();
     }
 
@@ -101,11 +93,12 @@ class ValidRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($country);
         $address->setRegion($region);
-        $this->validator->validate($address, $this->constraint);
-        $this
-            ->buildViolation($this->constraint->message)
+
+        $constraint = new ValidRegion();
+        $this->validator->validate($address, $constraint);
+
+        $this->buildViolation($constraint->message)
             ->setParameters(['{{ region }}' => 'Region', '{{ country }}' => 'Country'])
-            ->atPath('')
             ->assertRaised();
     }
 }

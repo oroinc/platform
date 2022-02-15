@@ -5,8 +5,8 @@ namespace Oro\Component\Testing\Unit;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Test\FormIntegrationTestCase as BaseTestCase;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\CollectionValidator;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextFactory;
@@ -16,16 +16,15 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 use Symfony\Component\Validator\Mapping\Loader\YamlFileLoader;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Base class for writing form integration tests as unit tests.
  */
 class FormIntegrationTestCase extends BaseTestCase
 {
-    /**
-     * @var ConstraintValidatorInterface[]
-     */
-    protected $validators;
+    /** @var ConstraintValidatorInterface[] */
+    private array $validators = [];
 
     /**
      * {@inheritdoc}
@@ -33,31 +32,23 @@ class FormIntegrationTestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->validators = $this->getValidators();
     }
 
     /**
-     * @return array
+     * @return ConstraintValidatorInterface[] [alias => validator, ...]
      */
-    protected function getValidators()
+    protected function getValidators(): array
     {
         return [];
     }
 
-    /**
-     * @param bool $loadMetadata
-     * @return ValidatorExtension
-     */
-    protected function getValidatorExtension($loadMetadata = false)
+    protected function getValidatorExtension(bool $loadMetadata = false): ValidatorExtension
     {
         return new ValidatorExtension($loadMetadata ? $this->getValidator() : Validation::createValidator());
     }
 
-    /**
-     * @return RecursiveValidator
-     */
-    protected function getValidator()
+    protected function getValidator(): RecursiveValidator
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
@@ -66,87 +57,86 @@ class FormIntegrationTestCase extends BaseTestCase
                 $this->loadMetadata($meta);
             });
 
-        $validator = new RecursiveValidator(
+        return new RecursiveValidator(
             new ExecutionContextFactory($this->getTranslator()),
             new LazyLoadingMetadataFactory($loader),
             $this->getConstraintValidatorFactory()
         );
-
-        return $validator;
     }
 
-    protected function assertFormIsValid(FormInterface $form)
+    protected function assertFormIsValid(FormInterface $form): void
     {
-        $formName = $form->getName();
-        $this->assertTrue($form->isValid(), "{$formName} form should be valid.");
+        $this->assertTrue($form->isValid(), sprintf('%s form should be valid.', $form->getName()));
     }
 
-    protected function assertFormIsNotValid(FormInterface $form)
+    protected function assertFormIsNotValid(FormInterface $form): void
     {
-        $formName = $form->getName();
-        $this->assertFalse($form->isValid(), "{$formName} form shouldn't be valid.");
+        $this->assertFalse($form->isValid(), sprintf('%s form should not be valid.', $form->getName()));
     }
 
-    /**
-     * @param mixed         $expectedValue
-     * @param string        $optionName
-     * @param FormInterface $form
-     */
-    protected function assertFormOptionEqual($expectedValue, $optionName, FormInterface $form)
+    protected function assertFormOptionEqual(mixed $expectedValue, string $optionName, FormInterface $form): void
     {
-        $formName = $form->getName();
-        $value = var_export($expectedValue, true);
         $this->assertTrue(
             $form->getConfig()->hasOption($optionName),
-            "Failed asserting that {$optionName} option of {$formName} not exists."
+            sprintf(
+                'Failed asserting that %s option of %s not exists.',
+                $optionName,
+                $form->getName()
+            )
         );
         $this->assertEquals(
             $expectedValue,
             $form->getConfig()->getOption($optionName),
-            "Failed asserting that {$optionName} option of {$formName} form matches expected {$value}."
+            sprintf(
+                'Failed asserting that %s option of %s form matches expected %s.',
+                $optionName,
+                $form->getName(),
+                var_export($expectedValue, true)
+            )
         );
     }
 
-    protected function assertFormContainsField($expectedFieldName, FormInterface $form)
+    protected function assertFormContainsField(string $expectedFieldName, FormInterface $form): void
     {
-        $formName = $form->getName();
         $this->assertTrue(
             $form->offsetExists($expectedFieldName),
-            "Failed asserting that {$expectedFieldName} field exists at {$formName} form."
+            sprintf(
+                'Failed asserting that %s field exists at %s form.',
+                $expectedFieldName,
+                $form->getName()
+            )
         );
     }
 
-    protected function assertFormNotContainsField($expectedFieldName, FormInterface $form)
+    protected function assertFormNotContainsField(string $expectedFieldName, FormInterface $form): void
     {
-        $formName = $form->getName();
         $this->assertFalse(
             $form->offsetExists($expectedFieldName),
-            "Failed asserting that {$expectedFieldName} field not exists at {$formName} form."
+            sprintf(
+                'Failed asserting that %s field not exists at %s form.',
+                $expectedFieldName,
+                $form->getName()
+            )
         );
     }
 
-    protected function loadMetadata(ClassMetadata $meta)
+    protected function loadMetadata(ClassMetadata $meta): void
     {
-        if (false !== ($configFile = $this->getConfigFile($meta->name))) {
+        $configFile = $this->getConfigFile($meta->name);
+        if ($configFile) {
             $loader = new YamlFileLoader($configFile);
             $loader->loadClassMetadata($meta);
         }
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ConstraintValidatorFactoryInterface
-     */
-    protected function getConstraintValidatorFactory()
+    protected function getConstraintValidatorFactory(): ConstraintValidatorFactoryInterface
     {
         $factory = $this->createMock(ConstraintValidatorFactoryInterface::class);
         $factory->expects($this->any())
             ->method('getInstance')
             ->willReturnCallback(function (Constraint $constraint) {
                 $className = $constraint->validatedBy();
-
-                if (!isset($this->validators[$className])
-                    || $className === 'Symfony\Component\Validator\Constraints\CollectionValidator'
-                ) {
+                if (!isset($this->validators[$className]) || CollectionValidator::class === $className) {
                     $this->validators[$className] = new $className();
                 }
 
@@ -156,56 +146,42 @@ class FormIntegrationTestCase extends BaseTestCase
         return $factory;
     }
 
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|Translator
-     */
-    protected function getTranslator()
+    protected function getTranslator(): TranslatorInterface
     {
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(function ($id) {
-                return $id;
-            });
+            ->willReturnArgument(0);
 
         return $translator;
     }
 
-    /**
-     * @param string $class
-     * @return string
-     */
-    protected function getConfigFile($class)
+    protected function getConfigFile(string $class): ?string
     {
-        if (false !== ($path = $this->getBundleRootPath($class))) {
+        $path = $this->getBundleRootPath($class);
+        if ($path) {
             $path .= '/Resources/config/validation.yml';
-
             if (!is_readable($path)) {
-                $path = false;
+                $path = null;
             }
         }
 
         return $path;
     }
 
-    /**
-     * @param string $class
-     * @return string
-     */
-    protected function getBundleRootPath($class)
+    protected function getBundleRootPath(string $class): ?string
     {
-        $rclass = new \ReflectionClass($class);
-
-        $path = false;
-
-        if (false !== ($pos = strrpos($rclass->getFileName(), 'Bundle'))) {
-            $path = substr($rclass->getFileName(), 0, $pos) . 'Bundle';
+        $path = null;
+        $reflClass = new \ReflectionClass($class);
+        $pos = strrpos($reflClass->getFileName(), 'Bundle');
+        if (false !== $pos) {
+            $path = substr($reflClass->getFileName(), 0, $pos) . 'Bundle';
         }
 
         return $path;
     }
 
-    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual)
+    public static function assertDateTimeEquals(\DateTime $expected, \DateTime $actual): void
     {
         self::assertEquals($expected->format('c'), $actual->format('c'));
     }

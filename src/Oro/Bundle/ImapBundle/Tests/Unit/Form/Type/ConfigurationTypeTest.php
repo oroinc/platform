@@ -16,9 +16,7 @@ use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFolders;
 use Oro\Bundle\ImapBundle\Validator\Constraints\EmailFoldersValidator;
-use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfigurationValidator;
-use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -29,7 +27,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\Constraints\ValidValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
@@ -83,7 +81,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $type = new ConfigurationType(
             $this->encryptor,
@@ -112,12 +110,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getValidators()
+    protected function getValidators(): array
     {
-        $valid = new Valid();
-        $emailFolders = new EmailFolders();
-        $imapConnectionConfiguration = new ImapConnectionConfiguration();
-        $smtpConnectionConfiguration = new SmtpConnectionConfiguration();
         $this->imapSettingsChecker->expects(self::any())
             ->method('checkConnection')
             ->willReturn(true);
@@ -130,12 +124,12 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->willReturn(true);
 
         return [
-            $valid->validatedBy() => $this->createMock(ConstraintValidatorInterface::class),
-            $emailFolders->validatedBy() => new EmailFoldersValidator(),
-            $imapConnectionConfiguration->validatedBy() => new ImapConnectionConfigurationValidator(
+            ValidValidator::class => $this->createMock(ConstraintValidatorInterface::class),
+            EmailFoldersValidator::class => new EmailFoldersValidator(),
+            ImapConnectionConfigurationValidator::class => new ImapConnectionConfigurationValidator(
                 $this->imapSettingsChecker
             ),
-            $smtpConnectionConfiguration->validatedBy() => new SmtpConnectionConfigurationValidator(
+            SmtpConnectionConfigurationValidator::class => new SmtpConnectionConfigurationValidator(
                 $this->smtpSettingsChecker,
                 $smtpSettingsFactory
             )

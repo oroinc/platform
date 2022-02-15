@@ -37,10 +37,11 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
 
     public function testInitialize(): void
     {
-        $this->fileValidator
-            ->expects($this->once())
+        $context = $this->createMock(ExecutionContextInterface::class);
+
+        $this->fileValidator->expects($this->once())
             ->method('initialize')
-            ->with($context = $this->createMock(ExecutionContextInterface::class));
+            ->with($context);
 
         $this->validator->initialize($context);
     }
@@ -53,19 +54,20 @@ class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\Tes
         int $expectedMaxSize,
         array $expectedMimeTypes
     ): void {
-        $this->fileConstraintsProvider
+        $file = new \stdClass();
+
+        $this->fileConstraintsProvider->expects($this->any())
             ->method('getMaxSizeByConfigPath')
             ->with($constraint->maxSizeConfigPath)
             ->willReturn(self::MAX_SIZE);
 
-        $this->fileConstraintsProvider
+        $this->fileConstraintsProvider->expects($this->any())
             ->method('getMimeTypes')
             ->willReturn(self::MIME_TYPES);
 
-        $this->fileValidator
-            ->expects($this->once())
+        $this->fileValidator->expects($this->once())
             ->method('validate')
-            ->with($file = new \stdClass(), $constraint);
+            ->with($file, $constraint);
 
         $this->validator->validate($file, $constraint);
 

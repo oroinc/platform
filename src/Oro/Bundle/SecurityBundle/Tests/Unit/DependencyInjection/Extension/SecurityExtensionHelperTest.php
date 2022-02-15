@@ -7,57 +7,50 @@ use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 
 class SecurityExtensionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    public function testMakeFirewallLatestNoFirewall()
+    public function testMakeFirewallLatestNoFirewall(): void
     {
         $securityConfig = [
-            'firewalls' => [
-                'not_main' => ['not_main_config'],
+            [
+                'firewalls' => [
+                    'main' => ['main_config'],
+                ]
             ]
         ];
 
-        $containerBuilder = $this->getContainerBuilder([$securityConfig]);
-        $containerBuilder->expects($this->never())
-            ->method('setExtensionConfig');
+        $container = new ExtendedContainerBuilder();
+        $container->setExtensionConfig('security', $securityConfig);
 
-        SecurityExtensionHelper::makeFirewallLatest($containerBuilder, 'latest_firewall');
+        SecurityExtensionHelper::makeFirewallLatest($container, 'another');
+
+        self::assertEquals($securityConfig, $container->getExtensionConfig('security'));
     }
 
-    public function testMakeFirewallLatest()
+    public function testMakeFirewallLatest(): void
     {
-        $inputSecurityConfig = [
-            'firewalls' => [
-                'latest_firewall' => ['main_config'],
-                'first' => ['first_config'],
-                'second' => ['second_config'],
+        $container = new ExtendedContainerBuilder();
+        $container->setExtensionConfig('security', [
+            [
+                'firewalls' => [
+                    'main'   => ['main_config'],
+                    'first'  => ['first_config'],
+                    'second' => ['second_config'],
+                ]
             ]
-        ];
-        $expectedSecurityConfig = [
-            'firewalls' => [
-                'first' => ['first_config'],
-                'second' => ['second_config'],
-                'latest_firewall' => ['main_config'],
-            ]
-        ];
+        ]);
 
-        $containerBuilder = $this->getContainerBuilder([$inputSecurityConfig]);
-        $containerBuilder->expects($this->once())
-            ->method('setExtensionConfig')
-            ->with('security', [$expectedSecurityConfig]);
+        SecurityExtensionHelper::makeFirewallLatest($container, 'main');
 
-        SecurityExtensionHelper::makeFirewallLatest($containerBuilder, 'latest_firewall');
-    }
-
-    /**
-     * @return \PHPUnit\Framework\MockObject\MockObject|ExtendedContainerBuilder
-     */
-    protected function getContainerBuilder(array $securityConfig)
-    {
-        $containerBuilder = $this->createMock(ExtendedContainerBuilder::class);
-        $containerBuilder->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('security')
-            ->willReturn($securityConfig);
-
-        return $containerBuilder;
+        self::assertSame(
+            [
+                [
+                    'firewalls' => [
+                        'first'  => ['first_config'],
+                        'second' => ['second_config'],
+                        'main'   => ['main_config'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('security')
+        );
     }
 }
