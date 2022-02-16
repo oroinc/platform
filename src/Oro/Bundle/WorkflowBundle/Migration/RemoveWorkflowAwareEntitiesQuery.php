@@ -57,7 +57,7 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
                 'oro_workflow_item',
                 'wi',
                 $qb->expr()->andX(
-                    $qb->expr()->eq('CAST(wi.entity_id as integer)', 'e.id'),
+                    $qb->expr()->eq('CAST(wi.entity_id as unsigned integer)', 'e.id'),
                     $qb->expr()->eq('wi.entity_class', ':class_name')
                 )
             )
