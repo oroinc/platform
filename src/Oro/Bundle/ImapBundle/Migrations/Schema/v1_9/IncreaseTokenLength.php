@@ -13,19 +13,6 @@ class IncreaseTokenLength implements Migration
 {
     public function up(Schema $schema, QueryBag $queries): void
     {
-        $this->changeEmailAccessTokenLength($schema);
-        $this->changeEmailRefreshTokenLength($schema);
-    }
-
-    private function changeEmailAccessTokenLength(Schema $schema): void
-    {
-        $table = $schema->getTable('oro_email_origin');
-        $table->changeColumn('access_token', ['length' => 8192]);
-    }
-
-    private function changeEmailRefreshTokenLength(Schema $schema): void
-    {
-        $table = $schema->getTable('oro_email_origin');
-        $table->changeColumn('refresh_token', ['length' => 8192]);
+        // Skip this migration. Moved to migration version 1_10_1.
     }
 }
