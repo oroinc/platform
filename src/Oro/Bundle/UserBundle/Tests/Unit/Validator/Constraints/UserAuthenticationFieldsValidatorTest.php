@@ -21,7 +21,7 @@ class UserAuthenticationFieldsValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
-    protected function createValidator()
+    protected function createValidator(): UserAuthenticationFieldsValidator
     {
         return new UserAuthenticationFieldsValidator($this->userManager);
     }
@@ -36,16 +36,10 @@ class UserAuthenticationFieldsValidatorTest extends ConstraintValidatorTestCase
         return $user;
     }
 
-    public function testConfiguration()
+    public function testGetTargets()
     {
         $constraint = new UserAuthenticationFields();
         $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
-    }
-
-    public function testGetDefaultOption()
-    {
-        $constraint = new UserAuthenticationFields();
-        $this->assertNull($constraint->getDefaultOption());
     }
 
     public function testUnexpectedConstraint()

@@ -1,6 +1,7 @@
 @regression
 @ticket-BAP-14021
 @ticket-BAP-15576
+@waf-skip
 @automatically-ticket-tagged
 @fixture-OroLocaleBundle:japanese-language.yml
 Feature: Localization Crud

@@ -23,8 +23,13 @@ const dropupClassName = 'ui-datepicker-dialog-is-above';
 
 $(document)
     .off('select2-open.dropdown.data-api')
-    .on('select2-open.dropdown.data-api', function() {
-        if ($.datepicker._curInst && $.datepicker._datepickerShowing && !($.datepicker._inDialog && $.blockUI)) {
+    .on('select2-open.dropdown.data-api', function(e) {
+        if (
+            !$.contains($.datepicker.dpDiv[0], e.target) &&
+            $.datepicker._curInst &&
+            $.datepicker._datepickerShowing &&
+            !($.datepicker._inDialog && $.blockUI)
+        ) {
             $.datepicker._hideDatepicker();
         }
     });
@@ -271,6 +276,8 @@ $.extend($.datepicker.constructor.prototype, {
     _generateHTML(inst) {
         const $html = $('<div />').append(original._generateHTML.call(this, inst));
 
+        $html.find('select.ui-datepicker-month').addClass(this._get(inst, 'selectMonthClassName'));
+        $html.find('select.ui-datepicker-year').addClass(this._get(inst, 'selectYearClassName'));
         $html.find('.ui-datepicker-title').attr({
             'id': `ui-datepicker-title-${this.uuid}`,
             'aria-atomic': true,

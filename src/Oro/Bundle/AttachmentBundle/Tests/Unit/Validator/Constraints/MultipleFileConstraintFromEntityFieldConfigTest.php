@@ -4,7 +4,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfig;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfig;
-use Symfony\Component\Validator\Constraint;
 
 class MultipleFileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,19 +13,11 @@ class MultipleFileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework
     /** @var FileConstraintFromEntityFieldConfig */
     private $constraint;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->constraint = new MultipleFileConstraintFromEntityFieldConfig(
             ['entityClass' => self::SAMPLE_CLASS, 'fieldName' => self::SAMPLE_FIELD]
         );
-    }
-
-    public function testGetTargets(): void
-    {
-        self::assertEquals(Constraint::PROPERTY_CONSTRAINT, $this->constraint->getTargets());
     }
 
     public function testConstructWhenNoEntityClass(): void

@@ -171,6 +171,7 @@ define(function(require) {
                 this.disposeWidget();
                 this.initializeWidget();
             }
+            this.$el.trigger('input-widget:refresh');
         },
 
         hide: function() {

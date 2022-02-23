@@ -282,6 +282,17 @@ define(function(require, exports, module) {
             options = options || {};
             if (typeof pathDesc === 'object' && pathDesc.url !== null && pathDesc.url !== void 0) {
                 options = params || {};
+
+                // Redirect to absolute URL if presented
+                if (/^[\w]+:\/\//.test(pathDesc.url) && pathDesc.url.match(location.origin) === null) {
+                    if (options.target === '_blank') {
+                        window.open(pathDesc.url, '_blank');
+                        return;
+                    }
+                    location[options.replace ? 'replace' : 'assign'](pathDesc.url);
+                    return;
+                }
+
                 // fetch from URL only pathname and query
                 parser = document.createElement('a');
                 parser.href = pathDesc.url;

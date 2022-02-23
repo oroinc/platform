@@ -484,6 +484,107 @@ class HasMoreTest extends EntitySerializerTestCase
         );
     }
 
+    /**
+     * @dataProvider subQueryLimitAndEntityCountMoreThanUnionQueryLimitDataProvider
+     */
+    public function testSubQueryLimitAndEntityCountMoreThanUnionQueryLimit(int $entityCount)
+    {
+        $unionQueryLimit = 100;
+        $entityRows = [];
+        $unionQueries = [];
+        $unionQueriesRows = [];
+        $unionQueriesGroupIndex = 0;
+        $unionQueriesGroups = [];
+        $relatedEntityIds = [];
+        $relatedEntityIdsTypes = [];
+        $relatedEntityRows = [];
+        $expectedResult = [];
+        for ($i = 1; $i <= $entityCount; $i++) {
+            $relatedEntityId = 10000 + $i;
+            $entityRows[] = ['id_0' => $i, 'name_1' => 'user_name' . $i];
+            $unionQueries[] = sprintf('SELECT u0_.id AS id_0, g1_.id AS id_1'
+                . ' FROM user_table u0_'
+                . ' INNER JOIN rel_user_to_group_table r2_ ON u0_.id = r2_.user_id'
+                . ' INNER JOIN group_table g1_ ON g1_.id = r2_.user_group_id'
+                . ' WHERE u0_.id = %d LIMIT 11', $i);
+            $unionQueriesRows[] = ['entityId' => $i, 'relatedEntityId' => $relatedEntityId];
+            if (($i - ($unionQueryLimit * $unionQueriesGroupIndex)) >= $unionQueryLimit) {
+                $unionQueriesGroups[$unionQueriesGroupIndex] = [$unionQueries, $unionQueriesRows];
+                $unionQueries = [];
+                $unionQueriesRows = [];
+                $unionQueriesGroupIndex++;
+            }
+            $relatedEntityIds[$i] = $relatedEntityId;
+            $relatedEntityIdsTypes[$i] = \PDO::PARAM_INT;
+            $relatedEntityRows[] = ['id_0' => $relatedEntityId, 'name_1' => 'group_name' . $i];
+            $expectedResult[] = [
+                'id'     => $i,
+                'name'   => 'user_name' . $i,
+                'groups' => [
+                    ['id' => $relatedEntityId, 'name' => 'group_name' . $i]
+                ]
+            ];
+        }
+        if ($unionQueries) {
+            $unionQueriesGroups[$unionQueriesGroupIndex] = [$unionQueries, $unionQueriesRows];
+        }
+
+        $this->addQueryExpectation(
+            'SELECT u0_.id AS id_0, u0_.name AS name_1 FROM user_table u0_',
+            $entityRows
+        );
+        foreach ($unionQueriesGroups as $unionQueries) {
+            $this->addQueryExpectation(
+                'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
+                . ' FROM ((' . implode(') UNION ALL (', $unionQueries[0]) . ')) entity',
+                $unionQueries[1]
+            );
+        }
+        $this->addQueryExpectation(
+            'SELECT g0_.id AS id_0, g0_.name AS name_1'
+            . ' FROM group_table g0_'
+            . ' WHERE g0_.id IN (' . implode(', ', array_fill(0, count($relatedEntityIds), '?')) . ')',
+            $relatedEntityRows,
+            $relatedEntityIds,
+            $relatedEntityIdsTypes
+        );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+
+        $result = $this->serializer->serialize(
+            $this->em->getRepository('Test:User')->createQueryBuilder('e'),
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'id'     => null,
+                    'name'   => null,
+                    'groups' => [
+                        'has_more'         => true,
+                        'max_results'      => 10,
+                        'exclusion_policy' => 'all',
+                        'fields'           => [
+                            'id'   => null,
+                            'name' => null
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $this->assertArrayEquals($expectedResult, $result);
+    }
+
+    public function subQueryLimitAndEntityCountMoreThanUnionQueryLimitDataProvider(): array
+    {
+        return [
+            [99],
+            [100],
+            [101],
+            [199],
+            [200],
+            [201]
+        ];
+    }
+
     public function testHasMoreWhenToManyAssociationQueryDoesNotHaveMaxResults()
     {
         $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')

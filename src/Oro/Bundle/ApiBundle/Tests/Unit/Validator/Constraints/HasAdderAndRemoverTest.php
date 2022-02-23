@@ -21,10 +21,4 @@ class HasAdderAndRemoverTest extends \PHPUnit\Framework\TestCase
         $constraint = new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'testProperty']);
         self::assertEquals(Response::HTTP_NOT_IMPLEMENTED, $constraint->getStatusCode());
     }
-
-    public function testGetTargets()
-    {
-        $constraint = new HasAdderAndRemover(['class' => 'Test\Class', 'property' => 'testProperty']);
-        self::assertEquals('property', $constraint->getTargets());
-    }
 }

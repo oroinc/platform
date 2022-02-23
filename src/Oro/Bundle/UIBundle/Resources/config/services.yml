@@ -376,3 +376,10 @@ services:
             - '@kernel'
         tags:
             - { name: kernel.event_listener, event: kernel.response }
+
+    oro_ui.tools.url_helper:
+        class: Oro\Bundle\UIBundle\Tools\UrlHelper
+        arguments:
+            - '@url_helper'
+            - '@request_stack'
+            - '@?request_context'
