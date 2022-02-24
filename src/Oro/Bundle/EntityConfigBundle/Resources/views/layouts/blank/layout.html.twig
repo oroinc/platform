@@ -1,38 +1,33 @@
-{% block attribute_group_rest_widget -%}
-    {% import '@OroUI/macros.html.twig' as UI -%}
-
+{%- block attribute_group_rest_widget -%}
+    {%- import '@OroUI/macros.html.twig' as UI -%}
     {% set content = '' %}
     {% set visibleTabsOptions = [] %}
-
     {% set tabsOptionsById = [] %}
-    {% for tab in tabsOptions %}
+    {%- for tab in tabsOptions -%}
         {% set tabsOptionsById = tabsOptionsById|merge({
             (tab.id): tab
         }) %}
-    {% endfor %}
-
-    {% for child in block -%}
-        {% if child.vars.visible %}
+    {%- endfor -%}
+    {%- for child in block -%}
+        {%- if child.vars.visible -%}
             {% set childContent = block_widget(child) %}
-            {% if childContent|trim|length > 0 %}
+            {%- if childContent|trim|length > 0 -%}
                 {% set content = content ~ childContent %}
                 {% set visibleTabsOptions = visibleTabsOptions|merge([tabsOptionsById[child.vars.group]]) %}
-            {% endif %}
-        {% endif %}
-    {%- endfor %}
-
-    {% if visibleTabsOptions is not empty %}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endfor -%}
+    {%- if visibleTabsOptions is not empty -%}
         <div {{ block('block_attributes') }}>
             <div {{ UI.renderPageComponentAttributes({
                 module: 'oroentityconfig/js/attribute-group-tabs-component',
                 name: 'attribute-group-tabs-component',
                 options: {data: visibleTabsOptions}
             }) }}></div>
-
-            {{ content|raw }}
+            {{- content|raw -}}
         </div>
-    {% endif %}
-{%- endblock %}
+    {%- endif -%}
+{%- endblock -%}
 
 {% block attribute_group_rest_attribute_group_widget %}
     {% set content = block_widget(block) %}
