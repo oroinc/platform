@@ -67,7 +67,7 @@ define(function(require) {
 
             const displayScrollbar = this.checkScrollbarDisplay();
 
-            this.domCache.$container.styledScrollBar(displayScrollbar ? 'update': 'sleep');
+            this.domCache.$container.styledScrollBar(displayScrollbar ? 'update' : 'sleep');
 
             StickedScrollbarPlugin.__super__.enable.call(this);
         },

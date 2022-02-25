@@ -277,7 +277,7 @@ define(function(require) {
                         groups = groups.split(';');
 
                         $.each(groups, function(index, group) {
-                            $el.prevAll('[data-index="'+ group +'"]').show();
+                            $el.prevAll('[data-index="' + group + '"]').show();
                         });
                     }
                 }

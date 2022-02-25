@@ -541,7 +541,7 @@ define(function(require) {
 
             this.container
                 .add(this.dropdown)
-                .addClass(`select2-direction-${_.isRTL() ? 'end': 'start'}`);
+                .addClass(`select2-direction-${_.isRTL() ? 'end' : 'start'}`);
         };
 
 

@@ -1,3 +1,4 @@
+/* eslint space-infix-ops: off */
 export default function(str, seed = 0) {
     let h1 = 0xdeadbeef ^ seed;
     let h2 = 0x41c6ce57 ^ seed;
