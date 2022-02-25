@@ -482,7 +482,7 @@ define(function(require, exports, module) {
          * @returns {Object}
          * @protected
          */
-        _getPickerConfigurationOptions: function(optionsToMerge, parameters= {}) {
+        _getPickerConfigurationOptions: function(optionsToMerge, parameters = {}) {
             const {startDateFieldAriaLabel, endDateFieldAriaLabel} = this.getTemplateDataProps();
             const labelsMap = {
                 start: startDateFieldAriaLabel,
