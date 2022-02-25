@@ -177,12 +177,8 @@ class ObjectMapper extends AbstractMapper
     /**
      * Gathers additionally selected fields from the search index
      * into an output array.
-     *
-     * @param Query $query
-     * @param array $resultItem
-     * @return array
      */
-    public function mapSelectedData(Query $query, $resultItem)
+    public function mapSelectedData(Query $query, array $resultItem) : array
     {
         $dataFields = $query->getSelectDataFields();
 
@@ -193,38 +189,43 @@ class ObjectMapper extends AbstractMapper
         $result = [];
 
         foreach ($dataFields as $column => $dataField) {
-            [$type, $columnName] = Criteria::explodeFieldTypeName($column);
-
-            $value = '';
-
-            if (isset($resultItem[$columnName])) {
-                $value = $resultItem[$columnName];
-            }
-
-            if (isset($resultItem[$dataField])) {
-                $value = $resultItem[$dataField];
-            }
-
-            if (is_array($value)) {
-                $value = array_shift($value);
-            }
-
-            if (is_numeric($value)) {
-                if ($type === Query::TYPE_INTEGER) {
-                    $value = (int)$value;
-                } elseif ($type === Query::TYPE_DECIMAL) {
-                    $value = (float)$value;
-                }
-            }
-
-            if ($value instanceof \DateTime) {
-                $value = $this->dateTimeFormatter->format($value);
-            }
-
-            $result[$dataField] = $value;
+            $result[$dataField] = $this->mapColumn($resultItem, $column, $dataField);
         }
 
         return $result;
+    }
+
+    private function mapColumn(array $resultItem, string $column, string $dataField): mixed
+    {
+        [$type, $columnName] = Criteria::explodeFieldTypeName($column);
+
+        $value = '';
+
+        if (isset($resultItem[$columnName])) {
+            $value = $resultItem[$columnName];
+        }
+
+        if (isset($resultItem[$dataField])) {
+            $value = $resultItem[$dataField];
+        }
+
+        if (is_array($value)) {
+            $value = array_shift($value);
+        }
+
+        if (is_numeric($value)) {
+            if ($type === Query::TYPE_INTEGER) {
+                $value = (int)$value;
+            } elseif ($type === Query::TYPE_DECIMAL) {
+                $value = (float)$value;
+            }
+        }
+
+        if ($value instanceof \DateTime) {
+            $value = $this->dateTimeFormatter->format($value);
+        }
+
+        return $value;
     }
 
     /**
