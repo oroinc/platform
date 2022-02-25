@@ -47,8 +47,8 @@ class ContentProviderPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_ui.content_provider.manager')
-            ->setArgument(0, $providers)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $services))
-            ->setArgument(2, $enabledProviders);
+            ->setArgument('$providerNames', $providers)
+            ->setArgument('$providerContainer', ServiceLocatorTagPass::register($container, $services))
+            ->setArgument('$enabledProviderNames', $enabledProviders);
     }
 }

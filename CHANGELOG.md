@@ -2,6 +2,18 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Changed
+
+#### ApiBundle
+* The parameter `throwException` was removed from the method `convertToEntityType`
+  of `Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil`. Use the `tryConvertToEntityType` method
+  when an entity type might not exist.
+* The parameter `throwException` was removed from the method `convertToEntityClass`
+  of `Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil`. Use the `tryConvertToEntityClass` method
+  when an entity class might not exist.
+
 ## 5.0.0
 
 ### Added

@@ -130,11 +130,6 @@ class AddFieldsFilter implements ProcessorInterface
 
     private function convertToEntityType(string $entityClass, RequestType $requestType): ?string
     {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $requestType,
-            false
-        );
+        return ValueNormalizerUtil::tryConvertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 }

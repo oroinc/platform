@@ -255,7 +255,7 @@ services:
         class: Oro\Bundle\ApiBundle\EventListener\ApiSourceListener
         arguments:
             - '@oro_api.cache_manager'
-            - [] # excluded features. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
+            - !abstract '$excludedFeatures defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass'
         tags:
             - { name: kernel.event_listener, event: oro.entity_extend.entity.schema.update, method: clearCache }
             - { name: kernel.event_listener, event: oro_featuretoggle.features.change, method: onFeaturesChange }
@@ -343,8 +343,8 @@ services:
     oro_api.config_bag_registry:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry
         arguments:
-            - [] # config bags. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - !abstract '$configBags defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
             - '@oro_api.request_expression_matcher'
 
     oro_api.config_loader_factory:
@@ -365,15 +365,15 @@ services:
     oro_api.entity_alias_resolver_registry:
         class: Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry
         arguments:
-            - [] # entity alias resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - !abstract '$entityAliasResolvers defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_exclusion_provider_registry:
         class: Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry
         arguments:
-            - [] # exclusion providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - !abstract '$exclusionProviders defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
             - '@oro_api.request_expression_matcher'
 
     oro_api.entity_exclusion_provider.shared:
@@ -385,8 +385,8 @@ services:
     oro_api.entity_override_provider_registry:
         class: Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry
         arguments:
-            - [] # entity override providers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader
+            - !abstract '$entityOverrideProviders defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
             - '@oro_api.request_expression_matcher'
 
     oro_api.query_acl_helper:
@@ -496,8 +496,8 @@ services:
     oro_api.entity_id_resolver_registry:
         class: Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry
         arguments:
-            - [] # resolvers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass
+            - !abstract '$resolvers defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass'
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.entity_id_transformer:
@@ -547,8 +547,8 @@ services:
     oro_api.document_builder_factory:
         class: Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory
         arguments:
-            - [] # document builders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass
+            - !abstract '$documentBuilders defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass'
             - '@oro_api.request_expression_matcher'
 
     oro_api.rest.document_builder:
@@ -741,8 +741,8 @@ services:
     oro_api.api_doc.data_type_converter:
         class: Oro\Bundle\ApiBundle\ApiDoc\ApiDocDataTypeConverter
         arguments:
-            - [] # default mapping. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
-            - [] # view mappings. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass
+            - !abstract '$defaultMapping defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass'
+            - !abstract '$viewMappings defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ApiDocCompilerPass'
 
     oro_api.api_doc.filters_sorter_registry:
         class: Oro\Bundle\ApiBundle\ApiDoc\Sorter\FiltersSorterRegistry
@@ -853,14 +853,20 @@ services:
             - '@oro_api.doctrine_helper'
             - '@translator'
 
+    oro_api.entity_name_provider:
+        class: Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider
+        arguments:
+            - '@oro_api.entity_description_provider'
+            - '@Doctrine\Inflector\Inflector'
+
     oro_api.resource_doc_provider:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider
 
     oro_api.resource_doc_parser_registry:
         class: Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry
         arguments:
-            - [] # parsers. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
-            - ~ # service locator. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass
+            - !abstract '$parsers defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass'
+            - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass'
             - '@oro_api.request_expression_matcher'
 
     # a template for non defined explicitly parsers

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Behat\Services;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessor as BasePreExportMessageProcessor;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Used only on CI.
@@ -17,28 +17,28 @@ class PreExportMessageProcessor extends BasePreExportMessageProcessor
 {
     public const BATCH_SIZE_KEY = 'batch_size_key';
 
-    /** @var CacheProvider */
-    private $cache;
+    private CacheItemPoolInterface $cache;
 
     protected function getBatchSize(): int
     {
         $cache = $this->getCache();
-        if (!$cache->contains(self::BATCH_SIZE_KEY)) {
+        $cacheItem = $cache->getItem(self::BATCH_SIZE_KEY);
+        if (!$cacheItem->isHit()) {
             return parent::getBatchSize();
         }
-        $batchSize = $cache->fetch(self::BATCH_SIZE_KEY);
+        $batchSize = $cacheItem->get();
         // Clear the cache, as these values should not affect other behat tests.
-        $cache->delete(self::BATCH_SIZE_KEY);
+        $cache->deleteItem(self::BATCH_SIZE_KEY);
 
         return $batchSize;
     }
 
-    public function getCache(): CacheProvider
+    public function getCache(): CacheItemPoolInterface
     {
         return $this->cache;
     }
 
-    public function setCache(CacheProvider $cache): void
+    public function setCache(CacheItemPoolInterface $cache): void
     {
         $this->cache = $cache;
     }

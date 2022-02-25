@@ -25,6 +25,9 @@ liip_imagine:
         original: {}
 
 oro_api:
+    api_doc_cache:
+        resettable_services:
+            - oro_attachment.api.attachment_association_provider
     error_title_overrides:
         'file constraint from system config constraint': 'file constraint'
 

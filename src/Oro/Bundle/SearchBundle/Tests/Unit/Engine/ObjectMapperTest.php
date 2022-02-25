@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -17,6 +16,8 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -206,10 +207,17 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($this->mappingConfig);
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
         $cache->expects($this->any())
-            ->method('fetch')
+            ->method('getItem')
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->any())
+            ->method('isHit')
             ->willReturn(false);
+        $cacheItem->expects($this->any())
+            ->method('set')
+            ->willReturn($cacheItem);
         $this->mappingProvider = new SearchMappingProvider(
             $this->dispatcher,
             $configProvider,

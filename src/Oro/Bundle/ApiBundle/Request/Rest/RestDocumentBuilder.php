@@ -146,11 +146,16 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertToEntityType(
-        string $entityClass,
-        RequestType $requestType,
-        bool $throwException = true
-    ): ?string {
+    protected function convertToEntityType(string $entityClass, RequestType $requestType): string
+    {
+        return $entityClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tryConvertToEntityType(string $entityClass, RequestType $requestType): ?string
+    {
         return $entityClass;
     }
 

@@ -245,6 +245,10 @@ form > .layout-content {
 
                     > li {
                         width: auto;
+
+                        &:last-child {
+                            border-width: 0;
+                        }
                     }
                 }
             }

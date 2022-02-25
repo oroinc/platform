@@ -213,6 +213,8 @@ services:
 
     oro_form.extension.js_validation.constraint_converter:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter
+        arguments:
+            - '@oro_form.validator.constraint_factory'
 
     oro_form.extension.js_validation.percent_range_constraint_converter:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\PercentRangeConstraintConverter

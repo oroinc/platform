@@ -11,14 +11,14 @@ use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
+use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Pager|\PHPUnit\Framework\MockObject\MockObject */
-    private $pager;
+    private Pager|MockObject $pager;
 
-    /** @var OrmPagerExtension */
-    private $extension;
+    private OrmPagerExtension $extension;
 
     protected function setUp(): void
     {
@@ -97,7 +97,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'page' => 0,
-                'maxPerPage' => 1000,
+                'maxPerPage' => 1113,
             ],
             'client mode' => [
                 'config' => [
@@ -106,7 +106,7 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'page' => 0,
-                'maxPerPage' => 1000,
+                'maxPerPage' => 1113,
             ],
         ];
     }
@@ -120,6 +120,8 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $dataSource = $this->createMock(OrmDatasource::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $datagrid = $this->createMock(DatagridInterface::class);
+        $mode = $configObject->offsetGetByPath(ModeExtension::MODE_OPTION_PATH);
+        $onePage = $configObject->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false);
 
         $dataSource->expects($this->once())
             ->method('getDatagrid')
@@ -134,6 +136,16 @@ class OrmPagerExtensionTest extends \PHPUnit\Framework\TestCase
         $this->pager->expects($this->once())
             ->method('setDatagrid')
             ->with($this->identicalTo($datagrid));
+
+        if ($onePage || $mode === ModeExtension::MODE_CLIENT) {
+            $this->pager->expects($this->once())
+                ->method('computeNbResult')
+                ->willReturn($maxPerPage);
+            $this->pager->expects($this->once())
+                ->method('adjustTotalCount')
+                ->with($maxPerPage);
+        }
+
         $this->pager->expects($this->once())
             ->method('setPage')
             ->with($page);

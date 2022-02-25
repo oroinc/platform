@@ -61,7 +61,7 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetEnumChoicesWithCachedValue()
     {
         $enumClass = 'Extend\Entity\EV_Test_Enum';
-        $expected = [1 => 'Test'];
+        $expected = ['Test' => '1'];
 
         $this->cache->expects(self::once())
             ->method('contains')
@@ -78,7 +78,8 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityRepository')
             ->with($enumClass);
 
-        self::assertEquals($expected, $this->provider->getEnumChoices($enumClass));
+        // We use assertSame here to get a data type proof comparison.
+        self::assertSame($expected, $this->provider->getEnumChoices($enumClass));
     }
 
     public function testGetEnumChoicesByCodeWithoutCachedValue()

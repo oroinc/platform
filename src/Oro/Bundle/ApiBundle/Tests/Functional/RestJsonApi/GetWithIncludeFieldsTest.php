@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestEmployee;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -38,17 +38,17 @@ class GetWithIncludeFieldsTest extends RestJsonApiTestCase
     public function testIncludeFilterWhenItIsDisabledBecauseEntityDoesNotHaveAssociations()
     {
         $this->appendEntityConfig(
-            TestDepartment::class,
+            TestEmployee::class,
             [
                 'fields' => [
-                    'staff'        => ['exclude' => true],
+                    'department'   => ['exclude' => true],
                     'owner'        => ['exclude' => true],
                     'organization' => ['exclude' => true]
                 ]
             ]
         );
 
-        $entityType = $this->getEntityType(TestDepartment::class);
+        $entityType = $this->getEntityType(TestEmployee::class);
         $response = $this->cget(['entity' => $entityType], ['include' => 'owner'], [], false);
 
         $this->assertResponseValidationError(

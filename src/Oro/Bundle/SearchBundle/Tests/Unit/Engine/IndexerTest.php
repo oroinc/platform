@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\ExtendedEngineInterface;
@@ -17,6 +16,8 @@ use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -43,10 +44,17 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
         $configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($this->config);
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
         $cache->expects($this->any())
-            ->method('fetch')
+            ->method('getItem')
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->any())
+            ->method('isHit')
             ->willReturn(false);
+        $cacheItem->expects($this->any())
+            ->method('set')
+            ->willReturn($cacheItem);
         $eventDispatcher = $this->createMock(EventDispatcher::class);
         $mappingProvider = new SearchMappingProvider(
             $eventDispatcher,

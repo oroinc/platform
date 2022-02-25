@@ -124,11 +124,10 @@ class SearchEntityListFilterHelper
             if (!$this->resourcesProvider->isResourceAccessible($entityClass, $version, $requestType)) {
                 continue;
             }
-            $entityType = ValueNormalizerUtil::convertToEntityType(
+            $entityType = ValueNormalizerUtil::tryConvertToEntityType(
                 $this->valueNormalizer,
                 $entityClass,
-                $requestType,
-                false
+                $requestType
             );
             if (!$entityClass) {
                 continue;

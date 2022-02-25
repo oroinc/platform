@@ -48,6 +48,6 @@ class OwnerDeletionManagerPass implements CompilerPassInterface
         }
 
         $container->findDefinition(self::MANAGER_SERVICE)
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$checkerContainer', ServiceLocatorTagPass::register($container, $services));
     }
 }

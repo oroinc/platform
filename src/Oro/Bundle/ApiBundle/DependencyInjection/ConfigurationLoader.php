@@ -82,17 +82,20 @@ class ConfigurationLoader
             }
         }
         $this->container->getDefinition(self::CONFIG_BAG_REGISTRY_SERVICE_ID)
-            ->setArgument(0, $this->sortByRequestTypeExpression($configBagsConfig))
-            ->setArgument(1, $this->registerServiceLocator($configBagsConfig));
+            ->setArgument('$configBags', $this->sortByRequestTypeExpression($configBagsConfig))
+            ->setArgument('$container', $this->registerServiceLocator($configBagsConfig));
         $this->container->getDefinition(self::ENTITY_ALIAS_RESOLVER_REGISTRY_SERVICE_ID)
-            ->setArgument(0, $this->sortByRequestTypeExpression($entityAliasResolversConfig))
-            ->setArgument(1, $this->registerServiceLocator($entityAliasResolversConfig));
+            ->setArgument('$entityAliasResolvers', $this->sortByRequestTypeExpression($entityAliasResolversConfig))
+            ->setArgument('$container', $this->registerServiceLocator($entityAliasResolversConfig));
         $this->container->getDefinition(self::ENTITY_EXCLUSION_PROVIDER_REGISTRY_SERVICE_ID)
-            ->setArgument(0, $this->sortByRequestTypeExpression($exclusionProvidersConfig))
-            ->setArgument(1, $this->registerServiceLocator($exclusionProvidersConfig));
+            ->setArgument('$exclusionProviders', $this->sortByRequestTypeExpression($exclusionProvidersConfig))
+            ->setArgument('$container', $this->registerServiceLocator($exclusionProvidersConfig));
         $this->container->getDefinition(self::ENTITY_OVERRIDE_PROVIDER_REGISTRY_SERVICE_ID)
-            ->setArgument(0, $this->sortByRequestTypeExpression($entityOverrideProvidersConfig))
-            ->setArgument(1, $this->registerServiceLocator($entityOverrideProvidersConfig));
+            ->setArgument(
+                '$entityOverrideProviders',
+                $this->sortByRequestTypeExpression($entityOverrideProvidersConfig)
+            )
+            ->setArgument('$container', $this->registerServiceLocator($entityOverrideProvidersConfig));
         if ($this->container->hasDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)) {
             $this->container->getDefinition(self::CONFIG_CACHE_STATE_REGISTRY_SERVICE_ID)
                 ->setArgument(0, $this->sortByRequestTypeExpression($configCacheStatesConfig));

@@ -331,3 +331,10 @@
         }
     }
 }
+
+// @media to detect touch device
+@mixin non-touch-device {
+    @media (hover: hover) and (pointer: fine) {
+        @content;
+    }
+}

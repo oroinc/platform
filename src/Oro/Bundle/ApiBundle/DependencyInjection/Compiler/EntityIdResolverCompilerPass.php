@@ -49,7 +49,7 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
         }
 
         $container->getDefinition(self::RESOLVER_REGISTRY_SERVICE_ID)
-            ->setArgument(0, $resolvers)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$resolvers', $resolvers)
+            ->setArgument('$container', ServiceLocatorTagPass::register($container, $services));
     }
 }

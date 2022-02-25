@@ -76,7 +76,7 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cacheAdapter->expects(self::once())
             ->method('getItem')
-            ->with('oro_entity.additional_metadata.Namespace\EntityName')
+            ->with('oro_entity.additional_metadata.Namespace_EntityName')
             ->willReturn($this->cacheItem);
         $this->cacheItem->expects(self::exactly(2))
             ->method('isHit')
@@ -87,7 +87,8 @@ class AdditionalMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->assertEquals(
             $expectedMetadata,
-            $this->additionalMetadataProvider->getInversedUnidirectionalAssociationMappings('Namespace\EntityName')
+            $this->additionalMetadataProvider
+                ->getInversedUnidirectionalAssociationMappings('Namespace_EntityName')
         );
     }
 

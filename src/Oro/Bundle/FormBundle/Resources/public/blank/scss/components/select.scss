@@ -16,13 +16,6 @@
 
     background: $select-bg;
 
-    /* Hide expand button of select in IE11
-     * Remove when stop supporting IE11
-     */
-    &::-ms-expand {
-        display: none;
-    }
-
     @include element-state('hover') {
         text-decoration: none;
         border-color: $select-border-color-hover-state;
@@ -42,7 +35,7 @@
     }
 }
 
-@-moz-document url-prefix() {
+@-moz-document url-prefix('') {
     .select {
         /**
         *  Set fixed height for Firefox

@@ -12,14 +12,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityIdResolverCompilerPass */
-    private $compiler;
+    private EntityIdResolverCompilerPass $compiler;
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $registry;
+    private Definition $registry;
 
     protected function setUp(): void
     {
@@ -32,20 +29,20 @@ class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoEntityIdTransformers()
+    public function testProcessWhenNoEntityIdTransformers(): void
     {
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->registry->getArgument(0));
+        self::assertEquals([], $this->registry->getArgument('$resolvers'));
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $resolver1 = $this->container->setDefinition('resolver1', new Definition());
         $resolver1->addTag(
@@ -87,10 +84,10 @@ class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$resolvers')
         );
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());

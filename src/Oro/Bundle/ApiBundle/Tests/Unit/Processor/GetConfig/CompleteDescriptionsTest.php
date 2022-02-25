@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
@@ -61,13 +62,10 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     private $resourcesProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDescriptionProvider */
-    private $entityDocProvider;
+    private $entityDescriptionProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocProvider */
     private $resourceDocProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserRegistry */
-    private $resourceDocParserRegistry;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ResourceDocParserInterface */
     private $resourceDocParser;
@@ -89,19 +87,19 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         parent::setUp();
 
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
-        $this->entityDocProvider = $this->createMock(EntityDescriptionProvider::class);
+        $this->entityDescriptionProvider = $this->createMock(EntityDescriptionProvider::class);
         $this->resourceDocProvider = $this->createMock(ResourceDocProvider::class);
-        $this->resourceDocParserRegistry = $this->createMock(ResourceDocParserRegistry::class);
+        $this->resourceDocParser = $this->createMock(ResourceDocParserInterface::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->ownershipConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'ownership');
 
-        $this->resourceDocParser = $this->createMock(ResourceDocParserInterface::class);
-        $this->resourceDocParserRegistry->expects(self::any())
+        $resourceDocParserRegistry = $this->createMock(ResourceDocParserRegistry::class);
+        $resourceDocParserRegistry->expects(self::any())
             ->method('getParser')
             ->willReturn($this->resourceDocParser);
 
-        $resourceDocParserProvider = new ResourceDocParserProvider($this->resourceDocParserRegistry);
+        $resourceDocParserProvider = new ResourceDocParserProvider($resourceDocParserRegistry);
         $descriptionProcessor = new DescriptionProcessor(
             new RequestDependedTextProcessor(),
             new FeatureDependedTextProcessor($this->createMock(FeatureChecker::class))
@@ -111,16 +109,16 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->processor = new CompleteDescriptions(
             $this->resourcesProvider,
             new EntityDescriptionHelper(
-                $this->entityDocProvider,
+                $this->entityDescriptionProvider,
+                new EntityNameProvider($this->entityDescriptionProvider, (new InflectorFactory())->build()),
                 $this->translator,
                 $this->resourceDocProvider,
                 $resourceDocParserProvider,
                 $descriptionProcessor,
-                $identifierDescriptionHelper,
-                (new InflectorFactory())->build()
+                $identifierDescriptionHelper
             ),
             new FieldsDescriptionHelper(
-                $this->entityDocProvider,
+                $this->entityDescriptionProvider,
                 $this->translator,
                 $resourceDocParserProvider,
                 $descriptionProcessor,
@@ -982,7 +980,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getFieldDocumentation')
             ->with($entityClass, 'testField')
             ->willReturn('field description from the entity config');
@@ -1019,7 +1017,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getFieldDocumentation')
             ->with($entityClass, 'testField')
             ->willReturn('field description from the entity config');
@@ -1056,7 +1054,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getFieldDocumentation')
             ->with($entityClass, 'testField')
             ->willReturn('field description from the entity config');
@@ -1211,7 +1209,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 [$entityClass, 'testField', null, null],
                 [$entityClass, 'testField', $targetAction, 'action field description. {@inheritdoc}']
             ]);
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getFieldDocumentation')
             ->with($entityClass, 'testField')
             ->willReturn('field description from the entity config');
@@ -1289,7 +1287,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 [$entityClass, 'testField', null, 'common field description. {@inheritdoc}'],
                 [$entityClass, 'testField', $targetAction, null]
             ]);
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getFieldDocumentation')
             ->with($entityClass, 'testField')
             ->willReturn('field description from the entity config');
@@ -1330,7 +1328,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 [$entityClass, 'testField', null, null],
                 [$entityClass, 'testField', $targetAction, null]
             ]);
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getFieldDocumentation')
             ->with($entityClass, 'testField')
             ->willReturn('field description from the entity config');
@@ -1369,7 +1367,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::exactly(2))
+        $this->entityDescriptionProvider->expects(self::exactly(2))
             ->method('getFieldDocumentation')
             ->willReturnMap([
                 [$entityClass, 'testField', null],
@@ -1415,7 +1413,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::exactly(2))
+        $this->entityDescriptionProvider->expects(self::exactly(2))
             ->method('getFieldDocumentation')
             ->willReturnMap([
                 [$entityClass, 'testField', null],
@@ -1463,7 +1461,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::exactly(2))
+        $this->entityDescriptionProvider->expects(self::exactly(2))
             ->method('getFieldDocumentation')
             ->willReturnMap([
                 [$entityClass, 'testField', null],
@@ -1510,7 +1508,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             ]
         ];
 
-        $this->entityDocProvider->expects(self::exactly(2))
+        $this->entityDescriptionProvider->expects(self::exactly(2))
             ->method('getFieldDocumentation')
             ->willReturnMap([
                 [$entityClass, 'testField', null],
@@ -1909,7 +1907,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNull()
+    public function testPrimaryResourceDescriptionWhenEntityDescriptionProviderReturnsNull()
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get';
@@ -1919,7 +1917,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $entityDescription = 'Product Price';
         $actionDescription = 'Get Product Price';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityDescription')
             ->with($entityClass)
             ->willReturn(null);
@@ -1943,7 +1941,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionWhenEntityDocProviderReturnsNullForCollectionResource()
+    public function testPrimaryResourceDescriptionWhenEntityDescriptionProviderReturnsNullForCollectionResource()
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1953,7 +1951,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $entityDescription = 'Product Prices';
         $actionDescription = 'Get list of Product Prices';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityPluralDescription')
             ->with($entityClass)
             ->willReturn(null);
@@ -1978,7 +1976,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionLoadedByEntityDocProvider()
+    public function testPrimaryResourceDescriptionLoadedByEntityDescriptionProvider()
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get';
@@ -1988,7 +1986,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $entityDescription = 'some entity';
         $actionDescription = 'Get some entity';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityDescription')
             ->with($entityClass)
             ->willReturn($entityDescription);
@@ -2012,7 +2010,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDescriptionLoadedByEntityDocProvider()
+    public function testSubresourceDescriptionLoadedByEntityDescriptionProvider()
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2023,7 +2021,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $associationDescription = 'test association';
         $subresourceDescription = 'Get test association';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('humanizeAssociationName')
             ->with($associationName)
             ->willReturn($associationDescription);
@@ -2048,7 +2046,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionLoadedByEntityDocProviderForCollectionResource()
+    public function testPrimaryResourceDescriptionLoadedByEntityDescriptionProviderForCollectionResource()
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -2058,7 +2056,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $entityDescription = 'some entities';
         $actionDescription = 'Get list of some entities';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityPluralDescription')
             ->with($entityClass)
             ->willReturn($entityDescription);
@@ -2083,7 +2081,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDescriptionLoadedByEntityDocProviderForCollectionResource()
+    public function testSubresourceDescriptionLoadedByEntityDescriptionProviderForCollectionResource()
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2094,7 +2092,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $associationDescription = 'test association';
         $subresourceDescription = 'Get test association';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('humanizeAssociationName')
             ->with($associationName)
             ->willReturn($associationDescription);
@@ -2242,7 +2240,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'documentation'    => 'action documentation. {@inheritdoc}'
         ];
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityDocumentation')
             ->with($entityClass)
             ->willReturn('entity documentation');
@@ -2270,7 +2268,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'documentation'    => 'action documentation. {@inheritdoc:description}'
         ];
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityDocumentation')
             ->with($entityClass)
             ->willReturn('entity documentation');
@@ -2301,11 +2299,11 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $pluralEntityDescription = 'some entities';
         $resourceDocumentation = 'Get some entity';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityDescription')
             ->with($entityClass)
             ->willReturn($singularEntityDescription);
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityPluralDescription')
             ->with($entityClass)
             ->willReturn($pluralEntityDescription);
@@ -2340,7 +2338,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $associationDescription = 'test association';
         $subresourceDocumentation = 'Get test association';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('humanizeAssociationName')
             ->with($associationName)
             ->willReturn($associationDescription);
@@ -2376,7 +2374,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $associationDescription = 'test association';
         $subresourceDocumentation = 'Get test association';
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('humanizeAssociationName')
             ->with($associationName)
             ->willReturn($associationDescription);
@@ -2416,7 +2414,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
             'documentation'    => $mainText
         ];
 
-        $this->entityDocProvider->expects(self::once())
+        $this->entityDescriptionProvider->expects(self::once())
             ->method('getEntityDocumentation')
             ->with($entityClass)
             ->willReturn($inheritDocText);

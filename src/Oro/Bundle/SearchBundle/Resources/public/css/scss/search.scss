@@ -68,8 +68,7 @@
 }
 
 .search-grid {
-    // stylelint-disable-next-line selector-max-compound-selectors
-    .table.grid tbody tr:first-child td {
-        border-top: 0 none;
+    .grid-row:last-child .grid-body-cell {
+        border-width: 0;
     }
 }

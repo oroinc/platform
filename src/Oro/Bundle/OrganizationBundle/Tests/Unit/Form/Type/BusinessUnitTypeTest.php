@@ -98,7 +98,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getValidators()
+    protected function getValidators(): array
     {
         return [
             'parent_business_unit_validator' => $this->createMock(ParentBusinessUnitValidator::class),

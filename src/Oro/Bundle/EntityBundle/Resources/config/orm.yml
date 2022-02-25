@@ -34,9 +34,9 @@ services:
     oro_entity.query_hint_resolver:
         class: Oro\Component\DoctrineUtils\ORM\QueryHintResolver
         arguments:
-            - [] # walkers
-            - ~ # service container for providers of the walker parameters
-            - [] # aliases
+            - !abstract '$walkers defined in Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass'
+            - !abstract '$walkerHintProviders defined in Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass'
+            - !abstract '$aliases defined in Oro\Bundle\EntityBundle\DependencyInjection\Compiler\QueryHintResolverPass'
 
     oro_entity.orm.native_query_executor_helper:
         class: Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper

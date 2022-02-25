@@ -1,4 +1,9 @@
 services:
+    oro_attachment.tests.migration_listener:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Environment\TestEntitiesMigrationListener
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp, priority: -10 }
+
     oro_attachment.tests.api.skipped_entity_provider:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProvider
         decorates: oro_api.tests.skipped_entity_provider

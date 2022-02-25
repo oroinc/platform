@@ -21,6 +21,6 @@ class AclGroupProvidersPass implements CompilerPassInterface
         $services = $this->findAndSortTaggedServices('oro_security.acl.group_provider', 'alias', $container);
 
         $container->getDefinition('oro_security.acl.group_provider.chain')
-            ->setArgument(0, array_values($services));
+            ->setArgument('$providers', array_values($services));
     }
 }

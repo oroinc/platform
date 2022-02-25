@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
 
-use Doctrine\Inflector\Inflector;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
@@ -17,50 +17,37 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityDescriptionHelper implements ResetInterface
 {
-    /** @var EntityDescriptionProvider */
-    private $entityDocProvider;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var ResourceDocProvider */
-    private $resourceDocProvider;
-
-    /** @var ResourceDocParserProvider */
-    private $resourceDocParserProvider;
-
-    /** @var DescriptionProcessor */
-    private $descriptionProcessor;
-
-    /** @var IdentifierDescriptionHelper */
-    private $identifierDescriptionHelper;
+    private EntityDescriptionProvider $entityDescriptionProvider;
+    private EntityNameProvider $entityNameProvider;
+    private TranslatorInterface $translator;
+    private ResourceDocProvider $resourceDocProvider;
+    private ResourceDocParserProvider $resourceDocParserProvider;
+    private DescriptionProcessor $descriptionProcessor;
+    private IdentifierDescriptionHelper $identifierDescriptionHelper;
 
     /** @var array [entity class => entity description, ...] */
-    private $singularEntityDescriptions = [];
-
+    private array $singularEntityDescriptions = [];
     /** @var array [entity class => entity description, ...] */
-    private $pluralEntityDescriptions = [];
-
+    private array $pluralEntityDescriptions = [];
     /** @var array [association name => humanized association name, ...] */
-    private $humanizedAssociationNames = [];
-    private Inflector $inflector;
+    private array $humanizedAssociationNames = [];
 
     public function __construct(
-        EntityDescriptionProvider $entityDocProvider,
+        EntityDescriptionProvider $entityDescriptionProvider,
+        EntityNameProvider $entityNameProvider,
         TranslatorInterface $translator,
         ResourceDocProvider $resourceDocProvider,
         ResourceDocParserProvider $resourceDocParserProvider,
         DescriptionProcessor $descriptionProcessor,
-        IdentifierDescriptionHelper $identifierDescriptionHelper,
-        Inflector $inflector
+        IdentifierDescriptionHelper $identifierDescriptionHelper
     ) {
-        $this->entityDocProvider = $entityDocProvider;
+        $this->entityDescriptionProvider = $entityDescriptionProvider;
+        $this->entityNameProvider = $entityNameProvider;
         $this->translator = $translator;
         $this->resourceDocProvider = $resourceDocProvider;
         $this->resourceDocParserProvider = $resourceDocParserProvider;
         $this->descriptionProcessor = $descriptionProcessor;
         $this->identifierDescriptionHelper = $identifierDescriptionHelper;
-        $this->inflector = $inflector;
     }
 
     /**
@@ -168,7 +155,7 @@ class EntityDescriptionHelper implements ResetInterface
             if (InheritDocUtil::hasDescriptionInheritDoc($documentation)) {
                 $documentation = InheritDocUtil::replaceDescriptionInheritDoc(
                     $documentation,
-                    $this->entityDocProvider->getEntityDocumentation($entityClass)
+                    $this->entityDescriptionProvider->getEntityDocumentation($entityClass)
                 );
             }
             $definition->setDocumentation($this->descriptionProcessor->process($documentation, $requestType));
@@ -190,7 +177,7 @@ class EntityDescriptionHelper implements ResetInterface
     {
         $documentation = $definition->getDocumentation();
         if (InheritDocUtil::hasInheritDoc($documentation)) {
-            $entityDocumentation = $this->entityDocProvider->getEntityDocumentation($entityClass);
+            $entityDocumentation = $this->entityDescriptionProvider->getEntityDocumentation($entityClass);
             $definition->setDocumentation(InheritDocUtil::replaceInheritDoc($documentation, $entityDocumentation));
         }
     }
@@ -291,24 +278,11 @@ class EntityDescriptionHelper implements ResetInterface
             return $this->singularEntityDescriptions[$entityClass];
         }
 
-        $entityDescription = $isCollection
-            ? $this->entityDocProvider->getEntityPluralDescription($entityClass)
-            : $this->entityDocProvider->getEntityDescription($entityClass);
-        if (!$entityDescription) {
-            $shortEntityClass = $entityClass;
-            $lastDelimiter = \strrpos($shortEntityClass, '\\');
-            if (false !== $lastDelimiter) {
-                $shortEntityClass = \substr($shortEntityClass, $lastDelimiter + 1);
-            }
-            // convert "SomeClassName" to "Some Class Name".
-            $entityDescription = preg_replace('~(?<=\\w)([A-Z])~', ' $1', $shortEntityClass);
-            if ($isCollection) {
-                $entityDescription = $this->inflector->pluralize($entityDescription);
-            }
-        }
         if ($isCollection) {
+            $entityDescription = $this->entityNameProvider->getEntityPluralName($entityClass);
             $this->pluralEntityDescriptions[$entityClass] = $entityDescription;
         } else {
+            $entityDescription = $this->entityNameProvider->getEntityName($entityClass);
             $this->singularEntityDescriptions[$entityClass] = $entityDescription;
         }
 
@@ -321,7 +295,7 @@ class EntityDescriptionHelper implements ResetInterface
             return $this->humanizedAssociationNames[$associationName];
         }
 
-        $humanizedAssociationName = $this->entityDocProvider->humanizeAssociationName($associationName);
+        $humanizedAssociationName = $this->entityDescriptionProvider->humanizeAssociationName($associationName);
         $this->humanizedAssociationNames[$associationName] = $humanizedAssociationName;
 
         return $humanizedAssociationName;

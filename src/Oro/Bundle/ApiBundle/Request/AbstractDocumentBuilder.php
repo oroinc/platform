@@ -106,7 +106,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
      */
     public function getEntityAlias(string $entityClass, RequestType $requestType): ?string
     {
-        return ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType, false);
+        return ValueNormalizerUtil::tryConvertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 
     /**
@@ -262,11 +262,9 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
 
     abstract protected function convertErrorToArray(Error $error): array;
 
-    abstract protected function convertToEntityType(
-        string $entityClass,
-        RequestType $requestType,
-        bool $throwException = true
-    ): ?string;
+    abstract protected function convertToEntityType(string $entityClass, RequestType $requestType): string;
+
+    abstract protected function tryConvertToEntityType(string $entityClass, RequestType $requestType): ?string;
 
     /**
      * @param mixed          $object
@@ -291,7 +289,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     ): string {
         $entityType = null;
         if ($entityClass) {
-            $entityType = $this->convertToEntityType($entityClass, $requestType, false);
+            $entityType = $this->tryConvertToEntityType($entityClass, $requestType);
         }
         if (!$entityType && $fallbackEntityClass) {
             $entityType = $this->convertToEntityType($fallbackEntityClass, $requestType);

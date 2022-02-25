@@ -106,11 +106,10 @@ class LoadEntitiesBySearchText implements ProcessorInterface
         foreach ($records as $record) {
             $this->eventDispatcher->dispatch(new PrepareResultItemEvent($record), PrepareResultItemEvent::EVENT_NAME);
             $entityClass = $record->getEntityName();
-            $entityType = ValueNormalizerUtil::convertToEntityType(
+            $entityType = ValueNormalizerUtil::tryConvertToEntityType(
                 $this->valueNormalizer,
                 $entityClass,
-                $requestType,
-                false
+                $requestType
             );
             $entityId = $record->getRecordId();
             $result[] = new SearchItem(

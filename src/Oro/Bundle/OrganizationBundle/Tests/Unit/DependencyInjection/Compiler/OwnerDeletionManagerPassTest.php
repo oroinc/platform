@@ -12,15 +12,14 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var OwnerDeletionManagerPass */
-    private $compiler;
+    private OwnerDeletionManagerPass $compiler;
 
     protected function setUp(): void
     {
         $this->compiler = new OwnerDeletionManagerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $managerRegistryDef = $container->register(
@@ -35,7 +34,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($container);
 
-        $managerServiceLocatorRef = $managerRegistryDef->getArgument(0);
+        $managerServiceLocatorRef = $managerRegistryDef->getArgument('$checkerContainer');
         self::assertInstanceOf(Reference::class, $managerServiceLocatorRef);
         $managerServiceLocatorDef = $container->getDefinition((string)$managerServiceLocatorRef);
         self::assertEquals(ServiceLocator::class, $managerServiceLocatorDef->getClass());
@@ -48,7 +47,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenCheckerDoesNotHaveEntityTagAttribute()
+    public function testProcessWhenCheckerDoesNotHaveEntityTagAttribute(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -70,7 +69,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testProcessWhenCheckerIsDuplicated()
+    public function testProcessWhenCheckerIsDuplicated(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

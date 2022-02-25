@@ -19,11 +19,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class NormalizeEntityClass implements ProcessorInterface
 {
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
+    private ValueNormalizer $valueNormalizer;
+    private ResourcesProvider $resourcesProvider;
 
     public function __construct(ValueNormalizer $valueNormalizer, ResourcesProvider $resourcesProvider)
     {
@@ -69,11 +66,10 @@ class NormalizeEntityClass implements ProcessorInterface
 
     private function getEntityClass(string $entityType, string $version, RequestType $requestType): ?string
     {
-        $entityClass = ValueNormalizerUtil::convertToEntityClass(
+        $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
             $this->valueNormalizer,
             $entityType,
-            $requestType,
-            false
+            $requestType
         );
         if (!$entityClass) {
             return null;

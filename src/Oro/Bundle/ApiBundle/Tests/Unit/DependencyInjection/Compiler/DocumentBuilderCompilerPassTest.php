@@ -13,14 +13,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DocumentBuilderCompilerPass */
-    private $compiler;
+    private DocumentBuilderCompilerPass $compiler;
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $factory;
+    private Definition $factory;
 
     protected function setUp(): void
     {
@@ -33,20 +30,20 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoDocumentBuilders()
+    public function testProcessWhenNoDocumentBuilders(): void
     {
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->factory->getArgument(0));
+        self::assertEquals([], $this->factory->getArgument('$documentBuilders'));
 
-        $serviceLocatorReference = $this->factory->getArgument(1);
+        $serviceLocatorReference = $this->factory->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());
         $documentBuilder1->setShared(false);
@@ -73,10 +70,10 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['document_builder1', 'rest'],
                 ['document_builder2', null]
             ],
-            $this->factory->getArgument(0)
+            $this->factory->getArgument('$documentBuilders')
         );
 
-        $serviceLocatorReference = $this->factory->getArgument(1);
+        $serviceLocatorReference = $this->factory->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -89,7 +86,7 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenDocumentBuilderIsShared()
+    public function testProcessWhenDocumentBuilderIsShared(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The document builder service "document_builder1" should be non shared.');

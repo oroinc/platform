@@ -4,6 +4,7 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
+use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3;
@@ -28,16 +29,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'entities'      => [],
                 'field_configs' => [],
                 'commands'      => [],
-                'sidebar_widgets' => [],
-                'dashboard_widgets' => [],
-                'cron_jobs' => [],
-                'api_resources' => [],
-                'navigation_items' => [],
-                'operations' => [],
-                'workflows' => [],
-                'processes' => [],
-                'placeholder_items' => [],
-                'mq_topics' => []
+                'mq_topics'     => []
             ],
             'feature2' => [
                 'label'         => 'Feature 2',
@@ -48,16 +40,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'entities'      => [],
                 'field_configs' => [],
                 'commands'      => [],
-                'sidebar_widgets' => [],
-                'dashboard_widgets' => [],
-                'cron_jobs' => [],
-                'api_resources' => [],
-                'navigation_items' => [],
-                'operations' => [],
-                'workflows' => [],
-                'processes' => [],
-                'placeholder_items' => [],
-                'mq_topics' => []
+                'mq_topics'     => []
             ],
             'feature3' => [
                 'label'         => 'Feature 3',
@@ -68,16 +51,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'entities'      => [],
                 'field_configs' => [],
                 'commands'      => [],
-                'sidebar_widgets' => [],
-                'dashboard_widgets' => [],
-                'cron_jobs' => [],
-                'api_resources' => [],
-                'navigation_items' => [],
-                'operations' => [],
-                'workflows' => [],
-                'processes' => [],
-                'placeholder_items' => [],
-                'mq_topics' => []
+                'mq_topics'     => []
             ]
         ],
         '__internal__' => [
@@ -106,20 +80,14 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    /** @var string */
-    private $cacheFile;
+    private string $cacheFile;
 
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('FeatureToggleConfigurationProvider');
     }
 
-    /**
-     * @param string[] $bundleClasses
-     *
-     * @return ConfigurationProvider
-     */
-    private function getConfigurationProvider(array $bundleClasses)
+    private function getConfigurationProvider(array $bundleClasses): ConfigurationProvider
     {
         $bundles = [];
         foreach ($bundleClasses as $bundleClass) {
@@ -135,7 +103,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             $this->cacheFile,
             false,
             $bundles,
-            new FeatureToggleConfiguration()
+            new FeatureToggleConfiguration([])
         );
     }
 
@@ -181,7 +149,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDependenciesConfigurationCircularReferenceTwoLevel()
     {
-        $this->expectException(\Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException::class);
+        $this->expectException(CircularReferenceException::class);
         $this->expectExceptionMessage('Feature "feature1" has circular reference on itself');
 
         $configurationProvider = $this->getConfigurationProvider([TestBundle4::class]);
@@ -190,7 +158,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDependenciesConfigurationCircularReferenceOneLevel()
     {
-        $this->expectException(\Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException::class);
+        $this->expectException(CircularReferenceException::class);
         $this->expectExceptionMessage('Feature "feature1" has circular reference on itself');
 
         $configurationProvider = $this->getConfigurationProvider([TestBundle3::class]);

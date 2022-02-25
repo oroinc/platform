@@ -39,8 +39,8 @@ services:
             - 'Oro\Bundle\DataGridBundle\Datagrid\Datagrid'
             - 'Oro\Bundle\DataGridBundle\Extension\Acceptor'
             - '@oro_datagrid.event.dispatcher'
-            - ~ # service locator for data sources
-            - [] # extensions
+            - !abstract '$dataSources defined in Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\DataSourcesPass'
+            - !abstract '$extensions defined in Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ExtensionsPass'
         calls:
             - ['setMemoryCacheProvider', ['@oro_datagrid.results.cache']]
         lazy: true

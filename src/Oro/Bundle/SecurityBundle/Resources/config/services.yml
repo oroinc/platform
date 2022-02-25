@@ -80,8 +80,8 @@ services:
         public: false
         class: Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector
         arguments:
-            - [] # extension names
-            - [] # extensions
+            - !abstract '$extensionNames defined in Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass'
+            - !abstract '$extensionContainer defined in Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclConfigurationPass'
             - '@oro_security.acl.object_id_accessor'
 
     oro_security.acl.extension.entity:
@@ -215,7 +215,7 @@ services:
     oro_security.acl.group_provider.chain:
         class: Oro\Bundle\SecurityBundle\Acl\Group\ChainAclGroupProvider
         arguments:
-            - [] # providers
+            - !abstract '$providers defined in Oro\Bundle\SecurityBundle\DependencyInjection\Compiler\AclGroupProvidersPass'
 
     oro_security.owner.decision_maker:
         public: false

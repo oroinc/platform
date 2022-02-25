@@ -146,11 +146,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 ['oro_api.config_bag.default', '']
             ],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$configBags')
         );
         self::assertServiceLocator(
             ['oro_api.config_bag.default'],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(1),
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$container'),
             $container
         );
         if ($devMode) {
@@ -165,11 +165,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 ['oro_api.config_entity_exclusion_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$exclusionProviders')
         );
         self::assertServiceLocator(
             ['oro_api.config_entity_exclusion_provider.default'],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -191,22 +191,23 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 ['oro_api.entity_alias_resolver.default', '']
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$entityAliasResolvers')
         );
         self::assertServiceLocator(
             ['oro_api.entity_alias_resolver.default'],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
             [
                 ['oro_api.entity_override_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_override_provider_registry')
+                ->getArgument('$entityOverrideProviders')
         );
         self::assertServiceLocator(
             ['oro_api.entity_override_provider.default'],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument('$container'),
             $container
         );
 
@@ -334,11 +335,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.config_bag.second', 'second'],
                 ['oro_api.config_bag.default', '']
             ],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$configBags')
         );
         self::assertServiceLocator(
             ['oro_api.config_bag.default', 'oro_api.config_bag.first', 'oro_api.config_bag.second'],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(1),
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$container'),
             $container
         );
         if ($devMode) {
@@ -357,7 +358,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.config_entity_exclusion_provider.second', 'second'],
                 ['oro_api.config_entity_exclusion_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$exclusionProviders')
         );
         self::assertServiceLocator(
             [
@@ -365,7 +366,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.config_entity_exclusion_provider.first',
                 'oro_api.config_entity_exclusion_provider.second'
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -413,7 +414,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_alias_resolver.second', 'second'],
                 ['oro_api.entity_alias_resolver.default', '']
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$entityAliasResolvers')
         );
         self::assertServiceLocator(
             [
@@ -421,7 +422,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.entity_alias_resolver.first',
                 'oro_api.entity_alias_resolver.second'
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -430,7 +431,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_override_provider.second', 'second'],
                 ['oro_api.entity_override_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_override_provider_registry')
+                ->getArgument('$entityOverrideProviders')
         );
         self::assertServiceLocator(
             [
@@ -438,7 +440,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.entity_override_provider.first',
                 'oro_api.entity_override_provider.second'
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument('$container'),
             $container
         );
 
@@ -674,7 +676,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.config_bag.plain', '!json_api'],
                 ['oro_api.config_bag.default', '']
             ],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$configBags')
         );
         self::assertServiceLocator(
             [
@@ -688,7 +690,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.config_bag.several_request_types',
                 'oro_api.config_bag.another'
             ],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(1),
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$container'),
             $container
         );
         if ($devMode) {
@@ -719,7 +721,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.config_entity_exclusion_provider.plain', '!json_api'],
                 ['oro_api.config_entity_exclusion_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$exclusionProviders')
         );
         self::assertServiceLocator(
             [
@@ -733,7 +735,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.config_entity_exclusion_provider.several_request_types',
                 'oro_api.config_entity_exclusion_provider.another'
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -859,7 +861,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_alias_resolver.plain', '!json_api'],
                 ['oro_api.entity_alias_resolver.default', '']
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$entityAliasResolvers')
         );
         self::assertServiceLocator(
             [
@@ -873,7 +875,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.entity_alias_resolver.several_request_types',
                 'oro_api.entity_alias_resolver.another'
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -888,7 +890,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_override_provider.plain', '!json_api'],
                 ['oro_api.entity_override_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_override_provider_registry')
+                ->getArgument('$entityOverrideProviders')
         );
         self::assertServiceLocator(
             [
@@ -902,7 +905,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.entity_override_provider.several_request_types',
                 'oro_api.entity_override_provider.another'
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument('$container'),
             $container
         );
     }
@@ -983,11 +986,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.config_bag.second', 'second'],
                 ['oro_api.config_bag.default', '']
             ],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(0)
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$configBags')
         );
         self::assertServiceLocator(
             ['oro_api.config_bag.default', 'oro_api.config_bag.first', 'oro_api.config_bag.second'],
-            $container->getDefinition('oro_api.config_bag_registry')->getArgument(1),
+            $container->getDefinition('oro_api.config_bag_registry')->getArgument('$container'),
             $container
         );
         if ($devMode) {
@@ -1006,7 +1009,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.config_entity_exclusion_provider.second', 'second'],
                 ['oro_api.config_entity_exclusion_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$exclusionProviders')
         );
         self::assertServiceLocator(
             [
@@ -1014,7 +1017,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.config_entity_exclusion_provider.first',
                 'oro_api.config_entity_exclusion_provider.second'
             ],
-            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_exclusion_provider_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -1062,7 +1065,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_alias_resolver.second', 'second'],
                 ['oro_api.entity_alias_resolver.default', '']
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$entityAliasResolvers')
         );
         self::assertServiceLocator(
             [
@@ -1070,7 +1073,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.entity_alias_resolver.first',
                 'oro_api.entity_alias_resolver.second'
             ],
-            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_alias_resolver_registry')->getArgument('$container'),
             $container
         );
         self::assertEquals(
@@ -1079,7 +1082,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.entity_override_provider.second', 'second'],
                 ['oro_api.entity_override_provider.default', '']
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(0)
+            $container->getDefinition('oro_api.entity_override_provider_registry')
+                ->getArgument('$entityOverrideProviders')
         );
         self::assertServiceLocator(
             [
@@ -1087,7 +1091,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
                 'oro_api.entity_override_provider.first',
                 'oro_api.entity_override_provider.second'
             ],
-            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument(1),
+            $container->getDefinition('oro_api.entity_override_provider_registry')->getArgument('$container'),
             $container
         );
 
@@ -1602,7 +1606,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $apiConfig = DependencyInjectionUtil::getConfig($container);
         self::assertEquals(
             [
-                'excluded_features' => ['web_api']
+                'excluded_features'   => ['web_api'],
+                'resettable_services' => []
             ],
             $apiConfig['api_doc_cache']
         );
@@ -1615,12 +1620,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $configs = [
             [
                 'api_doc_cache' => [
-                    'excluded_features' => ['feature1']
+                    'excluded_features'   => ['feature1'],
+                    'resettable_services' => ['service1']
                 ]
             ],
             [
                 'api_doc_cache' => [
-                    'excluded_features' => ['feature2']
+                    'excluded_features'   => ['feature2'],
+                    'resettable_services' => ['service2']
                 ]
             ]
         ];
@@ -1631,7 +1638,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $apiConfig = DependencyInjectionUtil::getConfig($container);
         self::assertEquals(
             [
-                'excluded_features' => ['feature1', 'feature2']
+                'excluded_features'   => ['feature1', 'feature2'],
+                'resettable_services' => ['service1', 'service2']
             ],
             $apiConfig['api_doc_cache']
         );

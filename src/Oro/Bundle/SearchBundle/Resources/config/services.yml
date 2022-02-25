@@ -168,9 +168,9 @@ services:
 
     oro_search.cache.mapping_configuration:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_search_mapping_configuration' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_search_mapping_configuration' }
 
     oro_search.provider.search_mapping:
         class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
@@ -198,9 +198,9 @@ services:
 
     oro_search.cache.doctrine_query:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'doctrine_query_search' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_query_search' }
 
     oro_search.entity.repository.search_index:
         alias: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository

@@ -56,6 +56,11 @@ define(function(require, exports, module) {
             this.target.on('input-widget:init', () => {
                 this.displaySelect2(this.showSelect);
             });
+            this.target.on('input-widget:refresh', () => {
+                const toShow = (this.collection && this.collection.models.length > 0) || this.target.val().length > 0;
+
+                this.displaySelect2(toShow);
+            });
 
             if (options.collectionRoute && !this.collection) {
                 this.collection = new RegionCollection([], {

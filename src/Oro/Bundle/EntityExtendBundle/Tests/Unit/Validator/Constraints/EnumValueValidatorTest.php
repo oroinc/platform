@@ -11,15 +11,14 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EnumValueValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): EnumValueValidator
     {
         return new EnumValueValidator();
     }
 
-    public function testConfiguration()
+    public function testGetTargets()
     {
         $constraint = new Constraints\EnumValue();
-        $this->assertEquals(EnumValueValidator::class, $constraint->validatedBy());
         $this->assertEquals([Constraint::CLASS_CONSTRAINT], $constraint->getTargets());
     }
 
@@ -27,8 +26,7 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
     {
         $this->expectException(UnexpectedTypeException::class);
 
-        $constraint = new Constraints\EnumValue();
-        $this->validator->validate(new \stdClass(), $constraint);
+        $this->validator->validate(new \stdClass(), new Constraints\EnumValue());
     }
 
     /**
@@ -37,24 +35,25 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
     public function testValidateForValidValue(string $label)
     {
         $value = (new EnumValue())->setLabel($label);
+
         $constraint = new Constraints\EnumValue();
         $this->validator->validate($value, $constraint);
-
         $this->assertNoViolation();
     }
 
-    public function validateForValidValueDataProvider(): \Generator
+    public function validateForValidValueDataProvider(): array
     {
-        yield ['label' => 'valLabel'];
-        yield ['label' => '0\''];
-        yield ['label' => '0'];
+        return [
+            ['label' => 'valLabel'],
+            ['label' => '0\''],
+            ['label' => '0'],
+        ];
     }
 
     public function testValidateEmptyValue()
     {
         $constraint = new Constraints\EnumValue();
         $this->validator->validate(new EnumValue(), $constraint);
-
         $this->assertNoViolation();
     }
 
@@ -67,7 +66,6 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Constraints\EnumValue();
         $this->validator->validate($value, $constraint);
-
         $this->assertNoViolation();
     }
 
@@ -77,6 +75,7 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
     public function testValidateForInvalidValue($label)
     {
         $value = (new EnumValue())->setLabel($label);
+
         $constraint = new Constraints\EnumValue();
         $this->validator->validate($value, $constraint);
 
@@ -86,9 +85,11 @@ class EnumValueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function validateForInvalidValueDataProvider(): \Generator
+    public function validateForInvalidValueDataProvider(): array
     {
-        yield ['label' => '+'];
-        yield ['label' => ' '];
+        return [
+            ['label' => '+'],
+            ['label' => ' '],
+        ];
     }
 }

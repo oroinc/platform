@@ -5,8 +5,6 @@
 "Choose values": "Choose values"
 "All": "All"
 "Input Label": "Input Label"
-"more than": "later than"
-"less than": "earlier than"
 "before": "before"
 "after": "after"
 "from": "from"
@@ -66,6 +64,13 @@ oro:
                 aria_label: '{{ label }} filter from date value'
             end_field:
                 aria_label: '{{ label }} filter to date value'
+            later_than: 'later than'
+            earlier_than: 'earlier than'
+            end: 'and'
+            before: 'before'
+            after: 'after'
+            from: 'from'
+            to: 'to'
         datetime:
             start_field:
                 aria_label: '{{ label }} filter from time value'
@@ -102,6 +107,9 @@ oro:
         clear: '{0} Clear search field|[1,Inf[ Clear filter "{{ label }}"'
         input_field:
             aria_label: '{{ label }} filter value'
+        number_range:
+            less_than: 'less than'
+            greater_than: 'greater than'
         range_fields:
             start_field:
                 aria_label: '{{ label }} filter from value'

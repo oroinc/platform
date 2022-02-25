@@ -10,14 +10,11 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $chainProvider;
+    private Definition $chainProvider;
 
-    /** @var AclGroupProvidersPass */
-    private $compiler;
+    private AclGroupProvidersPass $compiler;
 
     protected function setUp(): void
     {
@@ -27,7 +24,7 @@ class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new AclGroupProvidersPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->container->register('provider1')
             ->addTag('oro_security.acl.group_provider', ['alias' => 'alias1']);
@@ -39,16 +36,16 @@ class AclGroupProvidersPassTest extends \PHPUnit\Framework\TestCase
 
         $this->compiler->process($this->container);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 new Reference('provider3'),
                 new Reference('provider1')
             ],
-            $this->chainProvider->getArgument(0)
+            $this->chainProvider->getArgument('$providers')
         );
     }
 
-    public function testProcessWithoutAlias()
+    public function testProcessWithoutAlias(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

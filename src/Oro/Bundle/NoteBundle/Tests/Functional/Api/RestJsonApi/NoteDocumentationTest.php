@@ -42,7 +42,7 @@ class NoteDocumentationTest extends RestJsonApiTestCase
         $docs = $this->getEntityDocsForAction('testactivitytargets', ApiAction::GET);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals(
-            '<p>The notes associated with the testactivitytargets record.</p>',
+            '<p>The notes associated with the test activity target record.</p>',
             $resourceData['response']['activityNotes']['description']
         );
     }
@@ -79,7 +79,7 @@ class NoteDocumentationTest extends RestJsonApiTestCase
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals('Get activity notes', $resourceData['description']);
         self::assertEquals(
-            '<p>Retrieve the records of the notes associated with a specific testactivitytargets record.</p>',
+            '<p>Retrieve the records of the notes associated with a specific test activity target record.</p>',
             $resourceData['documentation']
         );
     }
@@ -94,7 +94,7 @@ class NoteDocumentationTest extends RestJsonApiTestCase
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals('Get "activity notes" relationship', $resourceData['description']);
         self::assertEquals(
-            '<p>Retrieve the IDs of the notes associated with a specific testactivitytargets record.</p>',
+            '<p>Retrieve the IDs of the notes associated with a specific test activity target record.</p>',
             $resourceData['documentation']
         );
     }

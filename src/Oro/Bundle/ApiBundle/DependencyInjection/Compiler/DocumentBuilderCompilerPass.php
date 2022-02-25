@@ -43,7 +43,7 @@ class DocumentBuilderCompilerPass implements CompilerPassInterface
         }
 
         $container->getDefinition(self::DOCUMENT_BUILDER_FACTORY_SERVICE_ID)
-            ->setArgument(0, $documentBuilders)
-            ->setArgument(1, ServiceLocatorTagPass::register($container, $services));
+            ->setArgument('$documentBuilders', $documentBuilders)
+            ->setArgument('$container', ServiceLocatorTagPass::register($container, $services));
     }
 }

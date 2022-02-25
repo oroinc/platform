@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -20,7 +20,6 @@ class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
             'oro_ui.content_provider.manager',
             new Definition(ContentProviderManager::class, [[], null, []])
         );
-        $twig = $container->register('twig');
 
         $container->setDefinition('tagged_service_1', new Definition())
             ->addTag('oro_ui.content_provider', ['alias' => 'provider1']);
@@ -32,9 +31,9 @@ class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
         $pass = new ContentProviderPass();
         $pass->process($container);
 
-        self::assertEquals(['provider1', 'provider2', 'provider3'], $manager->getArgument(0));
+        self::assertEquals(['provider1', 'provider2', 'provider3'], $manager->getArgument('$providerNames'));
 
-        $serviceLocatorReference = $manager->getArgument(1);
+        $serviceLocatorReference = $manager->getArgument('$providerContainer');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -47,6 +46,6 @@ class ContentProviderPassTest extends \PHPUnit\Framework\TestCase
             $serviceLocatorDef->getArgument(0)
         );
 
-        self::assertEquals(['provider1', 'provider3'], $manager->getArgument(2));
+        self::assertEquals(['provider1', 'provider3'], $manager->getArgument('$enabledProviderNames'));
     }
 }

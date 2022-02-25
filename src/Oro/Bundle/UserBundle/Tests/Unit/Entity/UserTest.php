@@ -339,15 +339,6 @@ class UserTest extends AbstractUserTest
         self::assertEquals(['email'], $user->getEmailFields());
     }
 
-    public function testGetNotificationEmails(): void
-    {
-        $user = $this->getUser();
-        $email = 'user@example.com';
-        $user->setEmail($email);
-        self::assertInstanceOf(ArrayCollection::class, $user->getNotificationEmails());
-        self::assertEquals([$email], $user->getNotificationEmails()->toArray());
-    }
-
     /**
      * @dataProvider setDataProviderAccountType
      */

@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\LayoutBundle\Provider\Image;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Caching decorator for image placeholder provider.
@@ -11,10 +12,9 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
 {
     private ImagePlaceholderProviderInterface $imagePlaceholderProvider;
+    private CacheInterface $cache;
 
-    private Cache $cache;
-
-    public function __construct(ImagePlaceholderProviderInterface $imagePlaceholderProvider, Cache $cache)
+    public function __construct(ImagePlaceholderProviderInterface $imagePlaceholderProvider, CacheInterface $cache)
     {
         $this->imagePlaceholderProvider = $imagePlaceholderProvider;
         $this->cache = $cache;
@@ -25,14 +25,9 @@ class CacheImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         string $format = '',
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): ?string {
-        $key = $filter .'|'. $format . '|' . $referenceType;
-
-        $path = $this->cache->fetch($key);
-        if (!$path) {
-            $path = $this->imagePlaceholderProvider->getPath($filter, $format, $referenceType);
-            $this->cache->save($key, $path);
-        }
-
-        return $path;
+        $key = UniversalCacheKeyGenerator::normalizeCacheKey($filter .'|'. $format . '|' . $referenceType);
+        return $this->cache->get($key, function () use ($filter, $format, $referenceType) {
+            return $this->imagePlaceholderProvider->getPath($filter, $format, $referenceType);
+        });
     }
 }

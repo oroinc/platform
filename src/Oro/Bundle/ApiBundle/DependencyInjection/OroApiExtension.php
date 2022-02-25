@@ -176,7 +176,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
     private function configureTestEnvironment(ContainerBuilder $container): void
     {
         // oro_api.tests.config_bag.*
-        $configBags = $container->getDefinition('oro_api.config_bag_registry')->getArgument(0);
+        $configBags = $container->getDefinition('oro_api.config_bag_registry')->getArgument('$configBags');
         foreach ($configBags as $configBag) {
             $configBagServiceId = $configBag[0];
             $configBagDecoratorServiceId = str_replace('oro_api.', 'oro_api.tests.', $configBagServiceId);

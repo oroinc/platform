@@ -9,18 +9,6 @@ define(function(require, exports, module) {
     const config = require('module-config').default(module.id);
     const containerSelector = '.navigation.navbar-extra .title-buttons-container';
 
-    function hideButtons() {
-        $(containerSelector).hide();
-    }
-
-    function showButtons() {
-        const $container = $(containerSelector);
-        if ($container.dropdownButtonProcessor('isGrouped')) {
-            $container.closest('.row').addClass('row__nowrap');
-        }
-        $container.show();
-    }
-
     function updatePageHeader() {
         const $container = $(containerSelector);
         const options = _.extend({
@@ -39,8 +27,13 @@ define(function(require, exports, module) {
             relativeTo: 'body'
         };
         $container.dropdownButtonProcessor(options);
+        $container.addClass('buttons-grouped');
 
-        showButtons();
+        if ($container.dropdownButtonProcessor('isGrouped')) {
+            if (!$container.closest('.row').find('.dashboard-selector-container').length) {
+                $container.closest('.row').addClass('row__nowrap');
+            }
+        }
     }
 
     /**
@@ -51,7 +44,6 @@ define(function(require, exports, module) {
      */
     return {
         init: function() {
-            hideButtons();
             mediator.on('page:afterChange', updatePageHeader);
         }
     };

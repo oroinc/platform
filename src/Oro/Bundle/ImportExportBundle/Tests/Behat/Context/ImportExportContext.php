@@ -807,7 +807,9 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     {
         // oro_importexport.test.cache service is defined in ImportExportBundle/Tests/Behat/parameters.yml
         $cache = $this->getAppContainer()->get('oro_importexport.test.cache');
-        $cache->save(PreExportMessageProcessor::BATCH_SIZE_KEY, $size);
+        $item = $cache->getItem(PreExportMessageProcessor::BATCH_SIZE_KEY);
+        $item->set($size);
+        $cache->save($item);
     }
 
     /**

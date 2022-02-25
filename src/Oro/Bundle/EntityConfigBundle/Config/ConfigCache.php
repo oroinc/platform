@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Config;
 
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
@@ -100,7 +101,11 @@ class ConfigCache
                 $this->saveMultiple($this->cache, $this->toSave);
             }
             if (!empty($this->toDelete)) {
-                $this->cache->deleteItems(\array_keys($this->toDelete));
+                $keysToDelete = \array_keys($this->toDelete);
+                \array_walk_recursive($keysToDelete, function (&$key) {
+                    $key = $this->getCacheKey($key);
+                });
+                $this->cache->deleteItems($keysToDelete);
             }
         } finally {
             $this->toSaveModel = null;
@@ -585,7 +590,7 @@ class ConfigCache
             if (null !== $this->toSaveModel && isset($this->toSaveModel[$className])) {
                 $entry = $this->toSaveModel[$className];
             } else {
-                $cacheItem = $this->modelCache->getItem($className);
+                $cacheItem = $this->modelCache->getItem($this->getCacheKey($className));
                 $entry = $cacheItem->isHit() ? $cacheItem->get() : null;
             }
             // put to a local cache
@@ -615,7 +620,7 @@ class ConfigCache
         }
 
         if (null === $this->toSaveModel) {
-            $cacheItem = $this->modelCache->getItem($className);
+            $cacheItem = $this->modelCache->getItem($this->getCacheKey($className));
             $cacheItem->set($entry);
             $this->modelCache->save($cacheItem);
         } else {
@@ -630,7 +635,7 @@ class ConfigCache
      */
     private function cacheFetch($key)
     {
-        $cacheItem = $this->cache->getItem($key);
+        $cacheItem = $this->cache->getItem($this->getCacheKey($key));
         if (null === $this->toSave) {
             return $cacheItem->isHit() ? $cacheItem->get() : false;
         }
@@ -653,7 +658,7 @@ class ConfigCache
     private function cacheSave($key, $value)
     {
         if (null === $this->toSave) {
-            $cacheItem = $this->cache->getItem($key);
+            $cacheItem = $this->cache->getItem($this->getCacheKey($key));
             $cacheItem->set($value);
             $this->cache->save($cacheItem);
         } else {
@@ -668,7 +673,7 @@ class ConfigCache
     private function cacheDelete($key)
     {
         if (null === $this->toDelete) {
-            $this->cache->deleteItem($key);
+            $this->cache->deleteItem($this->getCacheKey($key));
         } else {
             $this->toDelete[$key] = true;
             unset($this->toSave[$key]);
@@ -678,7 +683,7 @@ class ConfigCache
     private function saveMultiple(CacheItemPoolInterface $cacheItemPool, array $cacheItems): void
     {
         foreach ($cacheItems as $cacheKey => $cacheItem) {
-            $poolItem = $cacheItemPool->getItem($cacheKey);
+            $poolItem = $cacheItemPool->getItem($this->getCacheKey($cacheKey));
             $poolItem->set($cacheItem);
             $cacheItemPool->saveDeferred($poolItem);
         }
@@ -731,5 +736,10 @@ class ConfigCache
     private function getFieldConfigsCacheKey($className, $scope)
     {
         return $className . '.' . $scope;
+    }
+
+    private function getCacheKey(string $key): string
+    {
+        return UniversalCacheKeyGenerator::normalizeCacheKey($key);
     }
 }

@@ -16,7 +16,8 @@ class OroActivityExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             [],
-            $container->getDefinition('oro_activity.api.activity_association_provider')->getArgument(0)
+            $container->getDefinition('oro_activity.api.activity_association_provider')
+                ->getArgument('$activityAssociationNames')
         );
     }
 
@@ -34,7 +35,8 @@ class OroActivityExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame(
             ['Test\Activity1' => 'association1new', 'Test\Activity2' => 'association2'],
-            $container->getDefinition('oro_activity.api.activity_association_provider')->getArgument(0)
+            $container->getDefinition('oro_activity.api.activity_association_provider')
+                ->getArgument('$activityAssociationNames')
         );
     }
 }

@@ -38,8 +38,8 @@ services:
         class: Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider
         public: true
         arguments:
-            - [] # builders. They are set by Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass
-            - ~ # service locator. It is set by Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass
+            - !abstract '$builders defined in Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass'
+            - !abstract '$builderContainer defined in Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass'
             - '@oro_menu.factory'
             - '@oro_menu.array_loader'
             - '@oro_menu.manipulator'
@@ -123,7 +123,7 @@ services:
         class: Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory
         public: true
         arguments:
-            - ~ # service locator for builders
+            - !abstract '$builders defined in Oro\Bundle\NavigationBundle\DependencyInjection\Compiler\MenuBuilderPass'
 
     oro_navigation.item.pinbar.post_persist_listener:
         class: Oro\Bundle\NavigationBundle\Entity\Listener\PinbarPostPersist

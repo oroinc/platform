@@ -353,6 +353,13 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: save_data, class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel2 }
 
+    oro_api.api.set_custom_associations_query:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\SetCustomAssociationsQuery
+        arguments:
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine, priority: -35 }
+
     oro_api.tests.test_flash_bag_depended_service:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\TestFlashBagDependedService
         arguments:

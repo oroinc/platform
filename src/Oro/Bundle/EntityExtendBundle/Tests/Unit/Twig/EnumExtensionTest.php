@@ -88,6 +88,26 @@ class EnumExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testTransEnumWhenIdsAreNumeric()
+    {
+        $enumValueEntityClass = 'Test\EnumValue';
+
+        $values = [
+            'Value 1' => '05',
+            'Value 2' => '5'
+        ];
+
+        $this->enumValueProvider->expects($this->any())
+            ->method('getEnumChoices')
+            ->with($enumValueEntityClass)
+            ->willReturn($values);
+
+        $this->assertEquals(
+            'Value 2',
+            self::callTwigFilter($this->extension, 'trans_enum', ['5', $enumValueEntityClass])
+        );
+    }
+
     public function testSortEnum()
     {
         $enumValueEntityClass = 'Test\EnumValue';

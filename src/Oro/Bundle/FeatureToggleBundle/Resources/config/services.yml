@@ -30,6 +30,8 @@ services:
 
     oro_featuretoggle.configuration:
         class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+        arguments:
+            - !tagged_iterator oro_feature.config_extension
 
     oro_featuretoggle.twig.feature_extension:
         class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'

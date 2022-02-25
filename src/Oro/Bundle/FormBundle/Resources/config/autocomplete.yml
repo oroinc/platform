@@ -6,7 +6,7 @@ services:
         class: Oro\Bundle\FormBundle\Autocomplete\Security
         public: true
         arguments:
-            - [] # autocomplete ACL resources
+            - !abstract '$autocompleteAclResources defined in Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass'
             - '@security.authorization_checker'
 
     Oro\Bundle\FormBundle\Autocomplete\SearchRegistry:
@@ -16,7 +16,7 @@ services:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchRegistry
         public: true
         arguments:
-            - ~ # service locator for autocomplete search handlers
+            - !abstract '$searchHandlers defined in Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass'
 
     oro_form.autocomplete.search_handler:
         class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler

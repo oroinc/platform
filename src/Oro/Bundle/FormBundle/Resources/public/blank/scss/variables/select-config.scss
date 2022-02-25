@@ -20,6 +20,7 @@ $select-border-radius: $base-ui-element-border-radius !default;
 $select-background-color: $base-ui-element-bg-color !default;
 $select-color: $base-ui-element-color !default;
 $select-disable-platform-style: true !default;
+$select-arrow-color: get-color('additional', 'dark') !default;
 $select-bg: url('#{$global-url}/oroform/blank/images/icons/arrow-down--gray.png') no-repeat right 8px center get-color('additional', 'ultra') !default;
 
 $select-border-color-hover-state: get-color('additional', 'dark') !default;

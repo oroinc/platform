@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -279,7 +280,11 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
             $references = $this->getReferenceRepository()->getReferences();
             foreach ($references as $referenceId => $entity) {
                 $entityClass = $doctrineHelper->getClass($entity);
-                $entityType = $this->getEntityType($entityClass, false);
+                $entityType = ValueNormalizerUtil::tryConvertToEntityType(
+                    $this->getValueNormalizer(),
+                    $entityClass,
+                    $this->getRequestType()
+                );
                 if ($entityType) {
                     $em = $doctrine->getManagerForClass($entityClass);
                     if ($em instanceof EntityManagerInterface) {

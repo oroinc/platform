@@ -143,15 +143,23 @@ class ConfigCacheWarmer
                     $allSubstitutions[$overriddenEntityClass] = $entityClass;
                 }
             }
-            foreach ($fileConfig[self::EXCLUSIONS] as $exclusion) {
-                if (!$this->hasInclusionOrExclusion($exclusion, $allExclusions)) {
-                    $allExclusions[] = $exclusion;
-                }
+            $exclusions = $this->processInclusionOrExclusion(
+                $fileConfig[self::EXCLUSIONS],
+                $allExclusions,
+                $allInclusions
+            );
+            $inclusions = $this->processInclusionOrExclusion(
+                $fileConfig[self::INCLUSIONS],
+                $allInclusions,
+                $allExclusions
+            );
+            if ($exclusions) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
+                $allExclusions = array_merge($allExclusions, $exclusions);
             }
-            foreach ($fileConfig[self::INCLUSIONS] as $inclusion) {
-                if (!$this->hasInclusionOrExclusion($inclusion, $allInclusions)) {
-                    $allInclusions[] = $inclusion;
-                }
+            if ($inclusions) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
+                $allInclusions = array_merge($allInclusions, $inclusions);
             }
         }
 
@@ -319,6 +327,23 @@ class ConfigCacheWarmer
         }
 
         return $hasConfig;
+    }
+
+    private function processInclusionOrExclusion(
+        array $items,
+        array $existingItems,
+        array $existingInverseItems
+    ): array {
+        $newItems = [];
+        foreach ($items as $item) {
+            if (!$this->hasInclusionOrExclusion($item, $existingItems)
+                && !$this->hasInclusionOrExclusion($item, $existingInverseItems)
+            ) {
+                $newItems[] = $item;
+            }
+        }
+
+        return $newItems;
     }
 
     private function hasInclusionOrExclusion(array $item, array $items): bool

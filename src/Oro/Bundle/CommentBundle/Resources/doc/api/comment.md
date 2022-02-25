@@ -145,6 +145,18 @@ Delete a collection of comment records.
 
 A record that the comment was made on.
 
+#### create
+
+{@inheritdoc}
+
+**The required field.**
+
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
+
 ## SUBRESOURCES
 
 ### attachment

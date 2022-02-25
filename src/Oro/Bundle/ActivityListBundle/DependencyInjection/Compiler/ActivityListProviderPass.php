@@ -45,8 +45,8 @@ class ActivityListProviderPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_activity_list.provider.chain')
-            ->setArgument(0, array_keys($activityClasses))
-            ->setArgument(1, $activityAclClasses)
-            ->setArgument(2, ServiceLocatorTagPass::register($container, $activityProviders));
+            ->setArgument('$activityClasses', array_keys($activityClasses))
+            ->setArgument('$activityAclClasses', $activityAclClasses)
+            ->setArgument('$providerContainer', ServiceLocatorTagPass::register($container, $activityProviders));
     }
 }

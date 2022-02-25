@@ -32,8 +32,8 @@ class AutocompleteCompilerPass implements CompilerPassInterface
         }
 
         $container->getDefinition('oro_form.autocomplete.search_registry')
-            ->setArgument(0, ServiceLocatorTagPass::register($container, $handlers));
+            ->setArgument('$searchHandlers', ServiceLocatorTagPass::register($container, $handlers));
         $container->getDefinition('oro_form.autocomplete.security')
-            ->setArgument(0, $aclResources);
+            ->setArgument('$autocompleteAclResources', $aclResources);
     }
 }

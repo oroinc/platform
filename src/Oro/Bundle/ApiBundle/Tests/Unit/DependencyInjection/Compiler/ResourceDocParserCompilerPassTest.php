@@ -13,14 +13,11 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ResourceDocParserCompilerPass */
-    private $compiler;
+    private ResourceDocParserCompilerPass $compiler;
 
-    /** @var ContainerBuilder */
-    private $container;
+    private ContainerBuilder $container;
 
-    /** @var Definition */
-    private $registry;
+    private Definition $registry;
 
     protected function setUp(): void
     {
@@ -38,23 +35,23 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoResourceDocParsers()
+    public function testProcessWhenNoResourceDocParsers(): void
     {
         $config = ['api_doc_views' => []];
         $this->container->setParameter('oro_api.bundle_config', $config);
 
         $this->compiler->process($this->container);
 
-        self::assertEquals([], $this->registry->getArgument(0));
+        self::assertEquals([], $this->registry->getArgument('$parsers'));
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcessWithoutApiDocViews()
+    public function testProcessWithoutApiDocViews(): void
     {
         $config = ['api_doc_views' => []];
         $this->container->setParameter('oro_api.bundle_config', $config);
@@ -77,10 +74,10 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['parser1', 'rest&json_api'],
                 ['parser1', 'rest']
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$parsers')
         );
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -92,7 +89,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithApiDocViews()
+    public function testProcessWithApiDocViews(): void
     {
         $config = [
             'api_doc_views' => [
@@ -132,10 +129,10 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['parser1', 'rest&json_api'],
                 ['parser1', 'rest']
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$parsers')
         );
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -150,7 +147,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithNotNormalizedRequestTypeInApiDocView()
+    public function testProcessWithNotNormalizedRequestTypeInApiDocView(): void
     {
         $config = [
             'api_doc_views' => [
@@ -178,10 +175,10 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.resource_doc_parser.template.view1', 'another&rest'],
                 ['parser1', 'rest&json_api']
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$parsers')
         );
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -196,7 +193,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithNotNormalizedRequestType()
+    public function testProcessWithNotNormalizedRequestType(): void
     {
         $config = [
             'api_doc_views' => [
@@ -224,10 +221,10 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['oro_api.resource_doc_parser.template.view1', 'rest&another'],
                 ['parser1', 'json_api&rest']
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$parsers')
         );
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());
@@ -242,7 +239,7 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithRequestTypeThatCannotBeNormalized()
+    public function testProcessWithRequestTypeThatCannotBeNormalized(): void
     {
         $config = [
             'api_doc_views' => [
@@ -276,10 +273,10 @@ class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['parser1', 'rest|json_api'],
                 ['parser1', 'rest&!json_api']
             ],
-            $this->registry->getArgument(0)
+            $this->registry->getArgument('$parsers')
         );
 
-        $serviceLocatorReference = $this->registry->getArgument(1);
+        $serviceLocatorReference = $this->registry->getArgument('$container');
         self::assertInstanceOf(Reference::class, $serviceLocatorReference);
         $serviceLocatorDef = $this->container->getDefinition((string)$serviceLocatorReference);
         self::assertEquals(ServiceLocator::class, $serviceLocatorDef->getClass());

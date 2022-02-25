@@ -23,17 +23,10 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
  */
 class RestDocFiltersHandler
 {
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
-    /** @var ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ApiDocDataTypeConverter */
-    private $dataTypeConverter;
-
-    /** @var FiltersSorterRegistry */
-    private $sorterRegistry;
+    private RestDocViewDetector $docViewDetector;
+    private ValueNormalizer $valueNormalizer;
+    private ApiDocDataTypeConverter $dataTypeConverter;
+    private FiltersSorterRegistry $sorterRegistry;
 
     public function __construct(
         RestDocViewDetector $docViewDetector,
@@ -47,7 +40,7 @@ class RestDocFiltersHandler
         $this->sorterRegistry = $sorterRegistry;
     }
 
-    public function handle(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
+    public function handle(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata): void
     {
         if (!$filters->isEmpty()) {
             $this->addFilters($annotation, $filters, $metadata);
@@ -55,7 +48,7 @@ class RestDocFiltersHandler
         $this->sortFilters($annotation);
     }
 
-    private function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata)
+    private function addFilters(ApiDoc $annotation, FilterCollection $filters, EntityMetadata $metadata): void
     {
         foreach ($filters as $key => $filter) {
             if ($filter instanceof StandaloneFilter) {
@@ -67,7 +60,7 @@ class RestDocFiltersHandler
         }
     }
 
-    private function sortFilters(ApiDoc $annotation)
+    private function sortFilters(ApiDoc $annotation): void
     {
         $filters = $annotation->getFilters();
         if (count($filters) > 1) {
@@ -81,13 +74,7 @@ class RestDocFiltersHandler
         }
     }
 
-    /**
-     * @param StandaloneFilter $filter
-     * @param EntityMetadata   $metadata
-     *
-     * @return array
-     */
-    private function getFilterOptions(StandaloneFilter $filter, EntityMetadata $metadata)
+    private function getFilterOptions(StandaloneFilter $filter, EntityMetadata $metadata): array
     {
         $dataType = $filter->getDataType();
         $isArrayAllowed = $filter->isArrayAllowed();
@@ -129,24 +116,12 @@ class RestDocFiltersHandler
         return $options;
     }
 
-    /**
-     * @param string|null $description
-     *
-     * @return string
-     */
-    private function getFilterDescription($description)
+    private function getFilterDescription(?string $description): string
     {
         return $description ?? '';
     }
 
-    /**
-     * @param string $dataType
-     * @param bool   $isArrayAllowed
-     * @param bool   $isRangeAllowed
-     *
-     * @return string
-     */
-    private function getFilterType($dataType, $isArrayAllowed, $isRangeAllowed)
+    private function getFilterType(string $dataType, bool $isArrayAllowed, bool $isRangeAllowed): string
     {
         $dataType = $this->dataTypeConverter->convertDataType(
             $dataType,
@@ -169,7 +144,7 @@ class RestDocFiltersHandler
      *
      * @return string[]
      */
-    private function getFilterTargetEntityTypes($targetClassNames)
+    private function getFilterTargetEntityTypes(array $targetClassNames): array
     {
         $targetEntityTypes = [];
         foreach ($targetClassNames as $targetClassName) {
@@ -182,18 +157,12 @@ class RestDocFiltersHandler
         return $targetEntityTypes;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return string|null
-     */
-    private function getEntityType($entityClass)
+    private function getEntityType(string $entityClass): ?string
     {
-        return ValueNormalizerUtil::convertToEntityType(
+        return ValueNormalizerUtil::tryConvertToEntityType(
             $this->valueNormalizer,
             $entityClass,
-            $this->docViewDetector->getRequestType(),
-            false
+            $this->docViewDetector->getRequestType()
         );
     }
 
@@ -202,7 +171,7 @@ class RestDocFiltersHandler
      *
      * @return string[]
      */
-    private function getFilterOperators(StandaloneFilter $filter)
+    private function getFilterOperators(StandaloneFilter $filter): array
     {
         $operators = $filter->getSupportedOperators();
         if (empty($operators)) {

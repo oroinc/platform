@@ -18,13 +18,18 @@
     }
 }
 
-// @return the value in a $color-palette map associated with a given key;
+// @return the value from a $color-palette map associated with a given key;
 // Use: color: get-color('primary', 'base') => color: #000;
+// Use: color: get-color('primary', 'base', 10%) => color: rgba(0 0 0 / 10%);
 
-@function get-color($palette: 'primary', $key: 'main') {
+@function get-color($palette: 'primary', $key: 'main', $opacity: null) {
     $color-key: get-nested-map-value($color-palette, $palette, $key);
 
     @if ($color-key) {
+        @if ($opacity) {
+            @return rgba($color-key, $opacity);
+        }
+
         @return $color-key;
     } @else {
         @warn 'Color not found:' $palette $key;

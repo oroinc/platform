@@ -103,11 +103,10 @@ class FilterFieldsByExtra implements ProcessorInterface
         $result = [];
         foreach ($fieldFilters as $entity => $fields) {
             if (!str_contains($entity, '\\')) {
-                $entityClass = ValueNormalizerUtil::convertToEntityClass(
+                $entityClass = ValueNormalizerUtil::tryConvertToEntityClass(
                     $this->valueNormalizer,
                     $entity,
-                    $requestType,
-                    false
+                    $requestType
                 );
                 if ($entityClass) {
                     $entity = $entityClass;

@@ -1,4 +1,33 @@
 services:
+    oro_attachment.api.attachment_association_provider:
+        class: Oro\Bundle\AttachmentBundle\Api\AttachmentAssociationProvider
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_attachment.association_helper'
+
+    oro_attachment.api.get_config.add_attachment_associations:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\AddAttachmentAssociations
+        arguments:
+            - '@oro_attachment.api.attachment_association_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', priority: -10 }
+
+    oro_attachment.api.get_config.add_attachment_association_descriptions:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\AddAttachmentAssociationDescriptions
+        arguments:
+            - '@oro_attachment.api.attachment_association_provider'
+            - '@oro_api.complete_descriptions.resource_doc_parser_provider'
+            - '@oro_api.entity_name_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }
+
+    oro_attachment.api.collect_subresources.exclude_change_attachment_subresources:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ExcludeChangeAttachmentSubresources
+        arguments:
+            - '@oro_attachment.api.attachment_association_provider'
+        tags:
+            - { name: oro.api.processor, action: collect_subresources, priority: -20 }
+
     oro_attachment.api.compute_file_content:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
         arguments:

@@ -45,7 +45,7 @@ services:
     oro_organization.owner_deletion_manager:
         class: Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager
         arguments:
-            - ~ # checkers; it is injected by Oro\Bundle\OrganizationBundle\DependencyInjection\Compiler\OwnerDeletionManagerPass
+            - !abstract '$checkerContainer defined in Oro\Bundle\OrganizationBundle\DependencyInjection\Compiler\OwnerDeletionManagerPass'
             - '@oro_entity_config.provider.ownership'
             - '@oro_security.owner.ownership_metadata_provider'
             - '@oro_entity.doctrine_helper'

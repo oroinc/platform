@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ImapBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\TextType;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_3\OroImapBundle as v13;
 use Oro\Bundle\ImapBundle\Migrations\Schema\v1_4\OroImapBundle as v14;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
@@ -18,7 +20,7 @@ class OroImapBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_11';
     }
 
     /**
@@ -44,8 +46,9 @@ class OroImapBundleInstaller implements Installation
     private function changeEmailTokensLength(Schema $schema): void
     {
         $table = $schema->getTable('oro_email_origin');
-        $table->changeColumn('access_token', ['length' => 8192]);
-        $table->changeColumn('refresh_token', ['length' => 8192]);
+
+        $table->changeColumn('access_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
+        $table->changeColumn('refresh_token', ['type' => TextType::getType(Types::TEXT), 'length' => 8192]);
     }
 
     /**

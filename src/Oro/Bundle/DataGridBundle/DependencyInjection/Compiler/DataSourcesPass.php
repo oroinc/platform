@@ -21,7 +21,7 @@ class DataSourcesPass implements CompilerPassInterface
     {
         $container->getDefinition('oro_datagrid.datagrid.builder')
             ->setArgument(
-                3,
+                '$dataSources',
                 ServiceLocatorTagPass::register(
                     $container,
                     $this->findAndSortTaggedServices('oro_datagrid.datasource', 'type', $container)

@@ -21,22 +21,23 @@ class ApiDocCompilerPass implements CompilerPassInterface
 {
     use ApiTaggedServiceTrait;
 
-    private const API_DOC_EXTRACTOR_SERVICE                 = 'nelmio_api_doc.extractor.api_doc_extractor';
-    private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE     = 'oro_api.rest.request_type_provider';
-    private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.rest.chain_routing_options_resolver';
+    private const API_DOC_EXTRACTOR_SERVICE = 'nelmio_api_doc.extractor.api_doc_extractor';
+    private const API_DOC_REQUEST_TYPE_PROVIDER_SERVICE = 'oro_api.rest.request_type_provider';
+    private const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE = 'oro_api.rest.chain_routing_options_resolver';
     private const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'oro.api.routing_options_resolver';
-    private const API_DOC_ANNOTATION_HANDLER_SERVICE        = 'oro_api.rest.api_doc_annotation_handler';
-    private const API_DOC_ANNOTATION_HANDLER_TAG_NAME       = 'oro.api.api_doc_annotation_handler';
-    private const REST_DOC_VIEW_DETECTOR_SERVICE            = 'oro_api.rest.doc_view_detector';
-    private const API_DOC_HTML_FORMATTER_SERVICE            = 'nelmio_api_doc.formatter.html_formatter';
-    private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE    = 'oro_api.api_doc.formatter.html_formatter.nelmio';
-    private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE  = 'oro_api.api_doc.formatter.html_formatter.composite';
-    private const API_DOC_DATA_TYPE_CONVERTER               = 'oro_api.api_doc.data_type_converter';
-    private const API_DOC_SECURITY_CONTEXT_SERVICE          = 'oro_api.api_doc.security_context';
-    private const FILE_LOCATOR_SERVICE                      = 'file_locator';
-    private const DOCUMENTATION_PROVIDER_SERVICE            = 'oro_api.api_doc.documentation_provider';
-    private const API_SOURCE_LISTENER_SERVICE               = 'oro_api.listener.api_source';
-    private const TWIG                                      = 'twig';
+    private const API_DOC_ANNOTATION_HANDLER_SERVICE = 'oro_api.rest.api_doc_annotation_handler';
+    private const API_DOC_ANNOTATION_HANDLER_TAG_NAME = 'oro.api.api_doc_annotation_handler';
+    private const REST_DOC_VIEW_DETECTOR_SERVICE = 'oro_api.rest.doc_view_detector';
+    private const API_DOC_HTML_FORMATTER_SERVICE = 'nelmio_api_doc.formatter.html_formatter';
+    private const RENAMED_API_DOC_HTML_FORMATTER_SERVICE = 'oro_api.api_doc.formatter.html_formatter.nelmio';
+    private const COMPOSITE_API_DOC_HTML_FORMATTER_SERVICE = 'oro_api.api_doc.formatter.html_formatter.composite';
+    private const API_DOC_DATA_TYPE_CONVERTER = 'oro_api.api_doc.data_type_converter';
+    private const API_DOC_SECURITY_CONTEXT_SERVICE = 'oro_api.api_doc.security_context';
+    private const FILE_LOCATOR_SERVICE = 'file_locator';
+    private const DOCUMENTATION_PROVIDER_SERVICE = 'oro_api.api_doc.documentation_provider';
+    private const API_SOURCE_LISTENER_SERVICE = 'oro_api.listener.api_source';
+    private const API_CACHE_MANAGER_SERVICE = 'oro_api.cache_manager';
+    private const TWIG = 'twig';
 
     /**
      * {@inheritdoc}
@@ -54,6 +55,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
         $this->registerRoutingOptionsResolvers($container);
         $this->configureRequestTypeProvider($container);
         $this->configureApiSourceListener($container);
+        $this->configureCacheManager($container);
     }
 
     private function getApiDocViews(ContainerBuilder $container): array
@@ -173,7 +175,19 @@ class ApiDocCompilerPass implements CompilerPassInterface
     {
         $config = DependencyInjectionUtil::getConfig($container);
         $container->getDefinition(self::API_SOURCE_LISTENER_SERVICE)
-            ->setArgument(1, $config['api_doc_cache']['excluded_features']);
+            ->setArgument('$excludedFeatures', $config['api_doc_cache']['excluded_features']);
+    }
+
+    private function configureCacheManager(ContainerBuilder $container)
+    {
+        $config = DependencyInjectionUtil::getConfig($container);
+        $resettableServiceIds = $config['api_doc_cache']['resettable_services'];
+        if ($resettableServiceIds) {
+            $cacheManagerDef = $container->getDefinition(self::API_CACHE_MANAGER_SERVICE);
+            foreach ($resettableServiceIds as $resettableServiceId) {
+                $cacheManagerDef->addMethodCall('addResettableService', [new Reference($resettableServiceId)]);
+            }
+        }
     }
 
     private function configureApiDocFormatters(ContainerBuilder $container)
@@ -239,8 +253,8 @@ class ApiDocCompilerPass implements CompilerPassInterface
         }
 
         $container->getDefinition(self::API_DOC_DATA_TYPE_CONVERTER)
-            ->setArgument(0, $defaultMapping)
-            ->setArgument(1, $viewMappings);
+            ->setArgument('$defaultMapping', $defaultMapping)
+            ->setArgument('$viewMappings', $viewMappings);
     }
 
     private function registerRoutingOptionsResolvers(ContainerBuilder $container)

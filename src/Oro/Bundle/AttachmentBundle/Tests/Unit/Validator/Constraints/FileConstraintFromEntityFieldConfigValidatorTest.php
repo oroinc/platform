@@ -37,10 +37,11 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
 
     public function testInitialize(): void
     {
-        $this->fileValidator
-            ->expects($this->once())
+        $context = $this->createMock(ExecutionContextInterface::class);
+
+        $this->fileValidator->expects($this->once())
             ->method('initialize')
-            ->with($context = $this->createMock(ExecutionContextInterface::class));
+            ->with($context);
 
         $this->validator->initialize($context);
     }
@@ -58,21 +59,24 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
 
     public function testValidate(): void
     {
+        $entityClass = 'SampleClass';
+        $fieldName = 'sampleField';
+
         $constraint = $this->createMock(FileConstraintFromEntityFieldConfig::class);
-        $constraint
+        $constraint->expects($this->any())
             ->method('getEntityClass')
-            ->willReturn($entityClass = 'SampleClass');
+            ->willReturn($entityClass);
 
-        $constraint
+        $constraint->expects($this->any())
             ->method('getFieldName')
-            ->willReturn($fieldName = 'sampleField');
+            ->willReturn($fieldName);
 
-        $this->fileConstraintsProvider
+        $this->fileConstraintsProvider->expects($this->once())
             ->method('getAllowedMimeTypesForEntityField')
             ->with($entityClass, $fieldName)
             ->willReturn(self::MIME_TYPES);
 
-        $this->fileConstraintsProvider
+        $this->fileConstraintsProvider->expects($this->any())
             ->method('getMaxSizeForEntityField')
             ->with($entityClass, $fieldName)
             ->willReturn(self::MAX_SIZE);
@@ -81,12 +85,7 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
             ->method('validate')
             ->with(
                 $file = new \stdClass(),
-                new File(
-                    [
-                        'mimeTypes' => self::MIME_TYPES,
-                        'maxSize' => self::MAX_SIZE,
-                    ]
-                )
+                new File(['mimeTypes' => self::MIME_TYPES, 'maxSize' => self::MAX_SIZE])
             );
 
         $this->validator->validate($file, $constraint);

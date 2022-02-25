@@ -172,17 +172,17 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     /**
      * {@inheritdoc}
      */
-    protected function convertToEntityType(
-        string $entityClass,
-        RequestType $requestType,
-        bool $throwException = true
-    ): ?string {
-        return ValueNormalizerUtil::convertToEntityType(
-            $this->valueNormalizer,
-            $entityClass,
-            $requestType,
-            $throwException
-        );
+    protected function convertToEntityType(string $entityClass, RequestType $requestType): string
+    {
+        return ValueNormalizerUtil::convertToEntityType($this->valueNormalizer, $entityClass, $requestType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function tryConvertToEntityType(string $entityClass, RequestType $requestType): ?string
+    {
+        return ValueNormalizerUtil::tryConvertToEntityType($this->valueNormalizer, $entityClass, $requestType);
     }
 
     protected function addMeta(array &$result, array $data, EntityMetadata $metadata): void

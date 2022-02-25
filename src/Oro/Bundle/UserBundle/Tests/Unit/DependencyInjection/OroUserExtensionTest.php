@@ -8,20 +8,37 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testLoadWithDefaults()
+    public function testLoadWithDefaults(): void
     {
-        $config = [];
-
         $container = new ContainerBuilder();
         $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroUserExtension();
-        $extension->load([$config], $container);
+        $extension->load([], $container);
+
+        $extensionConfig = $container->getExtensionConfig($extension->getAlias());
+        self::assertSame(
+            [
+                [
+                    'settings' => [
+                        'resolved' => true,
+                        'password_min_length' => ['value' => 8, 'scope' => 'app'],
+                        'password_lower_case' => ['value' => true, 'scope' => 'app'],
+                        'password_upper_case' => ['value' => true, 'scope' => 'app'],
+                        'password_numbers' => ['value' => true, 'scope' => 'app'],
+                        'password_special_chars' => ['value' => false, 'scope' => 'app'],
+                        'send_password_in_invitation_email' => ['value' => false, 'scope' => 'app'],
+                        'case_insensitive_email_addresses_enabled' => ['value' => false, 'scope' => 'app'],
+                    ]
+                ]
+            ],
+            $extensionConfig
+        );
 
         $this->assertEquals(86400, $container->getParameter('oro_user.reset.ttl'));
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $config = [
             'reset' => [
@@ -38,33 +55,33 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1800, $container->getParameter('oro_user.reset.ttl'));
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
-        $inputSecurityConfig = [
-            'firewalls' => [
-                'main' => ['main_config'],
-                'first' => ['first_config'],
-                'second' => ['second_config'],
+        $container = new ExtendedContainerBuilder();
+        $container->setExtensionConfig('security', [
+            [
+                'firewalls' => [
+                    'main' => ['main_config'],
+                    'first' => ['first_config'],
+                    'second' => ['second_config'],
+                ]
             ]
-        ];
-        $expectedSecurityConfig = [
-            'firewalls' => [
-                'first' => ['first_config'],
-                'second' => ['second_config'],
-                'main' => ['main_config'],
-            ]
-        ];
-
-        $container = $this->createMock(ExtendedContainerBuilder::class);
-        $container->expects($this->once())
-            ->method('getExtensionConfig')
-            ->with('security')
-            ->willReturn([$inputSecurityConfig]);
-        $container->expects($this->once())
-            ->method('setExtensionConfig')
-            ->with('security', [$expectedSecurityConfig]);
+        ]);
 
         $extension = new OroUserExtension();
         $extension->prepend($container);
+
+        self::assertSame(
+            [
+                [
+                    'firewalls' => [
+                        'first' => ['first_config'],
+                        'second' => ['second_config'],
+                        'main' => ['main_config'],
+                    ]
+                ]
+            ],
+            $container->getExtensionConfig('security')
+        );
     }
 }
