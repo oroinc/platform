@@ -61,7 +61,10 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
         $redeliveryExtension = $container->getDefinition('oro_message_queue.consumption.redelivery_message_extension');
         self::assertEquals(10, $redeliveryExtension->getArgument(1));
-        self::assertEquals(['oro_message_queue.consumption.extension' => [[]]], $redeliveryExtension->getTags());
+        self::assertEquals(
+            ['oro_message_queue.consumption.extension' => [['priority' => 512]]],
+            $redeliveryExtension->getTags()
+        );
         self::assertEquals(
             ['oro_message_queue.consumption.extension' => [['persistent' => true]]],
             $container->getDefinition('oro_message_queue.consumption.signal_extension')->getTags()
@@ -177,7 +180,10 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
         $redeliveryExtension = $container->getDefinition('oro_message_queue.consumption.redelivery_message_extension');
         self::assertEquals(10, $redeliveryExtension->getArgument(1));
-        self::assertEquals(['oro_message_queue.consumption.extension' => [[]]], $redeliveryExtension->getTags());
+        self::assertEquals(
+            ['oro_message_queue.consumption.extension' => [['priority' => 512]]],
+            $redeliveryExtension->getTags()
+        );
         self::assertEquals(
             ['oro_message_queue.consumption.extension' => [['persistent' => true]]],
             $container->getDefinition('oro_message_queue.consumption.signal_extension')->getTags()
@@ -239,7 +245,10 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
 
         $redeliveryExtension = $container->getDefinition('oro_message_queue.consumption.redelivery_message_extension');
         self::assertEquals(2119, $redeliveryExtension->getArgument(1));
-        self::assertEquals(['oro_message_queue.consumption.extension' => [[]]], $redeliveryExtension->getTags());
+        self::assertEquals(
+            ['oro_message_queue.consumption.extension' => [['priority' => 512]]],
+            $redeliveryExtension->getTags()
+        );
         self::assertEquals(
             ['oro_message_queue.consumption.extension' => [['persistent' => true]]],
             $container->getDefinition('oro_message_queue.consumption.signal_extension')->getTags()
