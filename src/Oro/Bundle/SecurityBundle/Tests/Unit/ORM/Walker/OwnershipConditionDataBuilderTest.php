@@ -77,6 +77,10 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
             $this->metadataProvider->getUserClass(),
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id')
         );
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

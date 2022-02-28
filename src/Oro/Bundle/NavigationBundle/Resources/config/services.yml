@@ -295,9 +295,9 @@ services:
 
     oro_navigation.route_collection.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_navigation_route_collection' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_navigation_route_collection' }
 
     oro_navigation.form.type.route_select:
         class: Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType
@@ -460,9 +460,9 @@ services:
             - { name: doctrine.repository_service }
 
     oro_navigation.menu_update.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_navigation_menu_updates' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_navigation_menu_updates' }
 
     oro_navigation.data_provider.title:
         class: Oro\Bundle\NavigationBundle\Layout\DataProvider\NavigationTitleProvider

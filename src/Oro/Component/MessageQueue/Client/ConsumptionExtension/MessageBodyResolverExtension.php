@@ -30,20 +30,39 @@ class MessageBodyResolverExtension extends AbstractExtension
     {
         parent::onPreReceived($context);
 
-        $topicName = $context->getMessage()?->getProperty(Config::PARAMETER_TOPIC_NAME) ?? '';
-        if (!$topicName || !$this->topicRegistry->has($topicName)) {
-            // Skips resolving of the message body as its topic is not present in {@see TopicRegistry}.
+        $message = $context->getMessage();
+        $topicName = $message?->getProperty(Config::PARAMETER_TOPIC_NAME) ?? '';
+        $loggingContext = ['messageId' => $message?->getMessageId(), 'topic' => $topicName];
+
+        if ($context->getStatus()) {
+            // There is no sense in the message body resolving if a message status is already known.
+            $context->getLogger()->debug(
+                'Skipping message body resolving as message status is already set.',
+                $loggingContext + ['status' => $context->getStatus()]
+            );
             return;
         }
 
-        $message = $context->getMessage();
+        if (!$topicName || !$this->topicRegistry->has($topicName)) {
+            // Skips resolving of the message body as its topic is not present in {@see TopicRegistry}.
+            $context->getLogger()->debug(
+                'Skipping message body resolving as topic name is empty or is not present in topic registry.',
+                $loggingContext
+            );
+            return;
+        }
 
         try {
             $message->setBody($this->messageBodyResolver->resolveBody($topicName, $message->getBody()));
+
+            $context->getLogger()->debug('Message body is resolved.', $loggingContext);
         } catch (InvalidMessageBodyException $exception) {
             $context->getLogger()->error(
                 sprintf('Message is rejected. %s', $exception->getMessage()),
-                ['exception' => $exception, 'topic' => $topicName, 'message' => $message->getBody()]
+                $loggingContext + [
+                    'exception' => $exception,
+                    'message' => $message->getBody(),
+                ]
             );
 
             // Rejects message by setting a rejected status to context.

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Permission;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
@@ -10,41 +9,29 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\Repository\PermissionRepository;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The manager for security permissions.
  */
 class PermissionManager
 {
-    const CACHE_PERMISSIONS = 'permissions';
-    const CACHE_GROUPS = 'groups';
+    private const CACHE_PERMISSIONS = 'permissions';
+    private const CACHE_GROUPS = 'groups';
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected DoctrineHelper $doctrineHelper;
+    protected CacheInterface $cache;
+    protected ?array $groups = null;
+    protected ?array $permissions = null;
+    protected array $loadedPermissions = [];
 
-    /** @var CacheProvider */
-    protected $cache;
-
-    /** @var array */
-    protected $groups;
-
-    /** @var array */
-    protected $permissions;
-
-    /** @var Permission[] */
-    protected $loadedPermissions = [];
-
-    public function __construct(DoctrineHelper $doctrineHelper, CacheProvider $cache)
+    public function __construct(DoctrineHelper $doctrineHelper, CacheInterface $cache)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->cache = $cache;
     }
 
-    /**
-     * @param Permission[]|Collection $permissions
-     * @return Permission[]|Collection
-     */
-    public function processPermissions(Collection $permissions)
+    public function processPermissions(Collection $permissions): Collection
     {
         $entityRepository = $this->getRepository();
         $entityManager = $this->getEntityManager();
@@ -66,28 +53,19 @@ class PermissionManager
 
         $entityManager->flush();
 
-        $this->buildCache();
+        $this->buildCache(true);
 
         return $processedPermissions;
     }
 
-    /**
-     * @param string|null $groupName
-     * @return array
-     */
-    public function getPermissionsMap($groupName = null)
+    public function getPermissionsMap(?string $groupName = null): array
     {
         $this->normalizeGroupName($groupName);
 
         return $groupName ? $this->findGroupPermissions($groupName) : $this->findPermissions();
     }
 
-    /**
-     * @param mixed $entity
-     * @param string|null $groupName
-     * @return Permission[]
-     */
-    public function getPermissionsForEntity($entity, $groupName = null)
+    public function getPermissionsForEntity(mixed $entity, ?string $groupName = null): array
     {
         $this->normalizeGroupName($groupName);
 
@@ -96,11 +74,7 @@ class PermissionManager
         return $this->getRepository()->findByEntityClassAndIds($this->doctrineHelper->getEntityClass($entity), $ids);
     }
 
-    /**
-     * @param string $groupName
-     * @return Permission[]
-     */
-    public function getPermissionsForGroup($groupName)
+    public function getPermissionsForGroup(?string $groupName): array
     {
         $this->normalizeGroupName($groupName);
 
@@ -109,11 +83,7 @@ class PermissionManager
         return $ids ? $this->getRepository()->findBy(['id' => $ids], ['id' => 'ASC']) : [];
     }
 
-    /**
-     * @param string $name
-     * @return Permission|null
-     */
-    public function getPermissionByName($name)
+    public function getPermissionByName(string $name): ?Permission
     {
         if (!array_key_exists($name, $this->loadedPermissions)) {
             $map = $this->getPermissionsMap();
@@ -128,10 +98,7 @@ class PermissionManager
         return $this->loadedPermissions[$name];
     }
 
-    /**
-     * @return array
-     */
-    protected function buildCache()
+    protected function buildCache(bool $save = false): array
     {
         /** @var Permission[] $permissions */
         $permissions = $this->getRepository()->findBy([], ['id' => 'ASC']);
@@ -149,18 +116,19 @@ class PermissionManager
             }
         }
 
-        $this->cache->deleteAll();
-        foreach ($cache as $key => $value) {
-            $this->cache->save($key, $value);
+        if ($save) {
+            $this->cache->clear();
+            foreach ($cache as $key => $value) {
+                $this->cache->get($key, function () use ($value) {
+                    return $value;
+                });
+            }
         }
 
         return $cache;
     }
 
-    /**
-     * @return array
-     */
-    protected function findPermissions()
+    protected function findPermissions(): array
     {
         if (null === $this->permissions) {
             $this->permissions = $this->getCache(static::CACHE_PERMISSIONS);
@@ -169,11 +137,7 @@ class PermissionManager
         return $this->permissions;
     }
 
-    /**
-     * @param string $name
-     * @return array
-     */
-    protected function findGroupPermissions($name)
+    protected function findGroupPermissions(?string $name): array
     {
         if (null === $this->groups) {
             $this->groups = $this->getCache(static::CACHE_GROUPS);
@@ -182,43 +146,27 @@ class PermissionManager
         return array_key_exists($name, $this->groups) ? $this->groups[$name] : [];
     }
 
-    /**
-     * @param string $key
-     * @return array
-     */
-    protected function getCache($key)
+    protected function getCache(string $key): array
     {
-        if (false === ($cache = $this->cache->fetch($key))) {
+        return $this->cache->get($key, function () use ($key) {
             $data = $this->buildCache();
-
             return !empty($data[$key]) ? $data[$key] : [];
-        }
-
-        return $cache;
+        });
     }
 
-    /**
-     * @param string|null $groupName
-     */
-    protected function normalizeGroupName(&$groupName)
+    protected function normalizeGroupName(?string &$groupName): void
     {
         if ($groupName !== null && empty($groupName)) {
             $groupName = PermissionConfiguration::DEFAULT_GROUP_NAME;
         }
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManager
     {
         return $this->doctrineHelper->getEntityManagerForClass(Permission::class);
     }
 
-    /**
-     * @return PermissionRepository
-     */
-    protected function getRepository()
+    protected function getRepository(): PermissionRepository
     {
         return $this->doctrineHelper->getEntityRepositoryForClass(Permission::class);
     }

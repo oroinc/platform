@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -13,25 +12,21 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The provider for owner tree.
  */
 class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
+    private ManagerRegistry $doctrine;
+    private TokenStorageInterface $tokenStorage;
+    private OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
     public function __construct(
         ManagerRegistry $doctrine,
         DatabaseChecker $databaseChecker,
-        CacheProvider $cache,
+        CacheInterface $cache,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         TokenStorageInterface $tokenStorage
     ) {
@@ -41,9 +36,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function supports(): bool
     {
         $token = $this->tokenStorage->getToken();
@@ -54,9 +46,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         return $token->getUser() instanceof User;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function fillTree(OwnerTreeBuilderInterface $tree): void
     {
         $userClass = $this->ownershipMetadataProvider->getUserClass();
@@ -133,12 +122,6 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         return $id;
     }
 
-    /**
-     * @param Connection $connection
-     * @param Query      $query
-     *
-     * @return array [rows, columnMap]
-     */
     private function executeQuery(Connection $connection, Query $query): array
     {
         $parsedQuery = QueryUtil::parseQuery($query);
@@ -149,7 +132,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         ];
     }
 
-    protected function setSubordinateBusinessUnitIds(OwnerTreeBuilderInterface $tree, $businessUnits)
+    protected function setSubordinateBusinessUnitIds(OwnerTreeBuilderInterface $tree, $businessUnits): void
     {
         foreach ($businessUnits as $parentId => $businessUnitIds) {
             $tree->setSubordinateBusinessUnitIds($parentId, $businessUnitIds);

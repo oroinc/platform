@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -12,6 +11,8 @@ use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Event\LoadFieldsMetadata;
 use Oro\Component\Config\Cache\ClearableConfigCacheInterface;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -28,31 +29,20 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     private const FULL_CACHE_KEY_PREFIX  = 'full-';
     private const SHORT_CACHE_KEY_PREFIX = 'short-';
 
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var CacheProvider */
-    private $cache;
-
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var AclGroupProviderInterface */
-    private $aclGroupProvider;
-
-    /** @var array [security type => [class name => EntitySecurityMetadata, ...], ...] */
-    private $localCache = [];
-
-    /** @var array [security type => [class name => [group, [field name => field alias, ...]], ...], ...] */
-    private $shortLocalCache = [];
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
+    private CacheItemPoolInterface $cache;
+    private EventDispatcherInterface $eventDispatcher;
+    private AclGroupProviderInterface $aclGroupProvider;
+    /** [security type => [class name => EntitySecurityMetadata, ...], ...] */
+    private array $localCache = [];
+    /** [security type => [class name => [group, [field name => field alias, ...]], ...], ...] */
+    private array $shortLocalCache = [];
 
     public function __construct(
         ConfigManager $configManager,
         ManagerRegistry $doctrine,
-        CacheProvider $cache,
+        CacheItemPoolInterface $cache,
         EventDispatcherInterface $eventDispatcher,
         AclGroupProviderInterface $aclGroupProvider
     ) {
@@ -64,14 +54,9 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     }
 
     /**
-     * Checks whether an entity is protected using the given security type.
-     *
-     * @param string $className    The entity class name
-     * @param string $securityType The security type. Defaults to ACL.
-     *
-     * @return bool
+     * Checks whether an entity is protected using the given security type
      */
-    public function isProtectedEntity($className, $securityType = self::ACL_SECURITY_TYPE)
+    public function isProtectedEntity(string $className, string $securityType = self::ACL_SECURITY_TYPE): bool
     {
         $this->ensureShortMetadataLoaded($securityType);
 
@@ -85,16 +70,13 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     }
 
     /**
-     * Checks if the given field has an alias and if so, returns it instead of the given field name.
-     *
-     * @param string $className    The entity class name
-     * @param string $fieldName    The field name
-     * @param string $securityType The security type. Defaults to ACL.
-     *
-     * @return string
+     * Checks if the given field has an alias and if so, returns it instead of the given field name
      */
-    public function getProtectedFieldName($className, $fieldName, $securityType = self::ACL_SECURITY_TYPE)
-    {
+    public function getProtectedFieldName(
+        string $className,
+        string $fieldName,
+        string $securityType = self::ACL_SECURITY_TYPE
+    ): string {
         $this->ensureShortMetadataLoaded($securityType);
 
         if (isset($this->shortLocalCache[$securityType][$className])) {
@@ -108,22 +90,15 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     }
 
     /**
-     * Gets metadata for all entities marked with the given security type.
-     *
-     * @param string $securityType The security type. Defaults to ACL.
-     *
-     * @return EntitySecurityMetadata[]
+     * Gets metadata for all entities marked with the given security type
      */
-    public function getEntities($securityType = self::ACL_SECURITY_TYPE)
+    public function getEntities(string $securityType = self::ACL_SECURITY_TYPE): array
     {
         $this->ensureMetadataLoaded($securityType);
 
         return array_values($this->localCache[$securityType]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function warmUpCache(): void
     {
         $securityTypes = [];
@@ -135,80 +110,73 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
             }
         }
         foreach ($securityTypes as $securityType) {
-            $this->loadMetadata($securityType);
+            $this->loadMetadata($securityType, null, null);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearCache(): void
     {
         $this->localCache = [];
         $this->shortLocalCache = [];
-        $this->cache->deleteAll();
+        $this->cache->clear();
     }
 
     /**
-     * Get entity metadata.
-     *
-     * @param string $className
-     * @param string $securityType
-     *
-     * @return EntitySecurityMetadata
+     * Get entity metadata
      */
-    public function getMetadata($className, $securityType = self::ACL_SECURITY_TYPE)
-    {
+    public function getMetadata(
+        string $className,
+        string $securityType = self::ACL_SECURITY_TYPE
+    ): EntitySecurityMetadata {
         $this->ensureMetadataLoaded($securityType);
 
         if (!isset($this->localCache[$securityType][$className])) {
-            throw new \LogicException(sprintf('The entity "%s" must be %s protected.', $className, $securityType));
+            throw new \LogicException(
+                sprintf('The entity "%s" must be %s protected.', $className, $securityType)
+            );
         }
 
         return $this->localCache[$securityType][$className];
     }
 
     /**
-     * Makes sure that metadata for the given security type are loaded and cached.
-     *
-     * @param string $securityType The security type.
+     * Makes sure that metadata for the given security type are loaded and cached
      */
-    private function ensureMetadataLoaded($securityType)
+    private function ensureMetadataLoaded(string $securityType): void
     {
         if (!isset($this->localCache[$securityType])) {
-            $data = $this->cache->fetch(self::FULL_CACHE_KEY_PREFIX . $securityType);
-            if (false !== $data) {
-                $this->localCache[$securityType] = $data;
+            $fullCacheItem = $this->cache->getItem(self::FULL_CACHE_KEY_PREFIX . $securityType);
+            if ($fullCacheItem->isHit()) {
+                $this->localCache[$securityType] = $fullCacheItem->get();
             } else {
-                $this->loadMetadata($securityType);
+                $this->loadMetadata($securityType, $fullCacheItem, null);
             }
         }
     }
 
     /**
-     * Makes sure that metadata for the given security type are loaded and cached.
-     *
-     * @param string $securityType The security type.
+     * Makes sure that metadata for the given security type are loaded and cached
      */
-    private function ensureShortMetadataLoaded($securityType)
+    private function ensureShortMetadataLoaded($securityType): void
     {
         if (!isset($this->shortLocalCache[$securityType])) {
-            $data = $this->cache->fetch(self::SHORT_CACHE_KEY_PREFIX . $securityType);
-            if (false !== $data) {
-                $this->shortLocalCache[$securityType] = $data;
+            $shortCacheItem = $this->cache->getItem(self::SHORT_CACHE_KEY_PREFIX . $securityType);
+            if ($shortCacheItem->isHit()) {
+                $this->shortLocalCache[$securityType] = $shortCacheItem->get();
             } else {
-                $this->loadMetadata($securityType);
+                $this->loadMetadata($securityType, null, $shortCacheItem);
             }
         }
     }
 
     /**
-     * Loads metadata for the given security type and save them in cache.
-     *
-     * @param string $securityType
+     * Loads metadata for the given security type and save them in cache
      */
-    private function loadMetadata($securityType)
-    {
+    private function loadMetadata(
+        string $securityType,
+        ?CacheItemInterface $fullCacheItem,
+        ?CacheItemInterface $shortCacheItem
+    ): void {
         $data = [];
         $shortData = [];
         $securityConfigs = $this->configManager->getConfigs('security', null, true);
@@ -229,20 +197,17 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
             }
         }
 
-        $this->cache->save(self::FULL_CACHE_KEY_PREFIX . $securityType, $data);
-        $this->cache->save(self::SHORT_CACHE_KEY_PREFIX . $securityType, $shortData);
+        $fullCacheItem ??=$this->cache->getItem(self::FULL_CACHE_KEY_PREFIX . $securityType);
+        $fullCacheItem->set($data);
+        $this->cache->save($fullCacheItem);
+        $shortCacheItem ??=$this->cache->getItem(self::SHORT_CACHE_KEY_PREFIX . $securityType);
+        $shortCacheItem->set($shortData);
+        $this->cache->save($shortCacheItem);
         $this->localCache[$securityType] = $data;
         $this->shortLocalCache[$securityType] = $shortData;
     }
 
-    /**
-     * @param ConfigInterface $securityConfig
-     * @param string          $className
-     * @param string          $securityType
-     *
-     * @return bool
-     */
-    private function isEntityApplicable(ConfigInterface $securityConfig, $className, $securityType)
+    private function isEntityApplicable(ConfigInterface $securityConfig, string $className, string $securityType): bool
     {
         if ($securityConfig->get('type') !== $securityType) {
             return false;
@@ -253,15 +218,11 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
             ->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
     }
 
-    /**
-     * @param ConfigInterface $securityConfig
-     * @param string          $className
-     * @param string          $securityType
-     *
-     * @return EntitySecurityMetadata
-     */
-    private function getEntityMetadata(ConfigInterface $securityConfig, $className, $securityType)
-    {
+    private function getEntityMetadata(
+        ConfigInterface $securityConfig,
+        string $className,
+        string $securityType
+    ): EntitySecurityMetadata {
         $description = $securityConfig->get('description');
         if ($description) {
             $description = new Label($description);
@@ -280,14 +241,9 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     }
 
     /**
-     * Gets an array of fields metadata.
-     *
-     * @param        $securityConfig
-     * @param string $className
-     *
-     * @return FieldSecurityMetadata[]
+     * Gets an array of fields metadata
      */
-    private function getFields(ConfigInterface $securityConfig, $className)
+    private function getFields(ConfigInterface $securityConfig, string $className): array
     {
         $fields = [];
         if ($securityConfig->get('field_acl_supported') && $securityConfig->get('field_acl_enabled')) {
@@ -316,14 +272,9 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     }
 
     /**
-     * Gets a label of a field.
-     *
-     * @param ClassMetadata $metadata
-     * @param string        $fieldName
-     *
-     * @return string
+     * Gets a label of a field
      */
-    private function getFieldLabel(ClassMetadata $metadata, $fieldName)
+    private function getFieldLabel(ClassMetadata $metadata, string $fieldName): string
     {
         $label = null;
         $className = $metadata->getName();
@@ -338,13 +289,9 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
     }
 
     /**
-     * Returns array with supported permissions.
-     *
-     * @param ConfigInterface $securityConfig
-     *
-     * @return string[] Array with permissions, e.g. ['VIEW', 'CREATE']
+     * Returns array with supported permissions
      */
-    private function getPermissionsList(ConfigInterface $securityConfig)
+    private function getPermissionsList(ConfigInterface $securityConfig): array #e.g. ['VIEW', 'CREATE']
     {
         $permissions = $securityConfig->get('permissions');
 
@@ -353,16 +300,11 @@ class EntitySecurityMetadataProvider implements WarmableConfigCacheInterface, Cl
             : [];
     }
 
-    /**
-     * @param string $className
-     *
-     * @return ClassMetadata
-     */
-    private function getClassMetadata($className)
+    private function getClassMetadata(string $className): ClassMetadata
     {
         $manager = $this->doctrine
             ->getManagerForClass($className);
-        if ($manager == null) {
+        if ($manager === null) {
             throw new \LogicException(sprintf('There is no manager for %s', $className));
         }
 

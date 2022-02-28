@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
@@ -17,6 +16,8 @@ use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\Label;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -28,8 +29,11 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
+
+    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheItem;
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
@@ -44,7 +48,8 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->aclGroupProvider = $this->createMock(AclGroupProviderInterface::class);
 
@@ -138,7 +143,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($manager);
     }
 
-    private function expectLoadMetadata(): EntitySecurityMetadata
+    private function expectLoadMetadata(CacheItemInterface $cacheItem): EntitySecurityMetadata
     {
         $entitySecurityMetadata = $this->getEntitySecurityMetadata();
 
@@ -199,28 +204,28 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects($this->exactly(2))
             ->method('save')
-            ->withConsecutive(
-                [
-                    'full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE,
-                    [\stdClass::class => $entitySecurityMetadata]
-                ],
-                [
-                    'short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE,
-                    [\stdClass::class => ['SomeGroup', ['lastName' => 'lastNameAlias']]]
-                ]
-            );
+            ->with($cacheItem);
 
         return $entitySecurityMetadata;
     }
 
     public function testIsProtectedEntityWithoutCache(): void
     {
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->withConsecutive(
+                ['short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE],
+                ['full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE]
+            )
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->willReturn($this->cacheItem);
 
-        $entitySecurityMetadata = $this->expectLoadMetadata();
+        $entitySecurityMetadata = $this->expectLoadMetadata($this->cacheItem);
 
         $this->aclGroupProvider->expects($this->any())
             ->method('getGroup')
@@ -237,8 +242,14 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testIsProtectedEntity($entityClass, $entityGroup, $group, $expected): void
     {
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([\stdClass::class => [$entityGroup, []]]);
 
         $this->aclGroupProvider->expects($this->any())
@@ -288,12 +299,21 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetProtectedFieldNameWithoutCache(): void
     {
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->withConsecutive(
+                ['short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE],
+                ['full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE]
+            )
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->willReturn($this->cacheItem);
 
-        $entitySecurityMetadata = $this->expectLoadMetadata();
+        $entitySecurityMetadata = $this->expectLoadMetadata($this->cacheItem);
 
         $this->assertEquals(
             'lastNameAlias',
@@ -312,8 +332,14 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetProtectedFieldName($entityClass, $fieldName, $fieldAliases, $expected): void
     {
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([\stdClass::class => ['', $fieldAliases]]);
 
         $this->assertEquals($expected, $this->provider->getProtectedFieldName($entityClass, $fieldName));
@@ -353,12 +379,21 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntitiesWithoutCache(): void
     {
-        $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with('full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+        $this->cache->expects($this->exactly(2))
+            ->method('getItem')
+            ->withConsecutive(
+                ['full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE],
+                ['short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE]
+            )
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
             ->willReturn(false);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('set')
+            ->willReturn($this->cacheItem);
 
-        $entitySecurityMetadata = $this->expectLoadMetadata();
+        $entitySecurityMetadata = $this->expectLoadMetadata($this->cacheItem);
 
         $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
         // test local cache
@@ -370,11 +405,16 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $entitySecurityMetadata = $this->getEntitySecurityMetadata();
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('getItem')
             ->with('full-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects($this->once())
+            ->method('get')
             ->willReturn([\stdClass::class => $entitySecurityMetadata]);
-        $this->cache->expects($this->never())
-            ->method('save');
+
 
         $this->assertEquals([$entitySecurityMetadata], $this->provider->getEntities());
         // test local cache

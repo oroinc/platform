@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NavigationBundle\Form\Type\RouteChoiceType;
 use Oro\Bundle\NavigationBundle\Provider\TitleService;
@@ -13,6 +12,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class RouteChoiceTypeTest extends FormIntegrationTestCase
 {
@@ -28,7 +29,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     /** @var TitleService|\PHPUnit\Framework\MockObject\MockObject */
     private $titleService;
 
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var RouteChoiceType */
@@ -40,7 +41,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
         $this->readerRegistry = $this->createMock(TitleReaderRegistry::class);
         $this->translator = $this->createMock(TitleTranslator::class);
         $this->titleService = $this->createMock(TitleService::class);
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
 
         $this->formType = new RouteChoiceType(
             $this->router,
@@ -68,22 +69,12 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
 
         $this->readerRegistry->expects($this->never())
             ->method($this->anything());
-
         $this->cache->expects($this->once())
-            ->method('contains')
-            ->willReturn(false);
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(
-                $this->isType('string'),
-                [
-                    'oro_route_get_simple',
-                    'oro_route_get',
-                    'oro_route_get_post',
-                    'oro_route_with_option',
-                    'oro_route_get_simple_no_title'
-                ]
-            );
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $options = ['add_titles' => false, 'menu_name' => 'menu'];
 
@@ -112,12 +103,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
             ->method($this->anything());
 
         $this->cache->expects($this->once())
-            ->method('contains')
-            ->willReturn(true);
-        $this->cache->expects($this->never())
-            ->method('save');
-        $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with($this->isType('string'))
             ->willReturn(
                 [

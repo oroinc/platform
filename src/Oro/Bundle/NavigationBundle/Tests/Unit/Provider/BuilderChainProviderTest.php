@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\NavigationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
@@ -11,6 +10,8 @@ use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuItemStub;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -190,14 +191,17 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         $items = ['name' => $alias];
         $menu = $this->createMock(ItemInterface::class);
 
-        $cache = $this->createMock(CacheProvider::class);
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
         $cache->expects(static::once())
-            ->method('contains')
+            ->method('getItem')
             ->with($alias)
+            ->willReturn($cacheItem);
+        $cacheItem->expects(self::once())
+            ->method('isHit')
             ->willReturn(true);
-        $cache->expects(self::once())
-            ->method('fetch')
-            ->with($alias)
+        $cacheItem->expects(self::once())
+            ->method('get')
             ->willReturn($items);
 
         $this->loader->expects(self::once())
