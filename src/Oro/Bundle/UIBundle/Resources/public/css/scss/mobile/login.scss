@@ -82,6 +82,15 @@
         }
     }
 
+    &.form-signin--forgot {
+        width: $signin-forgot-mobile-width;
+        max-width: 100%;
+        
+        input[type='text'] {
+            width: 100%;
+        }
+    }
+
     .add-on {
         width: auto;
         height: auto;
