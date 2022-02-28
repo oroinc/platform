@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Form\Type;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\NavigationBundle\Provider\TitleServiceInterface;
 use Oro\Bundle\NavigationBundle\Provider\TitleTranslator;
@@ -13,50 +12,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Choice form type to choose route from route collection.
  */
 class RouteChoiceType extends AbstractType
 {
-    const NAME = 'oro_route_choice';
+    private const NAME = 'oro_route_choice';
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    /**
-     * @var TitleTranslator
-     */
-    private $titleTranslator;
-
-    /**
-     * @var TitleReaderRegistry
-     */
-    private $readerRegistry;
-
-    /**
-     * @var TitleServiceInterface
-     */
-    private $titleService;
-
-    /**
-     * @var RouteCollection
-     */
-    private $routeCollection;
-
-    /**
-     * @var Cache
-     */
-    private $cache;
+    private RouterInterface $router;
+    private TitleTranslator $titleTranslator;
+    private TitleReaderRegistry $readerRegistry;
+    private TitleServiceInterface $titleService;
+    private ?RouteCollection $routeCollection = null;
+    private CacheInterface $cache;
 
     public function __construct(
         RouterInterface $router,
         TitleReaderRegistry $readerRegistry,
         TitleTranslator $titleTranslator,
         TitleServiceInterface $titleService,
-        Cache $cache
+        CacheInterface $cache
     ) {
         $this->router = $router;
         $this->readerRegistry = $readerRegistry;
@@ -65,10 +42,7 @@ class RouteChoiceType extends AbstractType
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('menu_name');
 
@@ -117,47 +91,31 @@ class RouteChoiceType extends AbstractType
         );
     }
 
-    /**
-     * @param bool $withoutParametersOnly
-     * @param null|array $optionsFilter
-     * @param null|string $nameFilter
-     * @param null|string $pathFilter
-     * @return array
-     */
     private function getFilteredRoutes(
-        $withoutParametersOnly = true,
-        array $optionsFilter = null,
-        $nameFilter = null,
-        $pathFilter = null
-    ) {
+        bool $withoutParametersOnly = true,
+        ?array $optionsFilter = null,
+        ?string $nameFilter = null,
+        ?string $pathFilter = null
+    ): array {
         $cacheKey = md5(json_encode(func_get_args()));
-        if ($this->cache->contains($cacheKey)) {
-            $filteredRoutes = $this->cache->fetch($cacheKey);
-        } else {
-            $filteredRoutes = $this->filterRouteCollection(
-                $withoutParametersOnly,
-                $optionsFilter,
-                $nameFilter,
-                $pathFilter
-            );
-            $this->cache->save($cacheKey, $filteredRoutes);
-        }
-
-        return $filteredRoutes;
+        return $this->cache->get(
+            $cacheKey,
+            function () use ($withoutParametersOnly, $optionsFilter, $nameFilter, $pathFilter) {
+                return $this->filterRouteCollection(
+                    $withoutParametersOnly,
+                    $optionsFilter,
+                    $nameFilter,
+                    $pathFilter
+                );
+            }
+        );
     }
 
-    /**
-     * @param bool $withoutParametersOnly
-     * @param null|array $optionsFilter
-     * @param null|string $nameFilter
-     * @param null|string $pathFilter
-     * @return array
-     */
     private function filterRouteCollection(
-        $withoutParametersOnly = true,
-        array $optionsFilter = null,
-        $nameFilter = null,
-        $pathFilter = null
+        bool $withoutParametersOnly = true,
+        ?array $optionsFilter = null,
+        ?string $nameFilter = null,
+        ?string $pathFilter = null
     ): array {
         $filteredRoutes = [];
         foreach ($this->getRouteCollection() as $routeName => $route) {
@@ -175,70 +133,37 @@ class RouteChoiceType extends AbstractType
         return $filteredRoutes;
     }
 
-    /**
-     * @param Route $route
-     * @return bool
-     */
-    private function isGetMethodAllowed(Route $route)
+    private function isGetMethodAllowed(Route $route): bool
     {
         return count($route->getMethods()) === 0 || in_array('GET', $route->getMethods(), true);
     }
 
-    /**
-     * @param bool $withoutParametersOnly
-     * @param Route $route
-     * @return bool
-     */
-    private function isParametersAllowed($withoutParametersOnly, Route $route)
+    private function isParametersAllowed(bool $withoutParametersOnly, Route $route): bool
     {
         return !$withoutParametersOnly || !str_contains($route->getPath(), '{');
     }
 
-    /**
-     * @param array $optionsFilter
-     * @param Route $route
-     * @return bool
-     */
-    private function isOptionsAllowed(array $optionsFilter, Route $route)
+    private function isOptionsAllowed(?array $optionsFilter, Route $route): bool
     {
         return !$optionsFilter || $optionsFilter === array_intersect_assoc($optionsFilter, $route->getOptions());
     }
 
-    /**
-     * @param string $nameFilter
-     * @param string $routeName
-     * @return bool
-     */
-    private function isNameAllowed($nameFilter, $routeName)
+    private function isNameAllowed(?string $nameFilter, string $routeName): bool
     {
         return !$nameFilter || preg_match($nameFilter, $routeName);
     }
 
-    /**
-     * @param string $pathFilter
-     * @param Route $route
-     * @return bool
-     */
-    private function isPathAllowed($pathFilter, Route $route)
+    private function isPathAllowed(?string $pathFilter, Route $route): bool
     {
         return !$pathFilter || preg_match($pathFilter, $route->getPath());
     }
 
-    /**
-     * @param string $routeName
-     * @return string
-     */
-    private function getRouteNameAsTitle($routeName)
+    private function getRouteNameAsTitle(string $routeName): string
     {
         return str_replace('_', ' ', ucwords($routeName, '_'));
     }
 
-    /**
-     * @param array $routes
-     * @param string $menuName
-     * @return array
-     */
-    private function loadRouteTitles(array $routes, $menuName)
+    private function loadRouteTitles(array $routes, string $menuName): array
     {
         $titles = [];
         foreach ($routes as $routeName) {
@@ -252,10 +177,7 @@ class RouteChoiceType extends AbstractType
         return $titles;
     }
 
-    /**
-     * @return RouteCollection
-     */
-    private function getRouteCollection()
+    private function getRouteCollection(): RouteCollection
     {
         if ($this->routeCollection === null) {
             $this->routeCollection = $this->router->getRouteCollection();
@@ -264,26 +186,17 @@ class RouteChoiceType extends AbstractType
         return $this->routeCollection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getParent()
+    public function getParent(): string
     {
         return Select2ChoiceType::class;
     }

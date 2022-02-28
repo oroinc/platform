@@ -2,48 +2,33 @@
 
 namespace Oro\Bundle\NavigationBundle\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateWithScopeChangeEvent;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Flush menu update cache.
  */
 class MenuUpdateCacheFlusher
 {
-    /**
-     * @var CacheProvider
-     */
-    private $cache;
-
-    /**
-     * @var MenuUpdateRepository
-     */
-    private $repository;
-
-    /**
-     * @var ScopeManager
-     */
-    protected $scopeManager;
-
-    /**
-     * @var string
-     */
-    protected $scopeType;
+    private CacheInterface $cache;
+    private MenuUpdateRepository $repository;
+    protected ScopeManager $scopeManager;
+    protected string $scopeType;
 
     /**
      * @param MenuUpdateRepository $repository
-     * @param CacheProvider $cache
+     * @param CacheInterface $cache
      * @param ScopeManager $scopeManager
      * @param string $scopeType
      */
     public function __construct(
         MenuUpdateRepository $repository,
-        CacheProvider $cache,
+        CacheInterface $cache,
         ScopeManager $scopeManager,
         $scopeType
     ) {
