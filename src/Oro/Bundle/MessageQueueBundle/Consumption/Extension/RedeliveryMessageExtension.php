@@ -45,7 +45,16 @@ class RedeliveryMessageExtension extends AbstractExtension
     public function onPreReceived(Context $context)
     {
         $message = $context->getMessage();
-        if (false == $message->isRedelivered()) {
+        if (!$message->isRedelivered()) {
+            return;
+        }
+
+        if ($context->getStatus()) {
+            // There is no sense in proceeding as message status is already known.
+            $context->getLogger()->debug(
+                'Skipping extension as message status is already set.',
+                ['messageId' => $message->getMessageId(), 'status' => $context->getStatus()]
+            );
             return;
         }
 
