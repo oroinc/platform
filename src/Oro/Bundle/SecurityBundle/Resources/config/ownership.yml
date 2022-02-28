@@ -37,10 +37,10 @@ services:
             - { name: oro_service_link, service: oro_security.owner.ownership_metadata_provider }
 
     oro_security.owner.ownership_metadata_provider.cache:
-        parent: oro.cache.abstract
+        parent: oro.data.cache
         public: false
-        calls:
-            - [ setNamespace, [ 'oro_acl_entity_ownership' ] ]
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_acl_entity_ownership' }
 
     oro_security.owner.ownership_config_listener:
         class: Oro\Bundle\SecurityBundle\EventListener\OwnershipConfigListener

@@ -36,6 +36,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -459,6 +460,10 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 'PERMIT' => 6,
                 'UNKNOWN' => 7
             ]);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $entityClassResolver = $this->createMock(EntityClassResolver::class);
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -534,6 +539,10 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $this->assertEquals($expectedResult, $this->extension->decideIsGranting($triggeredMask, $object, $token));
     }
@@ -607,6 +616,10 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
                 new OwnershipMetadata($ownerType, 'owner', 'owner_id')
             );
         }
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $resultMask = $this->extension->adaptRootMask($aceMask, $object);
         $this->assertEquals(
@@ -687,6 +700,13 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function testGetAccessLevelNamesForRoot()
     {
         $object = new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
         $this->assertEquals(
             [
                 0 => 'NONE',

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Owner;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The base class for owner tree providers.
@@ -16,13 +16,10 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
 
     protected const CACHE_KEY = 'data';
 
-    /** @var DatabaseChecker */
-    private $databaseChecker;
+    private DatabaseChecker $databaseChecker;
+    protected CacheInterface $cache;
 
-    /** @var CacheProvider */
-    protected $cache;
-
-    public function __construct(DatabaseChecker $databaseChecker, CacheProvider $cache)
+    public function __construct(DatabaseChecker $databaseChecker, CacheInterface $cache)
     {
         $this->databaseChecker = $databaseChecker;
         $this->cache = $cache;
@@ -41,10 +38,10 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
     /**
      * Calculate subordinated entity ids.
      */
-    protected function buildTree(array $businessUnitIds, $businetUnitClass)
+    protected function buildTree(array $businessUnitIds, string $businessUnitClass): array
     {
         $subordinateBusinessUnitIds = [];
-        $calculatedLevels = array_reverse($this->calculateAdjacencyListLevels($businessUnitIds, $businetUnitClass));
+        $calculatedLevels = array_reverse($this->calculateAdjacencyListLevels($businessUnitIds, $businessUnitClass));
         foreach ($calculatedLevels as $businessUnitIdss) {
             foreach ($businessUnitIdss as $parentBuId => $buId) {
                 $parentBuId = $businessUnitIds[$buId];
@@ -88,7 +85,7 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
      *
      * @return array [level => [business unit id, ...], ...]
      */
-    protected function calculateAdjacencyListLevels($businessUnits, $businessUnitClass)
+    protected function calculateAdjacencyListLevels(array $businessUnits, string $businessUnitClass): array
     {
         $levelsData = [];
         while (!empty($businessUnits)) {
@@ -125,34 +122,22 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearCache(): void
     {
-        $this->cache->deleteAll();
+        $this->cache->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function warmUpCache(): void
     {
-        $this->cache->save(self::CACHE_KEY, $this->loadTree());
+        $this->cache->delete(self::CACHE_KEY);
+        $this->getTree();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTree(): OwnerTreeInterface
     {
-        $tree = $this->cache->fetch(self::CACHE_KEY);
-        if (!$tree) {
-            $tree = $this->loadTree();
-            $this->cache->save(self::CACHE_KEY, $tree);
-        }
-
-        return $tree;
+        return $this->cache->get(self::CACHE_KEY, function () {
+            return $this->loadTree();
+        });
     }
 
     /**

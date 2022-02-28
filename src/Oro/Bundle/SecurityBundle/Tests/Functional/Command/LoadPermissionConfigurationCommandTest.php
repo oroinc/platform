@@ -29,7 +29,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
     protected function tearDown(): void
     {
         $this->provider->warmUpCache();
-        $this->getContainer()->get('oro_security.cache.provider.permission')->deleteAll();
+        $this->getContainer()->get('oro_security.cache.provider.permission')->clear();
 
         parent::tearDown();
     }
