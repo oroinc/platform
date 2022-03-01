@@ -44,7 +44,7 @@ class SetCorsAllowAndExposeHeadersTest extends GetListProcessorTestCase
         $processor->process($this->context);
 
         self::assertEquals(
-            'Content-Type,X-Include',
+            'Authorization,Content-Type,X-Include',
             $this->context->getResponseHeaders()->get('Access-Control-Allow-Headers')
         );
     }
@@ -56,7 +56,7 @@ class SetCorsAllowAndExposeHeadersTest extends GetListProcessorTestCase
         $processor->process($this->context);
 
         self::assertEquals(
-            'Content-Type,X-Include,AllowHeader1',
+            'Authorization,Content-Type,X-Include,AllowHeader1',
             $this->context->getResponseHeaders()->get('Access-Control-Allow-Headers')
         );
     }

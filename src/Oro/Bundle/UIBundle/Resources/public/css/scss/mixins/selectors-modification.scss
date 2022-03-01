@@ -1,0 +1,59 @@
+
+// @return modified selector
+// Use: modify-selector($selector: 'a', $part-before: '~ ') =>  '~ a';
+@function modify-selector($selector, $part-before: null, $part-after: null) {
+    @if ($part-before) {
+        $selector: $part-before + $selector;
+    }
+
+    @if ($part-after) {
+        $selector: $part-after + $selector;
+    }
+
+    @return $selector;
+}
+
+// @return modified list of selectors
+// Use: modify-selector(selectors: 'a , button', $part-before: '~ ') => '~ a, ~ button';
+@function modify-selectors($selectors, $part-before: null, $part-after: null) {
+    @if (type-of($selectors) != 'list') {
+        @warn '$selectors: #{$selectors} must be a list type';
+    }
+
+    $modified-selectors: ();
+    $list-separator: list-separator($selectors);
+    @each $selector in $selectors {
+        $modified-selectors: append(
+            $modified-selectors,
+            modify-selector($selector, $part-before, $part-after),
+            $separator: $list-separator
+        );
+    }
+
+    @return $modified-selectors;
+}
+
+// @return the list of CSS selectors for HTML elements that can receive focus
+// Use: font-get-focusable-selector() => 'a[href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"])'
+@function get-focusable-selectors($whole-list: false, $part-before: null, $part-after: null) {
+    $base: (
+        'a[href]',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        'button:not([disabled])',
+        '.dropdown-menu',
+        '[tabindex]'
+    );
+    $more: (
+        'area[href]',
+        'iframe',
+        '[contentEditable=true]'
+    );
+
+    @if ($whole-list) {
+        @return modify-selectors($base, $part-before, $part-after) + modify-selectors($more, $part-before, $part-after);
+    } @else {
+        @return modify-selectors($base, $part-before, $part-after);
+    }
+}

@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -95,17 +96,25 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
      */
     public function getExceptionType(\Exception $exception)
     {
-        $exception = ExceptionUtil::getProcessorUnderlyingException($exception);
-        $exceptionClass = \get_class($exception);
-        if ($exception instanceof AuthenticationException) {
-            $exceptionClass = AuthenticationException::class;
-        } elseif ($exception instanceof AccessDeniedException
-            || $exception instanceof AccessDeniedHttpException
-        ) {
-            $exceptionClass = AccessDeniedException::class;
+        $underlyingException = ExceptionUtil::getProcessorUnderlyingException($exception);
+
+        if (\get_class($underlyingException) === HttpException::class) {
+            $statusCode = $underlyingException->getStatusCode();
+            if (\array_key_exists($statusCode, Response::$statusTexts)) {
+                return strtolower(Response::$statusTexts[$statusCode]) . ' http exception';
+            }
         }
 
-        return ValueNormalizerUtil::humanizeClassName($exceptionClass, 'Exception');
+        $underlyingExceptionClass = \get_class($underlyingException);
+        if ($underlyingException instanceof AuthenticationException) {
+            $underlyingExceptionClass = AuthenticationException::class;
+        } elseif ($underlyingException instanceof AccessDeniedException
+            || $underlyingException instanceof AccessDeniedHttpException
+        ) {
+            $underlyingExceptionClass = AccessDeniedException::class;
+        }
+
+        return ValueNormalizerUtil::humanizeClassName($underlyingExceptionClass, 'Exception');
     }
 
     /**
@@ -134,7 +143,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
             if ($underlyingException !== $exception && $exception instanceof ExecutionFailedException) {
                 $processorPath = $exception->getProcessorId();
                 $e = $exception->getPrevious();
-                while (null !== $e && $e instanceof ExecutionFailedException) {
+                while ($e instanceof ExecutionFailedException) {
                     $processorPath .= '->' . $e->getProcessorId();
                     $e = $e->getPrevious();
                 }
@@ -145,12 +154,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         return $text;
     }
 
-    /**
-     * @param \Exception $exception
-     *
-     * @return bool
-     */
-    private function isSafeException(\Exception $exception)
+    private function isSafeException(\Exception $exception): bool
     {
         $isSafe = false;
         foreach ($this->safeExceptions as $class) {
@@ -171,12 +175,7 @@ class ExceptionTextExtractor implements ExceptionTextExtractorInterface
         return $isSafe;
     }
 
-    /**
-     * @param \Exception $exception
-     *
-     * @return string
-     */
-    private function getSafeExceptionText(\Exception $exception)
+    private function getSafeExceptionText(\Exception $exception): string
     {
         if ($exception instanceof AccessDeniedException) {
             return $exception->getMessage();

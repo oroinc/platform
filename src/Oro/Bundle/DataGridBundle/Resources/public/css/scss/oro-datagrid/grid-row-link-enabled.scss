@@ -1,0 +1,34 @@
+/* @theme: admin.oro; */
+
+.grid-row-link-enabled {
+    .grid-cell {
+        position: relative;
+
+        .cell-link {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+
+            ~ * {
+                position: relative;
+                // Make elements invisible for events due to pass event to .cell-link
+                pointer-events: none;
+
+                $focusable-selectors: get-focusable-selectors();
+                // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
+                #{$focusable-selectors} {
+                    pointer-events: auto;
+                }
+            }
+
+            $focusable-selectors-after-link: get-focusable-selectors($whole-list: false, $part-before: '~ ');
+            // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
+            @warn $focusable-selectors-after-link;
+            #{$focusable-selectors-after-link} {
+                pointer-events: auto;
+            }
+        }
+    }
+}

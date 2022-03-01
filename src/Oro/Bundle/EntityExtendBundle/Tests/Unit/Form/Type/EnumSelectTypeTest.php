@@ -3,7 +3,11 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
+use Symfony\Component\Form\ChoiceList\View\ChoiceView;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\Test\FormInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -142,5 +146,73 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
             ],
             $resolvedOptions
         );
+    }
+
+    /**
+     * @dataProvider disabledValuesProvider
+     * @param array $choices
+     * @param array|callable $disabledValues
+     */
+    public function testBuildViewDisableChoices(array $choices, $disabledValues): void
+    {
+        $form = $this->createMock(FormInterface::class);
+        $view = new FormView();
+        $priority = 0;
+        $result = [];
+        foreach ($choices as $key => $item) {
+            $data = new TestEnumValue($item, (string)$key, ++$priority, false);
+            $choiceView = new ChoiceView($data, $item, (string)$key);
+            $view->vars['choices'][] = $choiceView;
+
+            if ((is_array($disabledValues) && in_array((string)$key, $disabledValues))
+                || (is_callable($disabledValues) && $disabledValues((string)$key))
+            ) {
+                $choiceView->attr = ['disabled' => 'disabled'];
+            }
+            $result[] = $choiceView;
+        }
+
+        $options = [
+            'disabled_values' => $disabledValues,
+            'excluded_values' => []
+        ];
+
+        $this->type->buildView($view, $form, $options);
+        $returnedChoices = $view->vars['choices'];
+
+        $this->assertSame($result, $returnedChoices);
+    }
+
+    /**
+     * @return array
+     */
+    public function disabledValuesProvider(): array
+    {
+        return [
+            [
+                'choices' => [
+                    '0.5' => '05',
+                    '5' => '5'
+                ],
+                'disabledValues' => ['5'],
+            ],
+            [
+                'choices' => [
+                    'zero point five' => 'zerofive',
+                    'five' => 'five'
+                ],
+                'disabledValues' => ['five'],
+            ],
+            [
+                'choices' => [
+                    '0.5' => '05',
+                    '5' => '5'
+                ],
+                'disabledValues' => static function ($value) {
+                    unset($value);
+                    return false;
+                },
+            ]
+        ];
     }
 }

@@ -282,7 +282,7 @@ define(function(require) {
                     return;
                 }
             } else {
-                exclude = 'a, .dropdown, .skip-row-click, :input';
+                exclude = 'a:not("[data-include]"), .dropdown, .skip-row-click, :input';
                 // if the target is an action element, skip toggling the email
                 if ($target.is(exclude) || $target.parents(exclude).length) {
                     return;

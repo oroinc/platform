@@ -105,16 +105,19 @@
         }
 
         .widget-content {
-            max-width: $dialog-content-widget-content-max-width;
             position: $dialog-content-widget-content-position;
             margin: $dialog-content-inner-offset;
+
+            .flash-messages {
+                max-width: $dialog-content-flash-messages-max-width;
+                min-width: $dialog-content-flash-messages-min-width;
+            }
         }
     }
 
     .ui-dialog-messages {
         padding: $dialog-ui-dialog-messages-inner-offset;
         background: $primary-inverse;
-        max-width: $dialog-ui-dialog-messages-max-width;
 
         &:empty {
             display: none;

@@ -6,14 +6,17 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
 use Oro\Bundle\ImapBundle\Manager\ConnectionControllerManager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\EmailSettingsType;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -147,7 +150,7 @@ class ConnectionController extends AbstractController
         // Check if there are some nested errors
         if ($nestedErrors->count() || null === $form->getData()) {
             return [
-                $this->get(TranslatorInterface::class)->trans('oro.imap.connection.malformed_parameters.error')
+                $this->get('translator')->trans('oro.imap.connection.malformed_parameters.error')
             ];
         }
 
@@ -213,13 +216,13 @@ class ConnectionController extends AbstractController
                     );
                 }
             } catch (\Exception $e) {
-                $this->get('logger')->error(
+                $this->get(LoggerInterface::class)->error(
                     sprintf('Could not retrieve folders via imap because of "%s"', $e->getMessage())
                 );
 
-                $response['errors'] = $this->get(TranslatorInterface::class)->trans(
+                $response['errors'] = [$this->get('translator')->trans(
                     'oro.imap.connection.retrieve_folders.error'
-                );
+                )];
             }
         }
 
@@ -240,8 +243,11 @@ class ConnectionController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
+                LoggerInterface::class,
+                'oro_imap.connector.factory' => ImapConnectorFactory::class,
                 'oro_imap.manager.controller.connection' => ConnectionControllerManager::class,
-                TranslatorInterface::class
+                'translator' => TranslatorInterface::class,
+                'oro_security.encoder.default' => DefaultCrypter::class
             ]
         );
     }

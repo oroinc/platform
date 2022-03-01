@@ -309,6 +309,8 @@ define(function(require) {
         },
 
         enterEditMode: function(cell, fromPreviousCell) {
+            cell.trigger('before-enter-edit-mode');
+
             let existingEditorComponent;
             // if there's previously focused editor, blur it
             if (this._focusedCell && this._focusedCell !== cell) {

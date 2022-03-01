@@ -7,6 +7,10 @@ The current file describes significant changes in the code that may affect the u
 ### Added
 * Added support for Right To Left UI design see more [Right to Left UI Support](https://doc.oroinc.com/frontend/rtl-support.html). 
 
+#### DataGridBundle
+
+* Added `orodatagrid/js/cell-links/builder` to provide behavior row as link. In customizations, it is not recommended to use selectors like `:first-child`, `:nth-child(n)` etc. Because it can affect this functionality. If necessary, wrap the cell content in a container.
+
 #### BatchBundle
 * Added \Oro\Bundle\BatchBundle\Step\CumulativeStepExecutor and \Oro\Bundle\BatchBundle\Step\CumulativeItemStep with writer call for empty items.
 

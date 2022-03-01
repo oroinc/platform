@@ -71,4 +71,18 @@ class SetCorsAllowOriginTest extends GetListProcessorTestCase
 
         self::assertFalse($this->context->getResponseHeaders()->has('Access-Control-Allow-Origin'));
     }
+
+    public function testAllowOriginWhenAllOriginsAreAllowed()
+    {
+        $processor = new SetCorsAllowOrigin($this->getCorsSettings(['https://foo.com', '*']));
+
+        $this->context->getRequestHeaders()->set('Origin', 'https://bar.com');
+        $this->context->setCorsRequest(true);
+        $processor->process($this->context);
+
+        self::assertEquals(
+            'https://bar.com',
+            $this->context->getResponseHeaders()->get('Access-Control-Allow-Origin')
+        );
+    }
 }

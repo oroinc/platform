@@ -20,6 +20,9 @@ class QueryFactory
      */
     private const FAKE_ID = '__fake_id__';
 
+    /** the maximum number of sub-queries in UNION query */
+    private const UNION_QUERY_LIMIT = 100;
+
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
@@ -117,9 +120,11 @@ class QueryFactory
         if (null !== $limit && $limit > 0 && \count($entityIds) > 1) {
             $this->initializeToManyAssociationQueryBuilder($qb, $entityClass, [self::FAKE_ID]);
             $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
-            $rows = $this->getRelatedItemsUnionAllQuery($query, $entityIds, $limit)
-                ->getQuery()
-                ->getScalarResult();
+            $rows = count($entityIds) > self::UNION_QUERY_LIMIT
+                ? $this->getRelatedItemsIdsBySeveralUnionAllQueries($query, $entityIds, $limit)
+                : $this->getRelatedItemsUnionAllQuery($query, $entityIds, $limit)
+                    ->getQuery()
+                    ->getScalarResult();
         } else {
             $this->initializeToManyAssociationQueryBuilder($qb, $entityClass, $entityIds);
             $query = $this->getRelatedItemsIdsQuery($qb, $targetEntityClass, $config);
@@ -127,6 +132,40 @@ class QueryFactory
                 $query->setMaxResults($limit);
             }
             $rows = $query->getScalarResult();
+        }
+
+        return $rows;
+    }
+
+    private function getRelatedItemsIdsBySeveralUnionAllQueries(
+        Query $query,
+        array $entityIds,
+        int $relatedRecordsLimit
+    ): array {
+        $rows = [];
+        $chunkEntityIds = [];
+        $chunkLimit = 0;
+        foreach ($entityIds as $entityId) {
+            $chunkEntityIds[] = $entityId;
+            $chunkLimit++;
+            if ($chunkLimit >= self::UNION_QUERY_LIMIT) {
+                $chunkRows = $this->getRelatedItemsUnionAllQuery($query, $chunkEntityIds, $relatedRecordsLimit)
+                    ->getQuery()
+                    ->getScalarResult();
+                foreach ($chunkRows as $row) {
+                    $rows[] = $row;
+                }
+                $chunkEntityIds = [];
+                $chunkLimit = 0;
+            }
+        }
+        if ($chunkLimit > 0) {
+            $chunkRows = $this->getRelatedItemsUnionAllQuery($query, $chunkEntityIds, $relatedRecordsLimit)
+                ->getQuery()
+                ->getScalarResult();
+            foreach ($chunkRows as $row) {
+                $rows[] = $row;
+            }
         }
 
         return $rows;

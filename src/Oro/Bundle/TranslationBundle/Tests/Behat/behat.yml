@@ -7,5 +7,6 @@ oro_behat_extension:
         - OroFormBundle::FormContext
         - OroConfigBundle::FeatureContext
         - OroDataGridBundle::GridContext
+
       paths:
         - '@OroTranslationBundle/Tests/Behat/Features'

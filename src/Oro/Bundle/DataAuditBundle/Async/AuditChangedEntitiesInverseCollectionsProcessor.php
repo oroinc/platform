@@ -2,18 +2,9 @@
 
 namespace Oro\Bundle\DataAuditBundle\Async;
 
-use Doctrine\Common\Collections\Collection;
-use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\ORM\PersistentCollection;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
-use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentifierHydrator;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
-use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
@@ -30,35 +21,19 @@ use Psr\Log\LoggerInterface;
 class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProcessor implements
     TopicSubscriberInterface
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
+    private JobRunner $jobRunner;
 
-    /**
-     * @var MessageProducerInterface
-     */
-    private $producer;
+    private MessageProducerInterface $producer;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var EntityChangesToAuditEntryConverter
-     */
-    private $entityChangesToAuditEntryConverter;
+    private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
-    /**
-     * @var int
-     */
-    private $batchSize = 500;
+    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
+
+    private int $batchSize = 500;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -182,23 +157,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
                 continue;
             }
 
-            $sourceEntityId = $sourceEntityData['entity_id'];
-            $sourceEntityClass = $sourceEntityData['entity_class'];
-            $sourceEntityManager = $this->doctrine->getManagerForClass($sourceEntityClass);
-            $sourceEntityMeta = $sourceEntityManager->getClassMetadata($sourceEntityClass);
-            $sourceEntity = $sourceEntityManager->find($sourceEntityClass, $sourceEntityId);
-            if (!$sourceEntity) {
-                // the entity may be removed after update and since we are processing stuff in background
-                // it is possible that the update is processed after the real remove was performed.
-                continue;
-            }
-
-            $fieldsData = $this->processEntityAssociationsFromCollection(
-                $sourceEntityMeta,
-                $sourceEntity,
-                $sourceEntityData,
-            );
-
+            $fieldsData = $this->strategyProcessor->processInverseCollections($sourceEntityData);
             if ($fieldsData) {
                 $collectionsData[$sourceKey] = $sourceEntityData + ['fields' => $fieldsData, 'set' => $set];
             }
@@ -208,142 +167,18 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
     }
 
     /**
-     * @param ClassMetadata $sourceEntityMeta
-     * @param ExtendEntityInterface|object $sourceEntity
-     * @param array $sourceEntityData
-     *
-     * @return array|null
-     */
-    private function processEntityAssociationsFromCollection(
-        ClassMetadata $sourceEntityMeta,
-        $sourceEntity,
-        array $sourceEntityData
-    ): ?array {
-        $fieldsData = [];
-        foreach ($sourceEntityMeta->associationMappings as $sourceFieldName => $associationMapping) {
-            $targetEntityClass = $sourceEntityMeta->associationMappings[$sourceFieldName]['targetEntity'];
-            $targetFieldName = $this->getTargetFieldName($sourceEntityMeta, $sourceFieldName);
-            $value = $sourceEntityMeta->getFieldValue($sourceEntity, $sourceFieldName);
-            $hasChangeSet = empty($sourceEntityData['change_set'][$sourceFieldName]);
-
-            /**
-             * $hasChangeSet - indicates whether there are changes.
-             * $value - check the source entity does not belong to any collections.
-             * $targetFieldName - check the unidirectional relation.
-             */
-            if (!$hasChangeSet || !$value || !$targetFieldName) {
-                continue;
-            }
-
-            $entityIds = $this->getEntityIds($targetEntityClass, $value);
-            if (!$entityIds) {
-                continue;
-            }
-
-            $fieldsData[$sourceFieldName] = [
-                'entity_class' => $targetEntityClass,
-                'field_name' => $targetFieldName,
-                'entity_ids' => $entityIds,
-            ];
-        }
-
-        return $fieldsData;
-    }
-
-    /**
-     * @param ClassMetadata $sourceEntityMeta
-     * @param string $sourceFieldName
-     *
-     * @return string
-     */
-    private function getTargetFieldName(ClassMetadata $sourceEntityMeta, string $sourceFieldName): ?string
-    {
-        return $sourceEntityMeta->associationMappings[$sourceFieldName]['inversedBy']
-            ?? $sourceEntityMeta->associationMappings[$sourceFieldName]['mappedBy']
-            ?? null;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param $entity
-     *
-     * @return int[]|string[]
-     */
-    private function getEntityIds(string $entityClass, $entity): array
-    {
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $this->doctrine->getManagerForClass($entityClass);
-        if ($entity instanceof PersistentCollection && !$entity->isInitialized()) {
-            $mapping = $entity->getMapping();
-            $class = $mapping['targetEntity'];
-            $field = $mapping['mappedBy'] ?? null;
-            $memberOf = $mapping['type'] & ClassMetadataInfo::MANY_TO_MANY;
-            if ($field) {
-                return $this->getIdsWithoutHydration($entityManager, $entity, $class, $field, $memberOf);
-            }
-        }
-
-        if ($entity instanceof Collection) {
-            return array_map(fn ($item) => $this->getEntityId($entityManager, $item), $entity->toArray());
-        }
-
-        if (is_object($entity)) {
-            return [$this->getEntityId($entityManager, $entity)];
-        }
-
-        return [];
-    }
-
-    /**
-     * @throws \Doctrine\ORM\Mapping\MappingException
-     */
-    private function getIdsWithoutHydration(
-        EntityManagerInterface $entityManager,
-        PersistentCollection $collection,
-        string $class,
-        string $field,
-        bool $memberOf
-    ): array {
-        $entityManager->getConfiguration()->addCustomHydrationMode('IdentifierHydrator', IdentifierHydrator::class);
-
-        $fieldName = $entityManager->getClassMetadata($class)->getSingleIdentifierFieldName();
-        $select = QueryBuilderUtil::sprintf('e.%s as id', $fieldName);
-        $where = QueryBuilderUtil::sprintf('e.%s', $field);
-
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $entityManager->getRepository($class)->createQueryBuilder('e');
-        $queryBuilder->select($select);
-        if ($memberOf) {
-            $queryBuilder->where($queryBuilder->expr()->isMemberOf(':field', $where));
-        } else {
-            $queryBuilder->where($queryBuilder->expr()->eq($where, ':field'));
-        }
-        $queryBuilder->setParameter('field', $collection->getOwner());
-
-        return $queryBuilder
-            ->getQuery()
-            ->getResult('IdentifierHydrator');
-    }
-
-    /**
-     * @param EntityManagerInterface $em
-     * @param object $entity
-     *
-     * @return mixed
-     */
-    private function getEntityId(EntityManagerInterface $em, $entity)
-    {
-        return $em
-            ->getClassMetadata(ClassUtils::getClass($entity))
-            ->getSingleIdReflectionProperty()
-            ->getValue($entity);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public static function getSubscribedTopics(): array
     {
         return [Topics::ENTITIES_INVERSED_RELATIONS_CHANGED];
+    }
+
+    /**
+     * @param EntityAuditStrategyProcessorInterface $strategyProcessor
+     */
+    public function setStrategyProcessor(EntityAuditStrategyProcessorInterface $strategyProcessor): void
+    {
+        $this->strategyProcessor = $strategyProcessor;
     }
 }

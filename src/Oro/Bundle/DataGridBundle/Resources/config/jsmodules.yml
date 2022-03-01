@@ -100,6 +100,7 @@ dynamic-imports:
         - orodatagrid/js/app/views/board/column-header-view
         - orodatagrid/js/app/views/board/column-view
         - orodatagrid/js/appearance/builder
+        - orodatagrid/js/cell-links/builder
         - orodatagrid/js/datagrid/listener/action-form-listener
         - orodatagrid/js/datagrid/listener/callback-listener
         - orodatagrid/js/datagrid/listener/change-editable-cell-listener

@@ -67,7 +67,7 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
             if (null === $error->getTitle()) {
                 $statusCode = $error->getStatusCode();
                 if (null !== $statusCode && \array_key_exists($statusCode, Response::$statusTexts)) {
-                    $error->setTitle(Response::$statusTexts[$statusCode]);
+                    $error->setTitle(strtolower(Response::$statusTexts[$statusCode]));
                 }
             }
         }

@@ -169,21 +169,21 @@ class TargetConfigExtraBuilder
             }
         }
 
-        $isExpandProductsRequested = false;
+        $isExpandRequested = false;
         if (null !== $expandRelatedEntitiesExtra) {
             if ($expandRelatedEntitiesExtra->isExpandRequested($associationName)) {
-                $isExpandProductsRequested = true;
+                $isExpandRequested = true;
             }
-            $productsExpandRelatedEntitiesExtra = self::buildExpandRelatedEntitiesConfigExtra(
+            $expandRelatedEntitiesExtra = self::buildExpandRelatedEntitiesConfigExtra(
                 $expandRelatedEntitiesExtra,
                 $associationName
             );
-            if (null !== $productsExpandRelatedEntitiesExtra) {
-                $result[] = $productsExpandRelatedEntitiesExtra;
+            if (null !== $expandRelatedEntitiesExtra) {
+                $result[] = $expandRelatedEntitiesExtra;
             }
         }
 
-        if (!$isExpandProductsRequested) {
+        if (!$isExpandRequested) {
             $fieldFilters = null !== $filterFieldsExtra
                 ? $filterFieldsExtra->getFieldFilters()
                 : [];

@@ -183,6 +183,8 @@ services:
         arguments:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.message_producer'
+        calls:
+            - [setStrategyProcessor, ['@oro_dataaudit.strategy_processor.entity_audit_strategy_delegate']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -201,6 +203,7 @@ services:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
         calls:
             - [setAuditConfigProvider,  ['@oro_dataaudit.audit_config_provider']]
+            - [setStrategyProcessor, ['@oro_dataaudit.strategy_processor.entity_audit_strategy_delegate']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -212,6 +215,9 @@ services:
             - '@oro_message_queue.job.runner'
             - '@oro_message_queue.client.message_producer'
             - '@logger'
+            - '@oro_dataaudit.strategy_processor.entity_audit_strategy_delegate'
+        calls:
+            - [setStrategyProcessor, ['@oro_dataaudit.strategy_processor.entity_audit_strategy_delegate']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
@@ -255,3 +261,18 @@ services:
 
     oro_dataaudit.provider.audit_field_type:
         class: 'Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider'
+
+    oro_dataaudit.strategy_processor.entity_audit_strategy_registry:
+        class: 'Oro\Bundle\DataAuditBundle\Strategy\EntityAuditStrategyProcessorRegistry'
+        arguments:
+            - '@oro_dataaudit.strategy_processor.default_entity'
+
+    oro_dataaudit.strategy_processor.default_entity:
+        class: 'Oro\Bundle\DataAuditBundle\Strategy\Processor\DefaultEntityAuditStrategyProcessor'
+        arguments:
+            - '@doctrine'
+
+    oro_dataaudit.strategy_processor.entity_audit_strategy_delegate:
+        class: 'Oro\Bundle\DataAuditBundle\Strategy\EntityAuditStrategyDelegateProcessor'
+        arguments:
+            - '@oro_dataaudit.strategy_processor.entity_audit_strategy_registry'

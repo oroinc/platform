@@ -17,7 +17,6 @@ $dialog-buttonpane-widget-actions-section-offset-left: 8px !default;
 $dialog-buttonpane-action-wrapper-offset-left: 8px !default;
 
 $dialog-ui-dialog-messages-inner-offset: 18px 18px 0 !default;
-$dialog-ui-dialog-messages-max-width: fit-content !default;
 
 $dialog-titlebar-inner-offset: 10px 18px 10px 18px !default;
 $dialog-titlebar-width: 100% !default;
@@ -76,8 +75,10 @@ $dialog-content-overflow: auto !default;
 $dialog-content-flex-shrink: 1 !default;
 $dialog-content-flex-grow: 1 !default;
 
-$dialog-content-widget-content-max-width: fit-content !default;
 $dialog-content-widget-content-position: relative !default;
+
+$dialog-content-flash-messages-max-width: fit-content !default;
+$dialog-content-flash-messages-min-width: 100% !default;
 
 $dialog-body-overflow-y: auto !default;
 $dialog-body-max-height: 400px !default;

@@ -278,6 +278,26 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * Disables (set to false) certain config options
+     * Used instead of manual walking on configuration like "System/ Configuration"
+     *
+     * Example: I disable configuration options:
+     *      | oro_config.setting1 |
+     *      | oro_config.setting2 |
+     *
+     * @Given /^I disable configuration options:$/
+     */
+    public function disableConfigOptions(TableNode $table): void
+    {
+        $configManager = $this->getContainer()->get('oro_config.global');
+        foreach ($table->getRows() as $row) {
+            $configManager->set($row[0], false);
+        }
+
+        $configManager->flush();
+    }
+
+    /**
      * @When /^(?:|I )set configuration property "(?P<key>[^"]+)" to "(?P<value>[^"]+)"$/
      * @param string $key
      * @param string $value

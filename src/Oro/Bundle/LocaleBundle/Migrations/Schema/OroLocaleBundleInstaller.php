@@ -21,7 +21,7 @@ class OroLocaleBundleInstaller implements Installation, ExtendExtensionAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_4_3';
+        return 'v1_5_1';
     }
 
     /**

@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
@@ -109,12 +108,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setParentClassName($parentEntityClass);
         $this->context->setAssociationName($associationName);
 
-        $expectedParentConfigExtras = [
-            new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-            new FilterFieldsConfigExtra(
-                [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-            )
-        ];
+        $expectedParentConfigExtras = [new EntityDefinitionConfigExtra($action)];
         self::assertEquals(
             $expectedParentConfigExtras,
             $this->context->getParentConfigExtras()
@@ -160,12 +154,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setParentConfigExtras([]);
 
-        $expectedParentConfigExtras = [
-            new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-            new FilterFieldsConfigExtra(
-                [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-            )
-        ];
+        $expectedParentConfigExtras = [new EntityDefinitionConfigExtra($action)];
         self::assertEquals(
             $expectedParentConfigExtras,
             $this->context->getParentConfigExtras()
@@ -195,7 +184,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setAssociationName($associationName);
 
         self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
         self::assertFalse($this->context->hasParentConfigExtra('another'));
     }
 
@@ -215,14 +203,10 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             EntityDefinitionConfigExtra::class,
             $this->context->getParentConfigExtra(EntityDefinitionConfigExtra::NAME)
         );
-        self::assertInstanceOf(
-            FilterFieldsConfigExtra::class,
-            $this->context->getParentConfigExtra(FilterFieldsConfigExtra::NAME)
-        );
         self::assertNull($this->context->getParentConfigExtra('another'));
     }
 
-    public function testAddParentConfigExtra()
+    public function testAddAndRemoveParentConfigExtra()
     {
         $action = 'update_relationship';
         $isCollection = true;
@@ -236,28 +220,12 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         $extra = new TestConfigExtra('another');
         $this->context->addParentConfigExtra($extra);
-
         self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
-        self::assertTrue($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
         self::assertSame($extra, $this->context->getParentConfigExtra($extra->getName()));
-    }
 
-    public function testRemoveParentConfigExtra()
-    {
-        $action = 'update_relationship';
-        $isCollection = true;
-        $parentEntityClass = 'Test\Class';
-        $associationName = 'test';
-
-        $this->context->setAction($action);
-        $this->context->setIsCollection($isCollection);
-        $this->context->setParentClassName($parentEntityClass);
-        $this->context->setAssociationName($associationName);
-
-        $this->context->removeParentConfigExtra(FilterFieldsConfigExtra::NAME);
-
+        $this->context->removeParentConfigExtra($extra->getName());
         self::assertTrue($this->context->hasParentConfigExtra(EntityDefinitionConfigExtra::NAME));
-        self::assertFalse($this->context->hasParentConfigExtra(FilterFieldsConfigExtra::NAME));
+        self::assertFalse($this->context->hasParentConfigExtra($extra->getName()));
     }
 
     public function testLoadParentConfig()
@@ -285,12 +253,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                [
-                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new FilterFieldsConfigExtra(
-                        [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                    )
-                ]
+                [new EntityDefinitionConfigExtra($action)]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
 
@@ -332,12 +295,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                [
-                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new FilterFieldsConfigExtra(
-                        [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                    )
-                ]
+                [new EntityDefinitionConfigExtra($action)]
             )
             ->willThrowException($exception);
 
@@ -495,12 +453,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                [
-                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new FilterFieldsConfigExtra(
-                        [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                    )
-                ]
+                [new EntityDefinitionConfigExtra($action)]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
         $this->metadataProvider->expects(self::once())
@@ -556,13 +509,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                [
-                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new FilterFieldsConfigExtra(
-                        [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                    ),
-                    new HateoasConfigExtra()
-                ]
+                [new EntityDefinitionConfigExtra($action), new HateoasConfigExtra()]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
         $this->metadataProvider->expects(self::once())
@@ -626,12 +573,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
                 $parentEntityClass,
                 $version,
                 new RequestType([$requestType]),
-                [
-                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
-                    new FilterFieldsConfigExtra(
-                        [$this->context->getParentClassName() => [$this->context->getAssociationName()]]
-                    )
-                ]
+                [new EntityDefinitionConfigExtra($action)]
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
         $this->metadataProvider->expects(self::once())
@@ -732,20 +674,13 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setHateoas(true);
         self::assertEquals(
-            [
-                new EntityDefinitionConfigExtra('action', false, 'Test\ParentEntity', 'test'),
-                new FilterFieldsConfigExtra(['Test\ParentEntity' => ['test']]),
-                new HateoasConfigExtra()
-            ],
+            [new EntityDefinitionConfigExtra('action'), new HateoasConfigExtra()],
             $this->context->getParentConfigExtras()
         );
 
         $this->context->setHateoas(false);
         self::assertEquals(
-            [
-                new EntityDefinitionConfigExtra('action', false, 'Test\ParentEntity', 'test'),
-                new FilterFieldsConfigExtra(['Test\ParentEntity' => ['test']])
-            ],
+            [new EntityDefinitionConfigExtra('action')],
             $this->context->getParentConfigExtras()
         );
     }

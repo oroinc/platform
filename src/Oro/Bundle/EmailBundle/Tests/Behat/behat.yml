@@ -9,6 +9,7 @@ oro_behat_extension:
         - OroEmailBundle::FeatureContext
         - OroEmailBundle::EmailFeatureToggleContext
         - OroFormBundle::FormContext
+        - OroFormBundle::WysiwygContext
         - OroUserBundle::FeatureContext
         - OroActivityListBundle::ActivityContext
         - OroConfigBundle::FeatureContext
@@ -157,6 +158,15 @@ oro_behat_extension:
 
     Email Page Contexts:
       selector: 'div.activity-context-activity'
+
+    Email Template Default Content:
+      selector: 'textarea[name="oro_email_emailtemplate[translations][default][content]"]'
+
+    Autoresponse Rule Default Content:
+      selector: 'textarea[name="oro_email_autoresponserule[template][new_entity][translations][default][content]"]'
+
+    Email Template Login Absolute Link:
+      selector: 'a.oro_email_template_login_link[href="http://localhost/admin/user/login"]'
 
   pages:
     User Emails:

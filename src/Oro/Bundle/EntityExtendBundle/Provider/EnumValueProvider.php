@@ -36,7 +36,14 @@ class EnumValueProvider
     {
         $nonUniqueEnumTranslations = $this->getEnumChoicesWithNonUniqueTranslation($enumClass);
 
-        return array_flip($nonUniqueEnumTranslations);
+        // array_flip() does not retain the data type of values,
+        // it will convert string value to integer when it is numeric
+        return array_map(
+            static function ($data) {
+                return (string)$data;
+            },
+            array_flip($nonUniqueEnumTranslations)
+        );
     }
 
     /**

@@ -8,6 +8,9 @@ services:
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: 'oro_imap.manager.controller.connection' }
+            - { name: container.service_subscriber, id: 'translator' }
+            - { name: container.service_subscriber, id: 'oro_security.encoder.default' }
+            - { name: container.service_subscriber, id: 'oro_imap.connector.factory' }
 
     Oro\Bundle\ImapBundle\Controller\AbstractAccessTokenController:
         calls:

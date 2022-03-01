@@ -76,6 +76,17 @@ define(function(require) {
             return result.join('&');
         },
 
+        createBlankObject() {
+            const {
+                hasOwnProperty,
+                isPrototypeOf,
+                toString,
+                valueOf
+            } = Object.getOwnPropertyDescriptors(Object.prototype);
+            const blankPrototype = Object.create(null, {hasOwnProperty, isPrototypeOf, toString, valueOf});
+            return Object.create(blankPrototype);
+        },
+
         /**
          * Unpack string to object. Reverse from packToQueryString.
          *
@@ -94,7 +105,7 @@ define(function(require) {
                 if (path.length > 1) {
                     const dir = path.shift();
                     if (typeof root[dir] === 'undefined') {
-                        root[dir] = path[0] === '' ? [] : {};
+                        root[dir] = path[0] === '' ? [] : tools.createBlankObject();
                     }
                     setValue(root[dir], path, value);
                 } else {
@@ -106,7 +117,7 @@ define(function(require) {
                 }
             };
             const nvp = query.split('&');
-            const data = {};
+            const data = tools.createBlankObject();
             for (let i = 0; i < nvp.length; i++) {
                 const pair = nvp[i].split('=');
                 if (pair.length < 2) {

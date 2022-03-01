@@ -10,6 +10,7 @@ use Gaufrette\StreamMode;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -46,6 +47,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->filesystem);
 
         $this->fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $this->protocolValidator);
+        $this->fileManager->setClientMimeTypeMapper(new ClientMimeTypeMapper());
         $this->fileManager->setProtocol(self::TEST_PROTOCOL);
         $this->fileManager->useSubDirectory(true);
         $this->fileManager->setFilesystemMap($filesystemMap);
@@ -438,6 +440,32 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('text/plain', $fileEntity->getMimeType());
         self::assertEquals(9, $fileEntity->getFileSize());
         self::assertNotEquals('testFile.txt', $fileEntity->getFilename());
+    }
+
+    public function testPreUploadForWinZipFile()
+    {
+        $fileEntity = $this->createFileEntity();
+        $file = new UploadedFile(
+            __DIR__ . '/../Fixtures/testFile/test.zip',
+            'original.zip',
+            'application/x-zip-compressed'
+        );
+        $fileEntity
+            ->setEmptyFile(false)
+            ->setFile($file);
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::stringStartsWith(self::TEST_FILE_SYSTEM_NAME . '/'))
+            ->willReturn(false);
+
+        $this->fileManager->preUpload($fileEntity);
+
+        self::assertEquals('original.zip', $fileEntity->getOriginalFilename());
+        self::assertEquals('zip', $fileEntity->getExtension());
+        self::assertEquals('application/zip', $fileEntity->getMimeType());
+        self::assertEquals(123, $fileEntity->getFileSize());
+        self::assertNotEquals('test.zip', $fileEntity->getFilename());
     }
 
     public function testUpload()

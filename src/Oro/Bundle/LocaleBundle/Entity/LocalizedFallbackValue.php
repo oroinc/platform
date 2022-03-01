@@ -17,8 +17,14 @@ use Oro\Bundle\LocaleBundle\Model\ExtendLocalizedFallbackValue;
  *          @ORM\Index(name="idx_string", columns={"string"})
  *      }
  * )
- * @ORM\Entity
- * @Config()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository")
+ * @Config(
+ *      defaultValues={
+ *          "dataaudit"={
+ *              "auditable"=true
+ *          }
+ *      }
+ * )
  */
 class LocalizedFallbackValue extends ExtendLocalizedFallbackValue
 {
@@ -28,6 +34,9 @@ class LocalizedFallbackValue extends ExtendLocalizedFallbackValue
      * @ORM\Column(name="string", type="string", length=255, nullable=true)
      * @ConfigField(
      *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          },
      *          "importexport"={
      *              "excluded"=false
      *          }
@@ -42,6 +51,9 @@ class LocalizedFallbackValue extends ExtendLocalizedFallbackValue
      * @ORM\Column(name="text", type="text", nullable=true)
      * @ConfigField(
      *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          },
      *          "importexport"={
      *              "excluded"=false
      *          }

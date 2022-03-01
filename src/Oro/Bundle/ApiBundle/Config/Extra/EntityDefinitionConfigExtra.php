@@ -30,9 +30,9 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
      * @param bool        $collection      A flag indicates whether a configuration is requested
      *                                     for a list of entities resource or a single entity resource
      * @param string|null $parentClassName The class name of the parent entity
-     *                                     for which the configuration is requested
+     *                                     for which the configuration of a sub-resource is requested
      * @param string|null $associationName The association name of a sub-resource
-     *                                     for which the configuration is requested
+     *                                     for which the configuration of a sub-resource is requested
      */
     public function __construct(
         $action = null,
@@ -64,7 +64,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     }
 
     /**
-     * Gets the class name of the parent entity for which the configuration is requested.
+     * Gets the class name of the parent entity for which the configuration of a sub-resource is requested.
      */
     public function getParentClassName(): ?string
     {
@@ -72,7 +72,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
     }
 
     /**
-     * Gets the association name of a sub-resource for which the configuration is requested.
+     * Gets the association name of a sub-resource for which the configuration of a sub-resource is requested.
      */
     public function getAssociationName(): ?string
     {

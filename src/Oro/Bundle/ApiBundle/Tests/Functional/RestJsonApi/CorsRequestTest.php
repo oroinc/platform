@@ -4,13 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CorsRequestTest extends RestJsonApiTestCase
 {
-    public function methodsProvider()
+    public function methodsProvider(): array
     {
         return [
             ['ANOTHER'],
@@ -38,7 +39,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH, POST, DELETE');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
             'Access-Control-Expose-Headers',
@@ -65,7 +66,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH, DELETE');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
             'Access-Control-Expose-Headers',
@@ -92,7 +93,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
             'Access-Control-Expose-Headers',
@@ -119,7 +120,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
             'Access-Control-Expose-Headers',
@@ -146,7 +147,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
             'Access-Control-Expose-Headers',
@@ -173,7 +174,7 @@ class CorsRequestTest extends RestJsonApiTestCase
         );
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeader($response, 'Access-Control-Allow-Methods', 'OPTIONS, GET, PATCH, POST, DELETE');
-        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Content-Type,X-Include');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Headers', 'Authorization,Content-Type,X-Include');
         self::assertResponseHeader(
             $response,
             'Access-Control-Expose-Headers',
@@ -483,6 +484,33 @@ class CorsRequestTest extends RestJsonApiTestCase
             ['title' => 'bad request http exception'],
             $response
         );
+        self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
+        self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Methods');
+        self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Headers');
+        self::assertResponseHeader(
+            $response,
+            'Access-Control-Expose-Headers',
+            'Location,X-Include-Total-Count,X-Include-Deleted-Count'
+        );
+        self::assertResponseHeaderNotExists($response, 'Access-Control-Max-Age');
+        self::assertResponseHeader($response, 'Access-Control-Allow-Credentials', 'true');
+    }
+
+    public function testCorsRequestWithUnauthorized()
+    {
+        $entityType = $this->getEntityType(TestDepartment::class);
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [],
+            [
+                'HTTP_Origin' => 'https://api.test.com',
+                'HTTP_X-WSSE' => self::generateWsseAuthHeader('NotExistingUser')
+            ],
+            false
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_UNAUTHORIZED);
+        self::assertSame('', $response->getContent());
+        self::assertResponseHeader($response, 'WWW-Authenticate', 'WSSE realm="Secured API", profile="UsernameToken"');
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Methods');
         self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Headers');

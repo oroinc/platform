@@ -76,9 +76,16 @@
                                     {%- set diffFieldValues = diffValue.change_set[diffFieldName] -%}
                                     <li>
                                         {{- oro_field_config_value(diffValue.entity_class, diffFieldName, 'label')|default(diffFieldName)|trans -}}:
-                                        <s>{{- AuditMacro.renderFieldValue(diffFieldValues|first) -}}</s>
-                                        {%- if diffFieldValues|first is not empty and diffFieldValues|last  is not empty -%}&nbsp;{% endif %}
-                                        {{- AuditMacro.renderFieldValue(diffFieldValues|last) -}}
+                                        {% if 'added' not in allowedDiffTypes %}{# old values #}
+                                            <s>{{- AuditMacro.renderFieldValue(diffFieldValues|first) -}}</s>
+                                            {%- if diffFieldValues|first is not empty and diffFieldValues|last is not empty -%}&nbsp;{% endif %}
+                                        {% elseif 'removed' not in allowedDiffTypes %}{# new values #}
+                                            {{- AuditMacro.renderFieldValue(diffFieldValues|last) -}}
+                                        {% else %}{# preserve the original output #}
+                                            <s>{{- AuditMacro.renderFieldValue(diffFieldValues|first) -}}</s>
+                                            {%- if diffFieldValues|first is not empty and diffFieldValues|last  is not empty -%}&nbsp;{% endif %}
+                                            {{- AuditMacro.renderFieldValue(diffFieldValues|last) -}}
+                                        {% endif %}
                                     </li>
                                 {%- endfor -%}
                             </ul>
