@@ -1,7 +1,6 @@
 search:
     Oro\Bundle\TagBundle\Entity\Tag:
         alias:                          oro_tag
-        title_fields:                   [name]
         search_template:                '@OroTag/Search/result.html.twig'
         route:
             name:                       oro_tag_search
@@ -15,7 +14,6 @@ search:
 
     Oro\Bundle\TagBundle\Entity\Taxonomy:
         alias:                          oro_taxonomy
-        title_fields:                   [name]
         search_template:                '@OroTag/Search/result.html.twig'
         route:
             name:                       oro_taxonomy_view

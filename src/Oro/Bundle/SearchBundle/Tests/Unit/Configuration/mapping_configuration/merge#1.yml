@@ -2,8 +2,6 @@ configs:
     -
         Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
             alias: test_alias
-            title_fields:
-                - name
             route:
                 name: route_name
                 parameters:
@@ -30,8 +28,6 @@ configs:
                                         - email
     -
         Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
-            title_fields:
-                - name
             route:
                 name: route_name
                 parameters:
@@ -55,8 +51,6 @@ configs:
 expected:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
       alias: test_alias
-      title_fields:
-          - name
       route:
           name: route_name
           parameters:

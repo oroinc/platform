@@ -1,7 +1,6 @@
 search:
     Oro\Bundle\UserBundle\Entity\User:
         alias:                          oro_user
-        title_fields:                   [username]
         route:
             name:                       oro_user_view
             parameters:
@@ -66,7 +65,6 @@ search:
                         target_fields: [email]
     Oro\Bundle\UserBundle\Entity\Role:
         alias:                          oro_access_role
-        title_fields:                   [label]
         search_template:                '@OroUser/Role/Search/result.html.twig'
         route:
             name:                       oro_user_role_index

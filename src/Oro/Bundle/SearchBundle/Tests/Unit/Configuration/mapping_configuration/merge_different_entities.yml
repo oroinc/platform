@@ -2,8 +2,6 @@ configs:
     -
         Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
             alias: test_alias
-            title_fields:
-                - name
             search_template: search_template.html.twig
             fields:
                 -
@@ -14,8 +12,6 @@ configs:
     -
         Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\AnotherItem:
             alias: another_test_alias
-            title_fields:
-                - name
             search_template: another_search_template.html.twig
             fields:
                 -
@@ -40,8 +36,6 @@ configs:
 expected:
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Item:
         alias: test_alias
-        title_fields:
-            - name
         search_template: search_template.html.twig
         label: ~
         mode: normal
@@ -54,8 +48,6 @@ expected:
                     - name
     Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\AnotherItem:
         alias: another_test_alias
-        title_fields:
-            - name
         search_template: another_search_template.html.twig
         label: ~
         mode: normal

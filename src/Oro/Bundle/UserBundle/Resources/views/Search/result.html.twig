@@ -24,7 +24,7 @@
     {% endif %}
 {% endblock %}
 
-{% set title = entity ? entity|oro_format_name : indexer_item.recordTitle %}
+{% set title = indexer_item.selectedData.name %}
 {% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}
 
 {% set entityInfo = [

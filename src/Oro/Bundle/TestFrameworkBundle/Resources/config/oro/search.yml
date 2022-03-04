@@ -49,7 +49,6 @@ search:
     Oro\Bundle\TestFrameworkBundle\Entity\Product:
         label: Test Search Bundle Product
         alias: oro_product_test
-        title_fields: [name]
         search_template: '@OroSearch/Test/searchResult.html.twig'
         route:
             name: oro_search_results

@@ -473,22 +473,3 @@ entity_config:
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
-                title_field:
-                    options:
-                        value_type:         boolean
-                        allowed_type:       [string]
-                        required_property:
-                            config_id:
-                                scope:      extend
-                            code:           owner
-                            value:          Custom
-                    form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
-                        options:
-                            choices:
-                                No:         false
-                                Yes:        true
-                            placeholder:    false
-                            block:          other
-                            label:          oro.entity_extend.entity_config.search.field.items.title_field
-                            tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip

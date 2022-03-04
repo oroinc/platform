@@ -13,6 +13,9 @@ use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Grid extension that prepares data for search results grid
+ */
 class SearchResultsExtension extends AbstractExtension
 {
     const TYPE_PATH  = '[columns][entity][type]';
@@ -67,8 +70,6 @@ class SearchResultsExtension extends AbstractExtension
                     return new ResultItem(
                         $entityName,
                         $recordId,
-                        null,
-                        null,
                         null,
                         [],
                         $this->mapper->getEntityConfig($entityName)

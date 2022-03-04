@@ -37,21 +37,18 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
             new Item(
                 'OroTestBundle:test',
                 1,
-                'test title first',
                 'http://example.com',
                 []
             ),
             new Item(
                 'OroTestBundle:test',
                 2,
-                'test title second',
                 'http://example.com',
                 []
             ),
             new Item(
                 'OroTestBundle:test',
                 3,
-                'test title third',
                 'http://example.com',
                 []
             )
@@ -173,7 +170,6 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $item = new Item(
             'OroTestBundle:test',
             4,
-            'test title third',
             'http://example.com',
             []
         );
@@ -188,7 +184,6 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $item = new Item(
             'OroTestBundle:test',
             4,
-            'test title third',
             'http://example.com',
             []
         );

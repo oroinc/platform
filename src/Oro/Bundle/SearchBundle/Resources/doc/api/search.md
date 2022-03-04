@@ -26,9 +26,9 @@ Example:
 
 ## FIELDS
 
-### entityTitle
+### entityName
 
-The title of an entity associated with a search record.
+The name of an entity associated with a search record.
 
 ### entity
 

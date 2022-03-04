@@ -19,6 +19,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
             $this->mappingProvider,
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
+            $this->nameResolver,
             $this->dispatcher,
             $this->htmlTagHelper
         );
@@ -47,6 +48,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
         $expectedMapping = [
             'text'    => $this->clearTextData(
                 [
+                    Indexer::NAME_FIELD          => $expectedProductName,
                     'name'                       => $expectedProductName,
                     'description'                => $productDescription,
                     'manufacturer'               => $manufacturerName,

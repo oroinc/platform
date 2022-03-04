@@ -49,6 +49,7 @@ services:
             - '@oro_search.provider.search_mapping'
             - '@property_accessor'
             - '@oro_search.handler.type_cast.type_casting_handler_registry'
+            - '@oro_entity.entity_name_resolver'
             - '@event_dispatcher'
             - '@oro_ui.html_tag_helper'
 
@@ -70,7 +71,7 @@ services:
     oro_search.formatter.result_formatter:
         class: Oro\Bundle\SearchBundle\Formatter\ResultFormatter
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.doctrine_helper'
 
     oro_search.formatter.datetime_formatter:
         class: Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter
@@ -82,7 +83,6 @@ services:
             - '@router'
             - '@oro_search.mapper'
             - '@doctrine'
-            - '@oro_entity.entity_name_resolver'
             - '@oro_entity_config.config_manager'
             - '@translator'
         tags:

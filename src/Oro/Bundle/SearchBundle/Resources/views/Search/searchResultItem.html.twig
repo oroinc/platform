@@ -6,7 +6,7 @@
                 <a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>
                 {%- endif -%}
                     {% include '@OroAttachment/Twig/picture.html.twig' with {
-                        sources: showImage and image ? oro_filtered_picture_sources(image, 'avatar_med') : asset('bundles/oroui/img/info-' ~ iconType|default('user') ~ '.png'),
+                        sources: showImage|default(false) and image|default(null) ? oro_filtered_picture_sources(image, 'avatar_med') : asset('bundles/oroui/img/info-' ~ iconType|default('user') ~ '.png'),
                         filter: 'avatar_med',
                         img_attrs: { alt: title }
                     } %}

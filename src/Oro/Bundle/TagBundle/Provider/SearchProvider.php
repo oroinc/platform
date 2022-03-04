@@ -14,6 +14,9 @@ use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides list of entities related to the specific tag
+ */
 class SearchProvider extends ResultStatisticsProvider
 {
     /**
@@ -70,7 +73,6 @@ class SearchProvider extends ResultStatisticsProvider
             $results[]  = new Item(
                 $entityName,
                 $item['recordId'],
-                null,
                 null,
                 [],
                 $this->mapper->getEntityConfig($entityName)

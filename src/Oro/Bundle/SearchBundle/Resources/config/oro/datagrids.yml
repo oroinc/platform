@@ -2,6 +2,9 @@ datagrids:
     search-grid:
         source:
             type: search
+            query:
+                select:
+                    - text.system_entity_name as name
         columns:
             entity:
                 label: Item

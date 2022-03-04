@@ -21,7 +21,6 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
 
     private array $expectedConfig = [
         'Oro\TestBundle\Entity\Test'   => [
-            'title_fields' => ['name', 'second'],
             'fields'       => [
                 [
                     'name'          => 'name',
@@ -43,7 +42,6 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         'Oro\TestBundle\Entity\Custom' => [
             'alias'           => 'testTable',
             'label'           => 'custom',
-            'title_fields'    => ['string'],
             'route'           => [
                 'name'       => 'oro_entity_view',
                 'parameters' => [
@@ -79,7 +77,6 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
     {
         $mappingConfig = [
             'Oro\TestBundle\Entity\Test' => [
-                'title_fields' => ['name'],
                 'fields' => [['name' => 'name', 'target_type' => 'text', 'target_fields' => ['name']]]
             ]
         ];
@@ -96,7 +93,6 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $testEntitySecondField  = new FieldConfigId('search', 'Oro\TestBundle\Entity\Test', 'second', 'string');
         $testEntitySecondConfig = new Config($testEntitySecondField);
         $testEntitySecondConfig->set('searchable', true);
-        $testEntitySecondConfig->set('title_field', true);
         $testEntitySearchConfigs = [$testEntityFirstFieldConfig, $testEntitySecondConfig];
 
         $customEntityConfigId = new EntityConfigId('extend', 'Oro\TestBundle\Entity\Custom');
@@ -114,7 +110,6 @@ class BeforeMapObjectSearchListenerTest extends \PHPUnit\Framework\TestCase
         $customEntitySecondField = new FieldConfigId('search', 'Oro\TestBundle\Entity\Custom', 'string', 'string');
         $customEntitySecondConfig = new Config($customEntitySecondField);
         $customEntitySecondConfig->set('searchable', true);
-        $customEntitySecondConfig->set('title_field', true);
         $customEntitySearchConfigs = [$customEntityFirstFieldConfig, $customEntitySecondConfig];
         $extendConfigs = [$testEntityConfig, $customEntityConfig];
         $searchProvider = $this->createMock(ConfigProvider::class);

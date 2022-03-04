@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Datagrid\Datasource;
 
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchIterableResult;
+use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\IndexerQuery;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -15,7 +16,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class SearchIterableResultTest extends SearchBundleWebTestCase
 {
-    private $expectedRecordTitles = [
+    private $expectedNames = [
         'item1@mail.com 0123-456100',
         'item2@mail.com 200987654',
         'item3@mail.com 0123-456300',
@@ -45,20 +46,26 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
     {
         $searchQuery = new Query();
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $searchQuery->from($alias)->getCriteria()->orderBy(['stringValue' => Criteria::ASC]);
+        $searchQuery
+            ->addSelect('text.' . Indexer::NAME_FIELD)
+            ->from($alias)
+            ->getCriteria()->orderBy(['stringValue' => Criteria::ASC]);
 
         $result = new SearchIterableResult(
             new IndexerQuery(self::getContainer()->get('oro_search.index'), $searchQuery)
         );
 
-        $this->assertAllRecordTitles($result);
+        $this->assertAllRecordNames($result);
     }
 
     public function testWithSmallBufferSize()
     {
         $searchQuery = new Query();
         $alias = $this->getSearchObjectMapper()->getEntityAlias(Item::class);
-        $searchQuery->from($alias)->getCriteria()->orderBy(['stringValue' => Criteria::ASC]);
+        $searchQuery
+            ->addSelect('text.' . Indexer::NAME_FIELD)
+            ->from($alias)
+            ->getCriteria()->orderBy(['stringValue' => Criteria::ASC]);
 
         $result = new SearchIterableResult(
             new IndexerQuery(self::getContainer()->get('oro_search.index'), $searchQuery)
@@ -66,16 +73,16 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
 
         $result->setBufferSize(2);
 
-        $this->assertAllRecordTitles($result);
+        $this->assertAllRecordNames($result);
     }
 
-    private function assertAllRecordTitles(SearchIterableResult $result)
+    private function assertAllRecordNames(SearchIterableResult $result)
     {
         $items = iterator_to_array($result);
-        $recordTitles = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {
-            return $item->getRecordTitle();
+        $recordNames = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {
+            return $item->getSelectedData()[Indexer::NAME_FIELD];
         }, $items);
 
-        $this->assertEquals($this->expectedRecordTitles, $recordTitles);
+        $this->assertEquals($this->expectedNames, $recordNames);
     }
 }

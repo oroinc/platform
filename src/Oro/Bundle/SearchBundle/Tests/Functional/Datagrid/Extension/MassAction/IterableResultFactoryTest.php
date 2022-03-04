@@ -115,14 +115,14 @@ class IterableResultFactoryTest extends SearchBundleWebTestCase
         $this->assertRecordIds([$firstItem->getId(), $seventhItem->getId()], $iterableResult);
     }
 
-    private function assertRecordIds(array $expectedRecordTitles, IterableResultInterface $result)
+    private function assertRecordIds(array $expectedRecordIds, IterableResultInterface $result)
     {
         $items = iterator_to_array($result);
-        $recordTitles = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {
+        $recordIds = array_map(function (\Oro\Bundle\SearchBundle\Query\Result\Item $item) {
             return $item->getRecordId();
         }, $items);
 
-        $this->assertEquals($expectedRecordTitles, $recordTitles);
+        $this->assertEquals($expectedRecordIds, $recordIds);
     }
 
     private function getFactory(): IterableResultFactoryInterface
