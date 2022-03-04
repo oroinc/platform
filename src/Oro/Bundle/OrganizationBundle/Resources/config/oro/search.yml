@@ -2,7 +2,6 @@ search:
     Oro\Bundle\OrganizationBundle\Entity\Organization:
         alias:                          oro_organization
         search_template:                '@OroOrganization/Search/organizationResult.html.twig'
-        title_fields:                   [name]
         fields:
             -
                 name:                   id
@@ -16,7 +15,6 @@ search:
     Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
         alias:                          oro_business_unit
         search_template:                '@OroOrganization/Search/businessUnitResult.html.twig'
-        title_fields:                   [name]
         fields:
             -
                 name:                   id

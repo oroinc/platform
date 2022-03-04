@@ -10,20 +10,20 @@ class SearchItem
     private string $id;
     private string $entityClass;
     private string $entityId;
-    private ?string $entityTitle;
+    private ?string $entityName;
     private ?string $entityUrl;
 
     public function __construct(
         string $id,
         string $entityClass,
         string $entityId,
-        ?string $entityTitle,
+        ?string $entityName,
         ?string $entityUrl
     ) {
         $this->id = $id;
         $this->entityClass = $entityClass;
         $this->entityId = $entityId;
-        $this->entityTitle = $entityTitle;
+        $this->entityName = $entityName;
         $this->entityUrl = $entityUrl;
     }
 
@@ -52,11 +52,11 @@ class SearchItem
     }
 
     /**
-     * Gets a title of an entity associated with a search record.
+     * Gets a name of an entity associated with a search record.
      */
-    public function getEntityTitle(): ?string
+    public function getEntityName(): ?string
     {
-        return $this->entityTitle;
+        return $this->entityName;
     }
 
     /**

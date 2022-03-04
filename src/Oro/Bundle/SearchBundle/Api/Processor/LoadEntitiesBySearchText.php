@@ -116,7 +116,7 @@ class LoadEntitiesBySearchText implements ProcessorInterface
                 sprintf('%s-%s', $entityType, $entityId),
                 $entityClass,
                 $entityId,
-                $record->getRecordTitle(),
+                $record->getSelectedData()['name'],
                 $record->getRecordUrl()
             );
         }

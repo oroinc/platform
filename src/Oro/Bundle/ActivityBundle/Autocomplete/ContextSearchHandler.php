@@ -156,7 +156,8 @@ class ContextSearchHandler implements ConverterInterface
             $items[] = new Item(
                 $target['entity'],
                 $target['id'],
-                $target['title']
+                null,
+                $target
             );
         }
 
@@ -174,7 +175,7 @@ class ContextSearchHandler implements ConverterInterface
         $this->dispatcher->dispatch(new PrepareResultItemEvent($item), PrepareResultItemEvent::EVENT_NAME);
 
         /** @var Item $item */
-        $text      = $item->getRecordTitle();
+        $text      = $item->getSelectedData()['name'];
         $className = $item->getEntityName();
 
         if (strlen(trim($text)) === 0) {
@@ -283,7 +284,7 @@ class ContextSearchHandler implements ConverterInterface
         $qb
             ->addSelect('id', 'id', Types::INTEGER)
             ->addSelect('entityClass', 'entity')
-            ->addSelect('entityTitle', 'title');
+            ->addSelect('entityName', 'name');
         foreach ($groupedTargets as $entityClass => $ids) {
             $nameDql = $this->nameResolver->prepareNameDQL(
                 $this->nameResolver->getNameDQL($entityClass, 'e'),
@@ -294,7 +295,7 @@ class ContextSearchHandler implements ConverterInterface
                 ->select(
                     'e.id AS id',
                     (string)$subQb->expr()->literal($entityClass) . ' AS entityClass',
-                    $nameDql . ' AS entityTitle'
+                    $nameDql . ' AS entityName'
                 );
             $subQb->where($subQb->expr()->in('e.id', $ids));
             $qb->addSubQuery($subQb->getQuery());

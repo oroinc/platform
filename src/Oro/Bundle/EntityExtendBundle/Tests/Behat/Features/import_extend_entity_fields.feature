@@ -33,7 +33,6 @@ Feature: Import extend entity fields
     And I see view.is_displayable column
     And I see view.priority column
     And I see search.searchable column
-    And I see search.title_field column
     And I see dataaudit.auditable column
     And I see extend.precision column
     And I see extend.scale column

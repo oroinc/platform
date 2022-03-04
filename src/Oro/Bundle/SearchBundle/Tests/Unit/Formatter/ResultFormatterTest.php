@@ -3,13 +3,10 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Formatter;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
-use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Category;
@@ -17,29 +14,18 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Formatter\Stub\Product;
 
 class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
     private array $productStubs;
     private array $categoryStubs;
 
     private function prepareEntityManager()
     {
-        $configuration = $this->createMock(Configuration::class);
-        $configuration->expects($this->any())
-            ->method('getDefaultQueryHints')
-            ->willReturn([]);
-        $configuration->expects($this->any())
-            ->method('isSecondLevelCacheEnabled')
-            ->willReturn(false);
-
-        $this->entityManager = $this->getMockBuilder(EntityManager::class)
+        $this->doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getMetadataFactory', 'getRepository', 'getConfiguration'])
+            ->onlyMethods(['getEntityMetadataForClass', 'getSingleEntityIdentifierFieldName', 'getEntityRepository'])
             ->getMock();
-        $this->entityManager->expects($this->any())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
     }
 
     private function prepareStubData(): array
@@ -88,13 +74,16 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         $reflectionProperty->setAccessible(true);
         $categoryMetadata->reflFields['id'] = $reflectionProperty;
 
-        $stubMetadata = new ClassMetadataFactory();
-        $stubMetadata->setMetadataFor(Product::getEntityName(), $productMetadata);
-        $stubMetadata->setMetadataFor(Category::getEntityName(), $categoryMetadata);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [Product::getEntityName(), true, $productMetadata],
+                [Category::getEntityName(), true, $categoryMetadata],
+            ]);
 
-        $this->entityManager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->willReturn($stubMetadata);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->willReturn('id');
 
         return [
             Product::getEntityName()  => $productEntities,
@@ -106,9 +95,9 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $query = $this->getMockForAbstractClass(
             AbstractQuery::class,
-            [$this->entityManager],
+            [],
             '',
-            true,
+            false,
             true,
             true,
             ['getResult']
@@ -119,12 +108,12 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 
         $queryBuilder = $this->getMockBuilder(QueryBuilder::class)
             ->onlyMethods(['where', 'getQuery', 'setParameter'])
-            ->setConstructorArgs([$this->entityManager])
+            ->disableOriginalConstructor()
             ->getMock();
 
         $queryBuilder->expects($this->once())
             ->method('where')
-            ->with(new Func('e.id IN', ':entityIds'))
+            ->with('e.id IN (:entityIds)')
             ->willReturnSelf();
         $queryBuilder->expects($this->once())
             ->method('setParameter')
@@ -156,8 +145,8 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
         );
 
         // entity manager behaviour
-        $this->entityManager->expects($this->any())
-            ->method('getRepository')
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
             ->willReturnMap([
                 [Product::getEntityName(), $productRepository],
                 [Category::getEntityName(), $categoryRepository],
@@ -206,7 +195,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 
         $indexerRows = $this->getIndexerRows();
 
-        $resultFormatter = new ResultFormatter($this->entityManager);
+        $resultFormatter = new ResultFormatter($this->doctrineHelper);
         $actualResult = $resultFormatter->getResultEntities($indexerRows);
 
         $this->assertEquals($expectedResult, $actualResult);
@@ -219,7 +208,7 @@ class ResultFormatterTest extends \PHPUnit\Framework\TestCase
 
         $indexerRows = $this->getIndexerRows();
 
-        $resultFormatter = new ResultFormatter($this->entityManager);
+        $resultFormatter = new ResultFormatter($this->doctrineHelper);
         $actualResult = $resultFormatter->getOrderedResultEntities($indexerRows);
 
         $expectedResult = $this->getOrderedEntities();

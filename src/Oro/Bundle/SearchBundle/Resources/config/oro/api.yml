@@ -45,7 +45,7 @@ api:
             fields:
                 id:
                     data_type: integer
-                entityTitle:
+                entityName:
                     data_type: string
                 entity:
                     data_type: nestedAssociation

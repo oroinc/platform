@@ -144,18 +144,6 @@ abstract class AbstractIndexer implements IndexerInterface
     }
 
     /**
-     * Get entity string
-     *
-     * @param object $entity
-     *
-     * @return string
-     */
-    protected function getEntityTitle($entity)
-    {
-        return $this->entityNameResolver->getName($entity);
-    }
-
-    /**
      * @param object|array $entity
      * @return array
      */

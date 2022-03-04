@@ -7,7 +7,6 @@ search:
             name: oro_email_thread_view
             parameters:
                 id: email.id
-        title_fields: [email.subject]
         fields:
             -
                 name: email

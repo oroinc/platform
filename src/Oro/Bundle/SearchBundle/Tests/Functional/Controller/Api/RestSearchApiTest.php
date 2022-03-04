@@ -56,13 +56,10 @@ class RestSearchApiTest extends SearchBundleWebTestCase
         $this->assertEquals($response['records_count'], $result['records_count']);
         $this->assertEquals($response['count'], $result['count']);
 
-        // remove ID references
-        $recordsRequired = !empty($response['rest']['data'][0]['record_string']);
+        // remove ID references and data
         foreach (array_keys($result['data']) as $key) {
             unset($result['data'][$key]['record_id']);
-            if (!$recordsRequired) {
-                unset($result['data'][$key]['record_string']);
-            }
+            unset($result['data'][$key]['selected_data']);
         }
 
         $this->assertResultHasItems($response['rest']['data'], $result['data']);
