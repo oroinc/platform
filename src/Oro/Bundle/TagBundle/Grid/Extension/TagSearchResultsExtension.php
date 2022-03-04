@@ -13,6 +13,9 @@ use Oro\Bundle\SearchBundle\Formatter\ResultFormatter;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Grid extension that prepares data for tag search results grid
+ */
 class TagSearchResultsExtension extends AbstractExtension
 {
     const TYPE_PATH  = '[columns][entity][type]';
@@ -70,6 +73,7 @@ class TagSearchResultsExtension extends AbstractExtension
                     $entityId,
                     null,
                     null,
+                    [],
                     $entityConfig
                 );
             },

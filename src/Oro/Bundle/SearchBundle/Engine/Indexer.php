@@ -10,6 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Security\SecurityProvider;
 use Oro\Bundle\SecurityBundle\Search\AclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Search index accessor class.
@@ -21,6 +22,7 @@ use Oro\Bundle\SecurityBundle\Search\AclHelper;
 class Indexer
 {
     const TEXT_ALL_DATA_FIELD   = 'all_text';
+    const NAME_FIELD            = 'system_entity_name';
 
     const RELATION_ONE_TO_ONE   = 'one-to-one';
     const RELATION_MANY_TO_MANY = 'many-to-many';
@@ -123,6 +125,10 @@ class Indexer
         $query = $this->select();
         $criteria = $query->getCriteria();
 
+        $nameField = Criteria::implodeFieldTypeName(Query::TYPE_TEXT, self::NAME_FIELD);
+        QueryBuilderUtil::checkField($nameField);
+
+        $query->addSelect($nameField . ' as name');
         $query->from($from ?: '*');
 
         $searchString = trim($searchString);

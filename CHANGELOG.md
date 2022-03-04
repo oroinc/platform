@@ -20,6 +20,9 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
   to provider image sources to be used in <picture> tag.
 
+#### LocaleBundle
+* Added entity name provider for `Locale` entity
+
 #### MessageQueue Component
 * Added `Oro\Component\MessageQueue\Topic\TopicInterface` to declare topic name, description, message default priority 
   and message body structure for the MQ topics.
@@ -59,6 +62,11 @@ The current file describes significant changes in the code that may affect the u
 * Moved JSON decoding of message body to transport level `Oro\Component\MessageQueue\Transport\MessageConsumerInterface` - 
   to `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer`.
 * Added the validation of message body to `Oro\Component\MessageQueue\Client\MessageProducer` using `Oro\Component\MessageQueue\Client\MessageBodyResolverInterface`.
+
+#### SearchBundle
+* Entity title is now stored as a regular index text field called `system_entity_name`
+* All entities presented in the search index now have proper entity name providers
+* You have to recreate indices and run full indexation of backend data using `bin/console oro:elasticsearch:create-standard-indexes` and `bin/console oro:search:reindex --scheduled` commands
 
 ### Removed
 
