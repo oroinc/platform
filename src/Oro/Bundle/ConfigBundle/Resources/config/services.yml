@@ -13,9 +13,9 @@ services:
 
     oro_config.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [setNamespace, [ 'oro_config' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_config' }
 
     oro_config.scope_manager.abstract:
         abstract: true

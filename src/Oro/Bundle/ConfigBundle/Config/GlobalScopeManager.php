@@ -9,26 +9,17 @@ class GlobalScopeManager extends AbstractScopeManager
 {
     public const SCOPE_NAME = 'app';
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopedEntityName()
+    public function getScopedEntityName(): string
     {
         return self::SCOPE_NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopeId()
+    public function getScopeId(): ?int
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getScopeIdFromEntity($entity)
+    public function getScopeIdFromEntity($entity): int
     {
         return 0;
     }
