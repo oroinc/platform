@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Twig\Sandbox;
 
-use Doctrine\Common\Cache\Cache;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The base class to provides cached configuration for the sandboxed TWIG templates renderer.
@@ -13,51 +13,31 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
     private const DEFAULT_FORMATTER = 'default_formatter';
     private const RELATED_ENTITY    = 'related_entity_name';
 
-    /** @var VariablesProvider */
-    private $variablesProvider;
+    private VariablesProvider $variablesProvider;
+    private CacheInterface $cache;
+    private string $configCacheKey;
+    private ?array $configuration = null;
+    private ?array $systemVariables = null;
+    private array $entityVariableProcessors = [];
 
-    /** @var Cache */
-    private $cache;
-
-    /** @var string */
-    private $configCacheKey;
-
-    /** @var array */
-    private $configuration;
-
-    /** @var array */
-    private $systemVariables;
-
-    /** @var array */
-    private $entityVariableProcessors = [];
-
-    public function __construct(VariablesProvider $variablesProvider, Cache $cache, string $configCacheKey)
+    public function __construct(VariablesProvider $variablesProvider, CacheInterface $cache, string $configCacheKey)
     {
         $this->variablesProvider = $variablesProvider;
         $this->cache = $cache;
         $this->configCacheKey = $configCacheKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration(): array
     {
         if (null === $this->configuration) {
-            $config = $this->cache->fetch($this->configCacheKey);
-            if (false === $config) {
-                $config = $this->loadConfiguration();
-                $this->cache->save($this->configCacheKey, $config);
-            }
-            $this->configuration = $config;
+            $this->configuration = $this->cache->get($this->configCacheKey, function () {
+                return $this->loadConfiguration();
+            });
         }
 
         return $this->configuration;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSystemVariableValues(): array
     {
         if (null === $this->systemVariables) {
@@ -67,9 +47,6 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
         return $this->systemVariables;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getEntityVariableProcessors(string $entityClass): array
     {
         if (!isset($this->entityVariableProcessors[$entityClass])) {
@@ -80,9 +57,6 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
         return $this->entityVariableProcessors[$entityClass];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function clearCache(): void
     {
         $this->cache->delete($this->configCacheKey);
