@@ -587,10 +587,10 @@ services:
             - '@property_accessor'
 
     oro_entity.entity_structure_cache:
-        parent: oro.cache.abstract
+        parent: oro.data.cache
         public: false
-        calls:
-            - [ setNamespace, [ 'oro_entity_structure' ] ]
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_structure' }
 
     oro_entity.listener.clear_entity_structure_cache:
         class: Oro\Bundle\EntityBundle\EventListener\ClearEntityStructureCacheListener

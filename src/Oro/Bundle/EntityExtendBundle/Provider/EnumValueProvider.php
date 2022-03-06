@@ -53,18 +53,7 @@ class EnumValueProvider
      */
     public function getEnumChoicesWithNonUniqueTranslation(string $enumClass): array
     {
-        if (!$this->enumTranslationCache->contains($enumClass)) {
-            $result = [];
-            $values = $this->getEnumValueRepository($enumClass)->getValues();
-            foreach ($values as $enum) {
-                $result[$enum->getId()] = $enum->getName();
-            }
-            $this->enumTranslationCache->save($enumClass, $result);
-        } else {
-            $result = $this->enumTranslationCache->fetch($enumClass);
-        }
-
-        return $result;
+        return $this->enumTranslationCache->get($enumClass, $this->getEnumValueRepository($enumClass));
     }
 
     /**

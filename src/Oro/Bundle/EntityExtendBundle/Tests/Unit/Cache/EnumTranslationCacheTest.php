@@ -2,18 +2,22 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Cache;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 {
     private const CLASS_NAME = 'FooBar';
     private const LOCALE = 'en_US';
 
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var EnumTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
@@ -27,7 +31,7 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->localizationHelper = $this->createMock(LocalizationHelper::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);
 
@@ -38,94 +42,44 @@ class EnumTranslationCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @dataProvider getDataForContains
-     */
-    public function testContains(bool $isContains, bool $expected)
+    public function testGet()
     {
         $localization = (new Localization())->setFormattingCode(self::LOCALE);
-        $this->localizationHelper->expects($this->any())
+        $this->localizationHelper->expects($this->exactly(2))
             ->method('getCurrentLocalization')
             ->willReturn($localization);
-
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $expected = ['test_val' => 'Test Value'];
+        $repo = $this->createMock(EnumValueRepository::class);
+        $repo->expects(self::once())
+            ->method('getValues')
+            ->willReturn([new TestEnumValue('test_val', 'Test Value')]);
         $this->cache->expects($this->once())
-            ->method('contains')
-            ->with($this->getKey())
-            ->willReturn($isContains);
-
-        $this->assertEquals($expected, $this->enumTranslationCache->contains(self::CLASS_NAME));
+            ->method('get')
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey($enumClass . '|' . self::LOCALE))
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
+        self::assertEquals($expected, $this->enumTranslationCache->get($enumClass, $repo));
     }
 
-    public function getDataForContains(): array
+    public function testGetCached()
     {
-        return [
-            'not contains' => [
-                'isContains' => false,
-                'expected' => false
-            ],
-            'contains' => [
-                'isContains' => true,
-                'expected' => true
-            ]
-        ];
-    }
-
-    /**
-     * @dataProvider getDataForFetch
-     */
-    public function testFetch(bool $isContains, array $values)
-    {
-        $key = $this->getKey();
-        $this->localeSettings->expects($this->any())
-            ->method('getLocale')
-            ->willReturn(self::LOCALE);
-
+        $localization = (new Localization())->setFormattingCode(self::LOCALE);
+        $this->localizationHelper->expects($this->exactly(2))
+            ->method('getCurrentLocalization')
+            ->willReturn($localization);
+        $enumClass = 'Extend\Entity\EV_Test_Enum';
+        $expected = ['test_val' => 'Test Value'];
+        $repo = $this->createMock(EnumValueRepository::class);
+        $repo->expects(self::never())
+            ->method('getValues');
         $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with($key)
-            ->willReturn($isContains ? $values : false);
-
-        $this->assertEquals($values, $this->enumTranslationCache->fetch(self::CLASS_NAME));
-    }
-
-    public function getDataForFetch(): array
-    {
-        return [
-            'not contains' => [
-                'isContains' => false,
-                'values' => []
-            ],
-            'contains empty' => [
-                'isContains' => true,
-                'values' => []
-            ],
-            'contains values' => [
-                'isContains' => true,
-                'values' => [
-                    ['value' => 1],
-                    ['value' => 2]
-                ]
-            ]
-        ];
-    }
-
-    public function testSave()
-    {
-        $key = $this->getKey();
-        $values = [
-            ['value' => 1],
-            ['value' => 2]
-        ];
-
-        $this->localeSettings->expects($this->any())
-            ->method('getLocale')
-            ->willReturn(self::LOCALE);
-
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with($key);
-
-        $this->enumTranslationCache->save(self::CLASS_NAME, $values);
+            ->method('get')
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey($enumClass . '|' . self::LOCALE))
+            ->willReturn($expected);
+        self::assertEquals($expected, $this->enumTranslationCache->get($enumClass, $repo));
     }
 
     public function testInvalidate()

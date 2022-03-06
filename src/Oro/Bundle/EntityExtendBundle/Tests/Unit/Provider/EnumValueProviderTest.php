@@ -34,22 +34,11 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
     {
         $enumClass = 'Extend\Entity\EV_Test_Enum';
         $expected = ['Test Value' => 'test_val'];
-
-        $this->cache->expects(self::once())
-            ->method('contains')
-            ->with($enumClass)
-            ->willReturn(false);
-        $this->cache->expects(self::never())
-            ->method('fetch');
-        $this->cache->expects(self::once())
-            ->method('save')
-            ->with($enumClass, array_flip($expected));
-
         $repo = $this->createMock(EnumValueRepository::class);
-        $repo->expects(self::once())
-            ->method('getValues')
-            ->willReturn([new TestEnumValue('test_val', 'Test Value')]);
-
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with($enumClass, $repo)
+            ->willReturn(array_flip($expected));
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
             ->with($enumClass)
@@ -63,20 +52,15 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
         $enumClass = 'Extend\Entity\EV_Test_Enum';
         $expected = ['Test' => '1'];
 
+        $repo = $this->createMock(EnumValueRepository::class);
         $this->cache->expects(self::once())
-            ->method('contains')
-            ->with($enumClass)
-            ->willReturn(true);
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with($enumClass)
+            ->method('get')
+            ->with($enumClass, $repo)
             ->willReturn(array_flip($expected));
-        $this->cache->expects(self::never())
-            ->method('save');
-
-        $this->doctrineHelper->expects(self::never())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
-            ->with($enumClass);
+            ->with($enumClass)
+            ->willReturn($repo);
 
         // We use assertSame here to get a data type proof comparison.
         self::assertSame($expected, $this->provider->getEnumChoices($enumClass));
@@ -88,21 +72,11 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
         $enumClass = 'Extend\Entity\EV_Test_Enum';
         $expected = ['Test Value' => 'test_val'];
 
-        $this->cache->expects(self::once())
-            ->method('contains')
-            ->with($enumClass)
-            ->willReturn(false);
-        $this->cache->expects(self::never())
-            ->method('fetch');
-        $this->cache->expects(self::once())
-            ->method('save')
-            ->with($enumClass, array_flip($expected));
-
         $repo = $this->createMock(EnumValueRepository::class);
-        $repo->expects(self::once())
-            ->method('getValues')
-            ->willReturn([new TestEnumValue('test_val', 'Test Value')]);
-
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with($enumClass, $repo)
+            ->willReturn(array_flip($expected));
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
             ->with($enumClass)
@@ -117,20 +91,15 @@ class EnumValueProviderTest extends \PHPUnit\Framework\TestCase
         $enumClass = 'Extend\Entity\EV_Test_Enum';
         $expected = ['Test Value' => 'test_val'];
 
+        $repo = $this->createMock(EnumValueRepository::class);
         $this->cache->expects(self::once())
-            ->method('contains')
-            ->with($enumClass)
-            ->willReturn(true);
-        $this->cache->expects(self::once())
-            ->method('fetch')
-            ->with($enumClass)
+            ->method('get')
+            ->with($enumClass, $repo)
             ->willReturn(array_flip($expected));
-        $this->cache->expects(self::never())
-            ->method('save');
-
-        $this->doctrineHelper->expects(self::never())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
-            ->with($enumClass);
+            ->with($enumClass)
+            ->willReturn($repo);
 
         self::assertEquals($expected, $this->provider->getEnumChoicesByCode($enumCode));
     }
