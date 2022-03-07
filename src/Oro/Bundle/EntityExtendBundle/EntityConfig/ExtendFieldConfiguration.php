@@ -24,7 +24,7 @@ class ExtendFieldConfiguration implements FieldConfigInterface
             ->scalarNode('state')
                 ->defaultValue('Active')
             ->end()
-            ->booleanNode('is_extend')
+            ->node('is_extend', 'normalized_boolean')
                 ->info('`boolean` switches to the ‘extend’ functionality.')
                 ->defaultFalse()
             ->end()
@@ -37,16 +37,16 @@ class ExtendFieldConfiguration implements FieldConfigInterface
             ->scalarNode('scale')
                 ->defaultValue(2)
             ->end()
-            ->booleanNode('is_deleted')
+            ->node('is_deleted', 'normalized_boolean')
                 ->defaultFalse()
             ->end()
-            ->booleanNode('bidirectional')
+            ->node('bidirectional', 'normalized_boolean')
             ->end()
             ->scalarNode('relation_key')
                 ->info('`string` can be built by the ExtendHelper::buildRelationKey method. The attribute is in the ' .
                 'following format: ‘relation_type’, ‘owning_entity’, ‘target_entity’,’field_name_in_owning_entity’.')
             ->end()
-            ->booleanNode('without_default')
+            ->node('without_default', 'normalized_boolean')
                 ->info('`boolean` indicates whether a relation has default value or not. Applicable only to ' .
                 'many-to-many or one-to-many relations. If not specified or FALSE, the relation has the default value.')
             ->end()
@@ -84,23 +84,23 @@ class ExtendFieldConfiguration implements FieldConfigInterface
                 ->info('`string` the type of fetch mode for the relation. Possible values are ‘lazy’, ‘extra_lazy’, ' .
                 'and ‘eager’.')
             ->end()
-            ->booleanNode('nullable')
+            ->node('nullable', 'normalized_boolean')
                 ->defaultTrue()
             ->end()
             ->scalarNode('on_delete')
                 ->info('`string` defines what happens with related rows ‘on delete’. Possible value are: ‘CASCADE’, ' .
                 '‘SET NULL’, ‘RESTRICT’.')
             ->end()
-            ->booleanNode('orphanRemoval')
+            ->node('orphanRemoval', 'normalized_boolean')
                 ->info('`boolean` there is concept of cascading that is relevant only when removing entities from ' .
                 'collections. If an Entity of type A contains references to a privately owned Entity B, and if the ' .
                 'reference from A to B is removed, then entity B should also be removed as it is no longer used. ' .
                 'OrphanRemoval works with one-to-one, one-to-many and many-to-many associations. See Doctrine’s ' .
                 'documentation for more details.')
             ->end()
-            ->booleanNode('default')
+            ->scalarNode('default')
             ->end()
-            ->booleanNode('is_serialized')
+            ->node('is_serialized', 'normalized_boolean')
                 ->info('`boolean` if set to true, the field data is saved in the serialized_data column without ' .
                 'doctrine schema update.')
                 ->defaultFalse()

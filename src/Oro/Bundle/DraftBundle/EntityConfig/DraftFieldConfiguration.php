@@ -18,7 +18,7 @@ class DraftFieldConfiguration implements FieldConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('draftable')
+            ->node('draftable', 'normalized_boolean')
                 ->info('`boolean` defines whether field can involved in the draft operation.')
                 ->defaultFalse()
             ->end()

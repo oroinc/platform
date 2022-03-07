@@ -18,7 +18,7 @@ class SearchEntityConfiguration implements EntityConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('searchable')
+            ->node('searchable', 'normalized_boolean')
                 ->info('`boolean` indicates what custom entity can be searchable.')
             ->end()
         ;

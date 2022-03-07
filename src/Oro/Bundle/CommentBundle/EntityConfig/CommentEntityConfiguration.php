@@ -18,11 +18,11 @@ class CommentEntityConfiguration implements EntityConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('enabled')
+            ->node('enabled', 'normalized_boolean')
                 ->info('`boolean` indicates whether the entity can have comments.')
                 ->defaultFalse()
             ->end()
-            ->booleanNode('immutable')
+            ->node('immutable', 'normalized_boolean')
                 ->info('`boolean` is used to prohibit changing the comment association state (regardless of whether ' .
                     'it is enabled or not) for the entity. If TRUE, than the current state cannot be changed.')
             ->end()
