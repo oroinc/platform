@@ -22,10 +22,10 @@ class MergeFieldConfiguration implements FieldConfigInterface
                 ->info('`string` the field label that should be displayed for this field in merge UI, value can ' .
                 'be translated.')
             ->end()
-            ->booleanNode('display')
+            ->node('display', 'normalized_boolean')
                 ->info('`boolean` a display merge form for this field.')
             ->end()
-            ->booleanNode('readonly')
+            ->node('readonly', 'normalized_boolean')
                 ->info('`boolean` turn the field into read-only during merge.')
             ->end()
             ->variableNode('merge_modes')
@@ -33,7 +33,7 @@ class MergeFieldConfiguration implements FieldConfigInterface
                 ' - replace - replaces one value with a selected value;' . "\n" .
                 ' - unite - merges all values into one (applicable to collections and lists).')
             ->end()
-            ->booleanNode('is_collection')
+            ->node('is_collection', 'normalized_boolean')
                 ->info('`boolean` a flag for a collection of fields. This fields supports unite mode by default.')
             ->end()
             ->variableNode('cast_method')
@@ -49,7 +49,7 @@ class MergeFieldConfiguration implements FieldConfigInterface
             ->variableNode('getter')
                 ->info('a method for getting a value to an entity.')
             ->end()
-            ->booleanNode('inverse_display')
+            ->node('inverse_display', 'normalized_boolean')
                 ->info('can be used to see merge form for this field for an entity on the other side of relation. ' .
                 'Let’s consider an example where the Call entity with a field referenced to Account uses ' .
                 'ManyToOne unidirectional relation. As Account does not have access to a collection of calls the ' .
@@ -79,7 +79,7 @@ class MergeFieldConfiguration implements FieldConfigInterface
             ->scalarNode('render_datetime_pattern')
                 ->info('`string` a date/time pattern. Example: ‘m/d/Y’.')
             ->end()
-            ->booleanNode('autoescape')
+            ->node('autoescape', 'normalized_boolean')
                 ->info('controls escaping of the value when rendered in the Merge table. Use ‘false’ to disable ' .
                 'escaping for the field (i.e., RichText) or set the Twig ‘escape’ method to enable: ' .
                 '‘html’ (or true), ‘html_attr’, ‘css’, ‘js’, ‘url’.')

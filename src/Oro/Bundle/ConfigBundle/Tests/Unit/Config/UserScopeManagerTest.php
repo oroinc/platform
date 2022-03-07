@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -14,6 +13,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class UserScopeManagerTest extends AbstractScopeManagerTestCase
 {
@@ -104,7 +104,7 @@ class UserScopeManagerTest extends AbstractScopeManagerTestCase
      */
     protected function createManager(
         ManagerRegistry $doctrine,
-        CacheProvider $cache,
+        CacheInterface $cache,
         EventDispatcher $eventDispatcher,
         ConfigBag $configBag
     ) {
