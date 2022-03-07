@@ -2,7 +2,8 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## Not released yet
+## 5.0.0 (2022-01-26)
+[Show detailed list of changes](incompatibilities-5-0.md)
 
 ### Added
 
