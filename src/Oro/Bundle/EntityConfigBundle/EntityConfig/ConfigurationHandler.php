@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EntityConfig;
 
+use Oro\Bundle\EntityConfigBundle\Config\Definition\NormalizedBooleanNodeDefinition;
 use Oro\Bundle\EntityConfigBundle\Exception\EntityConfigValidationException;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
@@ -49,7 +50,9 @@ class ConfigurationHandler
             $this->configurations[$type][$sectionName] = new TreeBuilder($sectionName);
         }
 
-        $node = $this->configurations[$type][$sectionName]->getRootNode()->children();
+        $node = $this->configurations[$type][$sectionName]->getRootNode()
+            ->children()
+            ->setNodeClass('normalized_boolean', NormalizedBooleanNodeDefinition::class);
         $configuration->configure($node);
     }
 

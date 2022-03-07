@@ -18,7 +18,7 @@ class WorkflowEntityConfiguration implements EntityConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('show_step_in_grid')
+            ->node('show_step_in_grid', 'normalized_boolean')
                 ->info('`boolean` if TRUE, then a workflow step is displayed in the grid.')
                 ->defaultTrue()
             ->end()
