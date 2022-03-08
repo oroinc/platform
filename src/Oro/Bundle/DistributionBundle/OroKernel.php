@@ -30,7 +30,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class OroKernel extends Kernel
 {
-    public const REQUIRED_PHP_VERSION = '8.0';
+    public const REQUIRED_PHP_VERSION = '8.1';
 
     /** @var string|null */
     private $warmupDir;
