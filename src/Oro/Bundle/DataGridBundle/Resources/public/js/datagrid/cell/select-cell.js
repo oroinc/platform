@@ -18,6 +18,8 @@ define(function(require) {
 
         optionValues: [],
 
+        notMarkAsBlank: true,
+
         /**
          * @inheritdoc
          */
