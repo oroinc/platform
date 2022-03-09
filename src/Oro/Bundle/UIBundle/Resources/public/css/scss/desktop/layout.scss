@@ -15,7 +15,14 @@ body:not(.login-page) {
 }
 
 & {
+    --responsive-section-container-minimal-width-threshold: #{$responsive-section-container-minimal-width-threshold};
+
     overflow-x: auto;
+}
+
+.responsive-section-container-minimal {
+    min-width: calc(var(--responsive-section-container-minimal-width-threshold) * 1px);
+    width: fit-content;
 }
 
 .responsive-section {

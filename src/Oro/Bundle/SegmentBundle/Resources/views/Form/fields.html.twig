@@ -24,6 +24,7 @@
     {{ form_widget(form.entity) }}
     {{ form_widget(form.definition) }}
     {{ QD.query_designer_column_chain_template(column_chain_template_id) }}
+    {% if not isMobileVersion() %}
     {{ segmentQD.query_designer_condition_builder({
         'id': coditionBuilderId,
         'currentSegmentId': segment.id|default(null),
@@ -33,6 +34,7 @@
         'column_chain_template_selector': '#' ~ column_chain_template_id,
         'fieldConditionOptions': field_condition_options|default([]),
     }) }}
+    {% endif %}
 
     {% set widgetOptions = {
         valueSource:                '[data-ftid=' ~ definitionId ~ ']',
