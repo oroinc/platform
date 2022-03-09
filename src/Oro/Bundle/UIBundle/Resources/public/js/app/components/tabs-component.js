@@ -20,12 +20,13 @@ define(function(require, exports, module) {
             useDropdown: config.useDropdown,
             elements: {
                 tabsContainer: ['el', 'ul:first'],
-                tabs: ['tabsContainer', 'li.tab, li.nav-item:not("[data-dropdown]")'],
+                tabs: ['tabsContainer', 'li.tab, li.nav-item:not("[data-dropdown], .pull-right")'],
+                pullRightTabs: ['tabsContainer', 'li.nav-item.pull-right'],
                 dropdown: ['tabsContainer', 'li[data-dropdown]'],
                 dropdownMenu: ['dropdown', 'ul.dropdown-menu'],
                 dropdownToggle: ['dropdown', 'a.dropdown-toggle'],
                 dropdownToggleLabel: ['dropdownToggle', '[data-dropdown-label]'],
-                visibleTabs: ['tabsContainer', '>li.tab, >li.nav-item:not("[data-dropdown]")'],
+                visibleTabs: ['tabsContainer', '>li.tab, >li.nav-item:not("[data-dropdown], .pull-right")'],
                 hiddenTabs: ['dropdownMenu', '>li:not("[data-helper-element]")']
             },
             tabClass: 'nav-item',
@@ -50,7 +51,7 @@ define(function(require, exports, module) {
         /**
          * @property {Number}
          */
-        dropdownContainerWidth: 0,
+        tabsContainerWidth: 0,
 
         /**
          * @inheritdoc
@@ -70,11 +71,18 @@ define(function(require, exports, module) {
             this.$el = options._sourceElement;
 
             if (this.options.useDropdown) {
-                this.$el
-                    .find(this.options.elements.tabsContainer[1])
-                    .append(this.options.dropdownTemplate({
+                const $firstPullRightTab = this.$el.find(`${this.options.elements.pullRightTabs[1]}:first`);
+                if ($firstPullRightTab.length) {
+                    $firstPullRightTab.before(this.options.dropdownTemplate({
                         label: this.options.dropdownText
                     }));
+                } else {
+                    this.$el
+                        .find(this.options.elements.tabsContainer[1])
+                        .append(this.options.dropdownTemplate({
+                            label: this.options.dropdownText
+                        }));
+                }
             }
 
             this.initElements();
@@ -163,21 +171,24 @@ define(function(require, exports, module) {
             }
             const self = this;
             const $tabsContainer = this.getElement('tabsContainer');
-            let dropdownContainerWidth = $tabsContainer.width();
-            if (!$tabsContainer.is(':visible') || this.dropdownContainerWidth === dropdownContainerWidth) {
+            let tabsContainerWidth = $tabsContainer.width();
+            if (!$tabsContainer.is(':visible') || this.tabsContainerWidth === tabsContainerWidth) {
                 return;
             }
-            this.dropdownContainerWidth = dropdownContainerWidth;
+            this.tabsContainerWidth = tabsContainerWidth;
 
             let visibleWidth = this.dropdownVisibleWidth();
             const dropdownWidth = this.getElement('dropdown').outerWidth(true);
+            const pullRightTabsWidth = this.getElement('pullRightTabs').find(':first-child').outerWidth(true) || 0;
             let updated = false;
 
             if (
-                dropdownContainerWidth < visibleWidth ||
-                (this.getElement('hiddenTabs').length > 0 && dropdownContainerWidth < visibleWidth + dropdownWidth)
+                tabsContainerWidth < visibleWidth + pullRightTabsWidth || (
+                    this.getElement('hiddenTabs').length > 0 &&
+                    tabsContainerWidth < visibleWidth + dropdownWidth + pullRightTabsWidth
+                )
             ) {
-                dropdownContainerWidth -= dropdownWidth;
+                tabsContainerWidth -= dropdownWidth + pullRightTabsWidth;
 
                 $.each(this.getElement('visibleTabs').get().reverse(), function() {
                     const $tab = $(this);
@@ -187,23 +198,23 @@ define(function(require, exports, module) {
                     self.turnToDropdownItem($tab);
 
                     updated = true;
-                    if (dropdownContainerWidth >= visibleWidth) {
+                    if (tabsContainerWidth >= visibleWidth) {
                         return false;
                     }
                 });
             } else {
                 let showAll = false;
-                if (dropdownContainerWidth >= visibleWidth + this.dropdownHiddenWidth()) {
+                if (tabsContainerWidth >= visibleWidth + this.dropdownHiddenWidth() + pullRightTabsWidth) {
                     showAll = true;
                 } else {
-                    dropdownContainerWidth -= dropdownWidth;
+                    tabsContainerWidth -= dropdownWidth + pullRightTabsWidth;
                 }
 
                 this.getElement('hiddenTabs').each(function(i) {
                     const $tab = $(this);
                     if (!showAll) {
                         visibleWidth += $tab.data('dropdownOuterWidth');
-                        if (dropdownContainerWidth < visibleWidth || i === 0 && $tab.hasClass('active')) {
+                        if (tabsContainerWidth < visibleWidth || i === 0 && $tab.hasClass('active')) {
                             return false;
                         }
                     }
@@ -261,7 +272,7 @@ define(function(require, exports, module) {
                     $dropdownToggleLabel.closest('a').removeClass('active');
                 }
 
-                this.dropdownContainerWidth = 0;
+                this.tabsContainerWidth = 0;
                 this.dropdownUpdate();
             }
         },
