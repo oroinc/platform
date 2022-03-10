@@ -8,11 +8,10 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class BatchUpdateProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var BatchUpdateContext */
-    protected $context;
+    protected BatchUpdateContext $context;
 
     protected function setUp(): void
     {

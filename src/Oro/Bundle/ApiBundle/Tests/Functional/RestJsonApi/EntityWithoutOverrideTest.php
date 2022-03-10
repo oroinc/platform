@@ -20,13 +20,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class EntityWithoutOverrideTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/entities_without_override_class.yml'
@@ -190,6 +186,7 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
                     'relationships' => [
                         'activityTargets' => [
                             'data' => [
+                                ['type' => 'testapitargets', 'id' => '<toString(@target_1->id)>'],
                                 ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
                             ]
                         ]
@@ -218,6 +215,7 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
                     'relationships' => [
                         'activityTargets' => [
                             'data' => [
+                                ['type' => 'testapitargets', 'id' => '<toString(@target_1->id)>'],
                                 ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
                             ]
                         ]
@@ -760,7 +758,8 @@ class EntityWithoutOverrideTest extends RestJsonApiTestCase
                         'relationships' => [
                             'owners' => [
                                 'data' => [
-                                    ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>']
+                                    ['type' => 'testapiowners', 'id' => '<toString(@owner_1->id)>'],
+                                    ['type' => 'testapiowners', 'id' => '<toString(@owner_2->id)>']
                                 ]
                             ]
                         ]

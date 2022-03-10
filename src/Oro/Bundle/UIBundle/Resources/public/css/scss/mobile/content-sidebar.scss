@@ -3,10 +3,6 @@
 .content-with-sidebar {
     &--container {
         @include safe-area-offset(padding, 0);
-
-        .scrollspy.container-fluid {
-            margin-top: 0;
-        }
     }
 
     &--sidebar {

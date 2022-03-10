@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Form\FormHelper;
 use Oro\Bundle\ApiBundle\Form\Guesser\DataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
@@ -26,7 +27,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    private const TEST_ASSOCIATION_NAME  = 'testAssociation';
+    private const TEST_ASSOCIATION_NAME = 'testAssociation';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;
@@ -78,7 +79,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWhenNoParentEntity()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'The parent entity object must be added to the context before creation of the form builder.'
         );

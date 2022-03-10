@@ -16,11 +16,10 @@ use Symfony\Component\Validator\Validation;
 
 class ChangeRelationshipProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var ChangeRelationshipContext */
-    protected $context;
+    protected ChangeRelationshipContext $context;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
     protected $configProvider;
@@ -43,7 +42,7 @@ class ChangeRelationshipProcessorTestCase extends \PHPUnit\Framework\TestCase
      *
      * @return FormBuilder
      */
-    protected function createFormBuilder(array $extensions = [])
+    protected function createFormBuilder(array $extensions = []): FormBuilder
     {
         $formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(array_merge($this->getFormExtensions(), $extensions))
@@ -56,7 +55,7 @@ class ChangeRelationshipProcessorTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getFormExtensions()
+    protected function getFormExtensions(): array
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)

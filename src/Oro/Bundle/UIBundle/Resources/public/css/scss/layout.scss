@@ -28,7 +28,7 @@
         ol,
         ul,
         dl {
-            &:not(.extra-list) {
+            &:not(.extra-list):not(.list-inline) {
                 margin: 0 0 $content-padding-medium $content-padding;
 
                 word-break: break-word;
@@ -199,14 +199,22 @@ body.backdrop {
     }
 }
 
-@mixin oro-page-menu-items {
+@mixin oro-page-menu-items($add-border-to-last-el: false) {
     list-style: none;
     margin: 0;
     line-height: 21px;
 
     > li {
-        &:not(:last-child) {
+        @if ($add-border-to-last-el) {
             border-bottom: 1px solid $additional-extra-lighten;
+
+            &:last-child {
+                border-color: $page-border-color;
+            }
+        } @else {
+            &:not(:last-child) {
+                border-bottom: 1px solid $additional-extra-lighten;
+            }
         }
 
         a {
@@ -253,26 +261,22 @@ body.backdrop {
 }
 
 .oro-page {
+    display: flex;
+    flex-wrap: wrap;
     border: 1px solid $page-border-color;
     background: $page-sidebar-background-color;
-    border-bottom: 1px solid $page-border-color;
 
     .oro-page-sidebar {
         width: 236px;
-        margin-right: -1px;
-        float: left;
         border-right: 1px solid $page-border-color;
-        border-bottom: 1px solid $page-border-color;
         background: $page-sidebar-background-color;
     }
 
     .oro-page-body {
-        float: right;
-        width: calc(100% - 235px);
-        border-left: 1px solid $page-border-color;
+        flex-grow: 1;
+        max-width: calc(100% - 236px);
         padding: 10px;
         background-color: $primary-inverse;
-        overflow: hidden;
     }
 
     &.collapsible-sidebar {
@@ -282,7 +286,7 @@ body.backdrop {
             }
 
             > .dropdown-menu {
-                @include oro-page-menu-items;
+                @include oro-page-menu-items(true);
 
                 top: auto;
                 left: initial;

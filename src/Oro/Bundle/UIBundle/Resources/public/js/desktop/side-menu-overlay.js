@@ -223,13 +223,30 @@ define(function(require) {
             this.toggleClearButton(false);
         },
 
-        clearSearchContent: function() {
-            $.each(this.searchContent, function() {
-                const $this = $(this);
-                const $title = $this.find('.title');
+        updateSearchContent: function($element, modifyContentFn) {
+            const $title = $element.find('.title');
+            const $icon = $title.find('.menu-icon').clone();
+            let content = $element.data('original-text');
 
-                $title.html($this.data('original-text'));
-                $this.show();
+            if (typeof modifyContentFn === 'function') {
+                content = modifyContentFn(content);
+            }
+
+            if ($icon.length) {
+                content = $icon[0].outerHTML + content;
+            }
+
+            $title.html(content);
+
+            return this;
+        },
+
+        clearSearchContent: function() {
+            $.each(this.searchContent, (i, el) => {
+                const $el = $(el);
+
+                this.updateSearchContent($el);
+                $el.show();
             });
         },
 
@@ -238,30 +255,29 @@ define(function(require) {
          */
         search: function(value) {
             const regex = tools.safeRegExp(value, 'ig');
-            const highlight = '<span class="highlight">$&</span>';
-            const testValue = function(string) {
-                return regex.test(string);
-            };
+            const testValue = string => regex.test(string);
 
             this.searchContent.hide();
 
-            $.each(this.searchContent, function() {
-                const $this = $(this);
-                const $title = $this.find('.title');
+            $.each(this.searchContent, (i, el) => {
+                const $el = $(el);
 
-                if (testValue($this.text().trim())) {
-                    $title.html(
-                        $this.data('original-text').replace(regex, highlight)
-                    );
+                if (testValue($el.text().trim())) {
+                    const highlightContent = content => {
+                        const highlight = '<span class="highlight">$&</span>';
 
-                    $this.show();
+                        return content.replace(regex, highlight);
+                    };
 
-                    let groups = $this.data('related-groups');
+                    this.updateSearchContent($el, highlightContent);
+                    $el.show();
+
+                    let groups = $el.data('related-groups');
                     if (groups) {
                         groups = groups.split(';');
 
                         $.each(groups, function(index, group) {
-                            $this.prevAll('[data-index="'+ group +'"]').show();
+                            $el.prevAll('[data-index="' + group + '"]').show();
                         });
                     }
                 }

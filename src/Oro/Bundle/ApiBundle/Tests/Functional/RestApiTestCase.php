@@ -20,75 +20,53 @@ abstract class RestApiTestCase extends ApiTestCase
 {
     protected const API_TEST_STATEFUL_REQUEST = '_api_test_stateful';
 
-    /**
-     * @return array
-     */
-    protected function getWsseAuthHeader()
+    protected function getWsseAuthHeader(): array
     {
         return self::generateWsseAuthHeader(static::USER_NAME, static::USER_PASSWORD);
     }
 
-    /**
-     * @return string
-     */
-    protected function getItemRouteName()
+    protected function getItemRouteName(): string
     {
         return 'oro_rest_api_item';
     }
 
-    /**
-     * @return string
-     */
-    protected function getListRouteName()
+    protected function getListRouteName(): string
     {
         return 'oro_rest_api_list';
     }
 
-    /**
-     * @return string
-     */
-    protected function getSubresourceRouteName()
+    protected function getSubresourceRouteName(): string
     {
         return 'oro_rest_api_subresource';
     }
 
-    /**
-     * @return string
-     */
-    protected function getRelationshipRouteName()
+    protected function getRelationshipRouteName(): string
     {
         return 'oro_rest_api_relationship';
     }
 
     /**
      * Returns the base URL for all REST API requests, e.g. "http://localhost/api".
-     *
-     * @return string
      */
-    protected function getApiBaseUrl()
+    protected function getApiBaseUrl(): string
     {
         return substr($this->getUrl($this->getListRouteName(), ['entity' => 'test'], true), 0, -5);
     }
 
-    /**
-     * @return string
-     */
-    abstract protected function getResponseContentType();
+    abstract protected function getResponseContentType(): string;
 
     /**
      * Sends REST API request.
-     *
-     * @param string      $method
-     * @param string      $uri
-     * @param array       $parameters
-     * @param array       $server
-     * @param string|null $content
-     *
-     * @return Response
      */
-    abstract protected function request($method, $uri, array $parameters = [], array $server = [], $content = null);
+    abstract protected function request(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $server = [],
+        string $content = null
+    ): Response;
 
-    protected function checkWsseAuthHeader(array &$server)
+    protected function checkWsseAuthHeader(array &$server): void
     {
         if (!array_key_exists('HTTP_X-WSSE', $server)) {
             $server = array_replace($server, $this->getWsseAuthHeader());
@@ -97,7 +75,7 @@ abstract class RestApiTestCase extends ApiTestCase
         }
     }
 
-    protected function checkCsrfHeader(array &$server)
+    protected function checkCsrfHeader(array &$server): void
     {
         $csrfHeader = 'HTTP_' . CsrfRequestManager::CSRF_HEADER;
         $cookieJar = $this->client->getCookieJar();
@@ -117,7 +95,7 @@ abstract class RestApiTestCase extends ApiTestCase
         }
     }
 
-    protected function checkHateoasHeader(array &$server)
+    protected function checkHateoasHeader(array &$server): void
     {
         $isHateoasEnabled = false;
         if (array_key_exists('HTTP_HATEOAS', $server)) {
@@ -139,20 +117,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends GET request for a list of entities.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function cget(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -180,20 +151,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends DELETE request for a list of entities.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function cdelete(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -220,20 +184,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends GET request for a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function get(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -261,20 +218,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends PATCH request for a list of entities.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
      */
     protected function cpatch(
         array $routeParameters = [],
-        $parameters = [],
+        array|string $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $content = null;
@@ -307,20 +257,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends PATCH request for a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
      */
     protected function patch(
         array $routeParameters = [],
-        $parameters = [],
+        array|string $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
@@ -348,20 +291,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends POST request for an entity resource.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
      */
     protected function post(
         array $routeParameters = [],
-        $parameters = [],
+        array|string $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
@@ -389,20 +325,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends DELETE request for a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function delete(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -429,20 +358,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends GET request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function getRelationship(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -470,20 +392,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends PATCH request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function patchRelationship(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -510,20 +425,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends POST request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function postRelationship(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -550,20 +458,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends DELETE request for a relationship of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function deleteRelationship(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -590,20 +491,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends GET request for a sub-resource of a single entity.
-     *
-     * @param array $routeParameters
-     * @param array $parameters
-     * @param array $server
-     * @param bool  $assertValid
-     *
-     * @return Response
      */
     protected function getSubresource(
         array $routeParameters = [],
         array $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = self::processTemplateData($parameters);
         $response = $this->request(
@@ -631,20 +525,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends PATCH request for a sub-resource of a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
      */
     protected function patchSubresource(
         array $routeParameters = [],
-        $parameters = [],
+        array|string $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
@@ -671,20 +558,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends POST request for a sub-resource of a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
      */
     protected function postSubresource(
         array $routeParameters = [],
-        $parameters = [],
+        array|string $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
@@ -711,20 +591,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends DELETE request for a sub-resource of a single entity.
-     *
-     * @param array        $routeParameters
-     * @param array|string $parameters
-     * @param array        $server
-     * @param bool         $assertValid
-     *
-     * @return Response
      */
     protected function deleteSubresource(
         array $routeParameters = [],
-        $parameters = [],
+        array|string $parameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         $routeParameters = self::processTemplateData($routeParameters);
         $parameters = $this->getRequestData($parameters);
         $response = $this->request(
@@ -751,20 +624,13 @@ abstract class RestApiTestCase extends ApiTestCase
 
     /**
      * Sends OPTIONS request.
-     *
-     * @param string $routeName
-     * @param array  $routeParameters
-     * @param array  $server
-     * @param bool   $assertValid
-     *
-     * @return Response
      */
     protected function options(
         string $routeName,
         array $routeParameters = [],
         array $server = [],
-        $assertValid = true
-    ) {
+        bool $assertValid = true
+    ): Response {
         if (!array_key_exists('HTTP_X-WSSE', $server)) {
             // disables authentication because OPTIONS requests must not require it
             $server['HTTP_X-WSSE'] = null;
@@ -794,19 +660,13 @@ abstract class RestApiTestCase extends ApiTestCase
         return $response;
     }
 
-    protected function assertOptionsResponseCacheHeader(Response $response)
+    protected function assertOptionsResponseCacheHeader(Response $response): void
     {
         self::assertResponseHeader($response, 'Cache-Control', 'max-age=600, public');
         self::assertResponseHeader($response, 'Vary', 'Origin');
     }
 
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return string|null
-     */
-    protected function getRestApiEntityId(string $entityClass, $entityId)
+    protected function getRestApiEntityId(string $entityClass, mixed $entityId): ?string
     {
         if (null === $entityId) {
             return null;
@@ -892,12 +752,7 @@ abstract class RestApiTestCase extends ApiTestCase
         );
     }
 
-    /**
-     * @param array $parameters
-     *
-     * @return string
-     */
-    private static function extractEntityType(array $parameters)
+    private static function extractEntityType(array $parameters): string
     {
         if (empty($parameters['entity'])) {
             return 'unknown';

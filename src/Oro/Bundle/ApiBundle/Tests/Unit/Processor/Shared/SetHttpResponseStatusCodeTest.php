@@ -22,7 +22,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
     /**
      * @dataProvider processDataProvider
      */
-    public function testProcess(array $errors, $expectedCode, $hasResult = true)
+    public function testProcess(array $errors, int $expectedCode, bool $hasResult = true)
     {
         foreach ($errors as $error) {
             $this->context->addError($error);
@@ -36,7 +36,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
         self::assertEquals($expectedCode, $this->context->getResponseStatusCode());
     }
 
-    public function processDataProvider()
+    public function processDataProvider(): array
     {
         return [
             'no errors'                                                                                 => [
@@ -115,12 +115,7 @@ class SetHttpResponseStatusCodeTest extends GetListProcessorTestCase
         ];
     }
 
-    /**
-     * @param int|null $statusCode
-     *
-     * @return Error
-     */
-    private function getError($statusCode = null)
+    private function getError(int $statusCode = null): Error
     {
         $error = new Error();
         $error->setStatusCode($statusCode);

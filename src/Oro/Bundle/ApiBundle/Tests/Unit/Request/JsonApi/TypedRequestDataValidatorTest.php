@@ -74,7 +74,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectProvider
      */
-    public function testValidResourceObject($requestData)
+    public function testValidResourceObject(array $requestData)
     {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -88,7 +88,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectWithIncludedResourcesProvider
      */
-    public function testValidResourceObjectWithIncludedResources($requestData)
+    public function testValidResourceObjectWithIncludedResources(array $requestData)
     {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -99,7 +99,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($errors);
     }
 
-    public function validResourceObjectProvider()
+    public function validResourceObjectProvider(): array
     {
         return [
             [
@@ -150,7 +150,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function validResourceObjectWithIncludedResourcesProvider()
+    public function validResourceObjectWithIncludedResourcesProvider(): array
     {
         return array_merge($this->validResourceObjectProvider(), [
             [
@@ -191,7 +191,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectCollectionProvider
      */
-    public function testValidResourceObjectCollection($requestData)
+    public function testValidResourceObjectCollection(array $requestData)
     {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -205,7 +205,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectCollectionWithIncludedResourcesProvider
      */
-    public function testValidResourceObjectCollectionWithIncludedResources($requestData)
+    public function testValidResourceObjectCollectionWithIncludedResources(array $requestData)
     {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -216,7 +216,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($errors);
     }
 
-    public function validResourceObjectCollectionProvider()
+    public function validResourceObjectCollectionProvider(): array
     {
         return [
             [
@@ -267,7 +267,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function validResourceObjectCollectionWithIncludedResourcesProvider()
+    public function validResourceObjectCollectionWithIncludedResourcesProvider(): array
     {
         return array_merge($this->validResourceObjectCollectionProvider(), [
             [
@@ -309,11 +309,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectProvider
      */
     public function testInvalidResourceObject(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -328,11 +328,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectWithIncludedResourcesProvider
      */
     public function testInvalidResourceObjectWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string|array $expectedError,
+        string|array $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -346,7 +346,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectProvider()
+    public function invalidResourceObjectProvider(): array
     {
         return [
             [[], 'The primary data object should exist', '/data'],
@@ -586,7 +586,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectWithIncludedResourcesProvider()
+    public function invalidResourceObjectWithIncludedResourcesProvider(): array
     {
         return array_merge($this->invalidResourceObjectProvider(), [
             [
@@ -716,11 +716,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionProvider
      */
     public function testInvalidResourceObjectCollection(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -735,11 +735,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionWithIncludedResourcesProvider
      */
     public function testInvalidResourceObjectCollectionWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string|array $expectedError,
+        string|array $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -753,7 +753,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectCollectionProvider()
+    public function invalidResourceObjectCollectionProvider(): array
     {
         return [
             [[], 'The primary data object collection should exist', '/data'],
@@ -1015,7 +1015,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function invalidResourceObjectCollectionWithIncludedResourcesProvider()
+    public function invalidResourceObjectCollectionWithIncludedResourcesProvider(): array
     {
         return array_merge($this->invalidResourceObjectCollectionProvider(), [
             [
@@ -1135,11 +1135,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectWithIdProvider
      */
     public function testInvalidResourceObjectWithId(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -1155,11 +1155,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectWithIdProvider
      */
     public function testInvalidResourceObjectWithIdWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObject(
             $requestData,
@@ -1171,7 +1171,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
     }
 
-    public function invalidResourceObjectWithIdProvider()
+    public function invalidResourceObjectWithIdProvider(): array
     {
         return [
             [
@@ -1193,11 +1193,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider
      */
     public function testInvalidResourceObjectCollectionWithRequiredPrimaryResourceId(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -1213,11 +1213,11 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
      * @dataProvider invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider
      */
     public function testInvalidResourceObjectCollectionWithRequiredPrimaryResourceIdWithIncludedResources(
-        $requestData,
-        $expectedError,
-        $pointer,
-        $title = Constraint::REQUEST_DATA,
-        $statusCode = 400
+        array $requestData,
+        string $expectedError,
+        string $pointer,
+        string $title = Constraint::REQUEST_DATA,
+        int $statusCode = 400
     ) {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
@@ -1229,7 +1229,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
     }
 
-    public function invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider()
+    public function invalidResourceObjectCollectionWithRequiredPrimaryResourceIdProvider(): array
     {
         return [
             [
@@ -1289,7 +1289,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidMetaObjectProvider
      */
-    public function testInvalidMetaObject($requestData, $expectedError, $pointer)
+    public function testInvalidMetaObject(array $requestData, string|array $expectedError, string|array $pointer)
     {
         $errors = $this->validator->validateMetaObject($requestData);
 
@@ -1302,7 +1302,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidMetaObjectProvider()
+    public function invalidMetaObjectProvider(): array
     {
         return [
             [[], 'The primary meta object should exist', '/meta'],

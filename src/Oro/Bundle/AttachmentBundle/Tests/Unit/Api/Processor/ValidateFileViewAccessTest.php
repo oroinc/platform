@@ -7,6 +7,7 @@ use Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileViewAccess;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateFileViewAccessTest extends GetProcessorTestCase
 {
@@ -43,7 +44,7 @@ class ValidateFileViewAccessTest extends GetProcessorTestCase
 
     public function testProcessWhenAccessDenied()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the entity.');
 
         $fileClass = File::class;

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NeqOrNullComparisonExpression;
@@ -16,7 +17,7 @@ class NeqOrNullComparisonExpressionTest extends OrmRelatedTestCase
 {
     public function testWalkComparisonExpressionForNullValue()
     {
-        $this->expectException(\Doctrine\ORM\Query\QueryException::class);
+        $this->expectException(QueryException::class);
         $this->expectExceptionMessage('The value for "e.test" must not be NULL.');
 
         $expression = new NeqOrNullComparisonExpression();

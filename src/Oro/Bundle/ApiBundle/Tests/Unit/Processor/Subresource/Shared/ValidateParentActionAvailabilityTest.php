@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentActionAvailability;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
@@ -25,7 +26,7 @@ class ValidateParentActionAvailabilityTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenActionIsExcluded()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException::class);
+        $this->expectException(ActionNotAllowedException::class);
         $parentEntityClass = 'Test\Class';
 
         $this->resourcesProvider->expects(self::once())

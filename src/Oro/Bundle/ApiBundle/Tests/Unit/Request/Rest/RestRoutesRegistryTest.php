@@ -26,12 +26,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         $this->secondProvider = $this->createMock(RestRoutes::class);
     }
 
-    /**
-     * @param array $providers
-     *
-     * @return RestRoutesRegistry
-     */
-    private function getRegistry(array $providers)
+    private function getRegistry(array $providers): RestRoutesRegistry
     {
         return new RestRoutesRegistry(
             $providers,

@@ -3,6 +3,7 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const Popover = require('bootstrap-popover');
     const GoogleMaps = require('oroaddress/js/mapservice/googlemaps');
     const ModelAction = require('oro/datagrid/action/model-action');
 
@@ -84,18 +85,23 @@ define(function(require) {
         handlePopover: function(config) {
             const $popoverTrigger = this.subviews[0].$el;
 
-            $popoverTrigger.popover(config).on('shown.bs.popover', () => {
-                this.mapView.updateMap(this.getAddress(), this.model.get('label'));
+            if (!$popoverTrigger.data(Popover.DATA_KEY)) {
+                $popoverTrigger.popover(config).on('shown.bs.popover', () => {
+                    this.mapView.updateMap(this.getAddress(), this.model.get('label'));
 
-                $(document).on('mouseup', e => {
-                    const $map = this.mapView.$el;
-                    if (!$map.is(e.target) && !$map.has(e.target).length) {
-                        $popoverTrigger.popover('dispose');
+                    $(document).on('mouseup', e => {
+                        const $map = this.mapView.$el;
+                        if (!$(e.target).closest($map).length) {
+                            $popoverTrigger.popover('dispose');
+                        }
+                    });
+                }).on('hide.bs.popover', () => {
+                    if (document.fullscreenElement || document.webkitFullscreenElement) {
+                        return false;
                     }
+                    $(document).off('mouseup', null, this);
                 });
-            }).on('hidden.bs.popover', () => {
-                $(document).off('mouseup', null, this);
-            });
+            }
 
             $popoverTrigger.popover('show');
         },

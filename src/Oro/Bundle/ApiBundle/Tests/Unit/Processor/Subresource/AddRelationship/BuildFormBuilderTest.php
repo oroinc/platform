@@ -19,7 +19,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
     private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    private const TEST_ASSOCIATION_NAME  = 'testAssociation';
+    private const TEST_ASSOCIATION_NAME = 'testAssociation';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|FormFactoryInterface */
     private $formFactory;

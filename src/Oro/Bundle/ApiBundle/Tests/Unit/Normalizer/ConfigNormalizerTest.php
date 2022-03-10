@@ -37,7 +37,7 @@ class ConfigNormalizerTest extends ConfigNormalizerTestCase
     /**
      * @dataProvider normalizeConfigProvider
      */
-    public function testNormalizeConfig($config, $expectedConfig)
+    public function testNormalizeConfig(array $config, array $expectedConfig)
     {
         $normalizer = new ConfigNormalizer();
 

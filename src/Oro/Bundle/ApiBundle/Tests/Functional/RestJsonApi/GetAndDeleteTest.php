@@ -96,12 +96,7 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         });
     }
 
-    /**
-     * @param string   $entityType
-     * @param mixed    $id
-     * @param string[] $excludedActions
-     */
-    private function checkDeleteRequest($entityType, $id, $excludedActions)
+    private function checkDeleteRequest(string $entityType, mixed $id, array $excludedActions): void
     {
         $response = $this->delete(['entity' => $entityType, 'id' => $id], [], [], false);
         if ($response->getStatusCode() !== Response::HTTP_NO_CONTENT) {
@@ -113,23 +108,13 @@ class GetAndDeleteTest extends RestJsonApiTestCase
         }
     }
 
-    /**
-     * @param string  $entityType
-     * @param mixed   $id
-     * @param integer $expectedStatus
-     */
-    private function checkGetRequest($entityType, $id, $expectedStatus)
+    private function checkGetRequest(string $entityType, mixed $id, int $expectedStatus): void
     {
         $response = $this->get(['entity' => $entityType, 'id' => $id], [], [], false);
         self::assertApiResponseStatusCodeEquals($response, $expectedStatus, $entityType, 'get');
     }
 
-    /**
-     * @param array $content
-     *
-     * @return mixed
-     */
-    private function getFirstEntityId($content)
+    private function getFirstEntityId(array $content): mixed
     {
         return array_key_exists('data', $content) && count($content['data']) === 1
             ? $content['data'][0]['id']

@@ -75,6 +75,8 @@ services:
         arguments:
             - '@oro_api.load_metadata.helper'
             - '@oro_entity_extend.association_manager'
+        calls:
+            - [setExtendedAssociationProvider, ['@oro_api.expanded_association_provider']]
 
     oro_api.load_metadata.helper:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper

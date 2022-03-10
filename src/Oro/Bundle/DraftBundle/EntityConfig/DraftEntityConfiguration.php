@@ -18,7 +18,7 @@ class DraftEntityConfiguration implements EntityConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('draftable')
+            ->node('draftable', 'normalized_boolean')
                 ->info('`boolean` enables the “draft” functionality.')
                 ->defaultFalse()
             ->end()

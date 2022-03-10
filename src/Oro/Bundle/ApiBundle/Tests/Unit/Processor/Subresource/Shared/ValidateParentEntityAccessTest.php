@@ -11,6 +11,8 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 {
@@ -123,7 +125,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 
     public function testProcessForManageableEntityWhenEntityNotFound()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The parent entity does not exist.');
 
         $parentClass = 'Test\Class';
@@ -181,7 +183,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
 
     public function testProcessForManageableEntityWhenNoAccessToEntity()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the parent entity.');
 
         $parentClass = 'Test\Class';

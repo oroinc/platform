@@ -18,7 +18,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getResourceDescriptionProvider
      */
-    public function testGetResourceDescription($action, $entityDescription, $expected)
+    public function testGetResourceDescription(string $action, string $entityDescription, ?string $expected)
     {
         self::assertSame(
             $expected,
@@ -26,7 +26,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getResourceDescriptionProvider()
+    public function getResourceDescriptionProvider(): array
     {
         return [
             ['unknown', 'Product', null],
@@ -44,8 +44,12 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getResourceDocumentationProvider
      */
-    public function testGetResourceDocumentation($action, $entitySingularName, $entityPluralName, $expected)
-    {
+    public function testGetResourceDocumentation(
+        string $action,
+        string $entitySingularName,
+        string $entityPluralName,
+        ?string $expected
+    ) {
         self::assertSame(
             $expected,
             $this->resourceDocProvider->getResourceDocumentation($action, $entitySingularName, $entityPluralName)
@@ -55,7 +59,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function getResourceDocumentationProvider()
+    public function getResourceDocumentationProvider(): array
     {
         return [
             ['unknown', 'Product', 'Products', null],
@@ -170,15 +174,19 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSubresourceDescriptionProvider
      */
-    public function testGetSubresourceDescription($action, $associationDescription, $isCollection, $expected)
-    {
+    public function testGetSubresourceDescription(
+        string $action,
+        string $associationDescription,
+        bool $isCollection,
+        ?string $expected
+    ) {
         self::assertSame(
             $expected,
             $this->resourceDocProvider->getSubresourceDescription($action, $associationDescription, $isCollection)
         );
     }
 
-    public function getSubresourceDescriptionProvider()
+    public function getSubresourceDescriptionProvider(): array
     {
         return [
             ['unknown', 'test', false, null],
@@ -206,15 +214,19 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSubresourceDocumentationProvider
      */
-    public function testGetSubresourceDocumentation($action, $associationDescription, $isCollection, $expected)
-    {
+    public function testGetSubresourceDocumentation(
+        string $action,
+        string $associationDescription,
+        bool $isCollection,
+        ?string $expected
+    ) {
         self::assertSame(
             $expected,
             $this->resourceDocProvider->getSubresourceDocumentation($action, $associationDescription, $isCollection)
         );
     }
 
-    public function getSubresourceDocumentationProvider()
+    public function getSubresourceDocumentationProvider(): array
     {
         return [
             ['unknown', 'test', false, null],

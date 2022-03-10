@@ -23,14 +23,10 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
         $this->processor = new RemoveInfoRecordsForCollection();
     }
 
-    /**
-     * @param string $associationName
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    private function createAssociationMetadata($associationName, $isCollection = false)
-    {
+    private function createAssociationMetadata(
+        string $associationName,
+        bool $isCollection = false
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setIsCollection($isCollection);

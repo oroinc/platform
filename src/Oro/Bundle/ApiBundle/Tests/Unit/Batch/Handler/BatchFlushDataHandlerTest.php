@@ -41,20 +41,11 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param BatchUpdateItem|\PHPUnit\Framework\MockObject\MockObject $item
-     * @param string                                                   $targetAction
-     * @param bool                                                     $hasErrors
-     * @param Context|\PHPUnit\Framework\MockObject\MockObject|null    $itemTargetContext
-     * @param object|null                                              $itemEntity
-     *
-     * @return BatchUpdateItemContext|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function prepareBatchUpdateItemContext(
-        BatchUpdateItem $item,
+        BatchUpdateItem|\PHPUnit\Framework\MockObject\MockObject $item,
         string $targetAction,
         bool $hasErrors,
-        ?Context $itemTargetContext,
+        Context|\PHPUnit\Framework\MockObject\MockObject|null $itemTargetContext,
         ?object $itemEntity
     ): void {
         $itemContext = $this->createMock(BatchUpdateItemContext::class);

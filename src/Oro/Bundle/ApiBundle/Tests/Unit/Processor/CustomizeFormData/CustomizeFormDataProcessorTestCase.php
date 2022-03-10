@@ -14,11 +14,10 @@ use Symfony\Component\Validator\Validation;
 
 class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var CustomizeFormDataContext */
-    protected $context;
+    protected CustomizeFormDataContext $context;
 
     protected function setUp(): void
     {
@@ -27,10 +26,7 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
     }
 
-    /**
-     * @return CustomizeFormDataContext
-     */
-    protected function createContext()
+    protected function createContext(): CustomizeFormDataContext
     {
         return new CustomizeFormDataContext();
     }
@@ -40,7 +36,7 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
      *
      * @return FormBuilder
      */
-    protected function createFormBuilder(array $extensions = [])
+    protected function createFormBuilder(array $extensions = []): FormBuilder
     {
         $formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(array_merge($this->getFormExtensions(), $extensions))
@@ -53,7 +49,7 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getFormExtensions()
+    protected function getFormExtensions(): array
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)

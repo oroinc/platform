@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
 use Oro\Bundle\ApiBundle\Processor\GetList\AssertHasResult;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AssertHasResultTest extends GetListProcessorTestCase
 {
@@ -24,7 +25,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
 
     public function testProcessOnExistingResult()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Getting a list of entities failed.');
 
         $this->context->setResult(new \stdClass());
@@ -33,7 +34,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
 
     public function testProcessOnEmptyQuery()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Unsupported request.');
 
         $this->processor->process($this->context);
@@ -41,7 +42,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
 
     public function testProcessOnWrongQuery()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Unsupported query type: stdClass.');
 
         $this->context->setQuery(new \stdClass());

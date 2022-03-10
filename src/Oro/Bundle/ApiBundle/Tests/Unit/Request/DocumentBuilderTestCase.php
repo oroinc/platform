@@ -19,55 +19,41 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
     /** @var RequestType */
     protected $requestType;
 
-    /**
-     * @return ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getValueNormalizer()
+    protected function getValueNormalizer(): ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject
     {
         $valueNormalizer = $this->createMock(ValueNormalizer::class);
         $valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnCallback(
-                function ($value, $dataType, $requestType, $isArrayAllowed) {
-                    self::assertEquals(DataType::ENTITY_TYPE, $dataType);
-                    self::assertEquals($this->requestType, $requestType);
-                    self::assertFalse($isArrayAllowed);
+            ->willReturnCallback(function ($value, $dataType, $requestType, $isArrayAllowed) {
+                self::assertEquals(DataType::ENTITY_TYPE, $dataType);
+                self::assertEquals($this->requestType, $requestType);
+                self::assertFalse($isArrayAllowed);
 
-                    if (str_contains($value, 'WithoutAlias')) {
-                        throw new EntityAliasNotFoundException($value);
-                    }
-
-                    return strtolower(str_replace('\\', '_', $value));
+                if (str_contains($value, 'WithoutAlias')) {
+                    throw new EntityAliasNotFoundException($value);
                 }
-            );
+
+                return strtolower(str_replace('\\', '_', $value));
+            });
 
         return $valueNormalizer;
     }
 
-    /**
-     * @return EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityIdTransformer()
+    protected function getEntityIdTransformer(): EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
     {
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $entityIdTransformer->expects(self::any())
             ->method('transform')
-            ->willReturnCallback(
-                function ($id, EntityMetadata $metadata) {
-                    return sprintf('%s::%s', $metadata->getClassName(), $id);
-                }
-            );
+            ->willReturnCallback(function ($id, EntityMetadata $metadata) {
+                return sprintf('%s::%s', $metadata->getClassName(), $id);
+            });
 
         return $entityIdTransformer;
     }
 
-    /**
-     * @param EntityIdTransformerInterface $entityIdTransformer
-     *
-     * @return EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getEntityIdTransformerRegistry(EntityIdTransformerInterface $entityIdTransformer)
-    {
+    protected function getEntityIdTransformerRegistry(
+        EntityIdTransformerInterface $entityIdTransformer
+    ): EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject {
         $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $entityIdTransformerRegistry->expects(self::any())
             ->method('getEntityIdTransformer')
@@ -77,27 +63,16 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
         return $entityIdTransformerRegistry;
     }
 
-    /**
-     * @param string   $class
-     * @param string[] $idFields
-     *
-     * @return EntityMetadata
-     */
-    protected function getEntityMetadata($class, array $idFields)
+    protected function getEntityMetadata(string $class, array $idFieldNames): EntityMetadata
     {
         $metadata = new EntityMetadata();
         $metadata->setClassName($class);
-        $metadata->setIdentifierFieldNames($idFields);
+        $metadata->setIdentifierFieldNames($idFieldNames);
 
         return $metadata;
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return MetaPropertyMetadata
-     */
-    protected function createMetaPropertyMetadata($fieldName)
+    protected function createMetaPropertyMetadata(string $fieldName): MetaPropertyMetadata
     {
         $fieldMetadata = new MetaPropertyMetadata();
         $fieldMetadata->setName($fieldName);
@@ -105,12 +80,7 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string $fieldName
-     *
-     * @return FieldMetadata
-     */
-    protected function createFieldMetadata($fieldName)
+    protected function createFieldMetadata(string $fieldName): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -118,20 +88,12 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string   $associationName
-     * @param string   $targetClass
-     * @param bool     $isCollection
-     * @param string[] $idFields
-     *
-     * @return AssociationMetadata
-     */
     protected function createAssociationMetadata(
-        $associationName,
-        $targetClass,
-        $isCollection = false,
+        string $associationName,
+        string $targetClass,
+        bool $isCollection = false,
         array $idFields = ['id']
-    ) {
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);

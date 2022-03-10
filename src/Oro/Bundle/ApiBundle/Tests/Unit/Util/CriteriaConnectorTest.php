@@ -73,11 +73,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @param CommonCriteria $criteria
-     * @param string         $expectedDql
-     */
-    private function assertQuery(CommonCriteria $criteria, $expectedDql)
+    private function assertQuery(CommonCriteria $criteria, string $expectedDql): void
     {
         $qb = new QueryBuilder($this->em);
         $qb
@@ -92,24 +88,12 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param mixed  $value
-     *
-     * @return Comparison
-     */
-    private static function comparison($field, $operator, $value)
+    private static function comparison(string $field, string $operator, mixed $value): Comparison
     {
         return new Comparison($field, $operator, $value);
     }
 
-    /**
-     * @param bool $isCommonCriteria
-     *
-     * @return CommonCriteria|Criteria
-     */
-    private function createCriteria(bool $isCommonCriteria = false)
+    private function createCriteria(bool $isCommonCriteria = false): CommonCriteria|Criteria
     {
         if ($isCommonCriteria) {
             return new CommonCriteria();
@@ -118,10 +102,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         return new Criteria($this->entityClassResolver);
     }
 
-    /**
-     * @return array
-     */
-    public function criteriaDataProvider()
+    public function criteriaDataProvider(): array
     {
         return [
             [false],

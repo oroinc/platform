@@ -26,12 +26,12 @@ $menu-side-width-minimized: 80px !default;
 // Main menu dropdown
 $menu-header-background-color: $primary !default;
 $menu-dropdown-background-color: $primary-860 !default;
-$menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 $menu-dropdown-background-color-active: $primary-500 !default;
 $menu-dropdown-background-color-light-active: $primary-700 !default;
 
 // Mobile main menu
-$menu-mobile-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, .19) !default;
+$menu-mobile-box-shadow: 0 2px 10px 0 rgba(0 0 0 / 19%) !default;
 
 // Main menu items
 $menu-accordion-icon-color: $primary-550 !default;
@@ -62,4 +62,4 @@ $side-menu-overlay-ui-helper-text-align: right !default;
 $side-menu-overlay-ui-fill-transform: translate(-100%) !default;
 $side-menu-overlay-ui-fill-width: 300% !default;
 $side-menu-overlay-ui-fill-background-color: rgba($primary-inverse, .5) !default;
-$side-menu-overlay-ui-fill-blur-box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, .19) !default;
+$side-menu-overlay-ui-fill-blur-box-shadow: 2px 2px 2px 0 rgba(0 0 0 / 19%) !default;

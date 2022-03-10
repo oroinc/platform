@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityExists;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ValidateEntityExistsTest extends GetProcessorTestCase
 {
@@ -25,7 +26,7 @@ class ValidateEntityExistsTest extends GetProcessorTestCase
 
     public function testProcessWithoutObject()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('An entity with the requested identifier does not exist.');
 
         $this->processor->process($this->context);
@@ -33,7 +34,7 @@ class ValidateEntityExistsTest extends GetProcessorTestCase
 
     public function testProcessWithNullObject()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('An entity with the requested identifier does not exist.');
 
         $this->context->setResult(null);

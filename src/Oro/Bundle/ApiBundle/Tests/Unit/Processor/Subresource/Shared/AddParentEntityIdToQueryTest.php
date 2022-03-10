@@ -137,9 +137,6 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 
     public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage('The query is not valid. Reason: the parent entity ID is not set.');
-
         $associationName = 'owner';
         $parentId = 123;
 
@@ -154,7 +151,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 
         $query = $this->doctrineHelper
             ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+            ->createQueryBuilder('r')
+            ->innerJoin('e.owner', 'e');
 
         $this->context->setParentClassName(Entity\Product::class);
         $this->context->setParentId($parentId);
@@ -163,6 +161,18 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User r'
+            . ' INNER JOIN e.owner e'
+            . ' WHERE e.id = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
     }
 
     public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsPreparedByAnotherProcessor()
@@ -216,9 +226,6 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 
     public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage('The query is not valid. Reason: the parent entity ID is not set.');
-
         $associationName = 'owner';
         $parentId = ['id' => 123, 'title' => 'test'];
 
@@ -235,7 +242,8 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
 
         $query = $this->doctrineHelper
             ->getEntityRepositoryForClass(Entity\User::class)
-            ->createQueryBuilder('e');
+            ->createQueryBuilder('r')
+            ->innerJoin('e.owner', 'e');
 
         $this->context->setParentClassName(Entity\Product::class);
         $this->context->setParentId($parentId);
@@ -244,6 +252,22 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $this->context->setParentMetadata($parentMetadata);
         $this->context->setQuery($query);
         $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User r'
+            . ' INNER JOIN e.owner e'
+            . ' WHERE e.id = :parent_entity_id1 AND e.title = :parent_entity_id2',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertSame(
+            $parentId['id'],
+            $this->context->getQuery()->getParameter('parent_entity_id1')->getValue()
+        );
+        self::assertSame(
+            $parentId['title'],
+            $this->context->getQuery()->getParameter('parent_entity_id2')->getValue()
+        );
     }
 
     public function testProcessForToManyBidirectionalAssociation()

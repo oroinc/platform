@@ -41,11 +41,7 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
         $this->context->setExtras([new TestConfigSection('test')]);
     }
 
-    /**
-     * @param string $parentResourceClass
-     * @param Config $parentConfig
-     */
-    private function loadParentConfig($parentResourceClass, Config $parentConfig)
+    private function loadParentConfig(string $parentResourceClass, Config $parentConfig): void
     {
         $this->configProvider->expects(self::once())
             ->method('getConfig')

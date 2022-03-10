@@ -232,11 +232,18 @@
 
 .fields-row {
     .datepicker-input {
+        min-width: $fields-row-datepicker-input-min-width;
         margin-right: $fields-row-datepicker-input-margin-end;
+        // Fix datepicker on iOS
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     .timepicker-input {
         min-width: $fields-row-timepicker-input-min-width;
+        // Fix timepicker on iOS
+        white-space: nowrap;
+        overflow: hidden;
     }
 
     input.error + .datepicker-input,

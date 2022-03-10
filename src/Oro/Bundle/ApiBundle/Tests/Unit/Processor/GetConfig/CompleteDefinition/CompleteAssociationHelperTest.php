@@ -42,11 +42,11 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
      * @dataProvider completeAssociationDataProvider
      */
     public function testCompleteAssociation(
-        $config,
-        $targetConfig,
-        $extras,
-        $expectedConfig,
-        $expectedExtras
+        array $config,
+        array $targetConfig,
+        array $extras,
+        array $expectedConfig,
+        array $expectedExtras
     ) {
         $config = $this->createConfigObject($config);
         $targetClass = 'Test\TargetEntity';
@@ -72,7 +72,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function completeAssociationDataProvider()
+    public function completeAssociationDataProvider(): array
     {
         return [
             'without config extras'                        => [

@@ -2801,4 +2801,19 @@ JS;
             )
         );
     }
+
+    /**
+     * Checks, that form field with specified id|name|label|value has specified value
+     * Example: Then the "username" field should contain:
+     *            """
+     *            John
+     *            Doe
+     *            """
+     *
+     * @Then /^the "(?P<field>(?:[^"]|\\")*)" field should contain:$/
+     */
+    public function assertFieldContains($field, $value)
+    {
+        parent::assertFieldContains($field, $value);
+    }
 }

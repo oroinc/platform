@@ -4,15 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class AllTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetTargets()
-    {
-        $constraint = new All(new NotNull());
-        self::assertEquals('property', $constraint->getTargets());
-    }
-
     public function testThatConstraintsPropertyIsSet()
     {
         $childConstraint = new NotNull();
@@ -22,13 +18,13 @@ class AllTest extends \PHPUnit\Framework\TestCase
 
     public function testRequiredOptions()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\MissingOptionsException::class);
+        $this->expectException(MissingOptionsException::class);
         new All();
     }
 
     public function testRejectNonConstraints()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\ConstraintDefinitionException::class);
+        $this->expectException(ConstraintDefinitionException::class);
         new All('test');
     }
 }

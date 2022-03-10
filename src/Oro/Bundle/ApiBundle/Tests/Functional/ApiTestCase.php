@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -25,21 +26,11 @@ abstract class ApiTestCase extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
 
-    /** @var bool */
-    private $isKernelRebootDisabled = false;
+    private bool $isKernelRebootDisabled = false;
 
-    /**
-     * @return RequestType
-     */
-    abstract protected function getRequestType();
+    abstract protected function getRequestType(): RequestType;
 
-    /**
-     * @param string $entityClass
-     * @param bool   $throwException
-     *
-     * @return string
-     */
-    protected function getEntityType($entityClass, $throwException = true)
+    protected function getEntityType(string $entityClass, bool $throwException = true): string
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->getValueNormalizer(),
@@ -49,13 +40,7 @@ abstract class ApiTestCase extends WebTestCase
         );
     }
 
-    /**
-     * @param string $entityType
-     * @param bool   $throwException
-     *
-     * @return string
-     */
-    protected function getEntityClass($entityType, $throwException = true)
+    protected function getEntityClass(string $entityType, bool $throwException = true): string
     {
         return ValueNormalizerUtil::convertToEntityClass(
             $this->getValueNormalizer(),
@@ -65,29 +50,17 @@ abstract class ApiTestCase extends WebTestCase
         );
     }
 
-    /**
-     * @return DoctrineHelper
-     */
-    protected function getDoctrineHelper()
+    protected function getDoctrineHelper(): DoctrineHelper
     {
         return self::getContainer()->get('oro_api.doctrine_helper');
     }
 
-    /**
-     * @return ValueNormalizer
-     */
-    protected function getValueNormalizer()
+    protected function getValueNormalizer(): ValueNormalizer
     {
         return self::getContainer()->get('oro_api.value_normalizer');
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $action
-     *
-     * @return bool
-     */
-    protected function isActionEnabled($entityClass, $action)
+    protected function isActionEnabled(string $entityClass, string $action): bool
     {
         $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
         $excludeActions = $resourcesProvider->getResourceExcludeActions(
@@ -102,7 +75,7 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
-    protected function getEntities()
+    protected function getEntities(): array
     {
         $result = [];
         $doctrineHelper = $this->getDoctrineHelper();
@@ -119,7 +92,7 @@ abstract class ApiTestCase extends WebTestCase
         return $result;
     }
 
-    protected function runForEntities(callable $callback)
+    protected function runForEntities(callable $callback): void
     {
         $entities = $this->getEntities();
         foreach ($entities as [$entityClass, $excludedActions]) {
@@ -138,7 +111,7 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * @return array [[entity class, association name, ApiSubresource], ...]
      */
-    protected function getSubresources()
+    protected function getSubresources(): array
     {
         $result = [];
         $resourcesProvider = self::getContainer()->get('oro_api.resources_provider');
@@ -161,7 +134,7 @@ abstract class ApiTestCase extends WebTestCase
         return $result;
     }
 
-    protected function runForSubresources(callable $callback)
+    protected function runForSubresources(callable $callback): void
     {
         $subresources = $this->getSubresources();
         foreach ($subresources as [$entityClass, $associationName, $subresource]) {
@@ -181,12 +154,7 @@ abstract class ApiTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return mixed
-     */
-    protected function findEntityId($entityClass)
+    protected function findEntityId(string $entityClass): mixed
     {
         /** @var EntityManager|null $em */
         $em = self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
@@ -220,44 +188,28 @@ abstract class ApiTestCase extends WebTestCase
             : $ids;
     }
 
-    /**
-     * @return string
-     */
-    protected function getRequestDataFolderName()
+    protected function getRequestDataFolderName(): string
     {
         return 'requests';
     }
 
-    /**
-     * @return string
-     */
-    protected function getResponseDataFolderName()
+    protected function getResponseDataFolderName(): string
     {
         return 'responses';
     }
 
     /**
      * Loads the response content and convert it to an array.
-     *
-     * @param string $fileName
-     * @param string $folderName
-     *
-     * @return array
      */
-    protected function loadYamlData($fileName, $folderName = null)
+    protected function loadYamlData(string $fileName, string $folderName = null): array
     {
         return Yaml::parse($this->loadData($fileName, $folderName));
     }
 
     /**
      * Loads the response content.
-     *
-     * @param string $fileName
-     * @param string $folderName
-     *
-     * @return string
      */
-    protected function loadData($fileName, $folderName = null)
+    protected function loadData(string $fileName, string $folderName = null): string
     {
         if ($this->isRelativePath($fileName)) {
             $fileName = $this->getTestResourcePath($folderName, $fileName);
@@ -275,7 +227,7 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @return array
      */
-    protected function getRequestData($request)
+    protected function getRequestData(array|string $request): array
     {
         if (is_string($request) && $this->isRelativePath($request)) {
             $request = $this->getTestResourcePath($this->getRequestDataFolderName(), $request);
@@ -292,7 +244,7 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @return array
      */
-    protected function getResponseData($expectedContent)
+    protected function getResponseData(array|string $expectedContent): array
     {
         if (is_string($expectedContent)) {
             $expectedContent = $this->loadYamlData($expectedContent, $this->getResponseDataFolderName());
@@ -315,7 +267,7 @@ abstract class ApiTestCase extends WebTestCase
      * @return array
      */
     protected function updateResponseContent(
-        $expectedContent,
+        array|string $expectedContent,
         Response $response,
         string $key = 'id',
         string $placeholder = 'new'
@@ -364,21 +316,18 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @param Response  $response
-     * @param int|int[] $statusCode
-     * @param string    $entityName
-     * @param string    $requestType
+     * Asserts response status code for API request equals to any of the given status code.
      */
     protected static function assertApiResponseStatusCodeEquals(
         Response $response,
-        $statusCode,
-        $entityName,
-        $requestType
-    ) {
+        int|array $statusCode,
+        string $entityName,
+        string $requestType
+    ): void {
         try {
-            static::assertResponseStatusCodeEquals($response, $statusCode);
+            static::assertResponseStatusCodeEqualsToOneOf($response, $statusCode);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $e = new \PHPUnit\Framework\ExpectationFailedException(
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -388,28 +337,23 @@ abstract class ApiTestCase extends WebTestCase
                 ),
                 $e->getComparisonFailure()
             );
-            throw $e;
         }
     }
 
     /**
-     * @param Response   $response
-     * @param int|int[]  $statusCode
-     * @param string     $entityName
-     * @param string     $requestType
-     * @param array|null $content
+     * Asserts response status code for update API request equals to any of the given status code.
      */
     protected static function assertUpdateApiResponseStatusCodeEquals(
         Response $response,
-        $statusCode,
-        $entityName,
-        $requestType,
-        $content
-    ) {
+        int|array $statusCode,
+        string $entityName,
+        string $requestType,
+        ?array $content
+    ): void {
         try {
-            static::assertResponseStatusCodeEquals($response, $statusCode);
+            static::assertResponseStatusCodeEqualsToOneOf($response, $statusCode);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-            $e = new \PHPUnit\Framework\ExpectationFailedException(
+            throw new \PHPUnit\Framework\ExpectationFailedException(
                 sprintf(
                     'Expects %s status code for "%s" request for entity: "%s". Error message: %s. Content: %s',
                     is_array($statusCode) ? implode(', ', $statusCode) : $statusCode,
@@ -420,34 +364,53 @@ abstract class ApiTestCase extends WebTestCase
                 ),
                 $e->getComparisonFailure()
             );
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected static function assertResponseStatusCodeEquals(
+        Response $response,
+        int $statusCode,
+        string $message = ''
+    ): void {
+        try {
+            \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
+                && static::isApplicableContentType($response->headers)
+            ) {
+                $e = new \PHPUnit\Framework\ExpectationFailedException(
+                    $e->getMessage() . "\nResponse content: " . $response->getContent(),
+                    $e->getComparisonFailure()
+                );
+            }
             throw $e;
         }
     }
 
     /**
      * Asserts response status code equals to one of the given status code.
-     *
-     * @param Response    $response
-     * @param int|int[]   $statusCode
-     * @param string $message
      */
-    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
-    {
+    private static function assertResponseStatusCodeEqualsToOneOf(
+        Response $response,
+        int|array $statusCode,
+        string $message = ''
+    ): void {
         try {
-            if (is_array($statusCode)) {
-                if (!in_array($response->getStatusCode(), $statusCode, true)) {
-                    $failureMessage = sprintf(
-                        'Failed asserting that %s is one of %s',
-                        $response->getStatusCode(),
-                        implode(', ', $statusCode)
-                    );
-                    if (!empty($message)) {
-                        $failureMessage = $message . "\n" . $failureMessage;
-                    }
-                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
-                }
-            } else {
+            if (!is_array($statusCode)) {
                 \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
+            } elseif (!in_array($response->getStatusCode(), $statusCode, true)) {
+                $failureMessage = sprintf(
+                    'Failed asserting that %s is one of %s',
+                    $response->getStatusCode(),
+                    implode(', ', $statusCode)
+                );
+                if (!empty($message)) {
+                    $failureMessage = $message . "\n" . $failureMessage;
+                }
+                throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
@@ -464,28 +427,25 @@ abstract class ApiTestCase extends WebTestCase
 
     /**
      * Asserts response status code does not equal to any of the given status code.
-     *
-     * @param Response    $response
-     * @param int|int[]   $statusCode
-     * @param string $message
      */
-    protected static function assertResponseStatusCodeNotEquals(Response $response, $statusCode, string $message = '')
-    {
+    protected static function assertResponseStatusCodeNotEquals(
+        Response $response,
+        int|array $statusCode,
+        string $message = ''
+    ): void {
         try {
-            if (is_array($statusCode)) {
-                if (in_array($response->getStatusCode(), $statusCode, true)) {
-                    $failureMessage = sprintf(
-                        'Failed asserting that %s is not one of %s',
-                        $response->getStatusCode(),
-                        implode(', ', $statusCode)
-                    );
-                    if (!empty($message)) {
-                        $failureMessage = $message . "\n" . $failureMessage;
-                    }
-                    throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
-                }
-            } else {
+            if (!is_array($statusCode)) {
                 \PHPUnit\Framework\TestCase::assertNotEquals($statusCode, $response->getStatusCode(), $message);
+            } elseif (in_array($response->getStatusCode(), $statusCode, true)) {
+                $failureMessage = sprintf(
+                    'Failed asserting that %s is not one of %s',
+                    $response->getStatusCode(),
+                    implode(', ', $statusCode)
+                );
+                if (!empty($message)) {
+                    $failureMessage = $message . "\n" . $failureMessage;
+                }
+                throw new \PHPUnit\Framework\ExpectationFailedException($failureMessage);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             if ($response->getStatusCode() >= Response::HTTP_BAD_REQUEST
@@ -508,39 +468,25 @@ abstract class ApiTestCase extends WebTestCase
         Response $response,
         string $expectedAllowedMethods,
         string $message = ''
-    ) {
+    ): void {
         self::assertResponseStatusCodeEquals($response, Response::HTTP_METHOD_NOT_ALLOWED, $message);
         self::assertAllowResponseHeader($response, $expectedAllowedMethods, $message);
     }
 
     /**
      * Asserts an array contains the expected array.
-     *
-     * @param array  $expected
-     * @param mixed  $actual
-     * @param string $message
      */
-    protected static function assertArrayContains(array $expected, $actual, string $message = '')
+    protected static function assertArrayContains(array $expected, mixed $actual, string $message = ''): void
     {
         self::assertThat($actual, new ArrayContainsConstraint($expected, false), $message);
     }
 
-    /**
-     * @param ResponseHeaderBag $headers
-     *
-     * @return bool
-     */
-    protected static function isApplicableContentType(ResponseHeaderBag $headers)
+    protected static function isApplicableContentType(ResponseHeaderBag $headers): bool
     {
         return $headers->contains('Content-Type', 'application/json');
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityManager
-     */
-    protected function getEntityManager(string $entityClass = null)
+    protected function getEntityManager(string $entityClass = null): EntityManagerInterface
     {
         $doctrine = self::getContainer()->get('doctrine');
         if ($entityClass) {
@@ -553,7 +499,7 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Clears the default entity manager.
      */
-    protected function clearEntityManager()
+    protected function clearEntityManager(): void
     {
         $em = $this->getEntityManager();
         if ($em->isOpen()) {
@@ -561,10 +507,7 @@ abstract class ApiTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @return TestConfigRegistry
-     */
-    protected function getConfigRegistry()
+    protected function getConfigRegistry(): TestConfigRegistry
     {
         return self::getContainer()->get('oro_api.tests.config_registry');
     }
@@ -583,7 +526,7 @@ abstract class ApiTestCase extends WebTestCase
      *                                     cache. E.g. this can happen when an association is renamed or excluded,
      *                                     or when a API resource is added or excluded
      */
-    protected function appendEntityConfig($entityClass, array $config, $affectResourcesCache = false)
+    protected function appendEntityConfig(string $entityClass, array $config, bool $affectResourcesCache = false): void
     {
         $this->getConfigRegistry()->appendEntityConfig(
             $this->getRequestType(),
@@ -603,7 +546,7 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @after
      */
-    protected function restoreConfigs()
+    protected function restoreConfigs(): void
     {
         $this->getConfigRegistry()->restoreConfigs($this->getRequestType());
         // restore the kernel reboot if it was disabled in appendEntityConfig method
@@ -620,7 +563,7 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @after
      */
-    protected function clearRequestTypeLogger()
+    protected function clearRequestTypeLogger(): void
     {
         $logger = $this->getRequestTypeLogger();
         if (null !== $logger) {
@@ -628,20 +571,15 @@ abstract class ApiTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @return BufferingLogger|null
-     */
-    protected function getRequestTypeLogger()
+    protected function getRequestTypeLogger(): ?BufferingLogger
     {
-        return null !== $this->client
-            ? $this->client->getContainer()->get('oro_api.tests.request_type_logger')
-            : null;
+        return $this->client?->getContainer()->get('oro_api.tests.request_type_logger');
     }
 
     /**
      * @return string[]
      */
-    protected function getRequestTypeLogMessages()
+    protected function getRequestTypeLogMessages(): array
     {
         $logger = $this->getRequestTypeLogger();
         if (null === $logger) {
@@ -662,7 +600,7 @@ abstract class ApiTestCase extends WebTestCase
      *
      * @after
      */
-    protected function clearCustomizeFormDataLogger()
+    protected function clearCustomizeFormDataLogger(): void
     {
         $logger = $this->getCustomizeFormDataLogger();
         if (null !== $logger) {
@@ -670,13 +608,8 @@ abstract class ApiTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @return BufferingLogger|null
-     */
-    protected function getCustomizeFormDataLogger()
+    protected function getCustomizeFormDataLogger(): ?BufferingLogger
     {
-        return null !== $this->client
-            ? $this->client->getContainer()->get('oro_api.tests.customize_form_data_logger')
-            : null;
+        return $this->client?->getContainer()->get('oro_api.tests.customize_form_data_logger');
     }
 }

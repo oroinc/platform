@@ -90,6 +90,7 @@
         font-size: $base-font-size--xl;
         font-weight: font-weight('light');
         display: inline;
+        word-break: break-all;
     }
 
     &__icon {
@@ -104,6 +105,12 @@
         img {
             width: $mobile-page-title-icon-size;
         }
+    }
+
+    .title-buttons-container:not(.buttons-grouped) {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
     }
 
     .title-buttons-container:not(:empty) {

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\AssertNotHasErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
@@ -25,7 +26,7 @@ class AssertNotHasErrorsTest extends GetListProcessorTestCase
 
     public function testProcessWithErrorsInContext()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\UnhandledErrorsException::class);
+        $this->expectException(UnhandledErrorsException::class);
         $this->context->addError(Error::createValidationError('some error'));
         $this->processor->process($this->context);
     }

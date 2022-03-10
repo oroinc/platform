@@ -45,6 +45,12 @@ api:
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestArticle:
             alias: testapiarticle
             plural_alias: testapiarticles
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine:
+            alias: testapicustommagazine
+            plural_alias: testapicustommagazines
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle:
+            alias: testapicustomarticle
+            plural_alias: testapicustomarticles
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestMagazineModel1:
             alias: testapimagazinemodel1
             plural_alias: testapimagazinemodel1
@@ -92,6 +98,7 @@ api:
                     fields:
                         firstName: ~
                         lastName: ~
+                        contactedAt: ~
                 firstName:
                     exclude: true
                 lastName:
@@ -382,6 +389,11 @@ api:
                 activityTargets:
                     data_type: association:manyToMany:activity
         Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestActivity: ~
+        Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget:
+            fields:
+                name:
+                    property_path: string
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestMagazine:
             fields:
                 articles:
@@ -466,6 +478,21 @@ api:
                     data_type: string
             # this entity does not have own API resource
             actions: false
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine:
+            fields:
+                articles:
+                    exclude: true
+                bestArticle:
+                    exclude: true
+                customArticles:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle
+                    target_type: to-many
+                    property_path: _
+                customBestArticle:
+                    target_class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle
+                    target_type: to-one
+                    property_path: _
+        Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomArticle: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCollection:
             fields:
                 name:

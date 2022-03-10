@@ -12,20 +12,9 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): ScheduleIntervalsIntersectionValidator
     {
         return new ScheduleIntervalsIntersectionValidator();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
-    {
-        $this->constraint = new ScheduleIntervalsIntersection();
-        $this->propertyPath = '';
-
-        return parent::createContext();
     }
 
     /**
@@ -35,7 +24,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
      */
     private function normalizeCollection(array $collection): array
     {
-        return array_map(function ($dates) {
+        return array_map(function (array $dates) {
             return $this->normalizeSingleDateData($dates);
         }, $collection);
     }
@@ -63,8 +52,8 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
         $date = reset($collection);
         $date->setHolder($holder);
 
-        $this->validator->validate($date, $this->constraint);
-
+        $constraint = new ScheduleIntervalsIntersection();
+        $this->validator->validate($date, $constraint);
         $this->assertNoViolation();
     }
 
@@ -120,10 +109,10 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
         $date = reset($collection);
         $date->setHolder($holder);
 
-        $this->validator->validate($date, $this->constraint);
+        $constraint = new ScheduleIntervalsIntersection();
+        $this->validator->validate($date, $constraint);
 
-        $this->buildViolation($this->constraint->message)
-            ->atPath('')
+        $this->buildViolation($constraint->message)
             ->assertRaised();
     }
 
@@ -192,6 +181,7 @@ class ScheduleIntervalsIntersectionValidatorTest extends ConstraintValidatorTest
     public function testNotPriceListScheduleValue(): void
     {
         $this->expectException(UnexpectedTypeException::class);
+
         $this->validator->validate(12, new ScheduleIntervalsIntersection());
     }
 }

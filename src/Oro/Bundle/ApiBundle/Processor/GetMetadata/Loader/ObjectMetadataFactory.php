@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
@@ -25,12 +26,20 @@ class ObjectMetadataFactory
     /** @var AssociationManager */
     protected $associationManager;
 
+    /** @var ExtendedAssociationProvider */
+    private $extendedAssociationProvider;
+
     public function __construct(
         MetadataHelper $metadataHelper,
         AssociationManager $associationManager
     ) {
         $this->metadataHelper = $metadataHelper;
         $this->associationManager = $associationManager;
+    }
+
+    public function setExtendedAssociationProvider(ExtendedAssociationProvider $extendedAssociationProvider)
+    {
+        $this->extendedAssociationProvider = $extendedAssociationProvider;
     }
 
     /**
@@ -102,7 +111,7 @@ class ObjectMetadataFactory
             $this->metadataHelper->assertDataType($field->getDataType(), $entityClass, $fieldName)
         );
         $fieldMetadata->setIsNullable(
-            !in_array($fieldName, $entityMetadata->getIdentifierFieldNames(), true)
+            !\in_array($fieldName, $entityMetadata->getIdentifierFieldNames(), true)
         );
 
         return $fieldMetadata;
@@ -168,20 +177,25 @@ class ObjectMetadataFactory
         EntityDefinitionConfig $config,
         EntityDefinitionFieldConfig $field
     ) {
-        list($associationType, $associationKind) = DataType::parseExtendedAssociation($field->getDataType());
+        [$associationType, $associationKind] = DataType::parseExtendedAssociation($field->getDataType());
         $this->setAssociationDataType($associationMetadata, $field);
         $associationMetadata->setAssociationType($associationType);
-        $targets = $this->getExtendedAssociationTargets(
-            $this->getAssociationOwnerClass($entityClass, $config, $field),
-            $associationType,
-            $associationKind
-        );
-        if (empty($targets)) {
-            $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
-        } else {
-            $associationMetadata->setAcceptableTargetClassNames(array_keys($targets));
+        $associationTargets = null;
+        $targetFieldNames = $field->getDependsOn();
+        if ($targetFieldNames) {
+            $associationTargets = $this->extendedAssociationProvider->filterExtendedAssociationTargets(
+                $this->getAssociationOwnerClass($entityClass, $config, $field),
+                $associationType,
+                $associationKind,
+                $targetFieldNames
+            );
         }
-        $associationMetadata->setIsCollection((bool)$field->isCollectionValuedAssociation());
+        if ($associationTargets) {
+            $associationMetadata->setAcceptableTargetClassNames(array_keys($associationTargets));
+        } else {
+            $associationMetadata->setEmptyAcceptableTargetsAllowed(false);
+        }
+        $associationMetadata->setIsCollection($field->isCollectionValuedAssociation());
     }
 
     /**

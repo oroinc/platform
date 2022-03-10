@@ -20,7 +20,6 @@ trait ConfigExtensionRegistryTrait
 {
     private function createConfigExtensionRegistry(): ConfigExtensionRegistry
     {
-        /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject $actionProcessorBag */
         $actionProcessorBag = $this->createMock(ActionProcessorBagInterface::class);
         $actionProcessorBag->expects(self::any())
             ->method('getActions')
@@ -53,7 +52,6 @@ trait ConfigExtensionRegistryTrait
             FilterOperator::ENDS_WITH       => '$',
             FilterOperator::NOT_ENDS_WITH   => '!$'
         ]);
-        /** @var PostProcessorRegistry|\PHPUnit\Framework\MockObject\MockObject $postProcessorRegistry */
         $postProcessorRegistry = $this->createMock(PostProcessorRegistry::class);
         $postProcessorRegistry->expects(self::any())
             ->method('getPostProcessorNames')

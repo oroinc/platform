@@ -53,7 +53,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /**
      * @dataProvider processNotManageableEntityProvider
      */
-    public function testProcessForNotManageableEntity($definition, $sorters, $expectedSorters)
+    public function testProcessForNotManageableEntity(array $definition, array $sorters, array $expectedSorters)
     {
         $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
@@ -69,7 +69,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processNotManageableEntityProvider()
+    public function processNotManageableEntityProvider(): array
     {
         return [
             'empty'                                                          => [
@@ -232,7 +232,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /**
      * @dataProvider processManageableEntityProvider
      */
-    public function testProcessForManageableEntity($definition, $sorters, $expectedSorters)
+    public function testProcessForManageableEntity(array $definition, array $sorters, array $expectedSorters)
     {
         $rootMetadata = $this->getClassMetadataMock();
         $toOne1Metadata = $this->getClassMetadataMock();
@@ -246,37 +246,29 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
 
         $rootMetadata->expects(self::any())
             ->method('hasAssociation')
-            ->willReturnMap(
-                [
-                    ['toOne1', true],
-                    ['toMany1', true]
-                ]
-            );
+            ->willReturnMap([
+                ['toOne1', true],
+                ['toMany1', true]
+            ]);
         $rootMetadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
-            ->willReturnMap(
-                [
-                    ['toOne1', false],
-                    ['toMany1', true]
-                ]
-            );
+            ->willReturnMap([
+                ['toOne1', false],
+                ['toMany1', true]
+            ]);
 
         $toOne1Metadata->expects(self::any())
             ->method('hasAssociation')
-            ->willReturnMap(
-                [
-                    ['toOne1_toOne11', true],
-                    ['toOne1_toMany11', true]
-                ]
-            );
+            ->willReturnMap([
+                ['toOne1_toOne11', true],
+                ['toOne1_toMany11', true]
+            ]);
         $toOne1Metadata->expects(self::any())
             ->method('isCollectionValuedAssociation')
-            ->willReturnMap(
-                [
-                    ['toOne1_toOne11', false],
-                    ['toOne1_toMany11', true]
-                ]
-            );
+            ->willReturnMap([
+                ['toOne1_toOne11', false],
+                ['toOne1_toMany11', true]
+            ]);
 
         $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
@@ -288,14 +280,12 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
             ->willReturn($rootMetadata);
         $this->doctrineHelper->expects(self::any())
             ->method('findEntityMetadataByPath')
-            ->willReturnMap(
-                [
-                    [self::TEST_CLASS_NAME, ['toOne1'], $toOne1Metadata],
-                    [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toOne11'], $toOne1toOne11Metadata],
-                    [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toMany11'], $toOne1toMany11Metadata],
-                    [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata]
-                ]
-            );
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, ['toOne1'], $toOne1Metadata],
+                [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toOne11'], $toOne1toOne11Metadata],
+                [self::TEST_CLASS_NAME, ['toOne1', 'toOne1_toMany11'], $toOne1toMany11Metadata],
+                [self::TEST_CLASS_NAME, ['toMany1'], $toMany1Metadata]
+            ]);
 
         $this->context->setResult($this->createConfigObject($definition));
         $this->context->setSorters($this->createConfigObject($sorters, ConfigUtil::SORTERS));
@@ -306,7 +296,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function processManageableEntityProvider()
+    public function processManageableEntityProvider(): array
     {
         return [
             'child sorters' => [

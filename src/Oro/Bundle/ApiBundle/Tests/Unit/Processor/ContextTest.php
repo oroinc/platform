@@ -51,6 +51,16 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new Context($this->configProvider, $this->metadataProvider);
     }
 
+    private function getConfig(array $data = []): Config
+    {
+        $result = new Config();
+        foreach ($data as $sectionName => $config) {
+            $result->set($sectionName, $config);
+        }
+
+        return $result;
+    }
+
     /**
      * keys of request headers should be are case insensitive
      */
@@ -539,7 +549,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testLoadKnownSectionConfigByGetConfigOf($configSection)
+    public function testLoadKnownSectionConfigByGetConfigOf(string $configSection)
     {
         $mainConfig = new EntityDefinitionConfig();
         $sectionConfig = [];
@@ -590,7 +600,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testConfigWhenIsSetExplicitlyForKnownSection($configSection, $sectionConfig)
+    public function testConfigWhenIsSetExplicitlyForKnownSection(string $configSection, object $sectionConfig)
     {
         $this->context->setClassName('Test\Class');
         // set "known" sections
@@ -616,7 +626,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    public function configSectionProvider()
+    public function configSectionProvider(): array
     {
         return [
             [FiltersConfigExtra::NAME, new FiltersConfig()],
@@ -1314,20 +1324,5 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         $this->context->setCriteria();
         self::assertNull($this->context->getCriteria());
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return Config
-     */
-    protected function getConfig(array $data = [])
-    {
-        $result = new Config();
-        foreach ($data as $sectionName => $config) {
-            $result->set($sectionName, $config);
-        }
-
-        return $result;
     }
 }

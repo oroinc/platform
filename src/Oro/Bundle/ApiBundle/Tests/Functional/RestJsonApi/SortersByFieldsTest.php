@@ -7,23 +7,15 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 class SortersByFieldsTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/supported_data_types.yml'
         ]);
     }
 
-    /**
-     * @param array  $expectedRows
-     * @param string $entityType
-     */
-    private function prepareExpectedRows(array &$expectedRows, $entityType)
+    private function prepareExpectedRows(array &$expectedRows, string $entityType): void
     {
         foreach ($expectedRows as &$row) {
             $row['type'] = $entityType;
@@ -49,7 +41,7 @@ class SortersByFieldsTest extends RestJsonApiTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function sorterDataProvider()
+    public function sorterDataProvider(): array
     {
         $expectedRowsDefault = [
             ['id' => '<toString(@TestItem3->id)>'],

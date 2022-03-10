@@ -43,6 +43,16 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
     }
 
+    private function createErrorObject(string $title, string $detail, string $propertyPath): Error
+    {
+        $error = Error::createValidationError($title, $detail);
+        if ($propertyPath) {
+            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
+        }
+
+        return $error;
+    }
+
     public function testProcessWithoutForm()
     {
         $this->processor->process($this->context);
@@ -491,22 +501,5 @@ class CollectFormErrorsTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @param string $title
-     * @param string $detail
-     * @param string $propertyPath
-     *
-     * @return Error
-     */
-    private function createErrorObject($title, $detail, $propertyPath)
-    {
-        $error = Error::createValidationError($title, $detail);
-        if ($propertyPath) {
-            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
-        }
-
-        return $error;
     }
 }

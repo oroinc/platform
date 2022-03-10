@@ -11,12 +11,9 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 class AsyncOperationTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @dataProvider  getSetDataProvider
-     *
-     * @param string $property
-     * @param mixed  $value
+     * @dataProvider getSetDataProvider
      */
-    public function testSetGet($property, $value)
+    public function testSetGet(string $property, mixed $value)
     {
         $entity = new AsyncOperation();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
@@ -25,7 +22,7 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($value, $propertyAccessor->getValue($entity, $property));
     }
 
-    public function getSetDataProvider()
+    public function getSetDataProvider(): array
     {
         return [
             'status'       => ['status', 'new'],

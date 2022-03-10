@@ -12,6 +12,37 @@ use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
 
 class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
 {
+    private function getApplicableChecker(): ChainApplicableChecker
+    {
+        $checker = new ChainApplicableChecker();
+        $checker->addChecker(new MatchApplicableChecker(['group'], ['class']));
+
+        return $checker;
+    }
+
+    private function getProcessorRegistry(): ProcessorRegistryInterface
+    {
+        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
+        $processorRegistry->expects(self::any())
+            ->method('getProcessor')
+            ->willReturnCallback(function ($processorId) {
+                return new ProcessorMock($processorId);
+            });
+
+        return $processorRegistry;
+    }
+
+    private function assertProcessors(array $expectedProcessorIds, \Iterator $processors): void
+    {
+        $processorIds = [];
+        /** @var ProcessorMock $processor */
+        foreach ($processors as $processor) {
+            $processorIds[] = $processor->getProcessorId();
+        }
+
+        self::assertEquals($expectedProcessorIds, $processorIds);
+    }
+
     public function testMatchByInstanceOf()
     {
         $context = new Context();
@@ -52,48 +83,5 @@ class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             ],
             $iterator
         );
-    }
-
-    /**
-     * @return ChainApplicableChecker
-     */
-    protected function getApplicableChecker()
-    {
-        $checker = new ChainApplicableChecker();
-        $checker->addChecker(new MatchApplicableChecker(['group'], ['class']));
-
-        return $checker;
-    }
-
-    /**
-     * @return ProcessorRegistryInterface
-     */
-    protected function getProcessorRegistry()
-    {
-        $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
-        $processorRegistry->expects(self::any())
-            ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) {
-                    return new ProcessorMock($processorId);
-                }
-            );
-
-        return $processorRegistry;
-    }
-
-    /**
-     * @param string[]  $expectedProcessorIds
-     * @param \Iterator $processors
-     */
-    protected function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
-    {
-        $processorIds = [];
-        /** @var ProcessorMock $processor */
-        foreach ($processors as $processor) {
-            $processorIds[] = $processor->getProcessorId();
-        }
-
-        self::assertEquals($expectedProcessorIds, $processorIds);
     }
 }

@@ -128,8 +128,8 @@ select[multiple] {
     box-sizing: $input-box-sizing;
     outline: $input-outline;
     width: $field-width;
-    height: $select-multiple-height;
-    padding: $select-multiple-inner-offset;
+    height: $field-size;
+    padding: $input-inner-offset;
     vertical-align: top;
     overflow-y: auto;
 
@@ -382,7 +382,7 @@ select[multiple] {
 
     .control-group {
         margin: 0;
-        max-width: 800px;
+        max-width: $form-container-control-group-max-width;
 
         &--column {
             flex-direction: column;
@@ -432,9 +432,9 @@ select[multiple] {
 }
 
 // Need refactor
-// ie, chrome, safari
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
+// chrome, safari
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
     appearance: none;
     margin: 0;
 }
@@ -528,5 +528,12 @@ input[type='number'] {
                 margin-left: 8px;
             }
         }
+    }
+}
+
+@include non-touch-device {
+    select[multiple] {
+        height: $select-multiple-height;
+        padding: $select-multiple-inner-offset;
     }
 }

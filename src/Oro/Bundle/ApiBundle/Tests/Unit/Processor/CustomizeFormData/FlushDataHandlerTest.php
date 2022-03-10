@@ -112,13 +112,11 @@ class FlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         return $context;
     }
 
-    /**
-     * @param string[]                                                        $calls
-     * @param EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em
-     * @param \Throwable|null                                                 $exception
-     */
-    private function expectsFlush(array &$calls, EntityManagerInterface $em, \Throwable $exception = null): void
-    {
+    private function expectsFlush(
+        array &$calls,
+        EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em,
+        \Throwable $exception = null
+    ): void {
         $connection = $this->createMock(Connection::class);
 
         $em->expects(self::any())

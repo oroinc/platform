@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
+use Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
@@ -58,7 +59,7 @@ class ChainOwnerTreeProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTreeFailed()
     {
-        $this->expectException(\Oro\Bundle\SecurityBundle\Exception\UnsupportedOwnerTreeProviderException::class);
+        $this->expectException(UnsupportedOwnerTreeProviderException::class);
         $this->expectExceptionMessage('Supported provider not found in chain');
 
         $provider = $this->createMock(OwnerTreeProviderInterface::class);

@@ -18,12 +18,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $resourceDocParsers
-     *
-     * @return ResourceDocParserRegistry
-     */
-    private function getResourceDocParserRegistry(array $resourceDocParsers)
+    private function getResourceDocParserRegistry(array $resourceDocParsers): ResourceDocParserRegistry
     {
         return new ResourceDocParserRegistry(
             $resourceDocParsers,

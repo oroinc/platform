@@ -36,7 +36,6 @@ body {
     left: -9999px;
 }
 
-.scrollspy.container-fluid,
 .page-title + [data-bound-component*='datagrid'],
 .page-title + .product-container {
     .content-with-sidebar--container {
@@ -245,6 +244,10 @@ form > .layout-content {
 
                     > li {
                         width: auto;
+
+                        &:last-child {
+                            border-width: 0;
+                        }
                     }
                 }
             }

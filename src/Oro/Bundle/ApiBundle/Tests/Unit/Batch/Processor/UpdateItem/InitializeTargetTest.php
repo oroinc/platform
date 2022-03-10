@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\UpdateItem;
 
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\InitializeTarget;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -30,7 +31,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWhenNoTargetProcessor()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target processor is not defined.');
 
         $this->processor->process($this->context);
@@ -38,7 +39,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWhenNoTargetContext()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target context is not defined.');
 
         $this->context->setTargetProcessor($this->createMock(ActionProcessorInterface::class));
@@ -47,7 +48,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessWhenNoLastGroupInTargetContext()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target last group is not defined.');
 
         $targetContext = $this->getTargetContext();

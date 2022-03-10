@@ -45,7 +45,7 @@ $btn-theme: (
     'color': $primary-100,
     'hover-color': $primary-100,
     'active-color': $primary-100,
-    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
+    'active-box-shadow': inset 0 2px 3px 2px rgba(0 0 0 / 21%),
     'focus-box-shadow': (inset 0 0 0 2px $secondary-100, 0 0 6px 0 rgba($secondary-100, .8))
 ) !default;
 
@@ -162,7 +162,7 @@ $btn-theme-square-default: (
     'active-background': $primary-900,
     'active-border': $primary-750,
     'active-color': $primary-500,
-    'active-box-shadow': inset 0 2px 3px 2px rgba(0, 0, 0, .21),
+    'active-box-shadow': inset 0 2px 3px 2px rgba(0 0 0 / 21%),
     'focus-box-shadow': 0 0 6px 0 rgba($secondary-100, .8),
     'focus-border': $secondary-100,
     'disabled-opacity': .25

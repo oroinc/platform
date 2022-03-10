@@ -1047,14 +1047,13 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Assert response status code equals
-     *
-     * @param Response $response
-     * @param int $statusCode
-     * @param string $message
+     * Asserts response status code equals to the given status code.
      */
-    protected static function assertResponseStatusCodeEquals(Response $response, $statusCode, string $message = '')
-    {
+    protected static function assertResponseStatusCodeEquals(
+        Response $response,
+        int $statusCode,
+        string $message = ''
+    ): void {
         try {
             \PHPUnit\Framework\TestCase::assertEquals($statusCode, $response->getStatusCode(), $message);
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {

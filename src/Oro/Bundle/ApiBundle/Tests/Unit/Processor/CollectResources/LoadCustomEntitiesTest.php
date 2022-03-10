@@ -25,6 +25,15 @@ class LoadCustomEntitiesTest extends \PHPUnit\Framework\TestCase
         $this->processor = new LoadCustomEntities($this->configManager);
     }
 
+    private function getEntityConfig(string $className, array $values = []): Config
+    {
+        $configId = new EntityConfigId('extend', $className);
+        $config = new Config($configId);
+        $config->setValues($values);
+
+        return $config;
+    }
+
     public function testProcess()
     {
         $context = new CollectResourcesContext();
@@ -58,20 +67,5 @@ class LoadCustomEntitiesTest extends \PHPUnit\Framework\TestCase
             ],
             $context->getResult()->toArray()
         );
-    }
-
-    /**
-     * @param string $className
-     * @param array  $values
-     *
-     * @return Config
-     */
-    private function getEntityConfig($className, array $values = [])
-    {
-        $configId = new EntityConfigId('extend', $className);
-        $config = new Config($configId);
-        $config->setValues($values);
-
-        return $config;
     }
 }

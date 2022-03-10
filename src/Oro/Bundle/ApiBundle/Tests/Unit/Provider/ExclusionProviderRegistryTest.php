@@ -30,12 +30,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $exclusionProviders
-     *
-     * @return ExclusionProviderRegistry
-     */
-    private function getRegistry(array $exclusionProviders)
+    private function getRegistry(array $exclusionProviders): ExclusionProviderRegistry
     {
         return new ExclusionProviderRegistry(
             $exclusionProviders,

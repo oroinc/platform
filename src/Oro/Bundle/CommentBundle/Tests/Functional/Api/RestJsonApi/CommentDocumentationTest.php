@@ -38,7 +38,29 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityCommentsGet(): void
+    public function testCommentTargetForCreate(): void
+    {
+        $docs = $this->getEntityDocsForAction('comments', ApiAction::CREATE);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertEquals(
+            '<p>A record that the comment was made on.</p>'
+            . '<p><strong>The required field.</strong></p>',
+            $resourceData['parameters']['target']['description']
+        );
+    }
+
+    public function testCommentTargetForUpdate(): void
+    {
+        $docs = $this->getEntityDocsForAction('comments', ApiAction::UPDATE);
+        $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
+        self::assertEquals(
+            '<p>A record that the comment was made on.</p>'
+            . '<p><strong>This field must not be empty, if it is passed.</strong></p>',
+            $resourceData['parameters']['target']['description']
+        );
+    }
+
+    public function testTargetEntityComments(): void
     {
         $docs = $this->getEntityDocsForAction('notes', ApiAction::GET);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
@@ -48,7 +70,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityCommentsCreate(): void
+    public function testTargetEntityCommentsForCreate(): void
     {
         $docs = $this->getEntityDocsForAction('notes', ApiAction::CREATE);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
@@ -58,7 +80,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testTargetEntityCommentsUpdate(): void
+    public function testTargetEntityCommentsForUpdate(): void
     {
         $docs = $this->getEntityDocsForAction('notes', ApiAction::UPDATE);
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));

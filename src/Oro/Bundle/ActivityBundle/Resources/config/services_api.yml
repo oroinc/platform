@@ -22,5 +22,7 @@ services:
             - '@oro_api.complete_descriptions.resource_doc_parser_provider'
             - '@oro_api.entity_description_provider'
             - '@oro_api.value_normalizer'
+        calls:
+            - [setEntityNameProvider, ['@oro_api.entity_name_provider']]
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }

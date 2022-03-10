@@ -12,29 +12,15 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RequiredRegionValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function createValidator()
+    protected function createValidator(): RequiredRegionValidator
     {
         return new RequiredRegionValidator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
+    public function testGetTargets(): void
     {
-        $this->constraint = new RequiredRegion();
-        $this->propertyPath = '';
-
-        return parent::createContext();
-    }
-
-    public function testConfiguration(): void
-    {
-        $this->assertEquals(RequiredRegionValidator::class, $this->constraint->validatedBy());
-        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        $constraint = new RequiredRegion();
+        $this->assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testAddressWithoutCountry(): void
@@ -42,7 +28,9 @@ class RequiredRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry(null);
         $address->setRegion(null);
-        $this->validator->validate($address, $this->constraint);
+
+        $constraint = new RequiredRegion();
+        $this->validator->validate($address, $constraint);
         $this->assertNoViolation();
     }
 
@@ -51,7 +39,9 @@ class RequiredRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($this->createMock(Country::class));
         $address->setRegion($this->createMock(Region::class));
-        $this->validator->validate($address, $this->constraint);
+
+        $constraint = new RequiredRegion();
+        $this->validator->validate($address, $constraint);
         $this->assertNoViolation();
     }
 
@@ -65,7 +55,9 @@ class RequiredRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($country);
         $address->setRegion(null);
-        $this->validator->validate($address, $this->constraint);
+
+        $constraint = new RequiredRegion();
+        $this->validator->validate($address, $constraint);
         $this->assertNoViolation();
     }
 
@@ -82,11 +74,13 @@ class RequiredRegionValidatorTest extends ConstraintValidatorTestCase
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         $address->setCountry($country);
         $address->setRegion(null);
-        $this->validator->validate($address, $this->constraint);
-        $this
-            ->buildViolation($this->constraint->message)
+
+        $constraint = new RequiredRegion();
+        $this->validator->validate($address, $constraint);
+
+        $this->buildViolation($constraint->message)
             ->setParameters(['{{ country }}' => 'Country'])
-            ->atPath('region')
+            ->atPath('property.path.region')
             ->assertRaised();
     }
 }

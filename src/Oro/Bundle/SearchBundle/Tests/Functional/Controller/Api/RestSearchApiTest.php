@@ -58,6 +58,7 @@ class RestSearchApiTest extends SearchBundleWebTestCase
         $recordsRequired = !empty($response['rest']['data'][0]['record_string']);
         foreach (array_keys($result['data']) as $key) {
             unset($result['data'][$key]['record_id']);
+            unset($result['data'][$key]['selected_data']);
             if (!$recordsRequired) {
                 unset($result['data'][$key]['record_string']);
             }

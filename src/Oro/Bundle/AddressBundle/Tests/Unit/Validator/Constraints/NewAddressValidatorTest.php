@@ -7,44 +7,34 @@ use Oro\Bundle\AddressBundle\Validator\Constraints\NewAddress;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NewAddressValidator;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NewAddressValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
-    protected function createValidator()
+    protected function createValidator(): NewAddressValidator
     {
         return new NewAddressValidator();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function createContext()
-    {
-        $this->constraint = new NewAddress();
-        $this->propertyPath = '';
-
-        return parent::createContext();
-    }
-
     public function testWithInvalidConstraint(): void
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
+
         $this->validator->validate(new Address(), $this->createMock(Constraint::class));
     }
 
     public function testWithNotAddressEntity(): void
     {
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        $constraint = new NewAddress();
+        $this->validator->validate(new \stdClass(), $constraint);
         $this->assertNoViolation();
     }
 
     public function testWithNewAddressEntity(): void
     {
-        $this->validator->validate(new Address(), $this->constraint);
+        $constraint = new NewAddress();
+        $this->validator->validate(new Address(), $constraint);
         $this->assertNoViolation();
     }
 
@@ -52,9 +42,11 @@ class NewAddressValidatorTest extends ConstraintValidatorTestCase
     {
         $address = new Address();
         ReflectionUtil::setId($address, 123);
-        $this->validator->validate($address, $this->constraint);
-        $this->buildViolation($this->constraint->message)
-            ->atPath('')
+
+        $constraint = new NewAddress();
+        $this->validator->validate($address, $constraint);
+
+        $this->buildViolation($constraint->message)
             ->assertRaised();
     }
 }

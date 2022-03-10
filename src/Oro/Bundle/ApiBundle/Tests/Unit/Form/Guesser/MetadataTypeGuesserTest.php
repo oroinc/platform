@@ -31,7 +31,7 @@ use Symfony\Component\Form\Guess\TypeGuess;
  */
 class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_CLASS    = 'Test\Entity';
+    private const TEST_CLASS = 'Test\Entity';
     private const TEST_PROPERTY = 'testField';
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
@@ -54,12 +54,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param EntityMetadata|null $metadata
-     *
-     * @return MetadataAccessorInterface
-     */
-    protected function getMetadataAccessor(EntityMetadata $metadata = null)
+    private function getMetadataAccessor(EntityMetadata $metadata = null): MetadataAccessorInterface
     {
         $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
         if (null === $metadata) {
@@ -76,14 +71,10 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         return $metadataAccessor;
     }
 
-    /**
-     * @param string                      $className
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return ConfigAccessorInterface
-     */
-    protected function getConfigAccessor($className, EntityDefinitionConfig $config = null)
-    {
+    private function getConfigAccessor(
+        string $className,
+        EntityDefinitionConfig $config = null
+    ): ConfigAccessorInterface {
         $configAccessor = $this->createMock(ConfigAccessorInterface::class);
         if (null === $config) {
             $configAccessor->expects(self::once())
@@ -99,13 +90,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         return $configAccessor;
     }
 
-    /**
-     * @param string $fieldName
-     * @param string $dataType
-     *
-     * @return FieldMetadata
-     */
-    protected function createFieldMetadata($fieldName, $dataType)
+    private function createFieldMetadata(string $fieldName, string $dataType): FieldMetadata
     {
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
@@ -114,16 +99,12 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         return $fieldMetadata;
     }
 
-    /**
-     * @param string $associationName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     * @param string $dataType
-     *
-     * @return AssociationMetadata
-     */
-    protected function createAssociationMetadata($associationName, $targetClass, $isCollection, $dataType)
-    {
+    private function createAssociationMetadata(
+        string $associationName,
+        string $targetClass,
+        bool $isCollection,
+        string $dataType
+    ): AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);

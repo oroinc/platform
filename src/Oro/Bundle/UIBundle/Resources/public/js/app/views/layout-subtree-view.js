@@ -59,6 +59,9 @@ define(function(require) {
         },
 
         setContent: function(content) {
+            if (content === void 0) {
+                return;
+            }
             const $content = $(content);
             this._hideLoading();
             this.disposePageComponents();

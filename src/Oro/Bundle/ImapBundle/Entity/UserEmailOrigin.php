@@ -87,14 +87,14 @@ class UserEmailOrigin extends EmailOrigin
     /**
      * @var string
      *
-     * @ORM\Column(name="access_token", type="string", length=8192, nullable=true)
+     * @ORM\Column(name="access_token", type="text", length=8192, nullable=true)
      */
     protected $accessToken;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="refresh_token", type="string", length=8192, nullable=true)
+     * @ORM\Column(name="refresh_token", type="text", length=8192, nullable=true)
      */
     protected $refreshToken;
 

@@ -6,82 +6,56 @@ use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganization;
 use Oro\Bundle\AddressBundle\Validator\Constraints\NameOrOrganizationValidator;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
 {
-    protected function createValidator()
+    protected function createValidator(): NameOrOrganizationValidator
     {
         return new NameOrOrganizationValidator();
     }
 
-    protected function createContext()
+    public function testGetTargets(): void
     {
-        $this->constraint = new NameOrOrganization();
-        $this->propertyPath = '';
-
-        return parent::createContext();
-    }
-
-    public function testConfiguration(): void
-    {
-        self::assertEquals(NameOrOrganizationValidator::class, $this->constraint->validatedBy());
-
-        self::assertEquals(Constraint::CLASS_CONSTRAINT, $this->constraint->getTargets());
+        $constraint = new NameOrOrganization();
+        self::assertEquals(Constraint::CLASS_CONSTRAINT, $constraint->getTargets());
     }
 
     public function testNotQuoteProduct(): void
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
-        $this->validator->validate(new \stdClass(), $this->constraint);
+        $this->expectException(UnexpectedTypeException::class);
+
+        $this->validator->validate(new \stdClass(), new NameOrOrganization());
     }
 
     /**
      * @dataProvider validDataProvider
-     *
-     * @param mixed $data
      */
-    public function testValidData($data): void
+    public function testValidData(Address $value): void
     {
-        $this->validator->validate($data, $this->constraint);
+        $constraint = new NameOrOrganization();
+        $this->validator->validate($value, $constraint);
         $this->assertNoViolation();
-    }
-
-    /**
-     * @dataProvider invalidDataProvider
-     *
-     * @param mixed $data
-     */
-    public function testInvalidData($data): void
-    {
-        $this->validator->validate($data, $this->constraint);
-        $this
-            ->buildViolation($this->constraint->firstNameMessage)
-            ->atPath('firstName')
-            ->buildNextViolation($this->constraint->lastNameMessage)
-            ->atPath('lastName')
-            ->buildNextViolation($this->constraint->organizationMessage)
-            ->atPath('organization')
-            ->assertRaised();
     }
 
     public function validDataProvider(): array
     {
         return [
             'empty first name' => [
-                'data' => (new Address())->setLastName('test last name')->setOrganization('test organization')
+                (new Address())->setLastName('test last name')->setOrganization('test organization')
             ],
             'empty last name' => [
-                'data' => (new Address())->setFirstName('test first name')->setOrganization('test organization')
+                (new Address())->setFirstName('test first name')->setOrganization('test organization')
             ],
             'empty organization' => [
-                'data' => (new Address())->setFirstName('test first name')->setLastName('test last name')
+                (new Address())->setFirstName('test first name')->setLastName('test last name')
             ],
             'empty first name and last name' => [
-                'data' => (new Address())->setOrganization('test organization')
+                (new Address())->setOrganization('test organization')
             ],
             'filled' => [
-                'data' => (new Address())
+                (new Address())
                     ->setFirstName('test first name')
                     ->setLastName('test last name')
                     ->setOrganization('test organization')
@@ -89,17 +63,35 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    /**
+     * @dataProvider invalidDataProvider
+     */
+    public function testInvalidData(Address $value): void
+    {
+        $constraint = new NameOrOrganization();
+        $this->validator->validate($value, $constraint);
+
+        $this
+            ->buildViolation($constraint->firstNameMessage)
+            ->atPath('property.path.firstName')
+            ->buildNextViolation($constraint->lastNameMessage)
+            ->atPath('property.path.lastName')
+            ->buildNextViolation($constraint->organizationMessage)
+            ->atPath('property.path.organization')
+            ->assertRaised();
+    }
+
     public function invalidDataProvider(): array
     {
         return [
             'empty' => [
-                'data' => new Address()
+                new Address()
             ],
             'empty first name and organization' => [
-                'data' => (new Address())->setLastName('test last name')
+                (new Address())->setLastName('test last name')
             ],
             'empty last name and organization' => [
-                'data' => (new Address())->setFirstName('test first name')
+                (new Address())->setFirstName('test first name')
             ]
         ];
     }

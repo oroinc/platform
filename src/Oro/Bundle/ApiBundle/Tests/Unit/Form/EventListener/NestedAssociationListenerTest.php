@@ -26,13 +26,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new NestedAssociationListener(new PropertyAccessor(), $config);
     }
 
-    /**
-     * @param mixed $entity
-     * @param mixed $data
-     *
-     * @return FormEvent
-     */
-    private function getFormEvent($entity, $data)
+    private function getFormEvent(object $entity, mixed $data): FormEvent
     {
         $parentForm = $this->createMock(FormInterface::class);
         $parentForm->expects(self::once())

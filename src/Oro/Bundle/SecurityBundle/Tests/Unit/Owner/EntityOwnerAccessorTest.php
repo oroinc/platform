@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestEntity;
@@ -53,14 +54,14 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOwnerNull()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this), $this->inflector);
         $accessor->getOwner(null);
     }
 
     public function testGetOwnerNoGetOwnerAndNoOwnerField()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
 
@@ -72,7 +73,7 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOrganizationWrongObject()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\InvalidEntityException::class);
+        $this->expectException(InvalidEntityException::class);
         $metadataProvider = new OwnershipMetadataProviderStub($this);
         $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
         $accessor->getOrganization('not_an_object');

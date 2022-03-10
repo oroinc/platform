@@ -109,7 +109,7 @@ class EnumSelectType extends AbstractEnumType
             $choices,
             function (ChoiceView $choiceView) use ($disabledChoices) {
                 if (is_array($disabledChoices)) {
-                    if (in_array($choiceView->value, $disabledChoices)) {
+                    if (in_array($choiceView->value, $disabledChoices, true)) {
                         $choiceView->attr = array_merge($choiceView->attr, ['disabled' => 'disabled']);
                     }
                 } elseif (is_callable($disabledChoices)) {

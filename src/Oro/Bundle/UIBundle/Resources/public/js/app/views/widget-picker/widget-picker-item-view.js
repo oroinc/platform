@@ -5,11 +5,11 @@ define(function(require) {
 
     const WidgetPickerItemView = BaseView.extend({
         template: require('tpl-loader!oroui/templates/widget-picker/widget-picker-item-view.html'),
-        tagName: 'div',
+        tagName: 'details',
         className: 'widget-picker__item',
 
         events: {
-            'click [data-role="description-toggler"]': '_toggleWidget',
+            'click': '_toggleWidget',
             'click [data-role="add-action"]': '_onClickAddWidget'
         },
 
@@ -69,8 +69,19 @@ define(function(require) {
          */
         _toggleWidget: function(e) {
             e.preventDefault();
-            this.$('[data-role="description-toggler"]').toggleClass('collapsed');
-            this.$('[data-role="description"]').slideToggle();
+            if (window.$(e.target).data('role') === 'description-toggler' ||
+                window.$(e.target).parents('[data-role="description-toggler"]').length) {
+                const isOpen = this.$el.prop('open');
+
+                if (isOpen) {
+                    this.$('[data-role="description"]').slideUp(400, () => {
+                        this.$el.removeAttr('open');
+                    });
+                } else {
+                    this.$el.attr('open', true);
+                    this.$('[data-role="description"]').hide().slideDown();
+                }
+            }
         }
     });
 

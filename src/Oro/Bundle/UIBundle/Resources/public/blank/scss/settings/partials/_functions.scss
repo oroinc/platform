@@ -1,6 +1,8 @@
 /* @theme: blank; */
 
 @use 'sass:math';
+@use 'sass:meta';
+@use 'sass:list';
 
 // @return the value with a nested map;
 // $map: (
@@ -16,13 +18,18 @@
     }
 }
 
-// @return the value in a $color-palette map associated with a given key;
+// @return the value from a $color-palette map associated with a given key;
 // Use: color: get-color('primary', 'base') => color: #000;
+// Use: color: get-color('primary', 'base', 10%) => color: rgba(0 0 0 / 10%);
 
-@function get-color($palette: 'primary', $key: 'main') {
+@function get-color($palette: 'primary', $key: 'main', $opacity: null) {
     $color-key: get-nested-map-value($color-palette, $palette, $key);
 
     @if ($color-key) {
+        @if ($opacity) {
+            @return rgba($color-key, $opacity);
+        }
+
         @return $color-key;
     } @else {
         @warn 'Color not found:' $palette $key;
@@ -126,4 +133,64 @@
 
 @function merge-breakpoints($breakpoints1, $news-breakpoint2) {
     @return map-merge-wo-null($breakpoints1, $news-breakpoint2);
+}
+
+// @return modified selector
+// Use: modify-selector($selector: 'a', $part-before: '~ ') => '~ a';
+@function modify-selector($selector, $part-before: null, $part-after: null) {
+    @if ($part-before) {
+        $selector: $part-before + $selector;
+    }
+
+    @if ($part-after) {
+        $selector: $part-after + $selector;
+    }
+
+    @return $selector;
+}
+
+// @return modified list of selectors
+// Use: modify-selector(selectors: 'a , button', $part-before: '~ ') => '~ a, ~ button';
+@function modify-selectors($selectors, $part-before: null, $part-after: null) {
+    @if (meta.type-of($selectors) != 'list') {
+        @warn '$selectors: #{$selectors} must be a list type';
+    }
+
+    $modified-selectors: ();
+    $list-separator: list.separator($selectors);
+
+    @each $selector in $selectors {
+        $modified-selectors: list.append(
+            $modified-selectors,
+            modify-selector($selector, $part-before, $part-after),
+            $separator: $list-separator
+        );
+    }
+
+    @return $modified-selectors;
+}
+
+// @return the list of CSS selectors for HTML elements that can receive focus
+// Use: font-get-focusable-selector() => 'a[href]:not([tabindex="-1"]), input:not([disabled]):not([tabindex="-1"])';
+@function get-focusable-selectors($whole-list: false, $part-before: null, $part-after: null) {
+    $base: (
+        'a[href]',
+        'input:not([disabled])',
+        'select:not([disabled])',
+        'textarea:not([disabled])',
+        'button:not([disabled])',
+        '.dropdown-menu',
+        '[tabindex]'
+    );
+    $more: (
+        'area[href]',
+        'iframe',
+        '[contentEditable=true]'
+    );
+
+    @if ($whole-list) {
+        @return modify-selectors($base, $part-before, $part-after) + modify-selectors($more, $part-before, $part-after);
+    } @else {
+        @return modify-selectors($base, $part-before, $part-after);
+    }
 }

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\FilterFieldsByExtra;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -76,7 +77,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
     public function testProcessForDisabledFieldset()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException::class);
+        $this->expectException(NotSupportedConfigOperationException::class);
         $this->expectExceptionMessage(
             'Requested unsupported operation "filter_fields" when building config for "Test\Class".'
         );
@@ -758,7 +759,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 
     public function testProcessForSubresourceWithDisabledFieldsetAndAdditionalFieldsFilter()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException::class);
+        $this->expectException(NotSupportedConfigOperationException::class);
         $this->expectExceptionMessage(
             'Requested unsupported operation "filter_fields" when building config for "Test\Class".'
         );

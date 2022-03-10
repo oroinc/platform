@@ -6,13 +6,12 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 
 class RestRoutesTest extends \PHPUnit\Framework\TestCase
 {
-    private const ITEM_ROUTE         = 'item_route';
-    private const LIST_ROUTE         = 'list_route';
-    private const SUBRESOURCE_ROUTE  = 'subresource_route';
+    private const ITEM_ROUTE = 'item_route';
+    private const LIST_ROUTE = 'list_route';
+    private const SUBRESOURCE_ROUTE = 'subresource_route';
     private const RELATIONSHIP_ROUTE = 'relationship_route';
 
-    /** @var RestRoutes */
-    private $routes;
+    private RestRoutes $routes;
 
     protected function setUp(): void
     {

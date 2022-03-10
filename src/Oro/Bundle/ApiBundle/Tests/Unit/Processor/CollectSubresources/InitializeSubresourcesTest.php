@@ -18,6 +18,8 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -694,7 +696,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAssociationAsFieldDataTypeProvider
      */
-    public function testProcessForAssociationThatShouldBeRepresentedAsField($dataType)
+    public function testProcessForAssociationThatShouldBeRepresentedAsField(string $dataType)
     {
         $resource = new ApiResource('Test\Class');
 
@@ -745,7 +747,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function getAssociationAsFieldDataTypeProvider()
+    public function getAssociationAsFieldDataTypeProvider(): array
     {
         return [
             ['array'],
@@ -1184,10 +1186,10 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
     public function testProcessForAssociationWithInheritanceAsTargetClassAndInvalidAcceptableTargetClass()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectExceptionMessage(sprintf(
             'The acceptable target class "%s" should be "%s" or its subclass.',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account::class,
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::class
+            Account::class,
+            User::class
         ));
 
         $resource = new ApiResource('Test\Class');

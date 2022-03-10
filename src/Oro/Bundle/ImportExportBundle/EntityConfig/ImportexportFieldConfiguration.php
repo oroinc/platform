@@ -28,19 +28,19 @@ class ImportexportFieldConfiguration implements FieldConfigInterface
                 ->info('`boolean` fields with this option are used to identify (search) the entity. You can use ' .
                 'multiple identity fields for one entity.')
             ->end()
-            ->booleanNode('excluded')
+            ->node('excluded', 'normalized_boolean')
                 ->info('`boolean` fields with this option cannot be exported.')
             ->end()
-            ->booleanNode('full')
+            ->node('full', 'normalized_boolean')
                 ->info('`boolean` all related entity fields’ are exported. Fields with the excluded option are ' .
                 'skipped. If the option is set to false (the default value), only fields with an ' .
                 'identity are exported.')
             ->end()
-            ->booleanNode('process_as_scalar')
+            ->node('process_as_scalar', 'normalized_boolean')
                 ->info('`boolean` defines whether a relation field is processed as scalar value when exporting data.')
                 ->defaultFalse()
             ->end()
-            ->booleanNode('immutable')
+            ->node('immutable', 'normalized_boolean')
             ->end()
             ->scalarNode('fallback_field')->end()
             ->arrayNode('short')

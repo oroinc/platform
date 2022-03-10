@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Splitter;
 
 use JsonStreamingParser\Exception\ParsingException;
 use Oro\Bundle\ApiBundle\Batch\Splitter\JsonFileSplitter;
+use Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 
 /**
@@ -80,10 +81,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function streamTypeDataProvider()
+    public function streamTypeDataProvider(): array
     {
         return [
             'Local'          => [false],
@@ -465,7 +463,7 @@ JSON;
 
     public function testSplitToSeveralChunksWhenHeaderSectionIsNotFirstSectionInDocument()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException::class);
+        $this->expectException(ParsingErrorFileSplitterException::class);
         $this->expectExceptionMessage(
             'Failed to split the file "tmpFileName". Reason: Parsing error in [0:0].'
             . ' The object with the key "jsonapi" should be the first object in the document.'
@@ -614,13 +612,13 @@ JSON;
     /**
      * @dataProvider dataProviderWithExceptions
      */
-    public function testSplitWithException($inputJson, $exceptionClass, $exceptionMessage)
+    public function testSplitWithException(string $inputJson, string $exceptionClass, string $exceptionMessage)
     {
         $splitter = new JsonFileSplitter();
         $this->splitWithException($splitter, $inputJson, $exceptionClass, $exceptionMessage);
     }
 
-    public function dataProviderWithExceptions()
+    public function dataProviderWithExceptions(): array
     {
         $inputJson1 = <<<JSON
 {"data":[

@@ -27,13 +27,11 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $bundle3 = new Fixtures\FooBundle\FooBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(
-                [
-                    $bundle1->getName() => get_class($bundle1),
-                    $bundle2->getName() => get_class($bundle2),
-                    $bundle3->getName() => get_class($bundle3)
-                ]
-            );
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2),
+                $bundle3->getName() => get_class($bundle3)
+            ]);
     }
 
     protected function tearDown(): void
@@ -41,10 +39,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         CumulativeResourceManager::getInstance()->clear();
     }
 
-    /**
-     * @return ConfigExtensionRegistry
-     */
-    private function getConfigExtensionRegistry()
+    private function getConfigExtensionRegistry(): ConfigExtensionRegistry
     {
         $configExtensionRegistry = new ConfigExtensionRegistry(3);
         $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
@@ -53,12 +48,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         return $configExtensionRegistry;
     }
 
-    /**
-     * @param string $content
-     *
-     * @return array
-     */
-    private function decodeContent($content)
+    private function decodeContent(string $content): array
     {
         $result = null;
         $filename = $this->getTempFile('api_config_cache_warmer') . '.php';
@@ -72,10 +62,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultConfig()
+    private function getDefaultConfig(): array
     {
         return [
             'entities'  => [
@@ -161,10 +148,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getFirstConfig()
+    private function getFirstConfig(): array
     {
         return [
             'entities'  => [
@@ -187,10 +171,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getSecondConfig()
+    private function getSecondConfig(): array
     {
         return [
             'entities'  => [
@@ -212,10 +193,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultAliases()
+    private function getDefaultAliases(): array
     {
         return [
             'Test\Entity4'          => [
@@ -239,10 +217,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getFirstAliases()
+    private function getFirstAliases(): array
     {
         return [
             'Test\Entity2' => [
@@ -252,10 +227,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultSubstitutions()
+    private function getDefaultSubstitutions(): array
     {
         return [
             'Test\Entity3'          => 'Test\Entity30',
@@ -263,10 +235,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultExcludedEntities()
+    private function getDefaultExcludedEntities(): array
     {
         return [
             'Test\Entity1',
@@ -275,10 +244,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getFirstExcludedEntities()
+    private function getFirstExcludedEntities(): array
     {
         return [
             'Test\Entity1',
@@ -288,10 +254,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getSecondExcludedEntities()
+    private function getSecondExcludedEntities(): array
     {
         return [
             'Test\Entity4',
@@ -300,10 +263,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultExclusions()
+    private function getDefaultExclusions(): array
     {
         return [
             ['entity' => 'Test\Entity1'],
@@ -312,10 +272,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getFirstExclusions()
+    private function getFirstExclusions(): array
     {
         return [
             ['entity' => 'Test\Entity1'],
@@ -325,10 +282,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getSecondExclusions()
+    private function getSecondExclusions(): array
     {
         return [
             ['entity' => 'Test\Entity4'],
@@ -337,10 +291,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultInclusions()
+    private function getDefaultInclusions(): array
     {
         return [
             ['entity' => 'Test\Entity12'],
@@ -348,10 +299,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getFirstInclusions()
+    private function getFirstInclusions(): array
     {
         return [
             ['entity' => 'Test\Entity2', 'field' => 'field2'],
@@ -361,10 +309,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return array
-     */
-    private function getSecondInclusions()
+    private function getSecondInclusions(): array
     {
         return [
             ['entity' => 'Test\Entity3'],
@@ -530,7 +475,6 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 'Test\Entity5',
                 'Test\Entity13',
                 'Test\Entity1',
-                'Test\Entity6',
                 'Test\Entity11'
             ],
             'exclusions'        => [
@@ -538,7 +482,6 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 ['entity' => 'Test\Entity5'],
                 ['entity' => 'Test\Entity13'],
                 ['entity' => 'Test\Entity1'],
-                ['entity' => 'Test\Entity6'],
                 ['entity' => 'Test\Entity11']
             ],
             'inclusions'        => [
@@ -546,7 +489,6 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
                 ['entity' => 'Test\Entity6'],
                 ['entity' => 'Test\Entity12'],
                 ['entity' => 'Test\Entity2', 'field' => 'field2'],
-                ['entity' => 'Test\Entity5'],
                 ['entity' => 'Test\Entity10']
             ]
         ];

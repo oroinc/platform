@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class HateoasTest extends RestJsonApiTestCase
 {
-    private function loadCustomEntities()
+    private function loadCustomEntities(): void
     {
         $this->loadFixtures([
             LoadEnumsData::class,
@@ -21,7 +21,7 @@ class HateoasTest extends RestJsonApiTestCase
         ]);
     }
 
-    private function loadEntitiesForPagination()
+    private function loadEntitiesForPagination(): void
     {
         $this->loadFixtures([
             LoadEnumsData::class,
@@ -29,7 +29,7 @@ class HateoasTest extends RestJsonApiTestCase
         ]);
     }
 
-    private function renameTestEntity1Fields()
+    private function renameTestEntity1Fields(): void
     {
         $this->appendEntityConfig(
             TestEntity1::class,
@@ -58,13 +58,7 @@ class HateoasTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param array|string         $expectedContent
-     * @param string|string[]|null $entityId
-     *
-     * @return array
-     */
-    private function getExpectedContent($expectedContent, $entityId = null): array
+    private function getExpectedContent(string|array $expectedContent, string|array|null $entityId = null): array
     {
         if (is_string($expectedContent)) {
             $expectedContent = $this->loadData($expectedContent, $this->getResponseDataFolderName());
@@ -82,9 +76,8 @@ class HateoasTest extends RestJsonApiTestCase
         foreach ($valueMap as $key => $value) {
             $expectedContent = str_replace('{' . $key . '}', $value, $expectedContent);
         }
-        $expectedContent = self::processTemplateData(Yaml::parse($expectedContent));
 
-        return $expectedContent;
+        return self::processTemplateData(Yaml::parse($expectedContent));
     }
 
     public function testGetList()

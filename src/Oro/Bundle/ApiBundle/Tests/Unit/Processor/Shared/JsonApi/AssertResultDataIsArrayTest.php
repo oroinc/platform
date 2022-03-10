@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AssertResultDataIsArray;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
@@ -30,7 +31,7 @@ class AssertResultDataIsArrayTest extends GetListProcessorTestCase
 
     public function testProcessWhenResultResultDataIsNotArray()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "data" section must be an array.');
 
         $this->context->setResult(['data' => 123]);

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityBundle\Tests\Unit\Api\Processor;
 use Oro\Bundle\ActivityBundle\Api\ActivityAssociationProvider;
 use Oro\Bundle\ActivityBundle\Api\Processor\AddActivityAssociationDescriptions;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
+use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\ResourceDocParserProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
@@ -39,18 +40,18 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
             ->with($this->context->getRequestType())
             ->willReturn($this->docParser);
 
-        $entityDescriptionProvider = $this->createMock(EntityDescriptionProvider::class);
-        $entityDescriptionProvider->expects(self::any())
-            ->method('getEntityDescription')
+        $entityNameProvider = $this->createMock(EntityNameProvider::class);
+        $entityNameProvider->expects(self::any())
+            ->method('getEntityName')
             ->with(self::isType('string'))
             ->willReturnCallback(function (string $className) {
-                return substr($className, strrpos($className, '\\') + 1) . ' (description)';
+                return strtolower(substr($className, strrpos($className, '\\') + 1)) . ' (description)';
             });
-        $entityDescriptionProvider->expects(self::any())
-            ->method('getEntityPluralDescription')
+        $entityNameProvider->expects(self::any())
+            ->method('getEntityPluralName')
             ->with(self::isType('string'))
             ->willReturnCallback(function (string $className) {
-                return substr($className, strrpos($className, '\\') + 1) . ' (plural description)';
+                return strtolower(substr($className, strrpos($className, '\\') + 1)) . ' (plural description)';
             });
 
         $valueNormalizer = $this->createMock(ValueNormalizer::class);
@@ -64,9 +65,10 @@ class AddActivityAssociationDescriptionsTest extends ConfigProcessorTestCase
         $this->processor = new AddActivityAssociationDescriptions(
             $this->activityAssociationProvider,
             $resourceDocParserProvider,
-            $entityDescriptionProvider,
+            $this->createMock(EntityDescriptionProvider::class),
             $valueNormalizer
         );
+        $this->processor->setEntityNameProvider($entityNameProvider);
     }
 
     public function testProcessWhenNoTargetAction(): void

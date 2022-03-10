@@ -151,6 +151,12 @@ A record which the attachment record belongs to.
 
 **The required field.**
 
+#### update
+
+{@inheritdoc}
+
+**This field must not be empty, if it is passed.**
+
 ## SUBRESOURCES
 
 ### file

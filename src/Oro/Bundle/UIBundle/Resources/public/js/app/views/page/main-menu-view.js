@@ -188,7 +188,7 @@ define([
             // Align first level
             if ($node.hasClass('dropdown-level-1')) {
                 $node.addClass(
-                    this.positions[this.calculateMenuPosition($innerDropdown) > limit ? 0: 1]
+                    this.positions[this.calculateMenuPosition($innerDropdown) > limit ? 0 : 1]
                 );
             }
 

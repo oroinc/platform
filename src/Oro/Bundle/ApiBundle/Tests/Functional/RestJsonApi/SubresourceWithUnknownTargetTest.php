@@ -8,13 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SubresourceWithUnknownTargetTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/test_product.yml'
         ]);

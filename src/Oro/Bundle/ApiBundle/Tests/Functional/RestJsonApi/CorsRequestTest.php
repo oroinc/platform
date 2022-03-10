@@ -26,7 +26,7 @@ class CorsRequestTest extends RestJsonApiTestCase
     /**
      * @dataProvider methodsProvider
      */
-    public function testOptionsPreflightRequestForList($requestMethod)
+    public function testOptionsPreflightRequestForList(string $requestMethod)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
@@ -53,7 +53,7 @@ class CorsRequestTest extends RestJsonApiTestCase
     /**
      * @dataProvider methodsProvider
      */
-    public function testOptionsPreflightRequestForItem($requestMethod)
+    public function testOptionsPreflightRequestForItem(string $requestMethod)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
@@ -80,7 +80,7 @@ class CorsRequestTest extends RestJsonApiTestCase
     /**
      * @dataProvider methodsProvider
      */
-    public function testOptionsPreflightRequestForToOneSubresource($requestMethod)
+    public function testOptionsPreflightRequestForToOneSubresource(string $requestMethod)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
@@ -107,7 +107,7 @@ class CorsRequestTest extends RestJsonApiTestCase
     /**
      * @dataProvider methodsProvider
      */
-    public function testOptionsPreflightRequestForToManySubresource($requestMethod)
+    public function testOptionsPreflightRequestForToManySubresource(string $requestMethod)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
@@ -134,7 +134,7 @@ class CorsRequestTest extends RestJsonApiTestCase
     /**
      * @dataProvider methodsProvider
      */
-    public function testOptionsPreflightRequestForToOneRelationship($requestMethod)
+    public function testOptionsPreflightRequestForToOneRelationship(string $requestMethod)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(
@@ -161,7 +161,7 @@ class CorsRequestTest extends RestJsonApiTestCase
     /**
      * @dataProvider methodsProvider
      */
-    public function testOptionsPreflightRequestForToManyRelationship($requestMethod)
+    public function testOptionsPreflightRequestForToManyRelationship(string $requestMethod)
     {
         $entityType = $this->getEntityType(TestDepartment::class);
         $response = $this->options(

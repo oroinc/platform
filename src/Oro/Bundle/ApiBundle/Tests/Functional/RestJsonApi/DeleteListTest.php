@@ -13,7 +13,6 @@ class DeleteListTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/delete_list.yml']);
     }
 

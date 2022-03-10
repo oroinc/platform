@@ -10,13 +10,9 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class NestedObjectTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures(['@OroApiBundle/Tests/Functional/DataFixtures/nested_object.yml']);
     }
 
@@ -32,8 +28,9 @@ class NestedObjectTest extends RestJsonApiTestCase
         self::assertEquals((string)$entity->getId(), $result['data']['id']);
         self::assertEquals(
             [
-                'firstName' => 'first name',
-                'lastName'  => 'last name'
+                'firstName'   => 'first name',
+                'lastName'    => 'last name',
+                'contactedAt' => '2010-11-01T10:12:13Z'
             ],
             $result['data']['attributes']['name']
         );
@@ -98,8 +95,9 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'attributes' => [
                     'name'   => [
-                        'firstName' => 'first name',
-                        'lastName'  => 'last name'
+                        'firstName'   => 'first name',
+                        'lastName'    => 'last name',
+                        'contactedAt' => '2010-11-01T10:12:13Z'
                     ],
                     'middle' => [
                         'value' => 'middle name'
@@ -119,8 +117,9 @@ class NestedObjectTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
-                'firstName' => 'first name',
-                'lastName'  => 'last name'
+                'firstName'   => 'first name',
+                'lastName'    => 'last name',
+                'contactedAt' => '2010-11-01T10:12:13Z'
             ],
             $result['data']['attributes']['name']
         );
@@ -152,8 +151,9 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'type'       => $entityType,
                 'attributes' => [
                     'name'   => [
-                        'firstName' => '',
-                        'lastName'  => ''
+                        'firstName'   => '',
+                        'lastName'    => '',
+                        'contactedAt' => null
                     ],
                     'middle' => [
                         'value' => ''
@@ -226,8 +226,9 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
                     'name'   => [
-                        'firstName' => 'new first name',
-                        'lastName'  => 'new last name'
+                        'firstName'   => 'new first name',
+                        'lastName'    => 'new last name',
+                        'contactedAt' => '2011-12-01T10:12:13Z'
                     ],
                     'middle' => [
                         'value' => 'new middle name'
@@ -250,8 +251,9 @@ class NestedObjectTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
-                'firstName' => 'new first name',
-                'lastName'  => 'new last name'
+                'firstName'   => 'new first name',
+                'lastName'    => 'new last name',
+                'contactedAt' => '2011-12-01T10:12:13Z'
             ],
             $result['data']['attributes']['name']
         );
@@ -296,8 +298,9 @@ class NestedObjectTest extends RestJsonApiTestCase
                 'id'         => (string)$entity->getId(),
                 'attributes' => [
                     'name'   => [
-                        'firstName' => '',
-                        'lastName'  => ''
+                        'firstName'   => '',
+                        'lastName'    => '',
+                        'contactedAt' => null
                     ],
                     'middle' => [
                         'value' => ''
@@ -420,8 +423,9 @@ class NestedObjectTest extends RestJsonApiTestCase
         $result = self::jsonToArray($response->getContent());
         self::assertEquals(
             [
-                'firstName' => 'first name',
-                'lastName'  => 'last name'
+                'firstName'   => 'first name',
+                'lastName'    => 'last name',
+                'contactedAt' => '2010-11-01T10:12:13Z'
             ],
             $result['data']['attributes']['name']
         );

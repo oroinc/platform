@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
+use Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException;
 use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
@@ -131,7 +132,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetHrefWhenOnlyPartOfUrlParamsAreResolved()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException::class);
+        $this->expectException(LinkHrefResolvingFailedException::class);
         $this->expectExceptionMessage('Cannot build URL for a link. Missing Parameters: filter,version.');
 
         $linkMetadata = new ExternalLinkMetadata(

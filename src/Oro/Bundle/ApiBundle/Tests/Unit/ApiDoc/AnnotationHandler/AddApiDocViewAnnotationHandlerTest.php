@@ -19,7 +19,7 @@ class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleProvider
      */
-    public function testHandle($existingViews, $expectedViews)
+    public function testHandle(array $existingViews, array $expectedViews)
     {
         $annotation = new ApiDoc(['views' => $existingViews]);
         $route = new Route('test');
@@ -29,7 +29,7 @@ class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedViews, $annotation->getViews());
     }
 
-    public function handleProvider()
+    public function handleProvider(): array
     {
         return [
             [[], []],

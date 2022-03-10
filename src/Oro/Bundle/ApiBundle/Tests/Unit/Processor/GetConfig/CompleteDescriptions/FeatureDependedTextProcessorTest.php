@@ -25,7 +25,7 @@ class FeatureDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validTextExpressionProvider
      */
-    public function testProcess($text, $expected)
+    public function testProcess(string $text, string $expected)
     {
         self::assertEquals(
             $expected,
@@ -33,7 +33,7 @@ class FeatureDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function validTextExpressionProvider()
+    public function validTextExpressionProvider(): array
     {
         return [
             ['', ''],
@@ -57,7 +57,7 @@ class FeatureDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidTextExpressionProvider
      */
-    public function testProcessForInvalidExpression($text)
+    public function testProcessForInvalidExpression(string $text)
     {
         self::assertEquals(
             $text,
@@ -65,7 +65,7 @@ class FeatureDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidTextExpressionProvider()
+    public function invalidTextExpressionProvider(): array
     {
         return [
             ['{@feature:}FEATURE 1{@/feature}'],

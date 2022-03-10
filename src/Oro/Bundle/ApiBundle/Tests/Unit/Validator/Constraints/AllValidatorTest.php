@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AllValidator;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AllValidatorTest extends ConstraintValidatorTestCase
@@ -31,14 +32,14 @@ class AllValidatorTest extends ConstraintValidatorTestCase
 
     public function testThrowsExceptionIfNotTraversable()
     {
-        $this->expectException(\Symfony\Component\Validator\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->validator->validate('test', new All(new NotBlank()));
     }
 
     /**
      * @dataProvider getValidArguments
      */
-    public function testWalkSingleConstraint($array)
+    public function testWalkSingleConstraint(array|\ArrayObject $array)
     {
         $constraint = new NotBlank();
 
@@ -55,7 +56,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidArguments
      */
-    public function testWalkMultipleConstraints($array)
+    public function testWalkMultipleConstraints(array|\ArrayObject $array)
     {
         $constraints = [new NotBlank(), new NotNull()];
 

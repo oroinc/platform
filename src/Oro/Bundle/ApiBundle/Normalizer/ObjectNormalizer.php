@@ -261,7 +261,14 @@ class ObjectNormalizer
                 ->andWhere(sprintf('e.%s = :id', $fieldName))
                 ->setParameter($fieldName, $entityId[$fieldName]);
         }
-        $value = $qb->getQuery()->getResult();
+        $result = $qb->getQuery()->getResult();
+        if ($field->isCollectionValuedAssociation()) {
+            $value = $result;
+        } elseif ($result) {
+            $value = reset($result);
+        } else {
+            $value = null;
+        }
 
         return true;
     }

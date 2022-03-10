@@ -25,12 +25,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         $this->secondState = $this->createMock(ConfigCacheStateInterface::class);
     }
 
-    /**
-     * @param array $states
-     *
-     * @return ConfigCacheStateRegistry
-     */
-    private function getRegistry(array $states)
+    private function getRegistry(array $states): ConfigCacheStateRegistry
     {
         return new ConfigCacheStateRegistry(
             $states,

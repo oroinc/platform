@@ -17,13 +17,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
  */
 trait SpecialFieldsConsistencyTestTrait
 {
-    /**
-     * @param string $entityClass
-     * @param string $entityType
-     *
-     * @return bool
-     */
-    private function isSkippedEntity($entityClass, $entityType)
+    private function isSkippedEntity(string $entityClass, string $entityType): bool
     {
         return
             is_a($entityClass, TestFrameworkEntityInterface::class, true)

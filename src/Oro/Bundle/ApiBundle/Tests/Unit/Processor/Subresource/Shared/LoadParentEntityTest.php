@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
@@ -171,7 +172,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessForManageableEntityWhenNoAccessToEntity()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the parent entity.');
 
         $parentClass = 'Test\Class';

@@ -68,7 +68,7 @@ class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function createExceptionListener($fullSetup = false): ExceptionListener
+    private function createExceptionListener(bool $fullSetup = false): ExceptionListener
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $trustResolver = $this->createMock(AuthenticationTrustResolverInterface::class);

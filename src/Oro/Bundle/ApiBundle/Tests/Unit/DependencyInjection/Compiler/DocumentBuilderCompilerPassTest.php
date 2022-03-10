@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -90,7 +91,7 @@ class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWhenDocumentBuilderIsShared()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The document builder service "document_builder1" should be non shared.');
 
         $documentBuilder1 = $this->container->setDefinition('document_builder1', new Definition());

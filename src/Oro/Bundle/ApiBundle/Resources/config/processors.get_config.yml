@@ -69,6 +69,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.complete_definition_helper.association'
             - '@oro_entity_extend.association_manager'
+        calls:
+            - [setExtendedAssociationProvider, ['@oro_api.expanded_association_provider']]
         tags:
             - { name: oro.api.custom_data_type_completer, priority: -255 }
 

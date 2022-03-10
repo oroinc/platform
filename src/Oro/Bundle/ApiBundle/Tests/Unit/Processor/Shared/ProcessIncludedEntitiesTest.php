@@ -119,13 +119,11 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->willReturn($actionContext);
         $actionProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CreateContext $context) use ($expectedContext, $actionMetadata) {
-                    self::assertEquals($expectedContext, $context);
+            ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $actionMetadata) {
+                self::assertEquals($expectedContext, $context);
 
-                    $context->setMetadata($actionMetadata);
-                }
-            );
+                $context->setMetadata($actionMetadata);
+            });
         $this->errorCompleter->expects(self::never())
             ->method('fixIncludedEntityPath');
         $this->exceptionTextExtractor->expects(self::never())
@@ -181,14 +179,12 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->willReturn($actionContext);
         $actionProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
-                    self::assertEquals($expectedContext, $context);
+            ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                self::assertEquals($expectedContext, $context);
 
-                    $context->setMetadata($actionMetadata);
-                    $context->addError($error);
-                }
-            );
+                $context->setMetadata($actionMetadata);
+                $context->addError($error);
+            });
         $this->errorCompleter->expects(self::once())
             ->method('fixIncludedEntityPath')
             ->with(
@@ -251,14 +247,12 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->willReturn($actionContext);
         $actionProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
-                    self::assertEquals($expectedContext, $context);
+            ->willReturnCallback(function (CreateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                self::assertEquals($expectedContext, $context);
 
-                    $context->setMetadata($actionMetadata);
-                    $context->addError($error);
-                }
-            );
+                $context->setMetadata($actionMetadata);
+                $context->addError($error);
+            });
         $this->errorCompleter->expects(self::once())
             ->method('fixIncludedEntityPath')
             ->with(
@@ -318,13 +312,11 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->willReturn($actionContext);
         $actionProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (UpdateContext $context) use ($expectedContext, $actionMetadata) {
-                    self::assertEquals($expectedContext, $context);
+            ->willReturnCallback(function (UpdateContext $context) use ($expectedContext, $actionMetadata) {
+                self::assertEquals($expectedContext, $context);
 
-                    $context->setMetadata($actionMetadata);
-                }
-            );
+                $context->setMetadata($actionMetadata);
+            });
         $this->errorCompleter->expects(self::never())
             ->method('fixIncludedEntityPath');
         $this->exceptionTextExtractor->expects(self::never())
@@ -385,14 +377,12 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
             ->willReturn($actionContext);
         $actionProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (UpdateContext $context) use ($expectedContext, $error, $actionMetadata) {
-                    self::assertEquals($expectedContext, $context);
+            ->willReturnCallback(function (UpdateContext $context) use ($expectedContext, $error, $actionMetadata) {
+                self::assertEquals($expectedContext, $context);
 
-                    $context->setMetadata($actionMetadata);
-                    $context->addError($error);
-                }
-            );
+                $context->setMetadata($actionMetadata);
+                $context->addError($error);
+            });
         $this->errorCompleter->expects(self::once())
             ->method('fixIncludedEntityPath')
             ->with(

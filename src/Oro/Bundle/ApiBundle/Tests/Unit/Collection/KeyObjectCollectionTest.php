@@ -71,9 +71,9 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             blankKeyProvider
+     * @dataProvider blankKeyProvider
      */
-    public function testShouldAddThrowExceptionForBlankKey($key)
+    public function testShouldAddThrowExceptionForBlankKey(string $key)
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The $key argument should not be a blank string.');
@@ -81,7 +81,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->add(new \stdClass(), $key);
     }
 
-    public function blankKeyProvider()
+    public function blankKeyProvider(): array
     {
         return [
             [''],
@@ -92,13 +92,13 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validKeysProvider
      */
-    public function testShouldAddWithNotStringKey($key)
+    public function testShouldAddWithNotStringKey(mixed $key)
     {
         $this->collection->add(new \stdClass(), $key);
         $this->expectNotToPerformAssertions();
     }
 
-    public function validKeysProvider()
+    public function validKeysProvider(): array
     {
         return [
             ['test'],

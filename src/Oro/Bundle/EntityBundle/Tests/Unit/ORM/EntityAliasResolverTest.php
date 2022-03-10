@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
 use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasLoader;
@@ -72,7 +73,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAliasForUnknownEntity()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('An alias for "Test\UnknownEntity" entity not found.');
 
         $this->setLoadExpectations();
@@ -82,7 +83,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPluralAliasForUnknownEntity()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('A plural alias for "Test\UnknownEntity" entity not found.');
 
         $this->setLoadExpectations();
@@ -92,7 +93,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClassByAliasForUnknownAlias()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('The alias "unknown" is not associated with any entity class.');
 
         $this->setLoadExpectations();
@@ -102,7 +103,7 @@ class EntityAliasResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testGetClassByPluralAliasForUnknownAlias()
     {
-        $this->expectException(\Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException::class);
+        $this->expectException(EntityAliasNotFoundException::class);
         $this->expectExceptionMessage('The plural alias "unknown" is not associated with any entity class.');
 
         $this->setLoadExpectations();

@@ -17,7 +17,7 @@ trait ResourceConsistencyTestTrait
      * @param string   $entityClass
      * @param string[] $excludedActions
      */
-    private function checkResourceConsistency($entityClass, $excludedActions)
+    private function checkResourceConsistency(string $entityClass, array $excludedActions): void
     {
         $actions = $this->getActions(
             [ApiAction::GET, ApiAction::GET_LIST, ApiAction::CREATE, ApiAction::UPDATE],
@@ -66,7 +66,7 @@ trait ResourceConsistencyTestTrait
      *
      * @return string[]
      */
-    private function getActions(array $allActions, array $excludedActions)
+    private function getActions(array $allActions, array $excludedActions): array
     {
         $actions = [];
         foreach ($allActions as $action) {
@@ -78,13 +78,7 @@ trait ResourceConsistencyTestTrait
         return $actions;
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $action
-     *
-     * @return EntityMetadata
-     */
-    private function getMetadata($entityClass, $action)
+    private function getMetadata(string $entityClass, string $action): EntityMetadata
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = self::getContainer()->get('oro_api.config_provider');
@@ -115,7 +109,7 @@ trait ResourceConsistencyTestTrait
      *
      * @return array [action => [field name, ...], ...]
      */
-    private function getFields($entityClass, array $actions)
+    private function getFields(string $entityClass, array $actions): array
     {
         $entityFields = [];
         foreach ($actions as $action) {
@@ -139,7 +133,7 @@ trait ResourceConsistencyTestTrait
      *
      * @return string
      */
-    private function compareFields(array $baseFields, $baseAction, array $actionFields, $action)
+    private function compareFields(array $baseFields, string $baseAction, array $actionFields, string $action): string
     {
         $newFields = [];
         $missingFields = [];

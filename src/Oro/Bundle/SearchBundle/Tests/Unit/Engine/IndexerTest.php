@@ -109,29 +109,33 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'no extra parameters' => [
-                'expectedQuery' => 'from * where text all_text ~ "qwerty"',
+                'expectedQuery' => 'select text.system_entity_name from * where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
             ],
             'custom offset' => [
-                'expectedQuery' => 'from * where text all_text ~ "qwerty" offset 10',
+                'expectedQuery' => 'select text.system_entity_name from * where text all_text ~ "qwerty" offset 10',
                 'string'        => 'qwerty',
                 'offset'        => 10,
             ],
             'custom offset custom maxResults' => [
-                'expectedQuery' => 'from * where text all_text ~ "qwerty" limit 200 offset 10',
+                'expectedQuery' =>
+                    'select text.system_entity_name ' .
+                    'from * where text all_text ~ "qwerty" limit 200 offset 10',
                 'string'        => 'qwerty',
                 'offset'        => 10,
                 'maxResults'    => 200,
             ],
             'custom from' => [
-                'expectedQuery' => 'from test_customer where text all_text ~ "qwerty"',
+                'expectedQuery' => 'select text.system_entity_name from test_customer where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,
                 'from'          => 'test_customer',
             ],
             'all custom parameters' => [
-                'expectedQuery' => 'from test_customer where text all_text ~ "qwerty" limit 200 offset 400',
+                'expectedQuery' =>
+                    'select text.system_entity_name ' .
+                    'from test_customer where text all_text ~ "qwerty" limit 200 offset 400',
                 'string'        => 'qwerty',
                 'offset'        => 10,
                 'maxResults'    => 200,
@@ -139,28 +143,32 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
                 'page'          => 3,
             ],
             'search by inherited entity' => [
-                'expectedQuery' => 'from concrete_customer where text all_text ~ "qwerty"',
+                'expectedQuery' =>
+                    'select text.system_entity_name from concrete_customer where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'concrete_customer',
             ],
             'search by superclass entity, mode including descendants' => [
-                'expectedQuery' => 'from customer, concrete_customer where text all_text ~ "qwerty"',
+                'expectedQuery' =>
+                    'select text.system_entity_name from customer, concrete_customer where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'customer',
             ],
             'search by abstract entity, mode descendants only' => [
-                'expectedQuery' => 'from repeatable_task, scheduled_task where text all_text ~ "qwerty"',
+                'expectedQuery' =>
+                    'select text.system_entity_name ' .
+                    'from repeatable_task, scheduled_task where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => null,
                 'maxResults'    => null,
                 'from'          => 'task',
             ],
             'unknown from' => [
-                'expectedQuery' => 'from unknown_entity where text all_text ~ "qwerty"',
+                'expectedQuery' => 'select text.system_entity_name from unknown_entity where text all_text ~ "qwerty"',
                 'string'        => 'qwerty',
                 'offset'        => 0,
                 'maxResults'    => 0,

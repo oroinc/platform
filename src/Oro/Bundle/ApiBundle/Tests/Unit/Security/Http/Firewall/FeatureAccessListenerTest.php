@@ -4,14 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class FeatureAccessListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject $tokenStorage;
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
 
-    private FeatureAccessListener $listener;
+    /** @var FeatureAccessListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -31,7 +34,7 @@ class FeatureAccessListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleWhenTokenDoesNotExist(): void
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $this->tokenStorage->expects(self::once())
             ->method('getToken')
             ->willReturn(null);

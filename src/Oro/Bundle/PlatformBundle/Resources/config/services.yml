@@ -168,3 +168,6 @@ services:
         abstract: true
         public: false
         configurator: ['@oro_platform.orm.configuration.configurator', 'configure']
+
+    oro_platform.provider.dbal_type_default_value:
+        class: Oro\Bundle\PlatformBundle\Provider\DbalTypeDefaultValueProvider

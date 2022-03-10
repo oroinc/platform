@@ -6,6 +6,7 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
@@ -14,6 +15,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
 {
@@ -113,7 +115,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
 
     public function testProcessWhenReturnedSeveralEntities()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result must have one or zero items.');
 
         $entityClass = Group::class;
@@ -206,7 +208,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
 
     public function testProcessWhenNoAccessToEntity()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the entity.');
 
         $entityClass = Group::class;

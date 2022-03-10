@@ -144,11 +144,9 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
 
         $getProcessor->expects(self::once())
             ->method('process')
-            ->willReturnCallback(
-                function (GetContext $context) use ($getError) {
-                    $context->addError($getError);
-                }
-            );
+            ->willReturnCallback(function (GetContext $context) use ($getError) {
+                $context->addError($getError);
+            });
 
         $this->processor->process($this->context);
 

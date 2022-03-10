@@ -18,7 +18,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validTextExpressionProvider
      */
-    public function testProcess($text, $expected)
+    public function testProcess(string $text, string $expected)
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -28,7 +28,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function validTextExpressionProvider()
+    public function validTextExpressionProvider(): array
     {
         return [
             ['', ''],
@@ -52,7 +52,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidTextExpressionProvider
      */
-    public function testProcessForInvalidExpression($text)
+    public function testProcessForInvalidExpression(string $text)
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -62,7 +62,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function invalidTextExpressionProvider()
+    public function invalidTextExpressionProvider(): array
     {
         return [
             ['{@request:}JSON API{@/request}'],

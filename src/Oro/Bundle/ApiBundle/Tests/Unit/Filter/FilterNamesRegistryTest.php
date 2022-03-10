@@ -26,12 +26,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
         $this->secondProvider = $this->createMock(FilterNames::class);
     }
 
-    /**
-     * @param array $providers
-     *
-     * @return FilterNamesRegistry
-     */
-    private function getRegistry(array $providers)
+    private function getRegistry(array $providers): FilterNamesRegistry
     {
         return new FilterNamesRegistry(
             $providers,

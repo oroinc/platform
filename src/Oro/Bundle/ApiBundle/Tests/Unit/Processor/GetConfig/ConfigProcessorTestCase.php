@@ -14,18 +14,13 @@ class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
     use ConfigExtensionRegistryTrait;
 
-    protected const TEST_CLASS_NAME   = 'Test\Class';
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_CLASS_NAME = 'Test\Class';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var ConfigContext */
-    protected $context;
-
-    /** @var ConfigExtensionRegistry */
-    protected $configExtensionRegistry;
-
-    /** @var ConfigLoaderFactory */
-    protected $configLoaderFactory;
+    protected ConfigContext $context;
+    protected ConfigExtensionRegistry $configExtensionRegistry;
+    protected ConfigLoaderFactory $configLoaderFactory;
 
     protected function setUp(): void
     {
@@ -38,36 +33,21 @@ class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
         $this->configLoaderFactory = new ConfigLoaderFactory($this->configExtensionRegistry);
     }
 
-    /**
-     * @param array  $config
-     * @param string $configType
-     *
-     * @return object
-     */
-    protected function createConfigObject(array $config, $configType = ConfigUtil::DEFINITION)
+    protected function createConfigObject(array $config, string $configType = ConfigUtil::DEFINITION): object
     {
         return $this->configLoaderFactory->getLoader($configType)->load($config);
     }
 
-    /**
-     * @param object|array $config
-     *
-     * @return array
-     */
-    protected function convertConfigObjectToArray($config)
+    protected function convertConfigObjectToArray(object|array $config): array
     {
         return is_object($config)
             ? $config->toArray()
             : $config;
     }
 
-    /**
-     * @param string|null $className
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
-     */
-    protected function getClassMetadataMock($className = null)
-    {
+    protected function getClassMetadataMock(
+        string $className = null
+    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])
@@ -85,11 +65,7 @@ class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
         return $classMetadata;
     }
 
-    /**
-     * @param array        $expected
-     * @param object|array $actual
-     */
-    protected function assertConfig(array $expected, $actual)
+    protected function assertConfig(array $expected, object|array $actual): void
     {
         self::assertEquals(
             $expected,

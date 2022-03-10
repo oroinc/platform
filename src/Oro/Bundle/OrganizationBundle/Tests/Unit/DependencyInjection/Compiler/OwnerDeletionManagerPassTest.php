@@ -6,6 +6,7 @@ use Oro\Bundle\OrganizationBundle\DependencyInjection\Compiler\OwnerDeletionMana
 use Oro\Bundle\OrganizationBundle\Ownership\OwnerDeletionManager;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -49,7 +50,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWhenCheckerDoesNotHaveEntityTagAttribute()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The attribute "entity" is required for "oro_organization.owner_assignment_checker" tag.'
             . ' Service: "checker2".'
@@ -71,7 +72,7 @@ class OwnerDeletionManagerPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWhenCheckerIsDuplicated()
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The service "checker2" must not have the tag "oro_organization.owner_assignment_checker"'
             . ' and the entity "Test\Entity1" because there is another service ("checker1") with this tag and entity.'

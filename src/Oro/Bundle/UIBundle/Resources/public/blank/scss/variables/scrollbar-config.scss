@@ -1,6 +1,6 @@
 /* @theme: blank; */
 
-$scrollbar-color: rgba(get-color('additional', 'dark'), .4) !default;
+$scrollbar-color: get-color('additional', 'dark', 40%) !default;
 $scrollbar-color-bg: get-color('additional', 'light') !default;
 
 $scrollbar-size: 10px !default;

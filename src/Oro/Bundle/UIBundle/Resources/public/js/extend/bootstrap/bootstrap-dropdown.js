@@ -341,8 +341,17 @@ define(function(require, exports, module) {
     Dropdown._clearMenus = function(event) {
         if (event && (event.type === 'click' || event.type === 'clearMenus')) {
             const $target = $(event.target);
-            if ($target.closest('[data-toggle]').length && $target.closest('.dropdown-menu.show').length) {
+            const $openDropdownMenu = $target.closest('.dropdown-menu.show');
+
+            if ($target.closest('[data-toggle]').length && $openDropdownMenu.length) {
                 // click on toggle element inside active dropdown-menu
+                return;
+            } else if (
+                event.type === 'clearMenus' &&
+                $openDropdownMenu.length &&
+                $.contains($openDropdownMenu[0], event.target)
+            ) {
+                // click on custom control inside active dropdown-menu
                 return;
             }
 

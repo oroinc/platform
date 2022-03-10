@@ -1049,7 +1049,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeRangeValueProvider
      */
-    public function testNormalizeRangeValue($expectedValue, $value, $dataType)
+    public function testNormalizeRangeValue(Range $expectedValue, Range|string $value, string $dataType)
     {
         $result = $this->valueNormalizer->normalizeValue(
             $value,

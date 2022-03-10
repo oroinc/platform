@@ -12,34 +12,23 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_CLASS_NAME   = 'Test\Class';
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_CLASS_NAME = 'Test\Class';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var ConfigLoaderFactory */
-    protected $configLoaderFactory;
+    protected ConfigLoaderFactory $configLoaderFactory;
 
     protected function setUp(): void
     {
         $this->configLoaderFactory = new ConfigLoaderFactory(new ConfigExtensionRegistry());
     }
 
-    /**
-     * @param array $config
-     *
-     * @return EntityDefinitionConfig
-     */
-    protected function createConfigObject(array $config)
+    protected function createConfigObject(array $config): EntityDefinitionConfig
     {
         return $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 
-    /**
-     * @param array|null $definition
-     *
-     * @return Config
-     */
-    protected function createRelationConfigObject(array $definition = null)
+    protected function createRelationConfigObject(array $definition = null): Config
     {
         $config = new Config();
         if (null !== $definition) {
@@ -49,23 +38,14 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    /**
-     * @param object|array $config
-     *
-     * @return array
-     */
-    protected function convertConfigObjectToArray($config)
+    protected function convertConfigObjectToArray(object|array $config): array
     {
         return is_object($config)
             ? $config->toArray()
             : $config;
     }
 
-    /**
-     * @param array        $expected
-     * @param object|array $actual
-     */
-    protected function assertConfig(array $expected, $actual)
+    protected function assertConfig(array $expected, object|array $actual): void
     {
         self::assertEquals(
             $expected,
@@ -73,13 +53,9 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string|null $className
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|ClassMetadata
-     */
-    protected function getClassMetadataMock($className = null)
-    {
+    protected function getClassMetadataMock(
+        string $className = null
+    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])

@@ -895,7 +895,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldProvider
      */
-    public function testToOneAssociationAsField($value, $expected)
+    public function testToOneAssociationAsField(array|int|null $value, array|int|null $expected)
     {
         $object = [
             'id'       => 123,
@@ -925,7 +925,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toOneAssociationAsFieldProvider()
+    public function toOneAssociationAsFieldProvider(): array
     {
         return [
             [null, null],
@@ -948,7 +948,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldProvider
      */
-    public function testToManyAssociationAsField($value, $expected)
+    public function testToManyAssociationAsField(?array $value, array $expected)
     {
         $object = [
             'id'         => 123,
@@ -978,7 +978,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toManyAssociationAsFieldProvider()
+    public function toManyAssociationAsFieldProvider(): array
     {
         return [
             [null, []],
@@ -1005,7 +1005,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToOneAssociationAsFieldForIdFieldsOnly($value, $expected)
+    public function testToOneAssociationAsFieldForIdFieldsOnly(array|int|null $value, array|int|null $expected)
     {
         $object = [
             'id'       => 123,
@@ -1034,7 +1034,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toOneAssociationAsFieldForIdFieldsOnlyProvider()
+    public function toOneAssociationAsFieldForIdFieldsOnlyProvider(): array
     {
         return [
             [null, null],
@@ -1047,7 +1047,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToManyAssociationAsFieldForIdFieldsOnly($value, $expected)
+    public function testToManyAssociationAsFieldForIdFieldsOnly(?array $value, array $expected)
     {
         $object = [
             'id'         => 123,
@@ -1076,7 +1076,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toManyAssociationAsFieldForIdFieldsOnlyProvider()
+    public function toManyAssociationAsFieldForIdFieldsOnlyProvider(): array
     {
         return [
             [null, []],
@@ -1096,7 +1096,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneCollapsedAssociationAsFieldProvider
      */
-    public function testToOneCollapsedAssociationAsField($value, $expected)
+    public function testToOneCollapsedAssociationAsField(array|string|null $value, ?string $expected)
     {
         $object = [
             'id'       => 123,
@@ -1128,7 +1128,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toOneCollapsedAssociationAsFieldProvider()
+    public function toOneCollapsedAssociationAsFieldProvider(): array
     {
         return [
             [null, null],
@@ -1147,7 +1147,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyCollapsedAssociationAsFieldProvider
      */
-    public function testToManyCollapsedAssociationAsField($value, $expected)
+    public function testToManyCollapsedAssociationAsField(?array $value, array $expected)
     {
         $object = [
             'id'         => 123,
@@ -1179,7 +1179,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function toManyCollapsedAssociationAsFieldProvider()
+    public function toManyCollapsedAssociationAsFieldProvider(): array
     {
         return [
             [null, []],

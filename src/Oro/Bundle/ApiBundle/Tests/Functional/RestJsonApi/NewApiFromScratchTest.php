@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Extend\Entity\EV_Api_Enum1 as TestEnum;
 use Extend\Entity\TestApiE1 as TestCustomEntity;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
@@ -15,7 +16,6 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadOrganization::class,
             LoadBusinessUnit::class,
@@ -27,7 +27,7 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getRequestType()
+    protected function getRequestType(): RequestType
     {
         $requestType = parent::getRequestType();
         $requestType->add('test_new');
@@ -38,8 +38,13 @@ class NewApiFromScratchTest extends RestJsonApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
-    {
+    protected function request(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $server = [],
+        string $content = null
+    ): Response {
         $server['HTTP_X-Test-Request-Type'] = 'test_new';
 
         return parent::request($method, $uri, $parameters, $server, $content);

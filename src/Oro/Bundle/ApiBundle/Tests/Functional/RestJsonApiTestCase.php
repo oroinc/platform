@@ -16,12 +16,9 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class RestJsonApiTestCase extends RestApiTestCase
 {
-    protected const JSON_API_MEDIA_TYPE   = 'application/vnd.api+json';
+    protected const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
     protected const JSON_API_CONTENT_TYPE = 'application/vnd.api+json';
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
@@ -31,7 +28,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getRequestType()
+    protected function getRequestType(): RequestType
     {
         return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
@@ -39,7 +36,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * {@inheritdoc}
      */
-    protected function getResponseContentType()
+    protected function getResponseContentType(): string
     {
         return self::JSON_API_CONTENT_TYPE;
     }
@@ -49,8 +46,13 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    protected function request($method, $uri, array $parameters = [], array $server = [], $content = null)
-    {
+    protected function request(
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $server = [],
+        string $content = null
+    ): Response {
         $this->checkHateoasHeader($server);
         $this->checkWsseAuthHeader($server);
         $this->checkCsrfHeader($server);
@@ -114,8 +116,11 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * @param Response     $response        The response object
      * @param bool         $ignoreOrder     Whether the order of elements in the primary data should not be checked
      */
-    protected function assertResponseContains($expectedContent, Response $response, $ignoreOrder = false)
-    {
+    protected function assertResponseContains(
+        array|string $expectedContent,
+        Response $response,
+        bool $ignoreOrder = false
+    ): void {
         $content = self::jsonToArray($response->getContent());
         $expectedContent = $this->getResponseData($expectedContent);
 
@@ -124,11 +129,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * Asserts the response contains the given number of data items.
-     *
-     * @param int      $expectedCount
-     * @param Response $response
      */
-    protected static function assertResponseCount($expectedCount, Response $response)
+    protected static function assertResponseCount(int $expectedCount, Response $response): void
     {
         $content = self::jsonToArray($response->getContent());
         self::assertCount($expectedCount, $content[JsonApiDoc::DATA]);
@@ -137,7 +139,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     /**
      * Asserts the response data are not empty.
      */
-    protected static function assertResponseNotEmpty(Response $response)
+    protected static function assertResponseNotEmpty(Response $response): void
     {
         $content = self::jsonToArray($response->getContent());
         self::assertNotEmpty($content[JsonApiDoc::DATA]);
@@ -149,7 +151,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * @param string[] $attributes The names of attributes
      * @param Response $response
      */
-    protected function assertResponseNotHasAttributes(array $attributes, Response $response)
+    protected function assertResponseNotHasAttributes(array $attributes, Response $response): void
     {
         $content = self::jsonToArray($response->getContent());
         self::assertArrayHasKey('data', $content);
@@ -167,7 +169,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * @param string[] $relationships The names of relationships
      * @param Response $response
      */
-    protected function assertResponseNotHasRelationships(array $relationships, Response $response)
+    protected function assertResponseNotHasRelationships(array $relationships, Response $response): void
     {
         $content = self::jsonToArray($response->getContent());
         self::assertArrayHasKey('data', $content);
@@ -181,72 +183,54 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * Asserts that the response content contains one validation error and it is the given error.
-     *
-     * @param array    $expectedError
-     * @param Response $response
-     * @param int      $statusCode
      */
     protected function assertResponseValidationError(
-        $expectedError,
+        array $expectedError,
         Response $response,
-        $statusCode = Response::HTTP_BAD_REQUEST
-    ) {
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
         $this->assertValidationErrors([$expectedError], $response, $statusCode, true);
     }
 
     /**
      * Asserts that the response content contains the given validation error.
-     *
-     * @param array    $expectedError
-     * @param Response $response
-     * @param int      $statusCode
      */
     protected function assertResponseContainsValidationError(
-        $expectedError,
+        array $expectedError,
         Response $response,
-        $statusCode = Response::HTTP_BAD_REQUEST
-    ) {
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
         $this->assertValidationErrors([$expectedError], $response, $statusCode, false);
     }
 
     /**
      * Asserts that the response content contains the given validation errors and only them.
-     *
-     * @param array    $expectedErrors
-     * @param Response $response
-     * @param int      $statusCode
      */
     protected function assertResponseValidationErrors(
-        $expectedErrors,
+        array $expectedErrors,
         Response $response,
-        $statusCode = Response::HTTP_BAD_REQUEST
-    ) {
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
         $this->assertValidationErrors($expectedErrors, $response, $statusCode, true);
     }
 
     /**
      * Asserts that the response content contains the given validation errors.
-     *
-     * @param array    $expectedErrors
-     * @param Response $response
-     * @param int      $statusCode
      */
     protected function assertResponseContainsValidationErrors(
-        $expectedErrors,
+        array $expectedErrors,
         Response $response,
-        $statusCode = Response::HTTP_BAD_REQUEST
-    ) {
+        int $statusCode = Response::HTTP_BAD_REQUEST
+    ): void {
         $this->assertValidationErrors($expectedErrors, $response, $statusCode, false);
     }
 
-    /**
-     * @param array    $expectedErrors
-     * @param Response $response
-     * @param int      $statusCode
-     * @param bool     $strict
-     */
-    private function assertValidationErrors($expectedErrors, Response $response, $statusCode, $strict)
-    {
+    private function assertValidationErrors(
+        array $expectedErrors,
+        Response $response,
+        int $statusCode,
+        bool $strict
+    ): void {
         static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
@@ -276,12 +260,12 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * If the first parameter is a file name, the file will be saved in the `responses` directory
      * near to PHP file contains the test.
      *
-     * @param string   $fileName The file name or full path to the output file
-     *                           Also it can be NULL or empty string, in this case the response content
-     *                           will be written in to the console
-     * @param Response $response
+     * @param string|null $fileName The file name or full path to the output file
+     *                              Also it can be NULL or empty string, in this case the response content
+     *                              will be written in to the console
+     * @param Response    $response
      */
-    protected function dumpYmlTemplate($fileName, Response $response)
+    protected function dumpYmlTemplate(?string $fileName, Response $response): void
     {
         $data = self::jsonToArray($response->getContent());
         if (null === $data) {
@@ -332,7 +316,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      * @param array $data
      * @param array $idReferences ['entityType::entityId' => [referenceId, entityIdFieldName], ...]
      */
-    protected function normalizeYmlTemplate(array &$data, array $idReferences)
+    protected function normalizeYmlTemplate(array &$data, array $idReferences): void
     {
         if (isset($data[JsonApiDoc::TYPE], $data[JsonApiDoc::ID])) {
             $key = $data[JsonApiDoc::TYPE] . '::' . $data[JsonApiDoc::ID];
@@ -362,23 +346,17 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
-     * @param ResponseHeaderBag $headers
-     *
-     * @return bool
+     * {@inheritDoc}
      */
-    protected static function isApplicableContentType(ResponseHeaderBag $headers)
+    protected static function isApplicableContentType(ResponseHeaderBag $headers): bool
     {
         return $headers->contains('Content-Type', self::JSON_API_CONTENT_TYPE);
     }
 
     /**
      * Extracts JSON:API resource identifier from the response.
-     *
-     * @param Response $response
-     *
-     * @return string
      */
-    protected function getResourceId(Response $response)
+    protected function getResourceId(Response $response): string
     {
         $content = self::jsonToArray($response->getContent());
         self::assertIsArray($content);
@@ -403,12 +381,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
 
     /**
      * Extracts the list of errors from JSON:API response.
-     *
-     * @param Response $response
-     *
-     * @return string
      */
-    protected function getResponseErrors(Response $response)
+    protected function getResponseErrors(Response $response): string
     {
         $content = self::jsonToArray($response->getContent());
         self::assertIsArray($content);

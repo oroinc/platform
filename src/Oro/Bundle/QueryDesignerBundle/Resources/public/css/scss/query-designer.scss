@@ -130,9 +130,18 @@
             font-size: $query-designer-grid-th-font-size;
         }
 
+        td {
+            padding-top: $query-designer-grid-td-offset-top;
+            vertical-align: top;
+        }
+
         .label-column,
         .label-cell {
             width: $query-designer-grid-label-cell-width;
+        }
+
+        .label-cell {
+            word-break: break-all;
         }
 
         .function-column,
@@ -155,6 +164,7 @@
         }
 
         .action-cell {
+            padding-top: $table-tbody-td-offset;
             padding-right: 0;
 
             white-space: nowrap;

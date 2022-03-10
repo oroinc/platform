@@ -115,7 +115,7 @@ $choice-tree-filter-choice-tree-filter-search-width: calc(100% - 14px) !default;
 $choice-tree-filter-buttons-offset-bottom: 5px !default;
 $choice-tree-filter-buttons-span-cursor: pointer !default;
 $choice-tree-filter-buttons-span-color: #006acc !default;
-$choice-tree-filter-buttons-span-active-color: rgb(68, 68, 68) !default;
+$choice-tree-filter-buttons-span-active-color: rgb(68 68 68) !default;
 $choice-tree-filter-buttons-span-active-cursor: default !default;
 
 $filters-state-page-title-center-text-align: center !default;
@@ -299,7 +299,7 @@ $open-filter-before-position: absolute !default;
 $open-filter-before-left: 15px !default;
 $open-filter-before-bottom: -13px !default;
 $open-filter-before-transform: rotate(45deg) !default;
-$open-filter-before-box-shadow: 1px 1px 9px 3px rgba(0, 0, 0, .08) !default;
+$open-filter-before-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 
 $open-filter-after-border-bottom: 10px solid #fff !default;
 $open-filter-after-border-left: 10px solid transparent !default;
@@ -311,7 +311,7 @@ $open-filter-after-bottom: -11px !default;
 $open-filter-after-z-index: $zindex-dropdown - 100 !default;
 
 $open-filter-filter-criteria-selector-background-color: $additional-extra-light !default;
-$open-filter-filter-criteria-selector-box-shadow: inset 0 2px 3px 2px rgba(0, 0, 0, .21) !default;
+$open-filter-filter-criteria-selector-box-shadow: inset 0 2px 3px 2px rgba(0 0 0 / 21%) !default;
 
 $filter-date-range-datetime-visual-element-width: 113px !default;
 $filter-date-range-datetime-visual-element-offset-bottom: 8px !default;

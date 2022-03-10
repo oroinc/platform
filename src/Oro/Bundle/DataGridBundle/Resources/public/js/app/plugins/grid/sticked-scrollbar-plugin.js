@@ -67,7 +67,7 @@ define(function(require) {
 
             const displayScrollbar = this.checkScrollbarDisplay();
 
-            this.domCache.$container.styledScrollBar(displayScrollbar ? 'update': 'sleep');
+            this.domCache.$container.styledScrollBar(displayScrollbar ? 'update' : 'sleep');
 
             StickedScrollbarPlugin.__super__.enable.call(this);
         },
@@ -106,6 +106,7 @@ define(function(require) {
                 $window: $(window),
                 $document: $(document),
                 $grid: this.grid.$grid,
+                $scrollableContainer: this.grid.$grid.closest('.scrollable-container'),
                 $container: this.grid.$grid.parents('.grid-scrollable-container:first'),
                 $spyScroll: this.grid.$grid.parents('[data-spy="scroll"]:first'),
                 $oroTabs: this.grid.$grid.parents('.oro-tabs:first'),
@@ -128,6 +129,7 @@ define(function(require) {
             this.domCache.$collapsible.on('hidden' + this.eventNamespace(), manageScroll);
             this.domCache.$collapsible.on('shown' + this.eventNamespace(), manageScroll);
             this.domCache.$document.on('scroll' + this.eventNamespace(), manageScroll);
+            this.domCache.$scrollableContainer.on('scroll' + this.eventNamespace(), _.throttle(manageScroll, 100));
             this.domCache.$window.on('resize' + this.eventNamespace(), updateCustomScrollbar);
             this.domCache.$oroTabs.on('shown' + this.eventNamespace(), updateCustomScrollbar);
 

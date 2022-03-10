@@ -11,6 +11,8 @@ services:
             - '@oro_entity_extend.association_manager'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_transformer'
+        calls:
+            - [setExtendedAssociationProvider, ['@oro_api.expanded_association_provider']]
         tags:
             - { name: oro.api.processor, action: customize_loaded_data, priority: 10 }
 

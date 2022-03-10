@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
 use Oro\Bundle\TranslationBundle\Form\Type\TranslatableEntityType;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -83,7 +84,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 
     public function testClassNormalizerOptionsException(): void
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessage('Either "class" or "enum_code" must option must be set.');
 
         $resolver = $this->getOptionsResolver();
@@ -96,7 +97,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 
     public function testClassNormalizerUnexpectedEnumException(): void
     {
-        $this->expectException(\Symfony\Component\OptionsResolver\Exception\InvalidOptionsException::class);
+        $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessage('must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"');
 
         $resolver = $this->getOptionsResolver();

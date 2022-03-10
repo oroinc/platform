@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Validation;
 
 class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
 {
-    protected const TEST_VERSION      = '1.1';
+    protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     /** @var FormContext|SingleItemContext */
@@ -43,10 +43,7 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    /**
-     * @return FormContext
-     */
-    protected function createContext()
+    protected function createContext(): FormContext
     {
         return new FormContextStub($this->configProvider, $this->metadataProvider);
     }
@@ -56,7 +53,7 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
      *
      * @return FormBuilder
      */
-    protected function createFormBuilder(array $extensions = [])
+    protected function createFormBuilder(array $extensions = []): FormBuilder
     {
         $formFactory = Forms::createFormFactoryBuilder()
             ->addExtensions(array_merge($this->getFormExtensions(), $extensions))
@@ -69,7 +66,7 @@ class FormProcessorTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @return FormExtensionInterface[]
      */
-    protected function getFormExtensions()
+    protected function getFormExtensions(): array
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)

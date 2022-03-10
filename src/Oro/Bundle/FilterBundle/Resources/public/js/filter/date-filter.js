@@ -482,7 +482,7 @@ define(function(require, exports, module) {
          * @returns {Object}
          * @protected
          */
-        _getPickerConfigurationOptions: function(optionsToMerge, parameters= {}) {
+        _getPickerConfigurationOptions: function(optionsToMerge, parameters = {}) {
             const {startDateFieldAriaLabel, endDateFieldAriaLabel} = this.getTemplateDataProps();
             const labelsMap = {
                 start: startDateFieldAriaLabel,
@@ -524,10 +524,10 @@ define(function(require, exports, module) {
 
                 switch (type) {
                     case this.typeValues.moreThan.toString():
-                        hint += [__('more than'), start].join(' ');
+                        hint += [__('oro.filter.date.later_than'), start].join(' ');
                         break;
                     case this.typeValues.lessThan.toString():
-                        hint += [__('less than'), end].join(' ');
+                        hint += [__('oro.filter.date.earlier_than'), end].join(' ');
                         break;
                     case this.typeValues.equal.toString():
                         option = this._getChoiceOption(this.typeValues.equal);
@@ -540,21 +540,21 @@ define(function(require, exports, module) {
                     case this.typeValues.notBetween.toString():
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.notBetween);
-                            hint += [option.label, start, __('and'), end].join(' ');
+                            hint += [option.label, start, __('oro.filter.date.and'), end].join(' ');
                         } else if (start) {
-                            hint += [__('before'), start].join(' ');
+                            hint += [__('oro.filter.date.before'), start].join(' ');
                         } else if (end) {
-                            hint += [__('after'), end].join(' ');
+                            hint += [__('oro.filter.date.after'), end].join(' ');
                         }
                         break;
                     default:
                         if (start && end) {
                             option = this._getChoiceOption(this.typeValues.between);
-                            hint += [option.label, start, __('and'), end].join(' ');
+                            hint += [option.label, start, __('oro.filter.date.and'), end].join(' ');
                         } else if (start) {
-                            hint += [__('from'), start].join(' ');
+                            hint += [__('oro.filter.date.from'), start].join(' ');
                         } else if (end) {
-                            hint += [__('to'), end].join(' ');
+                            hint += [__('oro.filter.date.to'), end].join(' ');
                         }
                         break;
                 }

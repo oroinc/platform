@@ -12,7 +12,6 @@ class WrongApiUriRequestsTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/custom_entities.yml'

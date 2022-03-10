@@ -47,15 +47,11 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->processor = new NormalizeRequestData($this->valueNormalizer, $entityIdTransformerRegistry);
     }
 
-    /**
-     * @param string $associationName
-     * @param string $targetClass
-     * @param bool   $isCollection
-     *
-     * @return AssociationMetadata
-     */
-    protected function createAssociationMetadata($associationName, $targetClass, $isCollection)
-    {
+    protected function createAssociationMetadata(
+        string $associationName,
+        string $targetClass,
+        bool $isCollection
+    ):AssociationMetadata {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
@@ -167,19 +163,15 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $requestType, false, false, 'Test\User'],
-                    ['groups', 'entityClass', $requestType, false, false, 'Test\Group']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $requestType, false, false, 'Test\User'],
+                ['groups', 'entityClass', $requestType, false, false, 'Test\Group']
+            ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
-                }
-            );
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
@@ -239,18 +231,14 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $requestType, false, false, 'Test\User']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $requestType, false, false, 'Test\User']
+            ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
-                }
-            );
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
@@ -377,12 +365,10 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                    ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+            ]);
         $this->entityIdTransformer->expects(self::never())
             ->method('reverseTransform');
 
@@ -462,19 +448,15 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                    ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+            ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
-                }
-            );
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
@@ -544,19 +526,15 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                    ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+            ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
-                }
-            );
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);
@@ -632,12 +610,10 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                    ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+            ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
             ->willThrowException(new \Exception('cannot normalize id'));
@@ -719,23 +695,19 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
 
         $this->valueNormalizer->expects(self::any())
             ->method('normalizeValue')
-            ->willReturnMap(
-                [
-                    ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
-                    ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
-                ]
-            );
+            ->willReturnMap([
+                ['users', 'entityClass', $this->context->getRequestType(), false, false, 'Test\User'],
+                ['groups', 'entityClass', $this->context->getRequestType(), false, false, 'Test\Group']
+            ]);
         $this->entityIdTransformer->expects(self::any())
             ->method('reverseTransform')
-            ->willReturnCallback(
-                function ($value, EntityMetadata $metadata) {
-                    if ('val1' === $value) {
-                        return null;
-                    }
-
-                    return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            ->willReturnCallback(function ($value, EntityMetadata $metadata) {
+                if ('val1' === $value) {
+                    return null;
                 }
-            );
+
+                return 'normalized::' . $metadata->getClassName() . '::' . $value;
+            });
 
         $this->context->setRequestData($inputData);
         $this->context->setMetadata($metadata);

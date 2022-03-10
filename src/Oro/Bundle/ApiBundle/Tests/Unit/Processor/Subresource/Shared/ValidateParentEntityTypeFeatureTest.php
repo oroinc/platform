@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeFeature;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCase
 {
@@ -25,7 +26,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
     public function testProcessDisabled()
     {
-        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+        $this->expectException(NotFoundHttpException::class);
         $parentClassName = 'Test\Class';
 
         $this->featureChecker->expects(self::once())

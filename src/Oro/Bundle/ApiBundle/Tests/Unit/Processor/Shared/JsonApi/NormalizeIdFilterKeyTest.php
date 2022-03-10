@@ -111,7 +111,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcessForManageableEntityWithoutConfig($className, $filters)
+    public function testProcessForManageableEntityWithoutConfig(string $className, array $filters)
     {
         foreach (array_keys($filters) as $fieldName) {
             $filter = new ComparisonFilter('integer');
@@ -129,7 +129,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcessForManageableEntityWithConfig($className, $filters)
+    public function testProcessForManageableEntityWithConfig(string $className, array $filters)
     {
         $config = new EntityDefinitionConfig();
         $idFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($className);
@@ -176,7 +176,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->assertFilters($filters, $this->context->getFilters());
     }
 
-    public function processProvider()
+    public function processProvider(): array
     {
         return [
             [
@@ -208,7 +208,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         ];
     }
 
-    private function assertFilters(array $expectedFilters, FilterCollection $actualFilters)
+    private function assertFilters(array $expectedFilters, FilterCollection $actualFilters): void
     {
         foreach ($actualFilters as $filterKey => $filterDefinition) {
             $fieldName = $filterDefinition->getField();

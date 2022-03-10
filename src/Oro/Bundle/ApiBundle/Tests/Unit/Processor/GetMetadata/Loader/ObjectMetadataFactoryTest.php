@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
+use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 
 /**
@@ -15,20 +16,21 @@ use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
  */
 class ObjectMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationManager */
-    private $associationManager;
+    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $extendedAssociationProvider;
 
     /** @var ObjectMetadataFactory */
     private $objectMetadataFactory;
 
     protected function setUp(): void
     {
-        $this->associationManager = $this->createMock(AssociationManager::class);
+        $this->extendedAssociationProvider = $this->createMock(ExtendedAssociationProvider::class);
 
         $this->objectMetadataFactory = new ObjectMetadataFactory(
             new MetadataHelper(),
-            $this->associationManager
+            $this->createMock(AssociationManager::class)
         );
+        $this->objectMetadataFactory->setExtendedAssociationProvider($this->extendedAssociationProvider);
     }
 
     public function testCreateObjectMetadata()
@@ -165,8 +167,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'integer',
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
         $expected->setPropertyPath('propertyPath');
 
@@ -230,8 +231,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToMany',
             true,
             'integer',
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -261,8 +261,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'integer',
-            ['Test\AnotherClass'],
-            false
+            ['Test\AnotherClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -292,8 +291,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             null,
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -323,8 +321,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'string',
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -355,8 +352,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'string',
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -387,8 +383,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'string',
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -420,8 +415,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'integer',
-            ['Test\TargetClass'],
-            false
+            ['Test\TargetClass']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -443,14 +437,15 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
+        $field->setDependsOn(['field1']);
         $field->setTargetClass(EntityIdentifier::class);
         $target = $field->createAndSetTargetEntity();
         $target->setIdentifierFieldNames(['id']);
         $target->addField('id')->setDataType('integer');
 
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with('Test\Class', null, 'manyToOne', null)
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with('Test\Class', 'manyToOne', null, ['field1'])
             ->willReturn(['Test\Association1Target' => 'field1']);
 
         $expected = $this->createAssociationMetadata(
@@ -459,8 +454,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'integer',
-            ['Test\Association1Target'],
-            false
+            ['Test\Association1Target']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -482,15 +476,16 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToMany');
+        $field->setDependsOn(['field1']);
         $field->setTargetClass(EntityIdentifier::class);
         $field->setTargetType('to-many');
         $target = $field->createAndSetTargetEntity();
         $target->setIdentifierFieldNames(['id']);
         $target->addField('id')->setDataType('integer');
 
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with('Test\Class', null, 'manyToMany', null)
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with('Test\Class', 'manyToMany', null, ['field1'])
             ->willReturn(['Test\Association1Target' => 'field1']);
 
         $expected = $this->createAssociationMetadata(
@@ -499,8 +494,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToMany',
             true,
             'integer',
-            ['Test\Association1Target'],
-            false
+            ['Test\Association1Target']
         );
 
         $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
@@ -522,14 +516,15 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $entityMetadata = new EntityMetadata();
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
+        $field->setDependsOn(['field1']);
         $field->setTargetClass(EntityIdentifier::class);
         $target = $field->createAndSetTargetEntity();
         $target->setIdentifierFieldNames(['id']);
         $target->addField('id')->setDataType('integer');
 
-        $this->associationManager->expects(self::once())
-            ->method('getAssociationTargets')
-            ->with('Test\Class', null, 'manyToOne', null)
+        $this->extendedAssociationProvider->expects(self::once())
+            ->method('filterExtendedAssociationTargets')
+            ->with('Test\Class', 'manyToOne', null, ['field1'])
             ->willReturn([]);
 
         $expected = $this->createAssociationMetadata(
@@ -538,8 +533,44 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
             'manyToOne',
             false,
             'integer',
-            [],
-            false
+            []
+        );
+        $expected->setEmptyAcceptableTargetsAllowed(false);
+
+        $result = $this->objectMetadataFactory->createAndAddAssociationMetadata(
+            $entityMetadata,
+            'Test\Class',
+            $config,
+            'testField',
+            $field,
+            'test'
+        );
+        self::assertSame($result, $entityMetadata->getAssociation('testField'));
+        self::assertEquals($expected, $result);
+    }
+
+    public function testCreateAndAddAssociationMetadataForExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $entityMetadata = new EntityMetadata();
+        $field = new EntityDefinitionFieldConfig();
+        $field->setDataType('association:manyToOne');
+        $field->setTargetClass(EntityIdentifier::class);
+        $target = $field->createAndSetTargetEntity();
+        $target->setIdentifierFieldNames(['id']);
+        $target->addField('id')->setDataType('integer');
+
+        $this->extendedAssociationProvider->expects(self::never())
+            ->method('filterExtendedAssociationTargets');
+
+        $expected = $this->createAssociationMetadata(
+            'testField',
+            EntityIdentifier::class,
+            'manyToOne',
+            false,
+            'integer',
+            []
         );
         $expected->setEmptyAcceptableTargetsAllowed(false);
 

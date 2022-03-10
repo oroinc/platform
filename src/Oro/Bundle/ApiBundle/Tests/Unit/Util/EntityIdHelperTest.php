@@ -3,9 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\Query\Parameter;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
@@ -201,10 +204,10 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
     public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithArrayId()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'The entity identifier cannot be an array because the entity "%s" has single identifier.',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::class
+            User::class
         ));
 
         $entityClass = Entity\User::class;
@@ -280,10 +283,10 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
     public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithScalarId()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'The entity identifier must be an array because the entity "%s" has composite identifier.',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity::class
+            CompositeKeyEntity::class
         ));
 
         $entityClass = Entity\CompositeKeyEntity::class;
@@ -302,10 +305,10 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 
     public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithWrongId()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'The entity identifier array must have the key "title" because the entity "%s" has composite identifier.',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity::class
+            CompositeKeyEntity::class
         ));
 
         $entityClass = Entity\CompositeKeyEntity::class;
@@ -325,12 +328,12 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     /**
      * @dataProvider isEntityIdentifierEmptyDataProvider
      */
-    public function testIsEntityIdentifierEmpty($id, $expected)
+    public function testIsEntityIdentifierEmpty(int|string|array|null $id, bool $expected)
     {
         self::assertSame($expected, $this->entityIdHelper->isEntityIdentifierEmpty($id));
     }
 
-    public function isEntityIdentifierEmptyDataProvider()
+    public function isEntityIdentifierEmptyDataProvider(): array
     {
         return [
             [null, true],

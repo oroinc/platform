@@ -30,12 +30,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->container = $this->createMock(ContainerInterface::class);
     }
 
-    /**
-     * @param array $entityOverrideProviders
-     *
-     * @return EntityOverrideProviderRegistry
-     */
-    private function getRegistry(array $entityOverrideProviders)
+    private function getRegistry(array $entityOverrideProviders): EntityOverrideProviderRegistry
     {
         return new EntityOverrideProviderRegistry(
             $entityOverrideProviders,

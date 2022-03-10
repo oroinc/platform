@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
 {
@@ -36,12 +37,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
             });
     }
 
-    /**
-     * @param bool $forcePermissionUsage
-     *
-     * @return ValidateEntityTypeAccess
-     */
-    private function getProcessor($forcePermissionUsage = false)
+    private function getProcessor(bool $forcePermissionUsage = false): ValidateEntityTypeAccess
     {
         return new ValidateEntityTypeAccess(
             $this->authorizationChecker,
@@ -69,7 +65,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
 
     public function testProcessWhenAccessDeniedForManageableEntityWithoutConfigOfAclResource()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $className = Product::class;
         $config = new EntityDefinitionConfig();
 
@@ -102,7 +98,7 @@ class ValidateEntityTypeAccessTest extends GetListProcessorTestCase
 
     public function testProcessWhenAccessDeniedForEntityWithConfigOfAclResource()
     {
-        $this->expectException(\Symfony\Component\Security\Core\Exception\AccessDeniedException::class);
+        $this->expectException(AccessDeniedException::class);
         $className = Product::class;
         $aclResource = 'acme_product_test';
         $config = new EntityDefinitionConfig();

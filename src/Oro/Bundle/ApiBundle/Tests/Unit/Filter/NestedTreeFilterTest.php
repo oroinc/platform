@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\Value;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\NestedTreeFilter;
@@ -14,7 +16,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
 {
     public function testForAssociation()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('This filter is not supported for associations.');
 
         $filter = new NestedTreeFilter(DataType::INTEGER);
@@ -26,7 +28,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testUnsupportedOperator()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException::class);
+        $this->expectException(InvalidFilterOperatorException::class);
         $this->expectExceptionMessage('The operator "neq" is not supported.');
 
         $filter = new NestedTreeFilter(DataType::INTEGER);
@@ -35,7 +37,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testWithoutOperator()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException::class);
+        $this->expectException(InvalidFilterOperatorException::class);
         $this->expectExceptionMessage('The operator "eq" is not supported.');
 
         $filter = new NestedTreeFilter(DataType::INTEGER);
@@ -45,7 +47,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterDataProvider
      */
-    public function testFilter($filterValue, $expectation, $field = null)
+    public function testFilter(FilterValue $filterValue, Comparison $expectation, string $field = null)
     {
         $supportedOperators = [
             FilterOperator::GT,
@@ -64,7 +66,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectation, $criteria->getWhereExpression());
     }
 
-    public function filterDataProvider()
+    public function filterDataProvider(): array
     {
         return [
             'GT filter'               => [

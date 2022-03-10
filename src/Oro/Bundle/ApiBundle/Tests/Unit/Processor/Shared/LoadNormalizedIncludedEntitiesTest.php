@@ -104,13 +104,11 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $getProcessor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($getContext))
-            ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult) {
-                    self::assertEquals($expectedGetContext, $context);
+            ->willReturnCallback(function (GetContext $context) use ($expectedGetContext, $getResult) {
+                self::assertEquals($expectedGetContext, $context);
 
-                    $context->setResult($getResult);
-                }
-            );
+                $context->setResult($getResult);
+            });
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);
@@ -184,13 +182,11 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $getProcessor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($getContext))
-            ->willReturnCallback(
-                function (GetContext $context) use ($expectedGetContext, $getResult) {
-                    self::assertEquals($expectedGetContext, $context);
+            ->willReturnCallback(function (GetContext $context) use ($expectedGetContext, $getResult) {
+                self::assertEquals($expectedGetContext, $context);
 
-                    $context->setResult($getResult);
-                }
-            );
+                $context->setResult($getResult);
+            });
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);
@@ -245,11 +241,9 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $getProcessor->expects(self::once())
             ->method('process')
             ->with(self::identicalTo($getContext))
-            ->willReturnCallback(
-                function (GetContext $context) use ($getError) {
-                    $context->addError($getError);
-                }
-            );
+            ->willReturnCallback(function (GetContext $context) use ($getError) {
+                $context->addError($getError);
+            });
 
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities($includedEntities);

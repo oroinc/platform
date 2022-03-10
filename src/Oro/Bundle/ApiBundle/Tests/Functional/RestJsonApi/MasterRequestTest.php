@@ -13,10 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
  */
 class MasterRequestTest extends RestJsonApiTestCase
 {
-    /**
-     * @return int
-     */
-    private function createProduct()
+    private function createProduct(): int
     {
         $product = new TestProduct();
         $product->setName('New Product');
@@ -29,10 +26,7 @@ class MasterRequestTest extends RestJsonApiTestCase
         return $productId;
     }
 
-    /**
-     * @return string
-     */
-    private function createProductType()
+    private function createProductType(): string
     {
         $productType = new TestProductType();
         $productType->setName('new_product_type');

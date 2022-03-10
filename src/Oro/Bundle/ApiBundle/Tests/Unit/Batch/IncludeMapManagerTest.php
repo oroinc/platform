@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Batch\IncludeMapManager;
 use Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Psr\Log\LoggerInterface;
 
@@ -1284,7 +1285,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testMoveToProcessedWhenNotPossibleToAcquireLockForIncludeIndex()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'Not possible to move included items to processed'
             . ' because the lock cannot be acquired for the "api_123_include_index" file.'

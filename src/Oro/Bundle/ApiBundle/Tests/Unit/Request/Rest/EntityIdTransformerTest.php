@@ -25,13 +25,13 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform($id, $expectedResult)
+    public function testTransform(int|array $id, string $expectedResult)
     {
         $result = $this->entityIdTransformer->transform($id, new EntityMetadata());
         self::assertSame($expectedResult, $result);
     }
 
-    public function transformProvider()
+    public function transformProvider(): array
     {
         return [
             [123, '123'],

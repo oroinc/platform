@@ -10,7 +10,7 @@ class BooleanTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider validValuesDataProvider
      */
-    public function testWithValidValue($value, $expected)
+    public function testWithValidValue(string|int|bool $value, bool $expected)
     {
         /**
          * @see \Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm::prepareRequestData
@@ -25,7 +25,7 @@ class BooleanTypeTest extends ApiFormTypeTestCase
         self::assertSame($expected, $form->getData());
     }
 
-    public function validValuesDataProvider()
+    public function validValuesDataProvider(): array
     {
         return [
             ['true', true],
@@ -44,14 +44,14 @@ class BooleanTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testWithInvalidValue($value)
+    public function testWithInvalidValue(?string $value)
     {
         $form = $this->factory->create(BooleanType::class);
         $form->submit($value);
         self::assertFalse($form->isSynchronized());
     }
 
-    public function invalidValuesDataProvider()
+    public function invalidValuesDataProvider(): array
     {
         return [
             ['test'],

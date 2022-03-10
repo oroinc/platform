@@ -28,12 +28,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         $this->processor = new RemoveNotAvailableSubresources();
     }
 
-    /**
-     * @param ApiResource $resource
-     *
-     * @return ApiResourceSubresourcesCollection
-     */
-    private function getApiResourceSubresources(ApiResource $resource)
+    private function getApiResourceSubresources(ApiResource $resource): ApiResourceSubresourcesCollection
     {
         $entitySubresources = new ApiResourceSubresources($resource->getEntityClass());
         $subresources = new ApiResourceSubresourcesCollection();

@@ -15,9 +15,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 
 class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
 {
-    private const TEST_CLASS_NAME        = 'Test\Class';
-    private const TEST_VERSION           = '1.1';
-    private const TEST_REQUEST_TYPE      = RequestType::REST;
+    private const TEST_CLASS_NAME = 'Test\Class';
+    private const TEST_VERSION = '1.1';
+    private const TEST_REQUEST_TYPE = RequestType::REST;
     private const TEST_TARGET_CLASS_NAME = 'Test\TargetClass';
 
     /** @var MetadataContext */

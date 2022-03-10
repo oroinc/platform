@@ -17,26 +17,17 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/supported_data_types.yml'
         ]);
     }
 
-    /**
-     * @return bool
-     */
-    private function isPostgreSql()
+    private function isPostgreSql(): bool
     {
         return $this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }
 
-    /**
-     * @param int $entityId
-     *
-     * @return array
-     */
-    private function getEntityData($entityId)
+    private function getEntityData(int $entityId): array
     {
         $entity = $this->getEntityManager()->find(TestAllDataTypes::class, $entityId);
 
@@ -300,8 +291,12 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider emptyValueDataProvider
      */
-    public function testCreateShouldAcceptEmptyValue($fieldName, $value, $responseValue, $entityValue)
-    {
+    public function testCreateShouldAcceptEmptyValue(
+        string $fieldName,
+        mixed $value,
+        mixed $responseValue,
+        mixed $entityValue
+    ) {
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $fieldName && null === $entityValue && $this->isPostgreSql()) {
@@ -331,8 +326,12 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider emptyValueDataProvider
      */
-    public function testUpdateShouldAcceptEmptyValue($fieldName, $value, $responseValue, $entityValue)
-    {
+    public function testUpdateShouldAcceptEmptyValue(
+        string $fieldName,
+        mixed $value,
+        mixed $responseValue,
+        mixed $entityValue
+    ) {
         // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
         // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
         if ('fieldBoolean' === $fieldName && $this->isPostgreSql()) {
@@ -365,10 +364,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertSame($entityValue, $entity->{$fieldName}, 'entity data');
     }
 
-    /**
-     * @return array
-     */
-    public function emptyValueDataProvider()
+    public function emptyValueDataProvider(): array
     {
         return [
             'String NULL'                  => ['fieldString', null, null, null],
@@ -436,8 +432,11 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider invalidValueDataProvider
      */
-    public function testUpdateShouldHandleInvalidValue($fieldName, $value, $errorDetail = 'This value is not valid.')
-    {
+    public function testUpdateShouldHandleInvalidValue(
+        string $fieldName,
+        mixed $value,
+        string $errorDetail = 'This value is not valid.'
+    ) {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -462,10 +461,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function invalidValueDataProvider()
+    public function invalidValueDataProvider(): array
     {
         return [
             'Int (empty string)'                  => ['fieldInt', ''],
@@ -513,7 +509,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider validBooleanValueDataProvider
      */
-    public function testValidValuesForBooleanField($submittedValue, $expectedValue)
+    public function testValidValuesForBooleanField(string|int|bool $submittedValue, bool $expectedValue)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -537,10 +533,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertSame($expectedValue, $entity->fieldBoolean);
     }
 
-    /**
-     * @return array
-     */
-    public function validBooleanValueDataProvider()
+    public function validBooleanValueDataProvider(): array
     {
         return [
             'false'          => [false, false],
@@ -559,7 +552,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider validIntegerValueDataProvider
      */
-    public function testValidValuesForIntegerField($submittedValue, $expectedValue)
+    public function testValidValuesForIntegerField(int $submittedValue, int $expectedValue)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -583,10 +576,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertSame($expectedValue, $entity->fieldInt);
     }
 
-    /**
-     * @return array
-     */
-    public function validIntegerValueDataProvider()
+    public function validIntegerValueDataProvider(): array
     {
         return [
             '1'  => [1, 1],
@@ -597,7 +587,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider validDateTimeValueDataProvider
      */
-    public function testValidValuesForDateTimeField($submittedValue, $responseValue, $entityValue)
+    public function testValidValuesForDateTimeField(string $submittedValue, string $responseValue, string $entityValue)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -622,10 +612,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertEquals($entityValue, $entity->fieldDateTime->format('Y-m-d\TH:i:s.vO'));
     }
 
-    /**
-     * @return array
-     */
-    public function validDateTimeValueDataProvider()
+    public function validDateTimeValueDataProvider(): array
     {
         return [
             'year only'                              => [
@@ -704,7 +691,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider invalidDateTimeDataProvider
      */
-    public function testInvalidValuesForDateTimeField($value, $errorDetail = 'This value is not valid.')
+    public function testInvalidValuesForDateTimeField(string $value, string $errorDetail = 'This value is not valid.')
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -730,10 +717,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function invalidDateTimeDataProvider()
+    public function invalidDateTimeDataProvider(): array
     {
         return [
             'without timezone'                        => [
@@ -806,7 +790,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider validDateValueDataProvider
      */
-    public function testValidValuesForDateField($submittedValue, $responseValue, $entityValue)
+    public function testValidValuesForDateField(string $submittedValue, string $responseValue, string $entityValue)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -831,10 +815,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertEquals($entityValue, $entity->fieldDate->format('Y-m-d\TH:i:s.vO'));
     }
 
-    /**
-     * @return array
-     */
-    public function validDateValueDataProvider()
+    public function validDateValueDataProvider(): array
     {
         return [
             'full date'           => [
@@ -858,7 +839,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider invalidDateDataProvider
      */
-    public function testInvalidValuesForDateField($value, $errorDetail = 'This value is not valid.')
+    public function testInvalidValuesForDateField(string $value, string $errorDetail = 'This value is not valid.')
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -884,10 +865,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function invalidDateDataProvider()
+    public function invalidDateDataProvider(): array
     {
         return [
             'with time'                      => [
@@ -913,7 +891,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider validTimeValueDataProvider
      */
-    public function testValidValuesForTimeField($submittedValue, $responseValue, $entityValue)
+    public function testValidValuesForTimeField(string $submittedValue, string $responseValue, string $entityValue)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -938,10 +916,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertEquals($entityValue, $entity->fieldTime->format('Y-m-d\TH:i:s.vO'));
     }
 
-    /**
-     * @return array
-     */
-    public function validTimeValueDataProvider()
+    public function validTimeValueDataProvider(): array
     {
         return [
             'full time'            => [
@@ -970,7 +945,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider invalidTimeDataProvider
      */
-    public function testInvalidValuesForTimeField($value, $errorDetail = 'This value is not valid.')
+    public function testInvalidValuesForTimeField(string $value, string $errorDetail = 'This value is not valid.')
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -996,10 +971,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @return array
-     */
-    public function invalidTimeDataProvider()
+    public function invalidTimeDataProvider(): array
     {
         return [
             'with date'                 => ['2017-07-21T10:20:30Z', 'The "2017-07-21T10:20:30Z" is not valid time.'],
@@ -1069,7 +1041,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
     /**
      * @dataProvider validDurationValueDataProvider
      */
-    public function testValidValuesForDurationField($submittedValue, $durationInSeconds)
+    public function testValidValuesForDurationField(string|int $submittedValue, int $durationInSeconds)
     {
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
@@ -1093,10 +1065,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         self::assertSame($durationInSeconds, $entity->fieldDuration);
     }
 
-    /**
-     * @return array
-     */
-    public function validDurationValueDataProvider()
+    public function validDurationValueDataProvider(): array
     {
         return [
             'seconds'                            => [123, 123],

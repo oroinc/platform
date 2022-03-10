@@ -10,7 +10,7 @@ class ConfigNormalizerTestCase extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function normalizeConfigProvider()
+    public function normalizeConfigProvider(): array
     {
         return [
             'ignored fields'                                             => [

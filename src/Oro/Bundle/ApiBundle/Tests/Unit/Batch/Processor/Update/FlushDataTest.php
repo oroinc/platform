@@ -46,11 +46,6 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $this->processor = new FlushData($this->flushDataHandlerFactoryRegistry, $this->logger);
     }
 
-    /**
-     * @param int $itemIndex
-     *
-     * @return BatchUpdateItem|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getBatchUpdateItem(int $itemIndex): BatchUpdateItem
     {
         $item = $this->createMock(BatchUpdateItem::class);
@@ -74,18 +69,9 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         $context->setProcessedItemStatuses($processedItemStatuses);
     }
 
-    /**
-     * @param bool|null                                                               $finished
-     * @param BatchFlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $flushDataHandler
-     * @param array                                                                   $items
-     * @param bool                                                                    $flushDataCall
-     * @param \Exception|null                                                         $flushDataError
-     *
-     * @return bool|null
-     */
     private function expectFlushData(
         ?bool &$finished,
-        $flushDataHandler,
+        BatchFlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $flushDataHandler,
         array $items,
         bool $flushDataCall = true,
         \Exception $flushDataError = null

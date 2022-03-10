@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Extension\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\Extension\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
+use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
@@ -16,6 +17,7 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityDataAccessor;
@@ -25,7 +27,6 @@ use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -52,20 +53,13 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ),
             new DoctrineHelper($doctrine),
             new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
-            new EntityDataAccessor(new PropertyAccessor()),
+            new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()
         );
     }
 
-    /**
-     * @param mixed                       $object
-     * @param EntityDefinitionConfig|null $config
-     * @param array                       $context
-     *
-     * @return mixed
-     */
-    private function normalizeObject($object, EntityDefinitionConfig $config = null, array $context = [])
+    private function normalizeObject(object $object, EntityDefinitionConfig $config = null, array $context = []): array
     {
         if (!isset($context[ApiContext::REQUEST_TYPE])) {
             $context[ApiContext::REQUEST_TYPE] = new RequestType([RequestType::REST]);
@@ -75,10 +69,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         return reset($normalizedObjects);
     }
 
-    /**
-     * @return Entity\Product
-     */
-    private function createProductObject()
+    private function createProductObject(): Entity\Product
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -108,12 +99,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         return $product;
     }
 
-    /**
-     * @param array $config
-     *
-     * @return EntityDefinitionConfig
-     */
-    private function createConfigObject(array $config)
+    private function createConfigObject(array $config): EntityDefinitionConfig
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
@@ -1118,10 +1104,10 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'The exclusion policy must be "all". Object type: "%s".',
-            \Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category::class
+            Category::class
         ));
 
         $config = [

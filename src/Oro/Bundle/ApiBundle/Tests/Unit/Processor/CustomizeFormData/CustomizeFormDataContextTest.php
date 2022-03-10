@@ -28,15 +28,11 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new CustomizeFormDataContext();
     }
 
-    /**
-     * @param string      $name
-     * @param bool        $compound
-     * @param string|null $propertyPath
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|FormConfigInterface
-     */
-    private function getFormConfig($name, $compound = false, $propertyPath = null)
-    {
+    private function getFormConfig(
+        string $name,
+        bool $compound = false,
+        string $propertyPath = null
+    ): FormConfigInterface {
         $config = $this->createMock(FormConfigInterface::class);
         $config->expects(self::any())
             ->method('getName')

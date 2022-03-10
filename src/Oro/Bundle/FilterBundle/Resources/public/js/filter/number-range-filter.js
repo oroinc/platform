@@ -146,9 +146,9 @@ define(function(require) {
                 option = this._getChoiceOption(type);
                 hint += [option.label, start, __('and'), end].join(' ');
             } else if (between && start || !between && end) {
-                hint += [__('after'), start || end].join(' ');
+                hint += [__('oro.filter.number_range.greater_than'), start || end].join(' ');
             } else if (between && end || !between && start) {
-                hint += [__('before'), end || start].join(' ');
+                hint += [__('oro.filter.number_range.less_than'), end || start].join(' ');
             }
 
             return hint;

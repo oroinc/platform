@@ -72,20 +72,12 @@ class RelationshipsTest extends RestJsonApiTestCase
         });
     }
 
-    /**
-     * @param string         $entityType
-     * @param string         $entityId
-     * @param string         $associationName
-     * @param ApiSubresource $subresource
-     *
-     * @return array|null
-     */
     protected function checkGetRelationshipRequest(
-        $entityType,
-        $entityId,
-        $associationName,
+        string $entityType,
+        string $entityId,
+        string $associationName,
         ApiSubresource $subresource
-    ) {
+    ): ?array {
         $parameters = [
             'entity'      => $entityType,
             'id'          => $entityId,
@@ -113,8 +105,8 @@ class RelationshipsTest extends RestJsonApiTestCase
         $data = $responseContent['data'];
         $resourceObjectId = null;
         if ($subresource->isCollection()) {
-            self::assertTrue(
-                is_array($data),
+            self::assertIsArray(
+                $data,
                 sprintf('The "data" should be an array for "get relationship" for %s', $resourceKey)
             );
             if (!empty($data)) {
@@ -133,20 +125,13 @@ class RelationshipsTest extends RestJsonApiTestCase
         return $resourceObjectId;
     }
 
-    /**
-     * @param string         $entityType
-     * @param string         $entityId
-     * @param string         $associationName
-     * @param array|null     $resourceObjectId
-     * @param ApiSubresource $subresource
-     */
     protected function checkUpdateRelationshipRequest(
-        $entityType,
-        $entityId,
-        $associationName,
-        $resourceObjectId,
+        string $entityType,
+        string $entityId,
+        string $associationName,
+        ?array $resourceObjectId,
         ApiSubresource $subresource
-    ) {
+    ): void {
         if (null === $resourceObjectId) {
             return;
         }
@@ -172,20 +157,13 @@ class RelationshipsTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param string         $entityType
-     * @param string         $entityId
-     * @param string         $associationName
-     * @param array|null     $resourceObjectId
-     * @param ApiSubresource $subresource
-     */
     protected function checkAddRelationshipRequest(
-        $entityType,
-        $entityId,
-        $associationName,
-        $resourceObjectId,
+        string $entityType,
+        string $entityId,
+        string $associationName,
+        ?array $resourceObjectId,
         ApiSubresource $subresource
-    ) {
+    ): void {
         if (null === $resourceObjectId) {
             return;
         }
@@ -211,20 +189,13 @@ class RelationshipsTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @param string         $entityType
-     * @param string         $entityId
-     * @param string         $associationName
-     * @param array|null     $resourceObjectId
-     * @param ApiSubresource $subresource
-     */
     protected function checkDeleteRelationshipRequest(
-        $entityType,
-        $entityId,
-        $associationName,
-        $resourceObjectId,
+        string $entityType,
+        string $entityId,
+        string $associationName,
+        ?array $resourceObjectId,
         ApiSubresource $subresource
-    ) {
+    ): void {
         if (null === $resourceObjectId) {
             return;
         }

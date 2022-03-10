@@ -585,12 +585,9 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     }
 
     /**
-     * @param EntityDefinitionConfig $configObject
-     * @param string                 $handlerType
-     *
      * @return callable[] [assertion, expectation]
      */
-    private function getRootHandlerAssertion(EntityDefinitionConfig $configObject, $handlerType = '')
+    private function getRootHandlerAssertion(EntityDefinitionConfig $configObject, string $handlerType = ''): array
     {
         $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
@@ -621,21 +618,15 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     }
 
     /**
-     * @param EntityDefinitionConfig $configObject
-     * @param EntityDefinitionConfig $childConfigObject
-     * @param string                 $childEntityClass
-     * @param string                 $fieldPath
-     * @param string                 $handlerType
-     *
      * @return callable[] [assertion, expectation]
      */
     private function getChildHandlerAssertion(
         EntityDefinitionConfig $configObject,
         EntityDefinitionConfig $childConfigObject,
-        $childEntityClass,
-        $fieldPath,
-        $handlerType = ''
-    ) {
+        string $childEntityClass,
+        string $fieldPath,
+        string $handlerType = ''
+    ): array {
         $sourceDataItem = ['source data'];
         $processedDataItem = ['processed data'];
         $expectation = function (CustomizeLoadedDataContext $context) use (

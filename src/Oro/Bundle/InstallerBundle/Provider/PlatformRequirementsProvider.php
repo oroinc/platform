@@ -33,7 +33,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
 
     public const REQUIRED_CURL_VERSION = '7.0';
 
-    public const REQUIRED_NODEJS_VERSION  = '>=14 <17';
+    public const REQUIRED_NODEJS_VERSION  = '>=16 <17';
 
     protected Connection $connection;
     protected string $projectDirectory;
@@ -117,6 +117,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addOpenSslExtRequirement($collection);
         $this->addIntlExtRequirement($collection);
         $this->addZipExtRequirement($collection);
+        $this->addMbstringExtRequirement($collection);
         $this->addNodeJsInstalledRequirement($collection, $nodeJsExecutable);
         $this->addNodeJsVersionRequirement($collection, $nodeJsExecutable);
         $this->addNpmInstalledRequirement($collection, $nodeJsExecutableFinder->findNpm());
@@ -493,6 +494,15 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
             extension_loaded('zip'),
             'zip extension should be installed',
             'Install and enable the <strong>Zip</strong> extension.'
+        );
+    }
+
+    protected function addMbstringExtRequirement(RequirementCollection $collection): void
+    {
+        $collection->addRequirement(
+            extension_loaded('mbstring'),
+            'mbstring extension should be installed',
+            'Install and enable the <strong>mbstring</strong> extension.'
         );
     }
 

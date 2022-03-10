@@ -7,16 +7,13 @@ use Extend\Entity\EV_Api_Enum2 as TestEnum2;
 use Extend\Entity\TestApiE1;
 use Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures\LoadEnumsData;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class ZeroIdentifierTest extends RestJsonApiTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->loadFixtures([
             LoadEnumsData::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/zero_identifier.yml'
@@ -47,7 +44,7 @@ class ZeroIdentifierTest extends RestJsonApiTestCase
             $this->getUrl($this->getItemRouteName(), ['entity' => $entityType, 'id' => '0'])
         );
 
-        $this->assertResponseStatusCodeEquals($response, 404);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_NOT_FOUND);
     }
 
     public function testCreateWithRelationshipWithZeroIdentifier()

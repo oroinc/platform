@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\UpdateItem;
 
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\NormalizeEntityClass;
+use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -98,7 +99,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
 
     public function testProcessForNotAccessibleEntityType()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException::class);
+        $this->expectException(ResourceNotAccessibleException::class);
 
         $entityType = 'test';
 

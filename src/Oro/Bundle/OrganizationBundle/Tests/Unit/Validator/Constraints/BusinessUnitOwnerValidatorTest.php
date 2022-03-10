@@ -24,6 +24,12 @@ class BusinessUnitOwnerValidatorTest extends ConstraintValidatorTestCase
         return $businessUnit;
     }
 
+    public function testGetTargets()
+    {
+        $constraint = new BusinessUnitOwner();
+        $this->assertEquals(BusinessUnitOwner::CLASS_CONSTRAINT, $constraint->getTargets());
+    }
+
     public function testValidBusinessUnit()
     {
         $businessUnit = $this->getBusinessUnit(1);

@@ -22,7 +22,7 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
         $this->loadFixtures([LoadOperationsErrorsData::class]);
     }
 
-    protected function updateIds(string $expectedContentFileName, int $operationId): array
+    private function updateIds(string $expectedContentFileName, int $operationId): array
     {
         $expectedContent = $this->getResponseData($expectedContentFileName);
         foreach ($expectedContent['data'] as $index => $item) {

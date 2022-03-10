@@ -5,7 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
+use Doctrine\Common\Collections\Expr\Expression;
 use Doctrine\Common\Collections\Expr\Value;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
@@ -59,7 +61,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testUnsupportedOperator()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException::class);
+        $this->expectException(InvalidFilterOperatorException::class);
         $this->expectExceptionMessage('The operator "neq" is not supported.');
 
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
@@ -101,16 +103,15 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string      $fieldName
-     * @param bool        $isArrayAllowed
-     * @param bool        $isRangeAllowed
-     * @param FilterValue $filterValue
-     * @param Criteria    $expectation
-     *
      * @dataProvider filterDataProvider
      */
-    public function testFilter($fieldName, $isArrayAllowed, $isRangeAllowed, $filterValue, $expectation)
-    {
+    public function testFilter(
+        string $fieldName,
+        bool $isArrayAllowed,
+        bool $isRangeAllowed,
+        ?FilterValue $filterValue,
+        ?Expression $expectation
+    ) {
         $supportedOperators = [
             FilterOperator::EQ,
             FilterOperator::NEQ,
@@ -148,7 +149,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function filterDataProvider()
+    public function filterDataProvider(): array
     {
         return [
             'empty filter'                 => [
@@ -314,16 +315,15 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string      $fieldName
-     * @param bool        $isArrayAllowed
-     * @param bool        $isRangeAllowed
-     * @param FilterValue $filterValue
-     * @param Criteria    $expectation
-     *
      * @dataProvider collectionFilterDataProvider
      */
-    public function testCollectionFilter($fieldName, $isArrayAllowed, $isRangeAllowed, $filterValue, $expectation)
-    {
+    public function testCollectionFilter(
+        string $fieldName,
+        bool $isArrayAllowed,
+        bool $isRangeAllowed,
+        ?FilterValue $filterValue,
+        ?Expression $expectation
+    ) {
         $supportedOperators = [
             FilterOperator::EQ,
             FilterOperator::NEQ,
@@ -354,7 +354,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function collectionFilterDataProvider()
+    public function collectionFilterDataProvider(): array
     {
         return [
             'empty filter'                 => [

@@ -8,6 +8,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
@@ -152,7 +153,8 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEnabledEntityWhenEntityIsNotAccessibleYet()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
+
         $entityName = 'Acme:Test';
         $entityClassName = 'Acme\Entity\Test';
         $entityConfig = $this->getEntityConfig(
@@ -182,7 +184,7 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
         $this->featureChecker->expects($this->never())
             ->method('isResourceEnabled');
 
-        $result = $this->provider->getEnabledEntity($entityName);
+        $this->provider->getEnabledEntity($entityName);
     }
 
     /**
@@ -275,10 +277,10 @@ class EntityProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getConfig')
             ->willReturnCallback(function ($param) {
                 $this->extendConfig->set('state', ExtendScope::STATE_ACTIVE);
-                if ($param == 'Acme\Entity\Test4') {
+                if ('Acme\Entity\Test4' === $param) {
                     $this->extendConfig->set('state', ExtendScope::STATE_NEW);
                 }
-                if ($param == 'Acme\Entity\Test4') {
+                if ('Acme\Entity\Test4' === $param) {
                     $this->extendConfig->set('state', ExtendScope::STATE_DELETE);
                 }
                 return $this->extendConfig;

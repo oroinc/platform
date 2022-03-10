@@ -109,13 +109,11 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
         $this->countQueryBuilderOptimizer->expects(self::once())
             ->method('getCountQueryBuilder')
-            ->willReturnCallback(
-                function (QueryBuilder $qb) {
-                    $qb->select('e.id');
+            ->willReturnCallback(function (QueryBuilder $qb) {
+                $qb->select('e.id');
 
-                    return $qb;
-                }
-            );
+                return $qb;
+            });
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
             ->with(self::isInstanceOf(Query::class), self::identicalTo($config));

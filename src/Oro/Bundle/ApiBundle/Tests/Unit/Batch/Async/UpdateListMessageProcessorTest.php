@@ -125,13 +125,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param array $body
-     * @param string $messageId
-     *
-     * @return MessageInterface
-     */
-    private function getMessage(array $body, string $messageId = '')
+    private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
@@ -142,14 +136,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($messageId);
 
         return $message;
-    }
-
-    /**
-     * @return SessionInterface
-     */
-    private function getSession()
-    {
-        return $this->createMock(SessionInterface::class);
     }
 
     private function expectGetSplitter(RequestType $requestType, ?FileSplitterInterface $splitter)
@@ -168,15 +154,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($classifier);
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|FileSplitterInterface $splitter
-     * @param int                                                            $operationId
-     * @param string                                                         $fileName
-     * @param int                                                            $chunkSize
-     * @param ChunkFile[]                                                    $chunkFiles
-     */
     private function expectSplitFile(
-        FileSplitterInterface $splitter,
+        FileSplitterInterface|\PHPUnit\Framework\MockObject\MockObject $splitter,
         int $operationId,
         string $fileName,
         int $chunkSize,
@@ -206,15 +185,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($chunkFiles);
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject|FileSplitterInterface $splitter
-     * @param int                                                            $operationId
-     * @param string                                                         $fileName
-     * @param int                                                            $chunkSize
-     * @param \Exception                                                     $exception
-     */
     private function expectSplitFileThrowException(
-        FileSplitterInterface $splitter,
+        FileSplitterInterface|\PHPUnit\Framework\MockObject\MockObject $splitter,
         int $operationId,
         string $fileName,
         int $chunkSize,
@@ -269,13 +241,9 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    /**
-     * @param Job $rootJob
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject|DependentJobContext
-     */
-    private function createDependentJobContext(Job $rootJob): DependentJobContext
-    {
+    private function createDependentJobContext(
+        Job $rootJob
+    ): DependentJobContext|\PHPUnit\Framework\MockObject\MockObject {
         $dependentJobContext = $this->createMock(DependentJobContext::class);
         $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
@@ -304,7 +272,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('critical')
             ->with('Got invalid message.');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -336,7 +304,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with('A file splitter was not found for the request type "testRequest".');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -373,7 +341,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with('A chunk file classifier was not found for the request type "testRequest".');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -423,7 +391,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('safeDeleteChunkFiles')
             ->with($operationId, sprintf('api_%d_chunk_', $operationId) . '%s');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -466,7 +434,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('safeDeleteChunkFiles')
             ->with($operationId, sprintf('api_%d_chunk_', $operationId) . '%s');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -514,7 +482,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('deleteFile')
             ->with($fileName);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -614,7 +582,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('incrementAggregateTime')
             ->with($operationId, $aggregateTime + 10);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -740,7 +708,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('incrementAggregateTime')
             ->with($operationId, $aggregateTime + 20);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -818,7 +786,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->jobRunner->expects(self::never())
             ->method('runUnique');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(Topics::UPDATE_LIST, [
@@ -892,7 +860,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('deleteFile')
             ->with($fileName);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertEmptyMessages(Topics::UPDATE_LIST);
@@ -1008,7 +976,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('incrementAggregateTime')
             ->with($operationId, $aggregateTime + 10);
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
@@ -1095,7 +1063,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->operationManager->expects(self::never())
             ->method('incrementAggregateTime');
 
-        $result = $this->processor->process($message, $this->getSession());
+        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }

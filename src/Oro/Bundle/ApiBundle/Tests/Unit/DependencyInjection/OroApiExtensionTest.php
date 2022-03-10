@@ -30,13 +30,11 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $bundle3 = new Fixtures\FooBundle\FooBundle();
         CumulativeResourceManager::getInstance()
             ->clear()
-            ->setBundles(
-                [
-                    $bundle1->getName() => get_class($bundle1),
-                    $bundle2->getName() => get_class($bundle2),
-                    $bundle3->getName() => get_class($bundle3)
-                ]
-            );
+            ->setBundles([
+                $bundle1->getName() => get_class($bundle1),
+                $bundle2->getName() => get_class($bundle2),
+                $bundle3->getName() => get_class($bundle3)
+            ]);
     }
 
     protected function tearDown(): void
@@ -44,38 +42,25 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         CumulativeResourceManager::getInstance()->clear();
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     */
-    private static function assertServiceExists(ContainerBuilder $container, $serviceId)
+    private static function assertServiceExists(ContainerBuilder $container, string $serviceId): void
     {
         if (!$container->hasDefinition($serviceId)) {
             self::fail(sprintf('Service "%s" should be defined', $serviceId));
         }
     }
 
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     */
-    private static function assertServiceNotExists(ContainerBuilder $container, $serviceId)
+    private static function assertServiceNotExists(ContainerBuilder $container, string $serviceId): void
     {
         if ($container->hasDefinition($serviceId)) {
             self::fail(sprintf('Service "%s" should not be defined', $serviceId));
         }
     }
 
-    /**
-     * @param array            $serviceIds
-     * @param object           $serviceLocatorReference
-     * @param ContainerBuilder $container
-     */
     private static function assertServiceLocator(
         array $serviceIds,
-        $serviceLocatorReference,
+        object $serviceLocatorReference,
         ContainerBuilder $container
-    ) {
+    ): void {
         $services = [];
         foreach ($serviceIds as $serviceId) {
             $services[$serviceId] = new ServiceClosureArgument(new Reference($serviceId));
@@ -87,10 +72,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($services, $serviceLocatorDef->getArgument(0));
     }
 
-    /**
-     * @return ConfigExtensionRegistry
-     */
-    private function getConfigExtensionRegistry()
+    private function getConfigExtensionRegistry(): ConfigExtensionRegistry
     {
         $configExtensionRegistry = new ConfigExtensionRegistry(3);
         $configExtensionRegistry->addExtension(new FiltersConfigExtension(new FilterOperatorRegistry([])));
@@ -99,12 +81,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         return $configExtensionRegistry;
     }
 
-    /**
-     * @param bool $devMode
-     *
-     * @return ContainerBuilder
-     */
-    private function getContainer(bool $devMode = false)
+    private function getContainer(bool $devMode = false): ContainerBuilder
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', $devMode);
@@ -114,10 +91,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         return $container;
     }
 
-    /**
-     * @return array
-     */
-    public static function environmentDataProvider()
+    public static function environmentDataProvider(): array
     {
         return [
             'prod mode' => [false],
@@ -1627,7 +1601,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $apiConfig = DependencyInjectionUtil::getConfig($container);
         self::assertEquals(
             [
-                'excluded_features' => ['web_api']
+                'excluded_features'   => ['web_api'],
+                'resettable_services' => []
             ],
             $apiConfig['api_doc_cache']
         );
@@ -1640,12 +1615,14 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $configs = [
             [
                 'api_doc_cache' => [
-                    'excluded_features' => ['feature1']
+                    'excluded_features'   => ['feature1'],
+                    'resettable_services' => ['service1']
                 ]
             ],
             [
                 'api_doc_cache' => [
-                    'excluded_features' => ['feature2']
+                    'excluded_features'   => ['feature2'],
+                    'resettable_services' => ['service2']
                 ]
             ]
         ];
@@ -1656,7 +1633,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $apiConfig = DependencyInjectionUtil::getConfig($container);
         self::assertEquals(
             [
-                'excluded_features' => ['feature1', 'feature2']
+                'excluded_features'   => ['feature1', 'feature2'],
+                'resettable_services' => ['service1', 'service2']
             ],
             $apiConfig['api_doc_cache']
         );

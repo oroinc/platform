@@ -43,15 +43,11 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $this->configProvider = $this->createMock(ConfigProvider::class);
     }
 
-    /**
-     * @param array           $configKeys
-     * @param array           $apiDocViews
-     * @param ApiDocExtractor $apiDocExtractor
-     *
-     * @return CacheManager
-     */
-    private function getCacheManager(array $configKeys, array $apiDocViews, ApiDocExtractor $apiDocExtractor)
-    {
+    private function getCacheManager(
+        array $configKeys,
+        array $apiDocViews,
+        ApiDocExtractor $apiDocExtractor
+    ): CacheManager {
         return new CacheManager(
             $configKeys,
             $apiDocViews,
@@ -147,7 +143,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dirtyConfigCacheDataProvider
      */
-    public function testWarmUpDirtyCachesWhenThereIsDirtyConfigCache($dirtyConfigKey, $toClearApiDocViews)
+    public function testWarmUpDirtyCachesWhenThereIsDirtyConfigCache(string $dirtyConfigKey, array $toClearApiDocViews)
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
         $cacheManager = $this->getCacheManager(
@@ -202,7 +198,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($toClearApiDocViews, $clearedApiDocViews);
     }
 
-    public function dirtyConfigCacheDataProvider()
+    public function dirtyConfigCacheDataProvider(): array
     {
         return [
             ['api1', ['view1', 'view2', 'view4']],

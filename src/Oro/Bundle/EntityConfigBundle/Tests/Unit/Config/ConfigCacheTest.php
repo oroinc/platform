@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigCache;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -936,7 +937,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider saveConfigurableProvider
      */
-    public function testSaveConfigurable($fetchVal, $flag, $fieldName, $saveValue)
+    public function testSaveConfigurable(array|false $fetchVal, ?bool $flag, ?string $fieldName, array $saveValue)
     {
         $this->modelCache->expects($this->once())
             ->method('fetch')
@@ -951,7 +952,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->configCache->saveConfigurable($flag, self::ENTITY_CLASS, $fieldName);
     }
 
-    public function saveConfigurableProvider()
+    public function saveConfigurableProvider(): array
     {
         return [
             [false, true, null, [true]],
@@ -979,7 +980,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfigurableProvider
      */
-    public function testGetConfigurable($fetchVal, $fieldName, $expectedFlag)
+    public function testGetConfigurable(array|false $fetchVal, ?string $fieldName, ?bool $expectedFlag)
     {
         $this->modelCache->expects($this->once())
             ->method('fetch')
@@ -991,7 +992,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expectedFlag, $this->configCache->getConfigurable(self::ENTITY_CLASS, $fieldName));
     }
 
-    public function getConfigurableProvider()
+    public function getConfigurableProvider(): array
     {
         return [
             [false, null, null],
@@ -1092,7 +1093,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testBeginBatchWhenBatchAlreadyStarted()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('A batch already started. Nested batches are not supported.');
 
         $this->configCache->beginBatch();
@@ -1101,7 +1102,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testSaveBatchWhenBatchIsNotStarted()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('A batch is not started.');
 
         $this->configCache->saveBatch();
@@ -1114,7 +1115,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllConfigsInBatchShouldNotBeAllowed()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('deleteAllConfigs() is not allowed inside a batch.');
 
         $this->configCache->beginBatch();
@@ -1123,7 +1124,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllConfigurableInBatchShouldNotBeAllowed()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('deleteAllConfigurable() is not allowed inside a batch.');
 
         $this->configCache->beginBatch();
@@ -1132,7 +1133,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
 
     public function testDeleteAllInBatchShouldNotBeAllowed()
     {
-        $this->expectException(\Oro\Bundle\EntityConfigBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('deleteAllConfigurable() is not allowed inside a batch.');
 
         $this->configCache->beginBatch();
