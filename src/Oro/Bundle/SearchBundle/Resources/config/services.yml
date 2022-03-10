@@ -51,6 +51,8 @@ services:
             - '@oro_search.handler.type_cast.type_casting_handler_registry'
             - '@event_dispatcher'
             - '@oro_ui.html_tag_helper'
+        calls:
+            - ['setNameResolver', ['@oro_entity.entity_name_resolver']]
 
     oro_search.text_filtered_mapper:
         class: Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper

@@ -18,10 +18,10 @@ class AttachmentFieldConfiguration implements FieldConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('use_dam')
+            ->node('use_dam', 'normalized_boolean')
                 ->defaultFalse()
             ->end()
-            ->booleanNode('acl_protected')
+            ->node('acl_protected', 'normalized_boolean')
                 ->defaultTrue()
             ->end()
         ;

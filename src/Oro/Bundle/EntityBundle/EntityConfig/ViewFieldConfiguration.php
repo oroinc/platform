@@ -18,7 +18,7 @@ class ViewFieldConfiguration implements FieldConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('is_displayable')
+            ->node('is_displayable', 'normalized_boolean')
                 ->info('`boolean` show on view.')
                 ->defaultTrue()
             ->end()

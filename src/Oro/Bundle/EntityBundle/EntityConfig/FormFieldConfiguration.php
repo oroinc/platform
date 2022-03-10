@@ -23,7 +23,7 @@ class FormFieldConfiguration implements FieldConfigInterface
                 'Symfony Form Type Options(https://symfony.com/doc/current/forms.html#form-type-options).')
                 ->prototype('variable')->end()
             ->end()
-            ->booleanNode('is_enabled')
+            ->node('is_enabled', 'normalized_boolean')
                 ->info('`boolean` enables the ‘form’ functionality.')
                 ->defaultTrue()
             ->end()

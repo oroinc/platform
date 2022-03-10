@@ -2,7 +2,8 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## Not released yet
+## 5.0.0 (2022-01-26)
+[Show detailed list of changes](incompatibilities-5-0.md)
 
 ### Added
 
@@ -19,6 +20,9 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider` to generate filename taking into account current WebP strategy.
 * Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
   to provider image sources to be used in <picture> tag.
+
+#### LocaleBundle
+* Added entity name provider for `Locale` entity
 
 #### MessageQueue Component
 * Added `Oro\Component\MessageQueue\Topic\TopicInterface` to declare topic name, description, message default priority 
@@ -59,6 +63,11 @@ The current file describes significant changes in the code that may affect the u
 * Moved JSON decoding of message body to transport level `Oro\Component\MessageQueue\Transport\MessageConsumerInterface` - 
   to `Oro\Component\MessageQueue\Transport\Dbal\DbalMessageConsumer`.
 * Added the validation of message body to `Oro\Component\MessageQueue\Client\MessageProducer` using `Oro\Component\MessageQueue\Client\MessageBodyResolverInterface`.
+
+#### SearchBundle
+* Entity title is now stored as a regular index text field called `system_entity_name`
+* All entities presented in the search index now have proper entity name providers
+* You have to recreate indices and run full indexation of backend data using `bin/console oro:elasticsearch:create-standard-indexes` and `bin/console oro:search:reindex --scheduled` commands
 
 ### Removed
 
@@ -134,6 +143,7 @@ The current file describes significant changes in the code that may affect the u
 #### LayoutBundle
 
 * Provided way to create separate JS builds only with essential modules for landing pages, see article [How to Create Extra JS Build for a Landing Page](https://doc.oroinc.com/master/frontend/storefront/how-to/how-to-create-extra-js-build-for-landing-page/).
+* Added configuration option for the list of enabled layout theme, see [How to Enabled the Theme](https://doc.oroinc.com/master/frontend/storefront/theming/#add-the-theme-to-enabled-themes-list).
 
 #### LoggerBundle
 * Added `Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper` monolog handler wrapper to prevent error log

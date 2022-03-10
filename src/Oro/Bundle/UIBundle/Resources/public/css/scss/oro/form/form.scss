@@ -382,7 +382,7 @@ select[multiple] {
 
     .control-group {
         margin: 0;
-        max-width: 800px;
+        max-width: $form-container-control-group-max-width;
 
         &--column {
             flex-direction: column;

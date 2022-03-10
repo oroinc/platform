@@ -32,7 +32,7 @@ class EnumFieldConfiguration implements FieldConfigInterface
                 'that is used to store enum values, and then as part of the field reference update procedure, ' .
                 'it is removed.')
             ->end()
-            ->booleanNode('enum_public')
+            ->node('enum_public', 'normalized_boolean')
                 ->info('`boolean` indicates whether an enum is public or not. This temporary attribute is used to ' .
                 'create/edit an enum on a field edit page. As part of the schema update procedure, the value of this ' .
                 'attribute is moved to the entity.enum.public attribute. This flag cannot be changed for system ' .
