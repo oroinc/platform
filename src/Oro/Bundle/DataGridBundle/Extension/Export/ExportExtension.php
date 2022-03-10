@@ -7,25 +7,21 @@ use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * This extension is responsible for export-related configurations management in datagrid
+ * Provides a way to enable export of data displayed by a datagrid.
  */
 class ExportExtension extends AbstractExtension
 {
-    const EXPORT_OPTION_PATH = '[options][export]';
+    public const EXPORT_OPTION_PATH = '[options][export]';
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenStorageInterface */
-    protected $tokenStorage;
+    private TranslatorInterface $translator;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenStorageInterface $tokenStorage;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -40,67 +36,71 @@ class ExportExtension extends AbstractExtension
     /**
      * {@inheritdoc}
      */
-    public function isApplicable(DatagridConfiguration $config)
+    public function isApplicable(DatagridConfiguration $config): bool
     {
         if (!parent::isApplicable($config) || !$this->isGranted()) {
             return false;
         }
 
+        $options = $config->offsetGetByPath(self::EXPORT_OPTION_PATH, false);
+
+        return
+            true === $options
+            || (\is_array($options) && !empty($options));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processConfigs(DatagridConfiguration $config): void
+    {
         // validate configuration and fill default values
         $options = $this->validateConfiguration(
             new Configuration(),
             ['export' => $config->offsetGetByPath(self::EXPORT_OPTION_PATH, false)]
         );
+
         // translate labels
-        foreach ($options as &$option) {
-            $option['label'] = isset($option['label']) ? $this->translator->trans((string) $option['label']) : '';
+        foreach ($options as $key => $option) {
+            $options[$key]['label'] = isset($option['label'])
+                ? $this->translator->trans((string)$option['label'])
+                : '';
         }
-        unset($option);
 
         // push options back to config
         $config->offsetSetByPath(self::EXPORT_OPTION_PATH, $options);
-
-        return !empty($options);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @throws UnexpectedTypeException
      */
-    public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
+    public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource): void
     {
         $exportParameters = $this->getParameters()->get('_export');
-
-        if (is_array($exportParameters) && array_key_exists('ids', $exportParameters)) {
-            if (! $datasource instanceof OrmDatasource) {
-                throw new UnexpectedTypeException($datasource, OrmDatasource::class);
-            }
-
-            /* @var OrmDatasource $datasource */
-            $qb = $datasource->getQueryBuilder();
-            $alias = $qb->getRootAliases()[0];
-            $name = $qb->getEntityManager()
-                ->getClassMetadata($qb->getRootEntities()[0])
-                ->getSingleIdentifierFieldName();
-
-            $qb->andWhere($alias.'.'.$name.' IN (:exportIds)')
-                ->setParameter('exportIds', $exportParameters['ids']);
+        if (!\is_array($exportParameters) || !\array_key_exists('ids', $exportParameters)) {
+            return;
         }
+
+        if (!$datasource instanceof OrmDatasource) {
+            throw new UnexpectedTypeException($datasource, OrmDatasource::class);
+        }
+
+        $qb = $datasource->getQueryBuilder();
+        $alias = $qb->getRootAliases()[0];
+        $name = $qb->getEntityManager()
+            ->getClassMetadata($qb->getRootEntities()[0])
+            ->getSingleIdentifierFieldName();
+        $qb->andWhere($alias . '.' . $name . ' IN (:exportIds)')
+            ->setParameter('exportIds', $exportParameters['ids']);
     }
 
-    /**
-     * Checks ACL Permissions
-     *
-     * @return bool
-     */
-    protected function isGranted()
+    private function isGranted(): bool
     {
         // we have to be sure that token is not null because Marketing Lists uses Grid building to get
         // query builder, some functional also uses Grid building without security context set
         return
             null !== $this->tokenStorage->getToken()
             && $this->authorizationChecker->isGranted('oro_datagrid_gridview_export')
-            && $this->authorizationChecker->isGranted('VIEW;entity:OroImportExportBundle:ImportExportResult');
+            && $this->authorizationChecker->isGranted('VIEW', 'entity:' . ImportExportResult::class);
     }
 }
