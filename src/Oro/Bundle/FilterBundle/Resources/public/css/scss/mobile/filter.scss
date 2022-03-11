@@ -306,7 +306,8 @@
         padding: $mobile-filter-box-ui-dialog-inner-offset;
 
         .ui-dialog-content {
-            padding: $mobile-filter-box-ui-dialog-content-inner-offset;
+            @include safe-area-offset(padding, $mobile-filter-box-ui-dialog-content-inner-offset);
+            
             height: $mobile-filter-box-ui-dialog-content-height;
         }
 

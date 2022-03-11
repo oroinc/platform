@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 .search-header {
-    padding: 16px 20px 13px;
+    @include safe-area-offset(padding, $search-header-padding);
 
     &.container-fluid {
         background-color: $primary-900;
