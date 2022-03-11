@@ -32,7 +32,7 @@
        <% attributesTemplate(attributes) %>>
         <% if (launcherMode == 'icon-text') { %>
             <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %>" aria-hidden="true"></span>
-            <%= label %>
+            <%- label %>
         <% } else if (launcherMode == 'icon-only') { %>
             <span class="<%- iconClassName ? iconClassName : 'fa-' + icon %> fa--no-offset" aria-hidden="true"></span>
         <% } else if (launcherMode == 'text-only') { %>
