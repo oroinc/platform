@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Manager;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Statement;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
@@ -12,6 +12,8 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Component\Testing\ReflectionUtil;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -30,8 +32,11 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
+
+    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheItem;
 
     /** @var Localization[] */
     private $entities = [];
@@ -41,7 +46,8 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
         $this->repository = $this->createMock(LocalizationRepository::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->cacheProvider = $this->createMock(CacheProvider::class);
+        $this->cacheProvider = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
 
         $this->entities = [
             1 => $this->getLocalization(1),
@@ -82,23 +88,6 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
         $entity = $this->getLocalization(1);
 
         $this->assertCacheReads([1 => $entity]);
-
-        $uow = $this->createMock(UnitOfWork::class);
-        $uow->expects($this->once())
-            ->method('merge')
-            ->with($entity);
-        $uow->expects($this->once())
-            ->method('markReadOnly')
-            ->with($entity);
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with(Localization::class)
-            ->willReturn($entityManager);
-
         $result = $this->manager->getLocalization($entity->getId());
 
         $this->assertEquals($entity, $result);
@@ -108,7 +97,11 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
         $this->assertRepositoryCalls(null, $this->entities);
-        $this->assertCacheReads(false);
+        $this->assertCacheReads(false, true);
+        $this->cacheProvider->expects($this->atLeastOnce())
+            ->method('saveDeferred');
+        $this->cacheProvider->expects($this->atLeastOnce())
+            ->method('commit');
 
         $result = $this->manager->getLocalizations();
 
@@ -119,25 +112,6 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertGetEntityRepositoryForClassIsNotCalled();
         $this->assertCacheReads($this->entities);
-
-        $uow = $this->createMock(UnitOfWork::class);
-        $uow->expects($this->exactly(3))
-            ->method('merge')
-            ->withConsecutive([$this->entities[1]], [$this->entities[3]], [$this->entities[2]]);
-
-        $uow->expects($this->exactly(3))
-            ->method('markReadOnly')
-            ->withConsecutive([$this->entities[1]], [$this->entities[3]], [$this->entities[2]]);
-
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($uow);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with(Localization::class)
-            ->willReturn($entityManager);
 
         $result = $this->manager->getLocalizations();
 
@@ -151,7 +125,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
 
         //Cache should not be accessed at all
         $this->cacheProvider->expects($this->never())
-            ->method('fetch');
+            ->method('getItem');
         $this->cacheProvider->expects($this->never())
             ->method('save');
 
@@ -164,7 +138,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
         $this->assertRepositoryCalls(null, $this->entities);
-        $this->assertCacheReads(false);
+        $this->assertCacheReads(false, true);
 
         $entities = [
             1 => $this->getLocalization(1),
@@ -181,7 +155,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetDefaultLocalization()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertCacheReads(false);
+        $this->assertCacheReads(false, true);
 
         $localization1 = $this->getLocalization(1);
         $localization2 = $this->getLocalization(2);
@@ -203,7 +177,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFirstLocalizationWhenNoDefaultLocalizationExist()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertCacheReads(false);
+        $this->assertCacheReads(false, true);
 
         $localization1 = $this->getLocalization(1);
         $localization2 = $this->getLocalization(2);
@@ -239,7 +213,7 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetFirstLocalizationWhenUnknownDefaultLocalizationReturnedFromConfig()
     {
         $this->assertGetEntityRepositoryForClassIsCalled();
-        $this->assertCacheReads(false);
+        $this->assertCacheReads(false, true);
 
         $localization1 = $this->getLocalization(1);
         $localization2 = $this->getLocalization(2);
@@ -262,13 +236,27 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityRepositoryForClass')
             ->with(Localization::class)
             ->willReturn($this->repository);
+        $entityManager = $this->createMock(EntityManager::class);
+        $connection = $this->createMock(Connection::class);
+        $result = $this->createMock(Statement::class);
+        $entityManager->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $connection->expects($this->once())
+            ->method('executeQuery')
+            ->willReturn($result);
 
-        $this->cacheProvider->expects($this->exactly(2))
-            ->method('fetch')
-            ->willReturnMap([
-                ['ORO_LOCALE_LOCALIZATION_DATA', false],
-                ['ORO_LOCALE_LOCALIZATION_DATA_SIMPLE', []]
-            ]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManager')
+            ->with(Localization::class)
+            ->willReturn($entityManager);
+
+        $this->cacheProvider->expects($this->any())
+            ->method('getItem')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->exactly(2))
+            ->method('isHit')
+            ->willReturn(false);
 
         $this->repository->expects($this->once())
             ->method('findAllIndexedById')
@@ -296,11 +284,19 @@ class LocalizationManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    private function assertCacheReads($results)
+    private function assertCacheReads($results, $multiple = false)
     {
-        $this->cacheProvider->expects($this->once())
-            ->method('fetch')
-            ->willReturn($results);
+        $this->cacheProvider->expects($multiple ? $this->atLeastOnce() : $this->once())
+            ->method('getItem')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects($this->once())
+            ->method('isHit')
+            ->willReturn((bool) $results);
+        if ($results !== false) {
+            $this->cacheItem->expects($this->once())
+                ->method('get')
+                ->willReturn($results);
+        }
     }
 
     private function assertGetEntityRepositoryForClassIsCalled()

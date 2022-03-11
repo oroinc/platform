@@ -14,7 +14,7 @@ define(function(require) {
     const ActivityConditionView = FieldConditionView.extend({
         TYPE_CHOICE_ENTITY: '$activity',
         template: activityConditionTemplate,
-        choiceSelectionTemplate: '<span class="entity-field-path"><span></span><b><%=text %></b></span>',
+        choiceSelectionTemplate: '<span class="entity-field-path"><span></span><b><%-text %></b></span>',
         choiceInputData: [{
             text: __('oro.entity.field_choice.fields'),
             children: [

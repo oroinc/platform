@@ -12,7 +12,7 @@
 {% endblock %}
 
 {%- block datagrid_cell_value_widget -%}
-    <%= render('{{ column_name }}') %>
+    <%- render('{{ column_name }}') %>
 {%- endblock -%}
 
 {% block datagrid_header_row_widget %}
@@ -25,5 +25,5 @@
     {% set attr = layout_attr_defaults(attr, {
         '~class': ''
     }) %}
-    <th <%= attributes('{{ column_name }}', {{ attr|json_encode|raw }}) %>><%= render('{{ column_name }}') %></th>
+    <th <%= attributes('{{ column_name }}', {{ attr|json_encode|raw }}) %>><%- render('{{ column_name }}') %></th>
 {% endblock %}

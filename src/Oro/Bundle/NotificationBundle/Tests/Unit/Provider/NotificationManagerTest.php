@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NotificationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -11,10 +10,12 @@ use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
 use Oro\Bundle\NotificationBundle\Provider\NotificationManager;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class NotificationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -25,7 +26,7 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->doctrine->expects(self::any())
@@ -60,11 +61,9 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
     private function expectFetchRulesCache(string $eventName, object $entity)
     {
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with('rules')
             ->willReturn([get_class($entity) => [$eventName]]);
-        $this->cache->expects(self::never())
-            ->method('save');
     }
 
     private function createRule(string $eventName, object $entity): EmailNotification
@@ -135,18 +134,12 @@ class NotificationManagerTest extends \PHPUnit\Framework\TestCase
         $entity = $this->createMock(\stdClass::class);
 
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with('rules')
-            ->willReturn(false);
-        $this->cache->expects(self::once())
-            ->method('save')
-            ->with(
-                'rules',
-                [
-                    get_class($entity)   => ['some_event', 'another_event'],
-                    'Test\AnotherEntity' => [$eventName]
-                ]
-            );
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $qb = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
