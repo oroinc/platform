@@ -14,7 +14,9 @@
     @include fa-icon($fa-var-times, after, true) {
         position: absolute;
         top: 5px;
-        left: $main-menu-mobile-width - 36px;
+
+        @include safe-area-property-left(left, $main-menu-mobile-width - 36px);
+        
         width: 32px;
         height: 32px;
         text-align: center;
