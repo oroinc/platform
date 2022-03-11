@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Translation\Strategy;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\ORM\EntityManager;
@@ -13,15 +12,19 @@ use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Translation\Strategy\LocalizationFallbackStrategy;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
+    private const CACHE_KEY = 'localization_fallbacks';
+
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var LocalizationFallbackStrategy */
@@ -30,7 +33,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->strategy = new LocalizationFallbackStrategy($this->doctrine, $this->cache);
         $this->strategy->setEntityClass(Localization::class);
     }
@@ -46,9 +49,12 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
     public function testGetLocaleFallbacks(?array $entities, array $localizations)
     {
         $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY)
-            ->willReturn(false);
+            ->method('get')
+            ->with(static::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
         $em = $this->createMock(EntityManager::class);
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
@@ -65,10 +71,6 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
         $repository->expects($this->once())
             ->method('findRootsWithChildren')
             ->willReturn($entities);
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY, $localizations)
-            ->willReturn((bool)$entities);
         $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
 
@@ -136,8 +138,8 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects($this->never())
             ->method('getManagerForClass');
         $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY)
+            ->method('get')
+            ->with(static::CACHE_KEY)
             ->willReturn($localizations);
         $this->assertEquals($localizations, $this->strategy->getLocaleFallbacks());
     }
@@ -163,7 +165,7 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache->expects($this->once())
             ->method('delete')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY);
+            ->with(static::CACHE_KEY);
         $this->strategy->clearCache();
     }
 
@@ -187,8 +189,12 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entities);
 
         $this->cache->expects($this->once())
-            ->method('save')
-            ->with(LocalizationFallbackStrategy::CACHE_KEY, $localizations);
+            ->method('get')
+            ->with(static::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->strategy->warmUp('sample/path');
     }
@@ -209,8 +215,13 @@ class LocalizationFallbackStrategyTest extends \PHPUnit\Framework\TestCase
             ->method('findRootsWithChildren')
             ->willThrowException($this->createMock(InvalidFieldNameException::class));
 
-        $this->cache->expects($this->never())
-            ->method('save');
+        $this->cache->expects($this->once())
+            ->method('get')
+            ->with(static::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->strategy->warmUp('sample/path');
     }

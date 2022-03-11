@@ -26,6 +26,8 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
     private Context $context;
 
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+
     protected function setUp(): void
     {
         $this->topicRegistry = $this->createMock(TopicRegistry::class);
@@ -34,20 +36,61 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new MessageBodyResolverExtension($this->topicRegistry, $this->messageBodyResolver);
 
         $this->context = new Context($this->createMock(SessionInterface::class));
+        $this->logger = $this->createMock(LoggerInterface::class);
+        $this->context->setLogger($this->logger);
+    }
+
+    public function testOnPreReceivedDoesNothingIfStatusIsAlreadySet(): void
+    {
+        $message = new Message();
+        $message->setMessageId('sample-id');
+        $message->setProperties([Config::PARAMETER_TOPIC_NAME => self::TOPIC]);
+
+        $this->context->setMessage($message);
+        $this->context->setStatus(MessageProcessorInterface::REJECT);
+
+        $this->logger
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Skipping message body resolving as message status is already set.',
+                [
+                    'messageId' => $message->getMessageId(),
+                    'topic' => self::TOPIC,
+                    'status' => $this->context->getStatus(),
+                ]
+            );
+
+        $this->extension->onPreReceived($this->context);
     }
 
     public function testOnPreReceivedDoesNothingIfNoMessage(): void
     {
-        $this->expectNotToPerformAssertions();
+        $this->logger
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Skipping message body resolving as topic name is empty or is not present in topic registry.',
+                ['messageId' => null, 'topic' => null]
+            );
 
         $this->extension->onPreReceived($this->context);
     }
 
     public function testOnPreReceivedDoesNothingIfNoTopic(): void
     {
-        $this->context->setMessage(new Message());
+        $message = new Message();
+        $message->setMessageId('sample-id');
 
-        $this->expectNotToPerformAssertions();
+        $this->context->setMessage($message);
+
+        $this->logger
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Skipping message body resolving as topic name is empty or is not present in topic registry.',
+                ['messageId' => $message->getMessageId(), 'topic' => null]
+            );
 
         $this->extension->onPreReceived($this->context);
     }
@@ -55,6 +98,7 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPreReceivedDoesNothingIfNoTopicService(): void
     {
         $message = new Message();
+        $message->setMessageId('sample-id');
         $message->setProperties([Config::PARAMETER_TOPIC_NAME => self::TOPIC]);
 
         $this->context->setMessage($message);
@@ -65,6 +109,14 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(self::TOPIC)
             ->willReturn(false);
 
+        $this->logger
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Skipping message body resolving as topic name is empty or is not present in topic registry.',
+                ['messageId' => $message->getMessageId(), 'topic' => self::TOPIC]
+            );
+
         $this->extension->onPreReceived($this->context);
 
         self::assertSame('', $message->getBody());
@@ -73,6 +125,7 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPreReceivedSetsResolvedBody(): void
     {
         $message = new Message();
+        $message->setMessageId('sample-id');
         $message->setProperties([Config::PARAMETER_TOPIC_NAME => self::TOPIC]);
         $message->setBody(self::BODY);
 
@@ -91,6 +144,14 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(self::TOPIC, self::BODY)
             ->willReturn($resolvedBody);
 
+        $this->logger
+            ->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Message body is resolved.',
+                ['messageId' => $message->getMessageId(), 'topic' => self::TOPIC]
+            );
+
         $this->extension->onPreReceived($this->context);
 
         self::assertSame($resolvedBody, $message->getBody());
@@ -99,12 +160,11 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
     public function testOnPreReceivedRejectsWhenInvalidBody(): void
     {
         $message = new Message();
+        $message->setMessageId('sample-id');
         $message->setProperties([Config::PARAMETER_TOPIC_NAME => self::TOPIC]);
         $message->setBody(self::BODY);
 
         $this->context->setMessage($message);
-        $logger = $this->createMock(LoggerInterface::class);
-        $this->context->setLogger($logger);
 
         $this->topicRegistry
             ->expects(self::once())
@@ -119,14 +179,19 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
             ->with(self::TOPIC, self::BODY)
             ->willThrowException($exception);
 
-        $logger
+        $this->logger
             ->expects(self::once())
             ->method('error')
             ->with(
                 self::stringContains(
                     sprintf('Message is rejected. Message of topic "%s" has invalid body', self::TOPIC)
                 ),
-                ['exception' => $exception, 'topic' => self::TOPIC, 'message' => self::BODY]
+                [
+                    'exception' => $exception,
+                    'messageId' => $message->getMessageId(),
+                    'topic' => self::TOPIC,
+                    'message' => self::BODY,
+                ]
             );
 
         $this->extension->onPreReceived($this->context);

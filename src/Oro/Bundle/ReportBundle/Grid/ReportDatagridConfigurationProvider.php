@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReportBundle\Grid;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
@@ -10,28 +9,22 @@ use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Grid\BuilderAwareInterface;
 use Oro\Bundle\QueryDesignerBundle\Grid\DatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The provider for configuration of datagrids used to show reports.
  */
 class ReportDatagridConfigurationProvider implements ConfigurationProviderInterface, BuilderAwareInterface
 {
-    /** @var ReportDatagridConfigurationBuilder */
-    private $builder;
-
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var Cache */
-    private $cache;
-
-    /** @var string */
-    private $prefixCacheKey;
+    private ReportDatagridConfigurationBuilder $builder;
+    private ManagerRegistry $doctrine;
+    private CacheInterface $cache;
+    private string $prefixCacheKey;
 
     public function __construct(
         ReportDatagridConfigurationBuilder $builder,
         ManagerRegistry $doctrine,
-        Cache $cache,
+        CacheInterface $cache,
         string $prefixCacheKey
     ) {
         $this->builder = $builder;
@@ -40,28 +33,16 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         $this->prefixCacheKey = $prefixCacheKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isApplicable(string $gridName): bool
     {
         return $this->builder->isApplicable($gridName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
-        $cacheKey = $this->prefixCacheKey . '.' . $gridName;
-
-        $config = $this->cache->fetch($cacheKey);
-        if (false === $config) {
-            $config = $this->buildConfiguration($gridName);
-            $this->cache->save($cacheKey, $config);
-        }
-
-        return $config;
+        return $this->cache->get($this->prefixCacheKey . '.' . $gridName, function () use ($gridName) {
+            return $this->buildConfiguration($gridName);
+        });
     }
 
     /**
@@ -78,9 +59,6 @@ class ReportDatagridConfigurationProvider implements ConfigurationProviderInterf
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getBuilder(): DatagridConfigurationBuilder
     {
         return $this->builder;

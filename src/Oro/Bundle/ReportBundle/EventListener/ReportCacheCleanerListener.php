@@ -2,22 +2,19 @@
 
 namespace Oro\Bundle\ReportBundle\EventListener;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\ReportBundle\Entity\Report;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Removes the report datagrid configuration from the cache when Report entity is updated.
  */
 class ReportCacheCleanerListener
 {
-    /** @var Cache */
-    private $cache;
+    private CacheInterface $cache;
+    private string $prefixCacheKey;
 
-    /** @var string */
-    private $prefixCacheKey;
-
-    public function __construct(Cache $cache, string $prefixCacheKey)
+    public function __construct(CacheInterface $cache, string $prefixCacheKey)
     {
         $this->cache = $cache;
         $this->prefixCacheKey = $prefixCacheKey;
@@ -26,8 +23,6 @@ class ReportCacheCleanerListener
     public function postUpdate(Report $entity, LifecycleEventArgs $args): void
     {
         $cacheKey = $this->prefixCacheKey . '.' . $entity->getGridPrefix() . $entity->getId();
-        if ($this->cache->contains($cacheKey)) {
-            $this->cache->delete($cacheKey);
-        }
+        $this->cache->delete($cacheKey);
     }
 }

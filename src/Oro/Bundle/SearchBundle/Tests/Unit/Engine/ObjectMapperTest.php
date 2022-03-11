@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
@@ -16,6 +17,8 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Manufacturer;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -43,6 +46,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $dispatcher;
+
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    protected $nameResolver;
 
     /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $mappingProvider;
@@ -95,7 +101,6 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         Product::class      => [
             'alias'        => 'test_product',
             'label'        => 'test product',
-            'title_fields' => ['name'],
             'route'        => [
                 'name'       => 'test_route',
                 'parameters' => [
@@ -196,14 +201,31 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
 
+        $this->nameResolver = $this->createMock(EntityNameResolver::class);
+        $this->nameResolver->expects($this->any())
+            ->method('getName')
+            ->with($this->isType('object'), EntityNameProviderInterface::FULL)
+            ->willReturnCallback(
+                function ($entity) {
+                    return $entity->getName();
+                }
+            );
+
         $configProvider = $this->createMock(MappingConfigurationProvider::class);
         $configProvider->expects($this->any())
             ->method('getConfiguration')
             ->willReturn($this->mappingConfig);
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
         $cache->expects($this->any())
-            ->method('fetch')
+            ->method('getItem')
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->any())
+            ->method('isHit')
             ->willReturn(false);
+        $cacheItem->expects($this->any())
+            ->method('set')
+            ->willReturn($cacheItem);
         $this->mappingProvider = new SearchMappingProvider(
             $this->dispatcher,
             $configProvider,
@@ -237,6 +259,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             $this->mappingProvider,
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
+            $this->nameResolver,
             $this->dispatcher,
             $this->htmlTagHelper
         );
@@ -258,6 +281,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $expectedMapping = [
             'text'    => $this->clearTextData([
+                Indexer::NAME_FIELD          => $productName,
                 'name'                       => $productName,
                 'description'                => $productDescription,
                 'manufacturer'               => $manufacturerName,
@@ -295,6 +319,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $expectedMapping = [
             'text'    => $this->clearTextData(
                 [
+                    Indexer::NAME_FIELD          => $productName,
                     'name'                       => $productName,
                     'description'                => $productDescription,
                     'manufacturer'               => $manufacturerName,
@@ -331,6 +356,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $expectedMapping = [
             'text' => $this->clearTextData(
                 [
+                    Indexer::NAME_FIELD          => '',
                     'description'                => $this->product->getDescription(),
                     'manufacturer'               => $this->product->getManufacturer()->getName(),
                     'all_data'                   => $allTextData,
@@ -356,6 +382,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
         $expectedMapping = [
             'text'    => $this->clearTextData(
                 [
+                    Indexer::NAME_FIELD          => '',
                     'description'                => $this->product->getDescription(),
                     'manufacturer'               => $this->product->getManufacturer()->getName(),
                     'all_data'                   => $allTextData,
@@ -387,6 +414,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $expectedMapping = [
             'text' => $this->clearTextData([
+                Indexer::NAME_FIELD          => $this->manufacturer->getName(),
                 'name'                       => '<p>adidas</p>',
                 'products'                   => $productName,
                 'categories'                 => implode(' ', $this->categories),
@@ -416,6 +444,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $expectedMapping = [
             'text' => $this->clearTextData([
+                Indexer::NAME_FIELD          => $categoryName,
                 'name'                       => $categoryName,
                 'products'                   => $productName,
                 'manufacturers'              => $manufacturerName,
@@ -437,6 +466,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $expectedMapping = [
             'text' => [
+                Indexer::NAME_FIELD          => $product->getName(),
                 'name'                       => $product->getName(),
                 'all_data'                   => $product->getName(),
                 Indexer::TEXT_ALL_DATA_FIELD => $product->getName()
@@ -452,6 +482,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
         $expectedMapping = [
             'text' => [
+                Indexer::NAME_FIELD          => $category->getName(),
                 'name'                       => $category->getName(),
                 Indexer::TEXT_ALL_DATA_FIELD => $category->getName()
             ]

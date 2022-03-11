@@ -68,29 +68,6 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test entity', $this->item->getEntity());
     }
 
-    public function testTitle()
-    {
-        $this->assertNull($this->item->getTitle());
-        $this->item->setTitle('test title');
-        $this->assertEquals('test title', $this->item->getTitle());
-    }
-
-    public function testSetLongTitleWithNonLatinUTF8Chars()
-    {
-        $this->item->setTitle(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut sem cursus ligula consectetur iaculis. '
-            . 'Sed ac viverra mi, in auctor tortor. Aliquam id est laoreet, ultricies lectus a, aliquam lectus. Aenean'
-            . ' ac tristique eros. Integer vestibulum volutpatälacus, eu lobortis sapien condimentum in.'
-        );
-
-        self::assertEquals(
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ut sem cursus ligula consectetur iaculis. '
-            . 'Sed ac viverra mi, in auctor tortor. Aliquam id est laoreet, ultricies lectus a, aliquam lectus. Aenean'
-            . ' ac tristique eros. Integer vestibulum volutpatä',
-            $this->item->getTitle()
-        );
-    }
-
     public function testIntegerField()
     {
         $fields = $this->item->getIntegerFields();

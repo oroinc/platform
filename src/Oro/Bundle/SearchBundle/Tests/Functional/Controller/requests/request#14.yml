@@ -12,5 +12,4 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Item
                 entity_label: oro.testframework.item.entity_label
-                record_string: "item1@mail.com 0123-456100"
                 record_url: http://localhost%oro_default_prefix%search/

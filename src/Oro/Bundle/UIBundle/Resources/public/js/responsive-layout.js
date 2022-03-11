@@ -30,6 +30,10 @@ define(function(require) {
 
     const ADDED_CLASSES_DATA_KEY = 'responsive-classes';
 
+    const CSS_VAR_NAMES = {
+        MINIMAL_WIDTH_THRESHOLD: '--responsive-section-container-minimal-width-threshold'
+    };
+
     const SELECTORS = {
         SECTION: '.responsive-section',
         CELL: '.responsive-cell',
@@ -158,6 +162,19 @@ define(function(require) {
         return isChanged;
     }
 
+    /**
+     * Toggles correspondent CSS class if container reached minimal width threshold
+     *
+     * @param {jQuery} $content
+     */
+    function checkMinimalWidthThreshold($content) {
+        const $scrollableContainerInside = $content.find(SELECTORS.SECTION).first().closest('.container-fluid');
+        const minimalWidthThreshold = Number(getComputedStyle(document.body)
+            .getPropertyValue(CSS_VAR_NAMES.MINIMAL_WIDTH_THRESHOLD).trim());
+        const isMinimalWidthThreshold = minimalWidthThreshold > $scrollableContainerInside.parent().width();
+        $scrollableContainerInside.toggleClass('responsive-section-container-minimal', isMinimalWidthThreshold);
+    }
+
     return {
         /**
          * Finds responsive sections in received context (or in document if context wasn't determined)
@@ -168,9 +185,11 @@ define(function(require) {
         update: function(context) {
             let isChanged = false;
 
-            $(context || window.document).find(SELECTORS.SECTION).addBack(SELECTORS.SECTION).each(function() {
+            $(context || window.document).find(SELECTORS.SECTION).each(function() {
                 isChanged = updateSection($(this)) || isChanged;
             });
+
+            checkMinimalWidthThreshold($(context || window.document));
 
             if (isChanged) {
                 mediator.trigger('layout:reposition');

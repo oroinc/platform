@@ -392,7 +392,7 @@ const NavigationMenuView = BaseView.extend({
             if (hasPopupMenus) {
                 const $directMenu = $subMenu.find(this.options.subMenus).first();
 
-                $el = this.getLastDirectFocusableElement($directMenu.length? $directMenu : $subMenu);
+                $el = this.getLastDirectFocusableElement($directMenu.length ? $directMenu : $subMenu);
             } else {
                 $el = this.getLastFocusableElement($subMenu);
             }
@@ -519,7 +519,7 @@ const NavigationMenuView = BaseView.extend({
             return this.getFirstFocusableElement($menu);
         }
 
-        $menu = this.isPopupMenu($menu) ? $menu :this.getPopupMenus($menu).first();
+        $menu = this.isPopupMenu($menu) ? $menu : this.getPopupMenus($menu).first();
 
         return this.getPopupFocusableElements($menu).first();
     },
@@ -555,7 +555,7 @@ const NavigationMenuView = BaseView.extend({
             return this.getLastDirectFocusableElement($menu);
         }
 
-        $menu = this.isPopupMenu($menu) ? $menu :this.getPopupMenus($menu).first();
+        $menu = this.isPopupMenu($menu) ? $menu : this.getPopupMenus($menu).first();
 
         return this.getPopupFocusableElements($menu).last();
     },

@@ -191,7 +191,6 @@ abstract class RestGetController extends AbstractFOSRestController implements
                 return [
                     'id'     => $entity->getRecordId(),
                     'entity' => $entity->getEntityName(),
-                    'title'  => $entity->getRecordTitle()
                 ];
             } else {
                 $entityClass = get_class($entity);

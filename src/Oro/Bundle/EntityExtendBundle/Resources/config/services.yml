@@ -652,9 +652,9 @@ services:
 
     oro_entity_extend.cache.enum_translation:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [setNamespace, ['oro_entity_extend_enum_trans']]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_entity_extend_enum_trans' }
 
     oro_entity_extend.cache.enum_translation_provider:
         class: Oro\Bundle\EntityExtendBundle\Cache\EnumTranslationCache

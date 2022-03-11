@@ -17,7 +17,7 @@ class AttributeEntityConfiguration implements EntityConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('has_attributes')
+            ->node('has_attributes', 'normalized_boolean')
                 ->info('`boolean` is used to enable the “attribute” functionality.')
                 ->defaultFalse()
             ->end()

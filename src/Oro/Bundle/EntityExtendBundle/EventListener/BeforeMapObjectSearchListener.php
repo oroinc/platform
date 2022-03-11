@@ -16,7 +16,6 @@ use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
  */
 class BeforeMapObjectSearchListener
 {
-    const TITLE_FIELDS_PATH = 'title_fields';
     const FIELDS_PATH = 'fields';
 
     /** @var array */
@@ -83,7 +82,6 @@ class BeforeMapObjectSearchListener
                             continue;
                         }
 
-                        $this->processTitles($mapConfig, $searchConfig, $className, $fieldId->getFieldName());
                         $this->processFields($mapConfig, $searchConfig, $fieldId, $className);
                     }
                 }
@@ -164,24 +162,6 @@ class BeforeMapObjectSearchListener
     }
 
     /**
-     * Check if field marked as title_field, add this field to titles
-     *
-     * @param array           $mapConfig
-     * @param ConfigInterface $searchConfig
-     * @param string          $className
-     * @param string          $fieldName
-     */
-    protected function processTitles(&$mapConfig, ConfigInterface $searchConfig, $className, $fieldName)
-    {
-        if ($searchConfig->is('title_field')) {
-            $mapConfig[$className][self::TITLE_FIELDS_PATH] = array_merge(
-                $mapConfig[$className][self::TITLE_FIELDS_PATH],
-                [$fieldName]
-            );
-        }
-    }
-
-    /**
      * Add custom entity mapping skeleton
      *
      * @param array           $mapConfig
@@ -195,7 +175,6 @@ class BeforeMapObjectSearchListener
         $mapConfig[$className] = [
             'alias'                 => $config->get('schema')['doctrine'][$className]['table'],
             'label'                 => $label,
-            self::TITLE_FIELDS_PATH => [],
             'route'                 => [
                 'name'       => 'oro_entity_view',
                 'parameters' => [

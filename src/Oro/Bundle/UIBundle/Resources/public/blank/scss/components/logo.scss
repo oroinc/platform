@@ -16,3 +16,9 @@
         height: $logo-img-height;
     }
 }
+
+a.logo {
+    &:hover {
+        opacity: $logo-link-opacity;
+    }
+}

@@ -56,7 +56,7 @@ class DbalMessageConsumerTest extends WebTestCase
 
         $consumer->acknowledge($message);
 
-        $messages = $dbal->executeQuery('SELECT * FROM message_queue WHERE id = ?', [$id])->fetchAll();
+        $messages = $dbal->executeQuery('SELECT * FROM message_queue WHERE id = ?', [$id])->fetchAllAssociative();
 
         $this->assertEmpty($messages);
     }
@@ -84,12 +84,12 @@ class DbalMessageConsumerTest extends WebTestCase
 
         $consumer->reject($message);
 
-        $messages = $dbal->executeQuery('SELECT * FROM message_queue WHERE id = ?', [$id])->fetchAll();
+        $messages = $dbal->executeQuery('SELECT * FROM message_queue WHERE id = ?', [$id])->fetchAllAssociative();
 
         $this->assertEmpty($messages);
     }
 
-    public function testShouldRemoveRecordAndCreateNewOneIfMessageIsRequeued(): void
+    public function testShouldUpdateRecordIfMessageIsRequeued(): void
     {
         $connection = $this->createConnection('message_queue');
         $dbal = $connection->getDBALConnection();
@@ -98,32 +98,34 @@ class DbalMessageConsumerTest extends WebTestCase
             'queue' => 'queue',
             'priority' => 1,
             'consumer_id' => 123,
+            'body' => 'sample body',
         ]);
         $id = (int) $dbal->lastInsertId('message_queue_id_seq');
 
-        //guard
         $this->assertGreaterThan(0, $id);
-        $messages = $dbal->executeQuery('SELECT * FROM message_queue')->fetchAll();
+        $messages = $dbal->executeQuery('SELECT * FROM message_queue')->fetchAllAssociative();
         $this->assertCount(1, $messages);
         $this->assertEquals($id, $messages[0]['id']);
         $this->assertEquals(123, $messages[0]['consumer_id']);
+        $this->assertEquals('sample body', $messages[0]['body']);
         $this->assertNull($messages[0]['redelivered']);
 
-        // test
         $message = new DbalMessage();
         $message->setId($id);
+        $message->setBody('updated body');
 
         $session = new DbalSession($connection);
         $consumer = new DbalMessageConsumer($session, new Queue('default'));
 
         $consumer->reject($message, true);
 
-        $messages = $dbal->executeQuery('SELECT * FROM message_queue')->fetchAll();
+        $messages = $dbal->executeQuery('SELECT * FROM message_queue')->fetchAllAssociative();
 
         $this->assertCount(1, $messages);
-        $this->assertNotEquals($id, $messages[0]['id']);
-        $this->assertNull($messages[0]['consumer_id']);
-        $this->assertTrue((bool) $messages[0]['redelivered']);
+        $this->assertEquals($id, $messages[0]['id'], 'ID was not expected to be changed.');
+        $this->assertEquals('sample body', $messages[0]['body'], 'Requeued message body must not to be changed.');
+        $this->assertNull($messages[0]['consumer_id'], 'Requeued message must not be assigned to a consumer.');
+        $this->assertTrue((bool) $messages[0]['redelivered'], 'Requeued message must have redelivered flag.');
     }
 
     public function testShouldReceiveMessage(): void

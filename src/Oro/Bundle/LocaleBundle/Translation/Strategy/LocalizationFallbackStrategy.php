@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Translation\Strategy;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\DBAL\Exception\InvalidFieldNameException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
@@ -10,73 +9,46 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Provides a tree of locale fallbacks configured by a user.
  */
 class LocalizationFallbackStrategy implements TranslationStrategyInterface, CacheWarmerInterface
 {
-    const NAME = 'oro_localization_fallback_strategy';
-    const CACHE_KEY = 'localization_fallbacks';
+    public const NAME = 'oro_localization_fallback_strategy';
+    private const CACHE_KEY = 'localization_fallbacks';
 
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    protected ManagerRegistry $registry;
+    protected CacheInterface $cacheProvider;
+    protected string $entityClass;
 
-    /**
-     * @var CacheProvider
-     */
-    protected $cacheProvider;
-
-    /**
-     * @var string
-     */
-    protected $entityClass;
-
-    public function __construct(ManagerRegistry $registry, CacheProvider $cacheProvider)
+    public function __construct(ManagerRegistry $registry, CacheInterface $cacheProvider)
     {
         $this->registry = $registry;
         $this->cacheProvider = $cacheProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isApplicable()
+    public function isApplicable(): bool
     {
         return true;
     }
 
-    /**
-     * @param string $entityClass
-     */
-    public function setEntityClass($entityClass)
+    public function setEntityClass(string $entityClass): void
     {
         $this->entityClass = $entityClass;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return static::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getLocaleFallbacks()
+    public function getLocaleFallbacks(): array
     {
-        $fallbacks = $this->cacheProvider->fetch(static::CACHE_KEY);
-        if (false === $fallbacks) {
-            $fallbacks = $this->getActualLocaleFallbacks();
-
-            $this->cacheProvider->save(static::CACHE_KEY, $fallbacks);
-        }
-
-        return $fallbacks;
+        return $this->cacheProvider->get(static::CACHE_KEY, function () {
+            return $this->getActualLocaleFallbacks();
+        });
     }
 
     private function getActualLocaleFallbacks(): array
@@ -93,15 +65,12 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         ];
     }
 
-    public function clearCache()
+    public function clearCache(): void
     {
         $this->cacheProvider->delete(static::CACHE_KEY);
     }
 
-    /**
-     * @return array|Localization[]
-     */
-    protected function getRootLocalizations()
+    protected function getRootLocalizations(): array
     {
         /** @var LocalizationRepository $repository */
         $repository = $this->registry->getManagerForClass($this->entityClass)->getRepository($this->entityClass);
@@ -109,11 +78,7 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         return $repository->findRootsWithChildren();
     }
 
-    /**
-     * @param Localization $localization
-     * @return array
-     */
-    protected function localizationToArray(Localization $localization)
+    protected function localizationToArray(Localization $localization): array
     {
         $children = [];
         foreach ($localization->getChildLocalizations() as $child) {
@@ -122,22 +87,17 @@ class LocalizationFallbackStrategy implements TranslationStrategyInterface, Cach
         return [$localization->getLanguageCode() => $children];
     }
 
-    /**
-     * @{@inheritdoc}
-     */
     public function warmUp($cacheDir): void
     {
         try {
-            $this->cacheProvider->save(static::CACHE_KEY, $this->getActualLocaleFallbacks());
+            $this->clearCache();
+            $this->getLocaleFallbacks();
         } catch (InvalidFieldNameException $exception) {
             // Cache warming can be used during upgrade from the app version where not all required columns yet exist.
             // Silently skips warming of locale fallbacks in this case, considering as not an error.
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isOptional(): bool
     {
         return true;

@@ -68,9 +68,9 @@ services:
 
     security.acl.cache.doctrine.cache_impl:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_acl' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_acl' }
 
     oro_security.acl.ace_provider:
         public: false
@@ -132,9 +132,9 @@ services:
 
     security.acl.underlying.cache.doctrine.cache_impl:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_acl_underlying' ]]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_acl_underlying' }
 
     oro_security.entity_security_metadata_provider_link:
         tags:
@@ -159,9 +159,9 @@ services:
             - '@oro_security.acl.extension_selector'
 
     oro_security.cache.provider.permission:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_security_permission' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_security_permission' }
 
     oro_security.acl.permission_manager:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
@@ -268,9 +268,9 @@ services:
 
     oro_security.entity_security_metadata_provider.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_acl_entities' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_acl_entities' }
 
     oro_security.action_metadata_provider:
         class: Oro\Bundle\SecurityBundle\Metadata\ActionSecurityMetadataProvider
@@ -416,9 +416,9 @@ services:
 
     oro_security.ownership_tree_provider.cache:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_acl_owner_tree' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_acl_owner_tree' }
 
     oro_security.ownership_tree.cache.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer

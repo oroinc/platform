@@ -58,3 +58,5 @@ rules:
   no-useless-escape: 'off' # has to be turned on in a future
   require-jsdoc: 'off' # has to be turned on in a future
   no-invalid-this: 'off' # has to be turned on in a future
+  space-infix-ops:
+    - 'error'

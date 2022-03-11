@@ -8,8 +8,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\SecurityIdentityToStringConverterInterface;
 use Oro\Bundle\SecurityBundle\Acl\Event\CacheClearEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -21,29 +19,21 @@ use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * ACL cache that stores ACL by OID and SIDs.
  */
 class AclCache implements AclCacheInterface
 {
-    /** @var Cache */
-    private $cache;
-
-    /** @var PermissionGrantingStrategyInterface */
-    private $permissionGrantingStrategy;
-
-    /** @var UnderlyingAclCache */
-    private $underlyingCache;
-
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var SecurityIdentityToStringConverterInterface */
-    private $sidConverter;
+    private CacheInterface $cache;
+    private PermissionGrantingStrategyInterface $permissionGrantingStrategy;
+    private UnderlyingAclCache $underlyingCache;
+    private EventDispatcherInterface $eventDispatcher;
+    private SecurityIdentityToStringConverterInterface $sidConverter;
 
     public function __construct(
-        Cache $cache,
+        CacheInterface $cache,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,
         UnderlyingAclCache $underlyingCache,
         EventDispatcherInterface $eventDispatcher,
@@ -57,20 +47,17 @@ class AclCache implements AclCacheInterface
     }
 
     /**
-     * Retrieves an ACL for the given object identity from the cache.
-     *
-     * @param ObjectIdentityInterface     $oid
-     * @param SecurityIdentityInterface[] $sids
-     *
-     * @return AclInterface
+     * Retrieves an ACL for the given object identity from the cache
      */
     public function getFromCacheByIdentityAndSids(ObjectIdentityInterface $oid, array $sids):? AclInterface
     {
         $key = $this->getDataKeyByIdentity($oid);
         $sidKey = $this->getSidKey($sids);
 
-        $data = $this->cache->fetch($key);
-        if (false !== $data && array_key_exists($sidKey, $data)) {
+        $data =  $this->cache->get($key, function () {
+            return null;
+        });
+        if ($data && array_key_exists($sidKey, $data)) {
             return $this->unserializeAcl($data[$sidKey]);
         }
 
@@ -78,40 +65,31 @@ class AclCache implements AclCacheInterface
     }
 
     /**
-     * Stores a new ACL in the cache.
-     *
-     * @param AclInterface                $acl
-     * @param SecurityIdentityInterface[] $sids
+     * Stores a new ACL in the cache
      */
-    public function putInCacheBySids(AclInterface $acl, array $sids)
+    public function putInCacheBySids(AclInterface $acl, array $sids): void
     {
         $acl = $this->fixAclAces($acl);
 
         $key = $this->getDataKeyByIdentity($acl->getObjectIdentity());
         $sidKey = $this->getSidKey($sids);
 
-        $data = $this->cache->fetch($key);
-        if (false === $data) {
-            $data = [];
-        }
-        $data[$sidKey] = serialize($acl);
-
-        $this->cache->save($key, $data);
+        $this->cache->delete($key);
+        $this->cache->get($key, function () use ($sidKey, $acl) {
+            return [$sidKey => \serialize($acl)];
+        });
     }
 
     /**
      * Removes an ACL from the cache by the reference OID.
      */
-    public function evictFromCacheByIdentity(ObjectIdentityInterface $oid)
+    public function evictFromCacheByIdentity(ObjectIdentityInterface $oid): void
     {
         if ($this->underlyingCache->isUnderlying($oid)) {
             $this->underlyingCache->evictFromCache($oid);
         }
 
         $key = $this->getDataKeyByIdentity($oid);
-        if (!$this->cache->contains($key)) {
-            return;
-        }
 
         $this->cache->delete($key);
     }
@@ -119,10 +97,10 @@ class AclCache implements AclCacheInterface
     /**
      * Removes all ACLs from the cache.
      */
-    public function clearCache()
+    public function clearCache(): void
     {
-        if ($this->cache instanceof CacheProvider) {
-            $this->cache->deleteAll();
+        if ($this->cache instanceof CacheInterface) {
+            $this->cache->clear();
         }
 
         // we should clear underlying cache to avoid generation of wrong ACLs

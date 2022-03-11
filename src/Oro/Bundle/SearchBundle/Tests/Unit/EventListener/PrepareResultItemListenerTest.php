@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\EventListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -13,9 +12,9 @@ use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\EventListener\PrepareResultItemListener;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,13 +36,10 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $entity;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var PrepareResultItemListener */
@@ -57,9 +53,8 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->item = $this->createMock(Item::class);
         $this->event = $this->createMock(PrepareResultItemEvent::class);
         $this->entity = $this->createMock(User::class);
-        $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
@@ -70,7 +65,6 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
             $this->urlGenerator,
             $this->mapper,
             $doctrine,
-            $this->entityNameResolver,
             $this->configManager,
             $this->translator
         );
@@ -91,10 +85,6 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->item->expects($this->once())
             ->method('getRecordUrl')
             ->willReturn('url');
-
-        $this->item->expects($this->once())
-            ->method('getRecordTitle')
-            ->willReturn('title');
 
         $config = new Config(new EntityConfigId('entity', User::class));
         $config->set('label', 'testLabel');
@@ -125,10 +115,6 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->item->expects($this->once())
             ->method('getRecordUrl')
             ->willReturn(null);
-
-        $this->item->expects($this->once())
-            ->method('getRecordTitle')
-            ->willReturn('title');
 
         $this->item->expects($this->exactly(2))
             ->method('getEntityName')
@@ -183,10 +169,6 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getRecordUrl')
             ->willReturn(null);
 
-        $this->item->expects($this->once())
-            ->method('getRecordTitle')
-            ->willReturn('title');
-
         $this->item->expects($this->exactly(2))
             ->method('getEntityName')
             ->willReturn(get_class($this->entity));
@@ -230,10 +212,6 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getRecordUrl')
             ->willReturn(null);
 
-        $this->item->expects($this->once())
-            ->method('getRecordTitle')
-            ->willReturn('title');
-
         $this->item->expects($this->exactly(2))
             ->method('getEntityName')
             ->willReturn(get_class($this->entity));
@@ -269,54 +247,6 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
             ->method('generate')
             ->with('test_route', ['parameter' => '1'], UrlGeneratorInterface::ABSOLUTE_URL)
             ->willReturn('test_url');
-
-        $this->listener->process($this->event);
-    }
-
-    /**
-     * Process loading entity and using fields for title
-     */
-    public function testProcessTitle()
-    {
-        $this->event->expects($this->once())
-            ->method('getEntity')
-            ->willReturn(null);
-
-        $this->event->expects($this->once())
-            ->method('getResultItem')
-            ->willReturn($this->item);
-
-        $this->item->expects($this->once())
-            ->method('getRecordUrl')
-            ->willReturn('url');
-
-        $this->item->expects($this->once())
-            ->method('getRecordTitle')
-            ->willReturn(null);
-
-        $this->item->expects($this->exactly(2))
-            ->method('getEntityName')
-            ->willReturn(get_class($this->entity));
-
-        $this->em->expects($this->once())
-            ->method('find')
-            ->with(get_class($this->entity))
-            ->willReturn($this->entity);
-
-        $this->entityNameResolver->expects($this->once())
-            ->method('getName')
-            ->willReturn('testTitle');
-
-        $this->item->expects($this->once())
-            ->method('setRecordTitle')
-            ->with('testTitle');
-
-        $config = new Config(new EntityConfigId('entity', User::class));
-        $config->set('label', 'testLabel');
-
-        $this->configManager->expects($this->once())
-            ->method('getEntityConfig')
-            ->willReturn($config);
 
         $this->listener->process($this->event);
     }

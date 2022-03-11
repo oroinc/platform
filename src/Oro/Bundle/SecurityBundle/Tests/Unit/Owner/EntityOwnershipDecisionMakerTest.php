@@ -53,6 +53,10 @@ class EntityOwnershipDecisionMakerTest extends AbstractCommonEntityOwnershipDeci
             $this->metadataProvider->getUserClass(),
             new OwnershipMetadata('BUSINESS_UNIT', 'owner', 'owner_id', 'organization')
         );
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $treeProvider = $this->createMock(OwnerTreeProvider::class);
         $treeProvider->expects($this->any())

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
@@ -14,26 +16,26 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 abstract class AbstractMapper
 {
-    /** @var SearchMappingProvider */
-    protected $mappingProvider;
+    protected SearchMappingProvider $mappingProvider;
 
-    /** @var PropertyAccessorInterface */
-    protected $propertyAccessor;
+    protected PropertyAccessorInterface $propertyAccessor;
 
-    /** @var TypeCastingHandlerRegistry */
-    protected $handlerRegistry;
+    protected TypeCastingHandlerRegistry $handlerRegistry;
 
-    /** @var array  */
-    protected $mappingErrors = [];
+    protected EntityNameResolver $nameResolver;
+
+    protected array $mappingErrors = [];
 
     public function __construct(
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,
-        TypeCastingHandlerRegistry $handlerRegistry
+        TypeCastingHandlerRegistry $handlerRegistry,
+        EntityNameResolver $nameResolver
     ) {
         $this->mappingProvider = $mappingProvider;
         $this->propertyAccessor = $propertyAccessor;
         $this->handlerRegistry = $handlerRegistry;
+        $this->nameResolver = $nameResolver;
     }
 
     /**
@@ -200,6 +202,11 @@ abstract class AbstractMapper
         $objectData[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD] = $textAllDataField;
 
         return $objectData;
+    }
+
+    protected function getEntityName(object $entity): string
+    {
+        return $this->nameResolver->getName($entity, EntityNameProviderInterface::FULL) ?? '';
     }
 
     private function addMappingError(string $alias, string $targetField, string $message): void

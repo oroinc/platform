@@ -2,15 +2,15 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockViewCache;
 use Oro\Component\Layout\LayoutContext;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class BlockViewCacheTest extends LayoutTestCase
 {
@@ -19,7 +19,7 @@ class BlockViewCacheTest extends LayoutTestCase
     /** @var BlockView */
     private $blockView;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
 
     /** @var BlockViewCache */
@@ -28,7 +28,7 @@ class BlockViewCacheTest extends LayoutTestCase
     protected function setUp(): void
     {
         $this->blockView = new BlockView();
-        $this->cacheProvider = $this->createMock(CacheProvider::class);
+        $this->cacheProvider = $this->createMock(AbstractAdapter::class);
 
         $normalizer = new ObjectNormalizer();
         $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
@@ -46,8 +46,12 @@ class BlockViewCacheTest extends LayoutTestCase
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
         $this->cacheProvider->expects(self::once())
-            ->method('save')
-            ->with($this::CONTEXT_HASH_VALUE, '[]');
+            ->method('get')
+            ->with($this::CONTEXT_HASH_VALUE)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->blockViewCache->save($context, $this->blockView);
     }
@@ -61,9 +65,9 @@ class BlockViewCacheTest extends LayoutTestCase
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
         $this->cacheProvider->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with($this::CONTEXT_HASH_VALUE)
-            ->willReturn(false);
+            ->willReturn(null);
 
         $this->assertNull($this->blockViewCache->fetch($context));
     }
@@ -77,7 +81,7 @@ class BlockViewCacheTest extends LayoutTestCase
             ->willReturn($this::CONTEXT_HASH_VALUE);
 
         $this->cacheProvider->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with($this::CONTEXT_HASH_VALUE)
             ->willReturn('[]');
 
@@ -93,7 +97,7 @@ class BlockViewCacheTest extends LayoutTestCase
     public function testReset()
     {
         $this->cacheProvider->expects(self::once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->blockViewCache->reset();
     }
@@ -127,7 +131,7 @@ class BlockViewCacheTest extends LayoutTestCase
         $serializer = new Serializer([$normalizer], [new JsonEncoder()]);
 
         $cache = new BlockViewCache(
-            DoctrineProvider::wrap(new ArrayAdapter(0, false)),
+            new ArrayAdapter(0, false),
             $serializer
         );
         $context = new LayoutContext(['some data']);

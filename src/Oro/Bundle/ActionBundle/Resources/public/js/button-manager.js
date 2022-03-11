@@ -251,7 +251,7 @@ define(function(require) {
          * @param {String} redirectUrl
          * @param {Object=} options
          */
-        doRedirect: function(redirectUrl, options= {}) {
+        doRedirect: function(redirectUrl, options = {}) {
             mediator.execute('redirectTo', {url: redirectUrl}, options)
                 // in case redirect action was canceled -- remove loading mask
                 .fail(() => mediator.execute('hideLoading'));

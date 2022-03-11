@@ -177,9 +177,9 @@ services:
             - { name: kernel.event_subscriber }
 
     oro_layout.layout_block_view.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, ['oro_layout_block_view'] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_layout_block_view' }
 
     oro_layout.cache.block_view_cache:
         class: Oro\Component\Layout\BlockViewCache

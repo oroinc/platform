@@ -36,7 +36,6 @@ body {
     left: -9999px;
 }
 
-.scrollspy.container-fluid,
 .page-title + [data-bound-component*='datagrid'],
 .page-title + .product-container {
     .content-with-sidebar--container {
@@ -57,9 +56,6 @@ body {
 .page-title + [data-bound-component*='datagrid'] {
     @include safe-area-property-left(padding-left, $content-padding, false);
     @include safe-area-property-right(padding-right, $content-padding, false);
-
-    padding-left: $content-padding;
-    padding-right: $content-padding;
 }
 
 .layout-content .responsive-section {
@@ -191,8 +187,7 @@ body {
 
 //  Update offset on create / update pages
 form > .layout-content {
-    padding-left: $content-padding;
-    padding-right: $content-padding;
+    @include safe-area-offset(padding, 0 $content-padding);
 
     .scrollspy-main-container > .scrollable-container {
         margin-left: -$content-padding;
@@ -255,6 +250,7 @@ form > .layout-content {
 
             .oro-page-body {
                 width: 100%;
+                max-width: 100%;
                 overflow: hidden;
             }
         }

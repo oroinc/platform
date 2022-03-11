@@ -25,7 +25,7 @@ class MergeEntityConfiguration implements EntityConfigInterface
             ->scalarNode('template')
                 ->info('`string` a twig template to render object as string.')
             ->end()
-            ->booleanNode('enable')
+            ->node('enable', 'normalized_boolean')
                 ->info('`boolean` enables merge for this entity.')
             ->end()
             ->scalarNode('max_entities_count')

@@ -49,6 +49,7 @@ services:
             - '@oro_search.provider.search_mapping'
             - '@property_accessor'
             - '@oro_search.handler.type_cast.type_casting_handler_registry'
+            - '@oro_entity.entity_name_resolver'
             - '@event_dispatcher'
             - '@oro_ui.html_tag_helper'
 
@@ -70,7 +71,7 @@ services:
     oro_search.formatter.result_formatter:
         class: Oro\Bundle\SearchBundle\Formatter\ResultFormatter
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.doctrine_helper'
 
     oro_search.formatter.datetime_formatter:
         class: Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter
@@ -82,7 +83,6 @@ services:
             - '@router'
             - '@oro_search.mapper'
             - '@doctrine'
-            - '@oro_entity.entity_name_resolver'
             - '@oro_entity_config.config_manager'
             - '@translator'
         tags:
@@ -167,9 +167,9 @@ services:
 
     oro_search.cache.mapping_configuration:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_search_mapping_configuration' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_search_mapping_configuration' }
 
     oro_search.provider.search_mapping:
         class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
@@ -197,9 +197,9 @@ services:
 
     oro_search.cache.doctrine_query:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'doctrine_query_search' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'doctrine_query_search' }
 
     oro_search.entity.repository.search_index:
         alias: Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository

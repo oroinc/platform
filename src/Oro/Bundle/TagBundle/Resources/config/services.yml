@@ -187,6 +187,7 @@ services:
             - '@oro_search.formatter.result_formatter'
             - '@oro_search.mapper'
             - '@event_dispatcher'
+            - '@oro_entity.entity_name_resolver'
         tags:
             - { name: oro_datagrid.extension }
 

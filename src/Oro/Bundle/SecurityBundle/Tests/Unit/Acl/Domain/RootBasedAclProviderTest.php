@@ -150,10 +150,7 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->underlyingCache->expects($this->any())
             ->method('isUnderlying')
-            ->willReturnMap([
-                [$underlyingOid, false],
-                [$oid, false],
-            ]);
+            ->willReturn(false);
         $this->baseProvider->expects($this->once())
             ->method('isEmptyAcl')
             ->with($this->identicalTo($underlyingAcl))
@@ -194,10 +191,12 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->underlyingCache->expects($this->any())
             ->method('isUnderlying')
-            ->willReturnMap([
-                [$underlyingOid, false],
-                [$oid, true],
-            ]);
+            ->willReturnCallback(function (ObjectIdentity $obj) use ($oid, $underlyingOid) {
+                return match ($obj->getIdentifier()) {
+                    $oid->getIdentifier() => true,
+                    $underlyingOid->getIdentifier() => false
+                };
+            });
         $this->baseProvider->expects($this->once())
             ->method('isEmptyAcl')
             ->with($this->identicalTo($underlyingAcl))
@@ -235,10 +234,7 @@ class RootBasedAclProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->underlyingCache->expects($this->any())
             ->method('isUnderlying')
-            ->willReturnMap([
-                [$underlyingOid, false],
-                [$oid, false],
-            ]);
+            ->willReturn(false);
         $this->baseProvider->expects($this->never())
             ->method('isEmptyAcl');
         $this->baseProvider->expects($this->never())

@@ -4,6 +4,11 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Added
+
+#### LocaleBundle
+* Added entity name provider for `Locale` entity
+
 ### Changed
 
 #### ApiBundle
@@ -13,6 +18,20 @@ The current file describes significant changes in the code that may affect the u
 * The parameter `throwException` was removed from the method `convertToEntityClass`
   of `Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil`. Use the `tryConvertToEntityClass` method
   when an entity class might not exist.
+
+#### SearchBundle
+* Entity title in the search index is no longer stored in the special field in the DB, now it is stored as a regular index text field called `system_entity_name`
+* Entity title is no longer returned in the search results by default, now it has to be manually added to the select section of the query
+* All entities presented in the search index now have proper entity name providers
+
+### Removed
+
+#### EntityExtendBundle
+* Entity configuration option `search.title_field` has been removed
+
+#### SearchBundle
+* `title_fields` field from `search.yml` field has been removed
+
 
 ## 5.0.0
 
@@ -149,6 +168,7 @@ The current file describes significant changes in the code that may affect the u
 #### LayoutBundle
 
 * Provided way to create separate JS builds only with essential modules for landing pages, see article [How to Create Extra JS Build for a Landing Page](https://doc.oroinc.com/master/frontend/storefront/how-to/how-to-create-extra-js-build-for-landing-page/).
+* Added configuration option for the list of enabled layout theme, see [How to Enabled the Theme](https://doc.oroinc.com/master/frontend/storefront/theming/#add-the-theme-to-enabled-themes-list).
 
 #### LoggerBundle
 * Added `Oro\Bundle\LoggerBundle\Monolog\ErrorLogNotificationHandlerWrapper` monolog handler wrapper to prevent error log
