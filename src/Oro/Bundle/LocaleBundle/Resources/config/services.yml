@@ -350,7 +350,7 @@ services:
         arguments:
             - '@oro_entity.doctrine_helper'
             - '@oro_config.manager'
-            - '@oro.cache.memory_cache_chain'
+            - '@oro_locale.cache.manager'
 
     oro_locale.provider.current_localization:
         class: Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider

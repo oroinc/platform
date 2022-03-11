@@ -9,12 +9,11 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\Unit\Cache\CacheTrait;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class LocalizationManagerTest extends WebTestCase
 {
     use ConfigManagerAwareTestTrait;
-    use CacheTrait;
 
     protected function setUp(): void
     {
@@ -68,7 +67,7 @@ class LocalizationManagerTest extends WebTestCase
         $conn = $em->getConnection();
         $sqlLogger = new QueryAnalyzer($conn->getDatabasePlatform());
         $conn->getConfiguration()->setSQLLogger($sqlLogger);
-        $cache = $this->getArrayCache();
+        $cache = new ArrayAdapter(0, true);
 
         $manager = new LocalizationManager(
             $doctrineHelper,

@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\LocaleBundle\Entity\AbstractLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
+use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -22,21 +22,16 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class CompleteLocalizedValues implements ProcessorInterface
 {
-    /** @var LocalizationHelper */
-    private $localizationHelper;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
+    private LocalizationManager $localizationManager;
+    private DoctrineHelper $doctrineHelper;
+    private PropertyAccessorInterface $propertyAccessor;
 
     public function __construct(
-        LocalizationHelper $localizationHelper,
+        LocalizationManager $localizationManager,
         DoctrineHelper $doctrineHelper,
         PropertyAccessorInterface $propertyAccessor
     ) {
-        $this->localizationHelper = $localizationHelper;
+        $this->localizationManager = $localizationManager;
         $this->doctrineHelper = $doctrineHelper;
         $this->propertyAccessor = $propertyAccessor;
     }
@@ -74,7 +69,7 @@ class CompleteLocalizedValues implements ProcessorInterface
             $fieldName = $this->getFieldName($child);
             if ($this->isLocalizedFallbackValueAssociation($metadata, $fieldName)) {
                 if (null === $localizations) {
-                    $localizations = $this->localizationHelper->getLocalizations();
+                    $localizations = $this->localizationManager->getLocalizations(null, false);
                 }
 
                 $oldValue = $this->propertyAccessor->getValue($entity, $fieldName);

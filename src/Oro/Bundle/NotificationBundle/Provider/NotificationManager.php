@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
-use Oro\Bundle\NotificationBundle\Event\Handler\EventHandlerInterface;
 use Oro\Bundle\NotificationBundle\Event\NotificationEvent;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -18,24 +17,12 @@ class NotificationManager implements ResetInterface
 {
     private const RULES_CACHE_KEY = 'rules';
 
-    /** @var iterable|EventHandlerInterface[] */
-    private $handlers;
+    private iterable $handlers;
+    private ManagerRegistry $doctrine;
+    private CacheInterface $cache;
+    private ?array $notificationRules = null;
 
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var Cache */
-    private $cache;
-
-    /** @var EmailNotification[]|null */
-    private $notificationRules;
-
-    /**
-     * @param iterable|EventHandlerInterface[] $handlers
-     * @param Cache                            $cache
-     * @param ManagerRegistry                  $doctrine
-     */
-    public function __construct(iterable $handlers, Cache $cache, ManagerRegistry $doctrine)
+    public function __construct(iterable $handlers, CacheInterface $cache, ManagerRegistry $doctrine)
     {
         $this->handlers = $handlers;
         $this->cache = $cache;
@@ -69,20 +56,11 @@ class NotificationManager implements ResetInterface
         $this->cache->delete(self::RULES_CACHE_KEY);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function reset()
+    public function reset(): void
     {
         $this->notificationRules = null;
     }
 
-    /**
-     * @param string $entityName
-     * @param string $eventName
-     *
-     * @return EmailNotification[]
-     */
     private function getRulesByCriteria(string $entityName, string $eventName): array
     {
         $filteredRules = [];
@@ -100,11 +78,9 @@ class NotificationManager implements ResetInterface
 
     private function hasRules(string $entityName, string $eventName): bool
     {
-        $ruleMap = $this->cache->fetch(self::RULES_CACHE_KEY);
-        if (false === $ruleMap) {
-            $ruleMap = $this->loadRuleMap();
-            $this->cache->save(self::RULES_CACHE_KEY, $ruleMap);
-        }
+        $ruleMap = $this->cache->get(self::RULES_CACHE_KEY, function () {
+            return $this->loadRuleMap();
+        });
 
         return
             isset($ruleMap[$entityName])
@@ -132,9 +108,6 @@ class NotificationManager implements ResetInterface
         return $ruleMap;
     }
 
-    /**
-     * @return EmailNotification[]
-     */
     private function getRules(): array
     {
         if (null === $this->notificationRules) {
@@ -144,9 +117,6 @@ class NotificationManager implements ResetInterface
         return $this->notificationRules;
     }
 
-    /**
-     * @return EmailNotification[]
-     */
     private function loadRules(): array
     {
         return $this->getEntityManager()
