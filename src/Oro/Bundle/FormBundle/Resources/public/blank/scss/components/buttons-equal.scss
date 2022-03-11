@@ -5,7 +5,12 @@
 
     padding-top: $offset-y;
 
-    .btn {
+    &--no-offset {
+        padding-top: 0;
+    }
+
+    > .btn,
+    > .btn-group {
         flex-basis: 50%;
 
         &:first-child {
