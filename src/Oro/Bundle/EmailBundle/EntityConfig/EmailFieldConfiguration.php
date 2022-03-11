@@ -18,7 +18,7 @@ class EmailFieldConfiguration implements FieldConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('available_in_template')
+            ->node('available_in_template', 'normalized_boolean')
                 ->info('`boolean` if set to true, the field can be used in email templates.')
                 ->defaultTrue()
             ->end()

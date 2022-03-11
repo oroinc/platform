@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SearchBundle\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
@@ -19,7 +18,6 @@ class PrepareResultItemListener
     private UrlGeneratorInterface $urlGenerator;
     private ObjectMapper $mapper;
     private ManagerRegistry $doctrine;
-    private EntityNameResolver $entityNameResolver;
     private ConfigManager $configManager;
     private TranslatorInterface $translator;
 
@@ -27,14 +25,12 @@ class PrepareResultItemListener
         UrlGeneratorInterface $urlGenerator,
         ObjectMapper $mapper,
         ManagerRegistry $doctrine,
-        EntityNameResolver $entityNameResolver,
         ConfigManager $configManager,
         TranslatorInterface $translator
     ) {
         $this->urlGenerator = $urlGenerator;
         $this->mapper = $mapper;
         $this->doctrine = $doctrine;
-        $this->entityNameResolver = $entityNameResolver;
         $this->configManager = $configManager;
         $this->translator = $translator;
     }
@@ -46,10 +42,6 @@ class PrepareResultItemListener
 
         if (!$item->getRecordUrl()) {
             $item->setRecordUrl($this->getEntityUrl($entity, $item));
-        }
-
-        if (!$item->getRecordTitle()) {
-            $item->setRecordTitle($this->getEntityTitle($entity, $item));
         }
 
         if (!$item->getEntityLabel()) {
@@ -100,16 +92,5 @@ class PrepareResultItemListener
             $routeData,
             UrlGeneratorInterface::ABSOLUTE_URL
         );
-    }
-
-    private function getEntityTitle(?object $entity, ResultItem $item): string
-    {
-        if (null === $entity) {
-            $className = $item->getEntityName();
-            $entity = $this->doctrine->getManagerForClass($className)
-                ->find($className, $item->getRecordId());
-        }
-
-        return $this->entityNameResolver->getName($entity) ?? '';
     }
 }

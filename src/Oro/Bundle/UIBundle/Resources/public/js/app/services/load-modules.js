@@ -54,7 +54,7 @@ module.exports = function loadModules(modules, callback, context) {
         .then(modules => {
             modules = processModules(modules);
             if (callback) {
-                callback[isModulesArray ? 'apply': 'call'](context || null, modules);
+                callback[isModulesArray ? 'apply' : 'call'](context || null, modules);
             }
             // promise can't be resolved a with multiple values
             return modules;

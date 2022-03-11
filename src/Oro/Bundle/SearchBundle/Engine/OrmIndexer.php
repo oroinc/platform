@@ -129,8 +129,7 @@ class OrmIndexer extends AbstractIndexer
                 $item->setWeight(1);
             }
 
-            $item->setTitle($this->getEntityTitle($entity))
-                ->setChanged(false)
+            $item->setChanged(false)
                 ->saveItemData($data);
 
             $this->getIndexRepository()->writeItem($item);

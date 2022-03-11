@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Unit\Grid;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -23,6 +22,8 @@ use Oro\Bundle\ReportBundle\Entity\Report;
 use Oro\Bundle\ReportBundle\Grid\DatagridDateGroupingBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationProvider;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -47,7 +48,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     /** @var DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $dateGroupingBuilder;
 
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var ReportDatagridConfigurationBuilder */
@@ -58,7 +59,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $this->functionProvider = $this->createMock(FunctionProviderInterface::class);
         $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
         $this->virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
 
@@ -95,8 +96,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
     public function testIsReportValidForInvalidConfiguration()
     {
         $this->cache->expects(self::once())
-            ->method('fetch')
-            ->willReturn(false);
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
         $repository = $this->createMock(EntityRepository::class);
         $this->doctrine->expects($this->once())
             ->method('getRepository')
@@ -125,8 +129,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $report = $this->getReportEntity($entity, ['columns' => [['name' => 'street']]]);
         $this->prepareRepository($report);
         $this->cache->expects(self::once())
-            ->method('fetch')
-            ->willReturn(false);
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $configuration = $this->target->getConfiguration($gridName);
         $this->assertEmpty($configuration->offsetGetByPath('[actions]'));
@@ -147,8 +154,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         ];
 
         $this->cache->expects(self::once())
-            ->method('fetch')
-            ->willReturn(false);
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->virtualFieldProvider->expects($this->any())
             ->method('isVirtualField')
@@ -208,8 +218,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn(false);
 
         $this->cache->expects(self::once())
-            ->method('fetch')
-            ->willReturn(false);
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $metadata = $this->prepareMetadata();
 
@@ -245,8 +258,11 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
         $entityMetadata = $this->getEntityMetadata($expectedViewRoute);
 
         $this->cache->expects(self::once())
-            ->method('fetch')
-            ->willReturn(false);
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $metadata = $this->prepareMetadata();
         $metadata->expects($this->once())
@@ -384,7 +400,7 @@ class ReportDatagridConfigurationProviderTest extends \PHPUnit\Framework\TestCas
 
         $expectedConfiguration = $this->buildConfiguration($gridName, $report);
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->willReturn($expectedConfiguration);
 
         $configuration = $this->target->getConfiguration($gridName);

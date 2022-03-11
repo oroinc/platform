@@ -6,7 +6,8 @@ define(function(require) {
     const SearchSuggestionItemView = BaseView.extend({
         tagName: 'li',
 
-        template: '<a href="<%-record_url %>" tabindex="-1"><div class="description"><%-record_string %></div>' +
+        template: '<a href="<%-record_url %>" tabindex="-1">' +
+            '<div class="description"><%-selected_data[\'name\'] %></div>' +
             '<div class="entity-label"><%-entity_label %></div></a>',
 
         listen: {

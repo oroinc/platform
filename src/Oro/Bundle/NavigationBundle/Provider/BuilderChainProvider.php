@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NavigationBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;
 use Knp\Menu\Loader\ArrayLoader;
 use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Oro\Bundle\NavigationBundle\Menu\BuilderInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -26,7 +26,7 @@ class BuilderChainProvider implements MenuProviderInterface
     private FactoryInterface $factory;
     private ArrayLoader $loader;
     private MenuManipulator $manipulator;
-    private ?CacheProvider $cache = null;
+    private ?CacheItemPoolInterface $cache = null;
     /** @var BuilderInterface[] */
     private array $loadedBuilders = [];
     /** @var ItemInterface[] */
@@ -46,15 +46,11 @@ class BuilderChainProvider implements MenuProviderInterface
         $this->manipulator = $manipulator;
     }
 
-    public function setCache(CacheProvider $cache): void
+    public function setCache(CacheItemPoolInterface $cache): void
     {
         $this->cache = $cache;
-        $this->cache->setNamespace('oro_menu_instance');
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function get(string $name, array $options = []): ItemInterface
     {
         self::assertAliasNotEmpty($name);
@@ -69,9 +65,9 @@ class BuilderChainProvider implements MenuProviderInterface
         }
 
         $ignoreCache = \array_key_exists(self::IGNORE_CACHE_OPTION, $options);
-        if (!$ignoreCache && null !== $this->cache && $this->cache->contains($name)) {
-            $menuData = $this->cache->fetch($name);
-            $menu = $this->loader->load($menuData);
+        if (!$ignoreCache && $this->cache) {
+            $cacheItem = $this->cache->getItem($name);
+            $menu = $cacheItem->isHit() ? $this->loader->load($cacheItem->get()) : $this->buildMenu($name, $options);
         } else {
             $menu = $this->buildMenu($name, $options);
         }
@@ -80,9 +76,6 @@ class BuilderChainProvider implements MenuProviderInterface
         return $menu;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function has(string $name, array $options = []): bool
     {
         self::assertAliasNotEmpty($name);
@@ -153,7 +146,9 @@ class BuilderChainProvider implements MenuProviderInterface
         $this->sort($menu);
 
         if (null !== $this->cache) {
-            $this->cache->save($name, $this->manipulator->toArray($menu));
+            $cacheItem = $this->cache->getItem($name);
+            $cacheItem->set($this->manipulator->toArray($menu));
+            $this->cache->save($cacheItem);
         }
 
         return $menu;

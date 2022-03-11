@@ -90,7 +90,6 @@ class OrmTest extends \PHPUnit\Framework\TestCase
                 $item['class'],
                 $item['id'],
                 null,
-                null,
                 [],
                 $entityConfiguration
             );

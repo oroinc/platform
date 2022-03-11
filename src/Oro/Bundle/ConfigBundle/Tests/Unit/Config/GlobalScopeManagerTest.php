@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
 {
@@ -20,7 +20,7 @@ class GlobalScopeManagerTest extends AbstractScopeManagerTestCase
      */
     protected function createManager(
         ManagerRegistry $doctrine,
-        CacheProvider $cache,
+        CacheInterface $cache,
         EventDispatcher $eventDispatcher,
         ConfigBag $configBag
     ) {

@@ -41,9 +41,12 @@ define(function(require, exports, module) {
 
         resizableSidebar: config.resizableSidebar,
 
-        events: {
-            'click [data-role="sidebar-minimize"]': 'minimize',
-            'click [data-role="sidebar-maximize"]': 'maximize'
+        events() {
+            return {
+                'click [data-role="sidebar-minimize"]': 'minimize',
+                'click [data-role="sidebar-maximize"]': 'maximize',
+                [`transitionend ${this.sidebar}`]: '_calculateContentWidth'
+            };
         },
 
         /**
@@ -85,7 +88,7 @@ define(function(require, exports, module) {
                 $resizableEl: this.sidebar,
                 resizableOptions: {
                     resize: this._resize.bind(this),
-                    create: this._create.bind(this)
+                    create: this._calculateContentWidth.bind(this)
                 }
             });
         },
@@ -106,7 +109,7 @@ define(function(require, exports, module) {
             }
         },
 
-        _create: function() {
+        _calculateContentWidth: function() {
             this.$(this.content).css({
                 width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
             });
@@ -142,6 +145,8 @@ define(function(require, exports, module) {
             }
 
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
+            this._calculateContentWidth();
+
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
         },
 

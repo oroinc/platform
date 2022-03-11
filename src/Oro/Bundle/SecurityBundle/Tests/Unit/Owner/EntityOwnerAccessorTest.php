@@ -45,7 +45,12 @@ class EntityOwnerAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOwnerNoMetadata()
     {
-        $accessor = new EntityOwnerAccessor(new OwnershipMetadataProviderStub($this), $this->inflector);
+        $metadataProvider = new OwnershipMetadataProviderStub($this);
+        $accessor = new EntityOwnerAccessor($metadataProvider, $this->inflector);
+        $metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
 
         $obj = new TestEntity('testId');
         $obj->setOwner('testOwner');

@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Twig\Sandbox;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateRendererConfigProvider;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -13,7 +14,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var VariablesProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $variablesProvider;
 
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var TemplateRendererConfigProvider */
@@ -22,7 +23,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->variablesProvider = $this->createMock(VariablesProvider::class);
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
 
         $this->configProvider = new TemplateRendererConfigProvider(
             $this->variablesProvider,
@@ -41,11 +42,9 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with(self::CONFIG_CACHE_KEY)
             ->willReturn($cachedConfig);
-        $this->cache->expects(self::never())
-            ->method('save');
 
         self::assertSame($cachedConfig, $this->configProvider->getConfiguration());
         // test local cache
@@ -88,13 +87,13 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityVariableGetters')
             ->willReturn($entityVariableGetters);
 
-        $this->cache->expects(self::once())
-            ->method('fetch')
+        $this->cache->expects($this->once())
+            ->method('get')
             ->with(self::CONFIG_CACHE_KEY)
-            ->willReturn(false);
-        $this->cache->expects(self::once())
-            ->method('save')
-            ->with(self::CONFIG_CACHE_KEY, $config);
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         self::assertSame($config, $this->configProvider->getConfiguration());
         // test local cache
@@ -155,14 +154,14 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->cache->expects(self::once())
             ->method('delete')
             ->with(self::CONFIG_CACHE_KEY);
-
         $this->cache->expects(self::exactly(2))
-            ->method('fetch')
+            ->method('get')
             ->with(self::CONFIG_CACHE_KEY)
-            ->willReturn(false);
-        $this->cache->expects(self::exactly(2))
-            ->method('save')
-            ->with(self::CONFIG_CACHE_KEY);
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
+
         $this->variablesProvider->expects(self::exactly(2))
             ->method('getSystemVariableValues')
             ->willReturn([]);

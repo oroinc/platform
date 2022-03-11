@@ -3,14 +3,13 @@
 namespace Oro\Bundle\NavigationBundle\Entity\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
@@ -18,12 +17,9 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
  */
 class MenuUpdateRepository extends ServiceEntityRepository
 {
-    /**
-     * @var CacheProvider
-     */
-    private $queryResultCache;
+    private ?CacheItemPoolInterface $queryResultCache = null;
 
-    public function setQueryResultCache(CacheProvider $queryResultCache)
+    public function setQueryResultCache(CacheItemPoolInterface $queryResultCache): void
     {
         $this->queryResultCache = $queryResultCache;
     }
@@ -41,13 +37,7 @@ class MenuUpdateRepository extends ServiceEntityRepository
         return $result;
     }
 
-    /**
-     * @param string $menuName
-     * @param array $scopeIds
-     *
-     * @return array
-     */
-    public function findMenuUpdatesByScopeIds($menuName, array $scopeIds)
+    public function findMenuUpdatesByScopeIds(string $menuName, array $scopeIds): array
     {
         $menuUpdates = [];
         $scopeIds = array_reverse($scopeIds);
@@ -76,13 +66,7 @@ class MenuUpdateRepository extends ServiceEntityRepository
         return [];
     }
 
-    /**
-     * @param string $menuName
-     * @param Scope $scope
-     *
-     * @return MenuUpdateInterface[]
-     */
-    public function findMenuUpdatesByScope($menuName, $scope)
+    public function findMenuUpdatesByScope(string $menuName, Scope $scope): array
     {
         $qb = $this->createQueryBuilder('u');
 
@@ -97,13 +81,12 @@ class MenuUpdateRepository extends ServiceEntityRepository
                 'scope' => $scope
             ])
             ->getQuery()
-            ->useResultCache(true)
-            ->setResultCacheDriver($this->getQueryResultCache())
+            ->setResultCache($this->getQueryResultCache())
             ->setResultCacheId(MenuUpdateUtils::generateKey($menuName, $scope))
             ->getResult();
     }
 
-    public function updateDependentMenuUpdates(MenuUpdateInterface $menuUpdate)
+    public function updateDependentMenuUpdates(MenuUpdateInterface $menuUpdate): void
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->update($this->getEntityName(), 'u')
@@ -121,11 +104,7 @@ class MenuUpdateRepository extends ServiceEntityRepository
         $qb->getQuery()->execute();
     }
 
-    /**
-     * @param MenuUpdateInterface $menuUpdate
-     * @return Scope[]
-     */
-    public function getDependentMenuUpdateScopes(MenuUpdateInterface $menuUpdate)
+    public function getDependentMenuUpdateScopes(MenuUpdateInterface $menuUpdate): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb
@@ -145,13 +124,10 @@ class MenuUpdateRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @return CacheProvider
-     */
-    private function getQueryResultCache()
+    private function getQueryResultCache(): CacheItemPoolInterface
     {
         if (!$this->queryResultCache) {
-            $this->queryResultCache = DoctrineProvider::wrap(new ArrayAdapter(0, false));
+            $this->queryResultCache = new ArrayAdapter(0, false);
         }
 
         return $this->queryResultCache;

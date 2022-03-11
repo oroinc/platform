@@ -43,7 +43,6 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->items[] = new Item(
             'OroTestBundle:test',
             1,
-            'test title',
             'http://example.com',
             [],
             [
@@ -60,7 +59,6 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->items[] = new Item(
             'OroTestBundle:test',
             2,
-            'test title 2',
             'http://example.com',
             [],
             [
@@ -77,7 +75,6 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->items[] = new Item(
             'OroTestBundle:test',
             3,
-            'test title 3',
             'http://example.com',
             [],
             [
@@ -130,7 +127,6 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(3, $resultArray['count']);
         $this->assertEquals('OroTestBundle:test', $resultArray['data'][0]['entity_name']);
         $this->assertEquals(2, $resultArray['data'][1]['record_id']);
-        $this->assertEquals('test title 3', $resultArray['data'][2]['record_string']);
 
         $this->result1->toSearchResultData();
     }

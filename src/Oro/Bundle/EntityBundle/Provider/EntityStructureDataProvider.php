@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\Event\EntityStructureOptionsEvent;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -16,20 +16,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityStructureDataProvider
 {
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var EntityWithFieldsProvider */
-    private $entityWithFieldsProvider;
-
-    /** @var EntityClassNameHelper */
-    private $classNameHelper;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var Cache */
-    private $cache;
+    private EventDispatcherInterface $eventDispatcher;
+    private EntityWithFieldsProvider $entityWithFieldsProvider;
+    private EntityClassNameHelper $classNameHelper;
+    private TranslatorInterface $translator;
+    private CacheInterface $cache;
 
     private const ENTITY_PROPERTY_MAPPINGS = [
         'name'         => 'setClassName',
@@ -52,7 +43,7 @@ class EntityStructureDataProvider
         EntityWithFieldsProvider $entityWithFieldsProvider,
         EntityClassNameHelper $classNameHelper,
         TranslatorInterface $translator,
-        Cache $cache
+        CacheInterface $cache
     ) {
         $this->eventDispatcher = $eventDispatcher;
         $this->entityWithFieldsProvider = $entityWithFieldsProvider;
@@ -61,33 +52,19 @@ class EntityStructureDataProvider
         $this->cache = $cache;
     }
 
-    /**
-     * @return EntityStructure[]
-     */
-    public function getEntities()
+    public function getEntities(): array
     {
         $cacheKey = $this->getCacheKey();
-        $entityStructures = $this->cache->fetch($cacheKey);
-        if (false === $entityStructures) {
+        return $this->cache->get($cacheKey, function () {
             $entityStructures = $this->processEntities();
-
             $event = new EntityStructureOptionsEvent();
             $event->setData($entityStructures);
             $this->eventDispatcher->dispatch($event, EntityStructureOptionsEvent::EVENT_NAME);
-            $entityStructures = $event->getData();
-
-            $this->cache->save($cacheKey, $entityStructures);
-        }
-
-        return $entityStructures;
+            return $event->getData();
+        });
     }
 
-    /**
-     * @param string $entityName The class name or url-safe class name of the entity
-     *
-     * @return EntityStructure
-     */
-    public function getEntity($entityName)
+    public function getEntity(string $entityName): EntityStructure
     {
         $entityClass = $this->classNameHelper->resolveEntityClass($entityName);
         $entity = $this->entityWithFieldsProvider
@@ -101,10 +78,7 @@ class EntityStructureDataProvider
         return $model;
     }
 
-    /**
-     * @return EntityStructure[]
-     */
-    private function processEntities()
+    private function processEntities(): array
     {
         $result = [];
 
@@ -116,12 +90,7 @@ class EntityStructureDataProvider
         return $result;
     }
 
-    /**
-     * @param array $entity
-     *
-     * @return EntityStructure
-     */
-    private function processEntity(array $entity)
+    private function processEntity(array $entity): EntityStructure
     {
         $model = new EntityStructure();
         foreach (self::ENTITY_PROPERTY_MAPPINGS as $name => $method) {
@@ -139,7 +108,7 @@ class EntityStructureDataProvider
         return $model;
     }
 
-    private function processFields(EntityStructure $structure, array $fields)
+    private function processFields(EntityStructure $structure, array $fields): void
     {
         foreach ($fields as $field) {
             $model = new EntityFieldStructure();

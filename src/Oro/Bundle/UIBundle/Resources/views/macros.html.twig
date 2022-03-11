@@ -1260,9 +1260,18 @@
                 </div>
             </div>
         {% endif %}
-        <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy container-fluid scrollable-container{% if isForm %} form-container{% endif %}">
+        <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy scrollable-container{% if isForm %} form-container{% endif %}">
+            <div class="container-fluid">
             {% for scrollBlock in dataBlocks %}
-                {{ UIMacro.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
+                {{ UIMacro.scrollBlock(
+                    "scroll-" ~ loop.index,
+                    scrollBlock.title,
+                    scrollBlock.subblocks,
+                    isForm,
+                    scrollBlock.content_attr is defined ? scrollBlock.content_attr : null,
+                    scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true,
+                    scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null
+                ) }}
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
                 <div class="hide" data-skip-input-widgets data-layout="separate">
@@ -1274,6 +1283,7 @@
                     {% endif %}
                 </div>
             {% endif %}
+            </div>
         </div>
     </div>
 {% endmacro %}

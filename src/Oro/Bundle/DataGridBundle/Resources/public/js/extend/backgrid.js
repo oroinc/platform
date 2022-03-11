@@ -119,7 +119,10 @@ define(function(require) {
             }
         }
 
-        if (this.model && this.model.get('isAuxiliary') !== true && !this.column.get('notMarkAsBlank')) {
+        if (
+            this.model && this.model.get('isAuxiliary') !== true &&
+            this.column.get('notMarkAsBlank') !== true && this.notMarkAsBlank !== true
+        ) {
             const value = this.model && this.model.get(this.column.get('name'));
 
             if (

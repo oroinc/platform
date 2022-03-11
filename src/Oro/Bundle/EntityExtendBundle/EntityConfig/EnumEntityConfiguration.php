@@ -21,16 +21,16 @@ class EnumEntityConfiguration implements EntityConfigInterface
             ->scalarNode('code')
                 ->info('`string` a unique identifier of this enum.')
             ->end()
-            ->booleanNode('public')
+            ->node('public', 'normalized_boolean')
                 ->info('`boolean` indicates whether this enum is public. Public enums can be used in any extendable ' .
                     'entity, which means that you can create a field of this enum type in any entity. Private enums ' .
                     'cannot be reused.')
             ->end()
-            ->booleanNode('multiple')
+            ->node('multiple', 'normalized_boolean')
                 ->info('`boolean` Indicates whether several options can be selected for this enum or it supports ' .
                     'only one selected option.')
             ->end()
-            ->booleanNode('immutable')
+            ->node('immutable', 'normalized_boolean')
                 ->info('`boolean or array` is used to prohibit changing the list of enum values and a public flag. ' .
                     'This means that values cannot be added or deleted, but it is still possible to update the ' .
                     'names of existing values, reorder them and change the default values. Below are examples of ' .

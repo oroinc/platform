@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,8 +18,10 @@ use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @SuppressWarnings(PHPMD)
@@ -51,7 +52,7 @@ class OwnerTreeProviderTest extends OrmTestCase
     /** @var DatabaseChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $databaseChecker;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -86,10 +87,7 @@ class OwnerTreeProviderTest extends OrmTestCase
 
         $this->databaseChecker = $this->createMock(DatabaseChecker::class);
 
-        $this->cache = $this->createMock(CacheProvider::class);
-        $this->cache->expects($this->any())
-            ->method('fetch')
-            ->willReturn(false);
+        $this->cache = $this->createMock(AbstractAdapter::class);
 
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->ownershipMetadataProvider->expects($this->any())
@@ -280,6 +278,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -374,6 +373,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -470,6 +470,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -550,6 +551,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -642,6 +644,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -790,6 +793,7 @@ class OwnerTreeProviderTest extends OrmTestCase
             ]
         );
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -874,6 +878,7 @@ class OwnerTreeProviderTest extends OrmTestCase
                     $criticalMessageArguments['buId']
                 )
             );
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -920,6 +925,7 @@ class OwnerTreeProviderTest extends OrmTestCase
                     $criticalMessageArguments[2]['buId']
                 )]
             );
+        $this->applyCacheExpectations();
 
         /** @var OwnerTree $tree */
         $tree = $this->treeProvider->getTree();
@@ -1001,5 +1007,15 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ]
             ]
         ];
+    }
+
+    private function applyCacheExpectations(): void
+    {
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
     }
 }

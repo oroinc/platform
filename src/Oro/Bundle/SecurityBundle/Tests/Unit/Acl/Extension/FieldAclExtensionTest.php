@@ -310,6 +310,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
     public function testValidateMaskForRootInvalid(int $mask)
     {
         $this->expectException(InvalidAclMaskException::class);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::once())
+            ->method('get')
+            ->willReturn(true);
         $this->extension->validateMask($mask, new ObjectIdentity('entity', ObjectIdentityFactory::ROOT_IDENTITY_TYPE));
     }
 
@@ -389,6 +393,10 @@ class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
         $token->expects($this->any())
             ->method('getUser')
             ->willReturn($user);
+        $this->metadataProvider->getCacheMock()
+            ->expects(self::any())
+            ->method('get')
+            ->willReturn(true);
         $this->assertEquals(
             $expectedResult,
             $this->extension->decideIsGranting($triggeredMask, $object, $token)

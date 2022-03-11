@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
@@ -20,11 +21,9 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  */
 class ObjectMapper extends AbstractMapper
 {
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
+    protected EventDispatcherInterface $dispatcher;
+    
+    protected HtmlTagHelper $htmlTagHelper;
 
     /** @var DateTimeFormatter */
     protected $dateTimeFormatter;
@@ -33,11 +32,13 @@ class ObjectMapper extends AbstractMapper
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,
         TypeCastingHandlerRegistry $handlerRegistry,
+        EntityNameResolver $nameResolver,
         EventDispatcherInterface $dispatcher,
         HtmlTagHelper $htmlTagHelper,
         DateTimeFormatter $dateTimeFormatter
     ) {
-        parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry);
+        parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry, $nameResolver);
+        
         $this->dispatcher = $dispatcher;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->dateTimeFormatter = $dateTimeFormatter;
@@ -129,6 +130,10 @@ class ObjectMapper extends AbstractMapper
         $objectData  = [];
         $objectClass = ClassUtils::getRealClass($object);
         if (is_object($object) && $this->mappingProvider->hasFieldsMapping($objectClass)) {
+            // generate system entity name
+            $objectData[Query::TYPE_TEXT][Indexer::NAME_FIELD] = $this->getEntityName($object);
+
+            // add field data
             $alias = $this->getEntityMapParameter($objectClass, 'alias', $objectClass);
             foreach ($this->getEntityMapParameter($objectClass, 'fields', []) as $field) {
                 $objectData = $this->processField($alias, $objectData, $field, $object);

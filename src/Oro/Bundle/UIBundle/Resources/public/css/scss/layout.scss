@@ -222,6 +222,8 @@ body.backdrop {
             align-items: center;
             padding-top: 4px;
             padding-bottom: 4px;
+
+            @include safe-area-property-left(padding-left, $content-padding-medium);
         }
 
         [class^='fa-'] {
@@ -276,6 +278,9 @@ body.backdrop {
         flex-grow: 1;
         max-width: calc(100% - 236px);
         padding: 10px;
+
+        @include safe-area-property-right(padding-right, 10px);
+        
         background-color: $primary-inverse;
     }
 

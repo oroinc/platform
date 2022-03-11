@@ -85,7 +85,7 @@ class SearchTest extends RestJsonApiTestCase
                         'entityUrl' => $this->getUrl('oro_user_view', ['id' => $userId], true)
                     ],
                     'attributes'    => [
-                        'entityTitle' => 'John Doe'
+                        'entityName' => 'John Doe'
                     ],
                     'relationships' => [
                         'entity' => ['data' => ['type' => 'users', 'id' => (string)$userId]]
@@ -95,7 +95,7 @@ class SearchTest extends RestJsonApiTestCase
                     'type'          => 'search',
                     'id'            => 'businessunits-' . $businessUnitId,
                     'attributes'    => [
-                        'entityTitle' => 'Main'
+                        'entityName' => 'Main'
                     ],
                     'relationships' => [
                         'entity' => ['data' => ['type' => 'businessunits', 'id' => (string)$businessUnitId]]
@@ -117,7 +117,7 @@ class SearchTest extends RestJsonApiTestCase
                     'type'          => 'search',
                     'id'            => 'businessunits-' . $businessUnitId,
                     'attributes'    => [
-                        'entityTitle' => 'Main'
+                        'entityName' => 'Main'
                     ],
                     'relationships' => [
                         'entity' => ['data' => ['type' => 'businessunits', 'id' => (string)$businessUnitId]]
@@ -142,7 +142,7 @@ class SearchTest extends RestJsonApiTestCase
                         'entityUrl' => $this->getUrl('oro_user_view', ['id' => $userId], true)
                     ],
                     'attributes'    => [
-                        'entityTitle' => 'John Doe'
+                        'entityName' => 'John Doe'
                     ],
                     'relationships' => [
                         'entity' => ['data' => ['type' => 'users', 'id' => (string)$userId]]
@@ -171,7 +171,7 @@ class SearchTest extends RestJsonApiTestCase
                         'entityUrl' => $this->getUrl('oro_user_view', ['id' => $userId], true)
                     ],
                     'attributes'    => [
-                        'entityTitle' => 'John Doe'
+                        'entityName' => 'John Doe'
                     ],
                     'relationships' => [
                         'entity' => ['data' => ['type' => 'users', 'id' => (string)$userId]]
@@ -181,7 +181,7 @@ class SearchTest extends RestJsonApiTestCase
                     'type'          => 'search',
                     'id'            => 'businessunits-' . $businessUnitId,
                     'attributes'    => [
-                        'entityTitle' => 'Main'
+                        'entityName' => 'Main'
                     ],
                     'relationships' => [
                         'entity' => ['data' => ['type' => 'businessunits', 'id' => (string)$businessUnitId]]

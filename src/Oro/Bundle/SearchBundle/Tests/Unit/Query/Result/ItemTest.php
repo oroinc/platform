@@ -25,7 +25,6 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $this->item = new Item(
             'OroTestBundle:test',
             1,
-            'test title',
             'http://example.com',
             [],
             [
@@ -56,13 +55,6 @@ class ItemTest extends \PHPUnit\Framework\TestCase
         $result = $this->item->toArray();
         $this->assertEquals('OroTestBundle:test', $result['entity_name']);
         $this->assertEquals(1, $result['record_id']);
-        $this->assertEquals('test title', $result['record_string']);
-    }
-
-    public function testRecordTitle()
-    {
-        $this->item->setRecordTitle('test title');
-        $this->assertEquals('test title', $this->item->getRecordTitle());
     }
 
     public function testRecordUrl()

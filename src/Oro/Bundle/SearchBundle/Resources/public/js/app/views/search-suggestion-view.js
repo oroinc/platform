@@ -135,13 +135,13 @@ define(function(require) {
             const selectedIndex = this.getSelectedIndex();
 
             if (selectedIndex !== index) {
-                let model = selectedIndex >=0 ? this.collection.at(selectedIndex) : null;
+                let model = selectedIndex >= 0 ? this.collection.at(selectedIndex) : null;
 
                 if (model) {
                     model.set('selected', false);
                 }
 
-                model = index >=0 ? this.collection.at(index) : null;
+                model = index >= 0 ? this.collection.at(index) : null;
 
                 if (model) {
                     model.set('selected', true);

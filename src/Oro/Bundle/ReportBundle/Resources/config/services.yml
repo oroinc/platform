@@ -21,10 +21,10 @@ services:
         alias: oro_report.datagrid.configuration.provider
 
     oro_report.cache:
-          parent: oro.cache.abstract
+          parent: oro.data.cache
           public: false
-          calls:
-              - [setNamespace, [ 'oro_report' ] ]
+          tags:
+              - { name: 'cache.pool', namespace: 'oro_report' }
 
     oro_report.listener.navigation_listener:
         class: Oro\Bundle\ReportBundle\EventListener\NavigationListener

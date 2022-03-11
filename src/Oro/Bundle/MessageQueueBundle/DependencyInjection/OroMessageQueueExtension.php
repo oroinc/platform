@@ -137,7 +137,9 @@ class OroMessageQueueExtension extends Extension
         if ($config['client']['redelivery']['enabled']) {
             $container->getDefinition('oro_message_queue.consumption.redelivery_message_extension')
                 ->replaceArgument(1, $config['client']['redelivery']['delay_time'])
-                ->addTag('oro_message_queue.consumption.extension');
+                // This extension should be called as early as possible as it rejects redelivered message,
+                // so all extensions called before are useless.
+                ->addTag('oro_message_queue.consumption.extension', ['priority' => 512]);
         }
 
         // php pcntl extension available only for UNIX like systems

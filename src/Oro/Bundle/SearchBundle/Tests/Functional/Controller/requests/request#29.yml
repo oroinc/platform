@@ -11,5 +11,4 @@ response:
             -
                 entity_name: Oro\Bundle\TestFrameworkBundle\Entity\Product
                 entity_label: oro.testframework.product.entity_label
-                record_string: "500-watt Work Light"
                 record_url: http://localhost%oro_default_prefix%search/

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;

@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Stub;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
 {
@@ -21,7 +22,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessorMock;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheMock;
 
     public function __construct(\PHPUnit\Framework\TestCase $testCase, array $classes = [])
@@ -35,7 +36,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
         $this->tokenAccessorMock = $testCase->getMockBuilder(TokenAccessorInterface::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->cacheMock = $testCase->getMockBuilder(CacheProvider::class)
+        $this->cacheMock = $testCase->getMockBuilder(AbstractAdapter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -62,7 +63,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     /**
      * {@inheritDoc}
      */
-    public function getMetadata($className)
+    public function getMetadata($className): OwnershipMetadataInterface
     {
         return $this->metadata[$className] ?? parent::getMetadata($className);
     }
@@ -79,7 +80,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     /**
      * {@inheritDoc}
      */
-    public function getMaxAccessLevel($accessLevel, $className = null)
+    public function getMaxAccessLevel($accessLevel, $className = null): int
     {
         return $accessLevel;
     }
@@ -101,10 +102,19 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     }
 
     /**
-     * @return CacheProvider|\PHPUnit\Framework\MockObject\MockObject
+     * @return AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject
      */
     public function getCacheMock()
     {
         return $this->cacheMock;
+    }
+
+    /**
+     * @param AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject $mockObject
+     * @return void
+     */
+    public function setCacheMock($mockObject)
+    {
+        $this->cacheMock = $mockObject;
     }
 }

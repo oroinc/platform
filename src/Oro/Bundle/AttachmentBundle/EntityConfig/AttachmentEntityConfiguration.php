@@ -18,7 +18,7 @@ class AttachmentEntityConfiguration implements EntityConfigInterface
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder
-            ->booleanNode('enabled')
+            ->node('enabled', 'normalized_boolean')
                 ->info('`boolean` indicates whether attachments can be added to the entity or not.')
                 ->defaultFalse()
             ->end()
@@ -31,7 +31,7 @@ class AttachmentEntityConfiguration implements EntityConfigInterface
                     'MIME types are delimited by linefeed (n) symbol. ')
                 ->example(['image/jpeg', 'image/gif', 'application/pdf'])
             ->end()
-            ->booleanNode('immutable')
+            ->node('immutable', 'normalized_boolean')
                 ->info('`boolean` can be used to prohibit changing the attachment association state (regardless of ' .
                     'whether it is enabled or not) for the entity. If TRUE than the current state cannot be changed.')
             ->end()

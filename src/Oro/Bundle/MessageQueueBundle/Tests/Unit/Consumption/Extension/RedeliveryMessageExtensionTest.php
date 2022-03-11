@@ -14,11 +14,9 @@ use Psr\Log\LoggerInterface;
 
 class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $driver;
+    private DriverInterface|\PHPUnit\Framework\MockObject\MockObject $driver;
 
-    /** @var RedeliveryMessageExtension */
-    private $extension;
+    private RedeliveryMessageExtension $extension;
 
     protected function setUp(): void
     {
@@ -30,7 +28,7 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testOnPreReceived(array $properties, array $expectedProperties)
+    public function testOnPreReceived(array $properties, array $expectedProperties): void
     {
         $session = $this->createMock(SessionInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -47,7 +45,7 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
         $context->setMessage($message);
         $context->setQueueName('oro.default');
 
-        $session->expects($this->once())
+        $session->expects(self::once())
             ->method('createQueue')
             ->with('oro.default')
             ->willReturn($queue);
@@ -58,11 +56,11 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
         $delayedMessage->setDelay(10);
         $delayedMessage->setMessageId('test message id');
 
-        $this->driver->expects($this->once())
+        $this->driver->expects(self::once())
             ->method('send')
             ->with($queue, $delayedMessage);
 
-        $logger->expects($this->exactly(2))
+        $logger->expects(self::exactly(2))
             ->method('debug')
             ->willReturnMap([
                 ['Send delayed message', []],
@@ -70,10 +68,10 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->extension->onPreReceived($context);
-        $this->assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
+        self::assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
     }
 
-    public function testOnPreReceivedMessageDoesNotRedelivered()
+    public function testOnPreReceivedMessageIsNotRedelivered(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $logger = $this->createMock(LoggerInterface::class);
@@ -83,13 +81,13 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
         $context->setLogger($logger);
         $context->setMessage($message);
 
-        $session->expects($this->never())
+        $session->expects(self::never())
             ->method('createQueue');
 
-        $logger->expects($this->never())
+        $logger->expects(self::never())
             ->method('debug');
 
-        $this->driver->expects($this->never())
+        $this->driver->expects(self::never())
             ->method('send');
 
         $this->extension->onPreReceived($context);
@@ -111,5 +109,34 @@ class RedeliveryMessageExtensionTest extends \PHPUnit\Framework\TestCase
                 'expectedProperties' => ['oro-redeliver-count' => 6],
             ],
         ];
+    }
+
+    public function testOnPreReceivedContextHasStatus(): void
+    {
+        $session = $this->createMock(SessionInterface::class);
+        $logger = $this->createMock(LoggerInterface::class);
+        $message = new TransportMessage();
+        $message->setMessageId('sample-id');
+        $message->setRedelivered(true);
+
+        $context = new Context($session);
+        $context->setLogger($logger);
+        $context->setMessage($message);
+        $context->setStatus(MessageProcessorInterface::REJECT);
+
+        $session->expects(self::never())
+            ->method('createQueue');
+
+        $logger->expects(self::once())
+            ->method('debug')
+            ->with(
+                'Skipping extension as message status is already set.',
+                ['messageId' => $message->getMessageId(), 'status' => $context->getStatus()]
+            );
+
+        $this->driver->expects(self::never())
+            ->method('send');
+
+        $this->extension->onPreReceived($context);
     }
 }

@@ -47,12 +47,6 @@ abstract class AbstractItem
     protected $recordId;
 
     /**
-     * @var string $title
-     * @ORM\Column(name="title", type="string", length=255, nullable=true)
-     */
-    protected $title;
-
-    /**
      * @var float
      * @ORM\Column(name="weight", type="decimal", precision=8, scale=4, nullable=false, options={"default"=1.0}))
      */
@@ -378,25 +372,6 @@ abstract class AbstractItem
     public function getAlias()
     {
         return $this->alias;
-    }
-
-    /**
-     * @param string $title
-     * @return AbstractItem
-     */
-    public function setTitle($title)
-    {
-        $this->title = mb_substr($title, 0, 255, mb_detect_encoding($title));
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
     }
 
     /**

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\LocaleBundle\Form\Type\TimezoneType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,9 +41,9 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
     {
         $timezones = ['Test' => '(UTC +0) Test'];
 
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with('timezones')
             ->willReturn($timezones);
 
@@ -61,14 +62,14 @@ class TimezoneTypeTest extends \PHPUnit\Framework\TestCase
      */
     public function testFormTypeWithEmptyCache()
     {
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with('timezones')
-            ->willReturn(false);
-        $cache->expects($this->once())
-            ->method('save')
-            ->with('timezones', $this->isType('array'));
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $type = new TimezoneType($cache);
         $resolver = $this->createMock(OptionsResolver::class);

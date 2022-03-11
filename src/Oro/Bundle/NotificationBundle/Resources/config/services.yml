@@ -78,9 +78,9 @@ services:
             - '@doctrine'
 
     oro_notification.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, ['oro_notification'] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_notification' }
 
     oro_notification.event_listener.invalidate_cache_listener:
         class: Oro\Bundle\NotificationBundle\EventListener\InvalidateCacheListener

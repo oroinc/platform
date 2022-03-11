@@ -118,10 +118,10 @@ services:
         factory: ['@oro_test.alice_fixture_loader', getReferenceRepository]
 
     oro_config.cache:
-        parent: oro_cache.array_cache
+        parent: oro.cache.adapter.array
         public: true
-        calls:
-            - [setNamespace, [ 'oro_config' ] ]
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_config' }
 
     oro_embedded_form.csrf_token_cache:
         class: Symfony\Component\Cache\Adapter\ArrayAdapter
