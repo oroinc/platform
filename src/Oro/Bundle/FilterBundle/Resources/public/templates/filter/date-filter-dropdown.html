@@ -7,7 +7,7 @@
             <li class="nav-item">
                 <a class="<%- tab.name %> no-hash tab-button nav-link<% if (i === 0) { %> active show<% } %>"
                    href="#<%- tab.name %><%- suffix %>"><% if (tab.icon) { %><span class="fa-<%- tab.icon %>"></span><% } %>
-                    <%= tab.label %></a>
+                    <%- tab.label %></a>
             </li>
             <% }); %>
         </ul>

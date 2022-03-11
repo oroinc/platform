@@ -24,11 +24,11 @@
                     <% } %>
                 </span>
                 <span class="details">
-                    <i class="date"><%= createdAt %></i>
+                    <i class="date"><%- createdAt %></i>
                 </span>
             </div>
             <div class="message-item">
-                <div class="message"><%= brief_message %></div>
+                <div class="message"><%- brief_message %></div>
             </div>
             <div class="actions">
                 <button class="btn btn-icon btn-lighter item-edit-button<% if (!editable) { %> disabled<% } %>"

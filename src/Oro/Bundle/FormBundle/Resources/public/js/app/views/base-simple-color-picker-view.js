@@ -6,7 +6,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
     const BaseSimpleColorPickerView = BaseView.extend({
         defaults: {
             pickerActionsTemplate: '<div class="form-actions">' +
-                '<button class="btn pull-right" data-action="cancel" type="button"><%= __("Close") %></button>' +
+                '<button class="btn pull-right" data-action="cancel" type="button"><%- __("Close") %></button>' +
             '</div>'
         },
 
