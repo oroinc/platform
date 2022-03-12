@@ -7,8 +7,7 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationType;
@@ -22,18 +21,17 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints\ValidValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {
     private const TEST_PASSWORD = 'somePassword';
-
     private const OAUTH_ACCOUNT_TYPE = 'oauth1';
 
     /** @var SymmetricCrypterInterface */
@@ -42,11 +40,8 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
 
     /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $imapSettingsChecker;
@@ -58,8 +53,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
     {
         $this->encryptor = new DefaultCrypter('someKey');
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->translator = $this->createMock(Translator::class);
-        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->imapSettingsChecker = $this->createMock(ImapSettingsChecker::class);
         $this->smtpSettingsChecker = $this->createMock(SmtpSettingsChecker::class);
 
@@ -83,23 +77,17 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
      */
     protected function getExtensions(): array
     {
-        $type = new ConfigurationType(
-            $this->encryptor,
-            $this->tokenAccessor,
-            $this->translator
-        );
-
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        CheckButtonType::class => new CheckButtonType(),
-                        EmailFolderTreeType::class => new EmailFolderTreeType(),
-                        ConfigurationType::class => $type
+                        new CheckButtonType(),
+                        new EmailFolderTreeType(),
+                        new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator)
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
                 $this->getValidatorExtension(true)

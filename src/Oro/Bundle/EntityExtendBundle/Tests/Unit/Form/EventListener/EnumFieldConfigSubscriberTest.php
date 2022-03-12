@@ -548,16 +548,12 @@ class EnumFieldConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->postSubmit($event);
     }
 
-    /**
-     * @param ConfigModel                                   $configModel
-     * @param \PHPUnit\Framework\MockObject\MockObject|null $form
-     *
-     * @return FormEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getFormEventMock(ConfigModel $configModel, $form = null)
-    {
+    private function getFormEventMock(
+        ConfigModel $configModel,
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject|null $form = null
+    ): FormEvent|\PHPUnit\Framework\MockObject\MockObject {
         if (!$form) {
-            $form = $this->createMock(\Symfony\Component\Form\Test\FormInterface::class);
+            $form = $this->createMock(FormInterface::class);
         }
         $formConfig = $this->createMock(FormConfigInterface::class);
         $form->expects($this->once())

@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
@@ -18,11 +16,11 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceAccountTypeTest extends FormIntegrationTestCase
 {
@@ -34,14 +32,8 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userConfigManager;
 
     /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $oauthManagerRegistry;
@@ -64,15 +56,12 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
             ->method('getOrganization')
             ->willReturn($this->user->getOrganization());
 
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($string) {
                 return $string . '.trans';
             });
-
-        $this->userConfigManager = $this->createMock(ConfigManager::class);
-        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $oauthManager1 = $this->getOAuthManager('oauth1');
         $oauthManager2 = $this->getOAuthManager('oauth2');
@@ -105,27 +94,24 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $type = new ChoiceAccountType($this->translator, $this->oauthManagerRegistry);
-
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        ChoiceAccountType::class     => $type,
-                        CheckButtonType::class       => new CheckButtonType(),
-                        ConfigurationTestType::class => new ConfigurationTestType($this->tokenAccessor),
-                        ConfigurationType::class     => new ConfigurationType(
-                            $this->encryptor,
-                            $this->tokenAccessor,
-                            $this->translator
-                        ),
-                        EmailFolderTreeType::class   => new EmailFolderTreeType(),
+                        new ChoiceAccountType($this->translator, $this->oauthManagerRegistry),
+                        new CheckButtonType(),
+                        new ConfigurationTestType($this->tokenAccessor),
+                        new ConfigurationType($this->encryptor, $this->tokenAccessor, $this->translator),
+                        new EmailFolderTreeType()
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
             ]
@@ -221,10 +207,7 @@ class ChoiceAccountTypeTest extends FormIntegrationTestCase
         self::assertSame('other', $entity->getAccountType());
     }
 
-    /**
-     *  Return UserEmailOrigin entity created with data of $data variable
-     */
-    private function getUserEmailOrigin($data)
+    private function getUserEmailOrigin(array $data): UserEmailOrigin
     {
         $userEmailOrigin = new UserEmailOrigin();
         $userEmailOrigin->setUser($data['user']);

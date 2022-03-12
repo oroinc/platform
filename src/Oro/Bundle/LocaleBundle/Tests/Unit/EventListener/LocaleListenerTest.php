@@ -9,7 +9,6 @@ use Oro\Bundle\LocaleBundle\EventListener\LocaleListener;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\Provider\CurrentLocalizationProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,19 +20,23 @@ use Symfony\Component\Translation\Translator;
 
 class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
+    private $localeSettings;
 
-    private LocaleSettings|\PHPUnit\Framework\MockObject\MockObject $localeSettings;
+    /** @var TranslatableListener|\PHPUnit\Framework\MockObject\MockObject */
+    private $transListener;
 
-    private TranslatableListener|\PHPUnit\Framework\MockObject\MockObject $transListener;
+    /** @var RequestContextAwareInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    private RequestContextAwareInterface|\PHPUnit\Framework\MockObject\MockObject $router;
+    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    private Translator|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $currentLocalizationProvider;
 
-    private CurrentLocalizationProvider|\PHPUnit\Framework\MockObject\MockObject $currentLocalizationProvider;
-
-    private ApplicationState|\PHPUnit\Framework\MockObject\MockObject $applicationState;
+    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
+    private $applicationState;
 
     private string $defaultLocale;
 
@@ -54,12 +57,19 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         \Locale::setDefault($this->defaultLocale);
     }
 
+    private function getListener(): LocaleListener
+    {
+        return new LocaleListener(
+            $this->localeSettings,
+            $this->currentLocalizationProvider,
+            $this->transListener,
+            $this->translator,
+            $this->router,
+            $this->applicationState
+        );
+    }
+
     /**
-     * @param bool|string|null $installed
-     * @param bool $isSetLocale
-     * @param string $expectedLanguage
-     * @param Localization|null $localization
-     *
      * @dataProvider onKernelRequestDataProvider
      */
     public function testOnKernelRequest(
@@ -76,34 +86,41 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         $request->setDefaultLocale($this->defaultLocale);
 
         if ($isSetLocale) {
-            $this->currentLocalizationProvider->expects(self::once())->method('getCurrentLocalization')
+            $this->currentLocalizationProvider->expects(self::once())
+                ->method('getCurrentLocalization')
                 ->willReturn($localization);
-            $this->localeSettings->expects($localization ? self::never() : self::once())->method('getLanguage')
+            $this->localeSettings->expects($localization ? self::never() : self::once())
+                ->method('getLanguage')
                 ->willReturn($customLanguage);
-            $this->localeSettings->expects(self::once())->method('getLocale')
+            $this->localeSettings->expects(self::once())
+                ->method('getLocale')
                 ->willReturn($customLocale);
-            $this->router->expects(self::once())->method('getContext')->willReturn($context);
+            $this->router->expects(self::once())
+                ->method('getContext')
+                ->willReturn($context);
         } else {
-            $this->localeSettings->expects(self::never())->method('getLanguage');
-            $this->localeSettings->expects(self::never())->method('getLocale');
+            $this->localeSettings->expects(self::never())
+                ->method('getLanguage');
+            $this->localeSettings->expects(self::never())
+                ->method('getLocale');
         }
 
         if ($installed) {
-            $this->applicationState->method('isInstalled')->willReturn(true);
+            $this->applicationState->expects(self::once())
+                ->method('isInstalled')
+                ->willReturn(true);
         } else {
-            $this->applicationState->method('isInstalled')->willReturn(false);
+            $this->applicationState->expects(self::once())
+                ->method('isInstalled')
+                ->willReturn(false);
         }
 
-        $listener = new LocaleListener(
-            $this->localeSettings,
-            $this->currentLocalizationProvider,
-            $this->transListener,
-            $this->translator,
-            $this->router,
-            $this->applicationState
-        );
+        $event = $this->createMock(RequestEvent::class);
+        $event->expects(self::once())
+            ->method('getRequest')
+            ->willReturn($request);
 
-        $listener->onKernelRequest($this->createRequestEvent($request));
+        $this->getListener()->onKernelRequest($event);
 
         if ($isSetLocale) {
             self::assertEquals($expectedLanguage, $request->getLocale());
@@ -134,9 +151,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
                 'installed' => true,
                 'isSetLocale' => true,
                 'language' => 'en_US',
-                'localization' => (new Localization())->setLanguage(
-                    $this->getEntity(Language::class, ['code' => 'en_US',])
-                ),
+                'localization' => (new Localization())->setLanguage((new Language())->setCode('en_US')),
             ],
         ];
     }
@@ -150,39 +165,19 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 
         $event = new ConsoleCommandEvent(null, $input, $this->createMock(OutputInterface::class));
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getLocale');
 
-        $this->localeSettings
-            ->expects(self::once())
+        $this->localeSettings->expects(self::once())
             ->method('getLanguage');
 
-        $this->transListener
-            ->expects(self::once())
+        $this->transListener->expects(self::once())
             ->method('setTranslatableLocale');
 
-        $this->applicationState->method('isInstalled')->willReturn(true);
+        $this->applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(true);
 
-        $listener = new LocaleListener(
-            $this->localeSettings,
-            $this->currentLocalizationProvider,
-            $this->transListener,
-            $this->translator,
-            $this->router,
-            $this->applicationState
-        );
-        $listener->onConsoleCommand($event);
-    }
-
-    private function createRequestEvent(Request $request): RequestEvent
-    {
-        $event = $this->createMock(RequestEvent::class);
-
-        $event->expects(self::once())
-            ->method('getRequest')
-            ->willReturn($request);
-
-        return $event;
+        $this->getListener()->onConsoleCommand($event);
     }
 }

@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +23,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
     private $manager;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var EmailTemplateHandler */
@@ -39,7 +39,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $requestStack = new RequestStack();
         $requestStack->push($this->request);
         $this->manager = $this->createMock(ObjectManager::class);
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->entity = new EmailTemplate();
         $this->handler = new EmailTemplateHandler($this->form, $requestStack, $this->manager, $this->translator);
