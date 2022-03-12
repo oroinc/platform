@@ -3,8 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\MultipleValueTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
@@ -12,7 +11,6 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\PercentTypeStub;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,6 +18,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LocalizedPropertyTypeTest extends AbstractLocalizedType
 {
@@ -30,39 +29,39 @@ class LocalizedPropertyTypeTest extends AbstractLocalizedType
         parent::setUp();
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
         $localizationCollection = new LocalizationCollectionType($this->registry);
         $localizationCollection->setDataClass(self::LOCALIZATION_CLASS);
 
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $translator = $this->createMock(Translator::class);
-
         return [
             new PreloadedExtension(
                 [
-                    FallbackPropertyType::class => new FallbackPropertyType($translator),
-                    FallbackValueType::class => new FallbackValueType(),
-                    LocalizationCollectionType::class => $localizationCollection,
-                    PercentTypeStub::class => new PercentTypeStub(),
+                    new FallbackPropertyType($this->createMock(TranslatorInterface::class)),
+                    new FallbackValueType(),
+                    $localizationCollection,
+                    new PercentTypeStub(),
                 ],
                 [
-                    FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                    FormType::class => [new TooltipFormExtensionStub($this)]
                 ]
             )
         ];
     }
 
     /**
-     * @param array $options
-     * @param mixed $defaultData
-     * @param mixed $viewData
-     * @param mixed $submittedData
-     * @param mixed $expectedData
      * @dataProvider submitDataProvider
      */
-    public function testSubmit(array $options, $defaultData, $viewData, $submittedData, $expectedData)
-    {
+    public function testSubmit(
+        array $options,
+        ?array $defaultData,
+        array $viewData,
+        ?array $submittedData,
+        array $expectedData
+    ) {
         $this->setRegistryExpectations();
 
         $form = $this->factory->create(LocalizedPropertyType::class, $defaultData, $options);

@@ -2,29 +2,29 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Manager;
 
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Layout\Extension\Theme\Manager\PageTemplatesManager;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ThemeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $themeManagerMock;
+    private $themeManager;
+
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var PageTemplatesManager */
     private $pageTemplatesManager;
 
-    /** @var Translator */
-    private $translatorMock;
-
     protected function setUp(): void
     {
-        $this->themeManagerMock = $this->createMock(ThemeManager::class);
-        $this->translatorMock = $this->createMock(Translator::class);
+        $this->themeManager = $this->createMock(ThemeManager::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
-        $this->pageTemplatesManager = new PageTemplatesManager($this->themeManagerMock, $this->translatorMock);
+        $this->pageTemplatesManager = new PageTemplatesManager($this->themeManager, $this->translator);
     }
 
     /**
@@ -32,11 +32,11 @@ class PageTemplatesManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetRoutePageTemplates(array $themes, array $expected)
     {
-        $this->themeManagerMock->expects($this->once())
+        $this->themeManager->expects($this->once())
             ->method('getAllThemes')
             ->willReturn($themes);
 
-        $this->translatorMock->expects($this->exactly(2))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
             ->willReturnArgument(0);
 

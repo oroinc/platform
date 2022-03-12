@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,7 +20,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);

@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Form\Type\CheckboxType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\LocaleBundle\Form\DataTransformer\FallbackValueTransformer;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackValueType;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\OroRichTextTypeStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\TextTypeStub;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -24,23 +22,24 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FallbackValueTypeTest extends FormIntegrationTestCase
 {
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $translator = $this->createMock(Translator::class);
-
         return [
             new PreloadedExtension(
                 [
-                    new FallbackPropertyType($translator),
+                    new FallbackPropertyType($this->createMock(TranslatorInterface::class)),
                     TextType::class => new TextTypeStub(),
                     OroRichTextType::class => new OroRichTextTypeStub()
                 ],
                 [
-                    FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                    FormType::class => [new TooltipFormExtensionStub($this)]
                 ]
             ),
             new ValidatorExtension(Validation::createValidator())
@@ -49,20 +48,13 @@ class FallbackValueTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $options
-     * @param mixed $defaultData
-     * @param array $viewData
-     * @param mixed $submittedData
-     * @param mixed $expectedData
-     * @param array $expectedOptions
      */
     public function testSubmit(
         array $options,
-        $defaultData,
+        mixed $defaultData,
         array $viewData,
-        $submittedData,
-        $expectedData,
+        ?array $submittedData,
+        mixed $expectedData,
         array $expectedOptions
     ) {
         $form = $this->factory->create(FallbackValueType::class, $defaultData, $options);

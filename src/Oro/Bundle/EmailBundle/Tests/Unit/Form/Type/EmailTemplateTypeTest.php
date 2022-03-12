@@ -11,16 +11,14 @@ use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType;
 use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Asset\Context\ContextInterface;
@@ -28,11 +26,10 @@ use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
@@ -55,7 +52,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
         $entityProvider = $this->createMock(EntityProvider::class);
         $entityProvider->expects($this->any())
@@ -64,44 +61,46 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
                 ['name' => \stdClass::class, 'label' => \stdClass::class . '_label'],
                 ['name' => \stdClass::class . '_new', 'label' => \stdClass::class . '_new_label'],
             ]);
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $translator = $this->createMock(Translator::class);
+
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);
-
-        $configManager = $this->createMock(ConfigManager::class);
 
         $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
         $htmlTagProvider->expects($this->any())
             ->method('getAllowedElements')
             ->willReturn(['br', 'a']);
 
-        $htmlTagHelper = new HtmlTagHelper($htmlTagProvider);
-
-        $context = $this->createMock(ContextInterface::class);
-
         return [
             new PreloadedExtension(
                 [
-                    EmailTemplateType::class => $this->type,
+                    $this->type,
                     new EntityChoiceType($entityProvider),
                     new Select2ChoiceType(),
                     new EmailTemplateTranslationCollectionType(),
-
-                    new EmailTemplateTranslationType(
-                        $translator,
-                        $this->localizationManager
-                    ),
-                    OroRichTextType::class =>
-                        new OroRichTextType($configManager, $htmlTagProvider, $context, $htmlTagHelper),
+                    new EmailTemplateTranslationType($translator, $this->localizationManager),
+                    new OroRichTextType(
+                        $this->createMock(ConfigManager::class),
+                        $htmlTagProvider,
+                        $this->createMock(ContextInterface::class),
+                        new HtmlTagHelper($htmlTagProvider)
+                    )
                 ],
                 [
-                    FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                    FormType::class => [new TooltipFormExtensionStub($this)],
                 ]
             ),
             new ValidatorExtension(Validation::createValidator()),
         ];
+    }
+
+    private function getLocalization(int $id): Localization
+    {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+
+        return $localization;
     }
 
     public function testConfigureOptions()
@@ -145,11 +144,8 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
      */
     public function submitDataProvider(): array
     {
-        /** @var Localization $localizationA */
-        $localizationA = $this->getEntity(Localization::class, ['id' => 1]);
-
-        /** @var Localization $localizationB */
-        $localizationB = $this->getEntity(Localization::class, ['id' => 42]);
+        $localizationA = $this->getLocalization(1);
+        $localizationB = $this->getLocalization(42);
 
         $localizations = [
             $localizationA->getId() => $localizationA,
