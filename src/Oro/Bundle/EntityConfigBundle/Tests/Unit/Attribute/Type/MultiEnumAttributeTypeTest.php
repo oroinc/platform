@@ -63,8 +63,8 @@ class MultiEnumAttributeTypeTest extends AttributeTypeTestCase
 
         $this->assertSame(
             [
-                self::FIELD_NAME . '_id1' => 1,
-                self::FIELD_NAME . '_id2' => 1
+                self::FIELD_NAME . '_enum.id1' => 1,
+                self::FIELD_NAME . '_enum.id2' => 1
             ],
             $this->getAttributeType()->getFilterableValue($this->attribute, [$value1, $value2], $this->localization)
         );

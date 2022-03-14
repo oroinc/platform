@@ -52,6 +52,7 @@ services:
             - '@oro_entity.entity_name_resolver'
             - '@event_dispatcher'
             - '@oro_ui.html_tag_helper'
+            - '@oro_search.formatter.datetime_formatter'
 
     oro_search.text_filtered_mapper:
         class: Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper

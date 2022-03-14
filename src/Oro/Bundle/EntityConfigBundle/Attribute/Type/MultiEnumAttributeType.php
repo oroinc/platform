@@ -50,7 +50,7 @@ class MultiEnumAttributeType extends EnumAttributeType
         foreach ($originalValue as $enum) {
             $this->ensureSupportedType($enum);
 
-            $key = sprintf('%s_%s', $attribute->getFieldName(), $enum->getId());
+            $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $enum->getId());
 
             $value[$key] = 1;
         }

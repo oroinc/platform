@@ -61,28 +61,52 @@ class NormalizeSearchAggregatedData implements ProcessorInterface
     ): array {
         foreach ($aggregatedData as $name => $value) {
             if (isset($dataTypes[$name]) && SearchQuery::TYPE_DATETIME === $dataTypes[$name]) {
-                if (\is_array($value)) {
-                    // "count" aggregation
-                    foreach ($value as $k => $v) {
-                        $val = $v['value'];
-                        if (\is_numeric($val)) {
-                            $value[$k]['value'] = $this->normalizeDateTime($val, $normalizationContext);
-                        }
-                    }
-                    $aggregatedData[$name] = $value;
-                } elseif (\is_numeric($value)) {
-                    $aggregatedData[$name] = $this->normalizeDateTime($value, $normalizationContext);
-                }
+                $aggregatedData[$name] = $this->normalizeDateTimeValue($value, $normalizationContext);
             }
         }
 
         return $aggregatedData;
     }
 
-    private function normalizeDateTime(float|int $timestamp, array $normalizationContext): ?string
+    private function normalizeDateTimeValue(mixed $value, array $normalizationContext)
+    {
+        if (\is_array($value)) {
+            // "count" aggregation
+            foreach ($value as $k => $v) {
+                $val = $v['value'];
+                if (\is_numeric($val)) {
+                    $value[$k]['value'] = $this->normalizeTimestampDateTime($val, $normalizationContext);
+                } elseif (\is_string($val)) {
+                    $value[$k]['value'] = $this->normalizeStringDateTime($val, $normalizationContext);
+                }
+            }
+            return $value;
+        }
+
+        if (\is_numeric($value)) {
+            return $this->normalizeTimestampDateTime($value, $normalizationContext);
+        }
+
+        if (\is_string($value)) {
+            return $this->normalizeStringDateTime($value, $normalizationContext);
+        }
+
+        return $value;
+    }
+
+    private function normalizeTimestampDateTime(float|int $timestamp, array $normalizationContext): ?string
     {
         return $this->valueTransformer->transformValue(
             new \DateTime('@' . $timestamp),
+            DataType::DATETIME,
+            $normalizationContext
+        );
+    }
+
+    private function normalizeStringDateTime(string $dateTime, array $normalizationContext): ?string
+    {
+        return $this->valueTransformer->transformValue(
+            new \DateTime($dateTime, new \DateTimeZone('UTC')),
             DataType::DATETIME,
             $normalizationContext
         );
