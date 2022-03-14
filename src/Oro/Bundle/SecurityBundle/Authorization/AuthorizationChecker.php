@@ -39,15 +39,15 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *                          string in format "permission;descriptor"
      *                          (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                          or something else, it depends on registered security voters
-     * @param mixed $object     A domain object, object identity or object identity descriptor (id:type)
+     * @param mixed $subject    A domain object, object identity or object identity descriptor (id:type)
      *                          (entity:Acme/DemoBundle/Entity/AcmeEntity, action:some_action)
      *
      * @return bool
      */
-    public function isGranted($attribute, $object = null)
+    public function isGranted($attribute, $subject = null)
     {
         if (\is_string($attribute) && !empty($attribute) && $annotation = $this->getAnnotation($attribute)) {
-            if (null === $object) {
+            if (null === $subject) {
                 $this->logger->debug(
                     sprintf('Check class based an access using "%s" ACL annotation.', $annotation->getId())
                 );
@@ -61,24 +61,24 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 );
                 $isGranted = $this->authorizationChecker->isGranted(
                     $annotation->getPermission(),
-                    $object
+                    $subject
                 );
             }
-        } elseif (\is_string($object)) {
+        } elseif (\is_string($subject)) {
             $isGranted = $this->authorizationChecker->isGranted(
                 $attribute,
-                $this->tryGetObjectIdentity($object) ?? $object
+                $this->tryGetObjectIdentity($subject) ?? $subject
             );
         } else {
-            if (null === $object && \is_string($attribute)) {
+            if (null === $subject && \is_string($attribute)) {
                 $delimiter = strpos($attribute, ';');
                 if ($delimiter) {
-                    $object = substr($attribute, $delimiter + 1);
+                    $subject = substr($attribute, $delimiter + 1);
                     $attribute = substr($attribute, 0, $delimiter);
                 }
             }
 
-            $isGranted = $this->authorizationChecker->isGranted($attribute, $object);
+            $isGranted = $this->authorizationChecker->isGranted($attribute, $subject);
         }
 
         return $isGranted;

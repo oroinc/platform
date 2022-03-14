@@ -357,8 +357,8 @@ oro:
         load_more_emails:         "%quantity% older messages"
 
         emailuser:
-            entity_label:             Email-User Relation
-            entity_plural_label:      Email-User Relations
+            entity_label:             User Emails
+            entity_plural_label:      User Emails
             entity_grid_all_view_label: All %entity_plural_label%
             email.label:              Email
             email.aria_label:         "Opens a default email client to write an email to %email%"
@@ -372,6 +372,7 @@ oro:
             folders.label:            Folders
             origin.label:             Email Origin
             unsynced_flag_count.label: Unsynced Flag Count
+            is_email_private.label:   Determinates if the email public or private
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
@@ -436,6 +437,9 @@ oro:
                 full: There was an issue when switching a folder during email synchronization. Please check the synced folders on the <a href="%settings_url%">connection settings</a> page.
                 short: There was an issue when switching a folder during email synchronization. Please check the synced folders.
             sync: There was an issue with email synchronization. Please contact your administrator.
+
+        permission:
+            view_private.label: View private
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

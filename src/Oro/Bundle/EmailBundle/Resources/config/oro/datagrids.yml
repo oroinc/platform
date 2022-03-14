@@ -251,9 +251,6 @@ datagrids:
     user-email-grid:
         extends: email-grid
         extended_entity_name: 'Oro\Bundle\EmailBundle\Entity\EmailUser'
-        source:
-            skip_acl_apply: true
-
         properties:
             id: ~
             view_thread_link:
@@ -313,7 +310,6 @@ datagrids:
     dashboard-recent-emails-grid:
         source:
             type: orm
-            skip_acl_apply: true
             query:
                 select:
                     - eu.id AS id

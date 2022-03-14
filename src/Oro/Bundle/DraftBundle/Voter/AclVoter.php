@@ -5,10 +5,7 @@ namespace Oro\Bundle\DraftBundle\Voter;
 use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
-use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter as BaseAclVoter;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
+use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterDecorator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -17,7 +14,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  *
  * Note that other permissions do not change! This class should not implement other logic.
  */
-class AclVoter implements AclVoterInterface
+class AclVoter extends AclVoterDecorator
 {
     private const IGNORED_PERMISSIONS = [
         BasicPermission::VIEW,
@@ -26,56 +23,14 @@ class AclVoter implements AclVoterInterface
     ];
 
     /**
-     * @var BaseAclVoter
+     * {@inheritDoc}
      */
-    private $voter;
-
-    public function __construct(BaseAclVoter $voter)
+    public function vote(TokenInterface $token, $subject, array $attributes): int
     {
-        $this->voter = $voter;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function vote(TokenInterface $token, $object, array $attributes): int
-    {
-        if ($object instanceof DraftableInterface && DraftHelper::isDraft($object)) {
+        if ($subject instanceof DraftableInterface && DraftHelper::isDraft($subject)) {
             $attributes = array_diff($attributes, self::IGNORED_PERMISSIONS);
         }
 
-        return $this->voter->vote($token, $object, $attributes);
-    }
-
-    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
-    {
-        $this->voter->addOneShotIsGrantedObserver($observer);
-    }
-
-    public function getSecurityToken(): TokenInterface
-    {
-        return $this->voter->getSecurityToken();
-    }
-
-    public function getAclExtension(): AclExtensionInterface
-    {
-        return $this->voter->getAclExtension();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getObject()
-    {
-        return $this->voter->getObject();
-    }
-
-    /**
-     * @param int $mask
-     * @param int $accessLevel
-     */
-    public function setTriggeredMask($mask, $accessLevel): void
-    {
-        $this->voter->setTriggeredMask($mask, $accessLevel);
+        return parent::vote($token, $subject, $attributes);
     }
 }

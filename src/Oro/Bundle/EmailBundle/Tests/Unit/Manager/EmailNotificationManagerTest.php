@@ -15,6 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
@@ -66,7 +67,8 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             $doctrine,
             $htmlTagHelper,
             $urlGenerator,
-            $configManager
+            $configManager,
+            $this->createMock(AclHelper::class)
         );
     }
 

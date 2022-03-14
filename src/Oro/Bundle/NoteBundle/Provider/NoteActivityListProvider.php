@@ -43,6 +43,9 @@ class NoteActivityListProvider implements
         $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicableTarget($entityClass, $accessible = true)
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
@@ -52,8 +55,10 @@ class NoteActivityListProvider implements
         );
     }
 
-    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
-    public function getRoutes($activityEntity): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoutes($entity): array
     {
         return [
             'itemView'   => 'oro_note_widget_info',
@@ -63,6 +68,7 @@ class NoteActivityListProvider implements
     }
 
     /**
+     * {@inheritdoc}
      * @param Note $entity
      */
     public function getSubject($entity): string
@@ -70,13 +76,16 @@ class NoteActivityListProvider implements
         return $this->truncate(\strip_tags((string)$entity->getMessage()), 100);
     }
 
-    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
+    /**
+     * {@inheritdoc}
+     */
     public function getDescription($entity): ?string
     {
         return null;
     }
 
     /**
+     * {@inheritdoc}
      * @param Note $entity
      */
     public function getOwner($entity): ?User
@@ -85,6 +94,7 @@ class NoteActivityListProvider implements
     }
 
     /**
+     * {@inheritdoc}
      * @param Note $entity
      */
     public function getUpdatedBy($entity): ?User
@@ -93,6 +103,7 @@ class NoteActivityListProvider implements
     }
 
     /**
+     * {@inheritdoc}
      * @param Note $entity
      */
     public function getCreatedAt($entity): ?\DateTime
@@ -101,6 +112,7 @@ class NoteActivityListProvider implements
     }
 
     /**
+     * {@inheritdoc}
      * @param Note $entity
      */
     public function getUpdatedAt($entity): ?\DateTime
@@ -108,28 +120,42 @@ class NoteActivityListProvider implements
         return $entity->getUpdatedAt();
     }
 
-    /** @SuppressWarnings(PHPMD.UnusedFormalParameter) */
-    public function getData(ActivityList $activityListEntity): array
+    /**
+     * {@inheritdoc}
+     */
+    public function getData(ActivityList $activityList): array
     {
         return [];
     }
 
-    /** @param Note $activityEntity */
-    public function getOrganization($activityEntity): ?Organization
+    /**
+     * {@inheritdoc}
+     * @param Note $entity
+     */
+    public function getOrganization($entity): ?Organization
     {
-        return $activityEntity->getOrganization();
+        return $entity->getOrganization();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getTemplate(): string
     {
         return '@OroNote/Note/js/activityItemTemplate.html.twig';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getActivityId($entity)
     {
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isApplicable($entity): bool
     {
         if (\is_object($entity)) {
@@ -139,16 +165,27 @@ class NoteActivityListProvider implements
         return $entity === Note::class;
     }
 
+    /**
+     * {@inheritdoc}
+     * @param Note $entity
+     */
     public function getTargetEntities($entity): array
     {
         return $entity->getActivityTargets();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function isCommentsEnabled($entityClass): bool
     {
         return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
+    /**
+     * {@inheritdoc}
+     * @param Note $entity
+     */
     public function getActivityOwners($entity, ActivityList $activityList): array
     {
         $organization = $this->getOrganization($entity);
@@ -162,7 +199,16 @@ class NoteActivityListProvider implements
         $activityOwner->setActivity($activityList);
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
+
         return [$activityOwner];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return true;
     }
 
     protected function truncate(string $string, int $length, string $etc = '...'): string

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
@@ -320,7 +320,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetUpdatedActivityList()
     {
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(ActivityListRepository::class);
 
         $activityEntity = new ActivityList();
@@ -352,6 +352,47 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $result = $provider->getUpdatedActivityList($testEntity, $em);
         $this->assertEquals('update', $result->getVerb());
         $this->assertEquals('testSubject', $result->getSubject());
+    }
+
+
+    public function testGetNewActivityList()
+    {
+        $testEntity = new \stdClass();
+        $testEntity->id = 123;
+        $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
+        $testEntity->owner = new User();
+        $testEntity->updatedBy = new User();
+
+        $targetEntity = new \stdClass();
+
+        $this->testActivityProvider->setTargets([$targetEntity]);
+        $this->doctrineHelper->expects(self::exactly(3))
+            ->method('getEntityClass')
+            ->withConsecutive(
+                [self::identicalTo($testEntity)],
+                [self::identicalTo($testEntity)],
+                [self::identicalTo($targetEntity)]
+            )
+            ->willReturnCallback(function ($entity) use ($testEntity) {
+                return $entity === $testEntity
+                    ? self::TEST_ACTIVITY_CLASS
+                    : get_class($entity);
+            });
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifier')
+            ->with(self::identicalTo($testEntity))
+            ->willReturn($testEntity->id);
+
+        $provider = $this->getActivityListChainProvider();
+        $result = $provider->getNewActivityList($testEntity);
+        $this->assertEquals(ActivityList::VERB_CREATE, $result->getVerb());
+        $this->assertEquals($testEntity->subject, $result->getSubject());
+        $this->assertEquals($testEntity->description, $result->getDescription());
+        $this->assertSame($testEntity->owner, $result->getOwner());
+        $this->assertSame($testEntity->updatedBy, $result->getUpdatedBy());
+        $this->assertEquals(self::TEST_ACTIVITY_CLASS, $result->getRelatedActivityClass());
+        $this->assertEquals($testEntity->id, $result->getRelatedActivityId());
     }
 
     public function testGetSupportedOwnerActivities()
