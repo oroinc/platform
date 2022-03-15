@@ -6,11 +6,16 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
+use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Entity repository for {@see Email} entity.
+ */
 class EmailRepository extends EntityRepository
 {
     /**
@@ -39,7 +44,43 @@ class EmailRepository extends EntityRepository
 
     /**
      * Get $limit last emails
-     * todo: BAP-11456 Move method getNewEmails from EmailRepository to EmailUserRepository
+     *
+     * @param User         $user
+     * @param Organization $organization
+     * @param int          $limit
+     * @param int|null     $folderId
+     * @param AclHelper|null $aclHelper
+     *
+     * @return array
+     */
+    public function getNewEmailsWithAcl(
+        User $user,
+        Organization $organization,
+        $limit,
+        $folderId,
+        AclHelper $aclHelper = null
+    ) {
+        $qb = $this->getEmailList($user, $organization, $limit, $folderId, false);
+        $query = $qb->getQuery();
+        if ($aclHelper) {
+            $query = $aclHelper->apply($query);
+        }
+        $newEmails = $query->getResult();
+        if (count($newEmails) < $limit) {
+            $qb = $this->getEmailList($user, $organization, $limit - count($newEmails), $folderId, true);
+            $query = $qb->getQuery();
+            if ($aclHelper) {
+                $query = $aclHelper->apply($query);
+            }
+            $seenEmails = $query->getResult();
+            $newEmails = array_merge($newEmails, $seenEmails);
+        }
+
+        return $newEmails;
+    }
+
+    /**
+     * Get $limit last emails
      *
      * @param User         $user
      * @param Organization $organization
@@ -50,15 +91,7 @@ class EmailRepository extends EntityRepository
      */
     public function getNewEmails(User $user, Organization $organization, $limit, $folderId)
     {
-        $qb = $this->getEmailList($user, $organization, $limit, $folderId, false);
-        $newEmails = $qb->getQuery()->getResult();
-        if (count($newEmails) < $limit) {
-            $qb = $this->getEmailList($user, $organization, $limit - count($newEmails), $folderId, true);
-            $seenEmails = $qb->getQuery()->getResult();
-            $newEmails = array_merge($newEmails, $seenEmails);
-        }
-
-        return $newEmails;
+        return $this->getNewEmailsWithAcl($user, $organization, $limit, $folderId);
     }
 
     /**
@@ -67,11 +100,16 @@ class EmailRepository extends EntityRepository
      * @param User         $user
      * @param Organization $organization
      * @param int|null     $folderId
+     * @param AclHelper|null $aclHelper
      *
      * @return mixed
      */
-    public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
-    {
+    public function getCountNewEmailsWithAcl(
+        User $user,
+        Organization $organization,
+        $folderId = null,
+        AclHelper $aclHelper = null
+    ) {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('COUNT(DISTINCT IDENTITY(eu.email))')
             ->from('OroEmailBundle:EmailUser', 'eu')
@@ -87,7 +125,29 @@ class EmailRepository extends EntityRepository
                 ->setParameter('folderId', $folderId);
         }
 
-        return $qb->getQuery()->getSingleScalarResult();
+        $query = $qb->getQuery();
+        if ($aclHelper) {
+            $query = $aclHelper->apply($query);
+        }
+
+        return $query->getSingleScalarResult();
+    }
+
+    /**
+     * Get count new emails
+     *
+     * @param User         $user
+     * @param Organization $organization
+     * @param int|null     $folderId
+     *
+     * @return mixed
+     */
+    public function getCountNewEmails(
+        User $user,
+        Organization $organization,
+        $folderId = null
+    ) {
+        return $this->getCountNewEmailsWithAcl($user, $organization, $folderId);
     }
 
     /**
@@ -254,6 +314,34 @@ class EmailRepository extends EntityRepository
                 ->setParameter('hasOwner', true),
         ];
     }
+
+    public function getEmailsByEmailAddress(string $emailAddress): array
+    {
+        return $this->createQueryBuilder('e')
+            ->join('e.recipients', 'r')
+            ->join('r.emailAddress', 'rea')
+            ->join('e.fromEmailAddress', 'fea')
+            ->where('fea.email = :email OR rea.email = :email')
+            ->setParameter('email', $emailAddress)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function isEmailPublic(int $emailId): bool
+    {
+        $rows = $this->_em->createQueryBuilder()
+            ->select('eu')
+            ->from(EmailUser::class, 'eu')
+            ->where('eu.isEmailPrivate != true')
+            ->andWhere('eu.email = :email')
+            ->setParameter('email', $emailId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+
+        return !empty($rows);
+    }
+
 
     /**
      * @param User         $user

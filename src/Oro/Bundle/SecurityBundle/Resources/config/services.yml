@@ -374,6 +374,13 @@ services:
             - '@oro_security.token_accessor'
             - '@oro_security.orm.ownership_sql_walker_builder'
             - '@oro_security.owner.metadata_provider.chain'
+        calls:
+            - [setAclHelperConditionProvider, ['@oro_security.search.acl_helper.condition_provider']]
+
+    oro_security.search.acl_helper.condition_provider:
+        class: Oro\Bundle\SecurityBundle\Search\SearchAclHelperConditionProvider
+        arguments:
+            - !tagged_iterator oro_security.acl_helper.condition
 
     oro_security.orm.ownership_sql_walker_builder:
         public: false

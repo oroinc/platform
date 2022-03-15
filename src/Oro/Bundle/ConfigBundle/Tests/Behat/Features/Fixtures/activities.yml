@@ -13,7 +13,7 @@ Oro\Bundle\EmailBundle\Entity\EmailBody:
     bodyIsText: true
 
 Oro\Bundle\EmailBundle\Entity\EmailUser:
-  adminEmailUser{1..2}:
+  adminEmailUser{1..26}:
     email: '@email<current()>'
     receivedAt: '<dateTimeBetween("-200 days", "now")>'
     owner: '@admin'
@@ -28,4 +28,4 @@ Oro\Bundle\EmailBundle\Entity\Email:
     fromEmailAddress: '@charlieAddress'
     internalDate: '<dateTimeBetween($subject, $subject)>'
     messageId: fsdfasdf
-    emailUsers: ['@adminEmailUser1']
+    emailUsers: ['@adminEmailUser<current()>']

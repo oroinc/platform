@@ -6,14 +6,14 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
- * Class EmailNotificationManager
- * @package Oro\Bundle\EmailBundle\Manager
+ * Provides information about new emails.
  */
 class EmailNotificationManager
 {
@@ -29,6 +29,9 @@ class EmailNotificationManager
     /** @var EntityManager */
     protected $em;
 
+    /** @var AclHelper */
+    private $aclHelper;
+
     public function __construct(
         EntityManager $entityManager,
         HtmlTagHelper $htmlTagHelper,
@@ -41,6 +44,11 @@ class EmailNotificationManager
         $this->configManager = $configManager;
     }
 
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
+    }
+
     /**
      * @param User         $user
      * @param Organization $organization
@@ -51,12 +59,8 @@ class EmailNotificationManager
      */
     public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
     {
-        $emails = $this->em->getRepository('OroEmailBundle:Email')->getNewEmails(
-            $user,
-            $organization,
-            $maxEmailsDisplay,
-            $folderId
-        );
+        $emails = $this->em->getRepository(Email::class)
+            ->getNewEmailsWithAcl($user, $organization, $maxEmailsDisplay, $folderId, $this->aclHelper);
 
         $emailsData = [];
         /** @var $email Email */
@@ -96,7 +100,8 @@ class EmailNotificationManager
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->em->getRepository('OroEmailBundle:Email')->getCountNewEmails($user, $organization, $folderId);
+        return $this->em->getRepository(Email::class)
+            ->getCountNewEmailsWithAcl($user, $organization, $folderId, $this->aclHelper);
     }
 
     /**

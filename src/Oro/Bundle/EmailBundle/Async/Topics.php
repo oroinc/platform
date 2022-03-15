@@ -18,4 +18,10 @@ class Topics
     const SYNC_EMAIL_SEEN_FLAG = 'oro.email.sync_email_seen_flag';
     const PURGE_EMAIL_ATTACHMENTS = 'oro.email.purge_email_attachments';
     const PURGE_EMAIL_ATTACHMENTS_BY_IDS = 'oro.email.purge_email_attachments_by_ids';
+    const RECALCULATE_EMAIL_VISIBILITY = 'oro.email.recalculate_email_visibility';
+    const UPDATE_VISIBILITIES = 'oro.email.update_visibilities';
+    const UPDATE_VISIBILITIES_FOR_ORGANIZATION = 'oro.email.update_visibilities_for_organization';
+    const UPDATE_EMAIL_VISIBILITIES_FOR_ORGANIZATION = 'oro.email.update_email_visibilities_for_organization';
+    const UPDATE_EMAIL_VISIBILITIES_FOR_ORGANIZATION_CHUNK =
+        'oro.email.update_email_visibilities_for_organization_chunk';
 }

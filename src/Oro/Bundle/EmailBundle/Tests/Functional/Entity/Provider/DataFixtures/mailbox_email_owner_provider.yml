@@ -1,0 +1,29 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+
+Oro\Bundle\OrganizationBundle\Entity\Organization:
+    another_organization:
+        name: 'Another Organization'
+        enabled: true
+
+Oro\Bundle\EmailBundle\Entity\Mailbox:
+    mailbox1:
+        label: 'John Smith'
+        email: 'john.smith@example.com'
+        organization: '@organization'
+    mailbox2:
+        label: 'Nancy Sallee'
+        email: 'test@example.com'
+        organization: '@organization'
+    mailbox3:
+        label: 'Jane Smith'
+        email: 'jane.smith@example.com'
+        organization: '@organization'
+    mailbox4:
+        label: 'Charlie Smith'
+        email: 'charlie.smith@example.com'
+        organization: '@another_organization'
+    mailbox5:
+        label: 'Nancy Smith'
+        email: 'nancy.smith@example.com'
+        organization: '@another_organization'

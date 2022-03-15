@@ -2,6 +2,13 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## 4.2.10
+
+### Changed
+
+#### EmailBundle
+* Added `getOrganizations()` and `getEmails()` methods to `Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface`.
+
 ## 4.2.4
 
 ### Added

@@ -13,6 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
@@ -50,6 +51,8 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
     /** @var EmailAddress[] */
     protected $newEmailAddresses = [];
 
+    private $processedAddresses = [];
+
     public function __construct(
         MessageProducerInterface $producer,
         ContainerInterface $container
@@ -68,7 +71,8 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
             'oro_email.email.thread.manager' => EmailThreadManager::class,
             'oro_email.email.activity.manager' => EmailActivityManager::class,
             'oro_email.model.email_activity_updates' => EmailActivityUpdates::class,
-            'oro_email.email.address.manager' => EmailAddressManager::class
+            'oro_email.email.address.manager' => EmailAddressManager::class,
+            'oro_email.email_address_visibility.manager' => EmailAddressVisibilityManager::class
         ];
     }
 
@@ -83,7 +87,10 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
 
         $emailOwnerManager = $this->getEmailOwnerManager();
         $emailAddressData = $emailOwnerManager->createEmailAddressData($uow);
-        [$updatedEmailAddresses, $created] = $emailOwnerManager->handleChangedAddresses($emailAddressData);
+        [$updatedEmailAddresses, $created, $processedAddresses] = $emailOwnerManager->handleChangedAddresses(
+            $emailAddressData
+        );
+        $this->processedAddresses = array_merge($this->processedAddresses, $processedAddresses);
         foreach ($updatedEmailAddresses as $emailAddress) {
             $this->computeEntityChangeSet($em, $emailAddress);
         }
@@ -144,6 +151,11 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
 
             $this->emailsToRemove = [];
             $em->flush();
+        }
+
+        if ($this->processedAddresses) {
+            $this->getEmailAddressVisibilityManager()->collectEmailAddresses($this->processedAddresses);
+            $this->processedAddresses = [];
         }
     }
 
@@ -228,6 +240,11 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         if ($flush) {
             $em->flush();
         }
+    }
+
+    private function getEmailAddressVisibilityManager(): EmailAddressVisibilityManager
+    {
+        return $this->container->get('oro_email.email_address_visibility.manager');
     }
 
     protected function getEmailOwnerManager(): EmailOwnerManager

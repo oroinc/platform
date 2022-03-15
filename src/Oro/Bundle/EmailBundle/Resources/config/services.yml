@@ -160,6 +160,7 @@ services:
             - { name: container.service_subscriber, id: oro_email.email.activity.manager }
             - { name: container.service_subscriber, id: oro_email.model.email_activity_updates }
             - { name: container.service_subscriber, id: oro_email.email.address.manager }
+            - { name: container.service_subscriber, id: oro_email.email_address_visibility.manager }
 
     oro_email.listener.auto_response_listener:
         class: Oro\Bundle\EmailBundle\EventListener\AutoResponseListener
@@ -263,6 +264,55 @@ services:
             - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.async.recalculate_email_visibility:
+        class: Oro\Bundle\EmailBundle\Async\RecalculateEmailVisibilityProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_email.email_address_visibility.manager'
+            - '@oro_activity_list.provider.chain'
+            - '@logger'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_email.async.update_visibilities:
+        class: Oro\Bundle\EmailBundle\Async\UpdateVisibilitiesProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.runner'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_email.async.update_visibilities_for_organization:
+        class: Oro\Bundle\EmailBundle\Async\UpdateVisibilitiesForOrganizationProcessor
+        arguments:
+            - '@oro_email.email_address_visibility.manager'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_email.async.update_email_visibilities_for_organization:
+        class: Oro\Bundle\EmailBundle\Async\UpdateEmailVisibilitiesForOrganizationProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+
+    oro_email.async.update_email_visibilities_for_organization_chunk:
+        class: Oro\Bundle\EmailBundle\Async\UpdateEmailVisibilitiesForOrganizationChunkProcessor
+        arguments:
+            - '@doctrine'
+            - '@oro_email.email_address_visibility.manager'
+            - '@oro_message_queue.job.runner'
+            - '@logger'
+        tags:
+            - { name: oro_message_queue.client.message_processor }
 
     oro_email.manager.autoresponserule.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -662,6 +712,19 @@ services:
             - '@oro_email.email.owner.provider.storage'
             - '%oro_email.email_sync_exclusions%'
 
+    oro_email.public_email_owner_provider:
+        class: Oro\Bundle\EmailBundle\Entity\Provider\PublicEmailOwnerProvider
+        arguments:
+            - '%oro_email.public_email_owners%'
+
+    oro_email.email_address_visibility.manager:
+        class: Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager
+        arguments:
+            - '@oro_email.email.owner.provider'
+            - '@doctrine'
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_email.public_email_owner_provider'
+
     oro_email.email.activity.manager:
         class: Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager
         arguments:
@@ -862,6 +925,27 @@ services:
         tags:
             - { name: security.voter }
 
+    oro_email.acl.voter.acl_voter:
+        class: Oro\Bundle\EmailBundle\Acl\Voter\AclVoter
+        decorates: oro_security.acl.voter.basic_permissions
+        arguments:
+            - '@oro_email.acl.voter.acl_voter.inner'
+
+    oro_email.acl.access_rule.email_user:
+        class: Oro\Bundle\EmailBundle\Acl\AccessRule\EmailUserAccessRule
+        public: false
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+        tags:
+            - { name: oro_security.access_rule, entityClass: Oro\Bundle\EmailBundle\Entity\EmailUser, permission: VIEW }
+
+    oro_email.acl.search.acl_helper_condition:
+        class: Oro\Bundle\EmailBundle\Acl\Search\SearchAclHelperCondition
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+        tags:
+            - { name: oro_security.acl_helper.condition }
+
     oro_email.entity_alias_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
         arguments:
@@ -934,6 +1018,8 @@ services:
             - '@oro_ui.html_tag_helper'
             - '@router'
             - '@oro_entity_config.config_manager'
+        calls:
+            - [setAclHelper, ['@oro_security.acl_helper']]
 
     Oro\Bundle\EmailBundle\Manager\EmailNotificationManager:
         alias: 'oro_email.manager.notification'
@@ -1214,6 +1300,8 @@ services:
         arguments:
             - '@oro_email.async.manager.association_manager'
         calls:
+            - [setDoctrine, ['@doctrine']]
+            - [setEmailAddressVisibilityManager, ['@oro_email.email_address_visibility.manager']]
             # this listener is disabled to prevent a lot of UpdateEmailAssociations messages
             - [disableListener, ['oro_email.listener.entity_listener']]
         tags:
@@ -1278,6 +1366,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@router'
+
     oro_email.form.handler.user_email_config:
          class: 'Oro\Bundle\EmailBundle\Form\Handler\UserEmailConfigHandler'
          public: true
@@ -1317,3 +1406,10 @@ services:
             - [setLogger, ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_email.listener.update_visibility_for_new_email_user:
+        class: Oro\Bundle\EmailBundle\EventListener\UpdateVisibilityForNewEmailUserListener
+        arguments:
+            - '@oro_email.email_address_visibility.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_email.email_user_added, method: onEmailUserAdded }

@@ -62,19 +62,19 @@ Feature: Managing users roles
     And I go to System/User Management/Roles
     When I click View Edited test role in grid
     Then the role has following active permissions:
-      | Email-User Relation | View:None | Create:None | Edit:None |
+      | User Emails | View:None | Create:None | Edit:None |
     And I should see "Manage passwords"
     When permission VIEW for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default restricts in application
     And permission CREATE for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default restricts in application
     And capability password_management and group default restricts in application
     And I reload the page
     Then the role has not following permissions:
-      | Email-User Relation | View | Create |
+      | User Emails | View | Create |
     And I should not see "Manage passwords"
     When all permissions for entity Oro\Bundle\EmailBundle\Entity\EmailUser and group default restricts in application
-    And I should see "Email-User Relation"
+    And I should see "User Emails"
     And I reload the page
-    Then I should not see "Email-User Relation"
+    Then I should not see "User Emails"
 
   Scenario: Delete user role
     Given I go to System/User Management/Roles
