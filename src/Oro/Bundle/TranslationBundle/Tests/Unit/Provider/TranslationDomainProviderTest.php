@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var TranslationDomainProvider */
@@ -36,7 +37,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
             ->with(TranslationKey::class)
             ->willReturn($manager);
 
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(CacheInterface::class);
 
         $this->provider = new TranslationDomainProvider($registry, $this->cache);
     }
@@ -50,16 +51,13 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn($domains);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE)
-            ->willReturn(false);
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE, $domains);
+            ->method('get')
+            ->with('availableDomains')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
-        $this->assertEquals($domains, $this->provider->getAvailableDomains());
-
-        //check local cache
         $this->assertEquals($domains, $this->provider->getAvailableDomains());
     }
 
@@ -69,19 +67,11 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->repository->expects($this->never())
             ->method($this->anything());
-
-        $this->cache->expects($this->never())
-            ->method('delete');
-        $this->cache->expects($this->never())
-            ->method('save');
         $this->cache->expects($this->once())
-            ->method('fetch')
-            ->with(TranslationDomainProvider::AVAILABLE_DOMAINS_NODE)
+            ->method('get')
+            ->with('availableDomains')
             ->willReturn($domains);
 
-        $this->assertEquals($domains, $this->provider->getAvailableDomains());
-
-        //check local cache
         $this->assertEquals($domains, $this->provider->getAvailableDomains());
     }
 
@@ -91,7 +81,7 @@ class TranslationDomainProviderTest extends \PHPUnit\Framework\TestCase
         $locales = ['locale1', 'locale2'];
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->willReturn($domains);
 
         $this->assertEquals(

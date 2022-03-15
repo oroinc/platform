@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ScopeBundle\DependencyInjection;
 
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -27,11 +26,7 @@ class OroScopeExtension extends Extension
             $loader->load('services_test.yml');
             // use a memory to cache scopes to avoid influence functional tests to each other
             $symfonyAdapterDefinition = new Definition(ArrayAdapter::class, [0, false]);
-            $doctrineProviderDefinition = new Definition(DoctrineProvider::class, [$symfonyAdapterDefinition]);
-            $doctrineProviderDefinition->setFactory([DoctrineProvider::class, 'wrap'])
-                ->setPublic(false)
-                ->setShared(true);
-            $container->setDefinition('oro_scope.scope_cache', $doctrineProviderDefinition);
+            $container->setDefinition('oro_scope.scope_cache', $symfonyAdapterDefinition);
         }
     }
 }
