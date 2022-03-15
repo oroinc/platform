@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListApplicableProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
@@ -45,6 +46,7 @@ class EmailActivityListProvider implements
     ActivityListProviderInterface,
     ActivityListDateProviderInterface,
     ActivityListGroupProviderInterface,
+    ActivityListApplicableProviderInterface,
     CommentProviderInterface,
     FeatureToggleableInterface
 {
@@ -286,7 +288,12 @@ class EmailActivityListProvider implements
     public function isApplicable($entity)
     {
         if (\is_object($entity)) {
-            return $entity instanceof Email;
+            if (!$entity instanceof Email) {
+                return false;
+            }
+
+            // the activity lists for private emails should not be created.
+            return $this->doctrineHelper->getEntityRepositoryForClass(Email::class)->isEmailPublic($entity->getId());
         }
 
         return $entity === Email::class;
@@ -448,6 +455,11 @@ class EmailActivityListProvider implements
 
         if ($owners) {
             foreach ($owners as $owner) {
+                // the activity lists for private emails should not have owner
+                // to be sure it is not shown at the activity list grid.
+                if ($owner->isEmailPrivate()) {
+                    continue;
+                }
                 if (($owner->getMailboxOwner() && $owner->getOrganization()) ||
                     (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner())) {
                     $activityOwner = new ActivityOwner();
@@ -467,6 +479,14 @@ class EmailActivityListProvider implements
         }
 
         return $activityOwners;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return $activityList->getActivityOwners()->count() > 0;
     }
 
     /**

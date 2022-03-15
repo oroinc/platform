@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
@@ -65,11 +66,11 @@ class EmailOriginHelperTest extends \PHPUnit\Framework\TestCase
         $organization = null;
         $originName = InternalEmailOrigin::BAP;
         $expectedOrigin = new \stdClass();
-        $owner = new \stdClass();
+        $owner = $this->createMock(EmailOwnerInterface::class);
 
         $this->emailOwnerProvider->expects($this->once())
             ->method('findEmailOwners')
-            ->willReturn($owner);
+            ->willReturn([$owner]);
         $entityRepository = $this->createMock(EntityRepository::class);
         $entityRepository->expects($this->once())
             ->method('findOneBy')
@@ -90,11 +91,11 @@ class EmailOriginHelperTest extends \PHPUnit\Framework\TestCase
         $organization = null;
         $originName = InternalEmailOrigin::BAP;
         $expectedOrigin = new \stdClass();
-        $owner = new \stdClass();
+        $owner = $this->createMock(EmailOwnerInterface::class);
 
         $this->emailOwnerProvider->expects($this->exactly(2))
             ->method('findEmailOwners')
-            ->willReturn($owner);
+            ->willReturn([$owner]);
         $entityRepository = $this->createMock(EntityRepository::class);
         $entityRepository->expects($this->exactly(2))
             ->method('findOneBy')

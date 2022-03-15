@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -28,6 +29,9 @@ class EmailNotificationManager
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var AclHelper */
+    private $aclHelper;
+
     public function __construct(
         ManagerRegistry $doctrine,
         HtmlTagHelper $htmlTagHelper,
@@ -38,6 +42,11 @@ class EmailNotificationManager
         $this->htmlTagHelper = $htmlTagHelper;
         $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
+    }
+
+    public function setAclHelper(AclHelper $aclHelper)
+    {
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -52,7 +61,7 @@ class EmailNotificationManager
     {
         $emails = $this->doctrine->getManagerForClass(Email::class)
             ->getRepository(Email::class)
-            ->getNewEmails($user, $organization, $maxEmailsDisplay, $folderId);
+            ->getNewEmailsWithAcl($user, $organization, $maxEmailsDisplay, $folderId, $this->aclHelper);
 
         $emailsData = [];
         /** @var Email $email */
@@ -94,7 +103,7 @@ class EmailNotificationManager
     {
         return $this->doctrine->getManagerForClass(Email::class)
             ->getRepository(Email::class)
-            ->getCountNewEmails($user, $organization, $folderId);
+            ->getCountNewEmailsWithAcl($user, $organization, $folderId, $this->aclHelper);
     }
 
     /**

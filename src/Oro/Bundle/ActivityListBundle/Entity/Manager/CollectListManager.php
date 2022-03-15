@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListApplicableProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 
@@ -16,6 +17,9 @@ class CollectListManager
 {
     /** @var ActivityListChainProvider */
     protected $chainProvider;
+
+    /** @var EntityManager|null */
+    private $entityManager;
 
     public function __construct(ActivityListChainProvider $chainProvider)
     {
@@ -93,11 +97,15 @@ class CollectListManager
     public function processInsertEntities($insertedEntities, EntityManager $entityManager)
     {
         if (!empty($insertedEntities)) {
+            $this->entityManager = $entityManager;
             foreach ($insertedEntities as $entity) {
                 $activityList = $this->chainProvider->getActivityListEntitiesByActivityEntity($entity);
                 if ($activityList) {
-                    $entityManager->persist($activityList);
-                    $this->fillOwners($this->chainProvider->getProviderForEntity($entity), $entity, $activityList);
+                    $activityListProvider = $this->chainProvider->getProviderForEntity($entity);
+                    $this->fillOwners($activityListProvider, $entity, $activityList);
+                    if ($this->isActivityListApplicable($activityListProvider, $activityList)) {
+                        $entityManager->persist($activityList);
+                    }
                 }
             }
 
@@ -118,11 +126,15 @@ class CollectListManager
     public function processFillOwners($entities, EntityManager $entityManager)
     {
         if ($entities) {
+            $this->entityManager = $entityManager;
             foreach ($entities as $entity) {
-                $activityProvider = $this->chainProvider->getProviderForOwnerEntity($entity);
                 $activityList = $this->chainProvider->getActivityListByEntity($entity, $entityManager);
                 if ($activityList) {
-                    $this->fillOwners($activityProvider, $entity, $activityList);
+                    $activityListProvider = $this->chainProvider->getProviderForOwnerEntity($entity);
+                    $this->fillOwners($activityListProvider, $entity, $activityList);
+                    if (!$this->isActivityListApplicable($activityListProvider, $activityList)) {
+                        $entityManager->remove($activityList);
+                    }
                 }
             }
 
@@ -130,6 +142,15 @@ class CollectListManager
         }
 
         return false;
+    }
+
+    private function isActivityListApplicable(
+        ActivityListProviderInterface $provider,
+        ActivityList $activityList
+    ): bool {
+        return $provider instanceof ActivityListApplicableProviderInterface
+            ? $provider->isActivityListApplicable($activityList)
+            : true;
     }
 
     /**
@@ -149,14 +170,13 @@ class CollectListManager
         foreach ($oldActivityOwners as $oldOwner) {
             if (!$oldOwner->isOwnerInCollection($newActivityOwners)) {
                 $activityList->removeActivityOwner($oldOwner);
+                $this->entityManager->remove($oldOwner);
             }
         }
 
-        if ($newActivityOwners) {
-            foreach ($newActivityOwners as $newOwner) {
-                if (!$newOwner->isOwnerInCollection($oldActivityOwners)) {
-                    $activityList->addActivityOwner($newOwner);
-                }
+        foreach ($newActivityOwners as $newOwner) {
+            if (!$newOwner->isOwnerInCollection($oldActivityOwners)) {
+                $activityList->addActivityOwner($newOwner);
             }
         }
     }

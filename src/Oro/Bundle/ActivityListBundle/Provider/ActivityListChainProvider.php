@@ -303,6 +303,17 @@ class ActivityListChainProvider implements ResetInterface
         );
     }
 
+    /**
+     * Tries to create a new instance of activity list entity for the given activity entity.
+     */
+    public function getNewActivityList(object $entity): ?ActivityList
+    {
+        return $this->getActivityListEntityForEntity(
+            $entity,
+            $this->getProviderForEntity($entity)
+        );
+    }
+
     public function getActivityListOption(Config $config): array
     {
         $templates = [];

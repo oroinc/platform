@@ -35,8 +35,15 @@ class LoadEmailActivityData extends AbstractFixture implements DependentFixtureI
         $activityList2->setVerb('create');
         $activityList2->setSubject('test2');
 
+        $activityList3 = new ActivityList();
+        $activityList3->setRelatedActivityClass(Email::class);
+        $activityList3->setRelatedActivityId($this->getReference('third_activity')->getId());
+        $activityList3->setVerb('create');
+        $activityList3->setSubject('test3');
+
         $manager->persist($activityList1);
         $manager->persist($activityList2);
+        $manager->persist($activityList3);
         $manager->flush();
 
         $this->setReference('test_activity_list_1', $activityList1);
