@@ -7,10 +7,7 @@ namespace Oro\Bundle\TranslationBundle\Translation;
  */
 class DebugTranslator extends Translator
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): ?string
     {
         return sprintf(
             $this->getStringFormat($id, $domain, $locale),
@@ -18,13 +15,7 @@ class DebugTranslator extends Translator
         );
     }
 
-    /**
-     * @param string|null $id
-     * @param string|null $domain
-     * @param string|null $locale
-     * @return string
-     */
-    protected function getStringFormat(?string $id, string $domain = null, string $locale = null): string
+    protected function getStringFormat(?string $id, ?string $domain = null, ?string $locale = null): string
     {
         if ($this->hasTrans($id, $domain, $locale)) {
             return '[%s]';

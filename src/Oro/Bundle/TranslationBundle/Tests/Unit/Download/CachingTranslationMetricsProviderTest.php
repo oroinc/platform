@@ -3,15 +3,16 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Download;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider;
 use Oro\Bundle\TranslationBundle\Download\TranslationServiceAdapterInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /** @coversDefaultClass \Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider */
 class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var TranslationServiceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -25,7 +26,7 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->adapter = $this->createMock(TranslationServiceAdapterInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
@@ -46,7 +47,7 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
 
         // once() to check that on subsequent calls to getAll() the populateMetrics() is not called again
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('get')
             ->with(CachingTranslationMetricsProvider::CACHE_KEY)
             ->willReturn($metrics);
 
@@ -66,24 +67,18 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $metrics = OroTranslationServiceAdapterTest::METRICS;
 
-        $this->cache->expects(self::exactly(2))
-            ->method('fetch')
-            ->withConsecutive(
-                [CachingTranslationMetricsProvider::CACHE_KEY],
-                [CachingTranslationMetricsProvider::CACHE_KEY]
-            )
-            ->willReturnOnConsecutiveCalls(
-                false,
-                $metrics
-            );
-
+        $cache2 = $this->createMock(CacheInterface::class);
         $this->cache->expects(self::once())
-            ->method('save')
-            ->with(
-                CachingTranslationMetricsProvider::CACHE_KEY,
-                $metrics,
-                self::anything()
-            );
+            ->method('get')
+            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
+        $cache2->expects(self::once())
+            ->method('get')
+            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->willReturn($metrics);
 
         $this->adapter->expects(self::once())
             ->method('fetchTranslationMetrics')
@@ -93,7 +88,7 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
             $metrics[$languageCode]['lastBuildDate'] = new \DateTime($data['lastBuildDate'], new \DateTimeZone('UTC'));
         }
         $instance1 = new CachingTranslationMetricsProvider($this->adapter, $this->cache, $this->logger);
-        $instance2 = new CachingTranslationMetricsProvider($this->adapter, $this->cache, $this->logger);
+        $instance2 = new CachingTranslationMetricsProvider($this->adapter, $cache2, $this->logger);
 
         $instance1->getAll();
         $instance2->getAll();
@@ -106,6 +101,12 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         $this->adapter->expects(self::once())
             ->method('fetchTranslationMetrics')
             ->willReturn(OroTranslationServiceAdapterTest::METRICS);
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $data = OroTranslationServiceAdapterTest::METRICS['uk_UA'];
         $data['lastBuildDate'] = new \DateTime($data['lastBuildDate'], new \DateTimeZone('UTC'));
@@ -137,6 +138,13 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
             new \DateTimeZone('UTC')
         );
 
+        $this->cache->expects(self::once())
+            ->method('get')
+            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
         $this->adapter->expects(self::any())
             ->method('fetchTranslationMetrics')
             ->willReturn($original);
@@ -153,8 +161,11 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
     public function testFetchMetricsSilentlyLogsTranslationAdapterExceptions(): void
     {
         $this->cache->expects(self::any())
-            ->method('fetch')
-            ->willReturn(false);
+            ->method('get')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
         $adapterException = new \RuntimeException('test message');
         $this->adapter->expects(self::any())
             ->method('fetchTranslationMetrics')

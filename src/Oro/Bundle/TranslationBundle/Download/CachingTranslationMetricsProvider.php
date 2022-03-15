@@ -3,9 +3,10 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Download;
 
-use Doctrine\Common\Cache\Cache;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Provides translation metrics (translation completeness and last build date) using an adapter
@@ -16,7 +17,7 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
     public const CACHE_KEY = 'translation_statistic';
     private const CACHE_TTL = 86400;
 
-    protected Cache $cache;
+    protected CacheInterface $cache;
     protected TranslationServiceAdapterInterface $adapter;
     protected LoggerInterface $logger;
 
@@ -24,7 +25,7 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
 
     public function __construct(
         TranslationServiceAdapterInterface $adapter,
-        Cache $cache,
+        CacheInterface $cache,
         LoggerInterface $logger
     ) {
         $this->adapter = $adapter;
@@ -64,18 +65,16 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
      */
     private function populateMetrics(): void
     {
-        $data = $this->cache->fetch(static::CACHE_KEY);
-
-        if (!\is_array($data)) {
-            $data = $this->fetchMetrics();
-            if (!empty($data)) {
-                $this->cache->save(static::CACHE_KEY, $data, static::CACHE_TTL);
-            }
-        }
+        $data = $this->cache->get(static::CACHE_KEY, function (ItemInterface $item) {
+            $item->expiresAfter(static::CACHE_TTL);
+            return $this->fetchMetrics();
+        });
 
         $this->metrics = [];
-        foreach ($data as $metrics) {
-            $this->metrics[$metrics['code']] = $metrics;
+        if ($data) {
+            foreach ($data as $metrics) {
+                $this->metrics[$metrics['code']] = $metrics;
+            }
         }
     }
 
@@ -105,13 +104,13 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
     /**
      * Fetches translations metrics from the adapter while silencing all exceptions.
      */
-    private function fetchMetrics(): array
+    private function fetchMetrics(): ?array
     {
         try {
             $data = $this->adapter->fetchTranslationMetrics();
         } catch (\Throwable $e) {
             $this->logger->error('Failed to fetch translation metrics.', ['exception' => $e]);
-            $data = [];
+            return null;
         }
 
         return $data;

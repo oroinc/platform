@@ -2,57 +2,40 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Doctrine\Common\Cache\CacheProvider;
+use Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * Stores the last update of database translations for locale in cache
+ */
 class DynamicTranslationMetadataCache
 {
-    /**
-     * @var array
-     */
-    protected $localCache;
+    private CacheItemPoolInterface $cacheImpl;
 
-    /**
-     * @var CacheProvider
-     */
-    protected $cacheImpl;
-
-    /**
-     * Constructor
-     */
-    public function __construct(CacheProvider $cacheImpl)
+    public function __construct(CacheItemPoolInterface $cacheImpl)
     {
         $this->cacheImpl = $cacheImpl;
-        $this->localCache = [];
     }
 
     /**
      * Gets the timestamp of the last update of database translations for the given locale
-     *
-     * @param string $locale
-     * @return int|bool timestamp or false if the timestamp is not cached yet
      */
-    public function getTimestamp($locale)
+    public function getTimestamp(string $locale): int|bool
     {
-        if (!isset($this->localCache[$locale])) {
-            $this->localCache[$locale] = $this->cacheImpl->fetch($locale);
-        }
-
-        return $this->localCache[$locale];
+        $cacheItem = $this->cacheImpl->getItem($locale);
+        return $cacheItem->isHit() ? $cacheItem->get() : false;
     }
 
     /**
      * Renews the timestamp of the last update of database translations for the given locale
-     *
-     * @param string|null $locale
      */
-    public function updateTimestamp($locale = null)
+    public function updateTimestamp(?string $locale = null): void
     {
         if ($locale) {
-            $this->localCache[$locale] = (new \DateTime('now', new \DateTimeZone('UTC')))->getTimestamp();
-            $this->cacheImpl->save($locale, $this->localCache[$locale]);
+            $cacheItem = $this->cacheImpl->getItem($locale);
+            $timestamp = (new \DateTime('now', new \DateTimeZone('UTC')))->getTimestamp();
+            $this->cacheImpl->save($cacheItem->set($timestamp));
         } else {
-            $this->localCache = [];
-            $this->cacheImpl->deleteAll();
+            $this->cacheImpl->clear();
         }
     }
 }

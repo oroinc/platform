@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ScopeBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
@@ -13,13 +12,14 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub as Entity;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\EventListener\DoctrineEventListener;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
+use Psr\Cache\CacheItemPoolInterface;
 
 class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ScopeCollection|\PHPUnit\Framework\MockObject\MockObject */
     private $scheduledForInsertScopes;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $scopeCache;
 
     /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -31,7 +31,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->scheduledForInsertScopes = $this->createMock(ScopeCollection::class);
-        $this->scopeCache = $this->createMock(CacheProvider::class);
+        $this->scopeCache = $this->createMock(CacheItemPoolInterface::class);
 
         $metadataFactory = $this->createMock(ClassMetadataFactory::class);
 
@@ -120,7 +120,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->scopeCache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
@@ -138,7 +138,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([new Scope()]);
 
         $this->scopeCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
@@ -166,7 +166,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->with(Scope::class);
 
         $this->scopeCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
@@ -193,7 +193,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ->with(Scope::class);
 
         $this->scopeCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
@@ -230,7 +230,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->scopeCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();
@@ -267,7 +267,7 @@ class DoctrineEventListenerTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->scopeCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onFlush(new OnFlushEventArgs($this->em));
         $this->listener->postFlush();

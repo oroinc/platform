@@ -2,28 +2,23 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * This class is responsible to get available translation domains.
  */
 class TranslationDomainProvider
 {
-    const AVAILABLE_DOMAINS_NODE = 'availableDomains';
+    private const AVAILABLE_DOMAINS_NODE = 'availableDomains';
 
-    /** @var ManagerRegistry */
-    protected $registry;
+    protected ManagerRegistry $registry;
+    protected CacheInterface $cache;
+    protected ?array $availableDomains = null;
 
-    /** @var CacheProvider */
-    protected $cache;
-
-    /** @var array */
-    protected $availableDomains;
-
-    public function __construct(ManagerRegistry $registry, CacheProvider $cache)
+    public function __construct(ManagerRegistry $registry, CacheInterface $cache)
     {
         $this->registry = $registry;
         $this->cache = $cache;
@@ -34,7 +29,7 @@ class TranslationDomainProvider
      *
      * @return array ['domain' => '...']
      */
-    public function getAvailableDomains()
+    public function getAvailableDomains(): array
     {
         $this->ensureAvailableDomainsLoaded();
 
@@ -44,10 +39,9 @@ class TranslationDomainProvider
     /**
      * Returns the list of all existing in the database translation domains for the given locales.
      *
-     * @param string[] $locales
      * @return array [['code' = '...', 'domain' => '...'], ...]
      */
-    public function getAvailableDomainsForLocales(array $locales)
+    public function getAvailableDomainsForLocales(array $locales): array
     {
         $this->ensureAvailableDomainsLoaded();
 
@@ -61,10 +55,7 @@ class TranslationDomainProvider
         return $result;
     }
 
-    /**
-     * @return $this
-     */
-    public function clearCache()
+    public function clearCache(): TranslationDomainProvider
     {
         $this->availableDomains = null;
         $this->cache->delete(self::AVAILABLE_DOMAINS_NODE);
@@ -72,24 +63,18 @@ class TranslationDomainProvider
         return $this;
     }
 
-    protected function ensureAvailableDomainsLoaded()
+    protected function ensureAvailableDomainsLoaded(): void
     {
         if (null !== $this->availableDomains) {
             return;
         }
 
-        $availableDomains = $this->cache->fetch(self::AVAILABLE_DOMAINS_NODE);
-        if (false === $availableDomains) {
-            $availableDomains = $this->getTranslationKeyRepository()->findAvailableDomains();
-            $this->cache->save(self::AVAILABLE_DOMAINS_NODE, $availableDomains);
-        }
-        $this->availableDomains = $availableDomains;
+        $this->availableDomains = $this->cache->get(self::AVAILABLE_DOMAINS_NODE, function () {
+            return $this->getTranslationKeyRepository()->findAvailableDomains();
+        });
     }
 
-    /**
-     * @return TranslationKeyRepository
-     */
-    private function getTranslationKeyRepository()
+    private function getTranslationKeyRepository(): TranslationKeyRepository
     {
         return $this->registry->getManagerForClass(TranslationKey::class)->getRepository(TranslationKey::class);
     }

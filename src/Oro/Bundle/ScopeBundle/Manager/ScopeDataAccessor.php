@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\ScopeBundle\Manager;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIteratorInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Provides a set of methods to load scopes from the database.
@@ -16,18 +15,13 @@ use Oro\Bundle\ScopeBundle\Model\ScopeCriteria;
  */
 class ScopeDataAccessor
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var CacheProvider */
-    private $scopeCache;
-
-    /** @var ScopeCacheKeyBuilderInterface */
-    private $scopeCacheKeyBuilder;
+    private DoctrineHelper $doctrineHelper;
+    private CacheItemPoolInterface $scopeCache;
+    private ScopeCacheKeyBuilderInterface $scopeCacheKeyBuilder;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        CacheProvider $scopeCache,
+        CacheItemPoolInterface $scopeCache,
         ScopeCacheKeyBuilderInterface $scopeCacheKeyBuilder
     ) {
         $this->doctrineHelper = $doctrineHelper;
@@ -44,11 +38,6 @@ class ScopeDataAccessor
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return BufferedQueryResultIteratorInterface|Scope[]
-     */
     public function findByCriteria(ScopeCriteria $criteria): iterable
     {
         $qb = $this->doctrineHelper->createQueryBuilder(Scope::class, 'scope');
@@ -64,9 +53,8 @@ class ScopeDataAccessor
         $query = $qb->setMaxResults(1)->getQuery();
         $cacheKey = $this->scopeCacheKeyBuilder->getCacheKey($criteria);
         if (null !== $cacheKey) {
-            $query
-                ->useResultCache(true, null, $cacheKey)
-                ->setResultCacheDriver($this->scopeCache);
+            $query->enableResultCache(null, $cacheKey)
+                ->setResultCache($this->scopeCache);
         }
 
         return $query->getOneOrNullResult();
@@ -80,23 +68,19 @@ class ScopeDataAccessor
         }
 
         $resultKey = 'id:' . $criteria->getIdentifier();
-        $data = $this->scopeCache->fetch($cacheKey);
-        if (false !== $data && \array_key_exists($resultKey, $data)) {
+        $cacheItem = $this->scopeCache->getItem($cacheKey);
+        $data = $cacheItem->isHit() ? $cacheItem->get() : [];
+        if (\array_key_exists($resultKey, $data)) {
             return $data[$resultKey];
         }
 
         $id = $this->loadIdentifierByCriteria($criteria);
         $data[$resultKey] = $id;
-        $this->scopeCache->save($cacheKey, $data);
+        $this->scopeCache->save($cacheItem->set($data));
 
         return $id;
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return int[]
-     */
     public function findIdentifiersByCriteria(ScopeCriteria $criteria): array
     {
         $cacheKey = $this->scopeCacheKeyBuilder->getCacheKey($criteria);
@@ -105,23 +89,19 @@ class ScopeDataAccessor
         }
 
         $resultKey = 'ids:' . $criteria->getIdentifier();
-        $data = $this->scopeCache->fetch($cacheKey);
-        if (false !== $data && isset($data[$resultKey])) {
+        $cacheItem = $this->scopeCache->getItem($cacheKey);
+        $data = $cacheItem->isHit() ? $cacheItem->get() : [];
+        if (isset($data[$resultKey])) {
             return $data[$resultKey];
         }
 
         $ids = $this->loadIdentifiersByCriteria($criteria);
         $data[$resultKey] = $ids;
-        $this->scopeCache->save($cacheKey, $data);
+        $this->scopeCache->save($cacheItem->set($data));
 
         return $ids;
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return int[]
-     */
     public function findIdentifiersByCriteriaWithPriority(ScopeCriteria $criteria): array
     {
         $cacheKey = $this->scopeCacheKeyBuilder->getCacheKey($criteria);
@@ -130,17 +110,15 @@ class ScopeDataAccessor
         }
 
         $resultKey = 'ids_priority:' . $criteria->getIdentifier();
-        $data = $this->scopeCache->fetch($cacheKey);
-        if (false !== $data && isset($data[$resultKey])) {
+        $cacheItem = $this->scopeCache->getItem($cacheKey);
+        $data = $cacheItem->isHit() ? $cacheItem->get() : [];
+        if ($cacheItem->isHit() && isset($data[$resultKey])) {
             return $data[$resultKey];
-        }
-        if ($data === false) {
-            $data = [];
         }
 
         $ids = $this->loadIdentifiersByCriteriaWithPriority($criteria);
         $data[$resultKey] = $ids;
-        $this->scopeCache->save($cacheKey, $data);
+        $this->scopeCache->save($cacheItem->set($data));
 
         return $ids;
     }
@@ -159,11 +137,6 @@ class ScopeDataAccessor
         return (int)$scopes[0]['id'];
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return int[]
-     */
     private function loadIdentifiersByCriteria(ScopeCriteria $criteria): array
     {
         $qb = $this->doctrineHelper->createQueryBuilder(Scope::class, 'scope');
@@ -172,11 +145,6 @@ class ScopeDataAccessor
         return $this->findIdentifiers($qb);
     }
 
-    /**
-     * @param ScopeCriteria $criteria
-     *
-     * @return int[]
-     */
     private function loadIdentifiersByCriteriaWithPriority(ScopeCriteria $criteria): array
     {
         $qb = $this->doctrineHelper->createQueryBuilder(Scope::class, 'scope');
@@ -185,11 +153,6 @@ class ScopeDataAccessor
         return $this->findIdentifiers($qb);
     }
 
-    /**
-     * @param QueryBuilder $qb
-     *
-     * @return int[]
-     */
     private function findIdentifiers(QueryBuilder $qb): array
     {
         $query = $qb->select('scope.id')->getQuery();
