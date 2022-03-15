@@ -13,19 +13,19 @@ use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -37,7 +37,7 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->translator = $this->createMock(Translator::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translationHelper = $this->createMock(ConfigTranslationHelper::class);
 
         $this->subscriber = new ConfigSubscriber(
@@ -555,15 +555,11 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param array                                                  $data
-     * @param FieldConfigModel|ConfigModel                           $model
-     * @param FormInterface|\PHPUnit\Framework\MockObject\MockObject $form
-     *
-     * @return FormEvent|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getFormEvent(array $data, ConfigModel $model, FormInterface $form = null)
-    {
+    private function getFormEvent(
+        array $data,
+        ConfigModel $model,
+        FormInterface|\PHPUnit\Framework\MockObject\MockObject|null $form = null
+    ): FormEvent|\PHPUnit\Framework\MockObject\MockObject {
         $fieldName = '';
         if ($model instanceof FieldConfigModel && !$model->getId()) {
             $fieldName = $model->getFieldName();
@@ -593,11 +589,11 @@ class ConfigSubscriberTest extends \PHPUnit\Framework\TestCase
         return $event;
     }
 
-    /**
-     * @return ConfigProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getConfigProvider(string $scope, array $configs, bool $isGetPropertyConfigExpected)
-    {
+    private function getConfigProvider(
+        string $scope,
+        array $configs,
+        bool $isGetPropertyConfigExpected
+    ): ConfigProvider|\PHPUnit\Framework\MockObject\MockObject {
         $provider = $this->createMock(ConfigProvider::class);
         $provider->expects($this->any())
             ->method('getScope')

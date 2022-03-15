@@ -249,6 +249,7 @@ abstract class BaseDriver implements DBALPersisterInterface
             $field = $options['field'];
             $function = $options['function'];
             [$fieldType, $fieldName] = Criteria::explodeFieldTypeName($field);
+            $fieldName = str_replace('.', self::SPECIAL_SEPARATOR, $fieldName);
             QueryBuilderUtil::checkField($fieldName);
 
             // prepare query builder to apply grouping

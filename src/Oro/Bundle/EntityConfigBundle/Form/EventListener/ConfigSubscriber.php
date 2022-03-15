@@ -7,10 +7,10 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Form listener to update configs and translatable values
@@ -25,13 +25,13 @@ class ConfigSubscriber implements EventSubscriberInterface
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     public function __construct(
         ConfigTranslationHelper $translationHelper,
         ConfigManager $configManager,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $this->translationHelper = $translationHelper;
         $this->configManager = $configManager;

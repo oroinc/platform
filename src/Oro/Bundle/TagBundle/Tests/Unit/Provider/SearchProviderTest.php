@@ -11,7 +11,7 @@ use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\TagBundle\Provider\SearchProvider;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SearchProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,7 +37,7 @@ class SearchProviderTest extends \PHPUnit\Framework\TestCase
         $this->securityProvider = $this->createMock(SecurityProvider::class);
         $indexer = $this->createMock(Indexer::class);
         $configManager = $this->createMock(ConfigManager::class);
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $this->provider = new SearchProvider(
             $this->entityManager,

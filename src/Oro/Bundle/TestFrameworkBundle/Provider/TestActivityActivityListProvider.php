@@ -42,26 +42,26 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getSubject($entity)
     {
-        /** @var TestActivity $entity */
         return $entity->getMessage();
     }
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getDescription($entity)
     {
-        /** @var TestActivity $entity */
         return $entity->getDescription();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getData(ActivityList $activityListEntity)
+    public function getData(ActivityList $activityList)
     {
         return [];
     }
@@ -76,11 +76,11 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
-    public function getOrganization($activityEntity)
+    public function getOrganization($entity)
     {
-        /** @var TestActivity $activityEntity */
-        return $activityEntity->getOrganization();
+        return $entity->getOrganization();
     }
 
     /**
@@ -94,7 +94,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoutes($activityEntity)
+    public function getRoutes($entity)
     {
         return [
             'itemView'   => '',
@@ -125,6 +125,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getTargetEntities($entity)
     {
@@ -133,6 +134,7 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
 
     /**
      * {@inheritdoc}
+     * @param TestActivity $entity
      */
     public function getActivityOwners($entity, ActivityList $activityList)
     {
@@ -147,6 +149,15 @@ class TestActivityActivityListProvider implements ActivityListProviderInterface
         $activityOwner->setActivity($activityList);
         $activityOwner->setOrganization($organization);
         $activityOwner->setUser($owner);
+
         return [$activityOwner];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return true;
     }
 }

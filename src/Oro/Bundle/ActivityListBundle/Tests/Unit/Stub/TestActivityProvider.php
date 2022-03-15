@@ -56,7 +56,7 @@ class TestActivityProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes($activityEntity)
+    public function getRoutes($entity)
     {
         return ['delete' => 'test_delete_route'];
     }
@@ -95,7 +95,7 @@ class TestActivityProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getData(ActivityList $activityListEntity)
+    public function getData(ActivityList $activityList)
     {
         return ['test_data'];
     }
@@ -103,7 +103,7 @@ class TestActivityProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getOrganization($activityEntity)
+    public function getOrganization($entity)
     {
     }
 
@@ -115,9 +115,17 @@ class TestActivityProvider implements
         return true;
     }
 
-    public function getActivityOwners($entity, ActivityList $activity)
+    public function getActivityOwners($entity, ActivityList $activityList)
     {
         return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return true;
     }
 
     /**

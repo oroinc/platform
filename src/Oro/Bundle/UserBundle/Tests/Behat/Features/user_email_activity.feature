@@ -27,27 +27,6 @@ Scenario: Send email
 #  And delete email-attachment2.jpg attachment
   When click "Send"
   Then I should see "The email was sent" flash message
-  And should see "Work for you" email in activity list
-
-Scenario Outline: View email in activity list
-  Given I go to System/User Management/Users
-  And click view <name> in grid
-  When I collapse "Work for you" in activity list
-  Then I should see "We have new role for you" in email body
-  And I should see <name> in Contexts
-  Examples:
-    | name   |
-    | audrey |
-    | brad   |
-
-Scenario: Response email
-  Given I go to System/User Management/Users
-  And click view Audrey in grid
-  And I click "Reply" on "Work for you" in activity list
-  When I click "Send"
-  Then email "Work for you" should have thread icon
-  When I collapse "Work for you" in activity list
-  Then email thread "Work for you" should have two emails
 
 # todo: Uncomment by resolve BAP-11089
 #Scenario: View attachments
@@ -59,32 +38,3 @@ Scenario: Response email
 #  Then I should see view of 1 attachment
 #  When I click next attachment
 #  Then I should see view of 2 attachment
-
-Scenario: Forward email
-  Given shouldn't see "Fwd: Re: Work for you" email in activity list
-  When I click "Forward" on "Work for you" in activity list
-  And I fill in "To" with "Bruce"
-  And click "Send"
-  Then should see "Fwd: Re: Work for you" email in activity list
-
-Scenario: Delete contexts
-  When I collapse "Fwd: Re: Work for you" in activity list
-  And delete "John Doe" context from collapsed email
-  Then I should see "The context has been removed" flash message
-  When I delete "Audrey Hepburn" context from collapsed email
-  Then I should see "The context has been removed" flash message
-  And shouldn't see "Fwd: Re: Work for you" email in activity list
-  When I go to System/User Management/Users
-  And click view Brad in grid
-  And shouldn't see "Fwd: Re: Work for you" email in activity list
-
-Scenario: Add contexts
-  Given I click My emails in user menu
-  And I click View Work for you in grid
-  And follow "Add Context"
-  And select User in activity context selector
-  When click on Audrey in grid
-  Then I should see "The context has been added" flash message
-  When I go to System/User Management/Users
-  And click view Audrey in grid
-  Then I should see "Fwd: Re: Work for you" email in activity list

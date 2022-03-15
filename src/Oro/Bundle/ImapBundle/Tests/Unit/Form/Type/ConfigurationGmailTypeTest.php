@@ -4,29 +4,25 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\ImapBundle\Form\Type\CheckButtonType;
 use Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType;
 use Oro\Bundle\ImapBundle\Mail\Storage\GmailImap;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationGmailTypeTest extends FormIntegrationTestCase
 {
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
-
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userConfigManager;
@@ -37,17 +33,12 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
     /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $oauthManagerRegistry;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->translator = $this->createMock(Translator::class);
         $this->userConfigManager = $this->createMock(ConfigManager::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);
-        $this->configProvider = $this->createMock(ConfigProvider::class);
 
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);
@@ -75,27 +66,28 @@ class ConfigurationGmailTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function getExtensions(): array
     {
-        $type = new ConfigurationGmailType(
-            $this->translator,
-            $this->userConfigManager,
-            $this->tokenAccessor,
-            $this->requestStack,
-            $this->oauthManagerRegistry
-        );
-
         return array_merge(
             parent::getExtensions(),
             [
                 new PreloadedExtension(
                     [
-                        CheckButtonType::class => new CheckButtonType(),
-                        EmailFolderTreeType::class => new EmailFolderTreeType(),
-                        ConfigurationGmailType::class => $type
+                        new CheckButtonType(),
+                        new EmailFolderTreeType(),
+                        new ConfigurationGmailType(
+                            $this->createMock(TranslatorInterface::class),
+                            $this->userConfigManager,
+                            $this->tokenAccessor,
+                            $this->requestStack,
+                            $this->oauthManagerRegistry
+                        )
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($this->configProvider, $this->translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
             ]

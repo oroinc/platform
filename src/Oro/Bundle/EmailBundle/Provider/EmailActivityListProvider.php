@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
@@ -127,7 +126,7 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getRoutes($activityEntity)
+    public function getRoutes($entity)
     {
         return [
             'itemView'  => 'oro_email_view',
@@ -137,19 +136,19 @@ class EmailActivityListProvider implements
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getSubject($entity)
     {
-        /** @var $entity Email */
         return $entity->getSubject();
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getDescription($entity)
     {
-        /** @var $entity Email */
         if ($entity->getEmailBody()) {
             return $entity->getEmailBody()->getTextBody();
         }
@@ -167,32 +166,29 @@ class EmailActivityListProvider implements
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getCreatedAt($entity)
     {
-        /** @var $entity Email */
         return $entity->getSentAt();
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getUpdatedAt($entity)
     {
-        /** @var $entity Email */
         return $entity->getSentAt();
     }
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
-    public function getOrganization($activityEntity)
+    public function getOrganization($entity)
     {
-        /**
-         * @var $activityEntity Email
-         * @var $emailAddressOwner EmailOwnerInterface
-         */
-        $emailAddressOwner = $activityEntity->getFromEmailAddress()->getOwner();
+        $emailAddressOwner = $entity->getFromEmailAddress()->getOwner();
         if ($emailAddressOwner && $emailAddressOwner->getOrganization()) {
             return $emailAddressOwner->getOrganization();
         }
@@ -207,7 +203,7 @@ class EmailActivityListProvider implements
         $processes = $this->mailboxProcessStorage->getProcesses();
         foreach ($processes as $process) {
             $settingsClass = $process->getSettingsEntityFQCN();
-            $mailboxes = $mailboxRepository->findBySettingsClassAndEmail($settingsClass, $activityEntity);
+            $mailboxes = $mailboxRepository->findBySettingsClassAndEmail($settingsClass, $entity);
 
             foreach ($mailboxes as $mailbox) {
                 return $mailbox->getOrganization();
@@ -220,13 +216,14 @@ class EmailActivityListProvider implements
     /**
      * {@inheritdoc}
      */
-    public function getData(ActivityList $activityListEntity)
+    public function getData(ActivityList $activityList)
     {
-        $relatedActivityClass = $activityListEntity->getRelatedActivityClass();
+        $relatedActivityClass = $activityList->getRelatedActivityClass();
         $em = $this->doctrineHelper->getEntityManagerForClass($relatedActivityClass);
         /** @var Email $email */
-        $email = $headEmail = $em->getRepository($relatedActivityClass)
-            ->find($activityListEntity->getRelatedActivityId());
+        $email = $em->getRepository($relatedActivityClass)
+            ->find($activityList->getRelatedActivityId());
+        $headEmail = $email;
         if (null !== $email->getThread()) {
             $headEmail = $this->emailThreadProvider->getHeadEmail($em, $email);
         }
@@ -286,7 +283,12 @@ class EmailActivityListProvider implements
     public function isApplicable($entity)
     {
         if (\is_object($entity)) {
-            return $entity instanceof Email;
+            if (!$entity instanceof Email) {
+                return false;
+            }
+
+            // the activity lists for private emails should not be created.
+            return $this->doctrineHelper->getEntityRepositoryForClass(Email::class)->isEmailPublic($entity->getId());
         }
 
         return $entity === Email::class;
@@ -294,6 +296,7 @@ class EmailActivityListProvider implements
 
     /**
      * {@inheritdoc}
+     * @param Email $entity
      */
     public function getTargetEntities($entity)
     {
@@ -328,7 +331,6 @@ class EmailActivityListProvider implements
             return [];
         }
 
-        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->doctrineHelper->getEntityRepositoryForClass(ActivityList::class)
             ->createQueryBuilder('a');
         $queryBuilder
@@ -434,12 +436,9 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * @param ActivityList $activityList
-     * @param array $filter
-     * @return array
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function collectActivityOwners(ActivityList $activityList, array $filter)
+    private function collectActivityOwners(ActivityList $activityList, array $filter): array
     {
         $activityOwners = [];
         /** @var EmailUser[] $owners */
@@ -448,6 +447,11 @@ class EmailActivityListProvider implements
 
         if ($owners) {
             foreach ($owners as $owner) {
+                // the activity lists for private emails should not have owner
+                // to be sure it is not shown at the activity list grid.
+                if ($owner->isEmailPrivate()) {
+                    continue;
+                }
                 if (($owner->getMailboxOwner() && $owner->getOrganization()) ||
                     (!$owner->getMailboxOwner() && $owner->getOrganization() && $owner->getOwner())) {
                     $activityOwner = new ActivityOwner();
@@ -467,6 +471,14 @@ class EmailActivityListProvider implements
         }
 
         return $activityOwners;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return $activityList->getActivityOwners()->count() > 0;
     }
 
     /**

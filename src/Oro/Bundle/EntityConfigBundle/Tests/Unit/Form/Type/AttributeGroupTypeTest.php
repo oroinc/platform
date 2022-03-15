@@ -9,9 +9,8 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeGroupRelation;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeGroupType;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeMultiSelectType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Tests\Unit\Stub\StripTagsExtensionStub;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Form\Type\FallbackPropertyType;
@@ -20,21 +19,19 @@ use Oro\Bundle\LocaleBundle\Form\Type\LocalizationCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedPropertyType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionTypeStub;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AttributeGroupTypeTest extends FormIntegrationTestCase
 {
     private const LOCALIZATION_ID = 42;
     private const ATTRIBUTES_CHOICES = ['choice_1' => 1, 'choice_5' => 5, 'choice_15' => 15, 'choice_20' => 20];
-
-    use EntityTrait;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
@@ -42,7 +39,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $translator;
 
     protected function setUp(): void
@@ -51,14 +48,17 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         $repositoryLocalization->expects($this->any())
             ->method('find')
             ->willReturnCallback(function ($id) {
-                return $this->getEntity(Localization::class, ['id' => $id]);
+                return $this->getLocalization($id);
             });
 
         $repositoryLocalizedFallbackValue = $this->createMock(ObjectRepository::class);
         $repositoryLocalizedFallbackValue->expects($this->any())
             ->method('find')
             ->willReturnCallback(function ($id) {
-                return $this->getEntity(LocalizedFallbackValue::class, ['id' => $id]);
+                $value = new LocalizedFallbackValue();
+                ReflectionUtil::setId($value, $id);
+
+                return $value;
             });
 
         $this->registry = $this->createMock(ManagerRegistry::class);
@@ -70,7 +70,6 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
             ]);
 
         $this->attributeManager = $this->createMock(AttributeManager::class);
-        $this->translator = $this->createMock(Translator::class);
 
         parent::setUp();
     }
@@ -78,34 +77,27 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $entityConfigProvider = $this->createMock(ConfigProvider::class);
+        $attributeMultiSelectType = new AttributeMultiSelectType($this->attributeManager, $this->getTranslator());
+        ReflectionUtil::setPropertyValue($attributeMultiSelectType, 'choices', self::ATTRIBUTES_CHOICES);
 
         return [
             new PreloadedExtension(
                 [
-                    LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
-                        $this->registry
-                    ),
-                    AttributeMultiSelectType::class => $this->getEntity(
-                        AttributeMultiSelectType::class,
-                        ['choices' => self::ATTRIBUTES_CHOICES],
-                        [$this->attributeManager, $this->getTranslator()]
-                    ),
-                    LocalizedPropertyType::class => new LocalizedPropertyType(),
-                    LocalizationCollectionType::class => new LocalizationCollectionTypeStub(
-                        [
-                            $this->getEntity(Localization::class, ['id' => self::LOCALIZATION_ID])
-                        ]
-                    ),
-                    FallbackValueType::class => new FallbackValueType(),
-                    FallbackPropertyType::class => new FallbackPropertyType($this->translator),
+                    new LocalizedFallbackValueCollectionType($this->registry),
+                    $attributeMultiSelectType,
+                    new LocalizedPropertyType(),
+                    new FallbackValueType(),
+                    new FallbackPropertyType($this->createMock(TranslatorInterface::class)),
+                    LocalizationCollectionType::class => new LocalizationCollectionTypeStub([
+                        $this->getLocalization(self::LOCALIZATION_ID)
+                    ])
                 ],
                 [
                     FormType::class => [
                         new StripTagsExtensionStub($this),
-                        new TooltipFormExtension($entityConfigProvider, $this->translator),
+                        new TooltipFormExtensionStub($this)
                     ]
                 ]
             ),
@@ -113,15 +105,19 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * @param string|null $string
-     * @param string|null $text
-     * @param Localization|null $localization
-     *
-     * @return LocalizedFallbackValue
-     */
-    private function createLocalizedValue($string = null, $text = null, Localization $localization = null)
+    private function getLocalization(int $id): Localization
     {
+        $localization = new Localization();
+        ReflectionUtil::setId($localization, $id);
+
+        return $localization;
+    }
+
+    private function createLocalizedValue(
+        string $string,
+        string $text = null,
+        Localization $localization = null
+    ): LocalizedFallbackValue {
         $value = new LocalizedFallbackValue();
         $value->setString($string)
             ->setText($text)
@@ -161,7 +157,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
             $this->createLocalizedValue(
                 'Group Label 2_stripped',
                 null,
-                $this->getEntity(Localization::class, ['id' => self::LOCALIZATION_ID])
+                $this->getLocalization(self::LOCALIZATION_ID)
             )
         );
         $entity->addLabel($this->createLocalizedValue('Group Label 1_stripped'));
@@ -230,7 +226,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
             $this->createLocalizedValue(
                 'Group Label 2_stripped',
                 null,
-                $this->getEntity(Localization::class, ['id' => self::LOCALIZATION_ID])
+                $this->getLocalization(self::LOCALIZATION_ID)
             )
         );
         $entity->addLabel($this->createLocalizedValue('Group Label 1_stripped'));
@@ -299,11 +295,11 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         $attributeGroup = new AttributeGroup();
         $attributeGroup->addAttributeRelation($attributeRelation5 = new AttributeGroupRelation());
         $attributeRelation5->setAttributeGroup($attributeGroup);
-        $attributeRelation5->setEntityConfigFieldId($attribute5Id = 5);
+        $attributeRelation5->setEntityConfigFieldId(5);
 
         $attributeGroup->addAttributeRelation($attributeRelation1 = new AttributeGroupRelation());
         $attributeRelation1->setAttributeGroup($attributeGroup);
-        $attributeRelation1->setEntityConfigFieldId($attribute1Id = 1);
+        $attributeRelation1->setEntityConfigFieldId(1);
 
         return [
             'attribute relations are not empty, choices are reordered' => [

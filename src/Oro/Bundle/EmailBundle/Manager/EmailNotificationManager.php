@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -16,28 +17,24 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class EmailNotificationManager
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
-
-    /** @var UrlGeneratorInterface */
-    protected $urlGenerator;
-
-    /** @var ConfigManager */
-    protected $configManager;
+    protected ManagerRegistry $doctrine;
+    protected HtmlTagHelper $htmlTagHelper;
+    protected UrlGeneratorInterface $urlGenerator;
+    protected ConfigManager $configManager;
+    private AclHelper $aclHelper;
 
     public function __construct(
         ManagerRegistry $doctrine,
         HtmlTagHelper $htmlTagHelper,
         UrlGeneratorInterface $urlGenerator,
-        ConfigManager $configManager
+        ConfigManager $configManager,
+        AclHelper $aclHelper
     ) {
         $this->doctrine = $doctrine;
         $this->htmlTagHelper = $htmlTagHelper;
         $this->urlGenerator = $urlGenerator;
         $this->configManager = $configManager;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -52,7 +49,7 @@ class EmailNotificationManager
     {
         $emails = $this->doctrine->getManagerForClass(Email::class)
             ->getRepository(Email::class)
-            ->getNewEmails($user, $organization, $maxEmailsDisplay, $folderId);
+            ->getNewEmails($user, $organization, $maxEmailsDisplay, $folderId, $this->aclHelper);
 
         $emailsData = [];
         /** @var Email $email */
@@ -94,7 +91,7 @@ class EmailNotificationManager
     {
         return $this->doctrine->getManagerForClass(Email::class)
             ->getRepository(Email::class)
-            ->getCountNewEmails($user, $organization, $folderId);
+            ->getCountNewEmails($user, $organization, $folderId, $this->aclHelper);
     }
 
     /**

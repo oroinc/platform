@@ -20,13 +20,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class EmailModelSender
 {
     private MailerInterface $mailer;
-
     private EmbeddedImagesInEmailModelHandler $embeddedImagesInEmailModelHandler;
-
     private EmailFactory $symfonyEmailFactory;
-
     private EmailUserFromEmailModelBuilder $emailUserFromEmailModelBuilder;
-
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(

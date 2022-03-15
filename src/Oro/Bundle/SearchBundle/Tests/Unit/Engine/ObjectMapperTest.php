@@ -9,6 +9,7 @@ use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
+use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Test\Unit\SearchMappingTypeCastingHandlersTestTrait;
@@ -123,6 +124,11 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     'target_type'   => 'decimal',
                     'target_fields' => ['price']
                 ],
+                [
+                    'name'          => 'createDate',
+                    'target_type'   => 'datetime',
+                    'target_fields' => ['createDate']
+                ],
                 [   // test that 'target_fields' is set to ['count']
                     'name'        => 'count',
                     'target_type' => 'integer'
@@ -186,7 +192,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             ->setPrice(self::TEST_PRICE)
             ->setManufacturer($this->manufacturer)
             ->setDescription('<p>description</p>')
-            ->setCreateDate(new \DateTime());
+            ->setCreateDate(new \DateTime('2022-12-12 12:13:14', new \DateTimeZone('UTC')));
         foreach ($this->categories as $categoryName) {
             $category = new Category();
             $category
@@ -261,7 +267,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             $this->getTypeCastingHandlerRegistry(),
             $this->nameResolver,
             $this->dispatcher,
-            $this->htmlTagHelper
+            $this->htmlTagHelper,
+            new DateTimeFormatter()
         );
     }
 
@@ -293,6 +300,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             ],
             'integer' => [
                 'count' => $this->product->getCount(),
+            ],
+            'datetime' => [
+                'createDate' => $this->product->getCreateDate()
             ]
         ];
 
@@ -332,6 +342,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             ],
             'integer' => [
                 'count' => $this->product->getCount()
+            ],
+            'datetime' => [
+                'createDate' => $this->product->getCreateDate()
             ]
         ];
 
@@ -362,7 +375,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     'all_data'                   => $allTextData,
                     Indexer::TEXT_ALL_DATA_FIELD => $allTextData
                 ]
-            )
+            ),
+            'datetime' => [
+                'createDate' => $this->product->getCreateDate()
+            ]
         ];
 
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->product));
@@ -394,6 +410,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             ],
             'integer' => [
                 'count' => 0
+            ],
+            'datetime' => [
+                'createDate' => $this->product->getCreateDate()
             ]
         ];
 
@@ -575,6 +594,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'text.defaultName'     => 'defaultName',
                 'integer.integerField' => 'integerValue',
                 'decimal.decimalField' => 'decimalValue',
+                'datetime.updated'     => 'updatedAt',
                 'notExistingField'     => 'notExistingField'
             ]);
 
@@ -586,7 +606,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             'sku'          => '2GH80',
             'defaultName'  => 'Example Headlamp',
             'integerField' => '42',
-            'decimalField' => '12.34'
+            'decimalField' => '12.34',
+            'updated'      => new \DateTime('2022-12-12 12:13:14', new \DateTimeZone('UTC')),
         ];
 
         $result = $this->mapper->mapSelectedData($query, $item);
@@ -597,7 +618,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'defaultName'      => 'Example Headlamp',
                 'integerValue'     => 42,
                 'decimalValue'     => 12.34,
-                'notExistingField' => ''
+                'updatedAt'        => '2022-12-12 12:13:14',
+                'notExistingField' => '',
             ],
             $result
         );

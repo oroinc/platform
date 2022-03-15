@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\NotificationBundle\Entity\RecipientList;
 use Oro\Bundle\NotificationBundle\Form\EventListener\AdditionalEmailsSubscriber;
@@ -20,7 +20,6 @@ use Oro\Bundle\NotificationBundle\Tests\Unit\Form\Type\Stub\Select2TranslatableE
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType;
@@ -166,24 +165,8 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $select2TranslatableEntityType = new Select2TranslatableEntityTypeStub(
-            [200 => new EmailTemplate('test')],
-            'oro_select2_translatable_entity',
-            ['configs' => []]
-        );
-
-        $entityType = new EntityTypeStub([1 => new Group()], 'entity', ['property' => null]);
-
-        $recipientListType = new RecipientListType();
-
-        $userOrganizationType = new EntityTypeStub(
-            [null => new ArrayCollection(), 3 => new ArrayCollection([$this->getUser()])],
-            'oro_user_organization_acl_multiselect',
-            ['configs' => []]
-        );
-
         return [
             new PreloadedExtension(
                 [
@@ -193,15 +176,21 @@ class EmailNotificationTypeTest extends FormIntegrationTestCase
                         EmailNotificationEntityChoiceType::NAME,
                         ['configs' => []]
                     ),
-                    Select2TranslatableEntityType::class => $select2TranslatableEntityType,
-                    EntityType::class => $entityType,
-                    RecipientListType::class => $recipientListType,
-                    OrganizationUserAclMultiSelectType::class => $userOrganizationType
+                    Select2TranslatableEntityType::class => new Select2TranslatableEntityTypeStub(
+                        [200 => new EmailTemplate('test')],
+                        'oro_select2_translatable_entity',
+                        ['configs' => []]
+                    ),
+                    EntityType::class => new EntityTypeStub([1 => new Group()], 'entity', ['property' => null]),
+                    OrganizationUserAclMultiSelectType::class => new EntityTypeStub(
+                        [null => new ArrayCollection(), 3 => new ArrayCollection([$this->getUser()])],
+                        'oro_user_organization_acl_multiselect',
+                        ['configs' => []]
+                    ),
+                    new RecipientListType()
                 ],
                 [
-                    FormType::class => [
-                        new TooltipFormExtension($this->configProvider, $this->createMock(Translator::class))
-                    ],
+                    FormType::class => [new TooltipFormExtensionStub($this)]
                 ]
             ),
             $this->getValidatorExtension()
