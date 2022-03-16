@@ -1,15 +1,3 @@
-{% block vertical_container_widget %}
-    {% set attr = layout_attr_defaults(attr, {
-        '~class': ' vertical-container'
-    }) %}
-
-    <div {{ block('block_attributes') }}>
-        <div class="vertical-container__content">
-            {{ block_widget(block) }}
-        </div>
-    </div>
-{% endblock %}
-
 {% block _copyright_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' copyright'

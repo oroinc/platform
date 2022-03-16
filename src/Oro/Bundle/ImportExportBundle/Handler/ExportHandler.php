@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
+use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
@@ -154,7 +155,11 @@ class ExportHandler extends AbstractHandler
 
         try {
             foreach ($files as $file) {
-                $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                try {
+                    $tmpPath = $this->fileManager->writeToTmpLocalStorage($file);
+                } catch (FileNotFound $e) {
+                    continue;
+                }
                 if ($outputFormat === 'csv') {
                     $tmpPath = $this->fileManager->fixNewLines($tmpPath);
                 }

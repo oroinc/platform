@@ -32,7 +32,10 @@ The current file describes significant changes in the code that may affect the u
 #### SearchBundle
 * `title_fields` field from `search.yml` field has been removed
 
-## 5.0.0 (2022-01-26)
+#### UIBundle
+* `vertical_container` layout block type has been removed, as redundant. Use conventional `container` layout block type instead, with additions custom CSS class that implements required alignment.
+
+## 5.0.0(2022-01-26)
 [Show detailed list of changes](incompatibilities-5-0.md)
 
 ### Added

@@ -2,20 +2,24 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Stub\EntityStub;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
+
+    private const WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX = 'workflow_applicable_entity:';
 
     /** @var WorkflowEntityConnector */
     private $entityConnector;
@@ -36,7 +40,9 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
      */
     private function cacheKey($class)
     {
-        return WorkflowEntityConnector::WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX . $class;
+        return UniversalCacheKeyGenerator::normalizeCacheKey(
+            self::WORKFLOW_APPLICABLE_ENTITIES_CACHE_KEY_PREFIX . $class
+        );
     }
 
     public function testIsApplicableEntityConvertsObjectToClassName()
@@ -44,18 +50,14 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
         $this->registry->expects($this->never())
             ->method('getManagerForClass');
 
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheInterface::class);
 
         $this->setValue($this->entityConnector, 'cache', $cache);
 
         $cacheKey = $this->cacheKey(EntityStub::class);
-        $cache->expects($this->once())
-            ->method('contains')
-            ->with($cacheKey)
-            ->willReturn(true);
 
         $cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with($cacheKey)
             ->willReturn(true);
 
@@ -64,16 +66,19 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
 
     public function testCacheStores()
     {
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheInterface::class);
 
         $this->setValue($this->entityConnector, 'cache', $cache);
 
         $key = $this->cacheKey(EntityStub::class);
 
-        $cache->expects($this->once())
-            ->method('contains')
+        $cache->expects(self::once())
+            ->method('get')
             ->with($key)
-            ->willReturn(false);
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         //routine
         $om = $this->createMock(ObjectManager::class);
@@ -89,13 +94,6 @@ class WorkflowEntityConnectorTest extends \PHPUnit\Framework\TestCase
             ->willReturn($metadata);
         $metadata->setIdentifier(['a', 'b']);
         //metadata setup is for composite keys so internally isSupportedIdentifierType will return false
-
-        $cache->expects($this->once())
-            ->method('save')
-            ->with($key, false);
-
-        $cache->expects($this->never())
-            ->method('fetch');
 
         $this->assertFalse($this->entityConnector->isApplicableEntity(new EntityStub(42)));
     }
