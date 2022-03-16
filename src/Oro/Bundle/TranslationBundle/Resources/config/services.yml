@@ -47,9 +47,9 @@ services:
 
     oro_translation.database_translation.metadata.cache_impl:
         public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_db_trans_metadata' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_db_trans_metadata' }
 
     oro_translation.database_translation.persister:
         class: Oro\Bundle\TranslationBundle\Translation\DatabasePersister
@@ -86,12 +86,12 @@ services:
             - [setLogger, ['@logger']]
 
     oro_translation.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [setNamespace, [ 'oro_trans' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_translation' }
 
     oro_translation.resource.cache:
-        parent: oro_cache.array_cache
+        parent: oro.cache.adapter.array
         public: false
 
     oro_translation.cache.translation_cache_warmer:
@@ -216,10 +216,10 @@ services:
             - '@event_dispatcher'
 
     oro_translation.cache.provider.domains:
-        parent: oro.cache.abstract
+        parent: oro.data.cache
         public: false
-        calls:
-            - [ setNamespace, [ 'oro_translation_domains' ] ]
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_translation_domains' }
 
     oro_translation.provider.translation_domain:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider

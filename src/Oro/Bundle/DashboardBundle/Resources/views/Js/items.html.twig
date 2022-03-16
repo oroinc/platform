@@ -3,7 +3,7 @@
         <select class="item-select filter-select-oro">
             <option></option>
             <% items.each(function (item) { %>
-                <option value="<%- item.get('id') %>"><%= item.get('label') %></option>
+                <option value="<%- item.get('id') %>"><%- item.get('label') %></option>
             <% }); %>
         </select>
     </div>
@@ -11,7 +11,7 @@
 
 <script id="widget-items-item-template" type="text/template">
     <tr class="widget-items-item-row" data-cid="<%- cid %>">
-        <td><%= label %></td>
+        <td><%- label %></td>
         <td class="action-cell">
             <input type="hidden" name="<%- namePrefix %>[id]" value="<%- id %>">
             <input data-name="order" type="hidden" class="order" name="<%- namePrefix %>[order]" value="<%- order %>">

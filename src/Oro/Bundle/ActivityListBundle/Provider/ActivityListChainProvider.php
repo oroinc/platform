@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
@@ -255,14 +255,9 @@ class ActivityListChainProvider implements ResetInterface
     }
 
     /**
-     * Get activity list by class and id of entity
-     *
-     * @param object        $entity
-     * @param EntityManager $entityManager
-     *
-     * @return ActivityList|null
+     * Gets an activity list by class and id of an entity.
      */
-    public function getActivityListByEntity($entity, EntityManager $entityManager): ?ActivityList
+    public function getActivityListByEntity(object $entity, EntityManagerInterface $entityManager): ?ActivityList
     {
         $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
@@ -281,14 +276,9 @@ class ActivityListChainProvider implements ResetInterface
     }
 
     /**
-     * Returns updated activity list entity for given activity
-     *
-     * @param object        $entity
-     * @param EntityManager $entityManager
-     *
-     * @return ActivityList|null
+     * Returns an updated activity list entity for the given activity.
      */
-    public function getUpdatedActivityList($entity, EntityManager $entityManager): ?ActivityList
+    public function getUpdatedActivityList(object $entity, EntityManagerInterface $entityManager): ?ActivityList
     {
         $existListEntity = $this->getActivityListByEntity($entity, $entityManager);
         if (!$existListEntity) {
@@ -300,6 +290,17 @@ class ActivityListChainProvider implements ResetInterface
             $this->getProviderForEntity($entity),
             ActivityList::VERB_UPDATE,
             $existListEntity
+        );
+    }
+
+    /**
+     * Tries to create a new instance of activity list entity for the given activity entity.
+     */
+    public function getNewActivityList(object $entity): ?ActivityList
+    {
+        return $this->getActivityListEntityForEntity(
+            $entity,
+            $this->getProviderForEntity($entity)
         );
     }
 

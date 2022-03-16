@@ -2,17 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    private const ACTIVE_WORKFLOW_RELATED_CLASSES_KEY = 'active_workflow_related';
+    private const WORKFLOW_RELATED_CLASSES_KEY = 'all_workflow_related';
+
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
@@ -23,7 +27,7 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->repository = $this->createMock(WorkflowDefinitionRepository::class);
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -45,11 +49,14 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $this->cache->expects($this->exactly(2))
-            ->method('save')
+            ->method('get')
             ->withConsecutive(
-                [WorkflowAwareCache::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY, [User::class => 0]],
-                [WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY, [\stdClass::class => 0, User::class => 1]]
-            );
+                [self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY],
+                [self::WORKFLOW_RELATED_CLASSES_KEY]
+            )->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->workflowAwareCache->build();
     }
@@ -58,7 +65,7 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache->expects($this->once())
             ->method('delete')
-            ->with(WorkflowAwareCache::WORKFLOW_RELATED_CLASSES_KEY);
+            ->with(self::WORKFLOW_RELATED_CLASSES_KEY);
 
         $this->workflowAwareCache->invalidateRelated();
     }
@@ -67,7 +74,7 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
     {
         $this->cache->expects($this->once())
             ->method('delete')
-            ->with(WorkflowAwareCache::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY);
+            ->with(self::ACTIVE_WORKFLOW_RELATED_CLASSES_KEY);
 
         $this->workflowAwareCache->invalidateActiveRelated();
     }

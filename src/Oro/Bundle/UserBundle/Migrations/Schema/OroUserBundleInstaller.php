@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Migrations\Schema;
 
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
@@ -13,8 +14,11 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_0\OroUserBundle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_10\OroUserBundle as PasswordChanged;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_15\RemoveOldSchema;
@@ -43,10 +47,12 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle2
  */
 class OroUserBundleInstaller implements
     Installation,
+    DatabasePlatformAwareInterface,
     AttachmentExtensionAwareInterface,
     ExtendExtensionAwareInterface,
     ActivityExtensionAwareInterface
 {
+    use DatabasePlatformAwareTrait;
     use AttachmentExtensionAwareTrait;
 
     /** @var ActivityExtension */
@@ -60,7 +66,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_7';
+        return 'v2_8';
     }
 
     /**
@@ -85,7 +91,7 @@ class OroUserBundleInstaller implements
     public function up(Schema $schema, QueryBag $queries)
     {
         /** Tables generation **/
-        $this->createOroUserEmailTable($schema);
+        $this->createOroUserEmailTable($schema, $queries);
         $this->createOroUserApiTable($schema);
 
         $this->createOroUserTable($schema);
@@ -152,7 +158,7 @@ class OroUserBundleInstaller implements
     /**
      * Create oro_user_email table
      */
-    protected function createOroUserEmailTable(Schema $schema)
+    protected function createOroUserEmailTable(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable('oro_user_email');
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
@@ -160,6 +166,13 @@ class OroUserBundleInstaller implements
         $table->addColumn('email', 'string', ['length' => 255, 'precision' => 0]);
         $table->addIndex(['user_id'], 'IDX_8600BE16A76ED395', []);
         $table->setPrimaryKey(['id']);
+        $table->addIndex(['email'], 'idx_user_email', []);
+
+        if ($this->platform instanceof PostgreSqlPlatform) {
+            $queries->addPostQuery(new SqlMigrationQuery(
+                'CREATE INDEX idx_user_email_ci ON oro_user_email (LOWER(email))'
+            ));
+        }
     }
 
     /**

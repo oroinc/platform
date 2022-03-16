@@ -5,6 +5,7 @@ namespace Oro\Bundle\SearchBundle\Engine;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
+use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
@@ -24,18 +25,23 @@ class ObjectMapper extends AbstractMapper
     
     protected HtmlTagHelper $htmlTagHelper;
 
+    /** @var DateTimeFormatter */
+    protected $dateTimeFormatter;
+
     public function __construct(
         SearchMappingProvider $mappingProvider,
         PropertyAccessorInterface $propertyAccessor,
         TypeCastingHandlerRegistry $handlerRegistry,
         EntityNameResolver $nameResolver,
         EventDispatcherInterface $dispatcher,
-        HtmlTagHelper $htmlTagHelper
+        HtmlTagHelper $htmlTagHelper,
+        DateTimeFormatter $dateTimeFormatter
     ) {
         parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry, $nameResolver);
         
         $this->dispatcher = $dispatcher;
         $this->htmlTagHelper = $htmlTagHelper;
+        $this->dateTimeFormatter = $dateTimeFormatter;
     }
 
     /**
@@ -176,12 +182,8 @@ class ObjectMapper extends AbstractMapper
     /**
      * Gathers additionally selected fields from the search index
      * into an output array.
-     *
-     * @param Query $query
-     * @param array $resultItem
-     * @return array
      */
-    public function mapSelectedData(Query $query, $resultItem)
+    public function mapSelectedData(Query $query, array $resultItem) : array
     {
         $dataFields = $query->getSelectDataFields();
 
@@ -192,34 +194,43 @@ class ObjectMapper extends AbstractMapper
         $result = [];
 
         foreach ($dataFields as $column => $dataField) {
-            [$type, $columnName] = Criteria::explodeFieldTypeName($column);
-
-            $value = '';
-
-            if (isset($resultItem[$columnName])) {
-                $value = $resultItem[$columnName];
-            }
-
-            if (isset($resultItem[$dataField])) {
-                $value = $resultItem[$dataField];
-            }
-
-            if (is_array($value)) {
-                $value = array_shift($value);
-            }
-
-            if (is_numeric($value)) {
-                if ($type === Query::TYPE_INTEGER) {
-                    $value = (int)$value;
-                } elseif ($type === Query::TYPE_DECIMAL) {
-                    $value = (float)$value;
-                }
-            }
-
-            $result[$dataField] = $value;
+            $result[$dataField] = $this->mapColumn($resultItem, $column, $dataField);
         }
 
         return $result;
+    }
+
+    private function mapColumn(array $resultItem, string $column, string $dataField): mixed
+    {
+        [$type, $columnName] = Criteria::explodeFieldTypeName($column);
+
+        $value = '';
+
+        if (isset($resultItem[$columnName])) {
+            $value = $resultItem[$columnName];
+        }
+
+        if (isset($resultItem[$dataField])) {
+            $value = $resultItem[$dataField];
+        }
+
+        if (is_array($value)) {
+            $value = array_shift($value);
+        }
+
+        if (is_numeric($value)) {
+            if ($type === Query::TYPE_INTEGER) {
+                $value = (int)$value;
+            } elseif ($type === Query::TYPE_DECIMAL) {
+                $value = (float)$value;
+            }
+        }
+
+        if ($value instanceof \DateTime) {
+            $value = $this->dateTimeFormatter->format($value);
+        }
+
+        return $value;
     }
 
     /**

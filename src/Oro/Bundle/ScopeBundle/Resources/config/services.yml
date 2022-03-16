@@ -34,9 +34,9 @@ services:
         class: Oro\Bundle\ScopeBundle\Manager\ScopeCacheKeyBuilder
 
     oro_scope.scope_cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_scope' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_scope' }
 
     oro_scope.migration.extension.scope:
         class: 'Oro\Bundle\ScopeBundle\Migration\Extension\ScopeExtension'

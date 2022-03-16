@@ -16,6 +16,7 @@ oro_behat_extension:
         - Oro\Bundle\SecurityBundle\Tests\Behat\Context\ACLContext
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\GoogleImapEnableContext
+        - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:

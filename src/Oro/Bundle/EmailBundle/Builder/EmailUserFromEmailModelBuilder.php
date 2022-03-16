@@ -62,7 +62,9 @@ class EmailUserFromEmailModelBuilder
             $sentAt, // sentAt is also an internalDate for outgoing email.
             Email::NORMAL_IMPORTANCE,
             $emailModel->getCc(),
-            $emailModel->getBcc()
+            $emailModel->getBcc(),
+            null,
+            $emailModel->getOrganization()
         );
 
         // Outgoing email should be marked as seen by default.

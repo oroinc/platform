@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ScopeBundle\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * The listener that does the following:
@@ -19,10 +19,10 @@ use Oro\Bundle\ScopeBundle\Manager\ScopeCollection;
 class DoctrineEventListener
 {
     private ScopeCollection $scheduledForInsertScopes;
-    private CacheProvider $scopeCache;
+    private CacheItemPoolInterface $scopeCache;
     private bool $needToResetScopeCache = false;
 
-    public function __construct(ScopeCollection $scheduledForInsertScopes, CacheProvider $scopeCache)
+    public function __construct(ScopeCollection $scheduledForInsertScopes, CacheItemPoolInterface $scopeCache)
     {
         $this->scheduledForInsertScopes = $scheduledForInsertScopes;
         $this->scopeCache = $scopeCache;
@@ -56,7 +56,7 @@ class DoctrineEventListener
     {
         if ($this->needToResetScopeCache) {
             $this->needToResetScopeCache = false;
-            $this->scopeCache->deleteAll();
+            $this->scopeCache->clear();
         }
     }
 

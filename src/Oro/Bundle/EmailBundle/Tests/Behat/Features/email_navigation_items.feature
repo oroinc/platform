@@ -1,12 +1,12 @@
 @regression
 @ticket-CRM-8143
+@fixture-OroUserBundle:second-admin.yml
 Feature: Email Navigation Items
   In order to manage Email feature
   as an Administrator
   I should be able to see or not see navigation items based on feature state
 
   Scenario: Scenario background
-    Given Charlie Sheen active user exists in the system
     And I login as "charlie" user
     And I click My Emails in user menu
     And there are no records in grid
@@ -20,8 +20,8 @@ Feature: Email Navigation Items
   Scenario: Pin and Add to favorites Email pages
     Given I pin page
     When I add page to favorites
-    Then "My Emails - Charlie Sheen" link must be in pin holder
-    And Favorites must contain "My Emails - Charlie Sheen"
+    Then "My Emails - Charlie Admin" link must be in pin holder
+    And Favorites must contain "My Emails - Charlie Admin"
     When I click View Subject 1 in grid
     And pin page
     And add page to favorites
@@ -32,8 +32,8 @@ Feature: Email Navigation Items
     Given I go to Dashboards/Dashboard
     When I disable Email feature
     And I reload the page
-    Then "My Emails - Charlie Sheen" link must not be in pin holder
-    And Favorites must not contain "My Emails - Charlie Sheen"
+    Then "My Emails - Charlie Admin" link must not be in pin holder
+    And Favorites must not contain "My Emails - Charlie Admin"
     And "Subject 1 - My Emails" link must not be in pin holder
     And Favorites must not contain "Subject 1 - My Emails"
 
@@ -41,7 +41,7 @@ Feature: Email Navigation Items
     Given I go to Dashboards/Dashboard
     When I enable Email feature
     And I reload the page
-    Then "My Emails - Charlie Sheen" link must be in pin holder
-    And Favorites must contain "My Emails - Charlie Sheen"
+    Then "My Emails - Charlie Admin" link must be in pin holder
+    And Favorites must contain "My Emails - Charlie Admin"
     And "Subject 1 - My Emails" link must be in pin holder
     And Favorites must contain "Subject 1 - My Emails"

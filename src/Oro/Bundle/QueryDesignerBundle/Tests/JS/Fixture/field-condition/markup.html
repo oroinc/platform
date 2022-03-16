@@ -4,11 +4,11 @@
     <div class="dropdown">
         <% var togglerId = _.uniqueId('dropdown-') %>
         <a id="<%- togglerId %>" class="dropdown-toggle" data-toggle="dropdown" href="#" role="button"
-           aria-haspopup="true" aria-expanded="false"><%= selectedChoiceLabel %></a>:
+           aria-haspopup="true" aria-expanded="false"><%- selectedChoiceLabel %></a>:
         <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(choices, function (option) { %>
                 <li<% if (selectedChoice == option.value) { %> class="active"<% } %>>
-                    <a class="choice-value" href="#" data-value="<%- option.value %>"><%= option.label %></a>
+                    <a class="choice-value" href="#" data-value="<%- option.value %>"><%- option.label %></a>
                 </li>
             <% }); %>
         </ul>
@@ -28,7 +28,7 @@
     <div class="horizontal clearfix">
         <select name="<%- name %>" class="filter-select-oro">
             <% _.each(choices, function (option) { %>
-                <option value="<%- option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%= option.label %></option>
+                <option value="<%- option.value %>"<% if (option.value == selectedChoice) { %> selected="selected"<% } %>><%- option.label %></option>
             <% }); %>
         </select>
     </div>
@@ -41,7 +41,7 @@
         <div class="tab-container">
             <ul class="nav nav-tabs">
                 <% _.each(tabs, function (tab, i) { %>
-                    <li<% if (i === 0) { %> class="active"<% } %>><a class="<%- tab.name %>" href="#<%- tab.name %><%= suffix %>"><%- tab.label %></a></li>
+                    <li<% if (i === 0) { %> class="active"<% } %>><a class="<%- tab.name %>" href="#<%- tab.name %><%- suffix %>"><%- tab.label %></a></li>
                 <% }); %>
             </ul>
             <div class="tab-content">

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
-use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
 /**
@@ -32,14 +31,6 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     public function testExtractEmailAddressName(string $fullEmailAddress, string $pureEmailAddress, string $name)
     {
         $this->assertEquals($name, $this->helper->extractEmailAddressName($fullEmailAddress));
-    }
-
-    /**
-     * @dataProvider emailAddressesProvider
-     */
-    public function testExtractEmailAddresses(array|string $src, array $expected)
-    {
-        $this->assertEquals($expected, $this->helper->extractEmailAddresses($src));
     }
 
     /**
@@ -112,22 +103,6 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
             ['<john@example.com>', true],
             ['John Smith <john@example.com>', true],
             ['"John Smith" <john@example.com>', true],
-        ];
-    }
-
-    public function emailAddressesProvider(): array
-    {
-        $emailObj = $this->createMock(EmailInterface::class);
-        $emailObj->expects($this->any())
-            ->method('getEmail')
-            ->willReturn('john@example.com');
-
-        return [
-            ['', []],
-            [[], []],
-            ['john@example.com', ['john@example.com']],
-            [['john@example.com'], ['john@example.com']],
-            [[$emailObj], ['john@example.com']],
         ];
     }
 

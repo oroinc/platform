@@ -8,13 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * The form for entity and entity field configuration options.
@@ -27,13 +27,13 @@ class ConfigType extends AbstractType
     /** @var ConfigManager */
     protected $configManager;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     public function __construct(
         ConfigTranslationHelper $translationHelper,
         ConfigManager $configManager,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $this->translationHelper = $translationHelper;
         $this->configManager = $configManager;

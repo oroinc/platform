@@ -8,7 +8,7 @@ use Oro\Bundle\EntityPaginationBundle\Navigation\EntityPaginationNavigation;
 use Oro\Bundle\EntityPaginationBundle\Storage\EntityPaginationStorage;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MessageManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -30,7 +30,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
         $this->navigation = $this->createMock(EntityPaginationNavigation::class);
         $this->storage = $this->createMock(EntityPaginationStorage::class);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($id, array $parameters = []) {

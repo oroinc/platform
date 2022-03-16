@@ -57,7 +57,7 @@ class EnumAttributeTypeTest extends AttributeTypeTestCase
         $value = new TestEnumValue('id', 'name', 100);
 
         $this->assertEquals(
-            [$this->attribute->getFieldName() . '_' . $value->getId() => 1],
+            [$this->attribute->getFieldName() . '_enum.' . $value->getId() => 1],
             $this->getAttributeType()->getFilterableValue($this->attribute, $value, $this->localization)
         );
     }

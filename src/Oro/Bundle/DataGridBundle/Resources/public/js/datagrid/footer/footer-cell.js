@@ -23,7 +23,7 @@ define(function(require) {
         /** @property */
         template: _.template(
             // wrap label into span otherwise underscore will not render it
-            '<span><%= label  %><%= total ? (label? ": " : "") + total : "" %></span>'
+            '<span><%- label  %><%- total ? (label? ": " : "") + total : "" %></span>'
         ),
 
         keepElement: false,

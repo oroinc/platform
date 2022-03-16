@@ -16,7 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,7 +42,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);

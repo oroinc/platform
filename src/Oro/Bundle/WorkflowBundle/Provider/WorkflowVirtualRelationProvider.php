@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Provider;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
-use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The provider to get virtual relations for workflow items ans steps.
@@ -19,19 +18,16 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
 {
     use WorkflowQueryTrait;
 
-    const ENTITIES_WITH_WORKFLOW = 'entities_with_workflow';
-    const ITEMS_RELATION_NAME = 'workflowItems_virtual';
-    const STEPS_RELATION_NAME = 'workflowSteps_virtual';
+    public const ENTITIES_WITH_WORKFLOW = 'entities_with_workflow';
+    public const ITEMS_RELATION_NAME = 'workflowItems_virtual';
+    public const STEPS_RELATION_NAME = 'workflowSteps_virtual';
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var Cache */
-    private $entitiesWithWorkflowCache;
+    private DoctrineHelper $doctrineHelper;
+    private CacheInterface $entitiesWithWorkflowCache;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        Cache $entitiesWithWorkflowCache
+        CacheInterface $entitiesWithWorkflowCache
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entitiesWithWorkflowCache = $entitiesWithWorkflowCache;
@@ -82,26 +78,17 @@ class WorkflowVirtualRelationProvider implements VirtualRelationProviderInterfac
         return !empty($entitiesWithWorkflow[$className]);
     }
 
-    /**
-     * @return array|null
-     */
-    private function getEntitiesWithWorkflow()
+    private function getEntitiesWithWorkflow(): ?array
     {
-        $entitiesWithWorkflow = $this->entitiesWithWorkflowCache->fetch(self::ENTITIES_WITH_WORKFLOW);
-        if (false === $entitiesWithWorkflow) {
-            /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
+        return $this->entitiesWithWorkflowCache->get(self::ENTITIES_WITH_WORKFLOW, function () {
             $workflowDefinitionRepository = $this->doctrineHelper->getEntityRepository(WorkflowDefinition::class);
             $entityClasses = $workflowDefinitionRepository->getAllRelatedEntityClasses(true);
-
             $entitiesWithWorkflow = [];
             foreach ($entityClasses as $entityClass) {
                 $entitiesWithWorkflow[$entityClass] = true;
             }
-
-            $this->entitiesWithWorkflowCache->save(self::ENTITIES_WITH_WORKFLOW, $entitiesWithWorkflow);
-        }
-
-        return $entitiesWithWorkflow;
+            return $entitiesWithWorkflow;
+        });
     }
 
     /**

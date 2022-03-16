@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\Cache;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\EventListener\WorkflowAwareCache;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -21,7 +22,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
+        $this->cache = $this->createMock(CacheInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $this->doctrineHelper);
@@ -134,12 +135,12 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
             ->willReturn($repository);
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with($cacheKey)
-            ->willReturn(false);
-        $this->cache->expects($this->once())
-            ->method('save')
-            ->with($cacheKey, $classes);
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
     }
 
     private function assertCacheFetching(string $cacheKey, object $entity, array $classes): void
@@ -149,7 +150,7 @@ class WorkflowAwareCacheRetrievingTest extends \PHPUnit\Framework\TestCase
             ->willReturn(get_class($entity));
 
         $this->cache->expects($this->once())
-            ->method('fetch')
+            ->method('get')
             ->with($cacheKey)
             ->willReturn($classes);
     }

@@ -8,6 +8,7 @@ use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 use Oro\Bundle\SearchBundle\Engine\ExtendedEngineInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
+use Oro\Bundle\SearchBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -86,7 +87,8 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             $this->getTypeCastingHandlerRegistry(),
             $this->createMock(EntityNameResolver::class),
             $this->createMock(EventDispatcherInterface::class),
-            $this->createMock(HtmlTagHelper::class)
+            $this->createMock(HtmlTagHelper::class),
+            new DateTimeFormatter()
         );
 
         $this->indexService = new Indexer(

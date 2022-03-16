@@ -6,3 +6,10 @@ oro_permissions:
     ASSIGN:
         exclude_entities:
             - Oro\Bundle\EmailBundle\Entity\EmailUser
+
+    VIEW_PRIVATE:
+        label: oro.email.permission.view_private.label
+        group_names: ""
+        apply_to_all: false
+        apply_to_entities:
+            - Oro\Bundle\EmailBundle\Entity\EmailUser

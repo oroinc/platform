@@ -2,44 +2,40 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Contracts\Cache\CacheInterface;
 
+/**
+ * Adapter for caching translations
+ */
 class CachingTranslationLoader implements LoaderInterface
 {
-    /** @var LoaderInterface */
-    private $innerLoader;
+    private LoaderInterface $innerLoader;
+    private ?CacheInterface $cache;
 
-    /** @var Cache */
-    private $cache = [];
-
-    public function __construct(LoaderInterface $innerLoader, Cache $cache)
+    public function __construct(LoaderInterface $innerLoader, ?CacheInterface $cache = null)
     {
         $this->innerLoader = $innerLoader;
         $this->cache       = $cache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function load($resource, $locale, $domain = 'messages')
+    public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         $resourceKey = $this->getResourceKey($resource);
         if (null === $resourceKey) {
             return $this->innerLoader->load($resource, $locale, $domain);
         }
-
-        $cacheKey = sprintf('%s_%s_%s', $locale, $domain, $resourceKey);
-
-        $catalogue = $this->cache->fetch($cacheKey);
-        if (false !== $catalogue) {
-            return $catalogue;
+        if ($this->cache) {
+            $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey(
+                sprintf('%s_%s_%s', $locale, $domain, $resourceKey)
+            );
+            return $this->cache->get($cacheKey, function () use ($resource, $locale, $domain) {
+                return $this->innerLoader->load($resource, $locale, $domain);
+            });
         }
-
-        $catalogue = $this->innerLoader->load($resource, $locale, $domain);
-        $this->cache->save($cacheKey, $catalogue);
-
-        return $catalogue;
+        return $this->innerLoader->load($resource, $locale, $domain);
     }
 
     /**
@@ -47,7 +43,7 @@ class CachingTranslationLoader implements LoaderInterface
      *
      * @return string|null
      */
-    protected function getResourceKey($resource)
+    protected function getResourceKey(mixed $resource): ?string
     {
         if (is_object($resource) && method_exists($resource, '__toString')) {
             $resource = (string)$resource;

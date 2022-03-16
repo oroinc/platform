@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -17,10 +17,10 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     /** @var DateTimeFormatConverterInterface */
     protected $converter;
 
-    /** @var LocaleSettings */
+    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
     protected $formatter;
 
-    /** @var Translator */
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     protected $translator;
 
     protected array $localFormatMap = [
@@ -68,28 +68,24 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
-
         $this->formatter->expects(self::any())
             ->method('getPattern')
             ->willReturnMap($this->localFormatMap);
 
-        $this->translator = $this->createMock(Translator::class);
-
-        $this->translator
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects(self::any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($one, $two, $tree, $locale) {
-                    if ($locale === self::LOCALE_EN) {
-                        return 'MMM d';
-                    }
-
-                    if ($locale === self::LOCALE_RU) {
-                        return 'd.MMM';
-                    }
-
-                    return '';
+            ->willReturnCallback(function ($one, $two, $tree, $locale) {
+                if ($locale === self::LOCALE_EN) {
+                    return 'MMM d';
                 }
-            );
+
+                if ($locale === self::LOCALE_RU) {
+                    return 'd.MMM';
+                }
+
+                return '';
+            });
 
         $this->converter = $this->createFormatConverter();
     }

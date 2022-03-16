@@ -89,16 +89,202 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedData, $listEvent->getScrollData()->getData());
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function formRenderDataProvider(): array
     {
-        $data = $this->viewListDataProvider();
+        $label = $this->getEntity(LocalizedFallbackValue::class, ['string' => 'Group1Title']);
+        $group1 = $this->getEntity(AttributeGroupStub::class, ['code' => 'group1', 'label' => $label]);
+        $attributeVisible = $this->getEntity(
+            FieldConfigModel::class,
+            [
+                'id' => 1,
+                'fieldName' => 'someField',
+                'data' => [
+                    'view' => ['is_displayable' => true],
+                    'form' => ['is_enabled' => true]
+                ]
+            ]
+        );
+        $attributeInvisible = $this->getEntity(
+            FieldConfigModel::class,
+            [
+                'id' => 1,
+                'fieldName' => 'someField',
+                'data' => [
+                    'view' => ['is_displayable' => false],
+                    'form' => ['is_enabled' => false]
+                ]
+            ]
+        );
 
-        //Add form view  parameters to data
-        $data['empty group not added']['formViewChildren'] = [];
-        $data['empty group gets deleted']['formViewChildren'] = [];
-        $data['new group is added']['formViewChildren']['someField'] = new FormView();
-        $data['invisible attribute not displayed']['formViewChildren']['someField'] = new FormView();
-        $data['move attribute field to other group']['formViewChildren']['someField'] = (new FormView())->setRendered();
+        $data = [
+            'empty group not added' => [
+                'groupsData' => [
+                    ['group' => $group1, 'attributes' => []]
+                ],
+                'scrollData' => [],
+                'templateHtml' => '',
+                'expectedData' => [],
+                'formViewChildren' => [],
+            ],
+            'empty group gets deleted' => [
+                'groupsData' => [
+                    ['group' => $group1, 'attributes' => []]
+                ],
+                'scrollData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'group1' => []
+                    ]
+                ],
+                'templateHtml' => '',
+                'expectedData' => [
+                    ScrollData::DATA_BLOCKS => [
+                    ]
+                ],
+                'formViewChildren' => [],
+            ],
+            'new group is added' => [
+                'groupsData' => [
+                    ['group' => $group1, 'attributes' => [$attributeVisible]]
+                ],
+                'scrollData' => [],
+                'templateHtml' => 'field template',
+                'expectedData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => ['someField' => 'field template']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'formViewChildren' => ['someField' => new FormView()],
+            ],
+            'attributes are added to the last subblock' => [
+                'groupsData' => [
+                    ['group' => $group1, 'attributes' => [$attributeVisible]],
+                ],
+                'scrollData' => [
+                    ScrollData::DATA_BLOCKS => [
+
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                ['data' => ['alreadyExistingField1' => 'sample data1']],
+                                ['data' => ['alreadyExistingField2' => 'sample data2']],
+                            ],
+                        ],
+                    ],
+                ],
+                'templateHtml' => 'field template',
+                'expectedData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => [
+                                        'alreadyExistingField1' => 'sample data1',
+                                    ],
+                                ],
+                                [
+                                    'data' => [
+                                        'alreadyExistingField2' => 'sample data2',
+                                        'someField' => 'field template',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                'formViewChildren' => [
+                    'alreadyExistingField' => (new FormView())->setRendered(),
+                    'someField' => new FormView(),
+                ],
+            ],
+            'invisible attribute not displayed' => [
+                'groupsData' => [
+                    [
+                        'group' => $group1,
+                        'attributes' => [
+                            $attributeVisible,
+                            $attributeInvisible
+                        ]
+                    ]
+                ],
+                'scrollData' => [],
+                'templateHtml' => 'field template',
+                'expectedData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => ['someField' => 'field template']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'formViewChildren' => ['someField' => new FormView()],
+            ],
+            'move attribute field to other group' => [
+                'groupsData' => [
+                    ['group' => $group1, 'attributes' => [$attributeVisible]]
+                ],
+                'scrollData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'existingGroup' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => [
+                                        'someField' => 'field template',
+                                        'otherField' => 'field template'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'templateHtml' => '',
+                'expectedData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'existingGroup' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => [
+                                        'otherField' => 'field template'
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => ['someField' => 'field template']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'formViewChildren' => ['someField' => (new FormView())->setRendered()],
+            ]
+        ];
 
         return $data;
     }
@@ -204,6 +390,44 @@ class AttributeFormViewListenerTest extends \PHPUnit\Framework\TestCase
                                 [
                                     'data' => ['someField' => 'field template']
                                 ]
+                            ]
+                        ]
+                    ]
+                ],
+            ],
+            'attributes are added to the last subblock' => [
+                'groupsData' => [
+                    ['group' => $group1, 'attributes' => [$attributeVisible]]
+                ],
+                'scrollData' => [
+                    ScrollData::DATA_BLOCKS => [
+
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                ['data' => ['alreadyExistingField1' => 'sample data1']],
+                                ['data' => ['alreadyExistingField2' => 'sample data2']],
+                            ],
+                        ],
+                    ],
+                ],
+                'templateHtml' => 'field template',
+                'expectedData' => [
+                    ScrollData::DATA_BLOCKS => [
+                        'group1' => [
+                            'title' => 'Group1Title',
+                            'useSubBlockDivider' => true,
+                            'subblocks' => [
+                                [
+                                    'data' => ['alreadyExistingField1' => 'sample data1']
+                                ],
+                                [
+                                    'data' => [
+                                        'alreadyExistingField2' => 'sample data2',
+                                        'someField' => 'field template',
+                                    ],
+                                ],
                             ]
                         ]
                     ]

@@ -79,8 +79,10 @@ class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         bool $isHtml,
         string $messageId
     ): void {
+        $organization = new Organization();
         $emailModel = ($this->createEmailModel())
-            ->setType($type);
+            ->setType($type)
+            ->setOrganization($organization);
 
         $emailEntity = new Email();
         $emailUser = (new EmailUser())->setEmail($emailEntity);
@@ -97,7 +99,9 @@ class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
                 self::isInstanceOf(\DateTime::class),
                 Email::NORMAL_IMPORTANCE,
                 $emailModel->getCc(),
-                $emailModel->getBcc()
+                $emailModel->getBcc(),
+                null,
+                $organization
             )
             ->willReturn($emailUser);
 

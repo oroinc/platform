@@ -4,7 +4,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -21,7 +21,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturn('MMM d');
@@ -41,17 +41,17 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
      * @dataProvider formatDataProvider
      */
     public function testFormat(
-        $expectedDateType,
-        $expectedTimeType,
+        int $expectedDateType,
+        int $expectedTimeType,
         \DateTime $expectedDate,
-        $date,
-        $dateType,
-        $timeType,
-        $locale,
-        $timeZone,
-        $language,
-        $defaultLocale = null,
-        $defaultTimeZone = null
+        \DateTime|string|int $date,
+        int|string|null $dateType,
+        int|string|null $timeType,
+        ?string $locale,
+        ?string $timeZone,
+        string $language,
+        string $defaultLocale = null,
+        string $defaultTimeZone = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getLanguage')
@@ -207,14 +207,14 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
      * @dataProvider formatDateDataProvider
      */
     public function testFormatDate(
-        $expectedDateType,
+        int $expectedDateType,
         \DateTime $date,
-        $dateType,
-        $locale,
-        $timeZone,
-        $language,
-        $defaultLocale = null,
-        $defaultTimeZone = null
+        int|string|null $dateType,
+        ?string $locale,
+        ?string $timeZone,
+        string $language,
+        string $defaultLocale = null,
+        string $defaultTimeZone = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getLanguage')
@@ -315,12 +315,12 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     public function testFormatTime(
         $expectedTimeType,
         \DateTime $date,
-        $timeType,
-        $locale,
-        $timeZone,
-        $language,
-        $defaultLocale = null,
-        $defaultTimeZone = null
+        int|string|null $timeType,
+        ?string $locale,
+        ?string $timeZone,
+        string $language,
+        string $defaultLocale = null,
+        string $defaultTimeZone = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getLanguage')
@@ -473,11 +473,11 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getDatePatternDataProvider
      */
     public function testGetDatePattern(
-        $expectedDateType,
-        $expectedTimeType,
-        $dateType,
-        $timeType,
-        $locale
+        int $expectedDateType,
+        int $expectedTimeType,
+        int|string $dateType,
+        int|string $timeType,
+        string $locale
     ) {
         $expected = $this->getPattern($locale, $expectedDateType, $expectedTimeType);
         $this->assertEquals($expected, $this->formatter->getPattern($dateType, $timeType, $locale));
@@ -513,7 +513,7 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDateTimeNotModifiedDataProvider
      */
-    public function testGetDateTimeReturnsNotModified($date)
+    public function testGetDateTimeReturnsNotModified(\DateTimeInterface $date)
     {
         $this->assertSame($date, $this->formatter->getDateTime($date));
     }
