@@ -3,12 +3,14 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Stub;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListApplicableProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
 
 class TestActivityProvider implements
     ActivityListProviderInterface,
+    ActivityListApplicableProviderInterface,
     CommentProviderInterface,
     ActivityListUpdatedByProviderInterface
 {
@@ -118,6 +120,14 @@ class TestActivityProvider implements
     public function getActivityOwners($entity, ActivityList $activity)
     {
         return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function isActivityListApplicable(ActivityList $activityList): bool
+    {
+        return true;
     }
 
     /**

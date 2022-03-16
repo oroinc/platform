@@ -123,7 +123,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
                     'updates' => [],
                     'deletions' => [],
                 ],
-                [[],[]],
+                [[],[], []],
             ],
             [
                 [
@@ -154,6 +154,7 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
                             ->setOwner($created1)
                             ->setEmail('primary@example.com'),
                     ],
+                    ['primary@example.com', 'existing@example.com', 'existing2@example.com']
                 ],
             ],
         ];

@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Migrations\Schema;
 
+use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_35\EmailMessageIdIndexQuery;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareInterface;
+use Oro\Bundle\MigrationBundle\Migration\Extension\DatabasePlatformAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\MigrationBundle\Migration\SqlMigrationQuery;
 
 /**
  * ORO installer for EmailBundle
@@ -13,14 +17,16 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class OroEmailBundleInstaller implements Installation
+class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInterface
 {
+    use DatabasePlatformAwareTrait;
+
     /**
      * {@inheritdoc}
      */
     public function getMigrationVersion()
     {
-        return 'v1_35';
+        return 'v1_36';
     }
 
     /**
@@ -41,10 +47,12 @@ class OroEmailBundleInstaller implements Installation
         $this->createOroEmailThreadTable($schema);
         $this->createOroEmailBodyTable($schema);
         $this->createOroEmailMailboxTable($schema);
+        $this->createOroEmailMailboxTableCaseInsensitiveIndex($queries);
         $this->createOroEmailMailboxProcessTable($schema);
         $this->createOroEmailTable($schema);
         $this->createOroEmailAutoResponseRuleTable($schema);
         $this->createOroEmailTemplateLocalizedTable($schema);
+        $this->createOroEmailAddressVisibilityTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroEmailToFolderRelationForeignKeys($schema);
@@ -214,6 +222,7 @@ class OroEmailBundleInstaller implements Installation
         $table->addColumn('created_at', 'datetime');
         $table->addColumn('received', 'datetime');
         $table->addColumn('is_seen', 'boolean', ['default' => true]);
+        $table->addColumn('is_private', 'boolean', ['notnull' => false]);
         $table->addColumn('mailbox_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('unsyncedflagcount', 'integer', ['default' => 0]);
         $table->setPrimaryKey(['id']);
@@ -268,6 +277,15 @@ class OroEmailBundleInstaller implements Installation
         $table->addUniqueIndex(['process_settings_id']);
         $table->addUniqueIndex(['origin_id']);
         $table->setPrimaryKey(['id']);
+    }
+
+    private function createOroEmailMailboxTableCaseInsensitiveIndex(QueryBag $queries)
+    {
+        if ($this->platform instanceof PostgreSqlPlatform) {
+            $queries->addPostQuery(new SqlMigrationQuery(
+                'CREATE INDEX idx_mailbox_email_ci ON oro_email_mailbox (LOWER(email))'
+            ));
+        }
     }
 
     /**
@@ -587,6 +605,21 @@ class OroEmailBundleInstaller implements Installation
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_email_template'),
             ['template_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
+        );
+    }
+
+    private function createOroEmailAddressVisibilityTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_email_address_visibility');
+        $table->addColumn('email', 'string', ['length' => 255]);
+        $table->addColumn('organization_id', 'integer', ['notnull' => true]);
+        $table->addColumn('is_visible', 'boolean', []);
+        $table->setPrimaryKey(['email', 'organization_id']);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_organization'),
+            ['organization_id'],
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );

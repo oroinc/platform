@@ -8,7 +8,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
-use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -44,7 +44,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             ->disableOriginalConstructor()->getMock();
         $this->repository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
-            ->setMethods(['getNewEmails','getCountNewEmails'])
+            ->setMethods(['getNewEmailsWithAcl','getCountNewEmailsWithAcl'])
             ->getMock();
         $this->entityManager->expects($this->once())
             ->method('getRepository')
@@ -75,8 +75,8 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             $this->htmlTagHelper,
             $this->router,
             $this->configManager,
-            new EmailBodyHelper($this->htmlTagHelper)
         );
+        $this->emailNotificationManager->setAclHelper($this->createMock(AclHelper::class));
     }
 
     /**
@@ -87,7 +87,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->repository->expects($this->once())->method('getNewEmails')->willReturn($emails);
+        $this->repository->expects($this->once())->method('getNewEmailsWithAcl')->willReturn($emails);
         $maxEmailsDisplay = 1;
         $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
 
@@ -154,7 +154,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCountNewEmails()
     {
-        $this->repository->expects($this->once())->method('getCountNewEmails')->willReturn(1);
+        $this->repository->expects($this->once())->method('getCountNewEmailsWithAcl')->willReturn(1);
         $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')->disableOriginalConstructor()->getMock();
         $organization = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Organization')
             ->disableOriginalConstructor()

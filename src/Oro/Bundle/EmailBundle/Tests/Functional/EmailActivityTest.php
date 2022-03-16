@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadAdminOwnerEmailData;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserWithUserRoleData;
@@ -14,28 +15,27 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailActivityTest extends WebTestCase
 {
+    use PublicEmailOwnerTrait;
+
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
+        self::addPublicEmailOwner(User::class);
     }
 
     public function testActivityDateIsNotUpdatedAfterUpdateEntity()
     {
-        $this->loadFixtures(['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData']);
+        $this->loadFixtures([LoadEmailData::class]);
+
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
         $email = $this->getReference('email_1');
         $originalSentAt = $email->getSentAt();
         $email->setSubject('My Web Store Introduction Changed');
         $em->flush($email);
 
-        $activityList = $em
-            ->getRepository(ActivityList::ENTITY_NAME)
-            ->findOneBy(
-                [
-                    'relatedActivityClass' => 'Oro\Bundle\EmailBundle\Entity\Email',
-                    'relatedActivityId' => $email->getId()
-                ]
-            );
+        /** @var ActivityList $activityList */
+        $activityList = $em->getRepository(ActivityList::ENTITY_NAME)
+            ->findOneBy(['relatedActivityClass' => Email::class, 'relatedActivityId' => $email->getId()]);
 
         $this->assertEquals($originalSentAt, $activityList->getUpdatedAt());
     }
@@ -61,15 +61,16 @@ class EmailActivityTest extends WebTestCase
 
     public function testGetAdminActivityListByAdmin()
     {
-        $this->loadFixtures([LoadAdminOwnerEmailData::class]);
+        $this->loadFixtures([LoadEmailData::class]);
+        $this->initClient([], $this->generateWsseAuthHeader('simple_user', 'simple_password'));
 
-        $admin = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneByUsername('admin');
+        $user = $this->getReference('simple_user');
         $routingHelper = $this->getContainer()->get('oro_entity.routing_helper');
         $url = $this->getUrl(
             'oro_activity_list_api_get_list',
             [
                 'entityClass' => $routingHelper->getUrlSafeClassName(User::class),
-                'entityId'    => $admin->getId()
+                'entityId'    => $user->getId()
             ]
         );
         $this->client->request('GET', $url);

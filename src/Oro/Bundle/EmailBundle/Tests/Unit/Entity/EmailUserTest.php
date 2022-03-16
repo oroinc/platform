@@ -38,6 +38,10 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
 
         $emailUser->setOrganization(null);
         $this->assertNull($emailUser->getOrganization());
+
+        $this->assertFalse($emailUser->isEmailPrivate());
+        $emailUser->setIsEmailPrivate(true);
+        $this->assertTrue($emailUser->isEmailPrivate());
     }
 
     public function testBeforeSave()

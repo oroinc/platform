@@ -17,6 +17,7 @@ use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Tools\EmailHolderHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -111,6 +112,16 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
     protected function getRelatedEmailsProvider()
     {
         return $this->container->get('oro_email.related_emails.provider');
+    }
+
+    protected function getUrlProvider(): UrlProvider
+    {
+        return $this->container->get('oro_email.provider.url_provider');
+    }
+
+    protected function getAclHelper(): AclHelper
+    {
+        return $this->container->get('oro_security.acl_helper');
     }
 
     /**
@@ -283,7 +294,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
         /** @var EmailRepository $repo */
         $repo = $this->getRepository('OroEmailBundle:Email');
         $result = $repo->getCountNewEmailsPerFolders($currentUser, $currentOrganization);
-        $total = $repo->getCountNewEmails($currentUser, $currentOrganization);
+        $total = $repo->getCountNewEmailsWithAcl($currentUser, $currentOrganization, null, $this->getAclHelper());
         $result[] = ['num' => $total, 'id' => 0];
 
         return $result;
@@ -314,7 +325,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
      */
     public function getAbsoluteUrl($route, $routeParams = []): string
     {
-        return $this->container->get('oro_email.provider.url_provider')->getAbsoluteUrl($route, $routeParams);
+        return $this->getUrlProvider()->getAbsoluteUrl($route, $routeParams);
     }
 
     /**
@@ -332,6 +343,7 @@ class EmailExtension extends AbstractExtension implements ServiceSubscriberInter
             'oro_security.token_accessor' => TokenAccessorInterface::class,
             'oro_email.related_emails.provider' => RelatedEmailsProvider::class,
             'oro_email.provider.url_provider' => UrlProvider::class,
+            'oro_security.acl_helper' => AclHelper::class,
         ];
     }
 }

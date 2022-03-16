@@ -53,7 +53,7 @@ You can limit the reindexation to a specific entity with the <info>--class</info
 Both the FQCN (Oro\Bundle\UserBundle\Entity\User) and short (OroUserBundle:User)
 class names are accepted:
 
-  <info>php %command.full_name% --class=<entity></info>
+  <info>php %command.full_name% <entityClass></info>
 
 The <info>--scheduled</info> options allows to run the reindexation in the background.
 It will only schedule the job by adding a message to the message queue, so ensure

@@ -135,6 +135,38 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user->getUsername(), $owner->getUser()->getUsername());
     }
 
+    public function testGetActivityOwnersForPrivateEmail(): void
+    {
+        $organization = new Organization();
+        $organization->setName('Org');
+        $user = new User();
+        $user->setUsername('test');
+        $user->setOrganization($organization);
+        $emailUser = new EmailUser();
+        $emailUser->setOrganization($organization);
+        $emailUser->setOwner($user);
+        $emailUser->setIsEmailPrivate(true);
+
+        $fromEmailAddress = new EmailAddress();
+        $fromEmailAddress->setOwner($user);
+        $email = new Email();
+        $email->setFromEmailAddress($fromEmailAddress);
+        $email->addEmailUser($emailUser);
+
+        $activityListMock = $this->createMock(ActivityList::class);
+        $repository = $this->createMock(ObjectRepository::class);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityRepositoryForClass')
+            ->willReturn($repository);
+        $repository->expects($this->once())
+            ->method('findBy')
+            ->willReturn([$emailUser]);
+
+        $activityOwnerArray = $this->emailActivityListProvider->getActivityOwners($email, $activityListMock);
+
+        $this->assertCount(0, $activityOwnerArray);
+    }
+
     public function testGetActivityOwnersSeveralOrganizations()
     {
         $organization1 = new Organization();
@@ -304,13 +336,5 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
                 'ownerLink' => null
             ]
         ];
-    }
-
-    public function testIsApplicable()
-    {
-        self::assertTrue($this->emailActivityListProvider->isApplicable(new Email()));
-        self::assertTrue($this->emailActivityListProvider->isApplicable(Email::class));
-        self::assertFalse($this->emailActivityListProvider->isApplicable(new \stdClass()));
-        self::assertFalse($this->emailActivityListProvider->isApplicable(\stdClass::class));
     }
 }
