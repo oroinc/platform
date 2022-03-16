@@ -2,51 +2,41 @@
 
 namespace Oro\Bundle\WorkflowBundle\Cache;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\EventTriggerRepositoryInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * The event trigger cache.
  */
 class EventTriggerCache
 {
-    const DATA = 'data';
-    const BUILT = 'built';
+    private const DATA = 'data';
+    private const BUILT = 'built';
 
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /** @var CacheProvider */
-    protected $provider;
-
-    /** @var string */
-    protected $triggerClassName;
+    protected ManagerRegistry $registry;
+    protected ?CacheItemPoolInterface $provider = null;
+    protected ?string $triggerClassName = null;
 
     public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }
 
-    public function setProvider(CacheProvider $provider)
+    public function setProvider(CacheItemPoolInterface $provider): void
     {
         $this->provider = $provider;
     }
 
-    /**
-     * @param string $triggerClassName
-     */
-    public function setTriggerClassName($triggerClassName)
+    public function setTriggerClassName(?string $triggerClassName): void
     {
         $this->triggerClassName = $triggerClassName;
     }
 
     /**
      * Write to cache entity classes and appropriate events
-     *
-     * @return array
      */
-    public function build()
+    public function build(): array
     {
         $this->assertConfigured();
 
@@ -68,48 +58,39 @@ class EventTriggerCache
         }
 
         // write trigger data to cache
-        $this->provider->deleteAll();
-        $this->provider->save(self::DATA, $data);
-        $this->provider->save(self::BUILT, true);
+        $this->provider->clear();
+        $dataItem = $this->provider->getItem(self::DATA);
+        $this->provider->save($dataItem->set($data));
+        $buildItem = $this->provider->getItem(self::BUILT);
+        $this->provider->save($buildItem->set(true));
 
         return $data;
     }
 
-    public function invalidateCache()
+    public function invalidateCache(): void
     {
-        $this->provider->delete(self::DATA);
-        $this->provider->delete(self::BUILT);
+        $this->provider->deleteItems([self::DATA, self::BUILT]);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $event
-     * @return bool
-     * @throws \LogicException
-     */
-    public function hasTrigger($entityClass, $event)
+    public function hasTrigger(string $entityClass, string $event): bool
     {
         $this->assertConfigured();
-
-        if (!$this->isBuilt() || false === ($data = $this->provider->fetch(self::DATA))) {
+        $dataItem = $this->provider->getItem(self::DATA);
+        $buildItem = $this->provider->getItem(self::BUILT);
+        $isBuild = $buildItem->isHit() && $buildItem->get() === true;
+        if (!$isBuild || !$dataItem->isHit()) {
             $data = $this->build();
+        } else {
+            $data = $dataItem->get();
         }
 
         return !empty($data[$entityClass]) && in_array($event, $data[$entityClass], true);
     }
 
     /**
-     * @return bool
-     */
-    protected function isBuilt()
-    {
-        return true === $this->provider->fetch(self::BUILT);
-    }
-
-    /**
      * @throws \LogicException
      */
-    protected function assertConfigured()
+    protected function assertConfigured(): void
     {
         if (!$this->provider) {
             throw new \LogicException('Event trigger cache provider is not defined');
@@ -124,7 +105,7 @@ class EventTriggerCache
      * @return EventTriggerRepositoryInterface
      * @throws \LogicException
      */
-    protected function getRepository()
+    protected function getRepository(): EventTriggerRepositoryInterface
     {
         $repository = $this->registry->getManagerForClass($this->triggerClassName)
             ->getRepository($this->triggerClassName);

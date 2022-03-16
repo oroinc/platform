@@ -43,9 +43,9 @@ services:
             - '@oro_ui.dynamic_asset_version.cache'
 
     oro_ui.dynamic_asset_version.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_dynamic_asset_version' }
 
     oro_ui.templating.template_name_parser:
         class: Symfony\Component\Templating\TemplateNameParser

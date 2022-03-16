@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowActivationException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowRemoveException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -29,7 +30,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
-        $this->entitiesWithWorkflowsCache = $this->createMock(CacheProvider::class);
+        $this->entitiesWithWorkflowsCache = $this->createMock(AbstractAdapter::class);
 
         $this->listener = new WorkflowDefinitionEntityListener(
             $this->entitiesWithWorkflowsCache,
@@ -70,7 +71,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new ArrayCollection());
 
         $this->entitiesWithWorkflowsCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->prePersist($definitionMock);
     }
@@ -167,7 +168,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $workflow = $this->createWorkflow('workflow1', ['group1']);
 
         $this->entitiesWithWorkflowsCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
@@ -194,7 +195,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new ArrayCollection([$workflow]));
 
         $this->entitiesWithWorkflowsCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
@@ -213,7 +214,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         $workflow = $this->createWorkflow('workflow1', ['group1']);
 
         $this->entitiesWithWorkflowsCache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->preUpdate($workflow->getDefinition(), $event);
     }
@@ -247,7 +248,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->entitiesWithWorkflowsCache->expects($this->never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->preUpdate($workflow->getDefinition(), $eventMock);
     }
@@ -278,7 +279,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName');
 
         $this->entitiesWithWorkflowsCache->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->preRemove($definitionMock);
     }
