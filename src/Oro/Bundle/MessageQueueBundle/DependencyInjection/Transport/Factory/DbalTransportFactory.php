@@ -27,12 +27,12 @@ class DbalTransportFactory implements TransportFactoryInterface
         $container->setParameter('oro_message_queue.dbal.pid_file_dir', $config['pid_file_dir']);
 
         $pidFileManager = new Definition(DbalPidFileManager::class, [$config['pid_file_dir']]);
-        $pidFileManager->setPublic(false);
         $pidFileManagerId = sprintf('oro_message_queue.consumption.%s.pid_file_manager', $this->getKey());
         $container->setDefinition($pidFileManagerId, $pidFileManager);
 
         $cliProcessManager = new Definition(DbalCliProcessManager::class);
-        $cliProcessManager->setPublic(false);
+        $cliProcessManager->addMethodCall('setLogger', [new Reference('logger')]);
+        $cliProcessManager->addTag('monolog.logger', ['channel' => 'consumer']);
         $cliProcessManagerId = sprintf('oro_message_queue.consumption.%s.cli_process_manager', $this->getKey());
         $container->setDefinition($cliProcessManagerId, $cliProcessManager);
 
@@ -41,7 +41,6 @@ class DbalTransportFactory implements TransportFactoryInterface
             new Reference($cliProcessManagerId),
             $config['consumer_process_pattern']
         ]);
-        $orphanExtension->setPublic(false);
         $orphanExtension->addTag('oro_message_queue.consumption.extension', ['priority' => -20]);
         $container->setDefinition(
             sprintf('oro_message_queue.consumption.%s.redeliver_orphan_messages_extension', $this->getKey()),
@@ -49,7 +48,6 @@ class DbalTransportFactory implements TransportFactoryInterface
         );
 
         $rejectOnExceptionExtension = new Definition(RejectMessageOnExceptionDbalExtension::class);
-        $rejectOnExceptionExtension->setPublic(false);
         $rejectOnExceptionExtension->addTag('oro_message_queue.consumption.extension');
         $container->setDefinition(
             sprintf('oro_message_queue.consumption.%s.reject_message_on_exception_extension', $this->getKey()),

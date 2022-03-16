@@ -115,16 +115,21 @@ class RedeliverOrphanMessagesDbalExtension extends AbstractExtension
 
     private function redeliverOrphanMessages(Context $context)
     {
-        // find orphan consumerIds
+        $pidsFileInfo = $this->pidFileManager->getListOfPidsFileInfo();
+        if (!$pidsFileInfo) {
+            return;
+        }
+
+        // Finds currently running consumers.
         $runningPids = $this->cliProcessManager->getListOfProcessesPids($this->consumerProcessPattern);
         $orphanConsumerIds = [];
-        foreach ($this->pidFileManager->getListOfPidsFileInfo() as $pidFileInfo) {
-            if (! in_array($pidFileInfo['pid'], $runningPids)) {
+        foreach ($pidsFileInfo as $pidFileInfo) {
+            if (!in_array($pidFileInfo['pid'], $runningPids, false)) {
                 $orphanConsumerIds[] = $pidFileInfo['consumerId'];
             }
         }
 
-        if (! $orphanConsumerIds) {
+        if (!$orphanConsumerIds) {
             return;
         }
 
