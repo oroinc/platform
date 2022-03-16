@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\OroIconType;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
+use Oro\Bundle\FormBundle\Tests\Unit\Stub\TooltipFormExtensionStub;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionType;
@@ -114,10 +112,11 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
         $this->assertEquals(WorkflowDefinitionType::NAME, $this->formType->getBlockPrefix());
     }
 
-    protected function getExtensions()
+    /**
+     * {@inheritDoc}
+     */
+    protected function getExtensions(): array
     {
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $translator = $this->createMock(Translator::class);
         $choiceType = $this->createMock(OroChoiceType::class);
         $choiceType->expects($this->any())
             ->method('getParent')
@@ -129,12 +128,12 @@ class WorkflowDefinitionTypeTest extends FormIntegrationTestCase
                 new PreloadedExtension(
                     [
                         $this->formType,
+                        $choiceType,
                         OroIconType::class => new OroIconTypeStub(),
-                        OroChoiceType::class => $choiceType,
                         ApplicableEntitiesType::class => new ApplicableEntitiesTypeStub()
                     ],
                     [
-                        FormType::class => [new TooltipFormExtension($configProvider, $translator)],
+                        FormType::class => [new TooltipFormExtensionStub($this)]
                     ]
                 ),
                 $this->getValidatorExtension(false)

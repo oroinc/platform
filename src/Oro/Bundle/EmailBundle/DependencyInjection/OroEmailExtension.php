@@ -23,6 +23,10 @@ class OroEmailExtension extends Extension implements PrependExtensionInterface
             'oro_email.email_sync_exclusions',
             $config['email_sync_exclusions']
         );
+        $container->setParameter(
+            'oro_email.public_email_owners',
+            $config['public_email_owners']
+        );
 
         $container->setParameter(
             'oro_email.flash_notification.max_emails_display',

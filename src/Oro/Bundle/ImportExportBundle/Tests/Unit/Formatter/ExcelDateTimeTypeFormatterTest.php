@@ -4,7 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
@@ -14,7 +14,7 @@ class ExcelDateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $this->formatter = new ExcelDateTimeTypeFormatter($localeSettings, $translator);
     }

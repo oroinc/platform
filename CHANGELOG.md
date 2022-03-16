@@ -105,6 +105,15 @@ The current file describes significant changes in the code that may affect the u
 ## 5.0.0-rc (2021-12-07)
 [Show detailed list of changes](incompatibilities-5-0-rc.md)
 
+## 4.2.10
+
+### Changed
+
+#### EmailBundle
+* Added `getOrganizations()` and `getEmails()` methods to `Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface`.
+
+## 4.2.4
+
 ### Added
 
 #### DataGridBundle

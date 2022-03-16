@@ -4,7 +4,7 @@
 <% } %>
         <a href="#" role="button" id="<%- togglerId %>" class="<%- buttonClass %> dropdown-toggle<% if (!useCaret) { %> dropdown-toggle--no-caret<% } %>" data-toggle="dropdown"
            aria-haspopup="true" aria-expanded="false"<% if (label) { %> aria-label="<%- label %>"<% } %>>
-            <span class="current-label"><%= selectedLabel %></span>
+            <span class="current-label"><%- selectedLabel %></span>
         </a>
         <ul class="dropdown-menu" role="menu" aria-labelledby="<%- togglerId %>">
             <% _.each(options, function (option) { %>

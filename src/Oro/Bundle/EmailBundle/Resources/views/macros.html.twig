@@ -42,7 +42,7 @@
                          role="tabpanel"
                          aria-labelledby="{{ systemTab }}"
                     >
-                        <%= variables.system %>
+                        <%- variables.system %>
                     </div>
                     <div id="{{ entity }}"
                          class="variables tab-pane"
@@ -60,8 +60,8 @@
             <li>
                 <a href="#"
                    class="variable"
-                   title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
-                <span>&ndash; <%= variable.label %></span>
+                   title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%- root %>.<%- varName %><% if(variable.filter){%>|<%- variable.filter %><% } %> }}{% endverbatim %}</a>
+                <span>&ndash; <%- variable.label %></span>
             </li>
             <% }); %>
         </ul>
@@ -71,16 +71,16 @@
             <a href="#"
                class="variable"
                title="<%- _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
-            >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
+            >{% verbatim %}{{ <%- varValue %> }}{% endverbatim %}</a>
             <span>&ndash;</span>
             <ul class="caption">
                 <% for (var i = 1; i < breadcrumbs.length; i++) { %>
                 <li>
-                    <span><%= pathLabels[breadcrumbs[i]] %></span>
+                    <span><%- pathLabels[breadcrumbs[i]] %></span>
                     <span>/</span>
                 </li>
                 <% } %>
-                <li><%= variable.label %></li>
+                <li><%- variable.label %></li>
             </ul>
         </li>
     </script>
@@ -95,10 +95,10 @@
                 <% if (i !== breadcrumbs.length - 1) { %>
                 <a href="#"
                    class="reference"
-                   data-path="<%- breadcrumbPath.substring(root.length + 1) %>"><%= breadcrumbItemLabel %></a>
+                   data-path="<%- breadcrumbPath.substring(root.length + 1) %>"><%- breadcrumbItemLabel %></a>
                 <span class="divider">/&nbsp;</span>
                 <% } else { %>
-                    <%= breadcrumbItemLabel %>
+                    <%- breadcrumbItemLabel %>
                 <% } %>
             </li>
             <% } %>
@@ -160,9 +160,9 @@
                     <li>
                         <a href="#"
                            class="reference"
-                           data-path="<%= path + '/' + varName %>"
-                           title="<%- _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
-                        <span>&ndash; <%= variable.label %></span>
+                           data-path="<%- path + '/' + varName %>"
+                           title="<%- _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%- varPrefix %>.<%- varName %> }}{% endverbatim %}</a>
+                        <span>&ndash; <%- variable.label %></span>
                     </li>
                     <% }); %>
                 </ul>

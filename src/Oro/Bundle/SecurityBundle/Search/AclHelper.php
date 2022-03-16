@@ -29,6 +29,9 @@ class AclHelper
     /** @var OwnershipMetadataProviderInterface */
     protected $metadataProvider;
 
+    /** @var SearchAclHelperConditionProvider */
+    private $aclHelperConditionProvider;
+
     public function __construct(
         SearchMappingProvider $mappingProvider,
         TokenAccessorInterface $tokenAccessor,
@@ -39,6 +42,11 @@ class AclHelper
         $this->mappingProvider = $mappingProvider;
         $this->ownershipDataBuilder = $ownershipDataBuilder;
         $this->metadataProvider = $metadataProvider;
+    }
+
+    public function setAclHelperConditionProvider(SearchAclHelperConditionProvider $aclHelperConditionProvider)
+    {
+        $this->aclHelperConditionProvider = $aclHelperConditionProvider;
     }
 
     /**
@@ -53,13 +61,19 @@ class AclHelper
     {
         $querySearchAliases = $this->getSearchAliases($query);
 
-        $allowedAliases   = [];
+        $allowedAliases = [];
         $ownerExpressions = [];
-        $expr             = $query->getCriteria()->expr();
+        $expr = $query->getCriteria()->expr();
+        $expressionProtectedClasses = [];
         if (false !== $querySearchAliases && count($querySearchAliases) !== 0) {
             foreach ($querySearchAliases as $entityAlias) {
                 $className = $this->mappingProvider->getEntityClass($entityAlias);
                 if (!$className) {
+                    continue;
+                }
+
+                if ($this->aclHelperConditionProvider->isApplicable($className, $permission)) {
+                    $expressionProtectedClasses[] = [$className, $entityAlias];
                     continue;
                 }
 
@@ -79,11 +93,27 @@ class AclHelper
             }
         }
 
+        $orExpression = null;
         if (count($ownerExpressions) !== 0) {
             $orExpression = new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions);
-            $query->getCriteria()->andWhere($orExpression);
         }
+
         $query->from($allowedAliases);
+
+        // Add the expression from the ACL helper condition providers.
+        // This helps to add custom search ACL restrictions.
+        foreach ($expressionProtectedClasses as $protectedClassData) {
+            [$className, $alias] = $protectedClassData;
+            $orExpression = $this->aclHelperConditionProvider->addRestriction(
+                $query,
+                $className,
+                $permission,
+                $alias,
+                $orExpression
+            );
+        }
+
+        $query->getCriteria()->andWhere($orExpression);
 
         $this->addOrganizationLimits($query, $expr);
 

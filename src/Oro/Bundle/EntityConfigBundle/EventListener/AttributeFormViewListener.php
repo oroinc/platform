@@ -90,6 +90,11 @@ class AttributeFormViewListener
      */
     protected function addAttributeEditBlocks(BeforeListRenderEvent $event, AttributeGroup $group, array $attributes)
     {
+        if (!$attributes) {
+            return;
+        }
+
+
         $scrollData = $event->getScrollData();
         $formView = $event->getFormView();
 
@@ -100,12 +105,30 @@ class AttributeFormViewListener
             if (!$attributeView->isRendered()) {
                 $html = $this->renderAttributeEditData($event->getEnvironment(), $attributeView, $attribute);
 
-                $subblockId = $scrollData->addSubBlock($group->getCode());
-                $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $fieldId);
+                $scrollData->addSubBlockData(
+                    $group->getCode(),
+                    $this->getSubBlockIdForGroup($group, $scrollData),
+                    $html,
+                    $fieldId
+                );
             } else {
                 $this->moveFieldToBlock($scrollData, $attribute->getFieldName(), $group->getCode());
             }
         }
+    }
+
+    private function getSubBlockIdForGroup(AttributeGroup $attributeGroup, ScrollData $scrollData): string|int
+    {
+        $subBlockIds = $scrollData->getSubblockIds($attributeGroup->getCode());
+        if (count($subBlockIds) < 2) {
+            // Adds a new subblock if number of subblocks is less than 2 - one for each column.
+            $subBlockId = $scrollData->addSubBlock($attributeGroup->getCode());
+        } else {
+            // Uses the existing last subblock if number of subblocks is already more than 2 - one for each column.
+            $subBlockId = end($subBlockIds);
+        }
+
+        return $subBlockId;
     }
 
     /**
@@ -147,6 +170,10 @@ class AttributeFormViewListener
      */
     protected function addAttributeViewBlocks(BeforeListRenderEvent $event, AttributeGroup $group, array $attributes)
     {
+        if (!$attributes) {
+            return;
+        }
+
         $scrollData = $event->getScrollData();
 
         foreach ($attributes as $attribute) {
@@ -157,9 +184,12 @@ class AttributeFormViewListener
             }
 
             $html = $this->renderAttributeViewData($event->getEnvironment(), $event->getEntity(), $attribute);
-
-            $subblockId = $scrollData->addSubBlock($group->getCode());
-            $scrollData->addSubBlockData($group->getCode(), $subblockId, $html, $fieldName);
+            $scrollData->addSubBlockData(
+                $group->getCode(),
+                $this->getSubBlockIdForGroup($group, $scrollData),
+                $html,
+                $fieldName
+            );
         }
     }
 
