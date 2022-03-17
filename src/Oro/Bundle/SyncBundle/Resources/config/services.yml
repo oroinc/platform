@@ -44,6 +44,10 @@ services:
         public: true
         arguments:
             - '@oro_sync.websocket_client.basic'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.event_listener.maintenance:
         class: Oro\Bundle\SyncBundle\EventListener\MaintenanceListener

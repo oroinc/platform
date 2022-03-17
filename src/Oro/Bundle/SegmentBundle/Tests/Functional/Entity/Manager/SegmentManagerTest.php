@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional\Entity\Manager;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\QueryDefinitionUtil;
@@ -15,6 +14,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -70,13 +70,13 @@ class SegmentManagerTest extends WebTestCase
 
     private function clearSegmentQueryConverterCache(): void
     {
-        $this->getSegmentQueryConverterCache()->deleteAll();
+        $this->getSegmentQueryConverterCache()->clear();
     }
 
-    private function getSegmentQueryConverterCache(): Cache
+    private function getSegmentQueryConverterCache(): ArrayAdapter
     {
         $cache = self::getContainer()->get('oro_segment.query.segment_query_cache');
-        self::assertInstanceOf(Cache::class, $cache, 'These tests can work only with ArrayCache.');
+        self::assertInstanceOf(ArrayAdapter::class, $cache, 'These tests can work only with ArrayCache.');
 
         return $cache;
     }
@@ -106,7 +106,7 @@ class SegmentManagerTest extends WebTestCase
     private function isSegmentCached(Segment $segment): bool
     {
         $cacheKey = 'segment_query_' . $segment->getId();
-        return $this->getSegmentQueryConverterCache()->contains($cacheKey);
+        return $this->getSegmentQueryConverterCache()->hasItem($cacheKey);
     }
 
     private function assertGetSegmentQueryBuilder(

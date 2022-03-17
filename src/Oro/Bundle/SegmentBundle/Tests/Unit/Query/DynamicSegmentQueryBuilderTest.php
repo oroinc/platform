@@ -27,8 +27,9 @@ use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverter;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterFactory;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState;
 use Oro\Bundle\SegmentBundle\Tests\Unit\SegmentDefinitionTestCase;
-use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
@@ -37,7 +38,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 {
-    use CacheTrait;
 
     /** @var FormFactoryInterface */
     private $formFactory;
@@ -230,6 +230,17 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
 
         $filterExecutionContext = new FilterExecutionContext();
         $filterExecutionContext->enableValidation();
+        $cache = $this->createMock(CacheItemPoolInterface::class);
+        $cacheItem = $this->createMock(CacheItemInterface::class);
+        $cache->expects($this->any())
+            ->method('getItem')
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->any())
+            ->method('isHit')
+            ->willReturn(false);
+        $cacheItem->expects($this->any())
+            ->method('set')
+            ->willReturn($cacheItem);
         $segmentQueryConverterFactory->expects($this->once())
             ->method('createInstance')
             ->willReturn(new SegmentQueryConverter(
@@ -238,7 +249,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 $this->getVirtualRelationProvider(),
                 new DoctrineHelper($doctrine),
                 new RestrictionBuilder($manager, $configManager, $filterExecutionContext),
-                new SegmentQueryConverterState($this->getNullCache())
+                new SegmentQueryConverterState($cache)
             ));
 
         return new DynamicSegmentQueryBuilder($segmentQueryConverterFactory, $doctrine);

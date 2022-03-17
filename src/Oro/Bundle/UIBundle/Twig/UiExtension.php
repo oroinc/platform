@@ -222,7 +222,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         array $additionalData = []
     ): array {
         foreach ($form->children as $child) {
-            if (empty($child->vars['extra_field'])) {
+            if (empty($child->vars['extra_field']) || $child->isRendered()) {
                 continue;
             }
 
