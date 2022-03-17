@@ -53,7 +53,11 @@ HTMLTEXT;
                 'another text'
             ],
             'text with body tag' => [$htmlTest, 'The body text'],
-            'text with non printed symbols' => ["some\ntext with\tsymbols", 'some text with symbols']
+            'text with non printed symbols' => ["some\ntext with\tsymbols", 'some text with symbols'],
+            'text with non printed unicode symbols' => [
+                "text \u{200b}\u{200c}\u{200d}\u{200e}\u{200f}\u{feff}",
+                'text'
+            ]
         ];
     }
 }
