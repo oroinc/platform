@@ -2,19 +2,23 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Unit\Query;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Bundle\SegmentBundle\Query\SegmentQueryConverterState;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Cache|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
+
+    /** @var CacheItemInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $cacheItem;
 
     /** @var AbstractQueryDesigner|\PHPUnit\Framework\MockObject\MockObject */
     private $segment;
@@ -27,8 +31,8 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(Cache::class);
-
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
+        $this->cacheItem = $this->createMock(CacheItemInterface::class);
         $this->state = new SegmentQueryConverterState($this->cache);
 
         $this->segment = $this->createMock(AbstractQueryDesigner::class);
@@ -252,8 +256,11 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
     public function testGetQueryFromCacheWhenNoCachedQuery()
     {
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('getItem')
             ->with('segment_query_123')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
             ->willReturn(false);
 
         self::assertNull($this->state->getQueryFromCache(123));
@@ -266,8 +273,14 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
             ->select('e');
 
         $this->cache->expects(self::once())
-            ->method('fetch')
+            ->method('getItem')
             ->with('segment_query_123')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects(self::once())
+            ->method('isHit')
+            ->willReturn(true);
+        $this->cacheItem->expects(self::once())
+            ->method('get')
             ->willReturn($cachedQuery);
 
         $query = $this->state->getQueryFromCache(123);
@@ -280,13 +293,17 @@ class SegmentQueryConverterStateTest extends \PHPUnit\Framework\TestCase
         $query = (new QueryBuilder($this->createMock(EntityManagerInterface::class)))
             ->from('Test\Entity', 'e')
             ->select('e');
-
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('segment_query_123')
+            ->willReturn($this->cacheItem);
+        $this->cacheItem->expects(self::once())
+            ->method('set')
+            ->with(clone $query)
+            ->willReturn($this->cacheItem);
         $this->cache->expects(self::once())
             ->method('save')
-            ->with('segment_query_123', $query)
-            ->willReturnCallback(function ($id, $data) use ($query) {
-                self::assertNotSame($query, $data);
-            });
+            ->with($this->cacheItem);
 
         $this->state->saveQueryToCache(123, $query);
     }

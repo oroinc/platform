@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\SegmentBundle\Query;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Represents a state of the {@see SegmentQueryConverter} that is used to optimize performance
@@ -13,16 +14,12 @@ use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
  */
 class SegmentQueryConverterState
 {
-    /** @var Cache */
-    private $cache;
+    private CacheItemPoolInterface $cache;
+    /** [segment id => the number of registered queries, ...] */
+    private array $queries = [];
+    private int $numberOfRegisteredQueries = 0;
 
-    /** @var int[] [segment id => the number of registered queries, ...] */
-    private $queries = [];
-
-    /** @var int */
-    private $numberOfRegisteredQueries = 0;
-
-    public function __construct(Cache $cache)
+    public function __construct(CacheItemPoolInterface $cache)
     {
         $this->cache = $cache;
     }
@@ -70,24 +67,26 @@ class SegmentQueryConverterState
             ));
         }
 
-        return
+        return UniversalCacheKeyGenerator::normalizeCacheKey(
             md5($segment->getEntity() . '::' . $segment->getDefinition())
             . '_'
-            . $this->numberOfRegisteredQueries;
+            . $this->numberOfRegisteredQueries
+        );
     }
 
     public function getQueryFromCache(int $segmentId): ?QueryBuilder
     {
-        $queryBuilder = $this->cache->fetch($this->getQueryCacheKey($segmentId));
+        $queryBuilderItem = $this->cache->getItem($this->getQueryCacheKey($segmentId));
 
-        return false !== $queryBuilder
-            ? clone $queryBuilder
+        return $queryBuilderItem->isHit()
+            ? clone $queryBuilderItem->get()
             : null;
     }
 
     public function saveQueryToCache(int $segmentId, QueryBuilder $queryBuilder): void
     {
-        $this->cache->save($this->getQueryCacheKey($segmentId), clone $queryBuilder);
+        $queryBuilderItem = $this->cache->getItem($this->getQueryCacheKey($segmentId));
+        $this->cache->save($queryBuilderItem->set(clone $queryBuilder));
     }
 
     private function getQueryCacheKey(int $segmentId): string

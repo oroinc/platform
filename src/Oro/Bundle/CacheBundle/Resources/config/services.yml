@@ -128,7 +128,7 @@ services:
         class: Symfony\Component\Cache\Adapter\ArrayAdapter
         shared: false
         arguments:
-            - '%oro_cache.data_adapter_lifetime%' # $defaultLifetime
+            - '%oro_cache.array_cache_lifetime%' # $defaultLifetime
             - '%oro_cache.array_cache_store_serialized%' # $storeSerialized
 
     oro.cache.provider.memory_cache:
@@ -138,12 +138,3 @@ services:
             - '@oro.cache.generator.universal_cache_key'
             - '@oro.cache.adapter.array'
 
-    oro_cache.array_cache:
-        class: Symfony\Component\Cache\Adapter\ArrayAdapter
-        factory: ['Doctrine\Common\Cache\Psr6\DoctrineProvider', 'wrap']
-        arguments:
-            - !service
-                class: Symfony\Component\Cache\Adapter\ArrayAdapter
-                arguments:
-                    - '%oro_cache.array_cache_lifetime%'
-                    - '%oro_cache.array_cache_store_serialized%'
