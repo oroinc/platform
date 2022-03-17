@@ -159,9 +159,7 @@ define(function(require, exports, module) {
                     'aria-label': ariaLabel,
                     ...config.timeInputAttrs
                 },
-                timePickerOptions: {
-                    appendTo: this.$el
-                }
+                timePickerOptions: {...this.timePickerOptions || {}}
             });
 
             return optionsToMerge;
