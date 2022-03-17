@@ -27,39 +27,30 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $environment;
+    private Environment|\PHPUnit\Framework\MockObject\MockObject $environment;
 
-    /** @var TwigContentProviderManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $contentProviderManager;
+    private TwigContentProviderManager|\PHPUnit\Framework\MockObject\MockObject $contentProviderManager;
 
-    /** @var UserAgentProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userAgentProvider;
+    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private RequestStack|\PHPUnit\Framework\MockObject\MockObject $requestStack;
 
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RouterInterface|\PHPUnit\Framework\MockObject\MockObject $router;
 
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var UiExtension */
-    private $extension;
+    private UiExtension $extension;
 
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);
         $this->contentProviderManager = $this->createMock(TwigContentProviderManager::class);
-        $this->userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
+        $userAgentProvider = $this->createMock(UserAgentProviderInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->router = $this->createMock(RouterInterface::class);
 
         $container = self::getContainerBuilder()
             ->add('oro_ui.content_provider.manager.twig', $this->contentProviderManager)
-            ->add('oro_ui.user_agent_provider', $this->userAgentProvider)
+            ->add('oro_ui.user_agent_provider', $userAgentProvider)
             ->add(EventDispatcherInterface::class, $this->eventDispatcher)
             ->add(RequestStack::class, $this->requestStack)
             ->add(RouterInterface::class, $this->router)
@@ -217,13 +208,13 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 'content' => ['b' => 'c'],
                 'additionalContent' => ['a' => 'b'],
                 'keys' => ['a', 'b', 'c'],
-                'expected' => ['a' => 'b', 'b' => 'c']
+                'expected' => ['a' => 'b', 'b' => 'c'],
             ],
             [
                 'content' => ['b' => 'c'],
                 'additionalContent' => null,
                 'keys' => null,
-                'expected' => ['b' => 'c']
+                'expected' => ['b' => 'c'],
             ],
         ];
     }
@@ -310,7 +301,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 'subject' => 'aaaaa   aaaaaabbccccccccaaaaad d d d   d      d d ddde',
                 'pattern' => '/(\s){2,}/',
                 'replacement' => '$1',
-                'limit' => -1
+                'limit' => -1,
             ],
             'pattern 2' => [
                 'expected' => '-asd-',
@@ -501,7 +492,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                     ['name' => '1'],
                     ['name' => '2', 'priority' => 100],
                     ['name' => '3'],
-                ]
+                ],
             ]
         );
         self::assertSame(
@@ -526,8 +517,8 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                     ['name' => '3'],
                 ],
                 [
-                    'reverse' => true
-                ]
+                    'reverse' => true,
+                ],
             ]
         );
         self::assertSame(
@@ -553,8 +544,8 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     'property' => 'name',
-                    'sorting-type' => 'string'
-                ]
+                    'sorting-type' => 'string',
+                ],
             ]
         );
         self::assertSame(
@@ -580,8 +571,8 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
                 [
                     'property' => 'name',
-                    'sorting-type' => 'string-case'
-                ]
+                    'sorting-type' => 'string-case',
+                ],
             ]
         );
         self::assertSame(
@@ -602,7 +593,7 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                 $this->extension,
                 'render_content',
                 [
-                    'render_content data'
+                    'render_content data',
                 ]
             )
         );
@@ -646,21 +637,21 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
                     'participants' => ['echo123'],
                     'name' => 'call',
                 ],
-                '@OroUI/skype_button.html.twig'
+                '@OroUI/skype_button.html.twig',
             ],
             [
                 'echo123',
                 [
                     'participants' => ['test'],
                     'name' => 'chat',
-                    'template' => 'test_template'
+                    'template' => 'test_template',
                 ],
                 [
                     'participants' => ['test'],
                     'name' => 'chat',
                 ],
-                'test_template'
-            ]
+                'test_template',
+            ],
         ];
     }
 
@@ -679,39 +670,109 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [5, 4.6],
-            [5, 4.1]
+            [5, 4.1],
         ];
     }
 
-    public function testRenderAdditionalData(): void
+    /**
+     * @dataProvider RenderAdditionalDataDataProvider
+     */
+    public function testRenderAdditionalData(FormView $formView, array $expectedResult): void
     {
-        $childView = new FormView();
-        $childView->vars['extra_field'] = true;
-        $childView->vars['name'] = 'some_field_name';
-        $form = new FormView();
-        $form->children = [$childView];
         $actualResult = self::callTwigFunction(
             $this->extension,
             'oro_form_additional_data',
-            [$this->environment, $form, 'Label']
+            [$this->environment, $formView, 'Sample Label']
         );
 
-        self::assertSame(
-            [
-                UiExtension::ADDITIONAL_SECTION_KEY => [
-                    'title' => 'Label',
+        self::assertSame($expectedResult, $actualResult);
+    }
+
+    public function renderAdditionalDataDataProvider(): array
+    {
+        $renderedChildView = new FormView();
+        $renderedChildView->setRendered();
+        $formViewWithRenderedChild = new FormView();
+        $formViewWithRenderedChild->children = [$renderedChildView];
+
+        $regularChildView = new FormView();
+        $regularChildView->vars['extra_field'] = true;
+        $regularChildView->vars['name'] = 'some_field_name';
+        $formViewWithRegularChild = new FormView();
+        $formViewWithRegularChild->children = [$regularChildView];
+
+        $regularChildViewWithoutExtraField = new FormView();
+        $regularChildViewWithoutExtraField->vars['name'] = 'some_field_name';
+        $formViewWithRegularChildWithoutExtraField = new FormView();
+        $formViewWithRegularChildWithoutExtraField->children = [$regularChildViewWithoutExtraField];
+
+        $renderedExtraFieldChildView = new FormView();
+        $renderedExtraFieldChildView->setRendered();
+        $renderedExtraFieldChildView->vars['extra_field'] = true;
+        $renderedExtraFieldChildView->vars['name'] = 'some_field_name';
+        $formViewWithRenderedExtraFieldChild = new FormView();
+        $formViewWithRenderedExtraFieldChild->children = [$renderedExtraFieldChildView];
+
+        return [
+            'form view without children' => [
+                'formView' => new FormView(),
+                'expectedResult' => [],
+            ],
+            'form view with already rendered child' => [
+                'formView' => $formViewWithRenderedChild,
+                'expectedResult' => [],
+            ],
+            'form view with regular child without extra_field' => [
+                'formView' => $formViewWithRegularChildWithoutExtraField,
+                'expectedResult' => [],
+            ],
+            'form view with regular child' => [
+                'formView' => $formViewWithRegularChild,
+                'expectedResult' => [
+                    UiExtension::ADDITIONAL_SECTION_KEY => [
+                        'title' => 'Sample Label',
+                        'priority' => UiExtension::ADDITIONAL_SECTION_PRIORITY,
+                        'subblocks' => [
+                            [
+                                'title' => '',
+                                'useSpan' => false,
+                                'data' => ['some_field_name' => ''],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'form view with already rendered extra field' => [
+                'formView' => $formViewWithRenderedExtraFieldChild,
+                'expectedResult' => [],
+            ],
+        ];
+    }
+
+    public function testRenderAdditionalDataAddsSectionWhenNoChildrenButHasAdditionalData(): void
+    {
+        $label = 'Sample Label';
+        $additionalData = ['value' => 'Sample additional data'];
+        $actualResult = self::callTwigFunction(
+            $this->extension,
+            'oro_form_additional_data',
+            [$this->environment, new FormView(), $label, $additionalData]
+        );
+
+        self::assertEquals([
+            UiExtension::ADDITIONAL_SECTION_KEY =>
+                [
+                    'title' => $label,
                     'priority' => UiExtension::ADDITIONAL_SECTION_PRIORITY,
                     'subblocks' => [
                         [
                             'title' => '',
-                            'useSpan' => false,
-                            'data' => ['some_field_name' => '']
-                        ]
-                    ]
-                ]
-            ],
-            $actualResult
-        );
+                            'useSpan'=>false,
+                            'data' => $additionalData,
+                        ],
+                    ],
+                ],
+        ], $actualResult);
     }
 
     public function testGetDefaultPage(): void
@@ -746,12 +807,12 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'https://example.com:8080/test',
                 ['hello' => 2, 'second' => 'abc'],
-                'https://example.com:8080/test?hello=2&second=abc'
+                'https://example.com:8080/test?hello=2&second=abc',
             ],
             [
                 'https://example.com:8080/test?hello=1&third=def',
                 ['hello' => 2, 'second' => 'abc'],
-                'https://example.com:8080/test?hello=2&third=def&second=abc'
+                'https://example.com:8080/test?hello=2&third=def&second=abc',
             ],
             ['/test', ['hello' => 2, 'second' => 'abc'], '/test?hello=2&second=abc'],
         ];
