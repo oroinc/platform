@@ -37,7 +37,19 @@ services:
         tags:
             - { name: 'oro_message_queue.topic' }
 
+    oro_message_queue.async.topic.sample_child_job_topic:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\Topic\SampleChildJobTopic
+        tags:
+            - { name: 'oro_message_queue.topic' }
+
     oro_message_queue.async.redelivery_aware_processor:
         class: Oro\Bundle\MessageQueueBundle\Test\Async\RedeliveryAwareMessageProcessor
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
+    oro_message_queue.async.sample_job_child_processor:
+        class: Oro\Bundle\MessageQueueBundle\Test\Async\SampleChildJobProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }

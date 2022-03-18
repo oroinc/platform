@@ -3,6 +3,7 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Component\MessageQueue\Exception\JobCannotBeStartedException;
 use Oro\Component\MessageQueue\Provider\JobConfigurationProviderInterface;
 use Oro\Component\MessageQueue\Provider\NullJobConfigurationProvider;
 
@@ -126,11 +127,7 @@ class JobProcessor
         }
 
         if (!in_array($job->getStatus(), $this->getNotStartedJobStatuses(), true)) {
-            throw new \LogicException(sprintf(
-                'Can start only new jobs: id: "%s", status: "%s"',
-                $job->getId(),
-                $job->getStatus()
-            ));
+            throw new JobCannotBeStartedException($job);
         }
 
         $job->setStatus(Job::STATUS_RUNNING);

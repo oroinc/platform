@@ -3,6 +3,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Component\MessageQueue\Exception\JobCannotBeStartedException;
 use Oro\Component\MessageQueue\Job\DuplicateJobException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
@@ -313,9 +314,9 @@ class JobProcessorTest extends \PHPUnit\Framework\TestCase
         $job->setRootJob(new Job());
         $job->setStatus(Job::STATUS_CANCELLED);
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(JobCannotBeStartedException::class);
         $this->expectExceptionMessage(
-            'Can start only new jobs: id: "12345", status: "oro.message_queue_job.status.cancelled"'
+            'Job "12345" cannot be started because it is already in status "oro.message_queue_job.status.cancelled"'
         );
 
         $this->jobProcessor->startChildJob($job);
