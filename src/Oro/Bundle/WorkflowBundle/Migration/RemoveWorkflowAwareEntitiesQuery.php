@@ -52,16 +52,17 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
     {
         $qb = $this->connection->createQueryBuilder();
         $dbDriver = $this->connection->getDriver()->getName();
-        $condition = match ($dbDriver) {
-            DatabaseDriverInterface::DRIVER_MYSQL => $qb->expr()->andX(
+        if ($dbDriver === DatabaseDriverInterface::DRIVER_MYSQL) {
+            $condition = $qb->expr()->andX(
                 $qb->expr()->eq('CAST(wi.entity_id as unsigned integer)', 'e.id'),
                 $qb->expr()->eq('wi.entity_class', ':class_name')
-            ),
-            default => $qb->expr()->andX(
+            );
+        } else {
+            $condition = $qb->expr()->andX(
                 $qb->expr()->eq('CAST(wi.entity_id as integer)', 'e.id'),
                 $qb->expr()->eq('wi.entity_class', ':class_name')
-            ),
-        };
+            );
+        }
 
         $sql = $qb->select('e.id')
             ->from($this->tableName, 'e')
