@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\Persistence\Mapping\AbstractClassMetadataFactory;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
@@ -32,22 +31,7 @@ class ShortMetadataProvider
     public function getAllShortMetadata(ObjectManager $manager, $throwException = true): array
     {
         if (null === $this->metadataCache) {
-            $metadataFactory = $manager->getMetadataFactory();
-            $cacheDriver = $metadataFactory instanceof AbstractClassMetadataFactory
-                ? $metadataFactory->getCacheDriver()
-                : null;
-            if ($cacheDriver) {
-                $metadataCache = $cacheDriver->fetch(static::ALL_SHORT_METADATA_CACHE_KEY);
-                if (false === $metadataCache) {
-                    $metadataCache = $this->loadAllShortMetadata($manager, $throwException);
-                    if (null !== $metadataCache) {
-                        $cacheDriver->save(static::ALL_SHORT_METADATA_CACHE_KEY, $metadataCache);
-                    }
-                }
-                $this->metadataCache = $metadataCache;
-            } else {
-                $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
-            }
+            $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
         }
 
         return $this->metadataCache ?? [];

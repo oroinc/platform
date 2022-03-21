@@ -48,14 +48,14 @@ services:
             - '%oro_platform.composer.installed_json%'
 
     oro_platform.version.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_platform_version' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_platform_version' }
 
     oro_platform.url.cache:
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_platform_url' ] ]
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_platform_url' }
 
     oro_platform.composer.version_helper:
         class: Oro\Bundle\PlatformBundle\Composer\VersionHelper

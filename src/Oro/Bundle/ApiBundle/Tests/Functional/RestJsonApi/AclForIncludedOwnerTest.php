@@ -2,14 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -33,9 +32,9 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
      */
     protected function clearAclCache()
     {
-        $cache = $this->getEntityManager()->getConfiguration()->getQueryCacheImpl();
-        if ($cache && !($cache instanceof ApcCache && $cache instanceof XcacheCache)) {
-            $cache->deleteAll();
+        $cache = $this->getEntityManager()->getConfiguration()->getQueryCache();
+        if ($cache instanceof AdapterInterface) {
+            $cache->clear();
         }
         self::getContainer()->get('tests.security.acl.cache.doctrine')->clearCache();
     }

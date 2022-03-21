@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityExtendBundle\Mapping\ExtendClassMetadataFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,11 +22,23 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testSetMetadataFor()
     {
-        $this->cmf->setCache(new ArrayAdapter(0, false));
-        $this->cmf->setMetadataFor(User::class, new ClassMetadata(User::class));
+        $classMetadata = new ClassMetadata(User::class);
+        $cache = $this->createMock(ArrayAdapter::class);
+        $cacheItem = $this->createMock(ItemInterface::class);
+        $cache->expects($this->once())
+            ->method('getItem')
+            ->willReturn($cacheItem);
+        $cacheItem->expects($this->once())
+            ->method('set')
+            ->with($classMetadata)
+            ->willReturn($cacheItem);
+        $cache->expects($this->once())
+            ->method('save')
+            ->with($cacheItem);
+        $this->cmf->setCache($cache);
+        $this->cmf->setMetadataFor(User::class, $classMetadata);
 
-        $cacheSalt = '__CLASSMETADATA__';
-        $this->assertTrue($this->cmf->getCacheDriver()->contains('Oro\Bundle\UserBundle\Entity\User' . $cacheSalt));
+        $this->assertSame($classMetadata, $this->cmf->getMetadataFor(User::class));
     }
 
     public function testSetMetadataForWithoutCacheDriver()

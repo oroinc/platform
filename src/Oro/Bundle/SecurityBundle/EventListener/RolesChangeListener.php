@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\PersistentCollection;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
@@ -38,8 +37,8 @@ class RolesChangeListener
             return;
         }
 
-        $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCacheImpl();
-        if (!$cacheDriver || $cacheDriver instanceof ApcCache || $cacheDriver instanceof XcacheCache) {
+        $cacheDriver = $args->getEntityManager()->getConfiguration()->getQueryCache();
+        if (!$cacheDriver) {
             return;
         }
 
@@ -47,8 +46,8 @@ class RolesChangeListener
         $this->isCacheOutdated = $this->checkRolesRelations($uow->getScheduledCollectionUpdates())
             || $this->checkRolesRelations($uow->getScheduledCollectionDeletions());
 
-        if ($this->isCacheOutdated) {
-            $cacheDriver->deleteAll();
+        if ($this->isCacheOutdated && $cacheDriver instanceof AdapterInterface) {
+            $cacheDriver->clear();
         }
     }
 

@@ -85,13 +85,14 @@ class OroClassMetadataFactory extends ClassMetadataFactory
             $logger->startGetAllMetadata();
         }
 
-        $cacheDriver = $this->getCacheDriver();
+        $cacheDriver = $this->getCache();
         if ($cacheDriver) {
-            $result = $cacheDriver->fetch(static::ALL_METADATA_KEY);
-            if (false === $result) {
+            $cacheItem = $cacheDriver->getItem(static::ALL_METADATA_KEY);
+            if (!$cacheItem->isHit()) {
                 $result = parent::getAllMetadata();
-                $cacheDriver->save(static::ALL_METADATA_KEY, $result);
+                $cacheDriver->save($cacheItem->set($result));
             } else {
+                $result = $cacheItem->get();
                 $reflectionService = $this->getReflectionService();
                 foreach ($result as $metadata) {
                     $this->wakeupReflection($metadata, $reflectionService);
@@ -182,5 +183,10 @@ class OroClassMetadataFactory extends ClassMetadataFactory
         }
 
         return $this->logger;
+    }
+
+    public function clearCache(): void
+    {
+        $this->getCache()?->clear();
     }
 }

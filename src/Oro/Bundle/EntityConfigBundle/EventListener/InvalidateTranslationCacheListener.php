@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EntityConfigBundle\EventListener;
 
-use Doctrine\Common\Cache\ClearableCache;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 /**
  * Event listener that processed InvalidateTranslationCacheEvent event and clears the doctrine queries cache.
@@ -27,9 +27,9 @@ class InvalidateTranslationCacheListener
     {
         /** @var EntityManagerInterface $manager */
         $manager = $this->registry->getManagerForClass(AbstractEnumValue::class);
-        $cacheProvider = $manager->getConfiguration()->getQueryCacheImpl();
-        if ($cacheProvider instanceof ClearableCache) {
-            $cacheProvider->deleteAll();
+        $cacheProvider = $manager->getConfiguration()->getQueryCache();
+        if ($cacheProvider instanceof AdapterInterface) {
+            $cacheProvider->clear();
         }
     }
 }

@@ -2,16 +2,15 @@
 
 namespace Oro\Component\TestUtils\ORM;
 
-use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Cache\Psr6\CacheAdapter;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 use Oro\Component\Testing\TempDirExtension;
-use Oro\Component\Testing\Unit\Cache\CacheTrait;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
 use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
 /**
@@ -21,9 +20,9 @@ use Symfony\Component\Cache\Adapter\NullAdapter;
  */
 abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 {
-    use TempDirExtension, CacheTrait;
+    use TempDirExtension;
 
-    /** @var CacheProvider The metadata cache that is shared between all ORM tests */
+    /** @var AbstractAdapter The metadata cache that is shared between all ORM tests */
     private $metadataCacheImpl;
 
     /** @var array|null */
@@ -61,7 +60,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         $config = new \Doctrine\ORM\Configuration();
         $config->setMetadataCache($this->getMetadataCacheImpl($withSharedMetadata));
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
-        $config->setQueryCacheImpl($this->getQueryCacheImpl());
+        $config->setQueryCache($this->getQueryCacheImpl());
         $config->setProxyDir($this->getProxyDir());
         $config->setProxyNamespace('Doctrine\Tests\Proxies');
 
@@ -251,20 +250,20 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     {
         if (!$withSharedMetadata) {
             // do not cache anything to avoid influence between tests
-            return $this->getChainCache();
+            return new NullAdapter();
         }
 
         if ($this->metadataCacheImpl === null) {
-            $this->metadataCacheImpl = $this->getArrayCache();
+            $this->metadataCacheImpl = new ArrayAdapter(0, false);
         }
 
-        return CacheAdapter::wrap($this->metadataCacheImpl);
+        return $this->metadataCacheImpl;
     }
 
 
     protected function getQueryCacheImpl()
     {
         // do not cache anything to avoid influence between tests
-        return $this->getChainCache([new NullAdapter()]);
+        return new NullAdapter();
     }
 }

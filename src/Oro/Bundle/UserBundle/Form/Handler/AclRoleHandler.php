@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Form\Handler;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ManagerRegistry;
@@ -20,6 +18,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractRole;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -323,9 +322,9 @@ class AclRoleHandler
 
         // Clear doctrine query cache to be sure that queries will process hints
         // again with updated security information.
-        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCacheImpl();
-        if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-            $cacheDriver->deleteAll();
+        $cacheDriver = $this->managerRegistry->getManager()->getConfiguration()->getQueryCache();
+        if ($cacheDriver instanceof AdapterInterface) {
+            $cacheDriver->clear();
         }
     }
 

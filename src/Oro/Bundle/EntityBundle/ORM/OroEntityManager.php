@@ -54,7 +54,7 @@ class OroEntityManager extends EntityManager
     public function setMetadataFactory(ClassMetadataFactory $metadataFactory)
     {
         $metadataFactory->setEntityManager($this);
-        $metadataFactory->setCacheDriver($this->getConfiguration()->getMetadataCacheImpl());
+        $metadataFactory->setCache($this->getConfiguration()->getMetadataCache());
 
         // $this->metadataFactory = $metadataFactory;
         $this->setPrivateMetadataFactory(

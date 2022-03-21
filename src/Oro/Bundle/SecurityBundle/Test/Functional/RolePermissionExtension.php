@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Test\Functional;
 
-use Doctrine\Common\Cache\ApcCache;
-use Doctrine\Common\Cache\XcacheCache;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
@@ -11,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -159,9 +158,9 @@ trait RolePermissionExtension
         if (!self::isDbIsolationPerTest()) {
             /** @var EntityManagerInterface $em */
             $em = $container->get('doctrine')->getManager();
-            $cacheDriver = $em->getConfiguration()->getQueryCacheImpl();
-            if ($cacheDriver && !($cacheDriver instanceof ApcCache && $cacheDriver instanceof XcacheCache)) {
-                $cacheDriver->deleteAll();
+            $cacheDriver = $em->getConfiguration()->getQueryCache();
+            if ($cacheDriver instanceof AdapterInterface) {
+                $cacheDriver->clear();
             }
         }
     }

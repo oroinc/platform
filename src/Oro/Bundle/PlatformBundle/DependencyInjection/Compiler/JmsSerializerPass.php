@@ -52,10 +52,10 @@ class JmsSerializerPass implements CompilerPassInterface
     {
         $cacheServiceId = 'oro_platform.jms_serializer.cache';
         $cacheNamespace = 'jms_serializer_cache';
-        $container->setDefinition($cacheServiceId, new ChildDefinition('oro.cache.abstract'))
+        $container->setDefinition($cacheServiceId, new ChildDefinition('oro.data.cache'))
             ->setPublic(false)
-            ->addMethodCall('setNamespace', [$cacheNamespace]);
-        $container->register(self::JMS_SERIALIZER_CACHE_ADAPTER_SERVICE_ID, 'Metadata\Cache\DoctrineCacheAdapter')
+            ->addTag('cache.pool', ['namespace' => $cacheNamespace]);
+        $container->register(self::JMS_SERIALIZER_CACHE_ADAPTER_SERVICE_ID, 'Metadata\Cache\PsrCacheAdapter')
             ->setPublic(false)
             ->setArguments([$cacheNamespace, new Reference($cacheServiceId)]);
     }

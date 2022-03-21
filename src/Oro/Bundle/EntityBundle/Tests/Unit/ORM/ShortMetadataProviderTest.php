@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Doctrine\Common\Cache\Cache;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\Mapping\AbstractClassMetadataFactory;
 use Doctrine\Persistence\Mapping\ClassMetadata as ClassMetadataInterface;
@@ -16,7 +15,6 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
-        $cacheDriver = $this->createMock(Cache::class);
 
         $metadata1 = new ClassMetadata('Test\Entity1');
         $metadata2 = new ClassMetadata('Test\Entity2');
@@ -38,16 +36,6 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects($this->once())
-            ->method('getCacheDriver')
-            ->willReturn($cacheDriver);
-        $cacheDriver->expects($this->once())
-            ->method('fetch')
-            ->with('oro_entity.all_short_metadata')
-            ->willReturn(false);
-        $cacheDriver->expects($this->once())
-            ->method('save')
-            ->with('oro_entity.all_short_metadata', $expectedResult);
-        $metadataFactory->expects($this->once())
             ->method('getAllMetadata')
             ->willReturn([$metadata1, $metadata2, $metadata3, $metadata11]);
 
@@ -62,50 +50,6 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
             [
                 new ShortClassMetadata('Test\Entity1'),
                 new ShortClassMetadata('Test\Entity11'),
-                new ShortClassMetadata('Test\Entity2', true),
-                new ShortClassMetadata('Test\Entity3'),
-            ],
-            $provider->getAllShortMetadata($manager)
-        );
-    }
-
-    public function testGetAllShortMetadataWhenDataExistInCache()
-    {
-        $manager = $this->createMock(ObjectManager::class);
-        $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
-        $cacheDriver = $this->createMock(Cache::class);
-
-        $expectedResult = [
-            new ShortClassMetadata('Test\Entity1'),
-            new ShortClassMetadata('Test\Entity2', true),
-            new ShortClassMetadata('Test\Entity3'),
-        ];
-
-        $manager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->willReturn($metadataFactory);
-        $metadataFactory->expects($this->once())
-            ->method('getCacheDriver')
-            ->willReturn($cacheDriver);
-        $cacheDriver->expects($this->once())
-            ->method('fetch')
-            ->with('oro_entity.all_short_metadata')
-            ->willReturn($expectedResult);
-        $cacheDriver->expects($this->never())
-            ->method('save');
-        $metadataFactory->expects($this->never())
-            ->method('getAllMetadata');
-
-        $provider = new ShortMetadataProvider();
-
-        $this->assertEquals(
-            $expectedResult,
-            $provider->getAllShortMetadata($manager)
-        );
-        // test that the result is cached locally
-        $this->assertEquals(
-            [
-                new ShortClassMetadata('Test\Entity1'),
                 new ShortClassMetadata('Test\Entity2', true),
                 new ShortClassMetadata('Test\Entity3'),
             ],
@@ -138,9 +82,6 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects($this->once())
-            ->method('getCacheDriver')
-            ->willReturn(null);
-        $metadataFactory->expects($this->once())
             ->method('getAllMetadata')
             ->willReturn([$metadata1, $metadata2, $metadata3, $metadata11]);
 
@@ -161,20 +102,10 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
-        $cacheDriver = $this->createMock(Cache::class);
 
         $manager->expects($this->any())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
-        $metadataFactory->expects($this->once())
-            ->method('getCacheDriver')
-            ->willReturn($cacheDriver);
-        $cacheDriver->expects($this->once())
-            ->method('fetch')
-            ->with('oro_entity.all_short_metadata')
-            ->willReturn(false);
-        $cacheDriver->expects($this->never())
-            ->method('save');
         $metadataFactory->expects($this->once())
             ->method('getAllMetadata')
             ->willThrowException(new \ReflectionException());
@@ -191,7 +122,6 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
     {
         $manager = $this->createMock(ObjectManager::class);
         $metadataFactory = $this->createMock(AbstractClassMetadataFactory::class);
-        $cacheDriver = $this->createMock(Cache::class);
 
         $exception = new \ReflectionException('some exception');
         $this->expectException(get_class($exception));
@@ -199,15 +129,6 @@ class ShortMetadataProviderTest extends \PHPUnit\Framework\TestCase
         $manager->expects($this->any())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
-        $metadataFactory->expects($this->once())
-            ->method('getCacheDriver')
-            ->willReturn($cacheDriver);
-        $cacheDriver->expects($this->once())
-            ->method('fetch')
-            ->with('oro_entity.all_short_metadata')
-            ->willReturn(false);
-        $cacheDriver->expects($this->never())
-            ->method('save');
         $metadataFactory->expects($this->once())
             ->method('getAllMetadata')
             ->willThrowException($exception);

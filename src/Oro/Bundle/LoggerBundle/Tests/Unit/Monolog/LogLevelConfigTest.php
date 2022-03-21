@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\LoggerBundle\Tests\Unit\Monolog;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Monolog\Logger;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
@@ -14,7 +13,7 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ArrayAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $loggerCache;
 
     private LogLevelConfig $config;

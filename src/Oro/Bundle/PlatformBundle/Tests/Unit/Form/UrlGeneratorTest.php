@@ -3,16 +3,17 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\Form;
 
 use Composer\Package\Package;
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\PlatformBundle\Form\UrlGenerator;
 use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var PackageProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $packageProvider;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cacheProvider;
 
     /** @var UrlGenerator */
@@ -21,17 +22,15 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->packageProvider = $this->createMock(PackageProvider::class);
-        $this->cacheProvider = $this->createMock(CacheProvider::class);
+        $this->cacheProvider = $this->createMock(CacheInterface::class);
         $this->generator = new UrlGenerator($this->packageProvider, $this->cacheProvider);
     }
 
     public function testGetFormUrlCacheHit()
     {
         $this->cacheProvider->expects($this->once())
-            ->method('contains')
-            ->willReturn(true);
-        $this->cacheProvider->expects($this->once())
-            ->method('fetch')
+            ->method('get')
+            ->with('url')
             ->willReturn(UrlGenerator::URL);
 
         $this->assertEquals(UrlGenerator::URL, $this->generator->getFormUrl());
@@ -43,13 +42,12 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
     public function testGetFormUrl(string $expectedUrl, array $packages = [])
     {
         $this->cacheProvider->expects($this->once())
-            ->method('contains')
-            ->willReturn(false);
-        $this->cacheProvider->expects($this->never())
-            ->method('fetch');
-        $this->cacheProvider->expects($this->once())
-            ->method('save')
-            ->with($this->isType('string'), $expectedUrl);
+            ->method('get')
+            ->with('url')
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
         $this->packageProvider->expects($this->once())
             ->method('getOroPackages')

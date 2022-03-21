@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -21,7 +20,7 @@ class WorkflowDefinitionEntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowRegistry;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $entitiesWithWorkflowsCache;
 
     /** @var WorkflowDefinitionEntityListener */

@@ -27,7 +27,29 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(self::DEFAULT_ENGINE_DSN)
                 ->end()
                 ->arrayNode('required_plugins')
-                    ->prototype('scalar')->end()
+                    ->prototype('array')->end()
+                    ->defaultValue([])
+                ->end()
+                ->arrayNode('required_attributes')
+                    ->info(
+                        'Contains an array of the required Elasticsearch attribute values to be checked on'
+                        . ' platform install or upgrade.' . PHP_EOL
+                        . 'The array\'s key determines the attribute name.'
+                    )->useAttributeAsKey('attribute_name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('value')
+                                ->info('Contains a proper Elasticsearch attribute value.')
+                                ->isRequired()
+                            ->end()
+                            ->scalarNode('err_message')
+                                ->info(
+                                    'Should contain a comprehensive message displayed'
+                                    . ' if Elasticsearch attribute value validation has failed.'
+                                )
+                            ->end()
+                        ->end()
+                    ->end()
                     ->defaultValue([])
                 ->end()
                 ->arrayNode('engine_parameters')

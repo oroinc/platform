@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\Common\Cache\ClearableCache;
 use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
@@ -12,6 +11,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Symfony\Bundle\FrameworkBundle\Console\Application as ConsoleApplication;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -102,15 +102,15 @@ abstract class CacheCommand extends Command
     {
         $kernel              = $this->getKernel();
         $em                  = $this->doctrine->getManager();
-        $metadataCacheDriver = $em->getConfiguration()->getMetadataCacheImpl();
+        $metadataCacheDriver = $em->getConfiguration()->getMetadataCache();
 
-        if (!$metadataCacheDriver instanceof ClearableCache) {
+        if (!$metadataCacheDriver instanceof AdapterInterface) {
             return;
         }
 
         if (empty($this->cacheDir) || $this->cacheDir === $kernel->getCacheDir()) {
             $output->writeln('Clear entity metadata cache');
-            $metadataCacheDriver->deleteAll();
+            $metadataCacheDriver->clear();
             $output->writeln('Warm up entity metadata cache');
             $em->getMetadataFactory()->getAllMetadata();
         } else {
@@ -127,7 +127,7 @@ abstract class CacheCommand extends Command
             $metadataCacheDriver->setDirectory($this->cacheDir . substr($metadataCacheDir, strlen($kernelCacheDir)));
             try {
                 $output->writeln('Clear entity metadata cache');
-                $metadataCacheDriver->deleteAll();
+                $metadataCacheDriver->clear();
                 $output->writeln('Warm up entity metadata cache');
                 $em->getMetadataFactory()->getAllMetadata();
                 $metadataCacheDriver->setDirectory($metadataCacheDir);

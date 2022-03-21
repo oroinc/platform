@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Doctrine\Common\Cache\ClearableCache;
-use Doctrine\Common\Cache\FlushableCache;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -284,11 +282,8 @@ class ExtendConfigDumper
         foreach ($this->entityManagerBag->getEntityManagers() as $em) {
             /** @var ClassMetadataFactory $metadataFactory */
             $metadataFactory = $em->getMetadataFactory();
-            $metadataCache   = $metadataFactory->getCacheDriver();
-            if ($metadataCache instanceof FlushableCache) {
-                $metadataCache->flushAll();
-            } elseif ($metadataCache instanceof ClearableCache) {
-                $metadataCache->deleteAll();
+            if (is_callable([$metadataFactory, 'clearCache'])) {
+                $metadataFactory->clearCache();
             }
         }
     }
