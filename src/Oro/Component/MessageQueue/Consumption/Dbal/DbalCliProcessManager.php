@@ -1,13 +1,24 @@
 <?php
+
 namespace Oro\Component\MessageQueue\Consumption\Dbal;
 
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Symfony\Component\Process\Process;
 
 /**
- * Allows to get list of processes PIDs
+ * Gets a list of processes PIDs.
  */
-class DbalCliProcessManager
+class DbalCliProcessManager implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
+    public function __construct()
+    {
+        $this->logger = new NullLogger();
+    }
+
     /**
      * @param string $searchTerm
      *
@@ -19,14 +30,25 @@ class DbalCliProcessManager
             $cmd = 'WMIC path win32_process get Processid,Commandline | findstr %s | findstr /V findstr';
             $searchRegExp = '/\s+(\d+)\s*$/Usm';
         } else {
-            $cmd = 'ps ax | grep %s | grep -v grep';
-            $searchRegExp = '/^\s*(\d+)\s+/Usm';
+            $cmd = "pgrep -f '%s'";
+            $searchRegExp = '/^(\d+)$/Usm';
         }
         $cmd = sprintf($cmd, escapeshellarg($searchTerm));
 
         $process = Process::fromShellCommandline($cmd);
-        $process->run();
-        $output = $process->getOutput();
+        try {
+            // It is possible that checking for running processes may result in a runtime exception. It is not
+            // a reason to interrupt consumer.
+            $process->run();
+            $output = $process->getOutput();
+        } catch (\RuntimeException $exception) {
+            $output = '';
+
+            $this->logger->error(
+                sprintf('Failed to get a list of running processes PIDs: %s', $exception->getMessage()),
+                ['exception' => $exception, 'command' => $cmd]
+            );
+        }
 
         $pids = [];
         $lines = preg_split('/$\R?^/m', $output);

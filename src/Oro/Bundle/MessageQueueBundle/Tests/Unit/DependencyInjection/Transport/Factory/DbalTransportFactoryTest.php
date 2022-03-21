@@ -11,23 +11,20 @@ use Oro\Component\MessageQueue\Transport\Dbal\DbalLazyConnection;
 use Oro\Component\Testing\TempDirExtension;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var DbalTransportFactory */
-    private $dbalTransportFactory;
+    private DbalTransportFactory $dbalTransportFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->dbalTransportFactory = new DbalTransportFactory();
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $container = new ContainerBuilder();
         $pidFileDir = $this->getTempDir('oro-message-queue');
@@ -40,67 +37,53 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
         ];
 
         $connectionId = $this->dbalTransportFactory->create($container, $config);
-        $this->assertEquals('oro_message_queue.transport.dbal.connection', $connectionId);
-        $this->assertEquals($pidFileDir, $container->getParameter('oro_message_queue.dbal.pid_file_dir'));
+        self::assertEquals('oro_message_queue.transport.dbal.connection', $connectionId);
+        self::assertEquals($pidFileDir, $container->getParameter('oro_message_queue.dbal.pid_file_dir'));
 
-        $this->assertEquals(
+        self::assertEquals(
             DbalPidFileManager::class,
             $container->getDefinition('oro_message_queue.consumption.dbal.pid_file_manager')->getClass()
         );
-        $this->assertFalse(
-            $container->getDefinition('oro_message_queue.consumption.dbal.pid_file_manager')->isPublic()
-        );
 
-        $this->assertEquals(
-            DbalCliProcessManager::class,
-            $container->getDefinition('oro_message_queue.consumption.dbal.cli_process_manager')->getClass()
-        );
-        $this->assertFalse(
-            $container->getDefinition('oro_message_queue.consumption.dbal.cli_process_manager')->isPublic()
-        );
+        $cliProcessManagerDef = $container->getDefinition('oro_message_queue.consumption.dbal.cli_process_manager');
+        self::assertEquals(DbalCliProcessManager::class, $cliProcessManagerDef->getClass());
+        self::assertEquals([['setLogger', [new Reference('logger')]]], $cliProcessManagerDef->getMethodCalls());
+        self::assertEquals([['channel' => 'consumer']], $cliProcessManagerDef->getTag('monolog.logger'));
 
-        $this->assertEquals(
+        self::assertEquals(
             RedeliverOrphanMessagesDbalExtension::class,
             $container->getDefinition('oro_message_queue.consumption.dbal.redeliver_orphan_messages_extension')
                 ->getClass()
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['oro_message_queue.consumption.extension' => [['priority' => -20]]],
             $container->getDefinition('oro_message_queue.consumption.dbal.redeliver_orphan_messages_extension')
                 ->getTags()
         );
-        $this->assertFalse(
-            $container->getDefinition('oro_message_queue.consumption.dbal.redeliver_orphan_messages_extension')
-                ->isPublic()
-        );
 
-        $this->assertEquals(
+        self::assertEquals(
             RejectMessageOnExceptionDbalExtension::class,
             $container->getDefinition('oro_message_queue.consumption.dbal.reject_message_on_exception_extension')
                 ->getClass()
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['oro_message_queue.consumption.extension' => [[]]],
             $container->getDefinition('oro_message_queue.consumption.dbal.reject_message_on_exception_extension')
                 ->getTags()
         );
-        $this->assertFalse(
-            $container->getDefinition('oro_message_queue.consumption.dbal.reject_message_on_exception_extension')
-                ->isPublic()
-        );
 
-        $this->assertEquals(
+        self::assertEquals(
             DbalLazyConnection::class,
             $container->getDefinition('oro_message_queue.transport.dbal.connection')->getClass()
         );
     }
 
-    public function testGetKey()
+    public function testGetKey(): void
     {
-        $this->assertEquals('dbal', $this->dbalTransportFactory->getKey());
+        self::assertEquals('dbal', $this->dbalTransportFactory->getKey());
     }
 
-    public function testAddConfiguration()
+    public function testAddConfiguration(): void
     {
         $builder = new ArrayNodeDefinition('transport');
         $pidFileDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'oro-message-queue';
@@ -136,6 +119,6 @@ class DbalTransportFactoryTest extends \PHPUnit\Framework\TestCase
             ->end()
         ->end();
 
-        $this->assertEquals($expectedBuilder, $builder);
+        self::assertEquals($expectedBuilder, $builder);
     }
 }
