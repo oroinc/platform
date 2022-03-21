@@ -31,6 +31,7 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -39,6 +40,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
 {
+    use EntityTrait;
+
     /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $aclHelper;
 
