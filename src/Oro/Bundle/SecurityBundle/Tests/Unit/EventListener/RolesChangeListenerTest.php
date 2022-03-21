@@ -3,7 +3,6 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\EventListener\RolesChangeListener;
@@ -13,6 +12,7 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestUser;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class RolesChangeListenerTest extends OrmTestCase
 {
@@ -24,7 +24,7 @@ class RolesChangeListenerTest extends OrmTestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $conn;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     /** @var RolesChangeListener */
@@ -32,7 +32,7 @@ class RolesChangeListenerTest extends OrmTestCase
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(CacheProvider::class);
+        $this->cache = $this->createMock(AbstractAdapter::class);
         $this->em = $this->getTestEntityManager();
         $reader = new AnnotationReader();
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -62,7 +62,7 @@ class RolesChangeListenerTest extends OrmTestCase
     public function testOnFlushWithNotSupportedEntity()
     {
         $this->cache->expects(self::never())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->conn->expects(self::once())
             ->method('prepare')
@@ -76,7 +76,7 @@ class RolesChangeListenerTest extends OrmTestCase
     public function testOnFlushOnInsertSupportedEntity()
     {
         $this->cache->expects(self::once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->conn->expects(self::exactly(2))
             ->method('prepare')
@@ -93,7 +93,7 @@ class RolesChangeListenerTest extends OrmTestCase
     public function testOnFlushOnUpdateSupportedEntity()
     {
         $this->cache->expects(self::once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->addQueryExpectation(
             'SELECT t0.id AS id_1, t0.username AS username_2, t0.owner_id AS owner_id_3'

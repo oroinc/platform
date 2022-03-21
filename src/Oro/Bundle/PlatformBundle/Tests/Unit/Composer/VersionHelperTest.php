@@ -4,10 +4,12 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\Composer;
 
 use Composer\Package\PackageInterface;
 use Composer\Repository\WritableRepositoryInterface;
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 use Oro\Bundle\PlatformBundle\Composer\VersionHelper;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class VersionHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,25 +30,18 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->repo);
     }
 
-    /**
-     * @dataProvider hasCacheDataProvider
-     */
-    public function testGetVersion(bool $hasCache)
+    public function testGetVersion()
     {
-        if ($hasCache) {
-            $cache = $this->createMock(Cache::class);
-            $cache->expects($this->once())
-                ->method('fetch')
-                ->with(OroPlatformBundle::PACKAGE_NAME)
-                ->willReturn(false);
-            $cache->expects($this->once())
-                ->method('save')
-                ->with(OroPlatformBundle::PACKAGE_NAME, self::VERSION);
+        $cache = $this->createMock(CacheInterface::class);
+        $cache->expects($this->once())
+            ->method('get')
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey(OroPlatformBundle::PACKAGE_NAME))
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
 
-            $helper = new VersionHelper($this->factory, $cache);
-        } else {
-            $helper = new VersionHelper($this->factory);
-        }
+        $helper = new VersionHelper($this->factory, $cache);
 
         $package = $this->createMock(PackageInterface::class);
         $package->expects($this->once())
@@ -61,17 +56,17 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(self::VERSION, $helper->getVersion());
     }
 
-    public function hasCacheDataProvider(): array
-    {
-        return [
-            [false],
-            [true]
-        ];
-    }
-
     public function testGetVersionNotAvailable()
     {
-        $helper = new VersionHelper($this->factory);
+        $cache = $this->createMock(CacheInterface::class);
+        $cache->expects($this->once())
+            ->method('get')
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey(OroPlatformBundle::PACKAGE_NAME))
+            ->willReturnCallback(function ($cacheKey, $callback) {
+                $item = $this->createMock(ItemInterface::class);
+                return $callback($item);
+            });
+        $helper = new VersionHelper($this->factory, $cache);
 
         $this->repo->expects($this->once())
             ->method('findPackages')
@@ -82,13 +77,11 @@ class VersionHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testGetVersionCached()
     {
-        $cache = $this->createMock(Cache::class);
+        $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())
-            ->method('fetch')
-            ->with(OroPlatformBundle::PACKAGE_NAME)
+            ->method('get')
+            ->with(UniversalCacheKeyGenerator::normalizeCacheKey(OroPlatformBundle::PACKAGE_NAME))
             ->willReturn(self::VERSION);
-        $cache->expects($this->never())
-            ->method('save');
 
         $helper = new VersionHelper($this->factory, $cache);
 

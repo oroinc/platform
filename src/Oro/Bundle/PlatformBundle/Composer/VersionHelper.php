@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\PlatformBundle\Composer;
 
-use Doctrine\Common\Cache\Cache;
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * The helper class that can be used to get the version of a package registered in the Composer.
@@ -12,16 +13,11 @@ class VersionHelper
 {
     private const UNDEFINED_VERSION = 'N/A';
 
-    /** @var LocalRepositoryFactory */
-    private $factory;
+    private LocalRepositoryFactory $factory;
+    private CacheInterface $cache;
+    private array $packageVersions = [];
 
-    /** @var Cache|null */
-    private $cache;
-
-    /** @var array */
-    private $packageVersions = [];
-
-    public function __construct(LocalRepositoryFactory $factory, Cache $cache = null)
+    public function __construct(LocalRepositoryFactory $factory, CacheInterface $cache)
     {
         $this->factory = $factory;
         $this->cache = $cache;
@@ -32,16 +28,10 @@ class VersionHelper
         if (isset($this->packageVersions[$packageName])) {
             return $this->packageVersions[$packageName];
         }
-
-        if (null === $this->cache) {
-            $version = $this->getPackageVersion($packageName);
-        } else {
-            $version = $this->cache->fetch($packageName);
-            if (false === $version) {
-                $version = $this->getPackageVersion($packageName);
-                $this->cache->save($packageName, $version);
-            }
-        }
+        $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey($packageName);
+        $version = $this->cache->get($cacheKey, function () use ($packageName) {
+            return $this->getPackageVersion($packageName);
+        });
 
         $this->packageVersions[$packageName] = $version;
 

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Oro\Bundle\CacheBundle\Provider\MemoryCacheProviderInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
@@ -88,7 +87,7 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
             ->willReturnOnConsecutiveCalls($rows1, $rows2);
 
         $cacheCallCounter = 0;
-        $cache = DoctrineProvider::wrap(new ArrayAdapter(0, false));
+        $cache = new ArrayAdapter(0, false);
         $this->memoryCacheProvider->expects($this->exactly(3))
             ->method('get')
             ->willReturnCallback(function ($arguments, $callback) use (&$cacheCallCounter, $cache) {
@@ -97,11 +96,11 @@ class DatagridTest extends \PHPUnit\Framework\TestCase
                 $cacheCallCounter++;
 
                 $cacheKey = md5(serialize($arguments['datagrid_results']->all()));
-                if (!$cache->contains($cacheKey)) {
-                    $cache->save($cacheKey, $callback());
+                $cacheItem = $cache->getItem($cacheKey);
+                if (!$cacheItem->isHit()) {
+                    $cache->save($cacheItem->set($callback()));
                 }
-
-                return $cache->fetch($cacheKey);
+                return $cacheItem->get();
             });
 
         $this->grid->setDatasource($dataSource);

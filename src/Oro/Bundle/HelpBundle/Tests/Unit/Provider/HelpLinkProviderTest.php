@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\HelpBundle\Tests\Unit\Provider;
 
-use Doctrine\Common\Cache\CacheProvider;
 use Oro\Bundle\HelpBundle\Annotation\Help;
 use Oro\Bundle\HelpBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\HelpBundle\Provider\HelpLinkProvider;
@@ -30,7 +29,7 @@ class HelpLinkProviderTest extends \PHPUnit\Framework\TestCase
     /** @var VersionHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $helper;
 
-    /** @var CacheProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
     protected function setUp(): void

@@ -2,8 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Mapping;
 
+use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 
+/**
+ * Caches metadata descriptor for specific class
+ */
 class ExtendClassMetadataFactory extends OroClassMetadataFactory
 {
     /**
@@ -11,9 +15,12 @@ class ExtendClassMetadataFactory extends OroClassMetadataFactory
      */
     public function setMetadataFor($className, $class)
     {
-        $cacheDriver = $this->getCacheDriver();
+        $cacheDriver = $this->getCache();
         if (null !== $cacheDriver) {
-            $cacheDriver->save($className . $this->cacheSalt, $class, null);
+            $cacheItem = $cacheDriver->getItem(
+                UniversalCacheKeyGenerator::normalizeCacheKey($className . $this->cacheSalt)
+            );
+            $cacheDriver->save($cacheItem->set($class));
         }
 
         parent::setMetadataFor($className, $class);

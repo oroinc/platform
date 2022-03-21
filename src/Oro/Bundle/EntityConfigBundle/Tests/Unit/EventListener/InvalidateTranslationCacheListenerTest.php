@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\EventListener;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\EventListener\InvalidateTranslationCacheListener;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Symfony\Component\Cache\Adapter\AbstractAdapter;
 
 class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,7 +37,7 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $configuration->setQueryCacheImpl($this->createMock(Cache::class));
+        $configuration->setQueryCache($this->createMock(AbstractAdapter::class));
 
         $this->listener->onInvalidateTranslationCache();
     }
@@ -56,10 +55,10 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $cacheProvider = $this->createMock(CacheProvider::class);
-        $configuration->setQueryCacheImpl($cacheProvider);
+        $cacheProvider = $this->createMock(AbstractAdapter::class);
+        $configuration->setQueryCache($cacheProvider);
         $cacheProvider->expects($this->once())
-            ->method('deleteAll');
+            ->method('clear');
 
         $this->listener->onInvalidateTranslationCache();
     }
