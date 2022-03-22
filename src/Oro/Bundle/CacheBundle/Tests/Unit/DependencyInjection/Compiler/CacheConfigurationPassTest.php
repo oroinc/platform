@@ -2,14 +2,10 @@
 
 namespace Oro\Bundle\CacheBundle\Tests\Unit\DependencyInjection\Compiler;
 
-use Doctrine\Common\Cache\Cache;
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use Oro\Bundle\CacheBundle\Adapter\ChainAdapter;
 use Oro\Bundle\CacheBundle\DependencyInjection\Compiler\CacheConfigurationPass;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Oro\Component\Config\Cache\ConfigCacheWarmer;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter as SymfonyChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -19,56 +15,25 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCacheDefinitions()
-    {
-        $container = new ContainerBuilder();
-        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-
-        $compiler = new CacheConfigurationPass();
-        $compiler->process($container);
-
-        $dataCacheDef = new Definition(
-            MemoryCacheChain::class,
-            [$this->getFilesystemCache()]
-        );
-        $dataCacheDef->setAbstract(true);
-        $this->assertEquals(
-            $dataCacheDef,
-            $container->getDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE)
-        );
-    }
-
     public function testExistingCacheDefinitionsShouldNotBeChanged()
     {
-        $dataCacheDef = new Definition(ArrayAdapter::class);
-        $doctrineProviderDefinition = new Definition(DoctrineProvider::class, [$dataCacheDef]);
-        $doctrineProviderDefinition->setFactory([DoctrineProvider::class, 'wrap']);
+        $cacheDefinition = new Definition(
+            FilesystemAdapter::class,
+            ['', 0, '%kernel.cache_dir%/oro_data']
+        );
+        $cacheDefinition->setAbstract(true);
 
         $container = new ContainerBuilder();
         $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $doctrineProviderDefinition);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_POOL, $cacheDefinition);
 
         $compiler = new CacheConfigurationPass();
         $compiler->process($container);
 
         $this->assertEquals(
-            (new Definition(MemoryCacheChain::class, [$doctrineProviderDefinition]))->setAbstract(true),
-            $container->getDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE)
+            (new Definition(FilesystemAdapter::class, ['', 0, '%kernel.cache_dir%/oro_data']))->setAbstract(true),
+            $container->getDefinition(CacheConfigurationPass::DATA_CACHE_POOL)
         );
-    }
-
-    public function testExceptionIsThrownWhenInvalidCacheProviderGiven()
-    {
-        $dataCacheDef = new Definition(Cache::class);
-
-        $container = new ContainerBuilder();
-        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $dataCacheDef);
-
-        $compiler = new CacheConfigurationPass();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $compiler->process($container);
     }
 
     public function testAbstractDefinitionWithoutClass()
@@ -78,7 +43,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
         $container = new ContainerBuilder();
         $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $abstractDataCacheDef);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_POOL, $abstractDataCacheDef);
 
         $compiler = new CacheConfigurationPass();
 
@@ -91,33 +56,18 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
         $container = new ContainerBuilder();
         $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $abstractDataCacheDef);
+        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_POOL, $abstractDataCacheDef);
 
         $compiler = new CacheConfigurationPass();
 
-        $compiler->process($container);
-    }
-
-    public function testAbstractDefinitionWithUnsupportedClass()
-    {
-        $abstractDataCacheDef = new Definition(Cache::class);
-        $abstractDataCacheDef->setAbstract(true);
-
-        $container = new ContainerBuilder();
-        $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
-        $container->setDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE, $abstractDataCacheDef);
-
-        $compiler = new CacheConfigurationPass();
-
-        $this->expectException(\InvalidArgumentException::class);
         $compiler->process($container);
     }
 
     public function testDataCacheManagerConfiguration()
     {
         $dataCacheManagerDef = new Definition(OroDataCacheManager::class);
-        $dataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE);
-        $abstractDataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_SERVICE);
+        $dataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_POOL);
+        $abstractDataCacheDef = new ChildDefinition(CacheConfigurationPass::DATA_CACHE_POOL);
         $abstractDataCacheDef->setAbstract(true);
         $otherCacheDef = new ChildDefinition('some_abstract_cache');
 
@@ -205,9 +155,7 @@ class CacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
             ['', 0, '%kernel.cache_dir%/oro_data']
         );
         $cacheDefinition->setAbstract(true);
-        $doctrineProviderDefinition = new Definition(DoctrineProvider::class, [$cacheDefinition]);
-        $doctrineProviderDefinition->setFactory([DoctrineProvider::class, 'wrap']);
 
-        return $doctrineProviderDefinition;
+        return $cacheDefinition;
     }
 }

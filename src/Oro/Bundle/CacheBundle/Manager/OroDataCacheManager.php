@@ -2,22 +2,17 @@
 
 namespace Oro\Bundle\CacheBundle\Manager;
 
-use Doctrine\Common\Cache\ClearableCache;
 use Oro\Bundle\CacheBundle\Provider\SyncCacheInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 
+/**
+ * Cache manager service to synchronize all cache providers which implement SyncCacheInterface
+ */
 class OroDataCacheManager
 {
-    /**
-     * @var array
-     */
-    protected $cacheProviders = [];
+    private array $cacheProviders = [];
 
-    /**
-     * Registers a cache provider in this manager
-     *
-     * @param object $cacheProvider
-     */
-    public function registerCacheProvider($cacheProvider)
+    public function registerCacheProvider(AdapterInterface|SyncCacheInterface $cacheProvider): void
     {
         $this->cacheProviders[] = $cacheProvider;
     }
@@ -26,7 +21,7 @@ class OroDataCacheManager
      * Makes sure all cache providers are synchronized
      * Call this method in main process if you need to get data modified in a child process
      */
-    public function sync()
+    public function sync(): void
     {
         foreach ($this->cacheProviders as $cacheProvider) {
             if ($cacheProvider instanceof SyncCacheInterface) {
@@ -38,11 +33,11 @@ class OroDataCacheManager
     /**
      * Clear cache at all registered cache providers
      */
-    public function clear()
+    public function clear(): void
     {
         foreach ($this->cacheProviders as $cacheProvider) {
-            if ($cacheProvider instanceof ClearableCache) {
-                $cacheProvider->deleteAll();
+            if ($cacheProvider instanceof AdapterInterface) {
+                $cacheProvider->clear();
             }
         }
     }

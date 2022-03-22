@@ -20,7 +20,7 @@ class ValidateCacheConfigurationPass implements CompilerPassInterface
         foreach ($methodCalls as [$method, $arguments]) {
             if ('registerCacheProvider' === $method) {
                 $cacheProviderRef = reset($arguments);
-                if (!$this->getNamespace($container->getDefinition((string)$cacheProviderRef))) {
+                if (!$this->hasNamespace($container->getDefinition((string)$cacheProviderRef))) {
                     throw new \InvalidArgumentException(sprintf(
                         'The namespace for the "%s" cache service must be defined.'
                         . ' Make sure that the "setNamespace" method call exists in the service definition.',
@@ -31,16 +31,16 @@ class ValidateCacheConfigurationPass implements CompilerPassInterface
         }
     }
 
-    private function getNamespace(Definition $cacheProviderDef): ?string
+    private function hasNamespace(Definition $cacheProviderDef): bool
     {
-        $namespace = null;
-        $methodCalls = $cacheProviderDef->getMethodCalls();
-        foreach ($methodCalls as [$method, $arguments]) {
-            if ('setNamespace' === $method) {
-                $namespace = reset($arguments);
+        $poolTag = $cacheProviderDef->getTag('cache.pool');
+        if (!empty($poolTag)) {
+            foreach ($poolTag as $value) {
+                if (array_key_exists('namespace', $value)) {
+                    return true;
+                }
             }
         }
-
-        return $namespace;
+        return false;
     }
 }

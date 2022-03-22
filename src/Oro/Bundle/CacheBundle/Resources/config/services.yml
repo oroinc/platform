@@ -19,24 +19,6 @@ services:
         class: Oro\Bundle\CacheBundle\Manager\OroDataCacheManager
         public: true
 
-    oro_cache.validator:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'validation' ] ]
-
-    oro_cache.annotations:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_annotations_cache' ] ]
-
-    oro_cache.serializer:
-        public: false
-        parent: oro.cache.abstract
-        calls:
-            - [ setNamespace, [ 'oro_serializer_cache' ] ]
-
     oro_cache.action.handler.invalidate_scheduled:
         class: 'Oro\Bundle\CacheBundle\Action\Handler\InvalidateCacheActionScheduledHandler'
         public: true
@@ -63,10 +45,6 @@ services:
 
     oro.static_config_provider.abstract:
         abstract: true
-
-    oro.cache.memory_cache_chain:
-        public: false
-        class: Oro\Bundle\CacheBundle\Provider\MemoryCacheChain
 
     oro.cache.generator.object_cache_key:
         class: Oro\Bundle\CacheBundle\Generator\ObjectCacheKeyGenerator

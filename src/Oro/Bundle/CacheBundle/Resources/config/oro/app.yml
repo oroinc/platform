@@ -2,14 +2,11 @@ framework:
     cache:
         pools:
             cache.annotations:
-                adapter: cache.adapter.doctrine
-                provider: oro_cache.annotations
+                adapter: oro.cache.adapter.persistent
             cache.serializer:
-                adapter: cache.adapter.doctrine
-                provider: oro_cache.serializer
+                adapter: oro.cache.adapter.persistent
             cache.validator:
-                adapter: cache.adapter.doctrine
-                provider: oro_cache.validator
+                adapter: oro.cache.adapter.persistent
 
             # These pools are not an active pool of caches, but only describe the structure of child caches.
             # This is necessary in order to be able to describe caches with unique namespaces.
