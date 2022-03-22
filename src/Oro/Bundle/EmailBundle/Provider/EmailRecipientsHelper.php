@@ -18,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -32,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class EmailRecipientsHelper
 {
     const ORGANIZATION_PROPERTY = 'organization';
-    const EMAIL_IDS_SEPARATOR   = ';';
+    const EMAIL_IDS_SEPARATOR = ';';
 
     /** @var AclHelper */
     protected $aclHelper;
@@ -49,7 +50,7 @@ class EmailRecipientsHelper
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var PropertyAccessorInterface*/
+    /** @var PropertyAccessorInterface */
     protected $propertyAccessor;
 
     /** @var EmailOwnerProvider */
@@ -98,19 +99,11 @@ class EmailRecipientsHelper
             return null;
         }
 
-        $organizationName = null;
-        if ($this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)) {
-            $organization = $this->propertyAccessor->getValue($object, static::ORGANIZATION_PROPERTY);
-            if ($organization) {
-                $organizationName = $organization->getName();
-            }
-        }
-
         return new RecipientEntity(
             $objectMetadata->name,
             reset($identifiers),
             $this->createRecipientEntityLabel($this->nameFormatter->format($object), $objectMetadata->name),
-            $organizationName
+            $this->getOrganizationName($object)
         );
     }
 
@@ -146,14 +139,14 @@ class EmailRecipientsHelper
     public function createRecipientData(Recipient $recipient)
     {
         $data = ['key' => $recipient->getId()];
-        if ($recipientEntity = $recipient->getEntity()) {
+        if ($recipient->getEntity()) {
             $data = array_merge(
                 $data,
                 [
-                    'contextText'  => $recipient->getEntity()->getLabel(),
+                    'contextText' => $recipient->getEntity()->getLabel(),
                     'contextValue' => [
                         'entityClass' => $recipient->getEntity()->getClass(),
-                        'entityId'    => $recipient->getEntity()->getId(),
+                        'entityId' => $recipient->getEntity()->getId(),
                     ],
                     'organization' => $recipient->getEntity()->getOrganization(),
                 ]
@@ -161,9 +154,9 @@ class EmailRecipientsHelper
         }
 
         return [
-            'id'    => self::prepareFormRecipientIds($recipient->getId()),
-            'text'  => $recipient->getName(),
-            'data'  => json_encode($data),
+            'id' => self::prepareFormRecipientIds($recipient->getId()),
+            'text' => $recipient->getName(),
+            'data' => json_encode($data),
         ];
     }
 
@@ -310,7 +303,7 @@ class EmailRecipientsHelper
     /**
      * Prepares base64 encoded emails to be used as ids in recipients form for select2 component.
      *
-     * @param  array|string $ids
+     * @param array|string $ids
      *
      * @return string;
      */
@@ -328,7 +321,7 @@ class EmailRecipientsHelper
     /**
      * Extracts base64 encoded selected email values, that are used as ids in recipients form for select2 component.
      *
-     * @param  array|string $value
+     * @param array|string $value
      *
      * @return array;
      */
@@ -343,7 +336,7 @@ class EmailRecipientsHelper
          */
         $idsEncoded = str_getcsv($value, self::EMAIL_IDS_SEPARATOR);
         $idsDecoded = array_map(function ($idEncoded) {
-            return base64_decode($idEncoded, true) ? : $idEncoded;
+            return base64_decode($idEncoded, true) ?: $idEncoded;
         }, $idsEncoded);
 
         return $idsDecoded;
@@ -416,8 +409,21 @@ class EmailRecipientsHelper
             return null;
         }
         $entityConfig = new EntityConfigId('entity', $className);
-        $label        = (string) $this->configManager->getConfig($entityConfig)->get('label');
+        $label = (string) $this->configManager->getConfig($entityConfig)->get('label');
 
         return $this->translator->trans($label);
+    }
+
+    protected function getOrganizationName(object $object): ?string
+    {
+        $organizationName = null;
+        if ($this->propertyAccessor->isReadable($object, static::ORGANIZATION_PROPERTY)) {
+            $organization = $this->propertyAccessor->getValue($object, static::ORGANIZATION_PROPERTY);
+            if ($organization instanceof OrganizationInterface) {
+                $organizationName = $organization->getName();
+            }
+        }
+
+        return $organizationName;
     }
 }
