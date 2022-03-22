@@ -857,6 +857,8 @@ services:
             - '@doctrine'
             - '@oro_email.email.address.helper'
             - '@oro_search.index'
+        calls:
+            - ['setPropertyAccessor', ['@property_accessor']]
 
     Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper:
         alias: 'oro_email.provider.email_recipients.helper'
