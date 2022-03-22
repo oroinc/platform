@@ -174,7 +174,7 @@ define(function(require, exports, module) {
             _.extend(
                 this,
                 _.pick(options, 'iconHideText', 'runAction', 'onClickReturnValue', 'links'),
-                _.pick(truthy, Boolean)
+                _.pick(truthy, value => value !== void 0)
             );
 
             return this;
@@ -186,6 +186,10 @@ define(function(require, exports, module) {
 
             if (!data.label) {
                 data.label = this.action.label;
+            }
+
+            if (!data.attributes && this.action.attributes) {
+                data.attributes = {...this.action.attributes};
             }
 
             if (!data.ariaLabel && this.action.ariaLabel) {
