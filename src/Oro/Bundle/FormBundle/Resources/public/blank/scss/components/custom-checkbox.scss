@@ -34,6 +34,8 @@
         opacity: 0;
         appearance: none;
 
+        z-index: z('base');
+
         &:hover {
             ~ .custom-checkbox__icon {
                 border-color: $checkbox-icon-border-color-hover-state;
