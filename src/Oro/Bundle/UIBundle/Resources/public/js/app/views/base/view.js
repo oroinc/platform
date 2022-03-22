@@ -1,10 +1,10 @@
-define([
-    'jquery',
-    'underscore',
-    'chaplin',
-    '../../models/base/collection'
-], function($, _, Chaplin, BaseCollection) {
+define(function(require) {
     'use strict';
+
+    const $ = require('jquery');
+    const _ = require('underscore');
+    const Chaplin = require('chaplin');
+    const BaseCollection = require('../../models/base/collection');
 
     const BaseView = Chaplin.View.extend(/** @lends BaseView.prototype */{
         /**

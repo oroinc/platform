@@ -198,7 +198,7 @@ services:
 
     oro_search.cache.doctrine_query:
         public: false
-        parent: oro.data.cache
+        parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query_search' }
 

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\DependencyInjection\Compiler;
 
 use Doctrine\Bundle\DoctrineBundle\Dbal\ManagerRegistryAwareConnectionProvider;
-use Oro\Bundle\CacheBundle\Provider\MemoryCacheChain;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -67,7 +66,6 @@ class CheckReferenceCompilerPass implements CompilerPassInterface
         if (in_array(
             $definition->getClass(),
             [
-                MemoryCacheChain::class,
                 MimeTypes::class,
                 ManagerRegistryAwareConnectionProvider::class,
             ]

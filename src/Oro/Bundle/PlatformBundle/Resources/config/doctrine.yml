@@ -7,7 +7,7 @@ services:
 
     doctrine.query.cache:
         public: false
-        parent: oro.data.cache
+        parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query' }
 
@@ -19,6 +19,6 @@ services:
 
     doctrine.query.cache.config:
         public: false
-        parent: oro.data.cache
+        parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query_config' }

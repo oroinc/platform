@@ -12,8 +12,8 @@ class ValidateCacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
     public function testAllCachesHaveNamespaces()
     {
         $container = new ContainerBuilder();
-        $container->register('cache_provider_1')->addMethodCall('setNamespace', ['namespace1']);
-        $container->register('cache_provider_2')->addMethodCall('setNamespace', ['namespace2']);
+        $container->register('cache_provider_1')->addTag('cache.pool', ['namespace' => 'namespace1']);
+        $container->register('cache_provider_2')->addTag('cache.pool', ['namespace' => 'namespace2']);
         $cacheManagerDef = $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
         $cacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('cache_provider_1')]);
         $cacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('cache_provider_2')]);
@@ -25,7 +25,7 @@ class ValidateCacheConfigurationPassTest extends \PHPUnit\Framework\TestCase
     public function testSomeCacheDoesNotHaveNamespace()
     {
         $container = new ContainerBuilder();
-        $container->register('cache_provider_1')->addMethodCall('setNamespace', ['namespace1']);
+        $container->register('cache_provider_1')->addTag('cache.pool', ['namespace' => 'namespace1']);
         $container->register('cache_provider_2');
         $cacheManagerDef = $container->register(CacheConfigurationPass::MANAGER_SERVICE_KEY);
         $cacheManagerDef->addMethodCall('registerCacheProvider', [new Reference('cache_provider_1')]);
