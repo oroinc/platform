@@ -15,6 +15,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
@@ -68,6 +69,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
             $urlGenerator,
             $configManager
         );
+        $this->emailNotificationManager->setAclHelper($this->createMock(AclHelper::class));
     }
 
     /**
@@ -77,7 +79,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $organization = $this->createMock(Organization::class);
         $this->repository->expects($this->once())
-            ->method('getNewEmails')
+            ->method('getNewEmailsWithAcl')
             ->willReturn($emails);
         $maxEmailsDisplay = 1;
         $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
@@ -143,7 +145,7 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     public function testGetCountNewEmails()
     {
         $this->repository->expects($this->once())
-            ->method('getCountNewEmails')
+            ->method('getCountNewEmailsWithAcl')
             ->willReturn(1);
         $user = $this->createMock(User::class);
         $organization = $this->createMock(Organization::class);

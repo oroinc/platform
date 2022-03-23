@@ -17,3 +17,7 @@ search:
                         name: subject
                         target_type: text
                         target_fields: [subject]
+            -
+                name: isEmailPrivate
+                target_type: integer
+                target_fields: [email_user_private]

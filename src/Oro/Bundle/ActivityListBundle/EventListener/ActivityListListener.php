@@ -117,7 +117,8 @@ class ActivityListListener
     {
         foreach ($entities as $hash => $entity) {
             if (empty($this->updatedOwnerEntities[$hash])
-                && $this->activityListManager->isSupportedOwnerEntity($entity)) {
+                && $this->activityListManager->isSupportedOwnerEntity($entity)
+            ) {
                 $this->updatedOwnerEntities[$hash] = $entity;
             }
             if (empty($this->updatedEntities[$hash])

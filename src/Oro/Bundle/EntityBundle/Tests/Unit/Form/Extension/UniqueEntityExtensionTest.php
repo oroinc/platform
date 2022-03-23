@@ -8,53 +8,47 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\FormBuilder;
-use Symfony\Component\Translation\Translator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UniqueEntityExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY = 'Namespace\EntityName';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $validator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configProvider;
+
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
+
+    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $config;
+
+    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     private $validatorMetadata;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
     private $builder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
 
     /** @var UniqueEntityExtension */
     private $extension;
 
     protected function setUp(): void
     {
-        $metadata = $this->createMock(DoctrineClassMetadata::class);
-
         $this->validator = $this->createMock(ValidatorInterface::class);
-
-        $translator = $this->createMock(Translator::class);
-
         $this->configProvider = $this->createMock(ConfigProvider::class);
-
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->config = $this->createMock(ConfigInterface::class);
-
         $this->validatorMetadata = $this->createMock(ClassMetadata::class);
-
         $this->builder = $this->createMock(FormBuilder::class);
 
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
+        $metadata = $this->createMock(DoctrineClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getName')
             ->willReturn(self::ENTITY);

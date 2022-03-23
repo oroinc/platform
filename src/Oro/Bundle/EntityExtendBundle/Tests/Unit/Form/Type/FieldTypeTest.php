@@ -15,7 +15,6 @@ use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterfa
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
 use Oro\Bundle\TranslationBundle\Form\Extension\TranslatableChoiceTypeExtension;
 use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
@@ -31,6 +30,7 @@ use Symfony\Component\Validator\Context\ExecutionContextFactory;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderChain;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class FieldTypeTest extends TypeTestCase
 {
@@ -76,7 +76,7 @@ class FieldTypeTest extends TypeTestCase
         $this->expectedChoicesView = $this->prepareExpectedChoicesView($this->defaultFieldTypeChoices);
         $this->configManager = $this->createMock(ConfigManager::class);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(function ($id, $parameters) {
@@ -130,32 +130,30 @@ class FieldTypeTest extends TypeTestCase
     /**
      * {@inheritDoc}
      */
-    protected function getExtensions()
+    protected function getExtensions(): array
     {
-        $validator = new RecursiveValidator(
-            new ExecutionContextFactory(new IdentityTranslator()),
-            new LazyLoadingMetadataFactory(new LoaderChain([])),
-            new ConstraintValidatorFactory()
-        );
-
         $constraintsProvider = $this->createMock(ConstraintsProviderInterface::class);
         $constraintsProvider->expects($this->any())
             ->method('getFormConstraints')
-            ->willReturnCallback(
-                function (FormInterface $form) {
-                    return $form->getName() === 'fieldName' ? ['NotBlank' => new NotBlank()] : [];
-                }
-            );
+            ->willReturnCallback(function (FormInterface $form) {
+                return $form->getName() === 'fieldName'
+                    ? ['NotBlank' => new NotBlank()]
+                    : [];
+            });
 
         return [
             new PreloadedExtension(
                 [
-                    FieldType::class => $this->type
+                    $this->type
                 ],
                 [
                     FormType::class => [
                         new DataBlockExtension(),
-                        new FormTypeValidatorExtension($validator),
+                        new FormTypeValidatorExtension(new RecursiveValidator(
+                            new ExecutionContextFactory(new IdentityTranslator()),
+                            new LazyLoadingMetadataFactory(new LoaderChain([])),
+                            new ConstraintValidatorFactory()
+                        )),
                         new JsValidationExtension($constraintsProvider)
                     ],
                     ChoiceType::class => [

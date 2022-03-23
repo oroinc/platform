@@ -30,10 +30,10 @@
                    title="<%- selectedChoiceTooltip %>"
                <% } %>
                data-toggle="dropdown" href="#">
-               <%= selectedChoiceLabel %>
+               <%- selectedChoiceLabel %>
             </a>
         <% } else { %>
-            <span><%= selectedChoiceLabel %></span>
+            <span><%- selectedChoiceLabel %></span>
         <% } %>
         <ul class="dropdown-menu">
             <% _.each(choices, function (option) { %>
@@ -41,7 +41,7 @@
                 <a class="choice-value"
                    <% if (option.tooltip) { %> title="<%- option.tooltip %>"<% } %>
                    href="#" data-value="<%- option.value %>">
-                   <%= option.label %>
+                   <%- option.label %>
                 </a>
             </li>
             <% }); %>

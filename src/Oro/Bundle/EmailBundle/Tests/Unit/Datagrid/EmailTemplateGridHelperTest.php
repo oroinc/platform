@@ -4,15 +4,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
 
     /** @var EmailTemplateGridHelper */
     private $helper;
@@ -21,7 +18,7 @@ class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
     {
         $this->entityProvider = $this->createMock(EntityProvider::class);
 
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);

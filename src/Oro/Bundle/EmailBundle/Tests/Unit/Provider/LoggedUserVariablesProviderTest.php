@@ -10,7 +10,7 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,7 +31,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturnArgument(0);

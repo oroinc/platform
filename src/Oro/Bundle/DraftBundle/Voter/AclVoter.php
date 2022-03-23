@@ -7,7 +7,6 @@ use Oro\Bundle\DraftBundle\Helper\DraftHelper;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
-use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter as BaseAclVoter;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
@@ -25,18 +24,15 @@ class AclVoter implements AclVoterInterface
         BasicPermission::DELETE
     ];
 
-    /**
-     * @var BaseAclVoter
-     */
-    private $voter;
+    private AclVoterInterface $voter;
 
-    public function __construct(BaseAclVoter $voter)
+    public function __construct(AclVoterInterface $voter)
     {
         $this->voter = $voter;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public function vote(TokenInterface $token, $object, array $attributes): int
     {
@@ -47,23 +43,32 @@ class AclVoter implements AclVoterInterface
         return $this->voter->vote($token, $object, $attributes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer): void
     {
         $this->voter->addOneShotIsGrantedObserver($observer);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getSecurityToken(): TokenInterface
     {
         return $this->voter->getSecurityToken();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getAclExtension(): AclExtensionInterface
     {
         return $this->voter->getAclExtension();
     }
 
     /**
-     * @return mixed
+     * {@inheritDoc}
      */
     public function getObject()
     {
@@ -71,8 +76,7 @@ class AclVoter implements AclVoterInterface
     }
 
     /**
-     * @param int $mask
-     * @param int $accessLevel
+     * {@inheritDoc}
      */
     public function setTriggeredMask($mask, $accessLevel): void
     {

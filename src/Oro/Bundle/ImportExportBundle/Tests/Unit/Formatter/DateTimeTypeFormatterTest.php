@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Formatter;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\ImportExportBundle\Formatter\DateTimeTypeFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +15,7 @@ class DateTimeTypeFormatterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);
-        $translator = $this->createMock(Translator::class);
+        $translator = $this->createMock(TranslatorInterface::class);
 
         $this->formatter = new DateTimeTypeFormatter($localeSettings, $translator);
     }

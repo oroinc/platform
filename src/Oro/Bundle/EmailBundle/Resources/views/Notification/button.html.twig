@@ -27,7 +27,7 @@
         <span class="forward-action-wrapper">
             <span class="forward-action">
                 {{- UI.clientLink({
-                    'dataUrlRaw': "<%= forwardRoute %>",
+                    'dataUrlRaw': "<%- forwardRoute %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'label': 'oro.email.forward'|trans,
                     'widget': {
@@ -49,7 +49,7 @@
             </span>
             <span class="reply-action">
                 {{- UI.clientLink({
-                    'dataUrlRaw': "<%= replyRoute %>",
+                    'dataUrlRaw': "<%- replyRoute %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'label': 'oro.email.reply'|trans,
                     'widget': {
@@ -71,7 +71,7 @@
             </span>
             <span class="reply-all-action">
                 {{- UI.clientLink({
-                    'dataUrlRaw': "<%= replyAllRoute %>",
+                    'dataUrlRaw': "<%- replyAllRoute %>",
                     'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
                     'label': 'oro.email.reply_all'|trans,
                     'widget': {
