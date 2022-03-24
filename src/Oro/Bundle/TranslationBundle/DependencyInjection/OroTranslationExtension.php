@@ -31,10 +31,10 @@ class OroTranslationExtension extends Extension
             $loader->load('services_test.yml');
         }
 
-        $container->getDefinition('oro_translation.controller')->replaceArgument(3, $config['js_translation']);
-
-        $container->setParameter('oro_translation.js_translation.domains', $config['js_translation']['domains']);
-        $container->setParameter('oro_translation.js_translation.debug', $config['js_translation']['debug']);
+        $container->getDefinition('oro_translation.js_generator')
+            ->setArgument('$domains', $config['js_translation']['domains']);
+        $container->getDefinition('oro_translation.twig.translation.extension')
+            ->setArgument('$isDebugJsTranslations', $config['js_translation']['debug']);
 
         $container->setParameter(
             'oro_translation.translation_service.apikey',
