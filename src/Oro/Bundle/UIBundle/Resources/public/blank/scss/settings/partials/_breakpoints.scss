@@ -23,8 +23,6 @@ $oro-breakpoints: (
         '(max-width: #{$breakpoint-mobile-landscape}) and (min-width: #{$breakpoint-mobile + 1})',
     'mobile':
         '(max-width: #{$breakpoint-mobile})',
-    'mobile-small':
-        '(max-width: #{$breakpoint-mobile-small})',
     'print': 'print',
     // Custom breakpoints
     'popup-gallery-tablet':
