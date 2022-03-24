@@ -225,6 +225,14 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
+    oro_navigation.file_manager.public_js:
+        parent: oro_gaufrette.file_manager
+        arguments:
+            - 'public_js'
+            - 'js'
+        tags:
+            - { name: oro_gaufrette.public_filesystem_manager }
+
     oro_navigation.title_service:
         class: Oro\Bundle\NavigationBundle\Provider\TitleService
         arguments:

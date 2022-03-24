@@ -113,6 +113,8 @@ services:
             - '@oro_translation.provider.language'
         lazy: true
         public: true
+        calls:
+            - [setFileManager, ['@oro_navigation.file_manager.public_js']]
 
     oro_translation.twig.translation.extension:
         class: Oro\Bundle\TranslationBundle\Twig\TranslationExtension

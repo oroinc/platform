@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Provider;
 
+use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\TranslationBundle\Controller\Controller;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -10,7 +11,7 @@ use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Dump js translations to appropriate files
+ * Dump JS translations to files.
  */
 class JsTranslationDumper implements LoggerAwareInterface
 {
@@ -33,6 +34,8 @@ class JsTranslationDumper implements LoggerAwareInterface
 
     /** @var string */
     protected $jsTranslationRoute;
+
+    private FileManager $fileManager;
 
     /**
      * @param Controller       $translationController
@@ -60,6 +63,11 @@ class JsTranslationDumper implements LoggerAwareInterface
         $this->setLogger(new NullLogger());
     }
 
+    public function setFileManager(FileManager $fileManager): void
+    {
+        $this->fileManager = $fileManager;
+    }
+
     /**
      * @param array         $locales
      *
@@ -74,22 +82,9 @@ class JsTranslationDumper implements LoggerAwareInterface
 
         foreach ($locales as $locale) {
             $target = $this->getTranslationFilePath($locale);
-
-            $this->logger->info(
-                sprintf(
-                    '<comment>%s</comment> <info>[file+]</info> %s',
-                    date('H:i:s'),
-                    basename($target)
-                )
-            );
+            $this->logger->info('<info>[file+]</info> ' . $target);
 
             $content = $this->translationController->renderJsTranslationContent($this->translationDomains, $locale);
-
-            $dirName = dirname($target);
-            if (!is_dir($dirName) && true !== @mkdir($dirName, 0777, true)) {
-                throw new IOException(sprintf('Failed to create %s', $dirName));
-            }
-
             if (false === @file_put_contents($target, $content)) {
                 throw new IOException('Unable to write file ' . $target);
             }
@@ -107,9 +102,6 @@ class JsTranslationDumper implements LoggerAwareInterface
 
     private function getTranslationFilePath(string $locale): string
     {
-        $targetPattern = realpath($this->kernelProjectDir . '/public')
-            . $this->router->getRouteCollection()->get($this->jsTranslationRoute)->getPath();
-
-        return strtr($targetPattern, ['{_locale}' => $locale]);
+        return $this->fileManager->getFilePath(sprintf('translation/%s.json', $locale));
     }
 }
