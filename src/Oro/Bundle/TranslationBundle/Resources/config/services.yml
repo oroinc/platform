@@ -1,14 +1,4 @@
 services:
-    oro_translation.controller:
-        class: Oro\Bundle\TranslationBundle\Controller\Controller
-        public: true
-        arguments:
-            - '@translator.default'
-            - '@twig'
-            - '@@OroTranslation/Translation/translation.js.twig'
-            - ""
-        lazy: true
-
     Oro\Bundle\TranslationBundle\Download\TranslationDownloader:
         arguments:
             - '@Oro\Bundle\TranslationBundle\Download\OroTranslationServiceAdapter'
@@ -103,14 +93,20 @@ services:
             - '@translation.warmer.default'
             - '@oro_translation.strategy.provider'
 
+    oro_translation.js_generator:
+        class: Oro\Bundle\TranslationBundle\Provider\JsTranslationGenerator
+        arguments:
+            - '@translator.default'
+            - '@twig'
+            - '@@OroTranslation/Translation/translation.js.twig'
+            - !abstract '$domains defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
+
     oro_translation.js_dumper:
         class: Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper
         arguments:
-            - '@oro_translation.controller'
-            - '@router'
-            - '%oro_translation.js_translation.domains%'
-            - '%kernel.project_dir%'
+            - '@oro_translation.js_generator'
             - '@oro_translation.provider.language'
+            - '@oro_navigation.file_manager.public_js'
         lazy: true
         public: true
 
@@ -120,7 +116,7 @@ services:
         arguments:
             - '@oro_platform.twig.service_locator'
             - '%oro_translation.debug_translator%'
-            - '%oro_translation.js_translation.debug%'
+            - !abstract '$isDebugJsTranslations defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
         tags:
             - { name: twig.extension }
 

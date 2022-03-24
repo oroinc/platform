@@ -2299,7 +2299,7 @@ JS;
     }
 
     /**
-     * Example: Given I set window size to 320x640
+     * Example: Given I set window size to 375x640
      *
      * @Given /^(?:|I )set window size to (?P<width>\d+)x(?P<height>\d+)$/
      */

@@ -93,7 +93,7 @@ define(function(require, exports, module) {
                 title: options.title,
                 limitTo: this.options.limitTo,
                 // minimal width is adjusted to dialog shows typical form without horizontal scroll
-                minWidth: tools.isMobile() ? 320 : 604,
+                minWidth: tools.isMobile() ? 375 : 604,
                 minHeight: 150
             });
             if (tools.isMobile()) {

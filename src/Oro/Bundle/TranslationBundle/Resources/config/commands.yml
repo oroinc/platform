@@ -3,8 +3,6 @@ services:
         public: false
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand:
-        public: false
-        class: Oro\Bundle\TranslationBundle\Command\OroTranslationDumpCommand
         arguments:
             - '@oro_translation.js_dumper'
         tags:

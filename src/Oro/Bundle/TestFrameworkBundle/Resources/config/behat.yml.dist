@@ -14,7 +14,7 @@ default: &default
                 system_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
-                320_session:
+                375_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
                 640_session:
@@ -99,7 +99,7 @@ chromedriver:
                                         - "--window-size=1920,1080"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
-                320_session:
+                375_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:9515'
                         capabilities:
@@ -112,7 +112,7 @@ chromedriver:
                                         - "--no-first-run"
                                         - "--disable-gpu"
                                         - "--headless"
-                                        - "--window-size=320,640"
+                                        - "--window-size=375,640"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
 

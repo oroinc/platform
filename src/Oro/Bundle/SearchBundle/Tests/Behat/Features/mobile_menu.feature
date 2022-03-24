@@ -15,8 +15,8 @@ Feature: Mobile menu
     And submit form
 
   Scenario: Check that search option places in fullscreen popup in custom theme
-    Given here is the "User" under "320_session"
-    And I set window size to 320x640
+    Given here is the "User" under "375_session"
+    And I set window size to 375x640
     When I am on homepage
     Then I should not see an "Search Form" element
     And I should not see an "Main Menu Search Button" element
