@@ -6,18 +6,11 @@ use Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
 /**
- * Updates default values of the format and target options for routing command.
+ * Renews the "routing" assets version before running the "fos:js-routing:dump" command.
  */
 class JsRoutingDumpListener
 {
-    /** @var DynamicAssetVersionManager */
-    private $assetVersionManager;
-
-    /** @var string */
-    private $projectDir;
-
-    /** @var string */
-    private $filenamePrefix;
+    private DynamicAssetVersionManager $assetVersionManager;
 
     public function __construct(
         DynamicAssetVersionManager $assetVersionManager,
@@ -25,42 +18,15 @@ class JsRoutingDumpListener
         string $filenamePrefix
     ) {
         $this->assetVersionManager = $assetVersionManager;
-        $this->projectDir = $projectDir;
-        $this->filenamePrefix = $filenamePrefix;
     }
 
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
         $command = $event->getCommand();
-        if (!$command || 'fos:js-routing:dump' !== $command->getName()) {
+        if (null === $command || 'fos:js-routing:dump' !== $command->getName()) {
             return;
         }
 
         $this->assetVersionManager->updateAssetVersion('routing');
-
-        $definition = $command->getDefinition();
-        $definition->getOption('format')
-            ->setDefault('json');
-
-        $input = $event->getInput();
-
-        $definition->getOption('target')
-            ->setDefault(
-                implode(
-                    DIRECTORY_SEPARATOR,
-                    [
-                        $this->projectDir,
-                        'public',
-                        'media',
-                        'js',
-                        sprintf('%s.%s', $this->getFilename(), $input->getOption('format'))
-                    ]
-                )
-            );
-    }
-
-    private function getFilename(): string
-    {
-        return implode('_', array_filter([rtrim($this->filenamePrefix, '_'), 'routes']));
     }
 }

@@ -225,6 +225,14 @@ services:
         tags:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
+    oro_navigation.listener.js_routing_route_collection_listener:
+        class: Oro\Bundle\NavigationBundle\EventListener\JsRoutingRouteCollectionListener
+        arguments:
+            - 'oro_navigation_js_routing_js'
+            - '%kernel.debug%'
+        tags:
+            - { name: kernel.event_listener, event: oro_distribution.route_collection.autoload, method: onCollectionAutoload }
+
     oro_navigation.file_manager.public_js:
         parent: oro_gaufrette.file_manager
         arguments:

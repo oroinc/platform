@@ -22,7 +22,8 @@ class RouteCollectionListener
                 'media/{subDirectory}/{fileName}',
                 ['_controller' => PublicFileController::class . '::getPublicFileAction'],
                 ['subDirectory' => '[\w-]+', 'fileName' => '.+']
-            )
+            ),
+            -10
         );
     }
 }
