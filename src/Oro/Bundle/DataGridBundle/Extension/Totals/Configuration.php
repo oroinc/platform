@@ -2,22 +2,28 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Defines the configuration parameters recognized by DataGrid > Totals.
+ */
 class Configuration implements ConfigurationInterface
 {
-    const TOTALS_PATH          = '[totals]';
-    const COLUMNS_PATH         = '[totals][columns]';
+    public const TOTALS_PATH                 = '[totals]';
+    public const COLUMNS_PATH                = '[totals][columns]';
 
-    const TOTALS_LABEL_KEY     = 'label';
-    const TOTALS_SQL_EXPRESSION_KEY = 'expr';
-    const TOTALS_FORMATTER_KEY      = 'formatter';
-    const TOTALS_DIVISOR_KEY      = 'divisor';
+    public const TOTALS_LABEL_KEY            = 'label';
+    public const TOTALS_SQL_EXPRESSION_KEY   = 'expr';
+    public const TOTALS_FORMATTER_KEY        = 'formatter';
+    public const TOTALS_DIVISOR_KEY          = 'divisor';
 
-    const TOTALS_PER_PAGE_ROW_KEY   = 'per_page';
-    const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
-    const TOTALS_EXTEND_KEY         = 'extends';
+    public const TOTALS_PER_PAGE_ROW_KEY     = 'per_page';
+    public const TOTALS_HIDE_IF_ONE_PAGE_KEY = 'hide_if_one_page';
+    public const TOTALS_DISABLED             = PropertyInterface::DISABLED_KEY;
+
+    public const TOTALS_EXTEND_KEY           = 'extends';
 
     /**
      * {@inheritDoc}
@@ -37,6 +43,12 @@ class Configuration implements ConfigurationInterface
                         ->info(
                             'Determines whether this total row should not be visible '
                             .'or not if all a grid has only one page'
+                        )
+                        ->defaultFalse()
+                    ->end()
+                    ->booleanNode(self::TOTALS_DISABLED)
+                        ->info(
+                            'Determines whether this total row should be disabled'
                         )
                         ->defaultFalse()
                     ->end()

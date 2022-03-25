@@ -7,6 +7,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\LoggerBundle\Monolog\LogLevelConfig;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,6 +28,7 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
     {
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->loggerCache = $this->createMock(ArrayAdapter::class);
+        $this->cacheItemMock = $this->createMock(ItemInterface::class);
         $this->applicationState = $this->createMock(ApplicationState::class);
 
         $this->applicationState->method('isInstalled')->willReturn(true);
@@ -35,32 +37,36 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
             $this->loggerCache,
             $this->configManager,
             $this->applicationState,
-            'warning'
+            Logger::WARNING
         );
     }
 
-    public function testGetMinLevelApplicationIsNotInstalled()
+    public function testGetMinLevelApplicationIsNotInstalled(): void
     {
         $applicationState = $this->createMock(ApplicationState::class);
-        $applicationState->method('isInstalled')->willReturn(false);
+        $applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturn(false);
 
         $config = new LogLevelConfig(
             $this->loggerCache,
             $this->configManager,
             $applicationState,
-            'warning'
+            Logger::WARNING
         );
         $this->loggerCache->expects(self::once())
             ->method('get')
             ->with(LogLevelConfig::CACHE_KEY)
-            ->willReturn(Logger::WARNING);
+            ->willReturnCallback(function ($logLevel, $callable) {
+                return $callable($this->cacheItemMock);
+            });
 
         $this->configManager->expects($this->never())->method('get');
 
-        $this->assertEquals(300, $config->getMinLevel());
+        $this->assertEquals(Logger::WARNING, $config->getMinLevel());
     }
 
-    public function testGetMinLevelWithCache()
+    public function testGetMinLevelWithCache(): void
     {
         $this->loggerCache->expects($this->once())
             ->method('get')
@@ -72,14 +78,16 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Logger::WARNING, $this->config->getMinLevel());
     }
 
-    public function testGetMinLevelWithoutCache()
+    public function testGetMinLevelWithoutCache(): void
     {
         $this->loggerCache->expects(self::once())
             ->method('get')
             ->with(LogLevelConfig::CACHE_KEY)
-            ->willReturn(Logger::INFO);
+            ->willReturnCallback(function ($logLevel, $callable) {
+                return $callable($this->cacheItemMock);
+            });
 
-        $this->configManager->expects(self::never())
+        $this->configManager->expects(self::exactly(2))
             ->method('get')
             ->withConsecutive(
                 ['oro_logger.detailed_logs_end_timestamp'],
@@ -87,14 +95,14 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnOnConsecutiveCalls(
                 time() + 500,
-                'info'
+                Logger::INFO
             );
 
         $this->config->isActive();
         $this->assertEquals(Logger::INFO, $this->config->getMinLevel());
     }
 
-    public function testIsActiveTrue()
+    public function testIsActiveTrue(): void
     {
         $this->loggerCache->expects(self::once())
             ->method('get')
@@ -106,7 +114,7 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->config->isActive());
     }
 
-    public function testIsActiveFalse()
+    public function testIsActiveFalse(): void
     {
         $this->loggerCache->expects(self::once())
             ->method('get')
@@ -118,7 +126,7 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->config->isActive());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $this->loggerCache->expects(self::exactly(2))
             ->method('get')
@@ -130,5 +138,46 @@ class LogLevelConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(Logger::WARNING, $this->config->getMinLevel());
         $this->config->reset();
         $this->assertEquals(Logger::WARNING, $this->config->getMinLevel());
+    }
+
+    public function testAntiRecursionFlagHandling(): void
+    {
+        $applicationState = $this->createMock(ApplicationState::class);
+
+        $config = new LogLevelConfig(
+            $this->loggerCache,
+            $this->configManager,
+            $applicationState,
+            Logger::WARNING
+        );
+
+        $applicationState->expects(self::once())
+            ->method('isInstalled')
+            ->willReturnCallback(function () use ($config) {
+                // single(and only available in this way) recursion loop triggering
+                $config->getMinLevel();
+                return true;
+            });
+
+        // expected 'get' calls count detects recursion loop
+        $this->loggerCache->expects(self::exactly(2))
+            ->method('get')
+            ->with(LogLevelConfig::CACHE_KEY)
+            ->willReturnCallback(function ($logLevel, $callable) {
+                return $callable($this->cacheItemMock);
+            });
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('get')
+            ->withConsecutive(
+                ['oro_logger.detailed_logs_end_timestamp'],
+                ['oro_logger.detailed_logs_level']
+            )
+            ->willReturnOnConsecutiveCalls(
+                time() + 500,
+                Logger::INFO
+            );
+
+        $config->getMinLevel();
     }
 }

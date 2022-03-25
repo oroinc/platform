@@ -82,7 +82,6 @@ define([
                     showLabel: this.showLabel,
                     options: options,
                     placeholder: this.placeholder,
-                    canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
                     isEmpty: this.isEmpty()
                 })

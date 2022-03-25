@@ -25,18 +25,11 @@ define(function(require, exports, module) {
      */
     const AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
-         * Is filter can be disabled
+         * Is filter renderable
          *
          * @property {Boolean}
          */
-        canDisable: true,
-
-        /**
-         * Is filter enabled
-         *
-         * @property {Boolean}
-         */
-        enabled: false,
+        renderable: false,
 
         /**
          * Is filter visible in UI
@@ -46,11 +39,11 @@ define(function(require, exports, module) {
         visible: true,
 
         /**
-         * Is filter enabled by default
+         * Is filter renderable by default
          *
          * @property {Boolean}
          */
-        defaultEnabled: false,
+        renderableByDefault: false,
 
         /**
          * Name of filter field
@@ -140,16 +133,16 @@ define(function(require, exports, module) {
          * Initialize.
          *
          * @param {Object} options
-         * @param {Boolean} [options.enabled]
+         * @param {Boolean} [options.renderable]
          */
         initialize: function(options) {
-            const opts = _.pick(options || {}, 'enabled', 'visible', 'canDisable', 'placeholder', 'showLabel', 'label',
+            const opts = _.pick(options || {}, 'renderable', 'visible', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme', 'template', 'renderMode', 'outerHintContainer');
             _.extend(this, opts);
 
             this._defineTemplate();
 
-            this.defaultEnabled = this.enabled;
+            this.renderableByDefault = this.renderable;
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -199,8 +192,8 @@ define(function(require, exports, module) {
          * @return {*}
          */
         enable: function() {
-            if (!this.enabled) {
-                this.enabled = true;
+            if (!this.renderable) {
+                this.renderable = true;
                 this.show();
                 this.trigger('enable', this);
             }
@@ -213,8 +206,8 @@ define(function(require, exports, module) {
          * @return {*}
          */
         disable: function() {
-            if (this.enabled) {
-                this.enabled = false;
+            if (this.renderable) {
+                this.renderable = false;
                 this.hide();
                 this.trigger('disable', this);
                 this.reset();

@@ -71,9 +71,8 @@
 
     &__link,
     &__label-container {
-        display: flex;
+        display: inline-flex;
         align-items: center;
-        width: 100%;
     }
 
     &:first-child {

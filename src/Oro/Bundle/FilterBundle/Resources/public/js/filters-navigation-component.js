@@ -89,7 +89,7 @@ const FiltersNavigationComponent = BaseComponent.extend({
 
     onFilterVisibilityChange() {
         const filter = this.iterator.current();
-        if (!filter.enabled || !filter.visible) {
+        if (!filter.renderable || !filter.visible) {
             this.setFirstVisibleFilterAsCurrent();
         }
         this.updateTabIndex();
@@ -116,7 +116,7 @@ const FiltersNavigationComponent = BaseComponent.extend({
         do {
             filter = this.iterator[iteratorMethod]();
         } while (
-            (!filter.enabled || !filter.visible) &&
+            (!filter.renderable || !filter.visible) &&
             filter !== currentFilter // if the filter is currentFilter -- all filters are checked and it is second lap
         );
 
@@ -125,7 +125,7 @@ const FiltersNavigationComponent = BaseComponent.extend({
 
     setFirstVisibleFilterAsCurrent() {
         const filter = this.iterator.reset();
-        if (!filter.visible || !filter.enabled) {
+        if (!filter.visible || !filter.renderable) {
             this.getFilterByIterator(_.isRTL() ? 'previous' : 'next');
         }
     },

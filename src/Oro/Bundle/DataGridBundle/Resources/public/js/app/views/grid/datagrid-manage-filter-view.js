@@ -94,11 +94,10 @@ define(function(require) {
             _.each(collectionFilters, function(filter) {
                 const stateKey = '__' + filter['name'];
                 if (_.has(stateFilters, stateKey)) {
-                    filter['enabled'] = stateFilters[stateKey] !== '0';
+                    filter.renderable = stateFilters[stateKey] !== '0';
                 }
-                filter['renderable'] = filter['enabled'];
-                filter['metadata'] = {
-                    renderable: filter['enabled']
+                filter.metadata = {
+                    renderable: filter.renderable
                 };
             });
 
