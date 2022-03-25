@@ -62,7 +62,7 @@ define(function(require) {
             $groups.removeClass('dropdown').addClass('accordion-group');
 
             const self = this;
-            $groups.add($root).each(function(i) {
+            $groups.each(function(i) {
                 const $group = $(this);
                 const isActive = $group.hasClass('active');
                 const autoCollapse = self.options.autoCollapse;
