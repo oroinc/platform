@@ -43,9 +43,9 @@ datagrids:
         extends: base-oro-locale-localizations-grid
         options:
             entity_pagination: true
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         source:
             type: orm
             query:

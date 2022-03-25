@@ -60,7 +60,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
         $this->filterFactory
             ->expects($this->once())
             ->method('createFilter')
-            ->with($filter1Name, ['label' => null])
+            ->with($filter1Name, ['label' => null, 'order' => 1, 'disabled' => null])
             ->willReturn($filter1);
 
         $this->assertEquals([$filter1Name => $filter1], $this->provider->getDatagridFilters($gridConfig));
@@ -85,7 +85,7 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
         $this->filterFactory
             ->expects($this->once())
             ->method('createFilter')
-            ->with($filter1Name, ['label' => $filter1Name, 'name' => $filter1Name])
+            ->with($filter1Name, ['label' => $filter1Name, 'name' => $filter1Name, 'order' => 1, 'disabled' => null])
             ->willReturn($filter1);
 
         $this->assertEquals([$filter1Name => $filter1], $this->provider->getDatagridFilters($gridConfig));
@@ -109,6 +109,171 @@ class DatagridFiltersProviderTest extends \PHPUnit\Framework\TestCase
             ->method('createFilter');
 
         $this->assertEquals([], $this->provider->getDatagridFilters($gridConfig));
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     *
+     * @return array[]
+     */
+    public function testGetDatagridFiltersCombinedProvider(): array
+    {
+        $filter1Name = 'sample_filter1';
+        $filter2Name = 'sample_filter2';
+
+        return [
+            'follow column order' => [
+                'configData'      => [
+                    'filters' => [
+                        'columns' => [
+                            $filter1Name => [
+                                'name' => $filter1Name,
+                            ],
+                            $filter2Name => [
+                                'order' => 5,
+                            ],
+                        ],
+                    ],
+                    'columns' => [
+                        $filter1Name => [
+                            'order' => 1,
+                        ],
+                        $filter2Name => [
+                            'order' => 2,
+                        ],
+                    ],
+                ],
+                'expectedFilters' => [
+                    $filter1Name => [
+                        'label'    => null,
+                        'name'     => $filter1Name,
+                        'order'    => 1,
+                        'disabled' => null,
+                    ],
+                    $filter2Name => [
+                        'label'    => null,
+                        'order'    => 5,
+                        'disabled' => null,
+                    ],
+                ],
+            ],
+            'disabled filter'     => [
+                'configData'      => [
+                    'filters' => [
+                        'columns' => [
+                            $filter1Name => [
+                                'name' => $filter1Name,
+                            ],
+                            $filter2Name => [
+                                'disabled' => true,
+                            ],
+                        ],
+                    ],
+                    'columns' => [
+                        $filter1Name => [
+                            'order' => 1,
+                        ],
+                        $filter2Name => [
+                            'order' => 2,
+                        ],
+                    ],
+                ],
+                'expectedFilters' => [
+                    $filter1Name => [
+                        'label'    => null,
+                        'name'     => $filter1Name,
+                        'order'    => 1,
+                        'disabled' => null,
+                    ],
+                ],
+            ],
+            'disabled column'     => [
+                'configData'      => [
+                    'filters' => [
+                        'columns' => [
+                            $filter1Name => [
+                                'name' => $filter1Name,
+                            ],
+                            $filter2Name => [
+                            ],
+                        ],
+                    ],
+                    'columns' => [
+                        $filter1Name => [
+                            'order' => 1,
+                        ],
+                        $filter2Name => [
+                            'disabled' => true,
+                        ],
+                    ],
+                ],
+                'expectedFilters' => [
+                    $filter1Name => [
+                        'label'    => null,
+                        'name'     => $filter1Name,
+                        'order'    => 1,
+                        'disabled' => null,
+                    ],
+                ],
+            ],
+            'check order'         => [
+                'configData'      => [
+                    'filters' => [
+                        'columns' => [
+                            $filter1Name => [
+                                'name' => $filter1Name,
+                            ],
+                            $filter2Name => [
+                                'order' => 1,
+                            ],
+                        ],
+                    ],
+                    'columns' => [
+                        $filter1Name => [
+                            'order' => 2,
+                        ],
+                    ],
+                ],
+                'expectedFilters' => [
+                    $filter2Name => [
+                        'label'    => null,
+                        'order'    => 1,
+                        'disabled' => null,
+                    ],
+                    $filter1Name => [
+                        'label'    => null,
+                        'name'     => $filter1Name,
+                        'order'    => 2,
+                        'disabled' => null,
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider testGetDatagridFiltersCombinedProvider
+     * @param array $configData
+     * @param array $expectedFilters
+     */
+    public function testGetDatagridFiltersCombined(array $configData, array $expectedFilters): void
+    {
+        $gridConfig    = $this->getGridConfig(OrmDatasource::TYPE, $configData);
+        $assertFilters = [];
+        $mockWith      = [];
+        $mockReturn    = [];
+        foreach ($expectedFilters as $filterName => $filterConfig) {
+            $filter = $this->createMock(FilterInterface::class);
+            $assertFilters[$filterName] = $filter;
+            $mockWith[] = [$filterName, $filterConfig];
+            $mockReturn[] = $filter;
+        }
+
+        $this->filterFactory->method('createFilter')
+            ->withConsecutive(... $mockWith)
+            ->willReturnOnConsecutiveCalls(... $mockReturn);
+
+        $this->assertEquals($assertFilters, $this->provider->getDatagridFilters($gridConfig));
     }
 
     private function getGridConfig(string $datasourceType, array $gridConfig = []): DatagridConfiguration

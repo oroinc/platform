@@ -81,7 +81,7 @@ datagrids:
                 lastRun:
                     type:       datetime
                     data_name:  s.lastRun
-                    enabled:    false
+                    renderable:    false
         actions:
             view:
                 type:          navigate

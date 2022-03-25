@@ -4,17 +4,21 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * Oro DataGrid Delete Mass Action Extension
+ */
 class DeleteMassActionExtension extends AbstractExtension
 {
-    const ACTION_KEY         = 'actions';
-    const MASS_ACTION_KEY    = 'mass_actions';
-    const ACTION_TYPE_KEY    = 'type';
-    const ACTION_TYPE_DELETE = 'delete';
+    public const ACTION_KEY         = 'actions';
+    public const MASS_ACTION_KEY    = 'mass_actions';
+    public const ACTION_TYPE_KEY    = 'type';
+    public const ACTION_TYPE_DELETE = 'delete';
 
-    const MASS_ACTION_OPTION_PATH = '[options][mass_actions][delete]';
+    public const MASS_ACTION_OPTION_PATH = '[mass_actions][delete]';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -43,19 +47,21 @@ class DeleteMassActionExtension extends AbstractExtension
             return false;
         }
 
-        // validate configuration and fill default values
-        $options = $this->validateConfiguration(
-            new DeleteMassActionConfiguration(),
-            ['delete' => $config->offsetGetByPath(self::MASS_ACTION_OPTION_PATH, true)]
-        );
+        $options = $config->offsetGetByPath(self::MASS_ACTION_OPTION_PATH, []);
+        // BC layer start
+        $configData = $config->offsetGetByPath('[options][mass_actions][delete]');
+        if (isset($configData['enabled']) && !$configData['enabled']) {
+            $options[PropertyInterface::DISABLED_KEY] = true;
+        }
+        // BC layer end
 
         return
+            !($options[PropertyInterface::DISABLED_KEY] ?? false) &&
             // Checks if mass delete action does not exists
             !$this->isDeleteActionExists($config, static::MASS_ACTION_KEY) &&
             // Checks if delete action exists
             $this->isDeleteActionExists($config, static::ACTION_KEY) &&
-            $this->isApplicableForEntity($config) &&
-            $options['enabled'];
+            $this->isApplicableForEntity($config);
     }
 
     /**
@@ -88,7 +94,8 @@ class DeleteMassActionExtension extends AbstractExtension
     {
         $actions = $config->offsetGetOr($key, []);
         foreach ($actions as $action) {
-            if ($action[static::ACTION_TYPE_KEY] === static::ACTION_TYPE_DELETE) {
+            $actionType = $action[static::ACTION_TYPE_KEY] ?? '';
+            if ($actionType === static::ACTION_TYPE_DELETE) {
                 return true;
             }
         }

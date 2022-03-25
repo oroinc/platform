@@ -7,6 +7,9 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
+/**
+ * Additional datagrid extension which adds to datagrids columns, filters and sorters for the extended entities fields.
+ */
 class AdditionalFieldsExtension extends AbstractFieldsExtension
 {
     const ENTITY_NAME_CONFIG_PATH       = '[options][entity_name]';
@@ -65,6 +68,6 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
     {
         parent::prepareColumnOptions($field, $columnOptions);
 
-        $columnOptions[DatagridGuesser::FILTER]['enabled'] = true;
+        $columnOptions[DatagridGuesser::FILTER]['renderable'] = true;
     }
 }

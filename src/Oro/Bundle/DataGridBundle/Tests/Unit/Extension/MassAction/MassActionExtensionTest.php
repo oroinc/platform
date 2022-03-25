@@ -134,6 +134,30 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testVisitMetadataDisabledMassActions()
+    {
+        $config = DatagridConfiguration::create(
+            [
+                'mass_actions' => [
+                    'action1' => [
+                        'type'     => 'type1',
+                        'disabled' => true,
+                    ],
+                ],
+            ]
+        );
+        $metadata = MetadataObject::create([]);
+
+        $this->extension->visitMetadata($config, $metadata);
+
+        self::assertEquals(
+            [
+                'massActions' => []
+            ],
+            $metadata->toArray()
+        );
+    }
+
     public function testVisitMetadataWithMassActionsAndValidHTTPMethods()
     {
         $actionName = 'action1';

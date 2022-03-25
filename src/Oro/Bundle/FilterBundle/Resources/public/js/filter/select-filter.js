@@ -219,7 +219,6 @@ define(function(require, exports, module) {
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
                 options: options,
-                canDisable: this.canDisable,
                 selected: _.extend({}, this.emptyValue, this.value),
                 isEmpty: this.isEmpty(),
                 renderMode: this.renderMode,

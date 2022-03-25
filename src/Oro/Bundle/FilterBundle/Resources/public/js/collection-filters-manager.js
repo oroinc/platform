@@ -139,13 +139,13 @@ define([
                 const shortName = '__' + name;
                 if (_.has(this.collection.initialState.filters, name) && !filter.isEmptyValue()) {
                     state[name] = filter.getValue();
-                } else if (filter.enabled) {
+                } else if (filter.renderable) {
                     if (!filter.isEmptyValue()) {
                         state[name] = filter.getValue();
-                    } else if (!filter.defaultEnabled) {
+                    } else if (!filter.renderableByDefault) {
                         state[shortName] = '1';
                     }
-                } else if (filter.defaultEnabled) {
+                } else if (filter.renderableByDefault) {
                     state[shortName] = '0';
                 }
             }, this);
@@ -170,12 +170,11 @@ define([
                 let filterState;
 
                 // Reset to initial state,
-                // todo: should be removed after complete story about filter states
-                if (filter.defaultEnabled === false && filter.enabled === true) {
+                if (filter.renderableByDefault === false && filter.renderable === true) {
                     this.disableFilter(filter);
                 }
 
-                if (filter.defaultEnabled === true && filter.enabled === false) {
+                if (filter.renderableByDefault === true && filter.renderable === false) {
                     this.enableFilter(filter);
                 }
 
