@@ -100,9 +100,9 @@ datagrids:
         options:
             entityHint: oro.workflow.workflowdefinition.entity_plural_label
             export:     false
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         acl_resource: oro_workflow_definition_view
         source:
             type: orm

@@ -5,9 +5,9 @@ datagrids:
         options:
             entityHint: oro.user.entity_plural_label
             entity_pagination: true
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         acl_resource: oro_user_user_view
         source:
             type: orm

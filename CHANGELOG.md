@@ -21,6 +21,13 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
   to provider image sources to be used in <picture> tag.
 
+#### DataGridBundle
+* Added a unified way to disable columns, sorters, actions, and mass actions
+
+### FilterBundle
+* Changed filter configuration variable from `enabled` to `renderable`
+* Added new filter configuration variable `order` behavior according to [the documentation](https://doc.oroinc.com/master/bundles/platform/FilterBundle/grid-extension/)
+
 #### LocaleBundle
 * Added entity name provider for `Locale` entity
 

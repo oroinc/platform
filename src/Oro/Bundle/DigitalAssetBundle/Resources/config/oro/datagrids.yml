@@ -113,7 +113,7 @@ datagrids:
                 updatedAt:
                     type: datetime
                     data_name: digitalAsset.updatedAt
-                    enabled: false
+                    renderable: false
         actions:
             update:
                 type: navigate
@@ -168,9 +168,9 @@ datagrids:
         filters:
             columns:
                 fileSize:
-                    enabled: false
+                    renderable: false
                 mimeType:
-                    enabled: false
+                    renderable: false
         action_configuration:
             update: false
             delete: true

@@ -236,7 +236,7 @@ define(function(require, exports, module) {
                     const filter = Object.values(this.filters)
                         .find(filter => {
                             return filter.visible &&
-                                   filter.enabled &&
+                                   filter.renderable &&
                                    filter.getCriteriaSelector().attr('tabindex') !== '-1';
                         });
 
@@ -282,7 +282,7 @@ define(function(require, exports, module) {
 
         checkFiltersVisibility: function() {
             _.each(this.filters, filter => {
-                if (filter.visible && filter.enabled) {
+                if (filter.visible && filter.renderable) {
                     this._renderFilter(filter).show();
                 } else if (!filter.visible) {
                     filter.hide();
@@ -392,7 +392,7 @@ define(function(require, exports, module) {
         getValues: function() {
             const values = {};
             _.each(this.filters, function(filter) {
-                if (filter.enabled) {
+                if (filter.renderable) {
                     values[filter.name] = filter.getValue();
                 }
             }, this);
@@ -561,7 +561,7 @@ define(function(require, exports, module) {
 
                 filter.setRenderMode(this.renderMode);
 
-                if (!filter.enabled || !filter.visible) {
+                if (!filter.renderable || !filter.visible) {
                     // append element to reserve space
                     // empty elements are hidden by default
                     $filterItems.append(filter.$el);
@@ -647,7 +647,7 @@ define(function(require, exports, module) {
         _calculateSelectedFilters: function() {
             return _.reduce(this.filters, function(memo, filter) {
                 const num = (
-                    filter.enabled &&
+                    filter.renderable &&
                     !filter.isEmptyValue() &&
                     !_.isEqual(filter.emptyValue, filter.value)
                 ) ? 1 : 0;
@@ -664,7 +664,7 @@ define(function(require, exports, module) {
             return _.reduce(this.filters, function(memo, filter) {
                 const domVal = filter._readDOMValue();
 
-                const num = (filter.enabled &&
+                const num = (filter.renderable &&
                    !_.isEqual(filter.value, domVal) &&
                    !_.isEqual(filter.emptyValue, domVal) &&
                    !_.isUndefined(domVal.type) &&
@@ -842,9 +842,9 @@ define(function(require, exports, module) {
             }
 
             _.each(this.filters, function(filter, name) {
-                if (!filter.enabled && _.indexOf(activeFilters, name) !== -1) {
+                if (!filter.renderable && _.indexOf(activeFilters, name) !== -1) {
                     this.enableFilter(filter);
-                } else if (filter.enabled && _.indexOf(activeFilters, name) === -1) {
+                } else if (filter.renderable && _.indexOf(activeFilters, name) === -1) {
                     this.disableFilter(filter);
                 }
             }, this);
@@ -924,7 +924,7 @@ define(function(require, exports, module) {
         getChangedFilters: function() {
             return _.filter(this.filters, function(filter) {
                 return (
-                    filter.enabled &&
+                    filter.renderable &&
                     filter._isDOMValueChanged()
                 );
             });
