@@ -105,7 +105,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
                 ['state', [Configuration::COLUMNS_KEY => $columnsState]],
                 ['initialState', [Configuration::COLUMNS_KEY => $defaultState]]
             );
-        $this->metadataObject->expects(self::once())
+        $this->metadataObject->expects(self::exactly(2))
             ->method('offsetGetOr')
             ->with('columns', [])
             ->willReturn([['name' => $columnName]]);
@@ -168,7 +168,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
                 ['state', [Configuration::COLUMNS_KEY => $columnsState]],
                 ['initialState', [Configuration::COLUMNS_KEY => $defaultState]]
             );
-        $this->metadataObject->expects(self::once())
+        $this->metadataObject->expects(self::exactly(2))
             ->method('offsetGetOr')
             ->with('columns', [])
             ->willReturn([['name' => $columnName]]);
@@ -242,7 +242,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
             ->with($this->datagridConfiguration)
             ->willReturn($defaultState);
 
-        $this->metadataObject->expects(self::once())
+        $this->metadataObject->expects(self::exactly(2))
             ->method('offsetGetOr')
             ->with('columns', [])
             ->willReturn($metadata);
@@ -262,5 +262,80 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
                 sprintf('[gridViews][views][%s][%s]', 0, 'columns'),
                 $defaultState
             );
+    }
+
+    public function testVisitMetadataDisabledProvider(): array
+    {
+        return [
+            'default behavior' => [
+                'configColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ],
+                    'column2' => [
+                        'label'    => 'column2.label',
+                        'disabled' => false,
+                    ],
+                ],
+                'expectedColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ],
+                    'column2' => [
+                        'label'    => 'column2.label',
+                        'disabled' => false,
+                    ],
+                ],
+            ],
+            'disabled column' => [
+                'configColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ],
+                    'column2' => [
+                        'label'    => 'column2.label',
+                        'disabled' => true,
+                    ],
+                ],
+                'expectedColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider testVisitMetadataDisabledProvider
+     * @param array $configColumns
+     * @param array $expectedColumns
+     */
+    public function testVisitMetadataDisabled(array $configColumns, array $expectedColumns)
+    {
+        $this->columnsStateProvider->expects(self::once())
+            ->method('getState')
+            ->with($this->datagridConfiguration)
+            ->willReturn([]);
+        $this->columnsStateProvider->expects(self::once())
+            ->method('getDefaultState')
+            ->with($this->datagridConfiguration)
+            ->willReturn(['sampleDefaultState']);
+        $this->metadataObject->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with('[gridViews][views]', [])
+            ->willReturn(['columnConfig' => []]);
+
+        $this->metadataObject->expects(self::exactly(2))
+            ->method('offsetGetOr')
+            ->with('columns', [])
+            ->willReturn($configColumns);
+
+        $this->metadataObject->expects(self::once())
+            ->method('offsetSet')
+            ->with(Configuration::COLUMNS_KEY, $expectedColumns);
+
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitMetadata($this->datagridConfiguration, $this->metadataObject);
     }
 }

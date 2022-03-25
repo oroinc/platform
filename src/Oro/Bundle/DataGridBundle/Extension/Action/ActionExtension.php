@@ -13,6 +13,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\CallbackProperty;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference;
 use Oro\Bundle\SecurityBundle\Owner\OwnershipQueryHelper;
@@ -218,6 +219,10 @@ class ActionExtension extends AbstractExtension
      */
     protected function createAction($actionName, array $actionConfig)
     {
+        if ($actionConfig[PropertyInterface::DISABLED_KEY] ?? false) {
+            return null;
+        }
+
         $action = $this->actionFactory->createAction($actionName, $actionConfig);
 
         $aclResource = $action->getAclResource();

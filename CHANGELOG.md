@@ -54,6 +54,12 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
   to provider image sources to be used in <picture> tag.
 
+#### DataGridBundle
+* Added a unified way to disable columns, sorters, actions, and mass actions
+
+### FilterBundle
+* Added new filter configuration variable `order` behavior according to [the documentation](https://doc.oroinc.com/master/bundles/platform/FilterBundle/grid-extension/)
+
 #### MessageQueue Component
 * Added `Oro\Component\MessageQueue\Topic\TopicInterface` to declare topic name, description, message default priority 
   and message body structure for the MQ topics.
@@ -80,6 +86,9 @@ The current file describes significant changes in the code that may affect the u
   `Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager::resize()`,
   `Oro\Bundle\AttachmentBundle\Manager\ImageResizeManager::applyFilter()`:
   added `$format` argument to specify the resized image format.
+
+#### DataGridBundle
+* Changed filter configuration variable from `enabled` to `renderable`
 
 #### Config component
 * Added sorting by depth to `Oro\Component\Config\Loader\FolderContentCumulativeLoader::getDirectoryContents()`
