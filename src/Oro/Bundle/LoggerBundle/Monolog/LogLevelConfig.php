@@ -19,7 +19,8 @@ class LogLevelConfig implements ResetInterface
 
     private int $defaultLevel;
 
-    private bool $loading = false;
+    /** @var bool tracks recursive calls of the log level loading */
+    private bool $logLevelLoadingFlag = false;
 
     private CacheInterface $loggerCache;
 
@@ -54,19 +55,28 @@ class LogLevelConfig implements ResetInterface
 
         $this->logLevel = $this->loggerCache->get(self::CACHE_KEY, function (ItemInterface $item) {
             $logLevel = $this->defaultLevel;
+            if ($this->logLevelLoadingFlag) {
+                return $logLevel;
+            }
+            $this->logLevelLoadingFlag = true;
             $lifeTime = 0;
-            if ($this->configManager && $this->applicationState->isInstalled()) {
-                $curTimestamp = time();
-                $endTimestamp = $this->configManager
-                    ->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));
-                if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
-                    $logLevel = $this->configManager
-                        ->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
-                    $logLevel = Logger::toMonologLevel($logLevel);
-                    $lifeTime = $endTimestamp - $curTimestamp;
+            try {
+                if ($this->configManager && $this->applicationState->isInstalled()) {
+                    $curTimestamp = time();
+                    $endTimestamp = $this->configManager
+                        ->get(Configuration::getFullConfigKey(Configuration::LOGS_TIMESTAMP_KEY));
+                    if (null !== $endTimestamp && $curTimestamp <= $endTimestamp) {
+                        $logLevel = $this->configManager
+                            ->get(Configuration::getFullConfigKey(Configuration::LOGS_LEVEL_KEY));
+                        $logLevel = Logger::toMonologLevel($logLevel);
+                        $lifeTime = $endTimestamp - $curTimestamp;
+                    }
                 }
+            } finally {
+                $this->logLevelLoadingFlag = false;
             }
             $item->expiresAfter($lifeTime);
+
             return $logLevel;
         });
 
