@@ -78,6 +78,8 @@ class CheckRequirementsCommandTest extends WebTestCase
         $this->assertContains('intl extension should be available', $messages, $errorMessage);
         $this->assertContains('zip extension should be installed', $messages, $errorMessage);
         $this->assertContains('openssl_encrypt() should be available', $messages, $errorMessage);
+        $this->assertContains('mb_strlen() should be available', $messages, $errorMessage);
+        $this->assertContains('imagewebp() should be available', $messages, $errorMessage);
     }
 
     private function executeCommand(array $args = []): string
