@@ -158,6 +158,7 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addFilterExtRecommendation($collection);
         $this->addPosixExtRecommendation($collection);
         $this->addAcceleratorExtRecommendation($collection);
+        $this->addGdExtRecommendation($collection);
 
         $this->addImageProcessorRecommendation($collection, ProcessorHelper::JPEGOPTIM);
         $this->addImageProcessorRecommendation($collection, ProcessorHelper::PNGQUANT);
@@ -757,6 +758,15 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
             $accelerator,
             'a PHP accelerator should be installed',
             'Install and/or enable a <strong>PHP accelerator</strong> (highly recommended).'
+        );
+    }
+
+    protected function addGdExtRecommendation(RequirementCollection $collection): void
+    {
+        $collection->addRecommendation(
+            function_exists('imagewebp'),
+            'imagewebp() should be available',
+            'Reinstall <strong>GD</strong> extension with WebP image processing enabled.'
         );
     }
 
