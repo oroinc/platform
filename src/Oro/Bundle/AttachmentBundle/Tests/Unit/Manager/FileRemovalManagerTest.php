@@ -12,17 +12,13 @@ use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 
 class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileRemovalManagerConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configuration;
+    private FileRemovalManagerConfigInterface|\PHPUnit\Framework\MockObject\MockObject $configuration;
 
-    /** @var FileNamesProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileNamesProvider;
+    private FileNamesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileNamesProvider;
 
-    /** @var MediaCacheManagerRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $mediaCacheManagerRegistry;
+    private MediaCacheManagerRegistryInterface|\PHPUnit\Framework\MockObject\MockObject $mediaCacheManagerRegistry;
 
-    /** @var FileRemovalManager */
-    private $fileRemovalManager;
+    private FileRemovalManager $fileRemovalManager;
 
     protected function setUp(): void
     {
@@ -37,14 +33,26 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveFilesWhenDirectoriesNotMatched()
+    public function testRemoveFilesDoesNothingWhenStoredExternally(): void
+    {
+        $file = new File();
+        $file->setExternalUrl('http://example.org/image.png');
+
+        $this->mediaCacheManagerRegistry
+            ->expects(self::never())
+            ->method(self::anything());
+
+        $this->fileRemovalManager->removeFiles($file);
+    }
+
+    public function testRemoveFilesWhenDirectoriesNotMatched(): void
     {
         $file = $this->createMock(File::class);
 
         $this->configuration->expects(self::atLeastOnce())
             ->method('getConfiguration')
             ->willReturn([
-                'resize' => new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', true)
+                'resize' => new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', true),
             ]);
         $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
@@ -56,7 +64,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($file))
             ->willReturn([
                 'attachment/filter/filter1/hash/123/file.jpg',
-                'attachment/filter/filter2/hash/123/file.jpg'
+                'attachment/filter/filter2/hash/123/file.jpg',
             ]);
 
         $mediaCacheManager->expects(self::exactly(2))
@@ -71,14 +79,14 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileRemovalManager->removeFiles($file);
     }
 
-    public function testRemoveFilesWhenDirectoriesMatchedAndAllowedToUseForSingleFile()
+    public function testRemoveFilesWhenDirectoriesMatchedAndAllowedToUseForSingleFile(): void
     {
         $file = $this->createMock(File::class);
 
         $this->configuration->expects(self::atLeastOnce())
             ->method('getConfiguration')
             ->willReturn([
-                'filter' => new DirectoryExtractor('/^(attachment\/filter\/\w+\/\w+\/\d+)\/\w+/', true)
+                'filter' => new DirectoryExtractor('/^(attachment\/filter\/\w+\/\w+\/\d+)\/\w+/', true),
             ]);
         $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
@@ -91,7 +99,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([
                 'attachment/filter/filter1/hash/123/file.jpg',
                 'attachment/filter/filter2/hash/123/file1.jpg',
-                'attachment/filter/filter2/hash/123/file2.jpg'
+                'attachment/filter/filter2/hash/123/file2.jpg',
             ]);
 
         $mediaCacheManager->expects(self::never())
@@ -106,14 +114,14 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileRemovalManager->removeFiles($file);
     }
 
-    public function testRemoveFilesWhenDirectoriesMatchedAndNotAllowedToUseForSingleFile()
+    public function testRemoveFilesWhenDirectoriesMatchedAndNotAllowedToUseForSingleFile(): void
     {
         $file = $this->createMock(File::class);
 
         $this->configuration->expects(self::atLeastOnce())
             ->method('getConfiguration')
             ->willReturn([
-                'filter' => new DirectoryExtractor('/^(attachment\/filter\/\w+\/\w+\/\d+)\/\w+/', false)
+                'filter' => new DirectoryExtractor('/^(attachment\/filter\/\w+\/\w+\/\d+)\/\w+/', false),
             ]);
         $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
@@ -126,7 +134,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([
                 'attachment/filter/filter1/hash/123/file.jpg',
                 'attachment/filter/filter2/hash/123/file1.jpg',
-                'attachment/filter/filter2/hash/123/file2.jpg'
+                'attachment/filter/filter2/hash/123/file2.jpg',
             ]);
 
         $mediaCacheManager->expects(self::once())
@@ -139,7 +147,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileRemovalManager->removeFiles($file);
     }
 
-    public function testRemoveFilesWhenThereAreMatchedDirsAndNotMatchedDirsFilesAndAllowedToUseForSingleFile()
+    public function testRemoveFilesWhenThereAreMatchedDirsAndNotMatchedDirsFilesAndAllowedToUseForSingleFile(): void
     {
         $file = $this->createMock(File::class);
 
@@ -147,7 +155,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn([
                 'filter' => new DirectoryExtractor('/^(attachment\/filter\/\w+\/\w+\/\d+)\/\w+/', true),
-                'resize' => new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', true)
+                'resize' => new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', true),
             ]);
         $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
@@ -164,7 +172,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
                 'attachment/resize/123/1/1/file.jpg',
                 'attachment/resize/123/10/10/file.jpg',
                 'attachment/other/123/1/1/file.jpg',
-                'attachment/other/123/file.jpg'
+                'attachment/other/123/file.jpg',
             ]);
 
         $mediaCacheManager->expects(self::exactly(2))
@@ -184,7 +192,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileRemovalManager->removeFiles($file);
     }
 
-    public function testRemoveFilesWhenThereAreMatchedDirsAndNotMatchedDirsFilesAndNotAllowedToUseForSingleFile()
+    public function testRemoveFilesWhenThereAreMatchedDirsAndNotMatchedDirsFilesAndNotAllowedToUseForSingleFile(): void
     {
         $file = $this->createMock(File::class);
 
@@ -192,7 +200,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getConfiguration')
             ->willReturn([
                 'filter' => new DirectoryExtractor('/^(attachment\/filter\/\w+\/\w+\/\d+)\/\w+/', false),
-                'resize' => new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', false)
+                'resize' => new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', false),
             ]);
         $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
@@ -209,7 +217,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
                 'attachment/resize/123/1/1/file.jpg',
                 'attachment/resize/123/10/10/file.jpg',
                 'attachment/other/123/1/1/file.jpg',
-                'attachment/other/123/file.jpg'
+                'attachment/other/123/file.jpg',
             ]);
 
         $mediaCacheManager->expects(self::exactly(3))
@@ -229,14 +237,14 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileRemovalManager->removeFiles($file);
     }
 
-    public function testRemoveFilesWhenDirectoriesMatchedByPatternThatIncludesTailingSlash()
+    public function testRemoveFilesWhenDirectoriesMatchedByPatternThatIncludesTailingSlash(): void
     {
         $file = $this->createMock(File::class);
 
         $this->configuration->expects(self::atLeastOnce())
             ->method('getConfiguration')
             ->willReturn([
-                'filter' => new DirectoryExtractor('/^(\w+\/)\w+/', true)
+                'filter' => new DirectoryExtractor('/^(\w+\/)\w+/', true),
             ]);
         $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
@@ -247,7 +255,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
             ->method('getFileNames')
             ->with(self::identicalTo($file))
             ->willReturn([
-                'dir/file.txt'
+                'dir/file.txt',
             ]);
 
         $mediaCacheManager->expects(self::never())

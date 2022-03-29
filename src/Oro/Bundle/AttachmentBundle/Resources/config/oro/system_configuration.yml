@@ -7,6 +7,8 @@ system_configuration:
             title:  oro.attachment.config.mime_types.label
         attachment_file_size_settings:
             title:  oro.attachment.config.file_size_settings.label
+        externally_stored_files_settings:
+            title:  oro.attachment.config.externally_stored_files_settings.label
         attachment_processors_settings:
             title:  oro.attachment.config.attachment_processors_settings.label
             description: oro.attachment.config.attachment_processors_settings.description
@@ -48,6 +50,15 @@ system_configuration:
                 tooltip: oro.attachment.config.upload_image_mime_types.tooltip
                 constraints:
                     - Oro\Bundle\AttachmentBundle\Validator\Constraints\MimeType: { type: image }
+
+        oro_attachment.external_file_allowed_urls_regexp:
+            data_type: string
+            type: \Symfony\Component\Form\Extension\Core\Type\TextType
+            options:
+                label: oro.attachment.config.external_file_allowed_urls_regexp.label
+                tooltip: oro.attachment.config.external_file_allowed_urls_regexp.tooltip
+                constraints:
+                    - Oro\Bundle\FormBundle\Validator\Constraints\RegExpSyntax: ~
 
         oro_attachment.processors_allowed:
             data_type: boolean
@@ -116,6 +127,9 @@ system_configuration:
                                         children:
                                             - oro_attachment.upload_file_mime_types
                                             - oro_attachment.upload_image_mime_types
+                                    externally_stored_files_settings:
+                                        children:
+                                            - oro_attachment.external_file_allowed_urls_regexp
                                     attachment_processors_settings:
                                         children:
                                             - oro_attachment.processors_allowed

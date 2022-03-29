@@ -9,6 +9,37 @@ The current file describes significant changes in the code that may affect the u
 #### LocaleBundle
 * Added entity name provider for `Locale` entity
 
+#### AttachmentBundle
+* Added `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` property to store external file URL.
+* Added `Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider` (`oro_attachment.provider.external_url_provider`) that
+  returns `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` for a file, a resized or a filtered image URL.
+* Added `oro_attachment.provider.external_url_provider` to the decorators chain of the file url providers
+  `Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface` (`oro_attachment.provider.file_url`).
+* Added `Oro\Bundle\AttachmentBundle\Model\ExternalFile` model as a descendant of `\SplFileInfo` that represents
+  an externally stored file.
+* Added `Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory` that creates `Oro\Bundle\AttachmentBundle\Model\ExternalFile`
+  from a URL or `Oro\Bundle\AttachmentBundle\Entity\File` entity.
+* Added `isExternalFile` form option to `Oro\Bundle\AttachmentBundle\Form\Type\FileType` that enables the external file URL
+  input instead of the upload input.
+* Added `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider` that provides form type and common form options
+  for extend fields.
+* Added `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider` (`oro_entity_extend.provider.extend_field_form_options`)
+  that collects extend field form options from the underlying providers
+  of `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface` interface.
+* Added service container tag `oro_entity_extend.form_options_provider` for extend field form options providers to be used
+  in `oro_entity_extend.provider.extend_field_form_options`.
+* Added `Oro\Bundle\AttachmentBundle\Provider\ExtendFieldFileFormOptionsProvider` that provides form options for
+  `file`, `image`, `multiFile`, `multiImage` types of extend fields.
+* Added `Oro\Bundle\FormBundle\Validator\Constraints\RegExpSyntax` validation constraint for checking regular expression
+  syntax.
+* Added `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator` that uploads a file or clones it from the existing
+  one during import.
+
+#### DigitalAssetBundle
+* Added `Oro\Bundle\DigitalAssetBundle\Provider\ExtendFieldFileDamFormOptionsProvider` that manages `dam_widget_enabled`
+  form option based on `use_dam`, `is_stored_externally` entity field config values for `file`, `image`,
+  `multiFile`, `multiImage` types of extend fields.
+
 ### Changed
 
 #### ApiBundle
@@ -23,6 +54,31 @@ The current file describes significant changes in the code that may affect the u
 * Entity title in the search index is no longer stored in the special field in the DB, now it is stored as a regular index text field called `system_entity_name`
 * Entity title is no longer returned in the search results by default, now it has to be manually added to the select section of the query
 * All entities presented in the search index now have proper entity name providers
+
+#### AttachmentBundle
+* Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
+  to allow `Oro\Bundle\AttachmentBundle\Model\ExternalFile`. Methods `setFile` and `getFile` are changed correspondingly.
+* Changed `Oro\Bundle\AttachmentBundle\Manager\FileManager::getFileFromFileEntity` return type to `?\SplFileInfo`
+  to comply with `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper::getFieldLabel` visibility to public,
+  so it can be used for getting human-readable field names during import.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener` constructor, so it expects
+  `Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator $fileManipulator`
+  instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
+
+#### DigitalAssetBundle
+* Changed `Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyEventListener` constructor,
+  so it expects `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper $fileImportStrategyHelper`
+  instead of `$doctrineHelper`.
+
+#### EntityExtendBundle
+* Changed `Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser` constructor, so it expects
+  `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider $extendFieldFormTypeProvider` and
+  `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface $extendFieldFormOptionsProvider`
+  instead of `$enumConfigProvider`.
+* Changed `Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser` so it gets the form type from
+  `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider` and the form options from
+  `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider` now.
 
 ### Removed
 

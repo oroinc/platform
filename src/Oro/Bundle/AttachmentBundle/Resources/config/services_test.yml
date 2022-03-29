@@ -37,3 +37,9 @@ services:
         decoration_priority: -256 # should be at the top of the decoration chain
         arguments:
             - '@.inner'
+
+    oro_attachment.tests.tools.external_file_factory.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\ExternalFileFactoryStub
+        decorates: oro_attachment.tools.external_file_factory
+        arguments:
+            - '@.inner'

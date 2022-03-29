@@ -4,6 +4,8 @@ namespace Oro\Bundle\AttachmentBundle\ImportExport;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -21,12 +23,16 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
 
     private FileManager $fileManager;
 
+    private AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider;
+
     public function __construct(
         AttachmentManager $attachmentManager,
-        FileManager $fileManager
+        FileManager $fileManager,
+        AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider
     ) {
         $this->attachmentManager = $attachmentManager;
         $this->fileManager = $fileManager;
+        $this->attachmentEntityConfigProvider = $attachmentEntityConfigProvider;
     }
 
     /**
@@ -50,7 +56,11 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        return $this->createFileEntity($data['uri'] ?? '', $data['uuid'] ?? '');
+        return $this->createFileEntity(
+            $data['uri'] ?? '',
+            $data['uuid'] ?? '',
+            $this->isFileStoredExternally($context['entityName'] ?? '', $context['originalFieldName'] ?? '')
+        );
     }
 
     /**
@@ -79,17 +89,23 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
     /**
      * Creates file entity with non-fetched file that can be fetched later during import.
      */
-    private function createFileEntity(string $uri, string $uuid): File
+    private function createFileEntity(string $uri, string $uuid, bool $isExternalUrl): File
     {
         $file = new File();
         $file->setUuid($uuid ?: UUIDGenerator::v4());
         if ($uri) {
-            if ($this->isRelativePath($uri)) {
-                $uri = $this->fileManager->getReadonlyFilePath($uri);
+            if ($isExternalUrl) {
+                // Sets ExternalFile without any checks as anyway the external file must not be accessed
+                // in normalizer, so it should pass through any file.
+                $file->setFile(new ExternalFile($uri));
+            } else {
+                if ($this->isRelativePath($uri)) {
+                    $uri = $this->fileManager->getReadonlyFilePath($uri);
+                }
+                // Sets SymfonyFile without checking path at constructor as anyway
+                // the file must not be uploaded in normalizer, so it should pass through any file.
+                $file->setFile(new SymfonyFile($uri, false));
             }
-            // Sets SymfonyFile without checking path at constructor as anyway
-            // the file must not be uploaded in normalizer, so it should pass through any file.
-            $file->setFile(new SymfonyFile($uri, false));
         }
 
         return $file;
@@ -100,5 +116,20 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
         return
             !str_contains($path, '://')
             && !is_file($path);
+    }
+
+    private function isFileStoredExternally(string $entityClass, string $fieldName): bool
+    {
+        if (!$entityClass || !$fieldName) {
+            return false;
+        }
+
+        $isFileStoredExternally = false;
+        $entityFieldConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
+        if ($entityFieldConfig && $entityFieldConfig->has('is_stored_externally')) {
+            $isFileStoredExternally = $entityFieldConfig->get('is_stored_externally');
+        }
+
+        return $isFileStoredExternally;
     }
 }

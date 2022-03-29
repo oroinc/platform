@@ -59,6 +59,7 @@ oro:
                 currency:           Currency
                 money_value:        Money Value
                 guid:               GUID
+                json:               JSON
             field_name.label:       Field name
             name.label:             Name
             key.label:              Key

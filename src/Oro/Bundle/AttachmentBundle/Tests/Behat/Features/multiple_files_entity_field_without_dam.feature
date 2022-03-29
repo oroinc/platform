@@ -52,7 +52,7 @@ Feature: Multiple Files entity field without DAM
       | Custom File 1 | file1.txt |
     And I save and close form
     Then I should see "User Form With Multiple Files" validation errors:
-      | Custom File 1 | The mime type of the file is invalid ("text/plain"). Allowed mime types are "application/pdf", "image/png". |
+      | Custom File 1 | The MIME type of the file is invalid ("text/plain"). Allowed MIME types are "application/pdf", "image/png". |
 
   Scenario: Check maximum number of files
     Given I fill "User Form With Multiple Files" with:

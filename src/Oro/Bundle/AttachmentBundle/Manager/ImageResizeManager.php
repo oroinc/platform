@@ -40,6 +40,11 @@ class ImageResizeManager implements ImageResizeManagerInterface
         string $format = '',
         bool $forceUpdate = false
     ): ?BinaryInterface {
+        if ($file->getExternalUrl() !== null) {
+            // Externally stored files cannot be managed.
+            return null;
+        }
+
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
         $storagePath = $this->resizedImagePathProvider->getPathForResizedImage($file, $width, $height, $format);
 
@@ -63,6 +68,11 @@ class ImageResizeManager implements ImageResizeManagerInterface
         string $format = '',
         bool $forceUpdate = false
     ): ?BinaryInterface {
+        if ($file->getExternalUrl() !== null) {
+            // Externally stored files cannot be managed.
+            return null;
+        }
+
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
         $storagePath = $this->resizedImagePathProvider->getPathForFilteredImage($file, $filterName, $format);
 

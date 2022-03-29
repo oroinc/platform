@@ -5,23 +5,20 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Layout\DataProvider;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\AttachmentBundle\Layout\DataProvider\FileApplicationsDataProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileApplicationsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileApplicationsProvider;
+    private FileApplicationsProvider|\PHPUnit\Framework\MockObject\MockObject $fileApplicationsProvider;
 
-    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentApplicationProvider;
+    private CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject $currentApplicationProvider;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
 
-    /** @var FileApplicationsDataProvider */
-    private $dataProvider;
+    private FileApplicationsDataProvider $dataProvider;
 
     protected function setUp(): void
     {
@@ -40,7 +37,7 @@ class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getIsValidForFieldDataProvider
      */
     public function testIsValidForField(
-        bool $isAclProtected,
+        array $scopeOptions,
         bool $isApplicationsValid,
         bool $expectedResult
     ): void {
@@ -48,45 +45,66 @@ class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
         $className = Item::class;
         $fieldName = 'testField';
 
-        $config = $this->createMock(ConfigInterface::class);
-        $config->expects($this->once())
-            ->method('is')
-            ->with('acl_protected')
-            ->willReturn($isAclProtected);
+        $config = new Config(new FieldConfigId('attachment', $className, $fieldName), $scopeOptions);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider
+            ->expects(self::once())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($config);
 
-        $this->fileApplicationsProvider->expects($this->exactly((int)$isAclProtected))
+        $this->fileApplicationsProvider
+            ->expects(self::any())
             ->method('getFileApplicationsForField')
             ->with($className, $fieldName)
             ->willReturn($applications);
 
-        $this->currentApplicationProvider->expects($this->exactly((int)$isAclProtected))
+        $this->currentApplicationProvider
+            ->expects(self::any())
             ->method('isApplicationsValid')
             ->with($applications)
             ->willReturn($isApplicationsValid);
 
-        $this->assertEquals($expectedResult, $this->dataProvider->isValidForField($className, $fieldName));
+        self::assertEquals($expectedResult, $this->dataProvider->isValidForField($className, $fieldName));
     }
 
     public function getIsValidForFieldDataProvider(): array
     {
         return [
-            'not acl protected' => [
-                'isAclProtected' => false,
+            'not acl protected when is_stored_externally is true' => [
+                'scopeOptions' => [
+                    'is_stored_externally' => true,
+                ],
+                'isApplicationsValid' => false,
+                'expectedResult' => true,
+            ],
+
+            'not acl protected when is_stored_externally is true and acl_protected is true' => [
+                'scopeOptions' => [
+                    'is_stored_externally' => true,
+                    'acl_protected' => false,
+                ],
+                'isApplicationsValid' => false,
+                'expectedResult' => true,
+            ],
+            'not acl protected when acl_protected is false' => [
+                'scopeOptions' => [
+                    'acl_protected' => false,
+                ],
                 'isApplicationsValid' => false,
                 'expectedResult' => true,
             ],
             'acl protected and application not valid' => [
-                'isAclProtected' => true,
+                'scopeOptions' => [
+                    'acl_protected' => true,
+                ],
                 'isApplicationsValid' => false,
                 'expectedResult' => false,
             ],
             'acl protected and application valid' => [
-                'isAclProtected' => true,
+                'scopeOptions' => [
+                    'acl_protected' => true,
+                ],
                 'isApplicationsValid' => true,
                 'expectedResult' => true,
             ],

@@ -6,7 +6,14 @@ services:
             - '@oro_entity_config.config_manager'
             - '@translator.default'
         tags:
-            - { name: form.type, alias: oro_entity_config_type }
+            - { name: form.type }
+
+    oro_entity_config.type.config_scope:
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\ConfigScopeType
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: form.type }
 
     oro_entity_config.extension.config:
         class: Oro\Bundle\EntityConfigBundle\Form\Extension\ConfigExtension

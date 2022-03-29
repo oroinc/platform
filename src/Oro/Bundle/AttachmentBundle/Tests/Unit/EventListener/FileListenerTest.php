@@ -38,175 +38,187 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new FileListener($this->fileManager, $this->tokenAccessor);
     }
 
-    public function testPrePersistWhenManagedAndIsEmptyFile()
+    public function testPrePersistWhenManagedAndIsEmptyFile(): void
     {
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('contains')
             ->with($entity)
             ->willReturn(true);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
 
-        $unitOfWork->expects($this->once())
+        $unitOfWork->expects(self::once())
             ->method('clearEntityChangeSet')
             ->with(spl_object_hash($entity));
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('refresh')
             ->with($entity);
 
-        $this->fileManager->expects($this->never())
+        $this->fileManager->expects(self::never())
             ->method('preUpload');
 
         $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
+        self::assertNull($entity->getOwner());
     }
 
-    public function testPrePersistWithoutFileObject()
+    public function testPrePersistWithoutFileObject(): void
     {
         $entity = new File();
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('preUpload')
             ->with($entity);
 
+        $loggedUser = $this->createMock(User::class);
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($loggedUser);
+
         $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
+        self::assertSame($loggedUser, $entity->getOwner());
     }
 
-    public function testPrePersistWithFileObject()
+    public function testPrePersistWithFileObject(): void
     {
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
         $loggedUser = $this->createMock(User::class);
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('preUpload')
             ->with($entity);
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($loggedUser);
 
         $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertSame($loggedUser, $entity->getOwner());
+        self::assertSame($loggedUser, $entity->getOwner());
     }
 
-    public function testPreUpdateWithoutFileObject()
+    public function testPreUpdateWithoutFileObject(): void
     {
         $entity = new File();
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('preUpload')
             ->with($entity);
 
+        $loggedUser = $this->createMock(User::class);
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($loggedUser);
+
         $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
+        self::assertSame($loggedUser, $entity->getOwner());
     }
 
-    public function testPreUpdateWithFileObject()
+    public function testPreUpdateWithFileObject(): void
     {
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
         $loggedUser = $this->createMock(User::class);
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('preUpload')
             ->with($entity);
-        $this->tokenAccessor->expects($this->once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($loggedUser);
 
         $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertSame($loggedUser, $entity->getOwner());
+        self::assertSame($loggedUser, $entity->getOwner());
     }
 
-    public function testPostPersistWhenFileObjectIsRemoved()
+    public function testPostPersistWhenFileObjectIsRemoved(): void
     {
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $this->fileManager->expects($this->never())
+        $this->fileManager->expects(self::never())
             ->method('upload');
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('remove')
             ->with($entity);
 
         $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostPersistWithoutFileObject()
+    public function testPostPersistWithoutFileObject(): void
     {
         $entity = new File();
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->never())
+        $this->em->expects(self::never())
             ->method('remove');
 
         $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostPersistWithFileObject()
+    public function testPostPersistWithFileObject(): void
     {
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->never())
+        $this->em->expects(self::never())
             ->method('remove');
 
         $this->listener->postPersist($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostUpdateWhenFileObjectIsRemoved()
+    public function testPostUpdateWhenFileObjectIsRemoved(): void
     {
         $entity = new File();
         $entity->setEmptyFile(true);
 
-        $this->fileManager->expects($this->never())
+        $this->fileManager->expects(self::never())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('remove')
             ->with($entity);
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostUpdateWithoutFileObject()
+    public function testPostUpdateWithoutFileObject(): void
     {
         $entity = new File();
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->never())
+        $this->em->expects(self::never())
             ->method('remove');
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));
     }
 
-    public function testPostUpdateWithFileObject()
+    public function testPostUpdateWithFileObject(): void
     {
         $entity = new File();
         $file = new ComponentFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $entity->setFile($file);
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('upload')
             ->with($entity);
-        $this->em->expects($this->never())
+        $this->em->expects(self::never())
             ->method('remove');
 
         $this->listener->postUpdate($entity, new LifecycleEventArgs($entity, $this->em));

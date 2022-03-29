@@ -63,10 +63,30 @@ entity_config:
                         options:
                             block:          general
                             subblock:       properties
+                is_stored_externally:
+                    options:
+                        value_type:         boolean
+                        default_value:      false
+                        allowed_type:       [file, image, multiFile, multiImage]
+                        create_only:        true
+                    form:
+                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        options:
+                            choices:
+                                No:         false
+                                Yes:        true
+                            placeholder:    false
+                            block:          general
+                            subblock:       properties
+                            label:          oro.attachment.config.is_stored_externally.label
+                            tooltip:        oro.attachment.config.is_stored_externally.tooltip
                 maxsize:
                     options:
                         value_type:         integer
                         allowed_type:       [file, image, multiFile, multiImage]
+                        required_property:
+                            code: is_stored_externally
+                            value: false
                     constraints:
                         - NotBlank:         ~
                         - Type:             integer
@@ -80,7 +100,6 @@ entity_config:
                             label:          oro.attachment.config.file_size.label
                             block:          general
                             subblock:       properties
-                            empty_data:     1
                             tooltip:        oro.attachment.max_size.tooltip
                 width:
                     options:

@@ -35,6 +35,11 @@ class FileRemovalManager implements FileRemovalManagerInterface
      */
     public function removeFiles(File $file): void
     {
+        if ($file->getExternalUrl()) {
+            // Externally stored files are not present in filesystem.
+            return;
+        }
+
         $mediaCacheManager = $this->mediaCacheManagerRegistry->getManagerForFile($file);
         $paths = $this->combineFileNames($this->fileNamesProvider->getFileNames($file));
         foreach ($paths as [$path, $isDir]) {

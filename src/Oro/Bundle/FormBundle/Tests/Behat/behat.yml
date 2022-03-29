@@ -13,6 +13,9 @@ oro_behat_extension:
     FileField:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\FileField
 
+    ExternalFileField:
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\ExternalFileField
+
     CollectionField:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\CollectionField
 

@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\FieldType;
+use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\UIBundle\Route\Router;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -20,6 +21,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ConfigHelperHandler
 {
+    use RequestHandlerTrait;
+
     /** @var FormFactoryInterface */
     private $formFactory;
 
@@ -62,8 +65,15 @@ class ConfigHelperHandler
     public function isFormValidAfterSubmit(Request $request, FormInterface $form)
     {
         if ($request->isMethod('POST')) {
-            $form->handleRequest($request);
+            $isPartialSubmit = !empty($request->get($form->getName())[ConfigType::PARTIAL_SUBMIT]);
+            $this->submitPostPutRequest($form, $request, !$isPartialSubmit);
+
             if ($form->isSubmitted() && $form->isValid()) {
+                if ($isPartialSubmit) {
+                    // Form is submitted partially, so it cannot be fully valid.
+                    return false;
+                }
+
                 return true;
             }
         }

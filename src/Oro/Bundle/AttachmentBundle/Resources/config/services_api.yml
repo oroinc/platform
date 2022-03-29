@@ -45,6 +45,15 @@ services:
             - { name: oro.api.processor, action: create, group: transform_data, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 90 }
             - { name: oro.api.processor, action: update, group: transform_data, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 90 }
 
+    oro_attachment.api.handle_external_url:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\HandleExternalUrl
+        arguments:
+            - '@oro_attachment.tools.external_file_factory'
+            - '@oro_attachment.validator.file_config_validator'
+            - '@translator'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: pre_submit|post_validate, class: Oro\Bundle\AttachmentBundle\Entity\File }
+
     oro_attachment.api.validate_file_view_access:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileViewAccess
         arguments:

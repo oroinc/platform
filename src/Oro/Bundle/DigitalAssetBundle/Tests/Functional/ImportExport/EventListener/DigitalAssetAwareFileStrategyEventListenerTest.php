@@ -5,6 +5,7 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\ImportExport\EventListe
 use Doctrine\ORM\Event\PreFlushEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyEventListener;
 use Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener\DigitalAssetAwareFileStrategyPersistEventListener;
 use Oro\Bundle\DigitalAssetBundle\Tests\Functional\DataFixtures\LoadUsersAvatarsDigitalAssets;
@@ -57,7 +58,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
+        self::assertEmpty($context->getErrors());
     }
 
     private function getContext(array $itemData = []): Context
@@ -104,10 +105,10 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->fileStrategyListener->onProcessAfter($event);
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotEmpty($existingUser->getAvatar()->getFile());
-        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
-        $this->assertEmpty($existingUser->getAvatar()->getDigitalAsset());
+        self::assertEmpty($context->getErrors());
+        self::assertNotEmpty($existingUser->getAvatar()->getFile());
+        self::assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        self::assertEmpty($existingUser->getAvatar()->getDigitalAsset());
     }
 
     public function testWhenFieldExcluded(): void
@@ -141,10 +142,10 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->fileStrategyListener->onProcessAfter($event);
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotEmpty($existingUser->getAvatar()->getFile());
-        $this->assertNotTrue($existingUser->getAvatar()->isEmptyFile());
-        $this->assertEmpty($existingUser->getAvatar()->getDigitalAsset());
+        self::assertEmpty($context->getErrors());
+        self::assertNotEmpty($existingUser->getAvatar()->getFile());
+        self::assertNotTrue($existingUser->getAvatar()->isEmptyFile());
+        self::assertEmpty($existingUser->getAvatar()->getDigitalAsset());
     }
 
     public function testWhenFileWhenReuseFromDigitalAssetSource(): void
@@ -166,7 +167,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $context = $this->getContext([$fieldName => ['uuid' => $sourceFileUuid]]);
         $event = $this->getEvent($context, $user);
 
-        $this->assertNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar());
 
         $this->fileStrategyListener->onProcessBefore($event);
 
@@ -175,26 +176,27 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $this->fileStrategyListener->onProcessAfter($event);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertEmpty($context->getErrors());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNotNull($existingUser->getAvatar()->getDigitalAsset());
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
         $this->persistListener->preFlush($preFlushEventArgs);
 
-        $this->assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
+        self::assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
     }
 
-    private function toggleDam(bool $isEnabled): void
+    private function toggleDam(bool $isEnabled, bool $isStoredExternally = false): void
     {
         $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
         $avatarFieldConfig = $entityConfigManager->getFieldConfig('attachment', User::class, 'avatar');
         $avatarFieldConfig->set('use_dam', $isEnabled);
+        $avatarFieldConfig->set('is_stored_externally', $isStoredExternally);
         $entityConfigManager->persist($avatarFieldConfig);
         $entityConfigManager->flush();
     }
@@ -226,19 +228,19 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $this->fileStrategyListener->onProcessAfter($event);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertEmpty($context->getErrors());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNotNull($existingUser->getAvatar()->getDigitalAsset());
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
         $this->persistListener->preFlush($preFlushEventArgs);
 
-        $this->assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
+        self::assertSame($digitalAsset, $existingUser->getAvatar()->getDigitalAsset());
     }
 
     public function testWhenFileWhenUploadDigitalAsset(): void
@@ -264,21 +266,21 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $existingUser->setAvatar($file);
         $event->setEntity($existingUser);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
         $this->fileStrategyListener->onProcessAfter($event);
 
         $this->listener->onProcessAfter($event);
 
-        $this->assertEmpty($context->getErrors());
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertEmpty($context->getErrors());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNotNull($existingUser->getAvatar()->getDigitalAsset());
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
         $this->persistListener->preFlush($preFlushEventArgs);
 
-        $this->assertNotNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar()->getDigitalAsset());
     }
 
     public function testWhenFileWhenCannotReuseOrUpload(): void
@@ -300,21 +302,21 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $existingUser->setAvatar($file);
         $event->setEntity($existingUser);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
         $this->listener->onProcessAfter($event);
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
         $this->persistListener->preFlush($preFlushEventArgs);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'Error in row #0. Failed to reuse digital asset: file not found by specified UUID. Failed to create '
-                . 'new digital asset: there is no file specified for uploading',
+                'Error in row #0. Failed to reuse digital asset in field Avatar: file not found by specified UUID (). '
+                . 'Failed to create new digital asset: there is no file specified for uploading',
                 'Error in row #0. Digital Asset importing has failed, entity is skipped',
             ],
             $context->getErrors()
@@ -343,26 +345,58 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $existingUser->setAvatar($file);
         $event->setEntity($existingUser);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
         $this->listener->onProcessAfter($event);
 
         $preFlushEventArgs = new PreFlushEventArgs($this->getContainer()->get('doctrine')->getManager());
         $this->persistListener->preFlush($preFlushEventArgs);
 
-        $this->assertNotNull($existingUser->getAvatar());
-        $this->assertNull($existingUser->getAvatar()->getDigitalAsset());
+        self::assertNotNull($existingUser->getAvatar());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
-                'Error in row #0. Cannot find digital asset #999999 specified as parent for file with'
-                . ' UUID 07bad972-48c9-4ba9-8cb3-eb595ab2d069',
-                'Error in row #0. Failed to reuse digital asset: file not found by specified UUID.'
-                .' Failed to create new digital asset: there is no file specified for uploading',
+                'Error in row #0. Cannot find digital asset #999999 specified as parent for file with '
+                . 'UUID 07bad972-48c9-4ba9-8cb3-eb595ab2d069 in field Avatar',
+                'Error in row #0. Failed to reuse digital asset in field Avatar: file not found by specified '
+                . 'UUID (07bad972-48c9-4ba9-8cb3-eb595ab2d069). Failed to create new digital asset: '
+                . 'there is no file specified for uploading',
                 'Error in row #0. Digital Asset importing has failed, entity is skipped'
             ],
             $context->getErrors()
         );
+    }
+
+    public function testWhenExternalUrl(): void
+    {
+        $this->toggleDam(true);
+
+        $existingUser = $this->getReference('user1');
+        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+
+        $url = 'http://example.org/sample/url/filename.jpg';
+        $externalFile = new ExternalFile($url, 'filename', 100, 'image/jpeg');
+
+        $file = new File();
+        $file->setExternalUrl($url);
+        $file->setFile($externalFile);
+        $user->setAvatar($file);
+
+        $context = $this->getContext(['avatar' => []]);
+        $event = $this->getEvent($context, $user);
+
+        $this->fileStrategyListener->onProcessBefore($event);
+
+        $existingUser->setAvatar($file);
+        $event->setEntity($existingUser);
+
+        $this->listener->onProcessAfter($event);
+
+        self::assertEquals($url, $existingUser->getAvatar()?->getExternalUrl());
+        self::assertNull($existingUser->getAvatar()->getDigitalAsset());
+
+        self::assertEmpty($context->getErrors());
     }
 }
