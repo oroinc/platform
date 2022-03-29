@@ -54,6 +54,11 @@
 
     &__filename {
         @include text-line-truncate(100%, true);
+
+        picture img {
+            width: $attachment-item-img-width;
+            height: $attachment-item-img-height;
+        }
     }
 
     &__not-valid {

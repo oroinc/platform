@@ -76,6 +76,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $value = $data[$fieldName];
             $fieldContext = $context;
             if ($value !== null) {
+                $fieldContext['originalFieldName'] = $fieldContext['fieldName'] ?? $fieldName;
                 $fieldContext['fieldName'] = $fieldName;
                 if ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field)) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {

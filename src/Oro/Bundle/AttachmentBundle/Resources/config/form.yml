@@ -13,6 +13,8 @@ services:
 
     oro_attachment.form.type.file:
         class: Oro\Bundle\AttachmentBundle\Form\Type\FileType
+        arguments:
+            - '@oro_attachment.tools.external_file_factory'
         calls:
             - [setEventSubscriber,  ['@oro_attachment.form.file_subscriber']]
         tags:
@@ -22,6 +24,20 @@ services:
         class: Oro\Bundle\AttachmentBundle\Form\Type\ImageType
         tags:
             - { name: form.type, alias: oro_image }
+
+    oro_attachment.form.type.external_file:
+        class: Oro\Bundle\AttachmentBundle\Form\Type\ExternalFileType
+        arguments:
+            - '@oro_attachment.form.data_transformer.external_file_transformer'
+        tags:
+            - { name: form.type }
+
+    oro_attachment.form.data_transformer.external_file_transformer:
+        class: Oro\Bundle\AttachmentBundle\Form\DataTransformer\ExternalFileTransformer
+        shared: false
+        arguments:
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.tools.external_file_factory'
 
     oro_attachment.form.type.mime_type_config.file:
         class: Oro\Bundle\AttachmentBundle\Form\Type\FileMimeTypeConfigType

@@ -30,6 +30,7 @@ services:
             - 'attachments'
             - '@oro_attachment.protocol_validator'
             - '@oro_attachment.mapper.client_mime_type_mapper'
+            - '@oro_attachment.tools.external_file_factory'
 
     oro_attachment.mapper.client_mime_type_mapper:
         class: Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper
@@ -201,6 +202,7 @@ services:
         arguments:
             - '@oro_attachment.manager'
             - '@oro_attachment.importexport.file_manager.import_files'
+            - '@oro_attachment.provider.attachment_entity_config'
         tags:
             - { name: oro_importexport.normalizer}
 
@@ -530,6 +532,12 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrlValidator:
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: validator.constraint_validator }
+
     oro_attachment.provider.file_title:
         class: Oro\Bundle\AttachmentBundle\Provider\FileTitleProvider
 
@@ -632,22 +640,30 @@ services:
             - '@oro_attachment.validator.multiple_file_config_validator'
             - '@translator'
 
-    oro_attachment.import_export.event_listener.file_strategy:
-        class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener
+    oro_attachment.import_export.file_manipulator:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator
         arguments:
             - '@oro_attachment.file_manager'
-            - '@oro_entity.helper.field_helper'
-            - '@oro_importexport.field.database_helper'
-            - '@oro_importexport.strategy.import.helper'
-            - '@oro_attachment.import_export.file_import_strategy_helper'
             - '@security.authorization_checker'
+            - '@oro_attachment.import_export.file_import_strategy_helper'
             - '@translator'
         calls:
             - [setLogger, ['@logger']]
         tags:
+            - { name: monolog.logger, channel: oro_attachment }
+
+    oro_attachment.import_export.event_listener.file_strategy:
+        class: Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener
+        arguments:
+            - '@oro_attachment.import_export.file_manipulator'
+            - '@oro_entity.helper.field_helper'
+            - '@oro_importexport.field.database_helper'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_attachment.import_export.file_import_strategy_helper'
+            - '@translator'
+        tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_before, method: onProcessBefore }
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 50 }
-            - { name: monolog.logger, channel: oro_attachment }
 
     oro_attachment.event_listener.file_preloading:
         parent: oro_entity.event_listener.default_preloading
@@ -724,3 +740,32 @@ services:
             - '@liip_imagine.filter.configuration'
             - '@oro_attachment.tools.webp_configuration'
 
+    oro_attachment.provider.external_url_provider:
+        class: 'Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider'
+        decorates: oro_attachment.provider.file_url
+        decoration_priority: -250
+        arguments:
+            - '@.inner'
+            - '@oro_attachment.url_generator'
+            - '@oro_attachment.provider.file_name'
+
+    oro_attachment.tools.external_file_factory:
+        class: Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory
+        arguments:
+            - !service { class: GuzzleHttp\Client }
+        calls:
+            - [setLogger, ['@logger']]
+
+    oro_attachment.provider.extend_field_form_options.file:
+        class: Oro\Bundle\AttachmentBundle\Provider\ExtendFieldFileFormOptionsProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_entity_extend.form_options_provider }
+
+    Oro\Bundle\AttachmentBundle\Validator\Constraints\FileFieldCompatibilityValidator:
+        arguments:
+            - '@oro_attachment.provider.attachment_entity_config'
+            - '@oro_entity.helper.field_helper'
+        tags:
+            - { name: validator.constraint_validator }

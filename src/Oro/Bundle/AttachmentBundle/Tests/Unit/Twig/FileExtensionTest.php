@@ -146,7 +146,7 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
                 [
                     'iconClass' => '',
                     'url' => $url,
-                    'sources' => [],
+                    'pictureSources' => [],
                     'fileName' => 'original-name.pdf',
                     'additional' => null,
                     'title' => '',
@@ -189,11 +189,9 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
                 [
                     'iconClass' => '',
                     'url' => $url,
-                    'sources' => [
-                            [
-                                'srcset' => '/original/image.png',
-                                'type' => 'image/png',
-                            ],
+                    'pictureSources' => [
+                        'src' => '/original/image.png',
+                        'sources' => [],
                     ],
                     'fileName' => 'original-name.pdf',
                     'additional' => null,
@@ -244,14 +242,13 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
                 [
                     'iconClass' => '',
                     'url' => $url,
-                    'sources' => [
-                        [
-                            'srcset' => '/original/image.png.webp',
-                            'type' => 'image/webp',
-                        ],
-                        [
-                            'srcset' => '/original/image.png',
-                            'type' => 'image/png',
+                    'pictureSources' => [
+                        'src' => '/original/image.png',
+                        'sources' => [
+                            [
+                                'srcset' => '/original/image.png.webp',
+                                'type' => 'image/webp',
+                            ],
                         ],
                     ],
                     'fileName' => 'original-name.pdf',
@@ -339,6 +336,28 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
         $config->expects(self::exactly(2))
             ->method('get')
             ->willReturn($size);
+
+        self::callTwigFunction(
+            $this->extension,
+            'oro_image_view',
+            [$environment, $this->file]
+        );
+    }
+
+    public function testGetImageViewConfiguredWithDefaultWidthAndHeight(): void
+    {
+        $this->file->setFilename('test.doc');
+        $this->file->setParentEntityClass($parentEntityClass = \stdClass::class);
+        $this->file->setParentEntityFieldName($fieldName = 'sampleField');
+
+        $config = $this->createMock(Config::class);
+
+        $environment = $this->createTwigEnvironmentForImagesTemplate($this->file);
+
+        $this->configManager->expects(self::once())
+            ->method('getFieldConfig')
+            ->with('attachment', $parentEntityClass, $fieldName)
+            ->willReturn($config);
 
         self::callTwigFunction(
             $this->extension,
@@ -465,15 +484,13 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                [
-                    'srcset' => '/original/image.mime.webp',
-                    'type' => 'image/webp',
-                    'sample_key' => 'sample_value',
-                ],
-                [
-                    'srcset' => '/original/image.mime',
-                    'type' => 'image/mime',
-                    'sample_key' => 'sample_value',
+                'src' => '/original/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.mime.webp',
+                        'type' => 'image/webp',
+                        'sample_key' => 'sample_value',
+                    ],
                 ],
             ],
             $result
@@ -508,15 +525,13 @@ class FileExtensionTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                [
-                    'srcset' => '/original/image.mime.webp',
-                    'type' => 'image/webp',
-                    'sample_key' => 'sample_value',
-                ],
-                [
-                    'srcset' => '/original/image.mime',
-                    'type' => 'image/mime',
-                    'sample_key' => 'sample_value',
+                'src' => '/original/image.mime',
+                'sources' => [
+                    [
+                        'srcset' => '/original/image.mime.webp',
+                        'type' => 'image/webp',
+                        'sample_key' => 'sample_value',
+                    ],
                 ],
             ],
             $result

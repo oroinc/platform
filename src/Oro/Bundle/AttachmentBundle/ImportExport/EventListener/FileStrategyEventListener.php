@@ -7,71 +7,51 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper;
-use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use Oro\Bundle\AttachmentBundle\ImportExport\FileManipulator;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
-use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
-use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Listens to onProcessBefore and onProcessAfter events of import strategy to handle file importing.
  */
-class FileStrategyEventListener implements LoggerAwareInterface
+class FileStrategyEventListener
 {
-    use LoggerAwareTrait;
+    private FileManipulator $fileManipulator;
 
-    /** @var FileManager */
-    private $fileManager;
+    private FieldHelper $fieldHelper;
 
-    /** @var FieldHelper */
-    private $fieldHelper;
+    private DatabaseHelper $databaseHelper;
 
-    /** @var DatabaseHelper */
-    private $databaseHelper;
+    private ImportStrategyHelper $importStrategyHelper;
 
-    /** @var ImportStrategyHelper */
-    private $importStrategyHelper;
+    private FileImportStrategyHelper $fileImportStrategyHelper;
 
-    /** @var FileImportStrategyHelper */
-    private $fileImportStrategyHelper;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
 
     /** @var File[] */
-    private $scheduledForDeletion = [];
+    private array $scheduledForDeletion = [];
 
-    /** @var SymfonyFile[] */
-    private $scheduledForUpload = [];
+    /** @var \SplFileInfo[] */
+    private array $scheduledForUpload = [];
 
     public function __construct(
-        FileManager $fileManager,
+        FileManipulator $fileManipulator,
         FieldHelper $fieldHelper,
         DatabaseHelper $databaseHelper,
         ImportStrategyHelper $importStrategyHelper,
         FileImportStrategyHelper $fileImportStrategyHelper,
-        AuthorizationCheckerInterface $authorizationChecker,
         TranslatorInterface $translator
     ) {
-        $this->fileManager = $fileManager;
+        $this->fileManipulator = $fileManipulator;
         $this->fieldHelper = $fieldHelper;
         $this->databaseHelper = $databaseHelper;
         $this->importStrategyHelper = $importStrategyHelper;
         $this->fileImportStrategyHelper = $fileImportStrategyHelper;
-        $this->authorizationChecker = $authorizationChecker;
         $this->translator = $translator;
-        $this->logger = new NullLogger();
     }
 
     public function onProcessBefore(StrategyEvent $event): void
@@ -150,7 +130,7 @@ class FileStrategyEventListener implements LoggerAwareInterface
             $file->setUuid(UUIDGenerator::v4());
         }
 
-        // Saves SymfonyFile entities prepared for uploading to prevent loosing them later during import strategy.
+        // Saves file object prepared for uploading to prevent loosing it later during import strategy.
         $this->scheduledForUpload[$file->getUuid()] = $file->getFile();
     }
 
@@ -194,7 +174,7 @@ class FileStrategyEventListener implements LoggerAwareInterface
     }
 
     /**
-     * @param FileItem[]|Collection $fileItems
+     * @param Collection<FileItem> $fileItems
      */
     private function fillSortOrderFields(Collection $fileItems): void
     {
@@ -281,119 +261,45 @@ class FileStrategyEventListener implements LoggerAwareInterface
         string $fieldName,
         ?int $index = null
     ): array {
-        $errors = [[]];
+        $errors = [];
 
         if (!$file->getId() || $file->getUuid() !== $originUuid) {
-            $uploadOrCloneErrors = $this->uploadOrCloneFromOrigin($file, $fieldName, $originUuid);
-            $errors[] = $uploadOrCloneErrors;
+            $originFile = $this->fileImportStrategyHelper->findFileByUuid($originUuid);
+            if ($originFile) {
+                $cloneErrors = $this->fileManipulator
+                    ->setFileFromOriginFile($file, $originFile, $entity, $fieldName);
 
-            // Skips validation if file failed to upload or clone.
-            if (!$uploadOrCloneErrors) {
-                $errors[] = $this->fileImportStrategyHelper->validateSingleFile($file, $entity, $fieldName, $index);
-            }
-        }
+                $errors[] = $cloneErrors;
+            } elseif (isset($this->scheduledForUpload[$file->getUuid()])) {
+                $uploadErrors = $this->fileManipulator
+                    ->setFileFromUpload(
+                        $file,
+                        $this->scheduledForUpload[$file->getUuid()],
+                        $entity,
+                        $fieldName
+                    );
 
-        $errors = array_merge(...$errors);
-        if ($errors && $file->getId()) {
-            $this->databaseHelper->refreshEntity($file);
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @param File $file
-     * @param string $fieldName
-     * @param string $originUuid
-     *
-     * @return string[]
-     */
-    private function uploadOrCloneFromOrigin(File $file, string $fieldName, string $originUuid): array
-    {
-        $originFile = $this->fileImportStrategyHelper->findFileByUuid($originUuid);
-        if ($originFile) {
-            $errors = $this->cloneFromOriginFile($file, $originFile);
-        } else {
-            $nonFetchedFile = $this->scheduledForUpload[$file->getUuid()] ?? null;
-            if ($nonFetchedFile) {
-                $errors = $this->uploadFromNonFetchedFile($file, $nonFetchedFile);
+                $errors[] = $uploadErrors;
             } else {
-                $errors = [
+                $entityClass = $this->fileImportStrategyHelper->getClass($entity);
+                $errors[] = [
                     $this->translator->trans(
                         'oro.attachment.import.failed_to_upload_or_clone',
-                        ['%fieldname%' => $fieldName]
+                        ['%fieldname%' => $this->fileImportStrategyHelper->getFieldLabel($entityClass, $fieldName)]
                     ),
                 ];
             }
-        }
 
-        return $errors;
-    }
+            $errors = array_merge(...$errors);
 
-    /**
-     * Uploads non-fetched file of the given File entity.
-     *
-     * @param File $file
-     * @param SymfonyFile $nonFetchedFile
-     *
-     * @return string[]
-     */
-    private function uploadFromNonFetchedFile(File $file, SymfonyFile $nonFetchedFile): array
-    {
-        $errors = [];
-        try {
-            $this->fileManager->setFileFromPath($file, $nonFetchedFile->getPathname());
-            $file->preUpdate();
-        } catch (\Throwable $exception) {
-            $this->logger->error('Failed to upload a file during import', ['e' => $exception]);
-
-            $errors = [
-                $this->translator->trans(
-                    'oro.attachment.import.failed_to_upload',
-                    ['%path%' => $nonFetchedFile->getPathname(), '%error%' => $exception->getMessage()]
-                ),
-            ];
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @param File $file
-     * @param File $originFile
-     *
-     * @return string[]
-     */
-    private function cloneFromOriginFile(File $file, File $originFile): array
-    {
-        $errors = [];
-        $parameters = ['%origin_id%' => $originFile->getId(), '%origin_uuid%' => $originFile->getUuid()];
-        $clonedFile = null;
-
-        if (!$this->authorizationChecker->isGranted(BasicPermission::VIEW, $originFile)) {
-            $parameters['%error%'] = $this->translator
-                ->trans('oro.attachment.import.failed_to_clone_forbidden', $parameters);
-        } else {
-            try {
-                $symfonyFile = $this->fileManager->getFileFromFileEntity($originFile);
-
-                // SymfonyFile which is set here will be processed later by oro_attachment.listener.file_listener.
-                $file->setFile($symfonyFile);
-                $file->setOriginalFilename($originFile->getOriginalFilename());
-                $file->preUpdate();
-            } catch (\Throwable $exception) {
-                $this->logger->error('Failed to clone a file during import', ['e' => $exception]);
-                $parameters['%error%'] = $exception->getMessage();
+            // Skips validation if file failed to upload or clone.
+            if (!$errors) {
+                $errors = $this->fileImportStrategyHelper->validateSingleFile($file, $entity, $fieldName, $index);
             }
         }
 
-        if (!$file->getFile()) {
-            $errors[] = $this->translator->trans(
-                'oro.attachment.import.failed_to_clone',
-                $parameters + [
-                    '%error%' => $this->translator->trans('oro.attachment.import.failed_to_clone_origin_file_empty'),
-                ]
-            );
+        if ($errors && $file->getId()) {
+            $this->databaseHelper->refreshEntity($file);
         }
 
         return $errors;

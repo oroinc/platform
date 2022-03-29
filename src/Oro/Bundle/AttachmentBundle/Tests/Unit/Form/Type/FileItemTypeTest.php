@@ -11,15 +11,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FileItemTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileItemType */
-    private $type;
+    private FileItemType $type;
 
     protected function setUp(): void
     {
         $this->type = new FileItemType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects(self::exactly(2))
@@ -30,36 +29,35 @@ class FileItemTypeTest extends \PHPUnit\Framework\TestCase
                     'file',
                     FileType::class,
                     [
-                        'allowDelete'  => false,
-                        'block_prefix' => 'oro_attachment_file_item_file'
-                    ]
+                        'allowDelete' => false,
+                        'block_prefix' => 'oro_attachment_file_item_file',
+                        'checkEmptyFile' => false,
+                    ],
                 ]
             )
             ->willReturnSelf();
 
-        $this->type->buildForm($builder, ['file_type' => FileType::class]);
+        $this->type->buildForm(
+            $builder,
+            ['file_type' => FileType::class, 'file_options' => ['checkEmptyFile' => false]]
+        );
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
-        $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects(self::once())
-            ->method('setDefaults')
-            ->with([
-                'data_class' => FileItem::class,
-                'file_type' => FileType::class,
-            ]);
+        $optionsResolver = new OptionsResolver();
 
-        $this->type->configureOptions($resolver);
+        $this->type->configureOptions($optionsResolver);
+
+        self::assertEquals([
+            'data_class' => FileItem::class,
+            'file_type' => FileType::class,
+            'file_options' => [],
+        ], $optionsResolver->resolve([]));
     }
 
-    public function testGetName()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals(FileItemType::TYPE, $this->type->getName());
-    }
-
-    public function testGetBlockPrefix()
-    {
-        $this->assertEquals(FileItemType::TYPE, $this->type->getBlockPrefix());
+        self::assertEquals(FileItemType::TYPE, $this->type->getBlockPrefix());
     }
 }

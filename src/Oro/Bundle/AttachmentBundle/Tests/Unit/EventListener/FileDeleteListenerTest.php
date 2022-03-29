@@ -12,20 +12,15 @@ use Psr\Log\LoggerInterface;
 
 class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
+    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
 
-    /** @var File */
-    private $file;
+    private File $file;
 
-    /** @var FileDeleteListener */
-    private $listener;
+    private FileDeleteListener $listener;
 
     protected function setUp(): void
     {
@@ -37,16 +32,26 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new FileDeleteListener($this->fileManager, $this->logger);
     }
 
+    public function testPostRemoveWhenStoredExternally(): void
+    {
+        $this->file->setExternalUrl('http://example.org/image.png');
+
+        $this->fileManager->expects(self::never())
+            ->method(self::anything());
+
+        $this->listener->postRemove($this->file);
+    }
+
     public function testPostRemoveWhenException(): void
     {
         $this->file->setFilename($filename = 'sample/file');
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with($filename)
             ->willThrowException(new \Exception());
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('warning');
 
         $this->listener->postRemove($this->file);
@@ -56,31 +61,41 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
     {
         $this->file->setFilename($filename = 'sample/file');
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with($filename);
 
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
 
         $this->listener->postRemove($this->file);
     }
 
+    public function testPostUpdateWhenStoredExternally(): void
+    {
+        $this->file->setExternalUrl('http://example.org/image.png');
+
+        $this->fileManager->expects(self::never())
+            ->method(self::anything());
+
+        $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
+    }
+
     public function testPostUpdateWhenFilenameUnchanged(): void
     {
         $unitOfWork = $this->createMock(UnitOfWork::class);
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
-        $unitOfWork->expects($this->once())
+        $unitOfWork->expects(self::once())
             ->method('getEntityChangeSet')
             ->with($this->file)
             ->willReturn(['sampleField' => ['sampleValue1', 'sampleValue2']]);
 
-        $this->fileManager->expects($this->never())
+        $this->fileManager->expects(self::never())
             ->method('deleteFile');
 
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
@@ -89,20 +104,20 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
     public function testPostUpdateWhenException(): void
     {
         $unitOfWork = $this->createMock(UnitOfWork::class);
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
-        $unitOfWork->expects($this->once())
+        $unitOfWork->expects(self::once())
             ->method('getEntityChangeSet')
             ->with($this->file)
             ->willReturn(['filename' => [$filename = 'name1', 'name2']]);
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with($filename)
             ->willThrowException(new \Exception());
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('warning');
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
@@ -111,19 +126,19 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
     public function testPostUpdate(): void
     {
         $unitOfWork = $this->createMock(UnitOfWork::class);
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
-        $unitOfWork->expects($this->once())
+        $unitOfWork->expects(self::once())
             ->method('getEntityChangeSet')
             ->with($this->file)
             ->willReturn(['filename' => [$filename = 'name1', 'name2']]);
 
-        $this->fileManager->expects($this->once())
+        $this->fileManager->expects(self::once())
             ->method('deleteFile')
             ->with($filename);
 
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));

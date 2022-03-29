@@ -20,12 +20,16 @@ class FileItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('sortOrder', NumberType::class, [
-            'block_prefix' => $this->getBlockPrefix() . '_sortOrder',
-        ])->add('file', $options['file_type'], [
-            'block_prefix' => $this->getBlockPrefix() . '_file',
-            'allowDelete' => false,
-        ]);
+        $builder
+            ->add('sortOrder', NumberType::class, ['block_prefix' => $this->getBlockPrefix() . '_sortOrder'])
+            ->add(
+                'file',
+                $options['file_type'],
+                array_merge_recursive([
+                    'block_prefix' => $this->getBlockPrefix() . '_file',
+                    'allowDelete' => false,
+                ], $options['file_options'])
+            );
     }
 
     /**
@@ -36,15 +40,10 @@ class FileItemType extends AbstractType
         $resolver->setDefaults([
             'data_class' => FileItem::class,
             'file_type' => FileType::class,
+            'file_options' => [],
         ]);
-    }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
-    {
-        return $this->getBlockPrefix();
+        $resolver->setAllowedTypes('file_options', 'array');
     }
 
     /**

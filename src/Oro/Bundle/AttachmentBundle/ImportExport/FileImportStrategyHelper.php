@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\ImportExport;
 
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
@@ -17,26 +18,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FileImportStrategyHelper
 {
-    /** @var FieldHelper */
-    private $fieldHelper;
+    private FieldHelper $fieldHelper;
 
-    /** @var DatabaseHelper */
-    private $databaseHelper;
+    private DatabaseHelper $databaseHelper;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
 
-    /** @var ConfigFileValidator */
-    private $configFileValidator;
+    private ConfigFileValidator $configFileValidator;
 
-    /** @var ConfigMultipleFileValidator */
-    private $configMultipleFileValidator;
+    private ConfigMultipleFileValidator $configMultipleFileValidator;
 
-    /** @var TranslatorInterface */
-    private $translator;
+    private TranslatorInterface $translator;
 
-    /** @var array */
-    private $fieldLabels = [];
+    private array $fieldLabels = [];
 
     public function __construct(
         FieldHelper $fieldHelper,
@@ -65,15 +59,15 @@ class FileImportStrategyHelper
     public function validateSingleFile(File $file, object $entity, string $fieldName, ?int $index = null): array
     {
         $violations = [];
-        $symfonyFile = $file->getFile();
-        if ($symfonyFile) {
+        $uploadedFile = $file->getFile();
+        if ($uploadedFile) {
             $entityClass = $this->getClass($entity);
 
-            $constraintsViolationList = $this->configFileValidator->validate($symfonyFile, $entityClass, $fieldName);
+            $constraintsViolationList = $this->configFileValidator->validate($uploadedFile, $entityClass, $fieldName);
 
             $messageParameters = [
-                '%fieldname%' => $this->getFieldLabel($entityClass, $fieldName) ?: $fieldName,
-                '%path%' => $symfonyFile->getPathname(),
+                '%fieldname%' => $this->getFieldLabel($entityClass, $fieldName),
+                '%path%' => $uploadedFile->getPathname(),
             ];
 
             if ($index !== null) {
@@ -88,6 +82,21 @@ class FileImportStrategyHelper
         }
 
         return $violations;
+    }
+
+    public function validateExternalFileUrl(ExternalFile $externalFile, object $entity, string $fieldName): array
+    {
+        $messageParameters = [
+            '%fieldname%' => $this->getFieldLabel($this->getClass($entity), $fieldName),
+            '%url%' => $externalFile->getUrl(),
+        ];
+        $constraintsViolationList = $this->configFileValidator->validateExternalFileUrl($externalFile->getUrl());
+
+        return $this->getPlainErrorsFromViolationList(
+            $constraintsViolationList,
+            'oro.attachment.import.file_external_url_violation',
+            $messageParameters
+        );
     }
 
     private function getPlainErrorsFromViolationList(
@@ -155,7 +164,7 @@ class FileImportStrategyHelper
         return $this->getPlainErrorsFromViolationList(
             $constraintsViolationList,
             $messageKey,
-            ['%fieldname%' => $this->getFieldLabel($entityClass, $fieldName) ?: $fieldName]
+            ['%fieldname%' => $this->getFieldLabel($entityClass, $fieldName)]
         );
     }
 
@@ -169,12 +178,12 @@ class FileImportStrategyHelper
         return $uuid ? $this->databaseHelper->findOneBy(File::class, ['uuid' => $uuid]) : null;
     }
 
-    private function getFieldLabel(string $className, string $fieldName): ?string
+    public function getFieldLabel(string $className, string $fieldName): ?string
     {
         if (!isset($this->fieldLabels[$className][$fieldName])) {
             $fields = $this->fieldHelper->getRelations($className);
 
-            $this->fieldLabels[$className][$fieldName] = $fields[$fieldName]['label'] ?? null;
+            $this->fieldLabels[$className][$fieldName] = $fields[$fieldName]['label'] ?? $fieldName;
         }
 
         return $this->fieldLabels[$className][$fieldName];

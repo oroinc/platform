@@ -394,6 +394,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                 if (array_key_exists('type', $field) && in_array($field['type'], ['date', 'datetime', 'time'], true)) {
                     $context = array_merge($context, ['type' => $field['type']]);
                 }
+                $context['originalFieldName'] = 'collection';
                 $denormalizedMap[] = [$fieldValue, $entityClass, null, $context, $field['denormalizedValue']];
             }
         }

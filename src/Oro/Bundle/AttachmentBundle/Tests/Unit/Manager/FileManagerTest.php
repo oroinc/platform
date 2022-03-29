@@ -7,38 +7,42 @@ use Gaufrette\Exception\FileNotFound as GaufretteFileNotFoundException;
 use Gaufrette\Filesystem;
 use Gaufrette\Stream\InMemoryBuffer;
 use Gaufrette\StreamMode;
+use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Exception\ProtocolNotSupportedException;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Mapper\ClientMimeTypeMapper;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestFile;
+use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class FileManagerTest extends \PHPUnit\Framework\TestCase
 {
     private const TEST_FILE_SYSTEM_NAME = 'testAttachments';
     private const TEST_PROTOCOL         = 'testProtocol';
 
-    /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
-    private $filesystem;
+    private Filesystem|\PHPUnit\Framework\MockObject\MockObject $filesystem;
 
-    /** @var ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $protocolValidator;
+    private ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $protocolValidator;
 
-    /** @var FileManager */
-    private $fileManager;
+    private ExternalFileFactory $externalFileFactory;
+
+    private FileManager $fileManager;
 
     protected function setUp(): void
     {
         $this->filesystem = $this->createMock(Filesystem::class);
         $this->protocolValidator = $this->createMock(ProtocolValidatorInterface::class);
+        $this->externalFileFactory = $this->createMock(ExternalFileFactory::class);
 
         $filesystemMap = $this->createMock(FilesystemMap::class);
         $filesystemMap->expects(self::once())
@@ -49,7 +53,8 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager = new FileManager(
             self::TEST_FILE_SYSTEM_NAME,
             $this->protocolValidator,
-            new ClientMimeTypeMapper()
+            new ClientMimeTypeMapper(),
+            $this->externalFileFactory
         );
         $this->fileManager->setProtocol(self::TEST_PROTOCOL);
         $this->fileManager->useSubDirectory(true);
@@ -71,7 +76,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         return $fileEntity;
     }
 
-    public function testGetContentByFileEntity()
+    public function testGetContentByFileEntity(): void
     {
         $fileEntity = $this->createFileEntity();
         $fileContent = 'test data';
@@ -97,7 +102,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fileContent, $this->fileManager->getContent($fileEntity));
     }
 
-    public function testGetContentWhenFileDoesNotExist()
+    public function testGetContentWhenFileDoesNotExist(): void
     {
         $this->expectException(GaufretteFileNotFoundException::class);
 
@@ -113,7 +118,18 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->getContent($fileName);
     }
 
-    public function testCreateFileEntity()
+    public function testGetContentWhenFileIsExternallyStored(): void
+    {
+        $file = new File();
+        $file->setExternalUrl('http://example.org/image.png');
+
+        $this->filesystem->expects(self::never())
+            ->method(self::anything());
+
+        self::assertNull($this->fileManager->getContent($file));
+    }
+
+    public function testCreateFileEntity(): void
     {
         $path = __DIR__ . '/../Fixtures/testFile/test.txt';
 
@@ -137,6 +153,23 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->setFileFromPath($file, $path);
         self::assertEquals('test.txt', $file->getOriginalFilename());
         self::assertFileEquals($path, $file->getFile()->getPathname());
+    }
+
+    public function testSetExternalFileFromExternalUrl(): void
+    {
+        $file = $this->createFileEntity();
+        $url = 'http://example.org/image.png';
+
+        $externalFile = new ExternalFile($url, 'original-image.png', 4242, 'image/png');
+        $this->externalFileFactory
+            ->expects(self::once())
+            ->method('createFromUrl')
+            ->with($url)
+            ->willReturn($externalFile);
+
+        $this->fileManager->setExternalFileFromUrl($file, $url);
+        self::assertEquals('original-image.png', $file->getOriginalFilename());
+        self::assertSame($externalFile, $file->getFile());
     }
 
     /**
@@ -255,7 +288,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->setFileFromPath($this->createFileEntity(), $path);
     }
 
-    public function testCreateFileEntityForNotExistingFile()
+    public function testCreateFileEntityForNotExistingFile(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -264,7 +297,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         $this->fileManager->createFileEntity($path);
     }
 
-    public function testCloneFileEntity()
+    public function testCloneFileEntity(): void
     {
         $fileEntity = $this->createFileEntity();
 
@@ -301,7 +334,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCloneFileEntityWhenFileDoesNotExist()
+    public function testCloneFileEntityWhenFileDoesNotExist(): void
     {
         $fileEntity = $this->createFileEntity();
 
@@ -342,13 +375,31 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->method('setName')
             ->with($fileEntity->getFilename());
 
-        $symfonyFile = $this->fileManager->getFileFromFileEntity($fileEntity, false);
+        $innerFile = $this->fileManager->getFileFromFileEntity($fileEntity, false);
 
-        self::assertNotNull($symfonyFile);
+        self::assertNotNull($innerFile);
         self::assertEquals(
             $fileContent,
-            file_get_contents($symfonyFile->getRealPath())
+            file_get_contents($innerFile->getRealPath())
         );
+    }
+
+    public function testGetFileFromFileEntityWhenExternalUrls(): void
+    {
+        $fileEntity = $this->createFileEntity();
+        $fileEntity->setExternalUrl('http://example.org/image.png');
+
+        $this->filesystem->expects(self::never())
+            ->method(self::anything());
+
+        $externalFile = new ExternalFile($fileEntity->getExternalUrl());
+        $this->externalFileFactory
+            ->expects(self::once())
+            ->method('createFromFile')
+            ->with($fileEntity)
+            ->willReturn($externalFile);
+
+        self::assertSame($externalFile, $this->fileManager->getFileFromFileEntity($fileEntity, false));
     }
 
     public function testGetFileFromFileEntityWhenFileDoesNotExist(): void
@@ -380,7 +431,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->fileManager->getFileFromFileEntity($fileEntity, true));
     }
 
-    public function testPreUploadDeleteFile()
+    public function testPreUploadDeleteFile(): void
     {
         $fileEntity = $this->createFileEntity();
         $fileEntity
@@ -401,7 +452,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fileEntity->getUuid(), $fileEntity->getFilename());
     }
 
-    public function testPreUploadForUploadedFile()
+    public function testPreUploadForUploadedFile(): void
     {
         $fileEntity = $this->createFileEntity();
         $file = new UploadedFile(__DIR__ . '/../Fixtures/testFile/test.txt', 'originalFile.csv', 'text/csv');
@@ -423,10 +474,10 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNotEquals('testFile.txt', $fileEntity->getFilename());
     }
 
-    public function testPreUploadForRegularFile()
+    public function testPreUploadForRegularFile(): void
     {
         $fileEntity = $this->createFileEntity();
-        $file = new File(__DIR__ . '/../Fixtures/testFile/test.txt');
+        $file = new SymfonyFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $fileEntity
             ->setEmptyFile(false)
             ->setFile($file);
@@ -471,12 +522,69 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNotEquals('test.zip', $fileEntity->getFilename());
     }
 
-    public function testUpload()
+    public function testPreUploadForExternalFile(): void
+    {
+        $fileEntity = $this->createFileEntity();
+        $externalFile = new ExternalFile('http://example.org/image.png', 'original-image.png', 4242, 'image/png');
+        $fileEntity->setFile($externalFile);
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::stringStartsWith(self::TEST_FILE_SYSTEM_NAME . '/'))
+            ->willReturn(false);
+
+        $this->fileManager->preUpload($fileEntity);
+
+        self::assertEquals($externalFile->getOriginalName(), $fileEntity->getOriginalFilename());
+        self::assertEquals($externalFile->getOriginalExtension(), $fileEntity->getExtension());
+        self::assertEquals($externalFile->getMimeType(), $fileEntity->getMimeType());
+        self::assertEquals($externalFile->getSize(), $fileEntity->getFileSize());
+        self::assertEquals($externalFile->getUrl(), $fileEntity->getExternalUrl());
+        self::assertNotEquals($externalFile->getFilename(), $fileEntity->getFilename());
+    }
+
+    public function testPreUploadForExternalFileWhenNoOriginalFilename(): void
+    {
+        $fileEntity = $this->createFileEntity();
+        $externalFile = new ExternalFile('http://example.org/image.png', '', 4242, 'image/png');
+        $fileEntity->setFile($externalFile);
+
+        $this->filesystem->expects(self::once())
+            ->method('has')
+            ->with(self::stringStartsWith(self::TEST_FILE_SYSTEM_NAME . '/'))
+            ->willReturn(false);
+
+        $this->fileManager->preUpload($fileEntity);
+
+        self::assertEquals($externalFile->getFilename(), $fileEntity->getOriginalFilename());
+        self::assertEquals($externalFile->getExtension(), $fileEntity->getExtension());
+        self::assertEquals($externalFile->getMimeType(), $fileEntity->getMimeType());
+        self::assertEquals($externalFile->getSize(), $fileEntity->getFileSize());
+        self::assertEquals($externalFile->getUrl(), $fileEntity->getExternalUrl());
+        self::assertNotEquals($externalFile->getFilename(), $fileEntity->getFilename());
+    }
+
+    public function testPreUploadForExternalFileDoesNothingWhenNotValid(): void
+    {
+        $fileEntity = $this->createFileEntity();
+        $externalFile = new ExternalFile('');
+        $fileEntity->setFile($externalFile);
+
+        $this->filesystem->expects(self::never())
+            ->method('has');
+
+        $this->fileManager->preUpload($fileEntity);
+
+        self::assertEquals('testFile.txt', $fileEntity->getOriginalFilename());
+        self::assertNull($fileEntity->getExternalUrl());
+    }
+
+    public function testUpload(): void
     {
         $fileEntity = $this->createFileEntity();
         $fileEntity->setEmptyFile(false);
 
-        $file = new File(__DIR__ . '/../Fixtures/testFile/test.txt');
+        $file = new SymfonyFile(__DIR__ . '/../Fixtures/testFile/test.txt');
         $fileEntity->setFile($file);
 
         $memoryBuffer = new InMemoryBuffer($this->filesystem, 'test.txt');

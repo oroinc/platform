@@ -41,6 +41,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'value' => 85,
                 'scope' => 'app',
             ],
+            'external_file_allowed_urls_regexp' => [
+                'value' => '',
+                'scope' => 'app',
+            ],
             'resolved' => true,
         ],
     ];

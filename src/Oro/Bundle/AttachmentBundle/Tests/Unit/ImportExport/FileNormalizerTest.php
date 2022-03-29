@@ -5,7 +5,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileNormalizer;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -19,32 +23,37 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var FileNormalizer */
-    private $normalizer;
+    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
 
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
+    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $attachmentEntityConfigProvider;
+
+    private FileNormalizer $normalizer;
 
     protected function setUp(): void
     {
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->fileManager = $this->createMock(FileManager::class);
+        $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
 
-        $this->normalizer = new FileNormalizer($this->attachmentManager, $this->fileManager);
+        $this->normalizer = new FileNormalizer(
+            $this->attachmentManager,
+            $this->fileManager,
+            $this->attachmentEntityConfigProvider
+        );
     }
 
     /**
      * @dataProvider supportsDenormalizationData
      */
-    public function testSupportsDenormalization($type, $isSupport)
+    public function testSupportsDenormalization($type, $isSupport): void
     {
         self::assertEquals($isSupport, $this->normalizer->supportsDenormalization([], $type));
     }
 
-    public function supportsDenormalizationData()
+    public function supportsDenormalizationData(): array
     {
         return [
             'supports' => [File::class, true],
@@ -55,21 +64,21 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationData
      */
-    public function testSupportsNormalization($data, $isSupport)
+    public function testSupportsNormalization($data, $isSupport): void
     {
         self::assertEquals($isSupport, $this->normalizer->supportsNormalization($data));
     }
 
-    public function supportsNormalizationData()
+    public function supportsNormalizationData(): array
     {
         return [
             'supports' => [new File(), true],
             'wrongObject' => [new \stdClass(), false],
-            'notObject' => ['test', false]
+            'notObject' => ['test', false],
         ];
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $sampleUrl = '/sample/url';
         $sampleUuid = 'sample-uuid';
@@ -149,6 +158,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
             File::class
         );
 
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
         self::assertEquals($expectedFile, $file);
         self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
     }
@@ -170,6 +180,7 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
             File::class
         );
 
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
         self::assertEquals($expectedFile, $file);
         self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
     }
@@ -194,6 +205,48 @@ class FileNormalizerTest extends \PHPUnit\Framework\TestCase
             File::class
         );
 
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
+        self::assertEquals($expectedFile, $file);
+        self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
+    }
+
+    public function testDenormalizeWithExternalUrl(): void
+    {
+        $sampleUuid = 'sample-uuid';
+        $url = 'http://example.org/sample/url/filename.pdf';
+        $entityClassName = \stdClass::class;
+        $fieldName = 'field_name';
+
+        $expectedFile = new File();
+        $expectedFile->setUuid($sampleUuid);
+        $expectedFile->setFile(new ExternalFile($url));
+
+        $entityFieldConfig = new Config(
+            new FieldConfigId('extend', $entityClassName, $fieldName),
+            [
+                'is_stored_externally' => true,
+            ]
+        );
+
+        $this->attachmentEntityConfigProvider->expects(self::once())
+            ->method('getFieldConfig')
+            ->with($entityClassName, $fieldName)
+            ->willReturn($entityFieldConfig);
+
+        $this->fileManager->expects(self::never())
+            ->method('getReadonlyFilePath');
+
+        $file = $this->normalizer->denormalize(
+            ['uri' => $url, 'uuid' => $sampleUuid],
+            File::class,
+            null,
+            [
+                'entityName' => $entityClassName,
+                'originalFieldName' => $fieldName,
+            ]
+        );
+
+        $expectedFile->setUpdatedAt($file->getUpdatedAt());
         self::assertEquals($expectedFile, $file);
         self::assertEquals($expectedFile->getFile()->getPathname(), $file->getFile()->getPathname());
     }

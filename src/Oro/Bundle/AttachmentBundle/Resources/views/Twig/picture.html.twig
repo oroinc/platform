@@ -13,6 +13,11 @@
         {% set sources = [] %}
     {% endif %}
 
+    {% if sources.src is defined and sources.sources is defined %}
+        {% set img_src = sources.src %}
+        {% set sources = sources.sources %}
+    {% endif %}
+
     {% if not img_src %}
         {% set img_src = (sources|last).srcset|default(sources|last|default('')) %}
         {% set sources = sources|slice(0, -1) %}

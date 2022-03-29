@@ -46,11 +46,7 @@ class DataBlockBuilder
 
     public function doBuild(FormView $form)
     {
-        if (isset($form->vars['block_config'])) {
-            foreach ($form->vars['block_config'] as $code => $blockConfig) {
-                $this->addBlock($code, $blockConfig);
-            }
-        }
+        $this->addBlocks($form);
 
         if ($form->isRendered()) {
             // Child blocks are already rendered so there is no sense in going through them.
@@ -58,6 +54,10 @@ class DataBlockBuilder
         }
 
         foreach ($form->children as $name => $child) {
+            if ($child->isRendered()) {
+                continue;
+            }
+
             if (isset($child->vars['block']) || isset($child->vars['subblock'])) {
                 $block = null;
                 if ($this->formConfig->hasBlock($child->vars['block'])) {
@@ -78,6 +78,15 @@ class DataBlockBuilder
             }
 
             $this->doBuild($child);
+        }
+    }
+
+    private function addBlocks(FormView $form): void
+    {
+        if (isset($form->vars['block_config'])) {
+            foreach ($form->vars['block_config'] as $code => $blockConfig) {
+                $this->addBlock($code, $blockConfig);
+            }
         }
     }
 

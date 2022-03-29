@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Form\Type;
 
+use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
+use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\ConfigBundle\Form\DataTransformer\ConfigFileDataTransformer;
 use Oro\Bundle\ConfigBundle\Form\Type\ConfigFileType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
@@ -88,6 +90,9 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
+                    FileType::class => new FileType(
+                        new ExternalFileFactory($this->createMock(ClientInterface::class))
+                    ),
                     ConfigFileType::class => $this->formType
                 ],
                 []

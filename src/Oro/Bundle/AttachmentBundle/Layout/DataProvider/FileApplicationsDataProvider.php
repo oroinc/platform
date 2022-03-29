@@ -34,7 +34,8 @@ class FileApplicationsDataProvider
     {
         $attachmentConfig = $this->configProvider->getConfig($className, $fieldName);
 
-        return !$attachmentConfig->is('acl_protected') ||
+        return $attachmentConfig->is('is_stored_externally') ||
+            !$attachmentConfig->is('acl_protected') ||
             $this->currentApplicationProvider->isApplicationsValid(
                 $this->fileApplicationsProvider->getFileApplicationsForField($className, $fieldName)
             );

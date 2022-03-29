@@ -13,7 +13,7 @@ class OroAttachmentBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_11';
     }
 
     /**
@@ -80,6 +80,7 @@ class OroAttachmentBundleInstaller implements Installation
         $table->addColumn('parent_entity_field_name', 'string', ['notnull' => false, 'length' => 50]);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('external_url', 'string', ['length' => 1024, 'notnull' => false]);
         $table->setPrimaryKey(['id']);
 
         $table->addIndex(['original_filename'], 'att_file_orig_filename_idx', []);

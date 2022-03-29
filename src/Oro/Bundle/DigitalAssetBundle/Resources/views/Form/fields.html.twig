@@ -2,13 +2,13 @@
     {{ block('oro_file_widget') }}
 
     {%- if value is not empty and value.id and oro_type_is_image(value.mimeType) -%}
-        {% set sources = oro_filtered_picture_sources(value, 'digital_asset_large') %}
+        {% set pictureSources = oro_filtered_picture_sources(value, 'digital_asset_large') %}
         <div class="preview">
             <a class="view-image no-hash"
                tabindex="-1"
                data-gallery="image{{ value.id }}"
-               data-sources="{{ sources|json_encode }}"
-               href="{{ (sources|last).srcset }}"
+               data-sources="{{ pictureSources.sources|json_encode }}"
+               href="{{ pictureSources.src }}"
             >
                 {% include '@OroAttachment/Twig/picture.html.twig' with {
                     file: value,
