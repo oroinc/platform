@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -17,11 +18,13 @@ class MultiImageType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'entry_options' => [
-                'file_type' => ImageType::class,
-            ],
-        ]);
+        $resolver->addNormalizer('entry_options', static function (Options $allOptions, array $option) {
+            if (!isset($option['file_type'])) {
+                $option['file_type'] = ImageType::class;
+            }
+
+            return $option;
+        });
     }
 
     /**

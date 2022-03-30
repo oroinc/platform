@@ -3,24 +3,27 @@
 namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
 /**
- * Form type for uploading file.
+ * Represents a form type for {@see File}.
  */
 class FileType extends AbstractType
 {
-    /** @var EventSubscriberInterface */
-    private $eventSubscriber;
+    private ?EventSubscriberInterface $eventSubscriber = null;
 
     public function setEventSubscriber(EventSubscriberInterface $eventSubscriber): void
     {
@@ -32,43 +35,64 @@ class FileType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('file', SymfonyFileType::class, $options['fileOptions']);
+        if ($options['isExternalFile']) {
+            $options['fileOptions'] = array_merge($options['fileOptions'], [
+                'getter' => function (File $file, FormInterface $form): ?\SplFileInfo {
+                    return $file->getExternalFile();
+                },
+                'setter' => function (File &$file, ?\SplFileInfo $externalFile, FormInterface $form): void {
+                    $file->setExternalFile($externalFile);
+                },
+            ]);
+            $builder->add(
+                $builder
+                    ->create('file', ExternalFileType::class, $options['fileOptions'])
+                    ->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'filePreSetData'])
+            );
+        } else {
+            $builder->add('file', SymfonyFileType::class, $options['fileOptions']);
+        }
 
-        // Adds emptyFile field if allowDelete option is true, removes owner field.
+        $builder->add('emptyFile', HiddenType::class);
+
+        // Removes owner field.
         $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
-
-        // Changes File::$updatedAt when new file is uploaded or file is marked for deletion.
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
 
         if ($options['addEventSubscriber']) {
             $builder->addEventSubscriber($this->eventSubscriber);
         }
     }
 
+    public function filePreSetData(PreSetDataEvent $event): void
+    {
+        /** @var File|null $file */
+        $file = $event->getForm()->getParent()?->getData();
+        if ($file) {
+            $event->setData(ExternalFileFactory::createFromFile($file));
+        }
+    }
+
     public function preSetData(FormEvent $event): void
     {
-        $form = $event->getForm();
+        $event->getForm()->remove('owner');
+    }
 
-        $form->remove('owner');
+    public function buildView(FormView $view, FormInterface $form, array $options): void
+    {
+        $view->vars['allowDelete'] = $options['allowDelete'];
+        $view->vars['attachmentViewOptions']['isExternalFile'] = $options['isExternalFile'];
+    }
 
-        if ($form->getConfig()->getOption('allowDelete')) {
-            $form->add('emptyFile', HiddenType::class, ['required' => false]);
-        }
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        $view->vars['attachmentViewOptions']['fileSelector'] = '#' . $view['file']->vars['id'];
+        $view->vars['attachmentViewOptions']['emptyFileSelector'] = '#' . $view['emptyFile']->vars['id'];
+
+        $view->vars['label_attr']['for'] = $view['file']->vars['id'];
     }
 
     public function postSubmit(FormEvent $event): void
     {
-        /** @var File $entity */
-        $entity = $event->getData();
-        $isEmptyFile = $entity && $entity->isEmptyFile();
-
-        // Property File::$file is filled only when new file is uploaded.
-        $isNewFile = $entity && $entity->getFile() !== null;
-
-        if ($isNewFile || $isEmptyFile) {
-            // Makes doctrine update File entity to enforce triggering of FileListener which uploads an image.
-            $entity->setUpdatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
-        }
     }
 
     /**
@@ -83,9 +107,11 @@ class FileType extends AbstractType
                 'allowDelete' => true,
                 'addEventSubscriber' => true,
                 'fileOptions' => [],
+                'isExternalFile' => false,
             ]
         );
 
+        $resolver->setAllowedTypes('isExternalFile', 'bool');
         $resolver->setAllowedTypes('fileOptions', 'array');
         $resolver->setNormalizer('fileOptions', \Closure::fromCallable([$this, 'normalizeFileOptions']));
     }

@@ -145,4 +145,14 @@ class FileConstraintsProvider
 
         return (int)$maxFileSize;
     }
+
+    /**
+     * Returns allowed URLs regular expression for externally stored files from system config.
+     */
+    public function getExternalFileAllowedUrlsRegExp(): string
+    {
+        $regExp = (string)$this->systemConfigManager->get('oro_attachment.external_file_allowed_urls_regexp');
+
+        return $regExp ? '~' . $regExp . '~i' : $regExp;
+    }
 }

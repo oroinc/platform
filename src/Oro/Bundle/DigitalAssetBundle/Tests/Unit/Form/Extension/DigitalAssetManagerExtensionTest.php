@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Extension;
 
+use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
@@ -9,6 +10,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
+use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\DigitalAssetBundle\Form\Extension\DigitalAssetManagerExtension;
 use Oro\Bundle\DigitalAssetBundle\Provider\PreviewMetadataProviderInterface;
@@ -45,26 +47,20 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
     private const SAMPLE_CLASS = 'SampleClass';
     private const SAMPLE_FIELD = 'sampleField';
 
-    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentEntityConfigProvider;
+    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $attachmentEntityConfigProvider;
 
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
+    private EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject $entityClassNameHelper;
 
-    /** @var PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $previewMetadataProvider;
+    private PreviewMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $previewMetadataProvider;
 
-    /** @var EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $digitalAssetToIdTransformer;
+    private EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject $digitalAssetToIdTransformer;
 
-    /** @var FileReflector|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileReflector;
+    private FileReflector|\PHPUnit\Framework\MockObject\MockObject $fileReflector;
 
-    /** @var DigitalAssetManagerExtension */
-    private $extension;
+    private DigitalAssetManagerExtension $extension;
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
 
     /**
      * {@inheritdoc}
@@ -90,25 +86,24 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->form = $this->createMock(FormInterface::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtensions()
+    public function getExtensions(): array
     {
-        $fileType = new FileType();
+        $fileType = new FileType(
+            new ExternalFileFactory($this->createMock(ClientInterface::class))
+        );
         $fileType->setEventSubscriber(new EventSubscriberStub());
 
         $multipleFileConstraintsProvider = $this->createMock(MultipleFileConstraintsProvider::class);
         $multiFileType = new MultiFileType(new EventSubscriberStub(), $multipleFileConstraintsProvider);
 
         return [
-            new PreloadedExtension([$fileType, $multiFileType], [])
+            new PreloadedExtension([$fileType, $multiFileType], []),
         ];
     }
 
     public function testGetExtendedTypes(): void
     {
-        $this->assertEquals([FileType::class, ImageType::class], DigitalAssetManagerExtension::getExtendedTypes());
+        self::assertEquals([FileType::class, ImageType::class], DigitalAssetManagerExtension::getExtendedTypes());
     }
 
     public function testConfigureOptions(): void
@@ -121,7 +116,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->willReturnCallback(
                 function (array $defaults) {
                     $this->assertArrayHasKey('dam_widget_enabled', $defaults);
-                    $this->assertTrue($defaults['dam_widget_enabled']);
+                    $this->assertIsCallable($defaults['dam_widget_enabled']);
                     $this->assertArrayHasKey('dam_widget_route', $defaults);
                     $this->assertSame($defaults['dam_widget_route'], 'oro_digital_asset_widget_choose');
                     $this->assertArrayHasKey('dam_widget_parameters', $defaults);
@@ -131,10 +126,39 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             );
 
         $resolver->expects($this->once())
+            ->method('addNormalizer')
+            ->with('fileOptions', $this->isType('callable'), true);
+
+        $resolver->expects($this->once())
             ->method('setNormalizer')
-            ->with('fileOptions', $this->isType('callable'));
+            ->with('dam_widget_enabled', $this->isType('callable'));
 
         $this->extension->configureOptions($resolver);
+    }
+
+    public function testConfigureOptionsWhenIsExternalFileAndDamWidgetEnabled(): void
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefined('fileOptions');
+        $resolver->setDefined('isExternalFile');
+
+        $this->extension->configureOptions($resolver);
+
+        $this->expectExceptionObject(new \LogicException('Digital Asset Manager cannot be used for external files'));
+
+        $resolver->resolve(['isExternalFile' => true, 'dam_widget_enabled' => true]);
+    }
+
+    public function testConfigureOptionsWhenIsExternalFileIsTrue(): void
+    {
+        $resolver = new OptionsResolver();
+        $resolver->setDefined('fileOptions');
+        $resolver->setDefined('isExternalFile');
+
+        $this->extension->configureOptions($resolver);
+
+        $resolved = $resolver->resolve(['isExternalFile' => true]);
+        self::assertFalse($resolved['dam_widget_enabled']);
     }
 
     /**
@@ -220,53 +244,30 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
                     ]
                 ),
                 'option' => [],
-                'expectedOption' => [
-                    'required' => false,
-                    'label' => 'oro.attachment.file.label',
-                ],
+                'expectedOption' => [],
             ],
-            'required is set' => [
+            'constraints are not set' => [
                 'allOptions' => (new OptionsResolver())->setDefaults(
                     [
                         'checkEmptyFile' => true,
                     ]
                 ),
-                'option' => [
-                    'required' => false,
-                ],
+                'option' => [],
                 'expectedOption' => [
-                    'required' => false,
-                    'label' => 'oro.attachment.file.label',
                     'constraints' => [new NotBlank(['groups' => 'DamWidgetDisabled'])],
                 ],
             ],
-            'constraints is set' => [
+            'constraints are set' => [
                 'allOptions' => (new OptionsResolver())->setDefaults(
                     [
                         'checkEmptyFile' => true,
                     ]
                 ),
                 'option' => [
-                    'constraints' => [],
+                    'constraints' => [new NotBlank()],
                 ],
                 'expectedOption' => [
-                    'required' => true,
-                    'label' => 'oro.attachment.file.label',
-                    'constraints' => [],
-                ],
-            ],
-            'label is set' => [
-                'allOptions' => (new OptionsResolver())->setDefaults(
-                    [
-                        'checkEmptyFile' => false,
-                    ]
-                ),
-                'option' => [
-                    'label' => 'sample-label',
-                ],
-                'expectedOption' => [
-                    'required' => false,
-                    'label' => 'sample-label',
+                    'constraints' => [new NotBlank()],
                 ],
             ],
         ];
@@ -306,7 +307,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ->method('addEventListener')
             ->with(FormEvents::POST_SUBMIT, $this->isType('array'));
 
-        $this->extension->buildForm($builder, []);
+        $this->extension->buildForm($builder, ['dam_widget_enabled' => true]);
     }
 
     public function buildFormDataProvider(): array
@@ -325,7 +326,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ],
             [
                 'options' => ['checkEmptyFile' => false],
-                'expectedOptions' => $commonOptions + ['constraints' => []]
+                'expectedOptions' => $commonOptions + ['constraints' => []],
             ],
             [
                 'options' => ['checkEmptyFile' => true, 'dam_widget_enabled' => true],
@@ -333,7 +334,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
             ],
             [
                 'options' => ['checkEmptyFile' => true, 'dam_widget_enabled' => false],
-                'expectedOptions' => $commonOptions + ['constraints' => []]
+                'expectedOptions' => $commonOptions + ['constraints' => []],
             ],
         ];
     }
@@ -410,7 +411,7 @@ class DigitalAssetManagerExtensionTest extends FormIntegrationTestCase
         $this->extension->buildView(
             $formView,
             $this->createMock(FormInterface::class),
-            []
+            ['dam_widget_enabled' => true]
         );
 
         $this->assertArrayNotHasKey('route', $formView->vars['dam_widget']);

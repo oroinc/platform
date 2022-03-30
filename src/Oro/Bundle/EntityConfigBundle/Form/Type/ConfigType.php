@@ -11,8 +11,11 @@ use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,6 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ConfigType extends AbstractType
 {
+    public const PARTIAL_SUBMIT = 'partialSubmit';
+
     /** @var ConfigTranslationHelper */
     protected $translationHelper;
 
@@ -96,13 +101,14 @@ class ConfigType extends AbstractType
                         'items' => $provider->getPropertyConfig()->getFormItems($configType, $fieldType),
                         'config' => $config,
                         'config_model' => $configModel,
-                        'config_manager' => $this->configManager,
                         'block_config' => $this->getFormBlockConfig($provider, $configType)
                     ]
                 );
                 $data[$provider->getScope()] = $config->all();
             }
         }
+
+        $builder->add(self::PARTIAL_SUBMIT, SubmitType::class, ['validate' => false, 'validation_groups' => false]);
 
         $builder->setData($data);
 
@@ -113,6 +119,12 @@ class ConfigType extends AbstractType
                 $this->translator
             )
         );
+    }
+
+    public function finishView(FormView $view, FormInterface $form, array $options): void
+    {
+        // Partial submit button should not be rendered.
+        $view[self::PARTIAL_SUBMIT]->setRendered();
     }
 
     /**

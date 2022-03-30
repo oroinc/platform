@@ -15,14 +15,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
  */
 class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SystemConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $systemConfigManager;
+    private SystemConfigManager|\PHPUnit\Framework\MockObject\MockObject $systemConfigManager;
 
-    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentEntityConfigProvider;
+    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $attachmentEntityConfigProvider;
 
-    /** @var FileConstraintsProvider */
-    private $provider;
+    private FileConstraintsProvider $provider;
 
     protected function setUp(): void
     {
@@ -477,5 +475,28 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
             10 * Configuration::BYTES_MULTIPLIER,
             $this->provider->getMaxSizeForEntityField($entityClass, $fieldName)
         );
+    }
+
+    /**
+     * @dataProvider getExternalFileAllowedUrlsRegExpDataProvider
+     */
+    public function testGetExternalFileAllowedUrlsRegExp(mixed $value, string $expectedValue): void
+    {
+        $this->systemConfigManager->expects($this->once())
+            ->method('get')
+            ->with('oro_attachment.external_file_allowed_urls_regexp', false, false, null)
+            ->willReturn($value);
+
+        self::assertSame($expectedValue, $this->provider->getExternalFileAllowedUrlsRegExp());
+    }
+
+    public function getExternalFileAllowedUrlsRegExpDataProvider(): array
+    {
+        return [
+            [null, ''],
+            ['', ''],
+            [123, '~123~i'],
+            ['sample value', '~sample value~i'],
+        ];
     }
 }

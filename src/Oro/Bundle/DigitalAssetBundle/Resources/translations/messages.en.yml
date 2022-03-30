@@ -57,7 +57,7 @@ oro:
 
         import:
             entity_is_skipped: 'Digital Asset importing has failed, entity is skipped'
-            cannot_find_digital_asset: 'Cannot find digital asset #%digital_asset_id% specified as parent for file with UUID %file_uuid%'
-            failed_to_create_or_reuse_digital_asset: 'Failed to reuse digital asset: file not found by specified UUID. Failed to create new digital asset: there is no file specified for uploading'
+            cannot_find_digital_asset: 'Cannot find digital asset #%digital_asset_id% specified as parent for file with UUID %file_uuid% in field %fieldname%'
+            failed_to_create_or_reuse_digital_asset: 'Failed to reuse digital asset in field %fieldname%: file not found by specified UUID (%file_uuid%). Failed to create new digital asset: there is no file specified for uploading'
 
     attachment.file.digital_asset.label: Digital Asset

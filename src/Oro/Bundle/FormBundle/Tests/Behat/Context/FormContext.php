@@ -229,7 +229,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $form = $this->createElement($formName);
 
             foreach ($table->getRows() as $row) {
-                list($label, $value) = $row;
+                [$label, $value] = $row;
                 $error = $form->getFieldValidationErrors($label);
                 self::assertEquals(
                     $value,
@@ -259,7 +259,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $form = $this->createElement($formName);
 
             foreach ($table->getRows() as $row) {
-                list($label, $value) = $row;
+                [$label, $value] = $row;
                 $errors = $form->getAllFieldValidationErrors($label);
                 self::assertFalse(
                     in_array($value, $errors),
@@ -861,5 +861,17 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     {
         $uploadFile = $this->createElement($element);
         $uploadFile->setValue($fileName);
+    }
+
+    //@codingStandardsIgnoreStart
+    /**
+     * @When /^(?:|I )fill "(?P<fieldName>(?:[^"]|\\")*)" with absolute URL "(?P<url>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )fill "(?P<fieldName>(?:[^"]|\\")*)" with absolute URL "(?P<url>(?:[^"]|\\")*)" in form "(?P<formName>(?:[^"]|\\")*)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iFillAbsoluteUrl(string $fieldName, string $url, string $formName = 'OroForm'): void
+    {
+        $element = $this->getFieldInForm($fieldName, $formName);
+        $element->setValue($this->locatePath($url));
     }
 }

@@ -45,6 +45,20 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testResizeReturnsNullWhenStoredExternally(): void
+    {
+        $file = new File();
+        $file->setExternalUrl('http://example.org/image.png');
+
+        $this->resizedImagePathProvider->expects(self::never())
+            ->method(self::anything());
+
+        $this->imagineBinaryFactory->expects(self::never())
+            ->method(self::anything());
+
+        self::assertNull($this->manager->resize($file, self::WIDTH, self::HEIGHT, self::FORMAT));
+    }
+
     public function testResizeWhenAlreadyExists(): void
     {
         $this->mockMediaCacheManager($file = new File(), $rawResizedImage = 'raw-image');
@@ -84,6 +98,20 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($rawResizedImage);
 
         return $mediaCacheManager;
+    }
+
+    public function testApplyFilterReturnsNullWhenStoredExternally(): void
+    {
+        $file = new File();
+        $file->setExternalUrl('http://example.org/image.png');
+
+        $this->resizedImagePathProvider->expects(self::never())
+            ->method(self::anything());
+
+        $this->imagineBinaryFactory->expects(self::never())
+            ->method(self::anything());
+
+        self::assertNull($this->manager->applyFilter($file, self::FILTER, self::FORMAT));
     }
 
     public function testApplyFilterWhenAlreadyExists(): void

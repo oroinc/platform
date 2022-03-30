@@ -5,12 +5,14 @@ namespace Oro\Bundle\EntityConfigBundle\Form\EventListener;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
 use Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * Form listener to update configs and translatable values
@@ -73,8 +75,13 @@ class ConfigSubscriber implements EventSubscriberInterface
         $this->updateConfigs(
             $configModel,
             $this->updatePendingChanges($configModel, $event->getData()),
-            $form->isValid()
+            $form->isValid() && !$this->isClickedButton($form, ConfigType::PARTIAL_SUBMIT)
         );
+    }
+
+    private function isClickedButton(FormInterface $form, string $buttonName): string
+    {
+        return method_exists($form, 'getClickedButton') && $form->getClickedButton()?->getName() === $buttonName;
     }
 
     /**

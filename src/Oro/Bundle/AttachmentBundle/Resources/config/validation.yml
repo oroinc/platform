@@ -25,3 +25,6 @@ Oro\Bundle\AttachmentBundle\Entity\File:
         uuid:
             - Uuid:
                 groups: ['Default', 'import_field_type']
+        externalUrl:
+            - Length:
+                  max: 1024

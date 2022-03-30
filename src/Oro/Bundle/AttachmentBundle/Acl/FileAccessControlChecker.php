@@ -10,19 +10,20 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface
  */
 class FileAccessControlChecker
 {
-    /** @var AttachmentEntityConfigProviderInterface */
-    private $attachmentEntityConfigProvider;
+    private AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider;
 
     public function __construct(AttachmentEntityConfigProviderInterface $configManager)
     {
         $this->attachmentEntityConfigProvider = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCoveredByAcl(File $file): bool
     {
+        if ($file->getExternalUrl()) {
+            // We cannot protect file that is stored externally.
+            return false;
+        }
+
         $parentEntityClass = $file->getParentEntityClass();
         $parentEntityFieldName = $file->getParentEntityFieldName();
         $parentEntityId = $file->getParentEntityId();

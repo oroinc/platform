@@ -135,9 +135,9 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $sources = [];
+        $pictureSources = [];
         if ($this->getAttachmentManager()->isImageType($file->getMimeType())) {
-            $sources = $this->getFilteredPictureSources($file);
+            $pictureSources = $this->getFilteredPictureSources($file);
         }
 
         return $environment->render(
@@ -145,7 +145,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
             [
                 'iconClass' => $this->getAttachmentManager()->getAttachmentIconClass($file),
                 'url' => $url,
-                'sources' => $sources,
+                'pictureSources' => $pictureSources,
                 'fileName' => $file->getOriginalFilename(),
                 'additional' => $additional,
                 'title' => $this->getFileTitle($file),
@@ -170,8 +170,8 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
 
         if ($entityClass && $fieldName) {
             $config = $this->getConfigManager()->getFieldConfig('attachment', $entityClass, $fieldName);
-            $width = $config->get('width');
-            $height = $config->get('height');
+            $width = (int) $config->get('width') ?: self::DEFAULT_THUMB_SIZE;
+            $height = (int) $config->get('height') ?: self::DEFAULT_THUMB_SIZE;
         }
 
         return $environment->render(
@@ -242,13 +242,18 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         array $attrs = []
     ): array {
         $file = $this->getFile($file);
-        $sources = [];
-        if ($file instanceof File) {
+        $pictureSources = [];
+
+        if ($file) {
             $pictureSources = $this->getPictureSourcesProvider()->getFilteredPictureSources($file, $filterName);
-            $sources = $this->mergeSources($pictureSources, $file, $attrs);
+
+            $pictureSources['sources'] = array_map(
+                static fn (array $source) => array_merge($source, $attrs),
+                $pictureSources['sources'] ?? []
+            );
         }
 
-        return $sources;
+        return $pictureSources;
     }
 
     private function mergeSources(array $pictureSources, File $file, array $attrs): array

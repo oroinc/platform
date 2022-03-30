@@ -85,7 +85,13 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
             ->method('validate')
             ->with(
                 $file = new \stdClass(),
-                new File(['mimeTypes' => self::MIME_TYPES, 'maxSize' => self::MAX_SIZE])
+                new File(
+                    [
+                        'mimeTypes' => self::MIME_TYPES,
+                        'maxSize' => self::MAX_SIZE,
+                        'mimeTypesMessage' => 'oro.attachment.mimetypes.invalid_mime_type',
+                    ]
+                )
             );
 
         $this->validator->validate($file, $constraint);

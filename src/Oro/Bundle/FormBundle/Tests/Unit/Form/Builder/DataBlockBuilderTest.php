@@ -108,6 +108,9 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
                         'second' => [
                             'priority' => 10,
                         ],
+                        'third' => [
+                            'priority' => 5,
+                        ],
                     ],
                 ],
             ],
@@ -120,17 +123,19 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
             'First' => [
                 'first' => ['item1'],
                 'second' => ['item2'],
+                'third' => [['item3', 'item3_2']],
             ],
         ];
 
         $formBuilder = $this->formFactory->createNamedBuilder('test', FormType::class, null, $formOptions);
         $this->buildForm($formBuilder, $formItems);
         $item3FormBuilder = $this->formFactory->createNamedBuilder('item3');
-        $item3FormBuilder->add('item3_1', null, ['block' => 'first']);
+        $item3FormBuilder->add('item3_1', null, ['block' => 'first', 'subblock' => 'third']);
+        $item3FormBuilder->add('item3_2', null, ['block' => 'first', 'subblock' => 'third']);
         $formBuilder->add($item3FormBuilder);
 
         $formView = $formBuilder->getForm()->createView();
-        $formView['item3']->setRendered();
+        $formView['item3']['item3_1']->setRendered();
 
         $result = $this->builder->build($formView);
 
@@ -247,7 +252,11 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $data = [];
         foreach ($itemNames as $itemName) {
-            $data[$itemName] = sprintf('{{ form_row(form.children[\'%s\']) }}', $itemName);
+            $itemName = (array)$itemName;
+            $data[end($itemName)] = sprintf(
+                '{{ form_row(form.%s) }}',
+                implode('.', array_map(static fn (string $name) => "children['$name']", $itemName))
+            );
         }
 
         return $data;

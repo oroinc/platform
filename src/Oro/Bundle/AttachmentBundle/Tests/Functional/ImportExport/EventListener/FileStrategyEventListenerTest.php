@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\ImportExport\EventListene
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileStrategyEventListener;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -344,7 +345,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         self::assertEquals(
             [
                 'Error in row #0. Failed to either upload or clone file from the existing one: file not found by ' .
-                'specified UUID and nothing is specified for uploading. Please make sure avatar.URI and avatar.UUID ' .
+                'specified UUID and nothing is specified for uploading. Please make sure Avatar.URI and Avatar.UUID ' .
                 'columns are present in the import file and have the correct values.',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
@@ -375,8 +376,8 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         self::assertEquals(
             [
-                'Error in row #0. Failed to upload a file from invalid/path: Failed to copy "invalid/path" '
-                . 'because file does not exist.',
+                'Error in row #0. Failed to upload a file from invalid/path for field Avatar: '
+                . 'Failed to copy "invalid/path" because file does not exist.',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
             $context->getErrors()
@@ -416,8 +417,8 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         self::assertEquals(
             [
-                'Error in row #0. File validation failed for field Avatar: The mime type of the file is invalid ' .
-                '("text/html"). Allowed mime types are "image/gif", "image/jpeg", "image/png", "image/webp".',
+                'Error in row #0. File validation failed for field Avatar: The MIME type of the file is invalid ' .
+                '("text/html"). Allowed MIME types are "image/gif", "image/jpeg", "image/png", "image/webp".',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
             $context->getErrors()
@@ -488,8 +489,8 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         self::assertEquals(
             [
-                'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba: The file '
-                . '"attachments/invalid/filepath.jpg" was not found.',
+                'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba for field Avatar: '
+                . 'The file "attachments/invalid/filepath.jpg" was not found.',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
             $context->getErrors()
@@ -521,11 +522,73 @@ class FileStrategyEventListenerTest extends WebTestCase
 
         self::assertEquals(
             [
-                'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba: you do not have '
-                . 'permission to view the file with uuid 74d27cad-b800-4d71-833e-775d01aebeba',
+                'Error in row #0. Failed to clone a file from 74d27cad-b800-4d71-833e-775d01aebeba for field Avatar: '
+                . 'you do not have permission to view the file with uuid 74d27cad-b800-4d71-833e-775d01aebeba',
                 'Error in row #0. File importing has failed, entity is skipped',
             ],
             $context->getErrors()
+        );
+    }
+
+    public function testFileFieldWhenExternalUrl(): void
+    {
+        $this->markTestSkipped('Due to BAP-21155');
+
+        $context = $this->getContext(['avatar' => []]);
+
+        $url = 'http://example.org/sample/url/filename.jpg';
+        $externalFile = new ExternalFile($url, 'filename', 100, 'image/jpeg');
+
+        $file = new File();
+        $file->setExternalFile($externalFile);
+
+        $existingUser = $this->getReference('user1');
+        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user->setAvatar($file);
+
+        $event = $this->getEvent($context, $user);
+
+        $this->listener->onProcessBefore($event);
+        $this->listener->onProcessAfter($event);
+
+        self::assertEmpty($context->getErrors());
+    }
+
+    public function testFileFieldWhenExternalUrlWithWrongMimeType(): void
+    {
+        $this->markTestSkipped('Due to BAP-21155');
+
+        $url = 'http://example.org/sample/url/filename.pdf';
+        $externalFile = new ExternalFile($url, 'filename', 100, 'application/pdf');
+
+        $file = new File();
+        $file->setExternalFile($externalFile);
+
+        $fieldName = 'avatar';
+        $context = $this->getContext([$fieldName => []]);
+
+        $existingUser = $this->getReference('user1');
+        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user->setAvatar($file);
+
+        $event = $this->getEvent($context, $user);
+
+        $this->listener->onProcessBefore($event);
+        $this->listener->onProcessAfter($event);
+
+        self::assertEquals(
+            [
+                'Error in row #0. File validation failed for field Avatar: The MIME type of the file is invalid ' .
+                '("text/html"). Allowed MIME types are "image/gif", "image/jpeg", "image/png", "image/webp".',
+                'Error in row #0. File importing has failed, entity is skipped',
+            ],
+            $context->getErrors()
+        );
+
+        self::assertEquals(
+            'empty.jpg',
+            $existingUser->getAvatar()->getOriginalFilename(),
+            'Failed asserting that original filename was not changed'
         );
     }
 }

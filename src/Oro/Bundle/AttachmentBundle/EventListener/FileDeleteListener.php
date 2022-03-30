@@ -23,11 +23,21 @@ class FileDeleteListener
 
     public function postRemove(File $file): void
     {
+        if ($file->getExternalUrl()) {
+            // Externally stored files are not present in filesystem.
+            return;
+        }
+
         $this->deleteFromFilesystem((string)$file->getFilename());
     }
 
     public function postUpdate(File $file, LifecycleEventArgs $args): void
     {
+        if ($file->getExternalUrl()) {
+            // Externally stored files are not present in filesystem.
+            return;
+        }
+
         $changeSet = $args->getEntityManager()->getUnitOfWork()->getEntityChangeSet($file);
         if (!empty($changeSet['filename'][0])) {
             $this->deleteFromFilesystem($changeSet['filename'][0]);

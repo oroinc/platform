@@ -64,6 +64,7 @@ class FileConstraintFromEntityFieldConfigValidator extends ConstraintValidator
                     $constraint->getEntityClass(),
                     $constraint->getFieldName()
                 ),
+                'mimeTypesMessage' => 'oro.attachment.mimetypes.invalid_mime_type',
             ]
         );
 

@@ -30,20 +30,15 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class DigitalAssetManagerExtension extends AbstractTypeExtension
 {
-    /** @var AttachmentEntityConfigProviderInterface */
-    private $attachmentEntityConfigProvider;
+    private AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider;
 
-    /** @var EntityClassNameHelper */
-    private $entityClassNameHelper;
+    private EntityClassNameHelper $entityClassNameHelper;
 
-    /** @var PreviewMetadataProviderInterface */
-    private $previewMetadataProvider;
+    private PreviewMetadataProviderInterface $previewMetadataProvider;
 
-    /** @var EntityToIdTransformer */
-    private $digitalAssetToIdTransformer;
+    private EntityToIdTransformer $digitalAssetToIdTransformer;
 
-    /** @var FileReflector */
-    private $fileReflector;
+    private FileReflector $fileReflector;
 
     public function __construct(
         AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider,
@@ -76,13 +71,32 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'dam_widget_enabled' => true,
+            'dam_widget_enabled' => static function (Options $allOptions) {
+                return !$allOptions['isExternalFile'];
+            },
             'dam_widget_route' => 'oro_digital_asset_widget_choose',
             'dam_widget_parameters' => null,
             'validation_groups' => [$this, 'validationGroupsCallback'],
         ]);
 
-        $resolver->setNormalizer('fileOptions', \Closure::fromCallable([$this, 'normalizeFileOptions']));
+        $resolver->addNormalizer('fileOptions', \Closure::fromCallable([$this, 'normalizeFileOptions']), true);
+
+        $resolver->setNormalizer('dam_widget_enabled', static function (Options $allOptions, $option) {
+            if ($allOptions['isExternalFile'] && $option) {
+                throw new \LogicException('Digital Asset Manager cannot be used for external files');
+            }
+
+            return $option;
+        });
+    }
+
+    public function normalizeFileOptions(Options $allOptions, array $option): array
+    {
+        if (!array_key_exists('constraints', $option) && $allOptions['checkEmptyFile']) {
+            $option['constraints'] = [new NotBlank(['groups' => 'DamWidgetDisabled'])];
+        }
+
+        return $option;
     }
 
     public function validationGroupsCallback(FormInterface $form): array
@@ -102,28 +116,15 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
         return $groups;
     }
 
-    public function normalizeFileOptions(Options $allOptions, array $option): array
-    {
-        if (!array_key_exists('required', $option)) {
-            $option['required'] = $allOptions['checkEmptyFile'];
-        }
-
-        if (!array_key_exists('constraints', $option) && $allOptions['checkEmptyFile']) {
-            $option['constraints'] = [new NotBlank(['groups' => 'DamWidgetDisabled'])];
-        }
-
-        if (!array_key_exists('label', $option)) {
-            $option['label'] = 'oro.attachment.file.label';
-        }
-
-        return $option;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        if (!$options['dam_widget_enabled']) {
+            return;
+        }
+
         $builder->add(
             'digitalAsset',
             HiddenType::class,
@@ -164,7 +165,11 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
      */
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
-        if (!array_key_exists('dam_widget', $view->vars) && $options['dam_widget_enabled']) {
+        if (!$options['dam_widget_enabled']) {
+            return;
+        }
+
+        if (!array_key_exists('dam_widget', $view->vars)) {
             $attachmentConfig = $this->getAttachmentConfig($form);
 
             if ($attachmentConfig && $attachmentConfig->is('use_dam')) {
