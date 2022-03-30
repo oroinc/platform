@@ -117,6 +117,11 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
 
         [$class, $method] = $controller;
 
+        // invokable controller given (for example, with the single __invoke method)
+        if (null === $method) {
+            return $defaultValue;
+        }
+
         if (isset($this->controllerAclCheckCache[$class][$method])) {
             return $this->controllerAclCheckCache[$class][$method];
         }
