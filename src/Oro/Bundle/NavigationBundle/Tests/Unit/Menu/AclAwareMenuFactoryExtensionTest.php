@@ -92,35 +92,35 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         return [
             'allowed' => [
                 ['extras' => ['acl_resource_id' => 'test']],
-                true
+                true,
             ],
             'not allowed' => [
                 ['extras' => ['acl_resource_id' => 'test']],
-                false
+                false,
             ],
             'allowed with uri' => [
                 ['uri' => '#', 'extras' => ['acl_resource_id' => 'test']],
-                true
+                true,
             ],
             'not allowed with uri' => [
                 ['uri' => '#', 'extras' => ['acl_resource_id' => 'test']],
-                false
+                false,
             ],
             'allowed with route' => [
                 ['route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
-                true
+                true,
             ],
             'not allowed with route' => [
                 ['route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
-                false
+                false,
             ],
             'allowed with route and uri' => [
                 ['uri' => '#', 'route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
-                true
+                true,
             ],
             'not allowed with route and uri' => [
                 ['uri' => '#', 'route' => 'test', 'extras' => ['acl_resource_id' => 'test']],
-                false
+                false,
             ],
         ];
     }
@@ -161,7 +161,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
             'check access' => [
                 ['check_access_not_logged_in' => true, 'extras' => []],
                 true,
-            ]
+            ],
         ];
     }
 
@@ -259,7 +259,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [''],
-            ['#']
+            ['#'],
         ];
     }
 
@@ -340,19 +340,29 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'allowed with route' => [
-                ['route' => 'route_name'], true, 1
+                ['route' => 'route_name'],
+                true,
+                1,
             ],
             'not allowed with route' => [
-                ['route' => 'route_name'], false, 1
+                ['route' => 'route_name'],
+                false,
+                1,
             ],
             'allowed with route and uri' => [
-                ['uri' => '#', 'route' => 'route_name'], true, 1
+                ['uri' => '#', 'route' => 'route_name'],
+                true,
+                1,
             ],
             'not allowed with route and uri' => [
-                ['uri' => '#', 'route' => 'route_name'], false, 1
+                ['uri' => '#', 'route' => 'route_name'],
+                false,
+                1,
             ],
             'default with route and controller without delimiter' => [
-                ['uri' => '#', 'route' => 'test'], true, 0
+                ['uri' => '#', 'route' => 'test'],
+                true,
+                0,
             ],
         ];
     }
@@ -390,10 +400,12 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     {
         return [
             'allowed with route and uri' => [
-                ['uri' => '/test'], true
+                ['uri' => '/test'],
+                true,
             ],
             'not allowed with route and uri' => [
-                ['uri' => '/test'], false
+                ['uri' => '/test'],
+                false,
             ],
         ];
     }
@@ -458,5 +470,56 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $item = $this->factory->createItem('test', $options);
         $this->assertInstanceOf(MenuItem::class, $item);
         $this->assertTrue($item->getExtra('isAllowed'));
+    }
+
+    /**
+     * @dataProvider optionsInvocableDataProvider
+     */
+    public function testBuildOptionsWithInvokableController(array $options, bool $isAllowed)
+    {
+        $controllerClassProvider = $this->createMock(ControllerClassProvider::class);
+        $controllerClassProvider->expects($this->any())
+            ->method('getControllers')
+            ->willReturn([
+                'route_name' => ['controller'],
+            ]);
+
+        $factoryExtension = new AclAwareMenuFactoryExtension(
+            $this->urlMatcher,
+            $controllerClassProvider,
+            $this->authorizationChecker,
+            $this->classAuthorizationChecker,
+            $this->tokenAccessor,
+            $this->logger
+        );
+
+        $this->factory = new MenuFactory();
+        $this->factory->addExtension($factoryExtension);
+
+        $item = $this->factory->createItem('test', $options);
+        $this->assertInstanceOf(MenuItem::class, $item);
+        $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
+    }
+
+    public function optionsInvocableDataProvider(): array
+    {
+        return [
+            'no access check' => [
+                [
+                    'check_access' => false,
+                ],
+                true,
+            ],
+            'show non authorized' => [
+                [
+                    'extras' => ['show_non_authorized' => true],
+                ],
+                true,
+            ],
+            'default' => [
+                [],
+                false,
+            ],
+        ];
     }
 }
