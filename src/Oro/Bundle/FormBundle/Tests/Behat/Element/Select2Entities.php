@@ -125,6 +125,14 @@ class Select2Entities extends Element implements ClearableInterface
     }
 
     /**
+     * Close search results dropdown
+     */
+    public function close()
+    {
+        $this->getDriver()->keyDown($this->getXpath(), 27);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function clear()
