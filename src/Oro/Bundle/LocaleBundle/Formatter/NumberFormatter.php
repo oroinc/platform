@@ -192,6 +192,10 @@ class NumberFormatter
         array $symbols = [],
         $locale = null
     ) {
+        if ($value === '') {
+            $value = null;
+        }
+
         $formatter = $this->getFormatter($locale, IntlNumberFormatter::DECIMAL, $attributes, $textAttributes, $symbols);
         $formattedValue = $formatter->format($value);
 
