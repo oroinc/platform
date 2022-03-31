@@ -282,7 +282,7 @@
             }
         }
 
-        &.choice-tree-filter {
+        .choice-tree-filter {
             max-width: initial;
 
             .select2-container {
@@ -307,7 +307,7 @@
 
         .ui-dialog-content {
             @include safe-area-offset(padding, $mobile-filter-box-ui-dialog-content-inner-offset);
-            
+
             height: $mobile-filter-box-ui-dialog-content-height;
         }
 
