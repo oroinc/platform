@@ -61,6 +61,8 @@ define(function(require) {
                         $fallback: this.$el.find(this.options.fields[fieldName].fallback)
                     };
 
+                    this.fields[fieldName] = field;
+
                     if (field.$fallback.length) {
                         field.$fallback.on(
                             'change' + this.eventNamespace(),
@@ -73,18 +75,18 @@ define(function(require) {
                             'change' + this.eventNamespace(),
                             this.onChangeInput.bind(this, fieldName)
                         );
+                        // Re-rendering process when enable or disable tinyMCE
+                        field.$input.on('rendered', () => {
+                            this.operateWithEditor(fieldName, editor => {
+                                editor.on('Change', this.onChangeInput.bind(this, fieldName));
+                            });
+                            this.processFallback(fieldName);
+                        });
 
-                        field.editor = tinyMCE.get(field.$input.attr('id'));
-
-                        if (field.editor) {
-                            field.editor.on(
-                                'Change',
-                                this.onChangeInput.bind(this, fieldName)
-                            );
-                        }
+                        this.operateWithEditor(fieldName, editor => {
+                            editor.on('Change', this.onChangeInput.bind(this, fieldName));
+                        });
                     }
-
-                    this.fields[fieldName] = field;
 
                     this.processFallback(fieldName);
                 }
@@ -93,27 +95,43 @@ define(function(require) {
             EmailTemplateLocalizationView.__super__.initialize.call(this, options);
         },
 
+        /**
+         * Do any operations with tinyMCE editor if it is exists
+         * @param fieldName
+         * @param callback
+         * @return {Object|null}
+         */
+        operateWithEditor(fieldName, callback) {
+            const editor = tinyMCE.get(this.fields[fieldName].$input.attr('id'));
+
+            if (editor && typeof callback === 'function') {
+                callback(editor);
+            }
+
+            return editor;
+        },
+
         processFallback: function(fieldName) {
             const field = this.fields[fieldName];
 
             if (this.isFieldFallback(fieldName)) {
                 field.$input.attr('disabled', 'disabled');
 
-                if (field.editor) {
-                    field.editor.setMode('readonly');
-                    $(field.editor.editorContainer).addClass('disabled');
-                    $(field.editor.editorContainer).append('<div class="disabled-overlay"></div>');
-                }
+                this.operateWithEditor(fieldName, editor => {
+                    editor.setMode('readonly');
+                    $(editor.editorContainer).addClass('disabled');
+                    $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
+                });
 
                 mediator.trigger(this.eventToParent('localized-template:field-fallback'), fieldName);
             } else {
                 field.$input.removeAttr('disabled');
 
-                if (field.editor) {
-                    field.editor.setMode('design');
-                    $(field.editor.editorContainer).removeClass('disabled');
-                    $(field.editor.editorContainer).children('.disabled-overlay').remove();
-                }
+                this.operateWithEditor(fieldName, editor => {
+                    editor.setMode('design');
+                    $(editor.editorContainer).removeClass('disabled');
+                    $(editor.editorContainer).children('.disabled-overlay').remove();
+                });
 
                 this.onChangeInput(fieldName);
             }
@@ -131,9 +149,9 @@ define(function(require) {
             if (this.isFieldFallback(fieldName)) {
                 this.fields[fieldName].$input.val(content);
 
-                if (this.fields[fieldName].editor) {
-                    this.fields[fieldName].editor.setContent(content);
-                }
+                this.operateWithEditor(fieldName, editor => {
+                    editor.setContent(content);
+                });
 
                 this.fields[fieldName].$input.change();
             }
