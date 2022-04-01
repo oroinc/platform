@@ -127,6 +127,7 @@ define(function(require) {
             }
 
             this.firstRender = false;
+            this.$el.trigger('rendered', {tinymceConnected: this.tinymceConnected});
             this.trigger('resize');
         },
 
