@@ -1,6 +1,7 @@
 define(function(require, exports, module) {
     'use strict';
 
+    const $ = require('jquery');
     const _ = require('underscore');
     const tools = require('oroui/js/tools');
     const BaseView = require('oroui/js/app/views/base/view');
@@ -16,6 +17,7 @@ define(function(require, exports, module) {
         sidebar: '[data-role="sidebar"]',
         scrollbar: '[data-role="sidebar-content"]',
         content: '[data-role="content"]',
+        controls: '[data-role="sidebar-controls"]',
         resizableSidebar: !tools.isMobile()
     }, config);
 
@@ -26,6 +28,7 @@ define(function(require, exports, module) {
             'sidebar',
             'scrollbar',
             'content',
+            'controls',
             'resizableSidebar'
         ]),
 
@@ -38,6 +41,8 @@ define(function(require, exports, module) {
         scrollbar: config.scrollbar,
 
         content: config.content,
+
+        controls: config.controls,
 
         resizableSidebar: config.resizableSidebar,
 
@@ -67,6 +72,44 @@ define(function(require, exports, module) {
 
             mediator.on('swipe-action-left', this.minimize, this);
             mediator.on('swipe-action-right', this.maximize, this);
+        },
+
+        /**
+         * @inheritdoc
+         */
+        delegateEvents: function(events) {
+            ContentSidebarView.__super__.delegateEvents.call(this, events);
+            $(window).on(`scroll${this.eventNamespace()}`, this.onScroll.bind(this));
+            return this;
+        },
+
+        /**
+         * @inheritdoc
+         */
+        undelegateEvents: function() {
+            $(window).off(`scroll${this.eventNamespace()}`);
+            return ContentSidebarView.__super__.undelegateEvents.call(this);
+        },
+
+        /**
+         * @param {Object} e
+         */
+        onScroll(e) {
+            if (this.$linePattern) {
+                const bottom = $(this.controls)[0].getBoundingClientRect().bottom;
+                const scrollY = window.scrollY;
+                let position = bottom;
+
+                if (scrollY === 0) {
+                // Property will be removed;
+                    position = '';
+                // Element out of screen;
+                } else if (bottom <= 0) {
+                    position = 0;
+                }
+
+                this.$linePattern.css('top', position);
+            }
         },
 
         /**
@@ -110,9 +153,11 @@ define(function(require, exports, module) {
         },
 
         _calculateContentWidth: function() {
-            this.$(this.content).css({
-                width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
-            });
+            if (!_.isMobile()) {
+                this.resizableSidebar && this.$(this.content).css({
+                    width: 'calc(100% - ' + this.$(this.sidebar).outerWidth() + 'px)'
+                });
+            }
         },
 
         _resize: function(event, ui) {
@@ -146,8 +191,29 @@ define(function(require, exports, module) {
 
             this.$(this.sidebar).toggleClass('content-sidebar-minimized', !show);
             this._calculateContentWidth();
+            this.toggleLinePattern(!show);
 
             mediator.execute('changeUrlParam', 'sidebar', show ? null : state);
+        },
+
+        /**
+         * Add or remove sticked block
+         * @param [add]
+         */
+        toggleLinePattern(add) {
+            if (!_.isMobile()) {
+                return;
+            }
+
+            const className = 'line-pattern';
+
+            $(this.controls).find(`.${className}`).remove();
+            delete this.$linePattern;
+
+            if (add) {
+                this.$linePattern = $(`<div class="${className}"></div>`);
+                $(this.controls).append(this.$linePattern);
+            }
         },
 
         /**
@@ -158,6 +224,7 @@ define(function(require, exports, module) {
                 this.pluginManager.dispose();
             }
 
+            this.toggleLinePattern();
             ContentSidebarView.__super__.dispose.call(this);
         }
     });

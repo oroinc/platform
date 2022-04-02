@@ -31,7 +31,7 @@
         margin: 0 auto;
     }
 
-    @media only screen and (max-width: $small-devices-media-breakpoint) {
+    @media only screen and (max-width: $small-landscape-devices-media-breakpoint) {
         .pagination-container {
             width: auto;
         }

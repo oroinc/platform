@@ -262,9 +262,11 @@ define(function(require, exports, module) {
             const defaultLabel = $dropdownToggleLabel.data('dropdownDefaultLabel');
             const currentLabel = $dropdownToggleLabel.html();
             const neededLabel = hiddenActive.length > 0 ? hiddenActive.html() : defaultLabel;
+            const roleAttr = hiddenActive.length > 0 ? hiddenActive.data('role') : null;
 
             if (currentLabel !== neededLabel) {
                 $dropdownToggleLabel.html(neededLabel);
+                $dropdownToggleLabel.attr('data-role', roleAttr);
 
                 if (neededLabel !== defaultLabel) {
                     $dropdownToggleLabel.closest('a').addClass('active');
