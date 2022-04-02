@@ -1,6 +1,7 @@
 import _ from 'underscore';
 import BasePlugin from 'oroui/js/app/plugins/base/plugin';
 import CellLinkView from 'orodatagrid/js/datagrid/cell-link';
+import {isTouchDevice} from 'oroui/js/tools';
 
 const CellLinksPlugin = BasePlugin.extend({
     constructor: function CellLinksPlugin(...args) {
@@ -45,8 +46,18 @@ const CellLinksPlugin = BasePlugin.extend({
                 this.rowUrl = clickRowActionLink ? this.model.get(clickRowActionLink) : false;
 
                 if (this.rowUrl) {
-                    this.$el.on(`mouseenter${this.eventNamespace()}`, this.onMouseEnter.bind(this));
-                    this.$el.on(`mouseleave${this.eventNamespace()}`, this.onMouseLeave.bind(this));
+                    if (!isTouchDevice()) {
+                        this.$el.on(`mouseenter${this.eventNamespace()}`, this.createCellLinkView.bind(this));
+                        this.$el.on(`mouseleave${this.eventNamespace()}`, this.destroyCellLinkView.bind(this));
+                    } else {
+                        this.createCellLinkView = _.debounce(this.createCellLinkView.bind(this), 50);
+                        this.destroyCellLinkView = _.debounce(this.destroyCellLinkView.bind(this), 50);
+                        this.$el.on(`touchstart${this.eventNamespace()}`, this.createCellLinkView.bind(this));
+                        this.$el.on(
+                            `touchend${this.eventNamespace()} touchcancel${this.eventNamespace()}`,
+                            this.destroyCellLinkView.bind(this)
+                        );
+                    }
                     this.listenTo(this, 'before-enter-edit-mode', this.disposeCellLink.bind(this));
                 }
             },
@@ -55,8 +66,8 @@ const CellLinksPlugin = BasePlugin.extend({
                 return !_.isUndefined(this.skipRowClick) && this.skipRowClick;
             },
 
-            onMouseEnter() {
-                if (this.inEditMode()) {
+            createCellLinkView(event) {
+                if (this.inEditMode() || (event.type === 'touchstart' && event.target.tagName === 'A')) {
                     return;
                 }
 
@@ -66,7 +77,7 @@ const CellLinksPlugin = BasePlugin.extend({
                 }));
             },
 
-            onMouseLeave() {
+            destroyCellLinkView() {
                 this.disposeCellLink();
             },
 
