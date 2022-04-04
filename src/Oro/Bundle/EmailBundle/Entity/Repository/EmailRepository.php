@@ -201,6 +201,7 @@ class EmailRepository extends EntityRepository
      * @param int $batchSize
      *
      * @return Email[]
+     * @deprecated
      */
     public function getEmailsWithoutBody($batchSize)
     {
@@ -212,6 +213,25 @@ class EmailRepository extends EntityRepository
             ->orderBy('email.sentAt', 'DESC')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * Get emails with empty body and at not synced body state
+
+     * @return array [email_id, ...]
+     */
+    public function getEmailIdsWithoutBody(int $batchSize): array
+    {
+        $data = $this->createQueryBuilder('email')
+            ->select('email.id as id')
+            ->where('email.emailBody is null')
+            ->andWhere('email.bodySynced = false or email.bodySynced is null')
+            ->setMaxResults($batchSize)
+            ->orderBy('email.sentAt', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_column($data, 'id');
     }
 
     /**
