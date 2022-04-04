@@ -26,42 +26,67 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testCheckConnection(): void
     {
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('connect');
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('isConnected')
             ->willReturn(true);
 
-        $this->assertTrue($this->checker->checkConnection());
+        self::assertTrue($this->checker->checkConnection());
     }
 
     public function testWsConnectedFail(): void
     {
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('connect');
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
 
-        $this->assertFalse($this->checker->checkConnection());
+        self::assertFalse($this->checker->checkConnection());
+    }
+
+    /**
+     * @dataProvider notInstalledDataProvider
+     */
+    public function testWsConnectedExceptionWhenNotInstalled(?bool $installed): void
+    {
+        $exception = new \Exception('sample message');
+        $this->client->expects(self::once())
+            ->method('connect')
+            ->willThrowException($exception);
+        $this->client->expects(self::never())
+            ->method('isConnected');
+        $this->loggerMock->expects(self::never())
+            ->method(self::anything());
+
+        $this->checker->setApplicationInstalled($installed);
+
+        self::assertFalse($this->checker->checkConnection());
+    }
+
+    public function notInstalledDataProvider(): array
+    {
+        return [[null], [false]];
     }
 
     public function testWsConnectedException(): void
     {
         $exception = new \Exception('sample message');
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('connect')
             ->willThrowException($exception);
-        $this->client->expects($this->never())
+        $this->client->expects(self::never())
             ->method('isConnected');
-        $this->loggerMock
-            ->expects(self::once())
-            ->method('warning')
+        $this->loggerMock->expects(self::once())
+            ->method('error')
             ->with(
                 'Failed to connect to websocket server: {message}',
                 ['message' => $exception->getMessage(), 'e' => $exception]
             );
 
-        $this->assertFalse($this->checker->checkConnection());
+        $this->checker->setApplicationInstalled(true);
+
+        self::assertFalse($this->checker->checkConnection());
     }
 }
