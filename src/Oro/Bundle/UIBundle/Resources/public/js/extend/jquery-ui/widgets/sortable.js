@@ -46,8 +46,14 @@ $.widget('ui.sortable', $.ui.sortable, {
      * @param {Object} event The widget element's touchstart event
      */
     _touchStart: function(event) {
+        // Prevents interactions from starting on specified elements.
+        // options.cancel is selector like: 'a, input, .btn, select'
+        const elIsCancel = typeof this.options.cancel === 'string' && event.target.nodeName
+            ? $(event.target).closest(this.options.cancel).length
+            : false;
+
         // Ignore the event if another widget is already being handled
-        if (touchHandled || !this._mouseCapture(event.originalEvent.changedTouches[0])) {
+        if (touchHandled || elIsCancel || !this._mouseCapture(event.originalEvent.changedTouches[0])) {
             return;
         }
 

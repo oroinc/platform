@@ -197,6 +197,24 @@ class EmailSyncNotificationAlert implements NotificationAlertInterface
     }
 
     /**
+     * Creates a notification alert object that represents a failure during save the email body data.
+     */
+    public static function createForSaveItemBodyFail(
+        int     $itemId,
+        ?string $message = null
+    ): EmailSyncNotificationAlert {
+        $item = new EmailSyncNotificationAlert();
+        $item->alertType = self::ALERT_TYPE_SYNC;
+        $item->operation = self::OPERATION_IMPORT_BODY;
+        $item->step = self::STEP_CONVERT;
+        $item->id = UUIDGenerator::v4();
+        $item->message = $message;
+        $item->additionalInfo['emailId'] = $itemId;
+
+        return $item;
+    }
+
+    /**
      * Creates a notification alert object that represents a failure during converting email data to the email object.
      */
     public static function createForConvertFailed(
