@@ -17,6 +17,9 @@ use Psr\Log\LoggerAwareTrait;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Synchronizer that syncs the email body data.
+ */
 class EmailBodySynchronizer implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
@@ -33,12 +36,12 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     /** @var array */
     protected $emailBodyLoaders = [];
 
-    /** @var EntityManager */
+    /**
+     * @var EntityManager
+     * @deprecated
+     */
     protected $manager = null;
 
-    /**
-     * EmailBodySynchronizer constructor.
-     */
     public function __construct(
         EmailBodyLoaderSelector $selector,
         ManagerRegistry $doctrine,
@@ -50,12 +53,8 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     }
 
     /**
-     * Syncs email body for one email
-     *
-     * @param Email $email
-     * @param bool $forceSync
-     *
-     * @throws LoadEmailBodyFailedException
+     * Syncs email body for one email.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function syncOneEmailBody(Email $email, $forceSync = false)
     {
@@ -70,30 +69,39 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                         list($bodyLoaded, $emailBodyChanged) = $this->loadBody($email, $forceSync, $origin, $folder);
                         if ($emailBodyChanged) {
                             $event = new EmailBodyAdded($email);
-                            $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
+                            try {
+                                $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
+                            } catch (\Exception $e) {
+                                $bodyLoaded = false;
+                                $this->processFailedDuringSaveEmail($email, $e);
+                            }
                             break 2;
                         }
                     }
                 }
             }
-            $email->setBodySynced(true);
-            $em->persist($email);
-            $em->flush($email);
             if (!$bodyLoaded) {
-                throw new LoadEmailBodyFailedException($email);
+                $this->updateBodySyncedStateForEntity($email);
+            } else {
+                $email->setBodySynced(true);
+                try {
+                    $em->persist($email);
+                    $em->flush($email);
+                    $this->logger->notice(
+                        sprintf('The "%s" (ID: %d) email body was synced.', $email->getSubject(), $email->getId())
+                    );
+                } catch (\Exception $e) {
+                    $this->processFailedDuringSaveEmail($email, $e);
+                }
             }
         }
     }
 
     /**
-     * Syncs email bodies
-     *
-     * @param int $maxExecTimeInMin
-     * @param int $batchSize
+     * Syncs email bodies.
      */
     public function sync($maxExecTimeInMin = -1, $batchSize = 10)
     {
-        $repo           = $this->doctrine->getRepository('OroEmailBundle:Email');
         $maxExecTimeout = $maxExecTimeInMin > 0
             ? new \DateInterval('PT' . $maxExecTimeInMin . 'M')
             : false;
@@ -109,8 +117,8 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 }
             }
 
-            $emails = $repo->getEmailsWithoutBody($batchSize);
-            if (count($emails) === 0) {
+            $emailIds = $this->doctrine->getRepository('OroEmailBundle:Email')->getEmailIdsWithoutBody($batchSize);
+            if (count($emailIds) === 0) {
                 $this->logger->info('All emails was processed');
                 break;
             }
@@ -118,17 +126,10 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             $batchStartTime = new \DateTime('now', new \DateTimeZone('UTC'));
 
             /** @var Email $email */
-            foreach ($emails as $email) {
-                try {
-                    $this->syncOneEmailBody($email);
-                    $this->logger->notice(
-                        sprintf('The "%s" (ID: %d) email body was synced.', $email->getSubject(), $email->getId())
-                    );
-                } catch (\Exception $e) {
-                    // in case of exception, we should save state that email body was synced.
-                    $this->getManager()->persist($email);
-                    continue;
-                }
+            foreach ($emailIds as $emailId) {
+                $em = $this->getManager();
+                $email = $em->find(Email::class, $emailId);
+                $this->syncOneEmailBody($email);
             }
             $this->getManager()->clear();
 
@@ -143,11 +144,15 @@ class EmailBodySynchronizer implements LoggerAwareInterface
      */
     protected function getManager()
     {
-        if (!$this->manager) {
-            $this->manager = $this->doctrine->getManager();
+        $manager = $this->doctrine->getManager();
+        if (!$manager->isOpen()) {
+            $manager = $this->doctrine->resetManager();
+            $manager->clear();
+
+            return $manager;
         }
 
-        return $this->manager;
+        return $manager;
     }
 
     /**
@@ -195,7 +200,6 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         try {
             $emailBody = $loader->loadEmailBody($folder, $email, $em);
             $bodyLoaded = true;
-            $em->refresh($email);
             // double check
             if ($this->isBodyNotLoaded($email, $forceSync)) {
                 $email->setEmailBody($emailBody);
@@ -204,7 +208,7 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         } catch (EmailBodyNotFoundException $e) {
             $this->logger->notice(
                 sprintf(
-                    'Attempt to load email body failed. Email id: %d. Error: %s',
+                    'Attempt to load email body from remote server failed. Email id: %d. Error: %s',
                     $email->getId(),
                     $e->getMessage()
                 ),
@@ -241,5 +245,24 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         }
 
         return [$bodyLoaded, $emailBodyChanged];
+    }
+
+    private function updateBodySyncedStateForEntity(Email $email)
+    {
+        // in case of exception during the entity save, we should save state that email body was synced
+        // to prevent sync degradation in time.
+        $em = $this->getManager();
+        $tableName = $em->getClassMetadata(Email::class)->getTableName();
+        $connection = $em->getConnection();
+        $connection->update($tableName, ['body_synced' => true], ['id' => $email->getId()]);
+    }
+
+    private function processFailedDuringSaveEmail(Email $email, \Exception $exception)
+    {
+        $this->updateBodySyncedStateForEntity($email);
+        $this->logger->info(
+            sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $exception->getMessage()),
+            ['exception' => $exception]
+        );
     }
 }
