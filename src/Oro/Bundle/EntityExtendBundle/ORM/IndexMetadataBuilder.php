@@ -52,7 +52,9 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
             if (\is_a(Type::getType($fieldConfig->getId()->getFieldType()), JsonType::class, true)) {
                 continue;
             }
-            if ($indexType && !$fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+
+            $fieldState = $fieldConfig->get('state');
+            if ($indexType && !in_array($fieldState, [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
                 $indexName = $this->nameGenerator->generateIndexNameForExtendFieldVisibleInGrid(
                     $className,
                     $columnName
