@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Client;
 
+use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -15,10 +16,17 @@ class ConnectionChecker implements LoggerAwareInterface
 
     private WebsocketClientInterface $client;
 
+    private ?ApplicationState $applicationState = null;
+
     public function __construct(WebsocketClientInterface $client)
     {
         $this->client = $client;
         $this->logger = new NullLogger();
+    }
+
+    public function setApplicationState(ApplicationState $applicationState): void
+    {
+        $this->applicationState = $applicationState;
     }
 
     /**
@@ -29,10 +37,14 @@ class ConnectionChecker implements LoggerAwareInterface
         try {
             $this->client->connect();
         } catch (\Throwable $exception) {
-            $this->logger->warning(
-                'Failed to connect to websocket server: {message}',
-                ['message' => $exception->getMessage(), 'e' => $exception]
-            );
+            if ($this->applicationState instanceof ApplicationState
+                && $this->applicationState->isInstalled()
+            ) {
+                $this->logger->error(
+                    'Failed to connect to websocket server: {message}',
+                    ['message' => $exception->getMessage(), 'e' => $exception]
+                );
+            }
 
             return false;
         }

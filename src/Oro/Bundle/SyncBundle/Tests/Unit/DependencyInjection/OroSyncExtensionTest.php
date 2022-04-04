@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection;
 
+use Monolog\Logger;
 use Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,7 +12,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loadExceptionProvider
      */
-    public function testLoadException(string $param, mixed $value, string $expected)
+    public function testLoadException(string $param, mixed $value, string $expected): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expected);
@@ -30,29 +31,29 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
                 'param' => OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT,
                 'value' => 'unknown',
                 'expected' => 'Transport "unknown" is not available, please run stream_get_transports() to verify ' .
-                    'the list of registered transports.'
+                    'the list of registered transports.',
             ],
             'context options' => [
                 'param' => OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS,
                 'value' => ['param' => 'unknown'],
                 'expected' => 'Unknown socket context option "param". Only SSL context options ' .
-                    '(http://php.net/manual/en/context.ssl.php) are allowed.'
+                    '(http://php.net/manual/en/context.ssl.php) are allowed.',
             ],
             'context options with invalid value' => [
                 'param' => OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS,
                 'value' => ['verify_peer' => 'unknown'],
-                'expected' => 'Invalid type "string" of socket context option "verify_peer", expected "boolean" type.'
-            ]
+                'expected' => 'Invalid type "string" of socket context option "verify_peer", expected "boolean" type.',
+            ],
         ];
     }
 
     /**
-     * @dataProvider loadDataProvider
+     * @dataProvider loadWebsocketConnectionParametersDataProvider
      */
-    public function testLoad(array $params, array $expected)
+    public function testLoadWebsocketConnectionParameters(array $params, array $expected): void
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.bundles', ['MonologBundle']);
+        $container->setParameter('kernel.debug', false);
 
         foreach ($params as $name => $value) {
             $container->setParameter($name, $value);
@@ -80,79 +81,140 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
         ];
         $configurationParams = array_intersect_key($configurationParams, array_flip($websocketParams));
 
-        $this->assertEquals($expected, $configurationParams);
+        self::assertEquals($expected, $configurationParams);
     }
 
-    public function loadDataProvider(): array
+    public function loadWebsocketConnectionParametersDataProvider(): array
     {
         return [
             [
-                'params'   => [],
+                'params' => [],
                 'expected' => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT => 'tcp',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => []
-                ]
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => [],
+                ],
             ],
             [
-                'params'   => [
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '8080',
+                'params' => [
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT => '8080',
                 ],
                 'expected' => [
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT => '8080',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT => 'tcp',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => []
-                ]
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => [],
+                ],
             ],
             [
-                'params'   => [
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  => '8080',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH  => '',
+                'params' => [
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH => '',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT => 'ssl',
                 ],
                 'expected' => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT => '8080',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH => '',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_PORT     => '8080',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_PORT => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT => '8080',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PATH => '',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT => '8080',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => '',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT => 'ssl',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => []
-                ]
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => [],
+                ],
             ],
             [
-                'params'   => [
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT  => '8080',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH  => '',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '1.1.1.1',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '1010',
+                'params' => [
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH => '',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST => '1.1.1.1',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT => '1010',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => 'websocket',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => ['peer_name' => 'name']
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => ['peer_name' => 'name'],
                 ],
                 'expected' => [
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_HOST => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PORT => '8080',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_DEFAULT_PATH => '',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS  => '0.0.0.0',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_PORT     => '8080',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST  => '1.1.1.1',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT  => '1010',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_ADDRESS => '0.0.0.0',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BIND_PORT => '8080',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_HOST => '1.1.1.1',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PORT => '1010',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_HOST => '0.0.0.0',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PORT => '8080',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PATH  => '',
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_PATH => '',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_FRONTEND_PATH => 'websocket',
                     OroSyncExtension::CONFIG_PARAM_WEBSOCKET_BACKEND_TRANSPORT => 'tcp',
-                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => ['peer_name' => 'name']
-                ]
+                    OroSyncExtension::CONFIG_PARAM_WEBSOCKET_SSL_CONTEXT_OPTIONS => ['peer_name' => 'name'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider loadPrependsMonologConfigDataProvider
+     */
+    public function testLoadPrependsMonologConfig(bool $isDebug, array $expectedVerbosityLevels): void
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', $isDebug);
+
+        $extension = new OroSyncExtension();
+        $extension->load([], $container);
+
+        self::assertEquals([
+            [
+                'channels' => ['oro_websocket'],
+                'handlers' => [
+                    'websocket' => [
+                        'type' => 'console',
+                        'verbosity_levels' => $expectedVerbosityLevels,
+                        'channels' => [
+                            'type' => 'inclusive',
+                            'elements' => ['oro_websocket', 'websocket'],
+                        ],
+                        'priority' => 512,
+                    ],
+                ],
+            ],
+        ], $container->getExtensionConfig('monolog'));
+
+        self::assertEquals(
+            ['monolog.handler.websocket', null, 0],
+            $container->getDefinition('oro_sync.log.handler.websocket_server_console')
+                ->getDecoratedService()
+        );
+    }
+
+    public function loadPrependsMonologConfigDataProvider(): array
+    {
+        return [
+            [
+                'isDebug' => false,
+                'expectedVerbosityLevels' => [
+                    'VERBOSITY_QUIET' => Logger::ERROR,
+                    'VERBOSITY_NORMAL' => Logger::WARNING,
+                    'VERBOSITY_VERBOSE' => Logger::NOTICE,
+                    'VERBOSITY_VERY_VERBOSE' => Logger::INFO,
+                    'VERBOSITY_DEBUG' => Logger::DEBUG,
+                ],
+            ],
+            [
+                'isDebug' => true,
+                'expectedVerbosityLevels' => [
+                    'VERBOSITY_QUIET' => Logger::ERROR,
+                    'VERBOSITY_NORMAL' => Logger::INFO,
+                    'VERBOSITY_VERBOSE' => Logger::DEBUG,
+                    'VERBOSITY_VERY_VERBOSE' => Logger::DEBUG,
+                    'VERBOSITY_DEBUG' => Logger::DEBUG,
+                ],
             ],
         ];
     }
