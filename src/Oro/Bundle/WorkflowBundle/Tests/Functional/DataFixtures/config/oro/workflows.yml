@@ -296,6 +296,9 @@ workflows:
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         priority: 70
         start_step: starting_point
+        attributes:
+            sample_attribute:
+                type: string
         steps:
             starting_point:
                 order: -1
