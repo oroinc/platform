@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
@@ -34,7 +35,7 @@ class DebugWorkflowDefinitionsCommand extends Command
         'Priority',
         'Applications',
         'Exclusive Active Group',
-        'Exclusive Record Groups'
+        'Exclusive Record Groups',
     ];
 
     private ManagerRegistry $doctrine;
@@ -67,8 +68,7 @@ Use <info>--workflow-name</info> option to display the definition of a specific 
 
 HELP
             )
-            ->addUsage('--workflow-name=<workflow-name>')
-        ;
+            ->addUsage('--workflow-name=<workflow-name>');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -110,7 +110,7 @@ HELP
                     (int)$workflow->getPriority(),
                     $applications,
                     $activeGroups,
-                    $recordGroups
+                    $recordGroups,
                 ];
                 $table->addRow($row);
             }
@@ -136,7 +136,7 @@ HELP
                 'steps_display_ordered' => $workflow->isStepsDisplayOrdered(),
                 'priority' => $workflow->getPriority() ?: 0,
                 'defaults' => ['active' => $workflow->isActive()],
-                WorkflowConfiguration::NODE_APPLICATIONS => $workflow->getApplications()
+                WorkflowConfiguration::NODE_APPLICATIONS => $workflow->getApplications(),
             ];
 
             $startStep = $workflow->getStartStep();
@@ -161,31 +161,57 @@ HELP
             $output->write(Yaml::dump($definition, self::INLINE_DEPTH), true);
 
             return 0;
-        } else {
-            $output->writeln('No workflow definitions found.');
-
-            return 1;
         }
+
+        $output->writeln('No workflow definitions found.');
+
+        return 1;
     }
 
     /**
-     * Clear "label" and "message" options from configuration
+     * Clears parameters containing translation keys.
+     * Clears init context parameters on the top level because they are redundant.
      */
-    protected function clearConfiguration(array &$array): void
+    protected function clearConfiguration(array &$config): void
     {
-        foreach ($array as $key => &$value) {
-            if (\is_array($value)) {
-                $countBefore = \count($value);
-                $this->clearConfiguration($value);
-                if (empty($value) && $countBefore) {
-                    $array[$key] = null;
+        $this->removeTranslationKeys($config);
+
+        // Keys that are no present in {@see WorkflowConfiguration}, but added
+        // by Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder::processInitContext.
+        $initContextKeys = [
+            WorkflowConfiguration::NODE_INIT_ENTITIES,
+            WorkflowConfiguration::NODE_INIT_ROUTES,
+            WorkflowConfiguration::NODE_INIT_DATAGRIDS,
+        ];
+        foreach ($initContextKeys as $keyToRemove) {
+            unset($config[$keyToRemove]);
+        }
+    }
+
+    private function removeTranslationKeys(array &$config): void
+    {
+        // The parameters containing translation keys must be removed because they are generated during workflow import.
+        $sections = [
+            WorkflowConfiguration::NODE_STEPS => ['label'],
+            WorkflowConfiguration::NODE_ATTRIBUTES => ['label'],
+            WorkflowConfiguration::NODE_TRANSITIONS => ['label', 'message', 'button_label', 'button_title'],
+        ];
+
+        foreach ($sections as $section => $keysToRemove) {
+            foreach ($config[$section] as &$item) {
+                foreach ($keysToRemove as $keyToRemove) {
+                    unset($item[$keyToRemove]);
                 }
             }
-            if (\is_string($key)
-                && \in_array(\strtolower($key), ['label', 'message', 'button_label', 'button_title'], true)
-            ) {
-                unset($array[$key]);
+        }
+        unset($item);
+
+        if (isset($config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS])) {
+            $variableDefinitions =& $config[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
+            foreach ($variableDefinitions[WorkflowConfiguration::NODE_VARIABLES] as &$item) {
+                unset($item['label'], $item['options']['form_options']['tooltip']);
             }
+            unset($item);
         }
     }
 
