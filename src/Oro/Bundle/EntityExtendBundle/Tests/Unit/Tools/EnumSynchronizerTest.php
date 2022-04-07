@@ -30,20 +30,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationHelper;
+    private ConfigTranslationHelper|\PHPUnit\Framework\MockObject\MockObject $translationHelper;
 
-    /** @var EnumSynchronizer */
-    private $synchronizer;
+    private EnumSynchronizer $synchronizer;
 
     protected function setUp(): void
     {
@@ -63,7 +58,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testSyncNoChanges(string $enumType)
+    public function testSyncNoChanges(string $enumType): void
     {
         $config1 = new Config(new EntityConfigId('extend', 'Test\Entity1'));
         $config1->set('is_extend', true);
@@ -89,13 +84,13 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('getProvider')
             ->willReturnMap([
                 ['extend', $extendConfigProvider],
-                ['enum', $enumConfigProvider]
+                ['enum', $enumConfigProvider],
             ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->withConsecutive([null], [$config1->getId()->getClassName()])
             ->willReturnOnConsecutiveCalls($configs, $fieldConfigs);
-        $enumConfigProvider->expects($this->once())
+        $enumConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity1', 'field1')
             ->willReturn($enumFieldConfig1);
@@ -110,7 +105,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
 
-        $synchronizer->expects($this->never())
+        $synchronizer->expects(self::never())
             ->method('updateEnumFieldConfig');
 
         $synchronizer->sync();
@@ -119,7 +114,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testSyncForAlreadySynchronizedField(string $enumType)
+    public function testSyncForAlreadySynchronizedField(string $enumType): void
     {
         $enumCode = 'test_enum';
 
@@ -135,17 +130,17 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('getProvider')
             ->willReturnMap([
                 ['extend', $extendConfigProvider],
-                ['enum', $enumConfigProvider]
+                ['enum', $enumConfigProvider],
             ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->withConsecutive([null], [$entityConfig->getId()->getClassName()])
             ->willReturnOnConsecutiveCalls([$entityConfig], [$fieldConfig]);
-        $enumConfigProvider->expects($this->once())
+        $enumConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity1', 'field1')
             ->willReturn($enumFieldConfig);
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('persist');
 
         $synchronizer = $this->getMockBuilder(EnumSynchronizer::class)
@@ -158,11 +153,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
 
-        $synchronizer->expects($this->never())
+        $synchronizer->expects(self::never())
             ->method('applyEnumNameTrans');
-        $synchronizer->expects($this->never())
+        $synchronizer->expects(self::never())
             ->method('applyEnumOptions');
-        $synchronizer->expects($this->never())
+        $synchronizer->expects(self::never())
             ->method('applyEnumEntityOptions');
 
         $synchronizer->sync();
@@ -171,7 +166,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider enumTypeProvider
      */
-    public function testSyncForNewField(string $enumType)
+    public function testSyncForNewField(string $enumType): void
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum';
@@ -201,20 +196,20 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('getProvider')
             ->willReturnMap([
                 ['extend', $extendConfigProvider],
-                ['enum', $enumConfigProvider]
+                ['enum', $enumConfigProvider],
             ]);
         $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->withConsecutive([null], [$entityConfig->getId()->getClassName()])
             ->willReturnOnConsecutiveCalls([$entityConfig], [$fieldConfig]);
-        $enumConfigProvider->expects($this->once())
+        $enumConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity1', 'field1')
             ->willReturn($enumFieldConfig);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($enumFieldConfig));
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('flush');
 
         $synchronizer = $this->getMockBuilder(EnumSynchronizer::class)
@@ -227,36 +222,36 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ])
             ->getMock();
 
-        $synchronizer->expects($this->once())
+        $synchronizer->expects(self::once())
             ->method('applyEnumNameTrans')
             ->with($enumCode, $enumName, $locale);
-        $synchronizer->expects($this->once())
+        $synchronizer->expects(self::once())
             ->method('applyEnumOptions')
             ->with($enumValueClassName, $enumOptions, $locale);
-        $synchronizer->expects($this->once())
+        $synchronizer->expects(self::once())
             ->method('applyEnumEntityOptions')
             ->with($enumValueClassName, $enumPublic, false);
 
         $synchronizer->sync();
 
-        $this->assertEquals($expectedEnumFieldConfig, $enumFieldConfig);
+        self::assertEquals($expectedEnumFieldConfig, $enumFieldConfig);
     }
 
     public function enumTypeProvider(): array
     {
         return [
             ['enum'],
-            ['multiEnum']
+            ['multiEnum'],
         ];
     }
 
-    public function testApplyEnumNameTransNoChanges()
+    public function testApplyEnumNameTransNoChanges(): void
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum';
         $locale = 'fr';
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -266,16 +261,16 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($enumName);
 
-        $this->doctrine->expects($this->never())
+        $this->doctrine->expects(self::never())
             ->method('getManagerForClass');
-        $this->translationHelper->expects($this->never())
+        $this->translationHelper->expects(self::never())
             ->method('saveTranslations')
             ->with([]);
 
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
     }
 
-    public function testApplyEnumNameTransEnumNameChanged()
+    public function testApplyEnumNameTransEnumNameChanged(): void
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum New';
@@ -283,7 +278,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $oldEnumName = 'Test Enum';
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -293,7 +288,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($oldEnumName);
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('saveTranslations')
             ->with([
                 ExtendHelper::getEnumTranslationKey('label', $enumCode) => $enumName,
@@ -304,13 +299,13 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
     }
 
-    public function testApplyEnumNameTransNoTrans()
+    public function testApplyEnumNameTransNoTrans(): void
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum New';
         $locale = 'fr';
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -320,7 +315,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(ExtendHelper::getEnumTranslationKey('label', $enumCode));
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('saveTranslations')
             ->with([
                 ExtendHelper::getEnumTranslationKey('label', $enumCode) => $enumName,
@@ -331,13 +326,13 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
     }
 
-    public function testApplyEnumNameTransNoTransForDefaultLocale()
+    public function testApplyEnumNameTransNoTransForDefaultLocale(): void
     {
         $enumCode = 'test_enum';
         $enumName = 'Test Enum New';
         $locale = Translator::DEFAULT_LOCALE;
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with(
                 ExtendHelper::getEnumTranslationKey('label', $enumCode),
@@ -347,7 +342,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn(ExtendHelper::getEnumTranslationKey('label', $enumCode));
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('saveTranslations')
             ->with([
                 ExtendHelper::getEnumTranslationKey('label', $enumCode) => $enumName,
@@ -358,7 +353,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumNameTrans($enumCode, $enumName, $locale);
     }
 
-    public function testApplyEnumEntityOptionsWithEmptyClassName()
+    public function testApplyEnumEntityOptionsWithEmptyClassName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$enumValueClassName must not be empty.');
@@ -366,7 +361,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumEntityOptions('', false);
     }
 
-    public function testApplyEnumEntityOptionsNoChanges()
+    public function testApplyEnumEntityOptionsNoChanges(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $isPublic = true;
@@ -375,21 +370,21 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $enumConfig->set('public', $isPublic);
 
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('enum')
             ->willReturn($enumConfigProvider);
-        $enumConfigProvider->expects($this->once())
+        $enumConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with($enumValueClassName)
             ->willReturn($enumConfig);
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('persist');
 
         $this->synchronizer->applyEnumEntityOptions($enumValueClassName, $isPublic);
     }
 
-    public function testApplyEnumEntityOptionsNoFlush()
+    public function testApplyEnumEntityOptionsNoFlush(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $isPublic = false;
@@ -398,29 +393,29 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $enumConfig->set('public', !$isPublic);
 
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('enum')
             ->willReturn($enumConfigProvider);
-        $enumConfigProvider->expects($this->once())
+        $enumConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with($enumValueClassName)
             ->willReturn($enumConfig);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($enumConfig));
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('flush');
 
         $this->synchronizer->applyEnumEntityOptions($enumValueClassName, $isPublic, false);
 
-        $this->assertEquals(
+        self::assertEquals(
             $isPublic,
             $enumConfig->get('public')
         );
     }
 
-    public function testApplyEnumEntityOptions()
+    public function testApplyEnumEntityOptions(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $isPublic = true;
@@ -428,29 +423,29 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $enumConfig = new Config(new EntityConfigId('enum', $enumValueClassName));
 
         $enumConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getProvider')
             ->with('enum')
             ->willReturn($enumConfigProvider);
-        $enumConfigProvider->expects($this->once())
+        $enumConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with($enumValueClassName)
             ->willReturn($enumConfig);
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($enumConfig));
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('flush');
 
         $this->synchronizer->applyEnumEntityOptions($enumValueClassName, $isPublic);
 
-        $this->assertEquals(
+        self::assertEquals(
             $isPublic,
             $enumConfig->get('public')
         );
     }
 
-    public function testApplyEnumOptionsWithEmptyClassName()
+    public function testApplyEnumOptionsWithEmptyClassName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$enumValueClassName must not be empty.');
@@ -458,7 +453,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumOptions('', [], 'en');
     }
 
-    public function testApplyEnumOptionsWithEmptyLocale()
+    public function testApplyEnumOptionsWithEmptyLocale(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$locale must not be empty.');
@@ -466,7 +461,7 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->applyEnumOptions('Test\EnumValue', [], null);
     }
 
-    public function testApplyEnumOptionsEmpty()
+    public function testApplyEnumOptionsEmpty(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
@@ -475,93 +470,93 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $values = [];
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
         $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('flush');
-        $this->translationHelper->expects($this->never())
+        $this->translationHelper->expects(self::never())
             ->method('invalidateCache');
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
     }
 
-    public function testApplyEnumOptionsTransactionError()
+    public function testApplyEnumOptionsTransactionError(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
 
         $values = [
-            new TestEnumValue('opt1', 'Option 1', 1, true)
+            new TestEnumValue('opt1', 'Option 1', 1, true),
         ];
 
         $em = $this->createMock(EntityManager::class);
         $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('commit');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('rollback');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush')
             ->willThrowException(new \Exception());
 
         $this->expectException(\Exception::class);
-        $this->translationHelper->expects($this->never())
+        $this->translationHelper->expects(self::never())
             ->method('invalidateCache');
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, [], $locale);
     }
 
-    public function testApplyEnumOptionsNoChanges()
+    public function testApplyEnumOptionsNoChanges(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
 
         $enumOptions = [
-            ['id' => 'opt1', 'label' => 'Option 1', 'priority' => 1, 'is_default' => true]
+            ['id' => 'opt1', 'label' => 'Option 1', 'priority' => 1, 'is_default' => true],
         ];
         $values = [
-            new TestEnumValue('opt1', 'Option 1', 1, true)
+            new TestEnumValue('opt1', 'Option 1', 1, true),
         ];
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
         $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('flush');
-        $this->translationHelper->expects($this->never())
+        $this->translationHelper->expects(self::never())
             ->method('invalidateCache');
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
     }
 
-    public function testApplyEnumOptions()
+    public function testApplyEnumOptions(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
@@ -583,52 +578,52 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $values = [$value1, $value2, $value3, $value5];
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('remove')
             ->with($this->identicalTo($value3));
-        $enumRepo->expects($this->once())
+        $enumRepo->expects(self::once())
             ->method('createEnumValue')
             ->with('Option 4', 4, true, 'option_4')
             ->willReturn($newValue);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($newValue));
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
 
         $em->expects($this->exactly(2))
             ->method('flush');
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('invalidateCache')
             ->with($locale);
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
 
         $expectedValue1 = new TestEnumValue('opt1', 'Option 1', 1, true);
-        $this->assertEquals($expectedValue1, $value1);
+        self::assertEquals($expectedValue1, $value1);
         $expectedValue2 = new TestEnumValue('opt2', 'Option 2', 2, false);
         $expectedValue2->setLocale($locale);
-        $this->assertEquals($expectedValue2, $value2);
+        self::assertEquals($expectedValue2, $value2);
         $expectedValue5 = new TestEnumValue('opt5', 'Option 5', 3, false);
         $expectedValue5->setLocale($locale);
-        $this->assertEquals($expectedValue5, $value5);
+        self::assertEquals($expectedValue5, $value5);
         $expectedNewValue = new TestEnumValue('opt4', 'Option 4', 4, true);
         $expectedNewValue->setLocale($locale);
-        $this->assertEquals($expectedNewValue, $newValue);
+        self::assertEquals($expectedNewValue, $newValue);
     }
 
-    public function testApplyEnumOptionsOptionsInDifferentCase()
+    public function testApplyEnumOptionsOptionsInDifferentCase(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
@@ -644,46 +639,46 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $values = [$value];
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('remove');
-        $enumRepo->expects($this->once())
+        $enumRepo->expects(self::once())
             ->method('createEnumValue')
             ->with('OPTION 1', 2, false, 'option_1_1')
             ->willReturn($newValue);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($newValue));
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush');
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('invalidateCache')
             ->with($locale);
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
 
         $expectedValue1 = new TestEnumValue('option_1', 'Option 1', 1, true);
-        $this->assertEquals($expectedValue1, $value);
+        self::assertEquals($expectedValue1, $value);
 
         $expectedNewValue = new TestEnumValue('option_1_1', 'OPTION 1', 2, false);
         $expectedNewValue->setLocale($locale);
-        $this->assertEquals($expectedNewValue, $newValue);
+        self::assertEquals($expectedNewValue, $newValue);
     }
 
-    public function testApplyEnumOptionsOptionsInDifferentCaseForExistingValues()
+    public function testApplyEnumOptionsOptionsInDifferentCaseForExistingValues(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
@@ -702,18 +697,18 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $newValue2 = new TestEnumValue('value_3', 'vALUE', 3, false);
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('remove')
             ->with($value2);
         $enumRepo->expects($this->exactly(2))
@@ -732,12 +727,12 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 [$newValue1],
                 [$newValue2]
             );
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
 
         $em->expects($this->exactly(2))
             ->method('flush');
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('invalidateCache')
             ->with($locale);
 
@@ -745,18 +740,18 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $expectedValue = new TestEnumValue('value', 'value', 2, false);
         $expectedValue->setLocale($locale);
-        $this->assertEquals($expectedValue, $value1);
+        self::assertEquals($expectedValue, $value1);
 
         $expectedNewValue1 = new TestEnumValue('value_2', 'Value', 1, true);
         $expectedNewValue1->setLocale($locale);
-        $this->assertEquals($expectedNewValue1, $newValue1);
+        self::assertEquals($expectedNewValue1, $newValue1);
 
         $expectedNewValue2 = new TestEnumValue('value_3', 'vALUE', 3, false);
         $expectedNewValue2->setLocale($locale);
-        $this->assertEquals($expectedNewValue2, $newValue2);
+        self::assertEquals($expectedNewValue2, $newValue2);
     }
 
-    public function testApplyEnumOptionsWithDuplicatedIds()
+    public function testApplyEnumOptionsWithDuplicatedIds(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
@@ -774,11 +769,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $newValue4 = new TestEnumValue('0_1_1', '0_1', 4, false);
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
@@ -808,11 +803,11 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 [$newValue4]
             );
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush');
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('invalidateCache')
             ->with($locale);
 
@@ -820,19 +815,19 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $expectedNewValue1 = new TestEnumValue('0', '0', 1, true);
         $expectedNewValue1->setLocale($locale);
-        $this->assertEquals($expectedNewValue1, $newValue1);
+        self::assertEquals($expectedNewValue1, $newValue1);
         $expectedNewValue2 = new TestEnumValue('0_1', '*0*', 2, false);
         $expectedNewValue2->setLocale($locale);
-        $this->assertEquals($expectedNewValue2, $newValue2);
+        self::assertEquals($expectedNewValue2, $newValue2);
         $expectedNewValue3 = new TestEnumValue('0_2', '**0**', 3, false);
         $expectedNewValue3->setLocale($locale);
-        $this->assertEquals($expectedNewValue3, $newValue3);
+        self::assertEquals($expectedNewValue3, $newValue3);
         $expectedNewValue4 = new TestEnumValue('0_1_1', '0_1', 4, false);
         $expectedNewValue4->setLocale($locale);
-        $this->assertEquals($expectedNewValue4, $newValue4);
+        self::assertEquals($expectedNewValue4, $newValue4);
     }
 
-    public function testApplyEnumOptionsWithDuplicatedIdsAndGeneratedIdEqualsRemovingId()
+    public function testApplyEnumOptionsWithDuplicatedIdsAndGeneratedIdEqualsRemovingId(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
@@ -851,55 +846,55 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $newValue = new TestEnumValue('option_1_3', 'Option 1', 2, true);
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('remove')
             ->with($this->identicalTo($value3));
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('persist')
             ->with($this->identicalTo($newValue));
         $em->expects($this->exactly(2))
             ->method('flush');
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
-        $enumRepo->expects($this->once())
+        $enumRepo->expects(self::once())
             ->method('createEnumValue')
             ->with('Option 1', 2, true, 'option_1_3')
             ->willReturn($newValue);
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('invalidateCache')
             ->with($locale);
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
 
         $expectedValue1 = new TestEnumValue('option_1', 'Existing Option 1', 1, true);
-        $this->assertEquals($expectedValue1, $value1);
+        self::assertEquals($expectedValue1, $value1);
         $expectedValue2 = new TestEnumValue('option_1_1', 'Existing Option 11', 3, false);
         $expectedValue2->setLocale($locale);
-        $this->assertEquals($expectedValue2, $value2);
+        self::assertEquals($expectedValue2, $value2);
         $expectedNewValue = new TestEnumValue('option_1_3', 'Option 1', 2, true);
         $expectedNewValue->setLocale($locale);
-        $this->assertEquals($expectedNewValue, $newValue);
+        self::assertEquals($expectedNewValue, $newValue);
     }
 
-    public function testApplyEnumOptionsMatchByLabel()
+    public function testApplyEnumOptionsMatchByLabel(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $locale = 'fr';
 
         $enumOptions = [
-            ['id' => '', 'label' => 'Option 1', 'priority' => 1, 'is_default' => false]
+            ['id' => '', 'label' => 'Option 1', 'priority' => 1, 'is_default' => false],
         ];
 
         $value = new TestEnumValue('option_1', 'Option 1', 2, true);
@@ -909,70 +904,70 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $values = [$value];
 
         $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('beginTransaction');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('commit');
 
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('remove');
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('persist');
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush')
             ->with([$expectedValue]);
-        $em->expects($this->never())
+        $em->expects(self::never())
             ->method('rollback');
 
         $enumRepo = $this->setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values);
-        $enumRepo->expects($this->never())
+        $enumRepo->expects(self::never())
             ->method('createEnumValue');
 
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
 
-        $this->translationHelper->expects($this->once())
+        $this->translationHelper->expects(self::once())
             ->method('invalidateCache')
             ->with($locale);
 
         $this->synchronizer->applyEnumOptions($enumValueClassName, $enumOptions, $locale);
 
-        $this->assertEquals($expectedValue, $value);
+        self::assertEquals($expectedValue, $value);
     }
 
-    public function testGetEnumOptions()
+    public function testGetEnumOptions(): void
     {
         $enumValueClassName = 'Test\EnumValue';
         $values = [['id' => 'opt1']];
         $locale = 'de_DE';
 
         $em = $this->createMock(EntityManager::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
             ->with($enumValueClassName)
             ->willReturn($em);
         $enumRepo = $this->createMock(EnumValueRepository::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($enumValueClassName)
             ->willReturn($enumRepo);
         $qb = $this->createMock(QueryBuilder::class);
-        $enumRepo->expects($this->once())
+        $enumRepo->expects(self::once())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($qb);
         $query = $this->createMock(AbstractQuery::class);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('select')
             ->with('e.id, e.priority, e.name as label, e.default as is_default')
             ->willReturnSelf();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('orderBy')
             ->with('e.priority')
             ->willReturnSelf();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
         $query->expects($this->exactly(2))
@@ -982,61 +977,114 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
                 [TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale]
             )
             ->willReturnSelf();
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getArrayResult')
             ->willReturn($values);
 
         $translatableListener = $this->createMock(TranslatableListener::class);
-        $translatableListener->expects($this->once())
+        $translatableListener->expects(self::once())
             ->method('getListenerLocale')
             ->willReturn($locale);
 
         $eventManager = $this->createMock(EventManager::class);
-        $eventManager->expects($this->any())
+        $eventManager->expects(self::any())
             ->method('getListeners')
             ->willReturn([[$translatableListener]]);
 
-        $em->expects($this->any())
+        $em->expects(self::any())
             ->method('getEventManager')
             ->willReturn($eventManager);
 
         $result = $this->synchronizer->getEnumOptions($enumValueClassName);
 
-        $this->assertEquals($values, $result);
+        self::assertEquals($values, $result);
     }
 
-    /**
-     * @param \PHPUnit\Framework\MockObject\MockObject $em
-     * @param string $enumValueClassName
-     * @param string $locale
-     * @param array $values
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
-     */
-    private function setApplyEnumOptionsQueryExpectation($em, $enumValueClassName, $locale, $values)
-    {
+    private function setApplyEnumOptionsQueryExpectation(
+        EntityManager|\PHPUnit\Framework\MockObject\MockObject $em,
+        string $enumValueClassName,
+        string $locale,
+        array $values
+    ): EnumValueRepository|\PHPUnit\Framework\MockObject\MockObject {
         $enumRepo = $this->createMock(EnumValueRepository::class);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('getRepository')
             ->with($enumValueClassName)
             ->willReturn($enumRepo);
         $qb = $this->createMock(QueryBuilder::class);
-        $enumRepo->expects($this->once())
+        $enumRepo->expects(self::once())
             ->method('createQueryBuilder')
             ->with('o')
             ->willReturn($qb);
         $query = $this->createMock(AbstractQuery::class);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('setHint')
             ->with(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale)
             ->willReturnSelf();
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getResult')
             ->willReturn($values);
 
         return $enumRepo;
+    }
+
+    /**
+     * @dataProvider fillOptionIdsDataProvider
+     */
+    public function testFillOptionIds(array $values, array $options, array $expectedOptions): void
+    {
+        $this->synchronizer->fillOptionIds($values, $options);
+
+        self::assertEquals($expectedOptions, $options);
+    }
+
+    public function fillOptionIdsDataProvider(): array
+    {
+        return [
+            'empty values, empty options' => ['values' => [], 'options' => [], 'expectedOptions' => []],
+            'empty values' => [
+                'values' => [],
+                'options' => [['id' => 'sample-id', 'label' => 'Sample Label']],
+                'expectedOptions' => [['id' => 'sample-id', 'label' => 'Sample Label']],
+            ],
+            'missing id and label in value' => [
+                'values' => [new TestEnumValue(null, null, 1, true)],
+                'options' => [['id' => null, 'label' => null], ['id' => 'sample-id', 'label' => 'Sample Label']],
+                'expectedOptions' => [
+                    ['id' => null, 'label' => null],
+                    ['id' => 'sample-id', 'label' => 'Sample Label'],
+                ],
+            ],
+            'empty id and label in value' => [
+                'values' => [new TestEnumValue('', '', 1, true)],
+                'options' => [['id' => '', 'label' => ''], ['id' => 'sample-id', 'label' => 'Sample Label']],
+                'expectedOptions' => [['id' => '', 'label' => ''], ['id' => 'sample-id', 'label' => 'Sample Label']],
+            ],
+            'empty id in value' => [
+                'values' => [new TestEnumValue('', 'Sample Label', 1, true)],
+                'options' => [
+                    ['id' => 'sample-new-id', 'label' => 'Sample Label'],
+                    ['id' => 'sample-id', 'label' => 'Sample Label'],
+                ],
+                'expectedOptions' => [
+                    ['id' => 'sample-new-id', 'label' => 'Sample Label'],
+                    ['id' => 'sample-id', 'label' => 'Sample Label'],
+                ],
+            ],
+            'not empty id in value' => [
+                'values' => [new TestEnumValue('sample-new-id', 'Sample Label', 1, true)],
+                'options' => [
+                    ['id' => 'sample-new-id', 'label' => 'Sample Label'],
+                    ['id' => 'sample-id', 'label' => 'Sample Label'],
+                ],
+                'expectedOptions' => [
+                    ['id' => 'sample-new-id', 'label' => 'Sample Label'],
+                    ['id' => 'sample-id', 'label' => 'Sample Label'],
+                ],
+            ],
+        ];
     }
 }
