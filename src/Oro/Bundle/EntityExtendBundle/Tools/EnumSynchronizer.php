@@ -432,6 +432,7 @@ class EnumSynchronizer
      */
     protected function isEmptyOption(array $option, $key): bool
     {
-        return !array_key_exists($key, $option) || $option[$key] === null || $option[$key] === '';
+        return $option['label'] !== '' && $option['label'] !== null &&
+            (!array_key_exists($key, $option) || $option[$key] === null || $option[$key] === '');
     }
 }
