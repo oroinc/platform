@@ -20,6 +20,7 @@ dynamic-imports:
         - oroform/js/app/components/select-create-inline-type-component
         - oroform/js/app/views/editor/text-editor-view
         - oroform/js/app/views/form-validate-view
+        - oroform/js/app/views/lazy-validation-collection-view
     oroform-validate:
         - oroform/js/validator/callback
         - oroform/js/validator/count

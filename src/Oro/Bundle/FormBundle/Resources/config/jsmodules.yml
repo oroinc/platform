@@ -42,6 +42,7 @@ dynamic-imports:
         - oroform/js/app/views/fields-groups-collection-view
         - oroform/js/app/views/form-loading-view
         - oroform/js/app/views/form-validate-view
+        - oroform/js/app/views/lazy-validation-collection-view
         - oroform/js/app/views/checkbox-view
         - oroform/js/app/views/simple-color-choice-view
         - oroform/js/app/views/simple-color-picker-view
