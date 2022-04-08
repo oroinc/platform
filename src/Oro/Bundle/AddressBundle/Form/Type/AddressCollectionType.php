@@ -4,9 +4,14 @@ namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ *  Addresses collection form type
+ */
 class AddressCollectionType extends AbstractType
 {
     const NAME = 'oro_address_collection';
@@ -27,6 +32,14 @@ class AddressCollectionType extends AbstractType
                 return $values;
             }
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['validation_ignore_if_not_changed'] = true;
     }
 
     /**

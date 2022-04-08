@@ -382,6 +382,11 @@
                 data-validation-optional-group-handler="{{ form.vars.attr['data-validation-optional-group-handler'] }}"
             {% endif %}
         {% endif %}
+        {% if widget.vars.valid and
+            widget.parent.vars.validation_ignore_if_not_changed is defined and
+            widget.parent.vars.validation_ignore_if_not_changed %}
+            data-validation-ignore
+        {% endif %}
     >
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
@@ -411,7 +416,11 @@
         {% endif %}
         {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection collection-fields-list' }) %}
         {% set id = id ~ '_collection' %}
-        <div class="row-oro">
+        <div class="row-oro"
+            {% if form.vars.validation_ignore_if_not_changed is defined and form.vars.validation_ignore_if_not_changed %}
+                data-page-component-view="oroform/js/app/views/lazy-validation-collection-view"
+            {% endif %}
+        >
             {% set prototype_name = form.vars.prototype_name %}
             <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-row-count-add="{{ form.vars.row_count_add }}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                 <input type="hidden" name="validate_{{ full_name }}" data-collection-name="{{ full_name }}" data-name="collection-validation" disabled data-validate-element>
