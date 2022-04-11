@@ -41,6 +41,11 @@ abstract class AbstractRenameField extends AbstractFixture implements ContainerA
             }
 
             foreach ($definition['filters'] ?? [] as $key => $filterData) {
+                if ($filterData === 'OR' || $filterData === 'AND') {
+                    // Skips iteration if it is an "AND" or "OR" operator.
+                    continue;
+                }
+
                 $definition['filters'][$key]['columnName'] = $this->replaceFieldName($filterData['columnName']);
             }
 
