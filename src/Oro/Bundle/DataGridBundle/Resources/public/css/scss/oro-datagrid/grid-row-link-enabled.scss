@@ -25,7 +25,6 @@
 
             $focusable-selectors-after-link: get-focusable-selectors($whole-list: false, $part-before: '~ ');
             // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
-            @warn $focusable-selectors-after-link;
             #{$focusable-selectors-after-link} {
                 pointer-events: auto;
             }
