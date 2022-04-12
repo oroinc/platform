@@ -26,3 +26,8 @@ features:
         description: oro.attachment.config.feature.webp.description
         configuration:
             - 'oro_attachment.webp_quality'
+
+    attachment_original_filenames:
+        label: oro.attachment.config.feature.original_file_names_enabled.label
+        description: oro.attachment.config.feature.original_file_names_enabled.description
+        toggle: oro_attachment.original_file_names_enabled

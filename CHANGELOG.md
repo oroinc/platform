@@ -6,6 +6,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### AttachmentBundle
+* Added `Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider` filename provider that
+  uses a sanitized original filename for files if `attachment_original_filenames` feature is enabled.
+
 #### LocaleBundle
 * Added entity name provider for `Locale` entity
 
