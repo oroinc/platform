@@ -2,6 +2,14 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Added
+
+#### AttachmentBundle
+* Added `Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider` filename provider that
+  uses a sanitized original filename for files if `attachment_original_filenames` feature is enabled.
+
 ## 4.2.10
 
 ### Changed

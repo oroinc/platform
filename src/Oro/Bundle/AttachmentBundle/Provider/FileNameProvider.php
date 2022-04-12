@@ -14,6 +14,6 @@ class FileNameProvider implements FileNameProviderInterface
      */
     public function getFileName(File $file): string
     {
-        return $file->getFilename();
+        return (string) $file->getFilename();
     }
 }

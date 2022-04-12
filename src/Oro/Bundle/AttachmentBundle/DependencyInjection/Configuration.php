@@ -73,6 +73,7 @@ class Configuration implements ConfigurationInterface
                 'processors_allowed' => ['value' => true],
                 'jpeg_quality' => ['value' => self::JPEG_QUALITY],
                 'png_quality' => ['value' => self::PNG_QUALITY],
+                'original_file_names_enabled' => ['type' => 'boolean', 'value' => false],
             ]
         );
 

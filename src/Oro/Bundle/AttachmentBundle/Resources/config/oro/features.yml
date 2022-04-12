@@ -20,3 +20,8 @@ features:
         description: oro.attachment.config.feature.attachment_processing.description
         dependencies:
             - 'attachment_post_processors_allowed'
+
+    attachment_original_filenames:
+        label: oro.attachment.config.feature.original_file_names_enabled.label
+        description: oro.attachment.config.feature.original_file_names_enabled.description
+        toggle: oro_attachment.original_file_names_enabled

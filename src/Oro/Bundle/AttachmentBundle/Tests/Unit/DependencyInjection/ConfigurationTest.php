@@ -7,22 +7,19 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    public function testGetConfigTreeBuilder()
+    public function testGetConfigTreeBuilder(): void
     {
         $configuration = new Configuration();
         $builder = $configuration->getConfigTreeBuilder();
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
+        self::assertInstanceOf('Symfony\Component\Config\Definition\Builder\TreeBuilder', $builder);
 
         $root = $builder->buildTree();
-        $this->assertInstanceOf('Symfony\Component\Config\Definition\ArrayNode', $root);
-        $this->assertEquals('oro_attachment', $root->getName());
+        self::assertInstanceOf('Symfony\Component\Config\Definition\ArrayNode', $root);
+        self::assertEquals('oro_attachment', $root->getName());
     }
 
-    public function testProcessConfiguration()
+    public function testProcessConfiguration(): void
     {
-        $configuration = new Configuration();
-        $processor = new Processor();
-
         $expected = [
             'settings' => [
                 'png_quality' => [
@@ -49,6 +46,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     'value' => true,
                     'scope' => 'app'
                 ],
+                'original_file_names_enabled' => [
+                    'value' => false,
+                    'scope' => 'app',
+                ],
                 'resolved' => true
             ],
             'debug_images' => true,
@@ -60,6 +61,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'processors_allowed' => true
         ];
 
-        $this->assertEquals($expected, $processor->processConfiguration($configuration, []));
+        $processor = new Processor();
+
+        self::assertEquals($expected, $processor->processConfiguration(new Configuration(), []));
     }
 }

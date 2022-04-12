@@ -165,7 +165,7 @@ class FeatureChecker
      */
     protected function check($feature, $scopeIdentifier = null)
     {
-        switch ($x = $this->configManager->get($feature, 'strategy', $this->strategy)) {
+        switch ($this->configManager->get($feature, 'strategy', $this->strategy)) {
             case self::STRATEGY_AFFIRMATIVE:
                 return $this->checkAffirmativeStrategy($feature, $scopeIdentifier);
 
