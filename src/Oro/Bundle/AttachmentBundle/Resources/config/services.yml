@@ -763,3 +763,20 @@ services:
             - '@oro_entity.helper.field_helper'
         tags:
             - { name: validator.constraint_validator }
+
+    oro_attachment.event_listener.original_file_names_configuration_listener:
+        class: Oro\Bundle\AttachmentBundle\EventListener\OriginalFileNamesConfigurationListener
+        arguments:
+            - '@session'
+            - '@translator'
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: afterUpdate }
+
+    oro_attachment.provider.file_name.original_file_name:
+        class: Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider
+        decorates: oro_attachment.provider.file_name
+        decoration_priority: -50
+        arguments:
+            - '@.inner'
+        tags:
+            - { name: oro_featuretogle.feature, feature: attachment_original_filenames }

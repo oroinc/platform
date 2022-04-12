@@ -29,6 +29,8 @@ The current file describes significant changes in the code that may affect the u
   `file`, `image`, `multiFile`, `multiImage` types of extend fields.
 * Added `Oro\Bundle\FormBundle\Validator\Constraints\RegExpSyntax` validation constraint for checking regular expression
   syntax.
+* Added `Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider` filename provider that
+  uses a sanitized original filename for files if `attachment_original_filenames` feature is enabled.
 
 #### DigitalAssetBundle
 * Added `Oro\Bundle\DigitalAssetBundle\Provider\ExtendFieldFileDamFormOptionsProvider` that manages `dam_widget_enabled`
