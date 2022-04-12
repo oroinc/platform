@@ -117,6 +117,12 @@ define(function(require) {
                 // set correct width of uniform widget
                 if (this.domCache.$customPart.data('bound-input-widget') === 'uniform') {
                     this.domCache.$customPart.data('input-widget').refresh();
+
+                    if (_.values(this.typeDefinedValues).indexOf(type) === -1) {
+                        this.domCache.$customPart.data('input-widget').$container.show();
+                    } else {
+                        this.domCache.$customPart.data('input-widget').$container.hide();
+                    }
                 }
 
                 const newRect = this.el.getBoundingClientRect();

@@ -123,6 +123,16 @@ select[multiple] {
                 }
             }
         }
+
+        &.control-group-oro_type_filter {
+            .date-filter-container {
+                &.date-filter-custom {
+                    .horizontal {
+                        margin-bottom: 16px;
+                    }
+                }
+            }
+        }
     }
 
     .control-group-checkbox {
