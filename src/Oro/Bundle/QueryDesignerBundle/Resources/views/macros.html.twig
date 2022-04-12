@@ -97,16 +97,16 @@
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%- cid %>">
             {% if ('column' in showItems) %}
-            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%- name %></td>
+            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             {% endif %}
             {% if ('label' in showItems) %}
             <td class="label-cell"><%- label %></td>
             {% endif %}
             {% if ('function' in showItems) %}
-            <td class="function-cell"><%- func %></td>
+            <td class="function-cell"><%= func %></td>
             {% endif %}
             {% if ('sorting' in showItems) %}
-            <td class="sorting-cell"><%- sorting %></td>
+            <td class="sorting-cell"><%= sorting %></td>
             {% endif %}
             {% if ('action' in showItems) %}
             <td class="action-cell">
