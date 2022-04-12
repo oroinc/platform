@@ -150,6 +150,12 @@
                         margin-bottom: 0;
                     }
                 }
+
+                &.date-filter-custom {
+                    .control-group {
+                        gap: 8px;
+                    }
+                }
             }
         }
 
