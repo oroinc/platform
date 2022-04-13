@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -16,7 +16,7 @@ class GridControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
-    public function testShouldSendExportMessageWithPageSizeParameter()
+    public function testShouldSendExportMessageWithPageSizeParameter(): void
     {
         $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
             'gridName' => 'items-grid-with-export-page-size',
@@ -24,13 +24,13 @@ class GridControllerTest extends WebTestCase
             'items-grid' => [],
         ]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
         $this->assertTrue($result['successful']);
 
-        $this->assertMessageSent(Topics::PRE_EXPORT, [
+        self::assertMessageSent(DatagridPreExportTopic::getName(), [
             'format' => 'csv',
             'parameters' => [
                 'gridName' => 'items-grid-with-export-page-size',
@@ -42,7 +42,7 @@ class GridControllerTest extends WebTestCase
         ]);
     }
 
-    public function testShouldSendExportMessage()
+    public function testShouldSendExportMessage(): void
     {
         $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
             'gridName' => 'audit-grid',
@@ -59,13 +59,13 @@ class GridControllerTest extends WebTestCase
             ],
         ]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
         $this->assertTrue($result['successful']);
 
-        $this->assertMessageSent(Topics::PRE_EXPORT, [
+        self::assertMessageSent(DatagridPreExportTopic::getName(), [
             'format' => 'csv',
             'notificationTemplate' => 'datagrid_export_result',
             'parameters' => [
@@ -86,7 +86,7 @@ class GridControllerTest extends WebTestCase
         ]);
     }
 
-    public function testMassActionActionWithToken()
+    public function testMassActionActionWithToken(): void
     {
         $this->client->disableReboot();
 
@@ -103,7 +103,7 @@ class GridControllerTest extends WebTestCase
 
         $result = $this->client->getResponse();
 
-        $this->assertJsonResponseStatusCodeEquals($result, 403);
-        $this->assertEquals('{}', $result->getContent());
+        self::assertJsonResponseStatusCodeEquals($result, 403);
+        self::assertEquals('{}', $result->getContent());
     }
 }

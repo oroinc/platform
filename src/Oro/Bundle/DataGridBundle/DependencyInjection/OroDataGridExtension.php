@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages OroDataGridBundle service configuration.
+ */
 class OroDataGridExtension extends Extension
 {
     /**
@@ -30,6 +33,7 @@ class OroDataGridExtension extends Extension
         $loader->load('datagrid_state.yml');
         $loader->load('controllers.yml');
         $loader->load('controllers_api.yml');
+        $loader->load('mq_topics.yml');
 
         if ($container->getParameter('kernel.environment') === 'test') {
             $loader->load('services_test.yml');

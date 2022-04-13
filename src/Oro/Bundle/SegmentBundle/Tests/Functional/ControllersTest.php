@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Functional;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -21,18 +21,18 @@ class ControllersTest extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_segment_index'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         $this->assertEquals('Manage Segments - Reports & Segments', $crawler->filter('#page-title')->html());
     }
 
     /**
      * @dataProvider segmentsDataProvider
      */
-    public function testCreate(array $report)
+    public function testCreate(array $report): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_segment_create'));
         $form = $crawler->selectButton('Save and Close')->form();
@@ -51,32 +51,32 @@ class ControllersTest extends WebTestCase
      * @depends testCreate
      * @dataProvider segmentsDataProvider
      */
-    public function testView(array $report, array $reportResult)
+    public function testView(array $report, array $reportResult): void
     {
         $response = $this->client->requestGrid(
             'oro_segments-grid',
             ['oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'], ]
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
         $this->client->request('GET', $this->getUrl('oro_segment_view', ['id' => $id]));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
 
-        if ($report['oro_segment_form[type]'] == 'static') {
+        if ($report['oro_segment_form[type]'] === 'static') {
             $this->ajaxRequest(
                 'POST',
                 $this->getUrl('oro_api_post_segment_run', ['id' => $id])
             );
             $result = $this->client->getResponse();
-            $this->assertEmptyResponseStatusCodeEquals($result, 204);
+            self::assertEmptyResponseStatusCodeEquals($result, 204);
         }
 
         $response = $this->client->requestGrid(Segment::GRID_PREFIX . $id);
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $data = $result['data'];
         $options = $result['options'];
         $this->addOroDefaultPrefixToUrlInParameterArray($reportResult, 'view_link');
@@ -87,14 +87,14 @@ class ControllersTest extends WebTestCase
      * @depends testView
      * @dataProvider segmentsDataProvider
      */
-    public function testUpdate(array $report, array $reportResult)
+    public function testUpdate(array $report, array $reportResult): void
     {
         $response = $this->client->requestGrid(
             'oro_segments-grid',
             ['oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]']]
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
 
@@ -107,35 +107,35 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('Segment saved', $crawler->html());
 
-        if ($report['oro_segment_form[type]'] == 'static') {
+        if ($report['oro_segment_form[type]'] === 'static') {
             $this->ajaxRequest(
                 'POST',
                 $this->getUrl('oro_api_post_segment_run', ['id' => $id])
             );
             $result = $this->client->getResponse();
-            $this->assertEmptyResponseStatusCodeEquals($result, 204);
+            self::assertEmptyResponseStatusCodeEquals($result, 204);
         }
 
-        $response = $response = $this->client->requestGrid(Segment::GRID_PREFIX . $id);
+        $response = $this->client->requestGrid(Segment::GRID_PREFIX . $id);
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $data = $result['data'];
         $options = $result['options'];
         $this->addOroDefaultPrefixToUrlInParameterArray($reportResult, 'view_link');
         $this->verifyReport($reportResult, $data, (int)$options['totalRecords']);
     }
 
-    public function testExport()
+    public function testExport(): void
     {
         $response = $this->client->requestGrid(
             'oro_segments-grid',
             ['oro_segments-grid[_filter][name][value]' => 'Users Filterd Dynamic_updated']
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
 
@@ -155,15 +155,15 @@ class ControllersTest extends WebTestCase
             ),
             [],
             [],
-            $this->generateNoHashNavigationHeader()
+            self::generateNoHashNavigationHeader()
         );
 
-        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $response = self::getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertCount(1, $response);
         $this->assertTrue($response['successful']);
 
-        $this->assertMessageSent(
-            Topics::PRE_EXPORT,
+        self::assertMessageSent(
+            DatagridPreExportTopic::getName(),
             [
                 'format' => 'csv',
                 'parameters' => [
@@ -187,14 +187,14 @@ class ControllersTest extends WebTestCase
      * @depends testView
      * @dataProvider segmentsDataProvider
      */
-    public function testDelete(array $report)
+    public function testDelete(array $report): void
     {
         $response = $this->client->requestGrid(
             'oro_segments-grid',
             ['oro_segments-grid[_filter][name][value]' => $report['oro_segment_form[name]'] . '_updated']
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
         $id = $result['id'];
 
@@ -204,12 +204,12 @@ class ControllersTest extends WebTestCase
         );
 
         $result = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+        self::assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request('GET', $this->getUrl('oro_segment_update', ['id' => $id]));
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 404);
+        self::assertHtmlResponseStatusCodeEquals($result, 404);
     }
 
     /**
@@ -217,18 +217,12 @@ class ControllersTest extends WebTestCase
      *
      * @return array
      */
-    public function segmentsDataProvider()
+    public function segmentsDataProvider(): array
     {
-        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'reports');
+        return self::getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'reports');
     }
 
-    /**
-     * @param Form $form
-     * @param array $fields
-     *
-     * @return Form $form
-     */
-    private function fillForm($form, $fields)
+    private function fillForm(Form $form, array $fields): Form
     {
         foreach ($fields as $fieldName => $value) {
             $form[$fieldName] = $value;
@@ -237,14 +231,7 @@ class ControllersTest extends WebTestCase
         return $form;
     }
 
-    /**
-     * @param $expected
-     * @param $actual
-     * @param $totalCount
-     *
-     * @return bool
-     */
-    private function verifyReport($expected, $actual, $totalCount)
+    private function verifyReport(array $expected, array $actual, int $totalCount): bool
     {
         $this->assertEquals(count($expected), $totalCount);
         for ($i = 0; $i < $totalCount; $i++) {
@@ -253,6 +240,7 @@ class ControllersTest extends WebTestCase
             //compare by value
             $this->assertEquals(array_values($expected[$i]), array_values($actual[$i]));
         }
+
         return true;
     }
 }
