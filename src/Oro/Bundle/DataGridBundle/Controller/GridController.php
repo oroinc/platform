@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Controller;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
@@ -154,11 +154,14 @@ class GridController extends AbstractController
             $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
         }
 
-        $this->get(MessageProducerInterface::class)->send(Topics::PRE_EXPORT, [
-            'format' => $format,
-            'parameters' => $parameters,
-            'notificationTemplate' => 'datagrid_export_result',
-        ]);
+        $this->get(MessageProducerInterface::class)->send(
+            DatagridPreExportTopic::getName(),
+            [
+                'format' => $format,
+                'parameters' => $parameters,
+                'notificationTemplate' => 'datagrid_export_result',
+            ]
+        );
 
         return new JsonResponse([
             'successful' => true,
