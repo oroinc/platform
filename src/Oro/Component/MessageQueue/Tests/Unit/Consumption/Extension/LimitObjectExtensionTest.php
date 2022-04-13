@@ -11,18 +11,37 @@ use Psr\Log\Test\TestLogger;
 
 class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    protected function setUp(): void
+    {
+        if (!function_exists('gc_status')) {
+            $this->markTestSkipped('gc_status function required');
+        }
+
+        $this->gcEnabled = gc_enabled();
+
+        gc_enable();
+        gc_collect_cycles();
+    }
+
+    protected function tearDown(): void
+    {
+        gc_collect_cycles();
+
+        $this->gcEnabled ? gc_enable() : gc_disable();
+    }
+
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         new LimitObjectExtension(12345);
     }
 
-    public function testShouldThrowExceptionIfMessageLimitIsNotInt()
+    public function testShouldThrowExceptionIfMessageLimitIsNotInt(): void
     {
         $this->expectException(\TypeError::class);
         new LimitObjectExtension('test');
     }
 
-    public function testInterruptWhenObjectLimitReached()
+    public function testInterruptWhenObjectLimitReached(): void
     {
         $context = $this->createContext();
 
@@ -40,23 +59,23 @@ class LimitObjectExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInterruptWhenObjectLimitReachedWithMultipleObjects()
+    public function testInterruptWhenObjectLimitReachedWithMultipleObjects(): void
     {
         $context = $this->createContext();
 
         $this->assertFalse($context->isExecutionInterrupted());
 
-        $objectLimit = spl_object_id(new \StdClass()) + 100;
+        $objectLimit = 100;
 
         /** GC reduces $objectLimit during runtime, so number of created objects should be way greater that limit */
-        $amountOfObjectsToCreate = 100;
+        $amountOfObjectsToCreate = 1000;
 
         $collection = new \ArrayObject();
 
-        for ($i = 0; $i < $objectLimit * $amountOfObjectsToCreate; $i++) {
-            $object = new \StdClass();
+        do {
+            $object = new \stdClass();
             $collection->append($object);
-        }
+        } while (spl_object_id($object) < $amountOfObjectsToCreate);
 
         $extension = new LimitObjectExtension($objectLimit);
 
