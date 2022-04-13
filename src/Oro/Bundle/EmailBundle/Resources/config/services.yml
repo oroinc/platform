@@ -1268,7 +1268,7 @@ services:
             - '@oro_entity.orm.native_query_executor_helper'
             - '@logger'
         tags:
-            - { name: 'oro_message_queue.client.message_processor', topicName: 'oro_email.migrate_email_body' }
+            - { name: 'oro_message_queue.client.message_processor' }
 
     oro_email.provider.smtp_settings:
         class: Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider

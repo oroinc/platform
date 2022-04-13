@@ -3,17 +3,19 @@
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor;
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\MessageQueue\Client\Message as ClientMessage;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
 use Oro\Component\MessageQueue\Job\DependentJobService;
@@ -29,65 +31,36 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
-        self::assertEquals([Topics::PRE_EXPORT], PreExportMessageProcessor::getSubscribedTopics());
-    }
-
-    public function invalidMessageBodyProvider(): array
-    {
-        return [
-            [
-                'Got invalid message',
-                ['format' => 'csv'],
-            ],
-            [
-                'Got invalid message',
-                ['parameters' => ['gridName' => 'name']],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidMessageBodyProvider
-     */
-    public function testShouldRejectMessageAndLogCriticalIfRequiredParametersAreMissing(
-        string $loggerMessage,
-        array $messageBody
-    ) {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(self::once())
-            ->method('critical')
-            ->with($this->stringContains($loggerMessage));
-
-        $processor = new PreExportMessageProcessor(
-            $this->createMock(JobRunner::class),
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(TokenStorageInterface::class),
-            $this->createMock(DependentJobService::class),
-            $logger,
-            $this->createMock(DefaultExportHandler::class),
-            100
-        );
-
-        $message = new Message();
-        $message->setBody(JSON::encode($messageBody));
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
+        self::assertEquals([DatagridPreExportTopic::getName()], PreExportMessageProcessor::getSubscribedTopics());
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testShouldReturnMessageACKOnExportSuccess()
+    public function testShouldReturnMessageACKOnExportSuccess(): void
     {
+        $gridName = 'grid_name';
+        $format = 'csv';
+        $entityName = 'Acme';
+        $batchSize = 100;
+
         $jobUniqueName = 'oro_datagrid.pre_export.grid_name.user_1.csv';
         $message = new Message();
         $message->setMessageId('123');
         $message->setBody(JSON::encode([
-            'format' => 'csv',
-            'parameters' => ['gridName' => 'grid_name']
+            'format' => $format,
+            'parameters' => [
+                'gridName' => $gridName,
+                'gridParameters' => [],
+                FormatterProvider::FORMAT_TYPE => 'excel',
+            ],
+            'exportType' => ProcessorRegistry::TYPE_EXPORT,
+            'jobName' => $gridName,
+            'outputFormat' => $format,
+            'entity' => $entityName,
+            'batchSize' => $batchSize,
         ]));
         $job = $this->createJob(1);
         $childJob = $this->createJob(10, $job);
@@ -114,10 +87,10 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,
-                    'jobName' => 'grid_name',
+                    'jobName' => $gridName,
                     'exportType' => 'export',
-                    'outputFormat' => 'csv',
-                    'entity' => 'Acme',
+                    'outputFormat' => $format,
+                    'entity' => $entityName,
                     'notificationTemplate' => 'export_result',
                 ]
             );
@@ -153,7 +126,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $dependentJob,
             $this->createMock(LoggerInterface::class),
             $this->createMock(DefaultExportHandler::class),
-            100
+            $batchSize
         );
 
         $exportHandler = $this->createMock(ExportHandler::class);
@@ -162,7 +135,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturn([]);
         $exportHandler->expects(self::once())
             ->method('getEntityName')
-            ->willReturn('Acme');
+            ->willReturn($entityName);
 
         $processor->setExportHandler($exportHandler);
         $processor->setExportIdFetcher($this->createMock(DatagridExportIdFetcher::class));
@@ -170,20 +143,20 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
-            Topics::EXPORT,
+            DatagridExportTopic::getName(),
             new ClientMessage(
                 [
-                    'format'       => 'csv',
-                    'batchSize'    => 100,
+                    'format'       => $format,
+                    'batchSize'    => $batchSize,
                     'parameters'   => [
-                        'gridName'       => 'grid_name',
+                        'gridName'       => $gridName,
                         'gridParameters' => [],
                         'format_type'    => 'excel'
                     ],
                     'exportType'   => 'export',
-                    'entity'       => 'Acme',
-                    'jobName'      => 'grid_name',
-                    'outputFormat' => 'csv',
+                    'entity'       => $entityName,
+                    'jobName'      => $gridName,
+                    'outputFormat' => $format,
                     'jobId'        => 10
                 ],
                 MessagePriority::LOW

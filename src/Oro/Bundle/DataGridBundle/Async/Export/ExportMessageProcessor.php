@@ -1,13 +1,13 @@
 <?php
+
 namespace Oro\Bundle\DataGridBundle\Async\Export;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessorAbstract;
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ExportProcessor;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
@@ -69,7 +69,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::EXPORT];
+        return [DatagridExportTopic::getName()];
     }
 
     /**
@@ -84,7 +84,7 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
         );
         $body['parameters']['gridParameters'] = $contextParameters;
 
-        $exportResult = $this->exportHandler->handle(
+        return $this->exportHandler->handle(
             $this->exportConnector,
             $this->exportProcessor,
             $this->writer,
@@ -92,8 +92,6 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
             $body['batchSize'],
             $body['format']
         );
-
-        return $exportResult;
     }
 
     /**
@@ -103,25 +101,12 @@ class ExportMessageProcessor extends ExportMessageProcessorAbstract
     {
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
-            'jobId' => null,
-            'format' => null,
             'batchSize' => 200,
-            'parameters' => [
-                'gridName' => null,
-                'gridParameters' => [],
-                FormatterProvider::FORMAT_TYPE => 'excel',
-            ],
         ], $body);
         $body['parameters']['pageSize'] = $body['batchSize'];
 
-        if (! isset($body['jobId'], $body['parameters']['gridName'], $body['format'])) {
-            $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
         $this->writer = $this->writerChain->getWriter($body['format']);
-        if (! $this->writer instanceof FileStreamWriter) {
+        if (!$this->writer instanceof FileStreamWriter) {
             $this->logger->critical(sprintf('Invalid format: "%s"', $body['format']));
 
             return false;
