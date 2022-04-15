@@ -93,9 +93,18 @@
 {% endblock breadcrumbs %}
 
 {% block stats %}
+    {% if is_granted('oro_view_user_login_attempt') %}
+        {% set loginAttempts %}
+            {{ 'oro.user.last_login.label'|trans }}: <a title="{{ 'oro.user.userloginattempt.entity_description'|trans }}" href="{{ oro_datagrid_link('oro_user_login_attempts', 'user-login-attempts-grid', {'f[user][value]': entity.id}) }}">{{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'|trans }}</a>
+        {% endset %}
+    {% else %}
+        {% set loginAttempts %}
+            {{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'|trans }}
+        {% endset %}
+    {% endif %}
     <li>{{ 'oro.ui.created_at'|trans }}: {{ entity.createdAt ? entity.createdAt|oro_format_datetime : 'N/A'|trans }}</li>
     <li>{{ 'oro.ui.updated_at'|trans }}: {{ entity.updatedAt ? entity.updatedAt|oro_format_datetime : 'N/A'|trans }}</li>
-    <li>{{ 'oro.user.last_login.label'|trans }}: {{ entity.lastLogin ? entity.lastLogin|oro_format_datetime : 'N/A'|trans }}</li>
+    <li>{{ loginAttempts }}</li>
     <li>{{ 'oro.user.login_count.label'|trans }}: {{ entity.loginCount|default(0) }}</li>
 {% endblock stats %}
 

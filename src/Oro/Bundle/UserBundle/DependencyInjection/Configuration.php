@@ -42,6 +42,36 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('login_sources')
+                    ->validate()
+                        ->always(function (array $value) {
+                            foreach ($value as $name => $config) {
+                                foreach ($value as $innerName => $innerConfig) {
+                                    if ($name === $innerName) {
+                                        continue;
+                                    }
+                                    if ($config['code'] === $innerConfig['code']) {
+                                        throw new \LogicException(sprintf(
+                                            'The "code" option for "%s" and "%s" login sources are duplicated.',
+                                            $name,
+                                            $innerName
+                                        ));
+                                    }
+                                }
+                            }
+
+                            return $value;
+                        })
+                    ->end()
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->addDefaultsIfNotSet()
+                        ->children()
+                            ->scalarNode('label')->end()
+                            ->integerNode('code')->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         SettingsBuilder::append(

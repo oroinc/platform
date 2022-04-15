@@ -4,8 +4,9 @@ namespace Oro\Bundle\UserBundle\Security;
 
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\UserBundle\Entity\BaseUserManager;
-use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\UserBundle\Exception\UserHolderExceptionInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
@@ -15,17 +16,27 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
 {
     private BaseUserManager $userManager;
-    private UserLoggingInfoProviderInterface $loggingInfoProvider;
-    private LoggerInterface $logger;
+    private UserLoginAttemptLogger $userLoginAttemptLogger;
+    private SkippedLogAttemptsFirewallsProvider $skippedLogAttemptsFirewallsProvider;
+
+    /** @var iterable|LoginSourceProviderForSuccessRequestInterface[] */
+    private iterable $loginSourceProvidersForSuccessRequest;
+
+    /** @var iterable|LoginSourceProviderForFailedRequestInterface[] */
+    private iterable $loginSourceProvidersForFailedRequest;
 
     public function __construct(
         BaseUserManager $userManager,
-        UserLoggingInfoProviderInterface $loggingInfoProvider,
-        LoggerInterface $logger
+        UserLoginAttemptLogger $userLoginAttemptLogger,
+        SkippedLogAttemptsFirewallsProvider $skippedLogAttemptsFirewallsProvider,
+        iterable $loginSourceProvidersForSuccessRequest,
+        iterable $loginSourceProvidersForFailedRequest
     ) {
         $this->userManager = $userManager;
-        $this->loggingInfoProvider = $loggingInfoProvider;
-        $this->logger = $logger;
+        $this->userLoginAttemptLogger = $userLoginAttemptLogger;
+        $this->skippedLogAttemptsFirewallsProvider = $skippedLogAttemptsFirewallsProvider;
+        $this->loginSourceProvidersForSuccessRequest = $loginSourceProvidersForSuccessRequest;
+        $this->loginSourceProvidersForFailedRequest = $loginSourceProvidersForFailedRequest;
     }
 
     /**
@@ -36,8 +47,18 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
         $token = $event->getAuthenticationToken();
         $user = $token->getUser();
 
-        if ($user instanceof AbstractUser) {
-            $this->logger->info('Successful login', $this->loggingInfoProvider->getUserLoggingInfo($user));
+        if ($user instanceof AbstractUser && $this->shouldAttemptBeLogged($token)) {
+            $source = null;
+            foreach ($this->loginSourceProvidersForSuccessRequest as $loginSourceProviderByToken) {
+                $source = $loginSourceProviderByToken->getLoginSourceForSuccessRequest($token);
+                if (null !== $source) {
+                    break;
+                }
+            }
+            if (null === $source) {
+                $source = 'general';
+            }
+            $this->userLoginAttemptLogger->logSuccessLoginAttempt($user, $source);
         }
     }
 
@@ -53,11 +74,32 @@ class LoginAttemptsHandler implements LoginAttemptsHandlerInterface
             $user = $this->userManager->findUserByUsernameOrEmail($user);
         }
 
-        $this->logger->notice(
-            'Unsuccessful login',
-            $this->loggingInfoProvider->getUserLoggingInfo(
-                $user instanceof AbstractUser ? $user : $token->getUser()
-            )
-        );
+        $exception = $event->getAuthenticationException();
+        $source = null;
+        foreach ($this->loginSourceProvidersForFailedRequest as $loginSourceProviderByException) {
+            $source = $loginSourceProviderByException->getLoginSourceForFailedRequest($token, $exception);
+            if (null !== $source) {
+                break;
+            }
+        }
+        if (null === $source) {
+            $source = 'general';
+        }
+
+        $user = $user instanceof AbstractUser ? $user : $token->getUser();
+        if (null === $user && $exception instanceof UserHolderExceptionInterface) {
+            $user = $exception->getUser();
+        }
+        $this->userLoginAttemptLogger->logFailedLoginAttempt($user, $source);
+    }
+
+    private function shouldAttemptBeLogged(TokenInterface $token): bool
+    {
+        $skippedFirewalls = $this->skippedLogAttemptsFirewallsProvider->getSkippedFirewalls();
+        $shouldBeSkipped = count($skippedFirewalls)
+            && is_a($token, UsernamePasswordToken::class)
+            && \in_array($token->getFirewallName(), $skippedFirewalls);
+
+        return !$shouldBeSkipped;
     }
 }

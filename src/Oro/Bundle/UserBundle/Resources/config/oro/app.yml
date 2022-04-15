@@ -47,14 +47,6 @@ security:
                 authenticators:
                     - oro_user.impersonation_authenticator
 
-monolog:
-    channels: ['oro_account_security']
-    handlers:
-        database_handler:
-            type: service
-            id: oro_logger.monolog.db_logs.handler
-            channels: ['oro_account_security']
-
 oro_user:
     privileges:
         entity:
@@ -75,3 +67,10 @@ oro_user:
             fix_values: false
             default_value: 1
             show_default: false
+    login_sources:
+        default:
+            label: oro.user.login_source.default
+            code: 1
+        impersonation:
+            label: oro.user.login_source.impersonation
+            code: 10

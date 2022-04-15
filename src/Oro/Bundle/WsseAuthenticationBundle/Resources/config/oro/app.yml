@@ -1,0 +1,5 @@
+oro_user:
+    login_sources:
+        wsse:
+            label: oro.wsse.login_source
+            code: 40

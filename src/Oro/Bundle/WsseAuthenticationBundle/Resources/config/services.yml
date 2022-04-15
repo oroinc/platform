@@ -48,3 +48,15 @@ services:
 
     oro_wsse_authentication.security.wsse_token_factory:
         class: Oro\Bundle\WsseAuthenticationBundle\Security\WsseTokenFactory
+
+    oro_wsse_authentication.security.wsse_login_source_provider:
+        class: Oro\Bundle\WsseAuthenticationBundle\Security\WsseLoginSourceProvider
+        tags:
+            - { name: oro_security.login_source_provider.fail }
+
+    oro_wsse_authentication.event_listener.authentication:
+        class: Oro\Bundle\WsseAuthenticationBundle\EventListener\AuthenticationListener
+        arguments:
+            - "@oro_user.logger.user_login_attempt"
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess }

@@ -56,7 +56,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'reset' => [
                 'ttl' => 86400
             ],
-            'privileges' => []
+            'privileges' => [],
+            'login_sources' => []
         ];
 
         $this->assertEquals($expected, $processor->processConfiguration($configuration, []));

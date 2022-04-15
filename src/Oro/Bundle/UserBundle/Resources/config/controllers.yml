@@ -28,7 +28,7 @@ services:
             - ['setContainer', ['@Psr\Container\ContainerInterface']]
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: monolog.logger.oro_account_security, key: Psr\Log\LoggerInterface }
+            - { name: container.service_subscriber, id: monolog.logger.oro_security, key: Psr\Log\LoggerInterface }
             - { name: container.service_subscriber, id: oro_user.provider.user_logging_info_provider, key: Oro\Bundle\UserBundle\Provider\UserLoggingInfoProvider }
             - { name: container.service_subscriber, id: oro_user.manager, key: Oro\Bundle\UserBundle\Entity\UserManager }
             - { name: container.service_subscriber, id: oro_user.form.reset }
