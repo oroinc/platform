@@ -9,6 +9,7 @@ use Symfony\Component\Security\Guard\Token\GuardTokenInterface;
  * Extends UsernamePasswordOrganizationToken to add ability to use it in guard authentication.
  */
 class ImpersonationUsernamePasswordOrganizationToken extends UsernamePasswordOrganizationToken implements
-    GuardTokenInterface
+    GuardTokenInterface,
+    ImpersonationTokenInterface
 {
 }

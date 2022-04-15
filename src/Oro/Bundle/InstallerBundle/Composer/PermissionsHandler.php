@@ -6,6 +6,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
+/**
+ * Set necessary access permissions for files.
+ */
 class PermissionsHandler
 {
     const SETFACL = 'setfacl -Rm "u:{user}:rwX,d:u:{user}:rwX,g:{group}:rw,d:g:{group}:rw" {path}';
@@ -101,12 +104,12 @@ class PermissionsHandler
         return trim($process->getOutput());
     }
 
-    /**
-     * @param string $commandline
-     * @return Process
-     */
-    protected function getProcess($commandline): Process
+    protected function getProcess(string $commandline): Process
     {
-        return new Process($commandline);
+        if (method_exists(Process::class, 'fromShellCommandline')) {
+            return Process::fromShellCommandline($commandline);
+        } else {
+            return new Process($commandline);
+        }
     }
 }

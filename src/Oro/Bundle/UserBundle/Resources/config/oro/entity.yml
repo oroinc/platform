@@ -3,6 +3,7 @@ oro_entity:
         - { entity: Oro\Bundle\UserBundle\Entity\User, field: password }
         - { entity: Oro\Bundle\UserBundle\Entity\User, field: salt }
         - { entity: Oro\Bundle\UserBundle\Entity\User, field: confirmationToken }
+        - { entity: Oro\Bundle\UserBundle\Entity\UserLoginAttempt, field: context }
 
     entity_aliases:
         Oro\Bundle\UserBundle\Entity\Email:

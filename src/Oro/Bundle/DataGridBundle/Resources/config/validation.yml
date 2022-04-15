@@ -1,0 +1,33 @@
+Oro\Bundle\DataGridBundle\Entity\GridView:
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+        type:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+            - Choice:
+                  callback: 'getTypes'
+        gridName:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+        appearanceType:
+            - Valid: ~
+
+Oro\Bundle\DataGridBundle\Entity\AppearanceType:
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                  max: 32
+        label:
+            - NotBlank: ~
+            - Length:
+                  max: 255
+        icon:
+            - NotBlank: ~
+            - Length:
+                  max: 255

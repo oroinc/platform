@@ -7,6 +7,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
+    const errorHandler = require('oroui/js/error');
     const GridViewModel = require('./model');
     const ViewNameModal = require('./view-name-modal');
     const mediator = require('oroui/js/mediator');
@@ -99,7 +100,7 @@ define(function(require) {
         modal: null,
 
         /** @property */
-        showErrorMessage: true,
+        showErrorMessage: false,
 
         /** @property */
         adjustDocumentTitle: true,
@@ -260,8 +261,6 @@ define(function(require) {
         },
 
         _onSaveModel: function(model) {
-            const self = this;
-
             model.save({
                 icon: void 0,
                 label: model.get('label'),
@@ -272,26 +271,29 @@ define(function(require) {
                 appearanceData: this.collection.state.appearanceData
             }, {
                 wait: true,
-                errorHandlerMessage: self.showErrorMessage,
-                success: function() {
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                errorHandlerMessage: this.showErrorMessage,
+                success: () => {
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             });
         },
 
         onSaveAs: function() {
-            const modal = new ViewNameModal();
-            const self = this;
+            if (_.isObject(this.modal)) {
+                this.modal.dispose();
+            }
 
-            modal.on('ok', function() {
-                const data = self.getInputData(modal.$el);
-                const model = self._createBaseViewModel(data);
+            const modal = new ViewNameModal();
+
+            modal.on('ok', () => {
+                const data = this.getInputData(modal.$el);
+                const model = this._createBaseViewModel(data);
 
                 if (model.isValid()) {
-                    self.lockModelOnOkCloses(modal, true);
-                    self._onSaveAsModel(model);
+                    this.lockModelOnOkCloses(modal, true);
+                    this._onSaveAsModel(model);
                 } else {
-                    self.lockModelOnOkCloses(modal, false);
+                    this.lockModelOnOkCloses(modal, false);
                 }
             });
 
@@ -306,30 +308,29 @@ define(function(require) {
          * @private
          */
         _onSaveAsModel: function(model) {
-            const self = this;
-
             model.save(null, {
                 wait: true,
-                success: function(model) {
-                    const currentModel = self._getCurrentDefaultViewModel();
-                    const icon = self._getAppearanceIcon(model.get('appearanceType'));
+                success: model => {
+                    const currentModel = this._getCurrentDefaultViewModel();
+                    const icon = this._getAppearanceIcon(model.get('appearanceType'));
+
                     model.set('name', model.get('id'));
                     model.set('icon', icon);
                     model.unset('id');
                     if (model.get('is_default') && currentModel) {
                         currentModel.set({is_default: false});
                     }
-                    self.viewsCollection.add(model);
-                    self.changeView(model.get('name'));
-                    self.collection.state.gridView = model.get('name');
-                    self.viewDirty = !self._isCurrentStateSynchronized();
-                    self._updateTitle();
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.created'));
-                    mediator.trigger('datagrid:' + self.gridName + ':views:add', model);
+                    this.viewsCollection.add(model);
+                    this.changeView(model.get('name'));
+                    this.collection.state.gridView = model.get('name');
+                    this.viewDirty = !this._isCurrentStateSynchronized();
+                    this._updateTitle();
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.created'));
+                    mediator.trigger('datagrid:' + this.gridName + ':views:add', model);
                 },
-                errorHandlerMessage: self.showErrorMessage,
-                error: function(model, response, options) {
-                    self.onError(model, response, options);
+                errorHandlerMessage: this.showErrorMessage,
+                error: (model, response, options) => {
+                    this.onError(model, response, options);
                 }
             });
         },
@@ -343,15 +344,14 @@ define(function(require) {
          */
         onShare: function(e) {
             const model = this._getEditableViewModel(e.currentTarget);
-            const self = this;
 
             model.save({
                 label: model.get('label'),
                 type: 'public'
             }, {
                 wait: true,
-                success: function() {
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                success: () => {
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             });
         },
@@ -361,15 +361,14 @@ define(function(require) {
          */
         onUnshare: function(e) {
             const model = this._getEditableViewModel(e.currentTarget);
-            const self = this;
 
             model.save({
                 label: model.get('label'),
                 type: 'private'
             }, {
                 wait: true,
-                success: function() {
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                success: () => {
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             });
         },
@@ -408,23 +407,26 @@ define(function(require) {
          * @param {Event} e
          */
         onRename: function(e) {
-            const self = this;
+            if (_.isObject(this.modal)) {
+                this.modal.dispose();
+            }
+
             const model = this._getEditableViewModel(e.currentTarget);
             const modal = new ViewNameModal({
                 defaultValue: model.get('label'),
                 defaultChecked: model.get('is_default')
             });
 
-            modal.on('ok', function() {
-                const data = self.getInputData(modal.$el);
+            modal.on('ok', () => {
+                const data = this.getInputData(modal.$el);
 
                 model.set(data, {silent: true});
 
                 if (model.isValid()) {
-                    self.lockModelOnOkCloses(modal, true);
-                    self._onRenameSaveModel(model);
+                    this.lockModelOnOkCloses(modal, true);
+                    this._onRenameSaveModel(model);
                 } else {
-                    self.lockModelOnOkCloses(modal, false);
+                    this.lockModelOnOkCloses(modal, false);
                 }
             });
             modal.open();
@@ -436,43 +438,46 @@ define(function(require) {
          * @private
          */
         _onRenameSaveModel: function(model) {
-            const self = this;
-
             model.save(
                 null, {
                     wait: true,
-                    success: function(savedModel) {
-                        const currentDefaultViewModel = self._getCurrentDefaultViewModel();
+                    success: savedModel => {
+                        const currentDefaultViewModel = this._getCurrentDefaultViewModel();
                         const isCurrentDefault = currentDefaultViewModel === model;
                         const isCurrentWasDefault = currentDefaultViewModel === undefined;
+
                         if (model.get('is_default') && !isCurrentDefault) {
                             // if current view hadn't default property and it is going to be
                             currentDefaultViewModel.set({is_default: false});
                         } else if (isCurrentWasDefault) {
                             // if current view had 'default' property and this property was removed, there are no
                             // views with 'default' property and it shall be set to system view.
-                            self._getDefaultSystemViewModel().set({is_default: true});
+                            this._getDefaultSystemViewModel().set({is_default: true});
                         }
 
                         model.set({
                             label: savedModel.get('label')
                         });
 
-                        self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                        this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                     },
-                    errorHandlerMessage: self.showErrorMessage,
-                    error: function(model, response, options) {
+                    errorHandlerMessage: this.showErrorMessage,
+                    error: (model, response, options) => {
                         model.set('label', model.previous('label'));
-                        self.onError(model, response, options);
+                        this.onError(model, response, options);
                     }
                 });
         },
 
         onError: function(model, response, options) {
-            if (_.isObject(this.modal)) {
-                this.modal.open();
+            if (response.status === 400) {
+                if (_.isObject(this.modal)) {
+                    this.modal.open();
+                }
+                this._showNameError(this.modal, response);
+            } else {
+                errorHandler.showErrorInUI(response);
             }
-            this._showNameError(this.modal, response);
         },
 
         /**
@@ -530,7 +535,6 @@ define(function(require) {
          * @param {Event} e
          */
         onUseAsDefault: function(e) {
-            const self = this;
             let isDefault = 1;
             const defaultModel = this._getCurrentDefaultViewModel();
             const gridName = this.gridName;
@@ -550,12 +554,12 @@ define(function(require) {
                     'gridName': gridName
                 }),
                 {},
-                function(response) {
+                response => {
                     if (defaultModel) {
                         defaultModel.set({is_default: false});
                     }
                     currentViewModel.set({is_default: true});
-                    self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
+                    this._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
                 }
             );
         },
@@ -1015,12 +1019,13 @@ define(function(require) {
          * @private
          */
         _showNameError: function(modal, response) {
-            if (response.status === 400) {
-                const jsonResponse = JSON.parse(response.responseText);
-                const errors = jsonResponse.errors.children.label.errors;
-                if (errors) {
-                    modal.setNameError(_.first(errors));
-                }
+            const responseJSON = response.responseJSON;
+            const errors = responseJSON.errors ? responseJSON.errors.children.label.errors : null;
+            const message = responseJSON.message;
+            const err = errors ? errors[0] : message;
+
+            if (err) {
+                modal.setNameError(err);
             }
         },
 

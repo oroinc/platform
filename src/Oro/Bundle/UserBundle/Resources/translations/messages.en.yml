@@ -285,6 +285,39 @@ oro:
             actions:
                 edit:            Edit
 
+        userloginattempt:
+            entity_label: Login Attempt
+            entity_plural_label: Login Attempts
+            entity_grid_all_view_label: All %entity_plural_label%
+            entity_description: A list of user login attempts
+            id:
+                label: Id
+                description: The unique identifier of record.
+            attempt_at:
+                label: Attempt at
+                description: The time when the login attempt has been produced.
+            success:
+                label: Success
+                description: Is the login was success.
+            source:
+                label: Source
+                description: The login type source (default, OAuth, WSSE, impersonation, …).
+            username:
+                label: Username
+                description: The tracked username.
+            user:
+                label: User
+                description: The tracked user that logged to the system.
+            ip:
+                label: IP
+                description: The user's IP address.
+            user_agent:
+                label: User agent
+                description: The user agent string.
+            context:
+                label: Context
+                description: Additional user info was tracked during loging.
+
         invite:
             label: Send an Email Invitation
         privileges:
@@ -408,6 +441,8 @@ oro:
                 success_message: '%count% user(s) were disabled'
                 error_message: '%count% user(s) were disabled'
                 label:               Disable
-
+        login_source:
+            default: Default
+            impersonation: Impersonation
     scope:
         user.label: User

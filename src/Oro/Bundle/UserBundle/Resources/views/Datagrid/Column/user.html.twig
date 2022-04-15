@@ -1,0 +1,4 @@
+{%- if value -%}
+    {%- import '@OroUI/macros.html.twig' as UI -%}
+    {{ UI.entityViewLink(value, attribute(value, 'fullName'), 'oro_user_view', 'VIEW') }}
+{%- endif -%}
