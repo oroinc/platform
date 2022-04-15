@@ -39,7 +39,26 @@ class UserLoggingInfoProvider implements UserLoggingInfoProviderInterface
             $info['ipaddress'] = $ip;
         }
 
-        return $info;
+        return array_merge($info, $this->getClientInfo());
+    }
+
+    private function getClientInfo(): array
+    {
+        $result = [];
+
+        if (!$this->requestStack->getCurrentRequest()) {
+            return $result;
+        }
+
+        $request = $this->requestStack->getCurrentRequest();
+        if ($request->server->has('HTTP_SEC_CH_UA_PLATFORM')) {
+            $result['platform'] = trim($request->server->get('HTTP_SEC_CH_UA_PLATFORM'), '"');
+        }
+        if ($request->server->has('HTTP_USER_AGENT')) {
+            $result['user agent'] = $request->server->get('HTTP_USER_AGENT');
+        }
+
+        return $result;
     }
 
     private function getIp(): ?string

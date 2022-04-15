@@ -76,8 +76,20 @@ services:
             - '@oro_user.manager'
             - '@oro_user.provider.user_logging_info_provider'
             - '@logger'
+        calls:
+            - [setUserLoginAttemptLogger, ['@oro_user.logger.user_login_attempt']]
+            - [setLoginSourceProvidersForSuccessRequest, [!tagged_iterator oro_security.login_source_provider.success]]
+            - [setLoginSourceProvidersForFailedRequest, [!tagged_iterator oro_security.login_source_provider.fail]]
+            - [setSkippedLogAttemptsFirewallsProvider, ['@oro_user.security.skipped_log_attempts_firewalls_provider']]
+
+    oro_user.security.skipped_log_attempts_firewalls_provider:
+        class: Oro\Bundle\UserBundle\Security\SkippedLogAttemptsFirewallsProvider
+
+    oro_user.security.impersonation_login_source_provider:
+        class: Oro\Bundle\UserBundle\Security\ImpersonationLoginSourceProvider
         tags:
-            - { name: monolog.logger, channel: oro_account_security }
+            - { name: oro_security.login_source_provider.success }
+            - { name: oro_security.login_source_provider.fail }
 
     oro_user.user_menu:
         class: Oro\Bundle\UserBundle\Menu\UserMenuBuilder
@@ -603,3 +615,16 @@ services:
     oro_user.security.factory.impersonation_username_password_organization:
         class: Oro\Bundle\UserBundle\Security\ImpersonationUsernamePasswordOrganizationTokenFactory
         public: true
+
+    oro_user.logger.user_login_attempt:
+        class: Oro\Bundle\UserBundle\Security\UserLoginAttemptLogger
+        public: true
+        arguments:
+            - '@doctrine'
+            - '@oro_user.provider.user_logging_info_provider'
+            - '@translator'
+            - '@logger'
+            - Oro\Bundle\UserBundle\Entity\UserLoginAttempt
+            - '%oro_user.login_sources%'
+        tags:
+            - { name: monolog.logger, channel: security }

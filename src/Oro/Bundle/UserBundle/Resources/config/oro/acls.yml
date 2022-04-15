@@ -17,3 +17,7 @@ acls:
         type: action
         group_name: ""
         category: "application"
+    oro_view_user_login_attempt:
+        type: entity
+        class: Oro\Bundle\UserBundle\Entity\UserLoginAttempt
+        permission: VIEW
