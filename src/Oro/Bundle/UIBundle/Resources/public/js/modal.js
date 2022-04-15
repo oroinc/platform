@@ -246,7 +246,7 @@ define(function(require, exports, module) {
 
             // Create it
             this.$el.modal(_.extend({
-                keyboard: this.options.allowCancel,
+                keyboard: this.options.keyboard !== void 0 ? this.options.keyboard : true,
                 backdrop: this.options.allowCancel ? true : 'static'
             }, this.options.modalOptions));
 
