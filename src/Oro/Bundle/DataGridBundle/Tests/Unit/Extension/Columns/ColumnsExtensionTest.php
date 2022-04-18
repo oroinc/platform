@@ -130,11 +130,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getDefaultState')
             ->with($this->datagridConfiguration)
             ->willReturn($defaultState);
-
-        $this->metadataObject
-            ->expects(self::at(4))
-            ->method('offsetAddToArray')
-            ->with('initialState', [Configuration::COLUMNS_KEY => $defaultState]);
     }
 
     private function assertStateIsSet(array $state): void
@@ -154,26 +149,10 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
     private function assertMetadataColumnsUpdated(string $columnName, array $columnsState): void
     {
         $this->metadataObject
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('offsetGetOr')
             ->with('columns', [])
             ->willReturn([['name' => $columnName]]);
-
-        $this->metadataObject
-            ->expects(self::at(2))
-            ->method('offsetSetByPath')
-            ->with(
-                sprintf('[%s][%s][%s]', 'columns', 0, ColumnsStateProvider::ORDER_FIELD_NAME),
-                $columnsState[$columnName][ColumnsStateProvider::ORDER_FIELD_NAME]
-            );
-
-        $this->metadataObject
-            ->expects(self::at(3))
-            ->method('offsetSetByPath')
-            ->with(
-                sprintf('[%s][%s][%s]', 'columns', 0, ColumnsStateProvider::RENDER_FIELD_NAME),
-                $columnsState[$columnName][ColumnsStateProvider::RENDER_FIELD_NAME]
-            );
     }
 
     public function testVisitMetadata(): void
@@ -205,14 +184,6 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('offsetGetByPath')
             ->with('[gridViews][views]', [])
             ->willReturn([['name' => GridViewsExtension::DEFAULT_VIEW_ID]]);
-
-        $this->metadataObject
-            ->expects(self::at(6))
-            ->method('offsetSetByPath')
-            ->with(
-                sprintf('[gridViews][views][%s][%s]', 0, 'columns'),
-                $defaultState
-            );
     }
 
     public function testVisitMetadataWhenNoColumnName(): void
@@ -246,7 +217,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($defaultState = ['sampleDefaultState']);
 
         $this->metadataObject
-            ->expects(self::once())
+            ->expects(self::exactly(2))
             ->method('offsetGetOr')
             ->with('columns', [])
             ->willReturn($metadata);
@@ -285,6 +256,81 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
         $metadata = [['name' => 'sampleColumn']];
 
         $this->assertMetadataNotUpdated($columnsState, $metadata);
+
+        $this->extension->setParameters($this->datagridParameters);
+        $this->extension->visitMetadata($this->datagridConfiguration, $this->metadataObject);
+    }
+
+    public function testVisitMetadataDisabledProvider(): array
+    {
+        return [
+            'default behavior' => [
+                'configColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ],
+                    'column2' => [
+                        'label'    => 'column2.label',
+                        'disabled' => false,
+                    ],
+                ],
+                'expectedColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ],
+                    'column2' => [
+                        'label'    => 'column2.label',
+                        'disabled' => false,
+                    ],
+                ],
+            ],
+            'disabled column' => [
+                'configColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ],
+                    'column2' => [
+                        'label'    => 'column2.label',
+                        'disabled' => true,
+                    ],
+                ],
+                'expectedColumns' => [
+                    'column1' => [
+                        'label'      => 'column1.label',
+                    ]
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider testVisitMetadataDisabledProvider
+     * @param array $configColumns
+     * @param array $expectedColumns
+     */
+    public function testVisitMetadataDisabled(array $configColumns, array $expectedColumns)
+    {
+        $this->columnsStateProvider->expects(self::once())
+            ->method('getState')
+            ->with($this->datagridConfiguration)
+            ->willReturn([]);
+        $this->columnsStateProvider->expects(self::once())
+            ->method('getDefaultState')
+            ->with($this->datagridConfiguration)
+            ->willReturn(['sampleDefaultState']);
+        $this->metadataObject->expects(self::once())
+            ->method('offsetGetByPath')
+            ->with('[gridViews][views]', [])
+            ->willReturn(['columnConfig' => []]);
+
+        $this->metadataObject->expects(self::exactly(2))
+            ->method('offsetGetOr')
+            ->with('columns', [])
+            ->willReturn($configColumns);
+
+        $this->metadataObject->expects(self::once())
+            ->method('offsetSet')
+            ->with(Configuration::COLUMNS_KEY, $expectedColumns);
 
         $this->extension->setParameters($this->datagridParameters);
         $this->extension->visitMetadata($this->datagridConfiguration, $this->metadataObject);

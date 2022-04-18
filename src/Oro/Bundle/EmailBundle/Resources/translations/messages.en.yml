@@ -357,8 +357,8 @@ oro:
         load_more_emails:         "%quantity% older messages"
 
         emailuser:
-            entity_label:             Email-User Relation
-            entity_plural_label:      Email-User Relations
+            entity_label:             User Emails
+            entity_plural_label:      User Emails
             entity_grid_all_view_label: All %entity_plural_label%
             email.label:              Email
             email.aria_label:         "Opens a default email client to write an email to %email%"
@@ -372,6 +372,7 @@ oro:
             folders.label:            Folders
             origin.label:             Email Origin
             unsynced_flag_count.label: Unsynced Flag Count
+            is_email_private.label:   Determinates if the email public or private
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
@@ -423,6 +424,9 @@ oro:
                 success: Email sync completed.
                 error: Email sync failed.
                 processing: Email sync has started. Please wait, the grid will be updated after it is complete...
+
+        permission:
+            view_private.label: View private
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

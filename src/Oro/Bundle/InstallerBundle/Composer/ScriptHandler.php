@@ -122,7 +122,7 @@ class ScriptHandler
         }
 
         $npmAssets = array_merge($npmAssets, $rootNpmAssets);
-        ksort($npmAssets);
+        ksort($npmAssets, SORT_STRING | SORT_FLAG_CASE);
 
         return $npmAssets;
     }

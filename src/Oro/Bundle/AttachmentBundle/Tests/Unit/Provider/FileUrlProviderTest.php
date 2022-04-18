@@ -27,22 +27,33 @@ class FileUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileUrl(): void
     {
+        $fileId = 1;
+        $filename = 'sample-filename';
+        $action = 'sample-action';
+        $referenceType = 1;
+        $file = $this->getFile($fileId, $filename);
+
+        $this->filenameProvider->expects(self::once())
+            ->method('getFileName')
+            ->with($file)
+            ->willReturn($filename);
+
         $this->urlGenerator
             ->method('generate')
             ->with(
                 'oro_attachment_get_file',
                 [
-                    'id' => $fileId = 1,
-                    'filename' => $filename = 'sample-filename',
-                    'action' => $action = 'sample-action',
+                    'id' => $fileId,
+                    'filename' => $filename,
+                    'action' => $action,
                 ],
-                $referenceType = 1
+                $referenceType
             )
             ->willReturn($url = 'sample-url');
 
         self::assertEquals(
             $url,
-            $this->provider->getFileUrl($this->getFile($fileId, $filename), $action, $referenceType)
+            $this->provider->getFileUrl($file, $action, $referenceType)
         );
     }
 

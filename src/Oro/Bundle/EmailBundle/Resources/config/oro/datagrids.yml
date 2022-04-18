@@ -203,8 +203,8 @@ datagrids:
                 subject: { type: email-string, data_name: e.subject }
                 from:    { type: email-string, data_name: e.fromName, label: oro.email.from_email_address.label }
                 to:      { type: string,   data_name: r_to.name,  label: oro.email.to.label }
-                cc:      { type: string,   data_name: r_cc.name,  label: oro.email.cc.label, enabled: false }
-                bcc:     { type: string,   data_name: r_bcc.name, label: oro.email.bcc.label, enabled: false }
+                cc:      { type: string,   data_name: r_cc.name,  label: oro.email.cc.label, renderable: false }
+                bcc:     { type: string,   data_name: r_bcc.name, label: oro.email.bcc.label, renderable: false }
                 date:    { type: datetime, data_name: e.sentAt,   label: oro.email.date_time.label }
 
                 folder:
@@ -251,9 +251,6 @@ datagrids:
     user-email-grid:
         extends: email-grid
         extended_entity_name: 'Oro\Bundle\EmailBundle\Entity\EmailUser'
-        source:
-            skip_acl_apply: true
-
         properties:
             id: ~
             view_thread_link:
@@ -313,7 +310,6 @@ datagrids:
     dashboard-recent-emails-grid:
         source:
             type: orm
-            skip_acl_apply: true
             query:
                 select:
                     - eu.id AS id

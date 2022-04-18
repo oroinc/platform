@@ -6,7 +6,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Provider\RawConfigurationProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterBagInterface;
@@ -128,7 +127,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $filtersConfig = $config->offsetGetByPath(Configuration::COLUMNS_PATH, []);
 
         foreach ($filtersConfig as $filterName => $filterConfig) {
-            if (!empty($filterConfig[PropertyInterface::DISABLED_KEY])) {
+            if (!empty($filterConfig[FilterUtility::DISABLED_KEY])) {
                 // Skips disabled filter.
                 continue;
             }

@@ -156,6 +156,13 @@ class EmailUser
      */
     protected $unsyncedFlagCount = 0;
 
+    /**
+     * @var bool
+     *
+     * @ORM\Column(name="is_private", type="boolean", nullable=true)
+     */
+    private $isEmailPrivate = false;
+
     public function __construct()
     {
         $this->folders = new ArrayCollection();
@@ -499,5 +506,21 @@ class EmailUser
         }
 
         return $fromEmailAddress->getOwner();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailPrivate(): bool
+    {
+        return $this->isEmailPrivate ?: false;
+    }
+
+    /**
+     * @param bool $isEmailPrivate
+     */
+    public function setIsEmailPrivate(bool $isEmailPrivate): void
+    {
+        $this->isEmailPrivate = $isEmailPrivate;
     }
 }

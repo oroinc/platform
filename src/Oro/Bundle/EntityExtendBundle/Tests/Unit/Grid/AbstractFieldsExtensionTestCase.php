@@ -206,7 +206,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'string',
                                 'data_name' => 'o.' . self::FIELD_NAME,
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -257,7 +257,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'string',
                                 'data_name' => 'o.'.self::FIELD_NAME,
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -312,7 +312,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'string',
                                 'data_name' => 'e.'.self::FIELD_NAME,
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -409,7 +409,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'data_name' => $alias.'.'.self::FIELD_NAME,
                                 'type' => 'enum',
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -481,7 +481,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'data_name' => 'c.testField',
                                 'type' => 'multiEnum',
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -539,7 +539,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
                             self::FIELD_NAME => [
                                 'type' => 'entity',
                                 'data_name' => 'IDENTITY(o.testField)',
-                                'enabled' => true,
+                                'renderable' => true,
                                 'translatable' => true,
                                 'options' => [
                                     'field_type' => EntityType::class,

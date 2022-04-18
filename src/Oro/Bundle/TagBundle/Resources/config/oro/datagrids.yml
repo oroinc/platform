@@ -86,7 +86,7 @@ datagrids:
                 taxonomyName:
                     type: entity
                     data_name: t.taxonomy
-                    enabled: true
+                    renderable: true
                     options:
                         field_options:
                             class: Oro\Bundle\TagBundle\Entity\Taxonomy

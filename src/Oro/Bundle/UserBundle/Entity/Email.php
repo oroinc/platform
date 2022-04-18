@@ -8,8 +8,11 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
+ * Represents an additional user email address.
  * @ORM\Entity()
- * @ORM\Table(name="oro_user_email")
+ * @ORM\Table("oro_user_email", indexes={
+ *      @ORM\Index(name="idx_user_email", columns={"email"})
+ * })
  * @Config()
  */
 class Email implements EmailInterface

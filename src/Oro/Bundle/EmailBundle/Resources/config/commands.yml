@@ -8,6 +8,12 @@ services:
         tags:
             - { name: console.command }
 
+    Oro\Bundle\EmailBundle\Command\UpdateVisibilitiesCommand:
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+        tags:
+            - { name: console.command }
+
     Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand:
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'

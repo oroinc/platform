@@ -743,4 +743,25 @@ class ActionExtensionTest extends \PHPUnit\Framework\TestCase
             self::assertEquals(['update' => false, 'delete' => false], $result);
         }
     }
+
+    public function testVisitMetadataDisabledAction(): void
+    {
+        $config   = DatagridConfiguration::create(
+            [
+                'actions' => [
+                    'action1' => ['type' => 'type1', 'disabled' => true],
+                ],
+            ]
+        );
+        $metadata = MetadataObject::create([]);
+
+        $this->extension->visitMetadata($config, $metadata);
+
+        $this->assertEquals(
+            [
+                'rowActions' => []
+            ],
+            $metadata->toArray()
+        );
+    }
 }

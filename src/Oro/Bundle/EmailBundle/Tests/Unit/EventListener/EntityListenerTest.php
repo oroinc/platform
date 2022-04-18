@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EmailBundle\Async\Topics;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
+use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\EventListener\EntityListener;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
@@ -56,6 +57,9 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|EntityRepository */
     private $entityRepository;
 
+    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailAddressVisibilityManager */
+    private $emailAddressVisibilityManager;
+
     protected function setUp(): void
     {
         $this->emailOwnerManager    =
@@ -95,6 +99,9 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->emailAddressManager = $this->getMockBuilder(EmailAddressManager::class)
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->emailAddressVisibilityManager = $this->createMock(EmailAddressVisibilityManager::class);
+
         $this->emailAddressManager->expects($this->any())
             ->method('getEmailAddressRepository')
             ->willReturn($this->entityRepository);
@@ -105,6 +112,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
             ->add('oro_email.email.activity.manager', $this->emailActivityManager)
             ->add('oro_email.model.email_activity_updates', $this->emailActivityUpdates)
             ->add('oro_email.email.address.manager', $this->emailAddressManager)
+            ->add('oro_email.email_address_visibility.manager', $this->emailAddressVisibilityManager)
             ->getContainer($this);
 
         $this->listener = new EntityListener(
@@ -154,7 +162,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->emailOwnerManager->expects($this->once())
             ->method('handleChangedAddresses')
             ->with([])
-            ->willReturn([$updatedEmailAddresses, $createdEmailAddresses]);
+            ->willReturn([$updatedEmailAddresses, $createdEmailAddresses, ['test@test.com']]);
 
         $postFlushEventArgs = $this->createPostFlushEventArgsMock();
         $postFlushEventArgs->expects($this->any())
@@ -177,6 +185,10 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->entityRepository->expects($this->any())
             ->method('findOneBy')
             ->willReturn(null);
+
+        $this->emailAddressVisibilityManager->expects(self::once())
+            ->method('collectEmailAddresses')
+            ->with(['test@test.com']);
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
@@ -219,7 +231,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
             ->will($this->returnValue([]));
         $this->emailOwnerManager->expects($this->once())
             ->method('handleChangedAddresses')
-            ->willReturn([[],[]]);
+            ->willReturn([[],[], []]);
         $this->emailActivityManager->expects($this->once())
             ->method('updateActivities')
             ->with($createdEmails);
@@ -266,6 +278,9 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
                 'ownerIds' => [123],
             ]);
 
+        $this->emailAddressVisibilityManager->expects(self::never())
+            ->method('collectEmailAddresses');
+
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);
     }
@@ -311,7 +326,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->emailOwnerManager->expects($this->once())
             ->method('handleChangedAddresses')
             ->with([])
-            ->willReturn([$updatedEmailAddresses, $createdEmailAddresses]);
+            ->willReturn([$updatedEmailAddresses, $createdEmailAddresses, ['test@test.com']]);
 
         $postFlushEventArgs = $this->createPostFlushEventArgsMock();
         $postFlushEventArgs->expects($this->any())
@@ -326,6 +341,10 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->producer->expects($this->never())
             ->method('send');
+
+        $this->emailAddressVisibilityManager->expects(self::once())
+            ->method('collectEmailAddresses')
+            ->with(['test@test.com']);
 
         $this->listener->onFlush($onFlushEventArgs);
         $this->listener->postFlush($postFlushEventArgs);

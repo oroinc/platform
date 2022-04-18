@@ -44,6 +44,11 @@ services:
         public: true
         arguments:
             - '@oro_sync.websocket_client.basic'
+        calls:
+            - [setLogger, ['@logger']]
+            - [setApplicationInstalled, ['%installed%']]
+        tags:
+            - { name: monolog.logger, channel: oro_websocket }
 
     oro_sync.event_listener.maintenance:
         class: Oro\Bundle\SyncBundle\EventListener\MaintenanceListener
@@ -82,10 +87,16 @@ services:
 
     oro_sync.loader.yaml:
         class:  Oro\Bundle\SyncBundle\Loader\YamlFileLoader
-        public: false
         parent: gos_pubsub_router.loader.yaml
         tags:
             - { name: gos_pubsub_router.routing.loader }
 
     oro_sync.authentication.origin_extractor:
         class: Oro\Bundle\SyncBundle\Authentication\Origin\OriginExtractor
+
+    oro_sync.log.handler.websocket_server_console:
+        class: Oro\Bundle\SyncBundle\Log\Handler\WebsocketServerConsoleHandler
+        # Decorated handler service is specified along with the websocket monolog handler in Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension
+        # decorates: monolog.handler.websocket
+        arguments:
+            - '@oro_sync.log.handler.websocket_server_console.inner'

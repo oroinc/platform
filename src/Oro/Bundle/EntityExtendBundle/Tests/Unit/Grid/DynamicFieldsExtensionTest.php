@@ -205,7 +205,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                             self::FIELD_NAME => [
                                 'type' => 'string',
                                 'data_name' => 'o.' . self::FIELD_NAME,
-                                'enabled' => true,
+                                'renderable' => true,
                             ],
                         ],
                     ],
@@ -365,7 +365,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                     self::FIELD_NAME => [
                         'type' => 'string',
                         'data_name' => 'o.' . self::FIELD_NAME,
-                        'enabled' => true,
+                        'renderable' => true,
                     ],
                 ],
             ],

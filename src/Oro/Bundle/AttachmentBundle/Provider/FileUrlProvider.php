@@ -35,7 +35,7 @@ class FileUrlProvider implements FileUrlProviderInterface
     ): string {
         return $this->urlGenerator->generate(
             'oro_attachment_get_file',
-            ['id' => $file->getId(), 'filename' => $file->getFilename(), 'action' => $action],
+            ['id' => $file->getId(), 'filename' => $this->filenameProvider->getFileName($file), 'action' => $action],
             $referenceType
         );
     }

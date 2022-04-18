@@ -24,11 +24,12 @@ class NavigationHistoryLoggerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
+        // send some web request to initialize the security context
+        $this->getClientInstance()->request('GET', $this->getUrl('oro_navigation_user_menu_index'));
+
         $this->navigationHistoryLogger = $this->getContainer()->get('oro_navigation.tests.navigation_history_logger');
         $this->tokenAccessor = $this->getContainer()->get('oro_security.token_accessor');
 
-        // send some web request to initialize the security context
-        $this->getClientInstance()->request('GET', $this->getUrl('oro_navigation_user_menu_index'));
         // check that the security context is initialized
         $this->assertNotNull($this->tokenAccessor->getUser(), 'No logged in user');
     }

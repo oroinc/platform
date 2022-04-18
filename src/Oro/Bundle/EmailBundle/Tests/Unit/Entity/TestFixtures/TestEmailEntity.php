@@ -9,5 +9,6 @@ class TestEmailEntity extends Email
     public function __construct($id = null)
     {
         $this->id = $id;
+        parent::__construct();
     }
 }

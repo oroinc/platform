@@ -83,9 +83,9 @@ datagrids:
         options:
             entityHint: oro.integration.channel.entity_plural_label
             entity_pagination: true
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
 
     oro-integration-status-grid:
         acl_resource: oro_integration_view

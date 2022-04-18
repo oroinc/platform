@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Migration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
+use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 use Psr\Log\LoggerInterface;
 
@@ -50,16 +51,26 @@ class RemoveWorkflowAwareEntitiesQuery extends ParametrizedMigrationQuery
     private function getIds(LoggerInterface $logger): array
     {
         $qb = $this->connection->createQueryBuilder();
+        $dbDriver = $this->connection->getDriver()->getName();
+        if ($dbDriver === DatabaseDriverInterface::DRIVER_MYSQL) {
+            $condition = $qb->expr()->andX(
+                $qb->expr()->eq('CAST(wi.entity_id as unsigned integer)', 'e.id'),
+                $qb->expr()->eq('wi.entity_class', ':class_name')
+            );
+        } else {
+            $condition = $qb->expr()->andX(
+                $qb->expr()->eq('CAST(wi.entity_id as integer)', 'e.id'),
+                $qb->expr()->eq('wi.entity_class', ':class_name')
+            );
+        }
+
         $sql = $qb->select('e.id')
             ->from($this->tableName, 'e')
             ->innerJoin(
                 'e',
                 'oro_workflow_item',
                 'wi',
-                $qb->expr()->andX(
-                    $qb->expr()->eq('CAST(wi.entity_id as unsigned integer)', 'e.id'),
-                    $qb->expr()->eq('wi.entity_class', ':class_name')
-                )
+                $condition
             )
             ->where($qb->expr()->eq('wi.workflow_name', ':workflow_name'))
             ->getSQL();

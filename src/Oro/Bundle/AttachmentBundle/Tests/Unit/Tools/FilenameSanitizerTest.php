@@ -9,9 +9,9 @@ class FilenameSanitizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fileNameDataProvider
      */
-    public function testSanitizeFilename(string $fileName, string $expected)
+    public function testSanitizeFilename(string $fileName, string $expected): void
     {
-        $this->assertEquals($expected, FilenameSanitizer::sanitizeFilename($fileName));
+        self::assertEquals($expected, FilenameSanitizer::sanitizeFilename($fileName));
     }
 
     public function fileNameDataProvider(): array

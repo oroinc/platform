@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
 use Oro\Bundle\DataGridBundle\Provider\State\ColumnsStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
@@ -62,6 +63,7 @@ class ColumnsExtension extends AbstractExtension
 
         $columnsState = $this->columnsStateProvider->getState($datagridConfiguration, $datagridParameters);
         $this->setColumnsState($metadata, $columnsState);
+        $this->updateMetadataVisibility($metadata);
         $this->updateMetadataColumns($metadata, $columnsState);
 
         $defaultColumnsState = $this->columnsStateProvider->getDefaultState($datagridConfiguration);
@@ -116,5 +118,19 @@ class ColumnsExtension extends AbstractExtension
                 );
             }
         }
+    }
+
+    private function updateMetadataVisibility(MetadataObject $metadata): void
+    {
+        $columns = $metadata->offsetGetOr(Configuration::COLUMNS_KEY, []);
+        $columns = array_filter(array_map(function ($columnData) {
+            if ($columnData[PropertyInterface::DISABLED_KEY] ?? false) {
+                return null;
+            }
+
+            return $columnData;
+        }, $columns));
+
+        $metadata->offsetSet(Configuration::COLUMNS_KEY, $columns);
     }
 }

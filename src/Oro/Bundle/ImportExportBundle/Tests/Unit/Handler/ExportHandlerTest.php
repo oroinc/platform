@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
+use Gaufrette\Exception\FileNotFound;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -147,6 +148,48 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Cannot merge export files into single summary file');
+
+        $this->exportHandler->exportResultFileMerge($jobName, $processorType, $outputFormat, $files);
+    }
+
+    public function testExportResultFileNotFound()
+    {
+        $jobName = 'job-name';
+        $processorType = 'export';
+        $outputFormat = 'csv';
+        $files = ['test1.csv'];
+
+        $writer = $this->createMock(FileStreamWriter::class);
+        $this->writerChain->expects(self::once())
+            ->method('getWriter')
+            ->willReturn($writer);
+        $this->batchFileManager->expects(self::once())
+            ->method('setWriter')
+            ->with($writer);
+
+        $reader = $this->createMock(AbstractFileReader::class);
+        $this->readerChain->expects(self::once())
+            ->method('getReader')
+            ->willReturn($reader);
+        $this->batchFileManager->expects(self::once())
+            ->method('setReader')
+            ->with($reader);
+
+        $this->fileManager->expects(self::once())
+            ->method('writeToTmpLocalStorage')
+            ->with('test1.csv')
+            ->willThrowException(new FileNotFound('test1.csv'));
+        $this->fileManager->expects(self::never())
+            ->method('fixNewLines');
+
+        $this->batchFileManager->expects(self::once())
+            ->method('mergeFiles')
+            ->with([]);
+        $this->fileManager->expects(self::once())
+            ->method('writeFileToStorage');
+        $this->fileManager->expects(self::once())
+            ->method('deleteFile')
+            ->with('test1.csv');
 
         $this->exportHandler->exportResultFileMerge($jobName, $processorType, $outputFormat, $files);
     }

@@ -103,6 +103,9 @@ oro:
                 attachment_processing:
                     label: Attachment processing
                     description: Allows to enable or disable post processing
+                original_file_names_enabled:
+                    label: Enable Original File Names
+                    description: When enabled, the original file names will be appended to the system-generated hash values.
             attachment_processors_settings:
                 label: Image Processing
                 description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
@@ -123,6 +126,19 @@ oro:
             max_number_of_files:
                 label: 'Maximum Number Of Files'
                 tooltip: 'Maximum Number Of Files'
+
+            file_names:
+                label: File Names
+                description: Modification of the default value may cause temporary storefront slow-down until all images are renamed. The URLs in the search index will not be updated immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the renamed images will be stored alongside the existing ones.
+
+            original_file_names_enabled:
+                label: Enable Original File Names
+                tooltip: When enabled, the original file names will be appended to the system-generated hash values.
+
+            notice:
+                storage_check_space: >
+                    This configuration option may affect application disk space usage, please check with your
+                    system administrator if you have enough space available.
 
         action:
             add:                 Add attachment

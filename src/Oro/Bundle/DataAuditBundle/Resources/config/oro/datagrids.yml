@@ -87,7 +87,7 @@ datagrids:
                 version:
                     type: number-range
                     data_name: a.version
-                    enabled: false
+                    renderable: false
                 objectClass:
                     type: choice
                     data_name: a.objectClass

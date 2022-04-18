@@ -114,7 +114,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
         $this->target = '/' . ltrim($target, '/');
 
         if ($this->connected) {
-            return $this->sessionId;
+            return (string) $this->sessionId;
         }
 
         $this->socket = $this->openSocket();
@@ -133,7 +133,7 @@ class WampClient implements ClientInterface, LoggerAwareInterface
             $this->connected = true;
         }
 
-        return $this->sessionId;
+        return (string) $this->sessionId;
     }
 
     /**

@@ -26,7 +26,6 @@ define(function(require) {
             this.setElement(this._getWrapperTemplate()({
                 label: this.labelPrefix + this.label,
                 showLabel: this.showLabel,
-                canDisable: this.canDisable,
                 isEmpty: this.isEmptyValue(),
                 renderMode: this.renderMode,
                 criteriaHint: this._getCriteriaHint(),

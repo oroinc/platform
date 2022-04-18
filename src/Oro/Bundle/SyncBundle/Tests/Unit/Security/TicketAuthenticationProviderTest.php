@@ -6,6 +6,7 @@ use Oro\Bundle\SyncBundle\Authentication\Ticket\TicketDigestGenerator\TicketDige
 use Oro\Bundle\SyncBundle\Security\TicketAuthenticationProvider;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -98,7 +99,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     public function testAuthenticateTokenCreatedDateInFuture(): void
     {
         $created = $this->getDateInFuture();
-        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new UsernamePasswordToken(new User(), self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $this->expectException(BadCredentialsException::class);
@@ -110,6 +111,44 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         ));
 
         $this->ticketAuthenticationProvider->authenticate($token);
+    }
+
+    public function testAuthenticateTokenCreatedDateInFutureLessThan30Sec(): void
+    {
+        $created = $this->getDateInFuture('now +29 sec');
+        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
+
+        $user = $this->createMock(UserInterface::class);
+
+        $userPassword = 'sampleUserPassword';
+        $user
+            ->expects(self::once())
+            ->method('getPassword')
+            ->willReturn($userPassword);
+
+        $userRoles = ['sampleRole'];
+        $user
+            ->expects(self::once())
+            ->method('getRoles')
+            ->willReturn($userRoles);
+
+        $this->userProvider
+            ->expects(self::once())
+            ->method('loadUserByUsername')
+            ->with(self::USERNAME)
+            ->willReturn($user);
+
+        $this->ticketDigestGenerator
+            ->expects(self::once())
+            ->method('generateDigest')
+            ->with(self::NONCE, $created, $userPassword)
+            ->willReturn(self::TICKET_DIGEST);
+
+        $expectedToken = new TicketToken($user, self::TICKET_DIGEST, self::PROVIDER_KEY, $userRoles);
+        $actualToken = $this->ticketAuthenticationProvider->authenticate($token);
+
+        self::assertEquals($expectedToken, $actualToken);
     }
 
     public function testAuthenticateTokenExpired(): void
@@ -244,9 +283,9 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         return date('c');
     }
 
-    private function getDateInFuture(): string
+    private function getDateInFuture(string $future = 'now +1 day'): string
     {
-        return (new \DateTime('now +1 day'))->format('c');
+        return (new \DateTime($future))->format('c');
     }
 
     private function getDateInPast(): string
