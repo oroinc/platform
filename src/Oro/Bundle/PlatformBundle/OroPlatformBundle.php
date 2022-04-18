@@ -4,6 +4,7 @@ namespace Oro\Bundle\PlatformBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\EntityListenerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\ServiceLinkCompilerPass;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -78,5 +79,7 @@ class OroPlatformBundle extends Bundle
                 'oro_platform.tests.merge_service_locators.service_locator'
             ), PassConfig::TYPE_BEFORE_REMOVING);
         }
+
+        $container->addCompilerPass(new ProfilerCompilerPass());
     }
 }
