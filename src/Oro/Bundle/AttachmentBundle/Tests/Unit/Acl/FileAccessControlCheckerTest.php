@@ -22,6 +22,18 @@ class FileAccessControlCheckerTest extends \PHPUnit\Framework\TestCase
         $this->checker = new FileAccessControlChecker($this->attachmentEntityConfigProvider);
     }
 
+    public function testIsCoveredByAclWhenStoredExternally(): void
+    {
+        $file = new File();
+        $file->setExternalUrl('http://example.org/image.png');
+
+        $this->attachmentEntityConfigProvider
+            ->expects(self::never())
+            ->method('getFieldConfig');
+
+        self::assertFalse($this->checker->isCoveredByAcl($file));
+    }
+
     /**
      * @dataProvider isCoveredByAclWhenNotEnoughDataProvider
      */

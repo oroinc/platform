@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
@@ -22,26 +23,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
+    private const FIELD_NAME = 'sampleField';
+    private const ENTITY_CLASS = 'SampleClass';
 
-    /** @var DatabaseHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $databaseHelper;
+    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
+    private DatabaseHelper|\PHPUnit\Framework\MockObject\MockObject $databaseHelper;
 
-    /** @var ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject */
-    private $configFileValidator;
+    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
 
-    /** @var ConfigMultipleFileValidator|\PHPUnit\Framework\MockObject\MockObject */
-    private $configMultipleFileValidator;
+    private ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject $configFileValidator;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private ConfigMultipleFileValidator|\PHPUnit\Framework\MockObject\MockObject $configMultipleFileValidator;
 
-    /** @var FileImportStrategyHelper */
-    private $helper;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+
+    private FileImportStrategyHelper $helper;
 
     protected function setUp(): void
     {
@@ -64,8 +61,8 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testValidateSingleFileWhenNoFile(): void
     {
-        $this->configFileValidator->expects($this->never())
-            ->method($this->anything());
+        $this->configFileValidator->expects(self::never())
+            ->method(self::anything());
 
         $this->helper->validateSingleFile(new File(), new \stdClass(), 'sample_field');
     }
@@ -76,25 +73,23 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $symfonyFile = new SymfonyFile('/sample/path', false);
         $file->setFile($symfonyFile);
         $entity = new \stdClass();
-        $fieldName = 'sampleField';
 
-        $entityClass = 'SampleClass';
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getClass')
             ->with($entity)
-            ->willReturn($entityClass);
+            ->willReturn(self::ENTITY_CLASS);
 
         $constraintViolationList = $this->createMock(ConstraintViolationListInterface::class);
-        $constraintViolationList->expects($this->once())
+        $constraintViolationList->expects(self::once())
             ->method('count')
             ->willReturn(0);
 
-        $this->configFileValidator->expects($this->once())
+        $this->configFileValidator->expects(self::once())
             ->method('validate')
-            ->with($symfonyFile, $entityClass, $fieldName)
+            ->with($symfonyFile, self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($constraintViolationList);
 
-        $this->assertCount(0, $this->helper->validateSingleFile($file, $entity, $fieldName));
+        self::assertCount(0, $this->helper->validateSingleFile($file, $entity, self::FIELD_NAME));
     }
 
     /**
@@ -106,13 +101,11 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $symfonyFile = new SymfonyFile('/sample/path', false);
         $file->setFile($symfonyFile);
         $entity = new \stdClass();
-        $fieldName = 'sampleField';
 
-        $entityClass = 'SampleClass';
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getClass')
             ->with($entity)
-            ->willReturn($entityClass);
+            ->willReturn(self::ENTITY_CLASS);
 
         $error1 = 'sample violation 1';
         $error2 = 'sample violation 2';
@@ -120,19 +113,19 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $violation2 = $this->createViolation($error2);
         $constraintViolationList = new ConstraintViolationList([$violation1, $violation2]);
 
-        $this->configFileValidator->expects($this->once())
+        $this->configFileValidator->expects(self::once())
             ->method('validate')
-            ->with($symfonyFile, $entityClass, $fieldName)
+            ->with($symfonyFile, self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($constraintViolationList);
 
-        $this->translator->expects($this->exactly(2))
+        $this->translator->expects(self::exactly(2))
             ->method('trans')
             ->willReturnCallback(function (string $key, array $params) {
                 return sprintf('%s: %s', $key, json_encode($params));
             });
 
-        $violations = $this->helper->validateSingleFile($file, $entity, $fieldName, $index);
-        $this->assertEquals($expectedResult, $violations);
+        $violations = $this->helper->validateSingleFile($file, $entity, self::FIELD_NAME, $index);
+        self::assertEquals($expectedResult, $violations);
     }
 
     public function validateSingleFileWhenViolationsDataProvider(): array
@@ -162,7 +155,7 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     private function createViolation(string $errorMessage): ConstraintViolation
     {
         $violation = $this->createMock(ConstraintViolation::class);
-        $violation->expects($this->any())
+        $violation->expects(self::any())
             ->method('getMessage')
             ->willReturn($errorMessage);
 
@@ -173,15 +166,15 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new \stdClass();
 
-        $this->databaseHelper->expects($this->once())
+        $this->databaseHelper->expects(self::once())
             ->method('findOneByIdentity')
             ->with($entity)
             ->willReturn(null);
 
-        $this->fieldHelper->expects($this->never())
-            ->method($this->anything());
+        $this->fieldHelper->expects(self::never())
+            ->method(self::anything());
 
-        $this->helper->getFromExistingEntity($entity, 'sampleField');
+        $this->helper->getFromExistingEntity($entity, self::FIELD_NAME);
     }
 
     public function testGetFromExistingEntityWhenDefault(): void
@@ -189,20 +182,18 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $existingEntity = new \stdClass();
 
-        $this->databaseHelper->expects($this->once())
+        $this->databaseHelper->expects(self::once())
             ->method('findOneByIdentity')
             ->with($entity)
             ->willReturn($existingEntity);
 
-        $fieldName = 'sampleField';
-
-        $this->fieldHelper->expects($this->once())
+        $this->fieldHelper->expects(self::once())
             ->method('getObjectValue')
-            ->with($existingEntity, $fieldName)
+            ->with($existingEntity, self::FIELD_NAME)
             ->willReturn(null);
 
         $default = 'sampleDefault';
-        $this->assertEquals($default, $this->helper->getFromExistingEntity($entity, $fieldName, $default));
+        self::assertEquals($default, $this->helper->getFromExistingEntity($entity, self::FIELD_NAME, $default));
     }
 
     public function testGetFromExistingEntity(): void
@@ -210,20 +201,19 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $existingEntity = new \stdClass();
 
-        $this->databaseHelper->expects($this->once())
+        $this->databaseHelper->expects(self::once())
             ->method('findOneByIdentity')
             ->with($entity)
             ->willReturn($existingEntity);
 
-        $fieldName = 'sampleField';
         $value = 'sampleValue';
 
-        $this->fieldHelper->expects($this->once())
+        $this->fieldHelper->expects(self::once())
             ->method('getObjectValue')
-            ->with($existingEntity, $fieldName)
+            ->with($existingEntity, self::FIELD_NAME)
             ->willReturn($value);
 
-        $this->assertEquals($value, $this->helper->getFromExistingEntity($entity, $fieldName));
+        self::assertEquals($value, $this->helper->getFromExistingEntity($entity, self::FIELD_NAME));
     }
 
     public function testValidateFileCollectionWhenNoRelation(): void
@@ -232,23 +222,21 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $this->expectExceptionMessage('Field invalidField not found in entity SampleClass');
 
         $entity = new \stdClass();
-        $fieldName = 'invalidField';
-        $entityClass = 'SampleClass';
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getClass')
             ->with($entity)
-            ->willReturn($entityClass);
+            ->willReturn(self::ENTITY_CLASS);
 
-        $this->fieldHelper->expects($this->once())
+        $this->fieldHelper->expects(self::once())
             ->method('getRelations')
-            ->with($entityClass, false, true, true)
+            ->with(self::ENTITY_CLASS, false, true, true)
             ->willReturn([]);
 
-        $this->configMultipleFileValidator->expects($this->never())
-            ->method($this->anything());
+        $this->configMultipleFileValidator->expects(self::never())
+            ->method(self::anything());
 
-        $this->helper->validateFileCollection(new ArrayCollection(), $entity, $fieldName);
+        $this->helper->validateFileCollection(new ArrayCollection(), $entity, 'invalidField');
     }
 
     public function testValidateFileCollectionWhenInvalidType(): void
@@ -259,24 +247,22 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         );
 
         $entity = new \stdClass();
-        $fieldName = 'sampleField';
-        $entityClass = 'SampleClass';
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getClass')
             ->with($entity)
-            ->willReturn($entityClass);
+            ->willReturn(self::ENTITY_CLASS);
 
         $fieldType = 'invalidType';
-        $this->fieldHelper->expects($this->once())
+        $this->fieldHelper->expects(self::once())
             ->method('getRelations')
-            ->with($entityClass, false, true, true)
-            ->willReturn([$fieldName => ['type' => $fieldType]]);
+            ->with(self::ENTITY_CLASS, false, true, true)
+            ->willReturn([self::FIELD_NAME => ['type' => $fieldType]]);
 
-        $this->configMultipleFileValidator->expects($this->never())
-            ->method($this->anything());
+        $this->configMultipleFileValidator->expects(self::never())
+            ->method(self::anything());
 
-        $this->helper->validateFileCollection(new ArrayCollection(), $entity, $fieldName);
+        $this->helper->validateFileCollection(new ArrayCollection(), $entity, self::FIELD_NAME);
     }
 
     /**
@@ -285,27 +271,25 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     public function testValidateFileCollectionWhenNoViolations(string $fieldType, string $methodName): void
     {
         $entity = new \stdClass();
-        $fieldName = 'sampleField';
-        $entityClass = 'SampleClass';
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getClass')
             ->with($entity)
-            ->willReturn($entityClass);
+            ->willReturn(self::ENTITY_CLASS);
 
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getRelations')
-            ->with($entityClass, false, true, true)
-            ->willReturn([$fieldName => ['type' => $fieldType, 'label' => $fieldName . 'Label']]);
+            ->with(self::ENTITY_CLASS, false, true, true)
+            ->willReturn([self::FIELD_NAME => ['type' => $fieldType, 'label' => self::FIELD_NAME . 'Label']]);
 
         $fileItems = new ArrayCollection([new FileItem(), new FileItem()]);
 
-        $this->configMultipleFileValidator->expects($this->once())
+        $this->configMultipleFileValidator->expects(self::once())
             ->method($methodName)
-            ->with($fileItems, $entityClass, $fieldName)
+            ->with($fileItems, self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn(new ConstraintViolationList([]));
 
-        $this->assertEquals([], $this->helper->validateFileCollection($fileItems, $entity, $fieldName));
+        self::assertEquals([], $this->helper->validateFileCollection($fileItems, $entity, self::FIELD_NAME));
     }
 
     public function validateFileCollectionWhenNoViolationsDataProvider(): array
@@ -332,35 +316,33 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         array $expectedViolations
     ): void {
         $entity = new \stdClass();
-        $fieldName = 'sampleField';
-        $entityClass = 'SampleClass';
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getClass')
             ->with($entity)
-            ->willReturn($entityClass);
+            ->willReturn(self::ENTITY_CLASS);
 
-        $this->fieldHelper->expects($this->any())
+        $this->fieldHelper->expects(self::any())
             ->method('getRelations')
-            ->with($entityClass, false, true, true)
-            ->willReturn([$fieldName => ['type' => $fieldType, 'label' => $fieldName . 'Label']]);
+            ->with(self::ENTITY_CLASS, false, true, true)
+            ->willReturn([self::FIELD_NAME => ['type' => $fieldType, 'label' => self::FIELD_NAME . 'Label']]);
 
         $fileItems = new ArrayCollection([new FileItem(), new FileItem()]);
 
-        $this->configMultipleFileValidator->expects($this->once())
+        $this->configMultipleFileValidator->expects(self::once())
             ->method($methodName)
-            ->with($fileItems, $entityClass, $fieldName)
+            ->with($fileItems, self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn(new ConstraintViolationList($violations));
 
-        $this->translator->expects($this->exactly(2))
+        $this->translator->expects(self::exactly(2))
             ->method('trans')
             ->willReturnCallback(function (string $key, array $params) {
                 return sprintf('%s: %s', $key, json_encode($params));
             });
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedViolations,
-            $this->helper->validateFileCollection($fileItems, $entity, $fieldName)
+            $this->helper->validateFileCollection($fileItems, $entity, self::FIELD_NAME)
         );
     }
 
@@ -396,5 +378,96 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    /**
+     * @dataProvider getFieldLabelDataProvider
+     */
+    public function testGetFieldLabel(array $relations, string $expectedLabel): void
+    {
+        $this->fieldHelper->expects(self::any())
+            ->method('getRelations')
+            ->with(self::ENTITY_CLASS, false, true, true)
+            ->willReturn($relations);
+
+        self::assertEquals($expectedLabel, $this->helper->getFieldLabel(self::ENTITY_CLASS, self::FIELD_NAME));
+    }
+
+    public function getFieldLabelDataProvider(): array
+    {
+        return [
+            ['relations' => [], 'expectedLabel' => self::FIELD_NAME],
+            ['relations' => [self::FIELD_NAME => ['type' => 'string']], 'expectedLabel' => self::FIELD_NAME],
+            [
+                'relations' => [self::FIELD_NAME => ['type' => 'string', 'label' => null]],
+                'expectedLabel' => self::FIELD_NAME,
+            ],
+            [
+                'relations' => [self::FIELD_NAME => ['type' => 'string', 'label' => 'Sample Label']],
+                'expectedLabel' => 'Sample Label',
+            ],
+        ];
+    }
+
+    public function testValidateExternalFileUrl(): void
+    {
+        $url = 'http://example.org/image.png';
+        $externalFile = new ExternalFile($url);
+        $errorMessage = 'sample error';
+        $this->configFileValidator
+            ->expects(self::once())
+            ->method('validateExternalFileUrl')
+            ->with($url)
+            ->willReturn(new ConstraintViolationList([$this->createViolation($errorMessage)]));
+
+        $label = 'Sample Label';
+        $this->fieldHelper->expects(self::once())
+            ->method('getRelations')
+            ->with(self::ENTITY_CLASS, false, true, true)
+            ->willReturn([self::FIELD_NAME => ['type' => 'string', 'label' => $label]]);
+
+        $entity = new \stdClass();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getClass')
+            ->with($entity)
+            ->willReturn(self::ENTITY_CLASS);
+
+        $translatedErrorMessage = 'translated error message';
+        $this->translator->expects(self::once())
+            ->method('trans')
+            ->with(
+                'oro.attachment.import.file_external_url_violation',
+                ['%error%' => $errorMessage, '%url%' => $url, '%fieldname%' => $label]
+            )
+            ->willReturn($translatedErrorMessage);
+
+        self::assertEquals(
+            [$translatedErrorMessage],
+            $this->helper->validateExternalFileUrl($externalFile, $entity, self::FIELD_NAME)
+        );
+    }
+
+    public function testValidateExternalFileUrlWhenNoViolations(): void
+    {
+        $url = 'http://example.org/image.png';
+        $externalFile = new ExternalFile($url);
+        $this->configFileValidator
+            ->expects(self::once())
+            ->method('validateExternalFileUrl')
+            ->with($url)
+            ->willReturn(new ConstraintViolationList());
+
+        $entity = new \stdClass();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getClass')
+            ->with($entity)
+            ->willReturn(self::ENTITY_CLASS);
+
+        $this->translator->expects(self::never())
+            ->method('trans');
+
+        self::assertEquals([], $this->helper->validateExternalFileUrl($externalFile, $entity, self::FIELD_NAME));
     }
 }

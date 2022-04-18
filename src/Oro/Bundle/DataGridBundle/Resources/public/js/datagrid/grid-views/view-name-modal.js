@@ -39,6 +39,7 @@ define(function(require) {
                 defaultChecked: options.defaultChecked || false
             });
             options.okText = __('oro.datagrid.gridView.save_name');
+            options.disposeOnHidden = false;
 
             ViewNameModal.__super__.initialize.call(this, options);
         },
@@ -57,7 +58,9 @@ define(function(require) {
                 error = this.nameErrorTemplate({
                     error: error
                 });
-                this.$('[data-role="grid-view-input"]').after(error);
+                this.$('[data-role="grid-view-input"]')
+                    .addClass('error')
+                    .after(error);
             }
         }
     });

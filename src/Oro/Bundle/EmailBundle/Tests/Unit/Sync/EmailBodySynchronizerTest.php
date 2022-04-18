@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
-use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyFailedException;
 use Oro\Bundle\EmailBundle\Exception\SyncWithNotificationAlertException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
@@ -58,7 +59,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->notificationAlertManager = $this->createMock(NotificationAlertManager::class);
 
-        $this->doctrine->expects($this->any())
+        $this->doctrine->expects(self::any())
             ->method('getManager')
             ->willReturn($this->em);
 
@@ -71,7 +72,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->setLogger($this->logger);
     }
 
-    public function testSyncOneEmailBodyForAlreadyCached()
+    public function testSyncOneEmailBodyForAlreadyCached(): void
     {
         $email = new Email();
         $email->setEmailBody(new EmailBody());
@@ -88,13 +89,14 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->syncOneEmailBody($email);
     }
 
-    public function testSyncOneEmailBody()
+    public function testSyncOneEmailBody(): void
     {
         $user = new User();
         $user->setId(12);
         $organization = new Organization();
         $organization->setId(22);
         $email = new TestEmailEntity(125);
+        $email->setSubject('Test Email');
         $emailBody = new EmailBody();
         $emailUser = new EmailUser();
 
@@ -111,11 +113,11 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
-        $this->selector->expects($this->once())
+        $this->selector->expects(self::once())
             ->method('select')
             ->with($this->identicalTo($origin))
             ->willReturn($loader);
-        $loader->expects($this->once())
+        $loader->expects(self::once())
             ->method('loadEmailBody')
             ->with(
                 $this->identicalTo($folder),
@@ -124,13 +126,17 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($emailBody);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::any())
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
             ->method('flush')
             ->with($this->identicalTo($email));
 
-        $this->logger->expects($this->never())
-            ->method('notice');
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->with('The "Test Email" (ID: 125) email body was synced.');
+        $this->logger->expects(self::never())
             ->method('warning');
         $this->notificationAlertManager->expects(self::never())
             ->method('addNotificationAlert');
@@ -144,15 +150,11 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailBody, $email->getEmailBody());
     }
 
-    public function testSyncOneEmailBodyFailure()
+    public function testSyncOneEmailBodyFailure(): void
     {
-        $this->expectException(LoadEmailBodyFailedException::class);
-        $this->expectExceptionMessage('Cannot load a body for "test email" email.');
-
         $email = new Email();
         ReflectionUtil::setId($email, 123);
         $email->setSubject('test email');
-        $emailBody = new EmailBody();
         $emailUser = new EmailUser();
 
         $user = new User();
@@ -174,20 +176,34 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
-        $this->selector->expects($this->once())
+        $this->selector->expects(self::once())
             ->method('select')
             ->with($this->identicalTo($origin))
             ->willReturn($loader);
-        $loader->expects($this->once())
+        $loader->expects(self::once())
             ->method('loadEmailBody')
             ->willThrowException($exception);
 
-        $this->em->expects($this->once())
-            ->method('persist');
-        $this->em->expects($this->once())
-            ->method('flush');
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_email');
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('update')
+            ->with('oro_email', ['body_synced' => true], ['id' => 123]);
+        $this->em->expects(self::exactly(3))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(Email::class)
+            ->willReturn($classMetadata);
+        $this->em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('info');
         $this->notificationAlertManager->expects(self::once())
             ->method('addNotificationAlert')
@@ -205,19 +221,13 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
 
         $this->synchronizer->syncOneEmailBody($email);
-
-        $this->assertSame($emailBody, $email->getEmailBody());
     }
 
-    public function testSyncOneEmailBodyNotFound()
+    public function testSyncOneEmailBodyNotFound(): void
     {
-        $this->expectException(LoadEmailBodyFailedException::class);
-        $this->expectExceptionMessage('Cannot load a body for "test email" email.');
-
         $email = new Email();
         ReflectionUtil::setId($email, 123);
         $email->setSubject('test email');
-        $emailBody = new EmailBody();
         $emailUser = new EmailUser();
 
         $user = new User();
@@ -239,27 +249,41 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
-        $this->selector->expects($this->once())
+        $this->selector->expects(self::once())
             ->method('select')
             ->with($this->identicalTo($origin))
             ->willReturn($loader);
-        $loader->expects($this->once())
+        $loader->expects(self::once())
             ->method('loadEmailBody')
             ->willThrowException($exception);
 
-        $this->em->expects($this->once())
-            ->method('persist');
-        $this->em->expects($this->once())
-            ->method('flush');
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_email');
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('update')
+            ->with('oro_email', ['body_synced' => true], ['id' => 123]);
+        $this->em->expects(self::exactly(3))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(Email::class)
+            ->willReturn($classMetadata);
+        $this->em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('notice')
             ->with(
                 'Attempt to load email body from remote server failed. Email id: 123.'
                 . ' Error: Cannot find a body for "test email" email.',
                 ['exception' => $exception]
             );
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
         $this->notificationAlertManager->expects(self::once())
             ->method('addNotificationAlert')
@@ -277,18 +301,12 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
 
         $this->synchronizer->syncOneEmailBody($email);
-
-        $this->assertSame($emailBody, $email->getEmailBody());
     }
 
-    public function testSyncOneEmailBodyWithSyncWithNotificationAlertException()
+    public function testSyncOneEmailBodyWithSyncWithNotificationAlertException(): void
     {
-        $this->expectException(LoadEmailBodyFailedException::class);
-        $this->expectExceptionMessage('Cannot load a body for "test2 email" email.');
-
         $email = new TestEmailEntity(456);
         $email->setSubject('test2 email');
-        $emailBody = new EmailBody();
         $emailUser = new EmailUser();
 
         $user = new User();
@@ -312,26 +330,40 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
-        $this->selector->expects($this->once())
+        $this->selector->expects(self::once())
             ->method('select')
             ->with($this->identicalTo($origin))
             ->willReturn($loader);
-        $loader->expects($this->once())
+        $loader->expects(self::once())
             ->method('loadEmailBody')
             ->willThrowException($exception);
 
-        $this->em->expects($this->once())
-            ->method('persist');
-        $this->em->expects($this->once())
-            ->method('flush');
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_email');
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('update')
+            ->with('oro_email', ['body_synced' => true], ['id' => 456]);
+        $this->em->expects(self::exactly(3))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(Email::class)
+            ->willReturn($classMetadata);
+        $this->em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
 
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'Load email body failed. Email id: 456. Error: Fail to connect',
                 ['exception' => $innerException]
             );
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
         $this->notificationAlertManager->expects(self::once())
             ->method('addNotificationAlert')
@@ -348,20 +380,104 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
 
         $this->synchronizer->syncOneEmailBody($email);
-
-        $this->assertSame($emailBody, $email->getEmailBody());
     }
 
-    public function testSyncOnEmptyData()
+    public function testSyncOneEmailBodyWithExceptionDuringSave(): void
+    {
+        $email = new TestEmailEntity(789);
+        $email->setSubject('test email');
+        $emailUser = new EmailUser();
+        $emailBody = new EmailBody();
+
+        $user = new User();
+        $user->setId(40);
+        $organization = new Organization();
+        $organization->setId(38);
+        $origin = new TestEmailOrigin(289);
+        $origin->setActive(true);
+        $origin->setOwner($user);
+        $origin->setOrganization($organization);
+        $folder = new EmailFolder();
+        $folder->setOrigin($origin);
+        $origin->addFolder($folder);
+        $emailUser->setOrigin($origin);
+        $emailUser->addFolder($folder);
+        $email->addEmailUser($emailUser);
+        $exception = new \Exception('test exception');
+
+        $loader = $this->createMock(EmailBodyLoaderInterface::class);
+
+        $this->selector->expects(self::once())
+            ->method('select')
+            ->with($this->identicalTo($origin))
+            ->willReturn($loader);
+        $loader->expects(self::once())
+            ->method('loadEmailBody')
+            ->willReturn($emailBody);
+
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_email');
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('update')
+            ->with('oro_email', ['body_synced' => true], ['id' => 789]);
+        $this->em->expects(self::exactly(3))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
+            ->method('flush')
+            ->with($this->identicalTo($email))
+            ->willThrowException($exception);
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(Email::class)
+            ->willReturn($classMetadata);
+        $this->em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        $this->logger->expects(self::once())
+            ->method('info')
+            ->with(
+                'Load email body failed. Email id: 789. Error: test exception',
+                ['exception' => $exception]
+            );
+        $this->logger->expects(self::never())
+            ->method('warning');
+        $this->notificationAlertManager->expects(self::once())
+            ->method('addNotificationAlert')
+            ->willReturnCallback(function (NotificationAlertInterface $notificationAlert) {
+                self::assertEquals(
+                    'Email body save failed. Exception: test exception',
+                    $notificationAlert->toArray()['message']
+                );
+                self::assertEquals(
+                    789,
+                    $notificationAlert->toArray()['additionalInfo']['emailId']
+                );
+
+                return 'test_id';
+            });
+        $this->notificationAlertManager->expects(self::once())
+            ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
+        $this->notificationAlertManager->expects(self::once())
+            ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
+
+        $this->synchronizer->syncOneEmailBody($email);
+    }
+
+    public function testSyncOnEmptyData(): void
     {
         $repo = $this->createMock(EmailRepository::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->willReturn($repo);
-        $repo->expects($this->once())
-            ->method('getEmailsWithoutBody')
+        $repo->expects(self::once())
+            ->method('getEmailIdsWithoutBody')
             ->willReturn([]);
-        $this->logger->expects($this->once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with('All emails was processed');
         $this->notificationAlertManager->expects(self::never())
@@ -374,7 +490,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->sync();
     }
 
-    public function testSync()
+    public function testSync(): void
     {
         $email = new TestEmailEntity(489);
         $email->setSubject('Test email');
@@ -397,24 +513,24 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $email->addEmailUser($emailUser);
 
         $repo = $this->createMock(EmailRepository::class);
-        $this->doctrine->expects($this->once())
+        $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturn($repo);
         $runCount = 0;
         $repo->expects($this->exactly(2))
-            ->method('getEmailsWithoutBody')
+            ->method('getEmailIdsWithoutBody')
             ->willReturnCallback(function () use (&$runCount, $email) {
                 $runCount++;
-                return $runCount === 1 ? [$email] : [];
+                return $runCount === 1 ? [$email->getId()] : [];
             });
 
         $loader = $this->createMock(EmailBodyLoaderInterface::class);
 
-        $this->selector->expects($this->once())
+        $this->selector->expects(self::once())
             ->method('select')
             ->with($this->identicalTo($origin))
             ->willReturn($loader);
-        $loader->expects($this->once())
+        $loader->expects(self::once())
             ->method('loadEmailBody')
             ->with(
                 $this->identicalTo($folder),
@@ -423,16 +539,23 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($emailBody);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::exactly(4))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
             ->method('flush')
             ->with($this->identicalTo($email));
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('clear');
-        $this->logger->expects($this->once())
+        $this->em->expects(self::once())
+            ->method('find')
+            ->with(Email::class, 489)
+            ->willReturn($email);
+        $this->logger->expects(self::once())
             ->method('notice');
-        $this->logger->expects($this->exactly(2))
+        $this->logger->expects(self::exactly(2))
             ->method('info');
-        $this->logger->expects($this->never())
+        $this->logger->expects(self::never())
             ->method('warning');
         $this->notificationAlertManager->expects(self::never())
             ->method('addNotificationAlert');

@@ -18,14 +18,13 @@ use Symfony\Component\Validator\ConstraintViolationList;
 
 class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
+    private ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject $validator;
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /** @var FileSubscriber */
-    private $subscriber;
+    private FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig;
+
+    private FileSubscriber $subscriber;
 
     /**
      * {@inheritdoc}
@@ -34,15 +33,20 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         $this->validator = $this->createMock(ConfigFileValidator::class);
         $this->form = $this->createMock(FormInterface::class);
+        $this->formConfig = $this->createMock(FormConfigInterface::class);
+        $this->form
+            ->expects(self::any())
+            ->method('getConfig')
+            ->willReturn($this->formConfig);
 
         $this->subscriber = new FileSubscriber($this->validator);
     }
 
     public function testGetSubscribedEvents(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             [
-                FormEvents::POST_SUBMIT => 'postSubmit'
+                FormEvents::POST_SUBMIT => 'postSubmit',
             ],
             FileSubscriber::getSubscribedEvents()
         );
@@ -50,37 +54,21 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenNoFile(): void
     {
-        $formEvent = $this->mockFormEvent(null);
+        $formEvent = new FormEvent($this->form, null);
 
         $this->validator
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('validate');
 
         $this->subscriber->postSubmit($formEvent);
     }
 
-    private function mockFormEvent(?File $data): FormEvent
-    {
-        $formEvent = $this->createMock(FormEvent::class);
-        $formEvent
-            ->expects($this->once())
-            ->method('getData')
-            ->willReturn($data);
-
-        $formEvent
-            ->expects($this->once())
-            ->method('getForm')
-            ->willReturn($this->form);
-
-        return $formEvent;
-    }
-
     public function testPostSubmitWhenEmptyFile(): void
     {
-        $formEvent = $this->mockFormEvent(new File());
+        $formEvent = new FormEvent($this->form, new File());
 
         $this->validator
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('validate');
 
         $this->subscriber->postSubmit($formEvent);
@@ -88,7 +76,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenParentEntityClass(): void
     {
-        $formEvent = $this->mockFormEvent($file = new File());
+        $formEvent = new FormEvent($this->form, $file = new File());
 
         $file->setFile($componentFile = $this->createMock(ComponentFile::class));
 
@@ -106,13 +94,13 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dataClass = \stdClass::class);
 
         $this->validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($componentFile, $dataClass, '')
             ->willReturn($violationsList = $this->createMock(ConstraintViolationList::class));
 
         $violationsList
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('count')
             ->willReturn(0);
 
@@ -121,7 +109,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenParentFormDataClass(): void
     {
-        $formEvent = $this->mockFormEvent($file = new File());
+        $formEvent = new FormEvent($this->form, $file = new File());
 
         $file->setFile($componentFile = $this->createMock(ComponentFile::class));
 
@@ -138,7 +126,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
 
         $formConfig
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getOption')
             ->with('parentEntityClass', null)
             ->willReturn(null);
@@ -148,13 +136,13 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dataClass = \stdClass::class);
 
         $this->validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($componentFile, $dataClass, $fieldName)
             ->willReturn($violationsList = $this->createMock(ConstraintViolationList::class));
 
         $violationsList
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('count')
             ->willReturn(0);
 
@@ -163,7 +151,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenParentParentFormDataClass(): void
     {
-        $formEvent = $this->mockFormEvent($file = new File());
+        $formEvent = new FormEvent($this->form, $file = new File());
 
         $file->setFile($componentFile = $this->createMock(ComponentFile::class));
 
@@ -180,7 +168,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
 
         $parentFormConfig
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getOption')
             ->with('parentEntityClass', null)
             ->willReturn(null);
@@ -202,13 +190,13 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($dataClass = \stdClass::class);
 
         $this->validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($componentFile, $dataClass, $fieldName)
             ->willReturn($violationsList = $this->createMock(ConstraintViolationList::class));
 
         $violationsList
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('count')
             ->willReturn(0);
 
@@ -217,7 +205,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenDataClassIsFileItem(): void
     {
-        $formEvent = $this->mockFormEvent($file = new File());
+        $formEvent = new FormEvent($this->form, $file = new File());
 
         $file->setFile($componentFile = $this->createMock(ComponentFile::class));
 
@@ -234,7 +222,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn($parentFormConfig = $this->createMock(FormConfigInterface::class));
 
         $parentFormConfig
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getOption')
             ->with('parentEntityClass', null)
             ->willReturn(null);
@@ -265,20 +253,20 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $parentParentParentFormConfig
             ->method('getDataClass')
-            ->willReturn($dataClass = \stdClass::class);
+            ->willReturn(\stdClass::class);
 
         $parentParentForm
             ->method('getPropertyPath')
             ->willReturn(new PropertyPath('fileItemField'));
 
         $this->validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($componentFile, \stdClass::class, 'fileItemField')
             ->willReturn($violationsList = $this->createMock(ConstraintViolationList::class));
 
         $violationsList
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('count')
             ->willReturn(0);
 
@@ -287,7 +275,7 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostSubmitWhenViolationsNotEmpty(): void
     {
-        $formEvent = $this->mockFormEvent($file = new File());
+        $formEvent = new FormEvent($this->form, $file = new File());
 
         $file->setFile($componentFile = $this->createMock(ComponentFile::class));
 
@@ -324,19 +312,19 @@ class FileSubscriberTest extends \PHPUnit\Framework\TestCase
         ];
 
         $this->validator
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('validate')
             ->with($componentFile, $dataClass, '')
-            ->willReturn($violationsList = new ConstraintViolationList($violations));
+            ->willReturn(new ConstraintViolationList($violations));
 
         $this->form
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('get')
             ->with('file')
             ->willReturn($fileForm = $this->createMock(FormInterface::class));
 
         $fileForm
-            ->expects($this->exactly(2))
+            ->expects(self::exactly(2))
             ->method('addError')
             ->withConsecutive(
                 [new FormError($message1, $messageTemplate1, $parameters1)],

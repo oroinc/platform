@@ -9,6 +9,7 @@ use Oro\Bundle\SecurityBundle\Exception\BadUserOrganizationException;
 use Oro\Bundle\UserBundle\Entity\Impersonation;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Event\ImpersonationSuccessEvent;
+use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -181,12 +182,16 @@ class ImpersonationAuthenticator implements AuthenticatorInterface
         }
 
         if ($impersonation->getLoginAt()) {
-            throw new CustomUserMessageAuthenticationException('Impersonation token has already been used.');
+            $exception = new ImpersonationAuthenticationException('Impersonation token has already been used.');
+            $exception->setUser($impersonation->getUser());
+            throw $exception;
         }
 
         $now = new \DateTime('now', new \DateTimeZone('UTC'));
         if ($impersonation->getExpireAt() <= $now) {
-            throw new CustomUserMessageAuthenticationException('Impersonation token has expired.');
+            $exception = new ImpersonationAuthenticationException('Impersonation token has expired.');
+            $exception->setUser($impersonation->getUser());
+            throw $exception;
         }
     }
 }

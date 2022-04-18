@@ -368,6 +368,11 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
                         );
                     } elseif ($value === '<notEmpty()>') {
                         static::assertNotEmpty($entityDataFromCsv[$property]);
+                    } elseif (preg_match('/\<absoluteUrl\("(?P<path>(?:[^"]|\\")+)"\)\>/i', $value, $matches)) {
+                        static::assertEquals(
+                            $this->getAbsoluteUrl($matches['path']),
+                            $entityDataFromCsv[$property]
+                        );
                     } else {
                         static::assertArrayHasKey(
                             $property,

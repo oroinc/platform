@@ -5,3 +5,14 @@ oro:
             images: 'Not more than {{max}} image is allowed in this field.|Not more than {{max}} images are allowed in this field.'
         mimetypes:
             not_allowed: 'MIME type {{ notAllowedMimeTypes }} is not allowed, please contact your system administrator.|MIME types {{ notAllowedMimeTypes }} are not allowed, please contact your system administrator.'
+            invalid_mime_type: 'The MIME type of the file is invalid ({{ type }}). Allowed MIME types are {{ types }}.'
+        external_file:
+            invalid_url: 'The specified URL is not accessible. Reason: "{{ reason }}"'
+            invalid_mime_type: 'The MIME type of the file is invalid ({{ type }}). Allowed MIME types are {{ types }}.'
+            does_not_match_regexp: 'The provided URL does not match the URLs allowed in the system configuration.'
+            empty_regexp: 'No external files and images are allowed. Allowed URLs RegExp can be configured on the following page: System -> Configuration -> General Setup -> Upload Settings.'
+            invalid_regexp: 'Allowed URLs RegExp is not valid. Look for the code {{ code }} in the application logs for more details.'
+
+        incompatible_field:
+            external_file: 'The specified external file is not compatible with the field {{ field }} that is configured to upload files.'
+            regular_file: 'The specified file is not compatible with the field {{ field }} that is configured to store files externally.'

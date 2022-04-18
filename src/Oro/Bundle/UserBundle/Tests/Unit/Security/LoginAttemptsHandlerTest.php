@@ -2,12 +2,21 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
+use Oro\Bundle\UserBundle\Exception\ImpersonationAuthenticationException;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
+use Oro\Bundle\UserBundle\Security\ImpersonationTokenInterface;
+use Oro\Bundle\UserBundle\Security\ImpersonationUsernamePasswordOrganizationToken;
 use Oro\Bundle\UserBundle\Security\LoginAttemptsHandler;
-use Oro\Component\Testing\Logger\BufferingLogger;
+use Oro\Bundle\UserBundle\Security\LoginSourceProviderForFailedRequestInterface;
+use Oro\Bundle\UserBundle\Security\LoginSourceProviderForSuccessRequestInterface;
+use Oro\Bundle\UserBundle\Security\SkippedLogAttemptsFirewallsProvider;
+use Oro\Bundle\UserBundle\Security\UserLoginAttemptLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -19,11 +28,11 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
-    /** @var UserLoggingInfoProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $loggingInfoProvider;
+    /** @var UserLoginAttemptLogger|\PHPUnit\Framework\MockObject\MockObject */
+    private $userLoginAttemptLogger;
 
-    /** @var BufferingLogger */
-    private $logger;
+    /** @var SkippedLogAttemptsFirewallsProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $skippedLogAttemptsFirewallsProvider;
 
     /** @var LoginAttemptsHandler */
     private $handler;
@@ -31,33 +40,85 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->userManager = $this->createMock(UserManager::class);
-        $this->loggingInfoProvider = $this->createMock(UserLoggingInfoProviderInterface::class);
-        $this->logger = new BufferingLogger();
+        $this->userLoginAttemptLogger = $this->createMock(UserLoginAttemptLogger::class);
+        $this->skippedLogAttemptsFirewallsProvider = $this->createMock(SkippedLogAttemptsFirewallsProvider::class);
+        $loginSourceProvidersForSuccessRequest = $this
+            ->createMock(LoginSourceProviderForSuccessRequestInterface::class);
+        $loginSourceProvidersForFailedRequest = $this
+            ->createMock(LoginSourceProviderForFailedRequestInterface::class);
 
-        $this->handler = new LoginAttemptsHandler($this->userManager, $this->loggingInfoProvider, $this->logger);
+        $loginSourceProvidersForSuccessRequest->expects(self::any())
+            ->method('getLoginSourceForSuccessRequest')
+            ->willReturnCallback(function (TokenInterface $token) {
+                if (is_a($token, ImpersonationTokenInterface::class)) {
+                    return 'impersonation';
+                }
+
+                return null;
+            });
+        $loginSourceProvidersForFailedRequest->expects(self::any())
+            ->method('getLoginSourceForFailedRequest')
+            ->willReturnCallback(function (TokenInterface $token, \Exception $exception) {
+                if ($exception instanceof ImpersonationAuthenticationException) {
+                    return 'impersonation';
+                }
+
+                return null;
+            });
+
+        $this->handler = new LoginAttemptsHandler(
+            $this->userManager,
+            $this->createMock(UserLoggingInfoProviderInterface::class),
+            $this->createMock(LoggerInterface::class)
+        );
+        $this->handler->setUserLoginAttemptLogger($this->userLoginAttemptLogger);
+        $this->handler->setLoginSourceProvidersForSuccessRequest([$loginSourceProvidersForSuccessRequest]);
+        $this->handler->setLoginSourceProvidersForFailedRequest([$loginSourceProvidersForFailedRequest]);
+        $this->handler->setSkippedLogAttemptsFirewallsProvider($this->skippedLogAttemptsFirewallsProvider);
     }
-
 
     public function testOnInteractiveLogin(): void
     {
         $user = new User();
         $token = new UsernamePasswordToken($user, 'password', 'main');
-        $logContext = ['user' => ['username' => 'john'], 'ipaddress' => '127.0.0.1'];
 
-        $this->loggingInfoProvider->expects(self::once())
-            ->method('getUserLoggingInfo')
-            ->with(self::identicalTo($user))
-            ->willReturn($logContext);
+        $this->userLoginAttemptLogger->expects(self::once())
+            ->method('logSuccessLoginAttempt')
+            ->with($user, 'general');
 
         $this->handler->onInteractiveLogin(
             new InteractiveLoginEvent(new Request(), $token)
         );
+    }
 
-        self::assertEquals(
-            [
-                ['info', 'Successful login', $logContext]
-            ],
-            $this->logger->cleanLogs()
+    public function testOnInteractiveLoginWhenTheAttemptShouldNotBeLogged(): void
+    {
+        $user = new User();
+        $token = new UsernamePasswordToken($user, 'main');
+
+        $this->skippedLogAttemptsFirewallsProvider->expects(self::once())
+            ->method('getSkippedFirewalls')
+            ->willReturn(['test_firewall', 'main', 'another']);
+
+        $this->userLoginAttemptLogger->expects(self::never())
+            ->method('logSuccessLoginAttempt');
+
+        $this->handler->onInteractiveLogin(
+            new InteractiveLoginEvent(new Request(), $token)
+        );
+    }
+
+    public function testOnInteractiveLoginWithImpersonateToken(): void
+    {
+        $user = new User();
+        $token = new ImpersonationUsernamePasswordOrganizationToken($user, 'password', 'main', new Organization(), []);
+
+        $this->userLoginAttemptLogger->expects(self::once())
+            ->method('logSuccessLoginAttempt')
+            ->with($user, 'impersonation');
+
+        $this->handler->onInteractiveLogin(
+            new InteractiveLoginEvent(new Request(), $token)
         );
     }
 
@@ -66,36 +127,45 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
         $user = $this->createMock(UserInterface::class);
         $token = new UsernamePasswordToken($user, 'password', 'main');
 
+        $this->userLoginAttemptLogger->expects(self::never())
+            ->method('logSuccessLoginAttempt');
+
         $this->handler->onInteractiveLogin(
             new InteractiveLoginEvent(new Request(), $token)
         );
-
-        self::assertEquals([], $this->logger->cleanLogs());
     }
 
     public function testOnAuthenticationFailure(): void
     {
         $user = new User();
         $token = new UsernamePasswordToken($user, 'wrongPassword', 'main');
-        $logContext = ['user' => ['username' => 'john'], 'ipaddress' => '127.0.0.1'];
 
         $this->userManager->expects(self::never())
             ->method('findUserByUsernameOrEmail');
 
-        $this->loggingInfoProvider->expects(self::once())
-            ->method('getUserLoggingInfo')
-            ->with(self::identicalTo($user))
-            ->willReturn($logContext);
+        $this->userLoginAttemptLogger->expects(self::once())
+            ->method('logFailedLoginAttempt')
+            ->with($user, 'general');
 
         $this->handler->onAuthenticationFailure(
             new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class))
         );
+    }
 
-        self::assertEquals(
-            [
-                ['notice', 'Unsuccessful login', $logContext]
-            ],
-            $this->logger->cleanLogs()
+    public function testOnAuthenticationFailureWithImpersonationAuthenticationException(): void
+    {
+        $user = new User();
+        $token = new UsernamePasswordToken($user, 'wrongPassword', 'main');
+
+        $this->userManager->expects(self::never())
+            ->method('findUserByUsernameOrEmail');
+
+        $this->userLoginAttemptLogger->expects(self::once())
+            ->method('logFailedLoginAttempt')
+            ->with($user, 'impersonation');
+
+        $this->handler->onAuthenticationFailure(
+            new AuthenticationFailureEvent($token, $this->createMock(ImpersonationAuthenticationException::class))
         );
     }
 
@@ -104,27 +174,18 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
         $username = 'john';
         $user = new User();
         $token = new UsernamePasswordToken($username, 'wrongPassword', 'main');
-        $logContext = ['user' => ['username' => $username], 'ipaddress' => '127.0.0.1'];
 
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn($user);
 
-        $this->loggingInfoProvider->expects(self::once())
-            ->method('getUserLoggingInfo')
-            ->with(self::identicalTo($user))
-            ->willReturn($logContext);
+        $this->userLoginAttemptLogger->expects(self::once())
+            ->method('logFailedLoginAttempt')
+            ->with($user, 'general');
 
         $this->handler->onAuthenticationFailure(
             new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class))
-        );
-
-        self::assertEquals(
-            [
-                ['notice', 'Unsuccessful login', $logContext]
-            ],
-            $this->logger->cleanLogs()
         );
     }
 
@@ -132,27 +193,18 @@ class LoginAttemptsHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $username = 'john';
         $token = new UsernamePasswordToken($username, 'wrongPassword', 'main');
-        $logContext = ['username' => $username, 'ipaddress' => '127.0.0.1'];
 
         $this->userManager->expects(self::once())
             ->method('findUserByUsernameOrEmail')
             ->with($username)
             ->willReturn(null);
 
-        $this->loggingInfoProvider->expects(self::once())
-            ->method('getUserLoggingInfo')
-            ->with($username)
-            ->willReturn($logContext);
+        $this->userLoginAttemptLogger->expects(self::once())
+            ->method('logFailedLoginAttempt')
+            ->with($username, 'general');
 
         $this->handler->onAuthenticationFailure(
             new AuthenticationFailureEvent($token, $this->createMock(AuthenticationException::class))
-        );
-
-        self::assertEquals(
-            [
-                ['notice', 'Unsuccessful login', $logContext]
-            ],
-            $this->logger->cleanLogs()
         );
     }
 }

@@ -36,6 +36,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
  *          }
  *      }
  * )
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class File extends ExtendFile implements FileExtensionInterface
 {
@@ -133,6 +134,13 @@ class File extends ExtendFile implements FileExtensionInterface
     protected $parentEntityFieldName;
 
     /**
+     * @var string|null
+     *
+     * @ORM\Column(name="external_url", type="string", length=1024, nullable=true)
+     */
+    protected $externalUrl;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -160,10 +168,7 @@ class File extends ExtendFile implements FileExtensionInterface
      */
     protected $updatedAt;
 
-    /**
-     * @var ComponentFile $file
-     */
-    protected $file;
+    protected ?\SplFileInfo $file = null;
 
     /**
      * @var bool
@@ -291,13 +296,29 @@ class File extends ExtendFile implements FileExtensionInterface
 
     public function setFile(ComponentFile $file = null)
     {
-        $this->file = $file;
+        $this->setExternalFile($file);
     }
 
     /**
-     * @return ComponentFile|null
+     * @return \SplFileInfo|null
      */
     public function getFile()
+    {
+        return $this->getExternalFile();
+    }
+
+    public function setExternalFile(\SplFileInfo $file = null)
+    {
+        $this->file = $file;
+
+        // Makes sure doctrine listeners react on change because the property `file` is not stored.
+        $this->preUpdate();
+    }
+
+    /**
+     * @return \SplFileInfo|null
+     */
+    public function getExternalFile()
     {
         return $this->file;
     }
@@ -328,6 +349,9 @@ class File extends ExtendFile implements FileExtensionInterface
     public function setEmptyFile($emptyFile)
     {
         $this->emptyFile = $emptyFile;
+
+        // Makes sure doctrine listeners react on change because the property `emptyFile` is not stored.
+        $this->preUpdate();
 
         return $this;
     }
@@ -403,17 +427,18 @@ class File extends ExtendFile implements FileExtensionInterface
         $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function __toString()
     {
-        $name = (string)$this->getFilename();
-        if ($this->getOriginalFilename()) {
-            $name .= ' (' . $this->getOriginalFilename() . ')';
+        if ($this->getExternalUrl() !== null) {
+            $result = $this->getExternalUrl();
+        } else {
+            $result = (string)$this->getFilename();
+            if ($this->getOriginalFilename()) {
+                $result .= ' (' . $this->getOriginalFilename() . ')';
+            }
         }
 
-        return $name;
+        return (string) $result;
     }
 
     /**
@@ -457,6 +482,7 @@ class File extends ExtendFile implements FileExtensionInterface
             $this->id,
             $this->filename,
             $this->uuid,
+            $this->externalUrl,
         ];
     }
 
@@ -466,6 +492,7 @@ class File extends ExtendFile implements FileExtensionInterface
             $this->id,
             $this->filename,
             $this->uuid,
+            $this->externalUrl,
         ] = $serialized;
     }
 
@@ -513,5 +540,17 @@ class File extends ExtendFile implements FileExtensionInterface
     public function getParentEntityFieldName(): ?string
     {
         return $this->parentEntityFieldName;
+    }
+
+    public function setExternalUrl(?string $externalUrl): File
+    {
+        $this->externalUrl = $externalUrl;
+
+        return $this;
+    }
+
+    public function getExternalUrl(): ?string
+    {
+        return $this->externalUrl;
     }
 }

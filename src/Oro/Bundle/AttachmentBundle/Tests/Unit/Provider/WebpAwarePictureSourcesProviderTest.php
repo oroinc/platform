@@ -47,6 +47,30 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetFilteredPictureSourcesWhenStoredExternally(): void
+    {
+        $image = (new File())
+            ->setExternalUrl('http://example.org/image.png');
+        $filterName = 'original';
+
+        $this->innerProvider
+            ->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($image, $filterName)
+            ->willReturn([
+                'src' => $image->getExternalUrl(),
+                'sources' => [],
+            ]);
+
+        self::assertEquals(
+            [
+                'src' => $image->getExternalUrl(),
+                'sources' => [],
+            ],
+            $this->provider->getFilteredPictureSources($image, $filterName)
+        );
+    }
+
     public function testGetFilteredPictureSourcesWebpNotEnabledIfSupported(): void
     {
         $image = (new File())
@@ -173,6 +197,31 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ],
             $this->provider->getResizedPictureSources(null, $width, $height)
+        );
+    }
+
+    public function testGetResizedPictureSourcesWhenStoredExternally(): void
+    {
+        $image = (new File())
+            ->setExternalUrl('http://example.org/image.png');
+        $width = 42;
+        $height = 24;
+
+        $this->innerProvider
+            ->expects(self::once())
+            ->method('getResizedPictureSources')
+            ->with($image, $width, $height)
+            ->willReturn([
+                'src' => $image->getExternalUrl(),
+                'sources' => [],
+            ]);
+
+        self::assertEquals(
+            [
+                'src' => $image->getExternalUrl(),
+                'sources' => [],
+            ],
+            $this->provider->getResizedPictureSources($image, $width, $height)
         );
     }
 

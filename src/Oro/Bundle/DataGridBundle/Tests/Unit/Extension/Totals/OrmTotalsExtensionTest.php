@@ -172,6 +172,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                         'extends' => 'grand_total',
                         'per_page' => true,
                         'hide_if_one_page' => true,
+                        'disabled' => false,
                         'columns' => [
                             'name' => ['label' => 'Page Total']
                         ]
@@ -179,6 +180,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
                     'grand_total' => [
                         'per_page' => false,
                         'hide_if_one_page' => false,
+                        'disabled' => false,
                         'columns' => [
                             'id' => ['expr' => 'COUNT(a.id)'],
                             'name' => ['label' => 'Grand Total'],

@@ -9,11 +9,11 @@
 
 {% if type == 'file' %}
     {% set value %}
-        {{ oro_file_view(value) }}
+        {{- oro_file_view(value) -}}
     {% endset %}
 {% elseif type == 'image' %}
     {% set value %}
-        {{ oro_image_view(value) }}
+        {{- oro_image_view(value) -}}
     {% endset %}
 {% endif %}
 

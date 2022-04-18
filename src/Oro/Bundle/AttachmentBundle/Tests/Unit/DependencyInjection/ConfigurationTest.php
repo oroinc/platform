@@ -41,6 +41,14 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 'value' => 85,
                 'scope' => 'app',
             ],
+            'external_file_allowed_urls_regexp' => [
+                'value' => '',
+                'scope' => 'app',
+            ],
+            'original_file_names_enabled' => [
+                'value' => false,
+                'scope' => 'app',
+            ],
             'resolved' => true,
         ],
     ];
@@ -49,11 +57,11 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         $configuration = new Configuration();
         $builder = $configuration->getConfigTreeBuilder();
-        $this->assertInstanceOf(TreeBuilder::class, $builder);
+        self::assertInstanceOf(TreeBuilder::class, $builder);
 
         $root = $builder->buildTree();
-        $this->assertInstanceOf(ArrayNode::class, $root);
-        $this->assertEquals('oro_attachment', $root->getName());
+        self::assertInstanceOf(ArrayNode::class, $root);
+        self::assertEquals('oro_attachment', $root->getName());
     }
 
     public function testProcessConfigurationWhenDefault(): void

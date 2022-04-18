@@ -23,3 +23,9 @@ services:
     oro_attachment.tests.imagine.provider.url:
         alias: oro_attachment.imagine.provider.url
         public: true
+
+    oro_attachment.tests.tools.external_file_factory.stub:
+        class: Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\ExternalFileFactoryStub
+        decorates: oro_attachment.tools.external_file_factory
+        arguments:
+            - '@.inner'

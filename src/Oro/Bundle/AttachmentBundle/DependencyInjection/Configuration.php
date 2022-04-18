@@ -85,6 +85,8 @@ class Configuration implements ConfigurationInterface
                 'jpeg_quality' => ['value' => self::JPEG_QUALITY],
                 'png_quality' => ['value' => self::PNG_QUALITY],
                 'webp_quality' => ['value' => self::WEBP_QUALITY],
+                'external_file_allowed_urls_regexp' => ['value' => '', 'type'  => 'string'],
+                'original_file_names_enabled' => ['type' => 'boolean', 'value' => false],
             ]
         );
 

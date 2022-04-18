@@ -66,6 +66,9 @@ oro:
             parent_entity_field_name:
                 label:               Parent entity field name
                 description:         The field name where this file is stored of the entity to which this file belongs.
+            external_url:
+                label:               External URL
+                description:         URL of the file that is stored externally on a third party service.
 
             uploaded_by.label: Uploaded By
             name.label: Name
@@ -91,6 +94,9 @@ oro:
 
         config:
             file_size_settings.label: File Size Settings
+            externally_stored_files_settings:
+                label: Externally Stored Files
+
             file_size.label:     File Size (MB)
             feature:
                 attachment_processors_allowed:
@@ -106,6 +112,9 @@ oro:
                 webp:
                     label: WebP Format Support
                     description: Allows to enable generation of images in the WebP format
+                original_file_names_enabled:
+                    label: Enable Original File Names
+                    description: When enabled, the original file names will be appended to the system-generated hash values.
             attachment_processors_settings:
                 label: Image Processing
                 description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
@@ -128,10 +137,30 @@ oro:
             upload_file_mime_types.tooltip: List of MIME file types that are permitted for upload.
             upload_image_mime_types.label: Image MIME types
             upload_image_mime_types.tooltip: List of MIME image types that are permitted for upload.
+            external_file_allowed_urls_regexp:
+                label: Allowed URLs RegExp
+                tooltip: 'A regular expression that describes allowed URLs for externally stored files and images. If left empty, no external files and images will be allowed. Example: <b>^http://example\.org</b>'
 
             max_number_of_files:
                 label: 'Maximum Number Of Files'
                 tooltip: 'Maximum Number Of Files'
+
+            is_stored_externally:
+                label: 'Stored Externally'
+                tooltip: 'The URLs of the external files should be publicly available. The URLs provided by the users should match the "Allowed URLs RegExp" specified in the system configuration. The system will not process, resize or modify the files that are stored externally.'
+
+            file_names:
+                label: File Names
+                description: Modification of the default value may cause temporary storefront slow-down until all images are renamed. The URLs in the search index will not be updated immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the renamed images will be stored alongside the existing ones.
+
+            original_file_names_enabled:
+                label: Enable Original File Names
+                tooltip: When enabled, the original file names will be appended to the system-generated hash values.
+
+            notice:
+                storage_check_space: >
+                    This configuration option may affect application disk space usage, please check with your
+                    system administrator if you have enough space available.
 
         action:
             add:                 Add attachment
@@ -155,14 +184,16 @@ oro:
         import:
             entity_is_skipped: 'File importing has failed, entity is skipped'
             failed_to_upload_or_clone: 'Failed to either upload or clone file from the existing one: file not found by specified UUID and nothing is specified for uploading. Please make sure %fieldname%.URI and %fieldname%.UUID columns are present in the import file and have the correct values.'
-            failed_to_upload: 'Failed to upload a file from %path%: %error%'
-            failed_to_clone: 'Failed to clone a file from %origin_uuid%: %error%'
+            failed_to_upload: 'Failed to upload a file from %path% for field %fieldname%: %error%'
+            failed_to_process_external_file: 'Failed to fetch external file metadata from %url% for field %fieldname%: %error%'
+            failed_to_clone: 'Failed to clone a file from %origin_uuid% for field %fieldname%: %error%'
             failed_to_clone_forbidden: 'you do not have permission to view the file with uuid %origin_uuid%'
             failed_to_clone_origin_file_empty: 'file is empty or not found'
             file_constraint_violation: 'File validation failed for field %fieldname%: %error%'
             multi_file_constraint_violation: 'File validation failed for element %index% of field %fieldname%: %error%'
             multi_file_field_constraint_violation: 'Validation failed for field %fieldname%: %error%'
             multi_image_field_constraint_violation: 'Validation failed for field %fieldname%: %error%'
+            file_external_url_violation: 'File URL ("%url%") validation failed for field %fieldname%: %error%'
 
     entity_extend:
         form:

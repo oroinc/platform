@@ -274,7 +274,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
             ],
             DatagridGuesser::FILTER => [
                 'data_name' => $fieldName,
-                'enabled' => false,
+                'renderable' => false,
             ],
         ];
 

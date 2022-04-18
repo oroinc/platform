@@ -69,6 +69,11 @@ navigation:
                 position: 12
                 attributes:
                     class: 'mobile-hide'
+            login_attempts:
+                label:    'oro.user.userloginattempt.entity_plural_label'
+                route:    'oro_user_login_attempts'
+                extras:
+                    description: 'oro.user.userloginattempt.entity_description'
 
         tree:
             application_menu:
@@ -80,6 +85,7 @@ navigation:
                                     user_list: ~
                                     user_roles: ~
                                     user_groups: ~
+                                    login_attempts: ~
             usermenu:
                 children:
                     oro_user_profile_view: ~
@@ -117,3 +123,5 @@ navigation:
         oro_user_group_index: ~
         oro_user_group_create: 'oro.ui.create_entity'
         oro_user_group_update: '%group% - oro.ui.edit'
+
+        oro_user_login_attempts: 'oro.user.userloginattempt.entity_plural_label'

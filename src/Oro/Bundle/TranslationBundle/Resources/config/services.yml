@@ -96,11 +96,9 @@ services:
 
     oro_translation.cache.translation_cache_warmer:
         class: Oro\Bundle\TranslationBundle\Cache\TranslationCacheWarmer
-        public: false
-        decorates: 'translation.warmer'
-        decoration_inner_name: 'translation.warmer.default'
+        decorates: translation.warmer
         arguments:
-            - '@translation.warmer.default'
+            - '@.inner'
             - '@oro_translation.strategy.provider'
 
     oro_translation.js_dumper:
@@ -113,6 +111,8 @@ services:
             - '@oro_translation.provider.language'
         lazy: true
         public: true
+        calls:
+            - [setFileManager, ['@oro_navigation.file_manager.public_js']]
 
     oro_translation.twig.translation.extension:
         class: Oro\Bundle\TranslationBundle\Twig\TranslationExtension

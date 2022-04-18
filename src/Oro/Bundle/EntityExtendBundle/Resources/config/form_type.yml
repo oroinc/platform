@@ -217,6 +217,14 @@ services:
             - '@oro_entity_config.provider.extend'
             - '@oro_entity_config.provider.enum'
         calls:
+            - [setExtendFieldFormTypeProvider, ['@oro_entity_extend.provider.extend_field_form_type']]
+            - [setExtendFieldFormOptionsProvider, ['@oro_entity_extend.provider.extend_field_form_options']]
+        tags:
+            - { name: form.type_guesser, priority: 15 }
+
+    oro_entity_extend.provider.extend_field_form_type:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider
+        calls:
             - [addExtendTypeMapping, ["string", Symfony\Component\Form\Extension\Core\Type\TextType]]
             - [addExtendTypeMapping, ["integer", Symfony\Component\Form\Extension\Core\Type\IntegerType]]
             - [addExtendTypeMapping, ["smallint", Symfony\Component\Form\Extension\Core\Type\IntegerType]]
@@ -243,8 +251,26 @@ services:
             - [addExtendTypeMapping, ["manyToMany", Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType]]
             - [addExtendTypeMapping, ["enum", Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType]]
             - [addExtendTypeMapping, ["multiEnum", Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType]]
+
+    oro_entity_extend.provider.extend_field_form_options:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider
+        arguments:
+            - !tagged_iterator oro_entity_extend.form_options_provider
+
+    oro_entity_extend.provider.extend_field_form_options.default:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsDefaultProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
         tags:
-            - { name: form.type_guesser, priority: 15 }
+            - { name: oro_entity_extend.form_options_provider }
+
+    oro_entity_extend.provider.extend_field_form_options.by_field_type:
+        class: Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsByFieldTypeProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.provider.extend_field_form_type'
+        tags:
+            - { name: oro_entity_extend.form_options_provider }
 
     oro_entity_extend.type.multiple_entity:
         class: Oro\Bundle\EntityExtendBundle\Form\Type\MultipleEntityType

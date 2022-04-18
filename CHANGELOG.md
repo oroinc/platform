@@ -2,6 +2,57 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Added
+
+#### AttachmentBundle
+* Added `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` property to store external file URL.
+* Added `Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider` (`oro_attachment.provider.external_url_provider`) that
+  returns `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` for a file, a resized or a filtered image URL.
+* Added `oro_attachment.provider.external_url_provider` to the decorators chain of the file url providers
+  `Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface` (`oro_attachment.provider.file_url`).
+* Added `Oro\Bundle\AttachmentBundle\Model\ExternalFile` model as a descendant of `\SplFileInfo` that represents
+  an externally stored file.
+* Added `Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory` that creates `Oro\Bundle\AttachmentBundle\Model\ExternalFile`
+  from a URL or `Oro\Bundle\AttachmentBundle\Entity\File` entity.
+* Added `isExternalFile` form option to `Oro\Bundle\AttachmentBundle\Form\Type\FileType` that enables the external file URL
+  input instead of the upload input.
+* Added `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider` that provides form type and common form options
+  for extend fields.
+* Added `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider` (`oro_entity_extend.provider.extend_field_form_options`)
+  that collects extend field form options from the underlying providers
+  of `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface` interface.
+* Added service container tag `oro_entity_extend.form_options_provider` for extend field form options providers to be used
+  in `oro_entity_extend.provider.extend_field_form_options`.
+* Added `Oro\Bundle\AttachmentBundle\Provider\ExtendFieldFileFormOptionsProvider` that provides form options for
+  `file`, `image`, `multiFile`, `multiImage` types of extend fields.
+* Added `Oro\Bundle\FormBundle\Validator\Constraints\RegExpSyntax` validation constraint for checking regular expression
+  syntax.
+* Added `Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider` filename provider that
+  uses a sanitized original filename for files if `attachment_original_filenames` feature is enabled.
+
+#### DigitalAssetBundle
+* Added `Oro\Bundle\DigitalAssetBundle\Provider\ExtendFieldFileDamFormOptionsProvider` that manages `dam_widget_enabled`
+  form option based on `use_dam`, `is_stored_externally` entity field config values for `file`, `image`,
+  `multiFile`, `multiImage` types of extend fields.
+
+### Changed
+
+#### AttachmentBundle
+* Changed `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type to `?\SplFileInfo`
+  to allow `Oro\Bundle\AttachmentBundle\Model\ExternalFile`. Methods `setFile` and `getFile` are changed correspondingly.
+* Changed `Oro\Bundle\AttachmentBundle\Manager\FileManager::getFileFromFileEntity` return type to `?\SplFileInfo`
+  to comply with `Oro\Bundle\AttachmentBundle\Entity\File::$file` property type.
+* Changed `Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper::getFieldLabel` visibility to public,
+  so it can be used for getting human-readable field names during import.
+  instead of `$fileManager`, also the `$authorizationChecker` argument is removed.
+
+#### EntityExtendBundle
+* Changed `Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser` so it gets the form type from
+  `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider` and the form options from
+  `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider` now.
+
 ## 5.0.0 (2022-01-26)
 [Show detailed list of changes](incompatibilities-5-0.md)
 
@@ -20,6 +71,13 @@ The current file describes significant changes in the code that may affect the u
 * Added `Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider` to generate filename taking into account current WebP strategy.
 * Added `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface` and `Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider`
   to provider image sources to be used in <picture> tag.
+
+#### DataGridBundle
+* Added a unified way to disable columns, sorters, actions, and mass actions
+
+### FilterBundle
+* Changed filter configuration variable from `enabled` to `renderable`
+* Added new filter configuration variable `order` behavior according to [the documentation](https://doc.oroinc.com/master/bundles/platform/FilterBundle/grid-extension/)
 
 #### LocaleBundle
 * Added entity name provider for `Locale` entity

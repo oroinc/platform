@@ -106,6 +106,7 @@ class OroUserBundleInstaller implements
         $this->createOroAccessGroupTable($schema);
         $this->createOroUserAccessGroupRoleTable($schema);
         $this->createOroAccessRoleTable($schema);
+        $this->createOroUserLoginAttemptsTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroUserEmailForeignKeys($schema);
@@ -116,6 +117,7 @@ class OroUserBundleInstaller implements
         $this->addOroUserBusinessUnitForeignKeys($schema);
         $this->addOroAccessGroupForeignKeys($schema);
         $this->addOroUserAccessGroupRoleForeignKeys($schema);
+        $this->addOroUserLoginAttemptsForeignKeys($schema);
 
         EmailTemplateOwner::addOwnerToOroEmailTemplate($schema);
         OroUserBundle::addOwnerToOroEmailAddress($schema);
@@ -333,6 +335,23 @@ class OroUserBundleInstaller implements
         $table->setPrimaryKey(['id']);
     }
 
+    private function createOroUserLoginAttemptsTable(Schema $schema): void
+    {
+        $table = $schema->createTable('oro_user_login');
+        $table->addColumn('id', 'guid', ['notnull' => false]);
+        $table->addColumn('attempt_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addColumn('success', 'boolean', ['notnull' => true]);
+        $table->addColumn('source', 'integer', ['notnull' => true]);
+        $table->addColumn('username', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('user_id', 'integer', ['notnull' => false]);
+        $table->addColumn('ip', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('user_agent', 'string', ['length' => 255, 'notnull' => false]);
+        $table->addColumn('context', 'json', ['notnull' => true, 'comment' => '(DC2Type:json)']);
+        $table->addIndex(['user_id'], 'idx_aa4c6465a76ed395', []);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['attempt_at'], 'oro_user_log_att_at_idx');
+    }
+
     /**
      * Add oro_user_email foreign keys.
      */
@@ -472,6 +491,17 @@ class OroUserBundleInstaller implements
             ['role_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
+        );
+    }
+
+    private function addOroUserLoginAttemptsForeignKeys(Schema $schema): void
+    {
+        $table = $schema->getTable('oro_user_login');
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_user'),
+            ['user_id'],
+            ['id'],
+            ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
     }
 

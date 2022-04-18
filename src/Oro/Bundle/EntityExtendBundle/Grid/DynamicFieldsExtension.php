@@ -101,7 +101,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         parent::prepareColumnOptions($field, $columnOptions);
 
         if ($this->getFieldConfig('datagrid', $field)->is('show_filter')) {
-            $columnOptions[DatagridGuesser::FILTER]['enabled'] = true;
+            $columnOptions[DatagridGuesser::FILTER]['renderable'] = true;
         }
     }
 

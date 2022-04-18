@@ -5,6 +5,8 @@ namespace Oro\Bundle\DigitalAssetBundle\ImportExport\EventListener;
 use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
+use Oro\Bundle\AttachmentBundle\ImportExport\FileImportStrategyHelper;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
@@ -27,14 +29,24 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class DigitalAssetAwareFileStrategyEventListener
 {
     private AttachmentEntityConfigProviderInterface $attachmentEntityConfigProvider;
+
     private FieldHelper $fieldHelper;
+
     private DatabaseHelper $databaseHelper;
+
     private ImportStrategyHelper $importStrategyHelper;
+
     private DoctrineHelper $doctrineHelper;
+
+    private ?FileImportStrategyHelper $fileImportStrategyHelper = null;
+
     private TranslatorInterface $translator;
+
     private MemoryCache $memoryCache;
+
     /** @var DigitalAsset[] */
     private array $newDigitalAssets = [];
+
     /** @var File[] */
     private array $newFiles = [];
 
@@ -56,11 +68,18 @@ class DigitalAssetAwareFileStrategyEventListener
         $this->memoryCache = $memoryCache;
     }
 
+    public function setFileImportStrategyHelper(FileImportStrategyHelper $fileImportStrategyHelper): void
+    {
+        $this->fileImportStrategyHelper = $fileImportStrategyHelper;
+    }
+
     public function onProcessAfter(StrategyEvent $event): void
     {
         $errors = [[]];
         $entity = $event->getEntity();
-        $entityClass = $this->doctrineHelper->getClass($entity);
+        $entityClass = $this->fileImportStrategyHelper instanceof FileImportStrategyHelper
+            ? $this->fileImportStrategyHelper->getClass($entity)
+            : $this->doctrineHelper->getClass($entity);
         $relations = $this->getRelations($entityClass);
         $itemData = (array)($event->getContext()->getValue('itemData') ?? []);
 
@@ -104,10 +123,12 @@ class DigitalAssetAwareFileStrategyEventListener
 
     private function isDamEnabled(object $entity, string $fieldName): bool
     {
-        $attachmentConfig = $this->attachmentEntityConfigProvider
-            ->getFieldConfig($this->doctrineHelper->getClass($entity), $fieldName);
+        $entityClass = $this->fileImportStrategyHelper instanceof FileImportStrategyHelper
+            ? $this->fileImportStrategyHelper->getClass($entity)
+            : $this->doctrineHelper->getClass($entity);
+        $attachmentConfig = $this->attachmentEntityConfigProvider->getFieldConfig($entityClass, $fieldName);
 
-        return $attachmentConfig && $attachmentConfig->is('use_dam');
+        return $attachmentConfig && $attachmentConfig->is('use_dam') && !$attachmentConfig->is('is_stored_externally');
     }
 
     /**
@@ -124,11 +145,21 @@ class DigitalAssetAwareFileStrategyEventListener
         /** @var File $file */
         $file = $this->fieldHelper->getObjectValue($entity, $fieldName);
 
-        if ($file) {
+        if ($file && !$file->getFile() instanceof ExternalFile) {
             $originUuid = $this->fieldHelper->getItemData($itemData, $fieldName)['uuid'] ?? '';
 
             if ($this->isDamEnabled($entity, $fieldName)) {
-                $errors = $this->createOrReuseDigitalAsset($file, $originUuid);
+                $fieldLabel = '';
+                if ($this->fileImportStrategyHelper instanceof FileImportStrategyHelper) {
+                    $entityClass = $this->fileImportStrategyHelper->getClass($entity);
+                    $fieldLabel = $this->fileImportStrategyHelper->getFieldLabel($entityClass, $fieldName);
+                }
+
+                $errors = $this->createOrReuseDigitalAsset(
+                    $file,
+                    $originUuid,
+                    $fieldLabel
+                );
             }
 
             if (!isset($this->newFiles[$file->getUuid()]) && !$file->getId()) {
@@ -140,12 +171,13 @@ class DigitalAssetAwareFileStrategyEventListener
     }
 
     /**
-     * @param File   $file
+     * @param File $file
      * @param string $originUuid
+     * @param string $fieldLabel
      *
      * @return string[]
      */
-    private function createOrReuseDigitalAsset(File $file, string $originUuid): array
+    private function createOrReuseDigitalAsset(File $file, string $originUuid, string $fieldLabel): array
     {
         $errors = [];
         $digitalAsset = null;
@@ -161,6 +193,7 @@ class DigitalAssetAwareFileStrategyEventListener
                             '%file_id%' => $foundByUuid->getId(),
                             '%file_uuid%' => $originUuid,
                             '%digital_asset_id%' => $foundByUuid->getParentEntityId(),
+                            '%fieldname%' => $fieldLabel,
                         ]
                     );
                 }
@@ -191,6 +224,7 @@ class DigitalAssetAwareFileStrategyEventListener
                 'oro.digitalasset.import.failed_to_create_or_reuse_digital_asset',
                 [
                     '%file_uuid%' => $originUuid,
+                    '%fieldname%' => $fieldLabel,
                 ]
             );
         }
@@ -209,7 +243,7 @@ class DigitalAssetAwareFileStrategyEventListener
         if (!isset($this->newDigitalAssets[$key])) {
             $sourceFile = new File();
             $sourceFile->setOriginalFilename($file->getOriginalFilename());
-            $sourceFile->setFile($file->getFile());
+            $sourceFile->setExternalFile($file->getFile());
 
             $this->newDigitalAssets[$key] = (new DigitalAsset())
                 ->addTitle((new LocalizedFallbackValue())->setString($file->getOriginalFilename()))
@@ -221,8 +255,15 @@ class DigitalAssetAwareFileStrategyEventListener
 
     private function findFileByUuid(string $uuid): ?File
     {
-        return $this->newFiles[$uuid] ??
-            ($uuid ? $this->databaseHelper->findOneBy(File::class, ['uuid' => $uuid]) : null);
+        if (isset($this->newFiles[$uuid])) {
+            return $this->newFiles[$uuid];
+        }
+
+        if ($this->fileImportStrategyHelper instanceof FileImportStrategyHelper) {
+            return $this->fileImportStrategyHelper->findFileByUuid($uuid);
+        }
+
+        return $uuid ? $this->databaseHelper->findOneBy(File::class, ['uuid' => $uuid]) : null;
     }
 
     /**
@@ -241,14 +282,19 @@ class DigitalAssetAwareFileStrategyEventListener
 
         $fieldItemData = $this->fieldHelper->getItemData($itemData, $fieldName);
         $isDamEnabled = $this->isDamEnabled($entity, $fieldName);
+        $fieldLabel = '';
+        if ($isDamEnabled && $this->fileImportStrategyHelper instanceof FileImportStrategyHelper) {
+            $entityClass = $this->fileImportStrategyHelper->getClass($entity);
+            $fieldLabel = $this->fileImportStrategyHelper->getFieldLabel($entityClass, $fieldName);
+        }
 
         foreach ($fileItems as $fileItem) {
             $file = $fileItem->getFile();
-            if ($file) {
+            if ($file && !$file->getFile() instanceof ExternalFile) {
                 $originUuid = $this->fieldHelper->getItemData(array_shift($fieldItemData))['file']['uuid'] ?? '';
 
                 if ($isDamEnabled) {
-                    $errors[] = $this->createOrReuseDigitalAsset($file, $originUuid);
+                    $errors[] = $this->createOrReuseDigitalAsset($file, $originUuid, $fieldLabel);
                 }
 
                 if (!isset($this->newFiles[$file->getUuid()]) && !$file->getId()) {

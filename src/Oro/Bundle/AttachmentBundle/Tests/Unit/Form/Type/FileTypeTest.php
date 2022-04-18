@@ -3,20 +3,20 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Form\Type\ExternalFileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
+use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestSubscriber;
-use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormConfigInterface;
-use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -24,8 +24,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class FileTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FileType */
-    private $type;
+    private FileType $type;
 
     protected function setUp(): void
     {
@@ -34,29 +33,64 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm(): void
     {
-        $event = new TestSubscriber();
-        $this->type->setEventSubscriber($event);
+        $eventSubscriber = new TestSubscriber();
+        $this->type->setEventSubscriber($eventSubscriber);
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->once())
+        $builder->expects(self::once())
             ->method('addEventSubscriber')
-            ->with($event);
+            ->with($eventSubscriber);
 
-        $builder->expects($this->exactly(2))
+        $builder->expects(self::once())
             ->method('addEventListener')
-            ->withConsecutive(
-                [FormEvents::PRE_SET_DATA, $this->isType('array')],
-                [FormEvents::POST_SUBMIT, $this->isType('array')]
-            );
+            ->with(FormEvents::PRE_SET_DATA, [$this->type, 'preSetData']);
 
         $options = [
             'checkEmptyFile' => true,
             'addEventSubscriber' => true,
-            'fileOptions' => $fileOptions = [],
+            'fileOptions' => [],
+            'isExternalFile' => false,
         ];
 
-        $builder->expects($this->once())
+        $builder->expects(self::exactly(2))
             ->method('add')
-            ->with('file', SymfonyFileType::class, $fileOptions);
+            ->withConsecutive(['file', SymfonyFileType::class, []], ['emptyFile', HiddenType::class]);
+
+        $this->type->buildForm($builder, $options);
+    }
+
+    public function testBuildFormWhenExternalFile(): void
+    {
+        $eventSubscriber = new TestSubscriber();
+        $this->type->setEventSubscriber($eventSubscriber);
+        $builder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::once())
+            ->method('addEventSubscriber')
+            ->with($eventSubscriber);
+
+        $builder->expects(self::once())
+            ->method('addEventListener')
+            ->with(FormEvents::PRE_SET_DATA, [$this->type, 'preSetData']);
+
+        $options = [
+            'checkEmptyFile' => true,
+            'addEventSubscriber' => true,
+            'fileOptions' => [],
+            'isExternalFile' => true,
+        ];
+
+        $childBuilder = $this->createMock(FormBuilderInterface::class);
+        $builder->expects(self::once())
+            ->method('create')
+            ->with('file', ExternalFileType::class, $this->isType('array'))
+            ->willReturn($childBuilder);
+
+        $childBuilder->expects(self::once())
+            ->method('addEventListener')
+            ->with(FormEvents::PRE_SET_DATA, [$this->type, 'filePreSetData']);
+
+        $builder->expects(self::exactly(2))
+            ->method('add')
+            ->withConsecutive($childBuilder, ['emptyFile', HiddenType::class]);
 
         $this->type->buildForm($builder, $options);
     }
@@ -65,241 +99,186 @@ class FileTypeTest extends \PHPUnit\Framework\TestCase
     {
         $builder = $this->createMock(FormBuilderInterface::class);
 
-        $builder->expects($this->exactly(2))
+        $builder->expects(self::once())
             ->method('addEventListener')
-            ->withConsecutive(
-                [FormEvents::PRE_SET_DATA, $this->isType('array')],
-                [FormEvents::POST_SUBMIT, $this->isType('array')]
-            );
+            ->with(FormEvents::PRE_SET_DATA, [$this->type, 'preSetData']);
+
+        $builder->expects(self::never())
+            ->method('addEventSubscriber');
 
         $options = [
             'checkEmptyFile' => true,
             'addEventSubscriber' => false,
-            'fileOptions' => $fileOptions = [],
+            'fileOptions' => [],
+            'isExternalFile' => false,
         ];
 
-        $builder->expects($this->once())
+        $builder->expects(self::exactly(2))
             ->method('add')
-            ->with('file', SymfonyFileType::class, $fileOptions);
+            ->withConsecutive(['file', SymfonyFileType::class, []], ['emptyFile', HiddenType::class]);
 
         $this->type->buildForm($builder, $options);
     }
 
-    public function testPreSetDataWhenNotAllowDelete(): void
+    public function testPreSetDataRemovesOwnerField(): void
     {
-        $formEvent = $this->createMock(FormEvent::class);
+        $form = $this->createMock(FormInterface::class);
+        $formEvent = new PreSetDataEvent($form, null);
 
-        $formEvent->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form = $this->createMock(FormInterface::class));
-
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('remove')
             ->with('owner');
-
-        $form->method('getConfig')
-            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
-
-        $formConfig->method('getOption')
-            ->with('allowDelete')
-            ->willReturn(false);
-
-        $form->expects($this->never())
-            ->method('add');
 
         $this->type->preSetData($formEvent);
     }
 
-    public function testPreSetDataWhenAllowDelete(): void
+    public function testFilePreSetDataSetsExternalFile(): void
     {
-        $formEvent = $this->createMock(FormEvent::class);
+        $form = $this->createMock(FormInterface::class);
+        $event = new PreSetDataEvent($form, null);
+        $parentForm = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::once())
+            ->method('getParent')
+            ->willReturn($parentForm);
 
-        $formEvent->expects($this->once())
-            ->method('getForm')
-            ->willReturn($form = $this->createMock(FormInterface::class));
+        $file = (new File())
+            ->setExternalUrl('http://example.org/image.png')
+            ->setOriginalFilename('original-image.png')
+            ->setFileSize(4242)
+            ->setMimeType('image/png');
 
-        $form->expects($this->once())
-            ->method('remove')
-            ->with('owner');
-
-        $form->method('getConfig')
-            ->willReturn($formConfig = $this->createMock(FormConfigInterface::class));
-
-        $formConfig->method('getOption')
-            ->with('allowDelete')
-            ->willReturn(true);
-
-        $form->expects($this->once())
-            ->method('add')
-            ->with('emptyFile', HiddenType::class, ['required' => false]);
-
-        $this->type->preSetData($formEvent);
-    }
-
-    public function testPostSubmitWhenNoEntity(): void
-    {
-        $formEvent = $this->createMock(FormEvent::class);
-
-        $formEvent->expects($this->once())
+        $parentForm
+            ->expects(self::once())
             ->method('getData')
-            ->willReturn(null);
+            ->willReturn($file);
 
-        $this->type->postSubmit($formEvent);
+        $this->type->filePreSetData($event);
+
+        self::assertEquals(
+            new ExternalFile(
+                $file->getExternalUrl(),
+                $file->getOriginalFilename(),
+                $file->getFileSize(),
+                $file->getMimeType()
+            ),
+            $event->getData()
+        );
     }
 
-    public function testPostSubmitWhenNoFile(): void
+    public function testFilePreSetDataDoesNothingWhenNoExternalUrl(): void
     {
-        $formEvent = $this->createMock(FormEvent::class);
+        $form = $this->createMock(FormInterface::class);
+        $event = new PreSetDataEvent($form, null);
+        $parentForm = $this->createMock(FormInterface::class);
+        $form
+            ->expects(self::once())
+            ->method('getParent')
+            ->willReturn($parentForm);
 
-        $formEvent->expects($this->once())
+        $parentForm
+            ->expects(self::once())
             ->method('getData')
-            ->willReturn($file = $this->createMock(File::class));
+            ->willReturn(new File());
 
-        $file
-            ->expects($this->never())
-            ->method('setUpdatedAt');
+        $this->type->filePreSetData($event);
 
-        $this->type->postSubmit($formEvent);
+        self::assertNull($event->getData());
     }
 
-    public function testPostSubmitWhenEmptyFile(): void
+    /**
+     * @dataProvider configureOptionsDataProvider
+     */
+    public function testConfigureOptions(array $options, array $expectedOptions): void
     {
-        $formEvent = $this->createMock(FormEvent::class);
+        $resolver = new OptionsResolver();
 
-        $formEvent->expects($this->once())
-            ->method('getData')
-            ->willReturn($file = $this->createMock(File::class));
+        $this->type->configureOptions($resolver);
 
-        $file
-            ->expects($this->once())
-            ->method('isEmptyFile')
-            ->willReturn(true);
-
-        $file
-            ->expects($this->once())
-            ->method('setUpdatedAt')
-            ->with($this->isInstanceOf(\DateTime::class));
-
-        $this->type->postSubmit($formEvent);
+        self::assertEquals($expectedOptions, $resolver->resolve($options));
     }
 
-    public function testPostSubmitWhenUploadedFile(): void
+    public function testFinishView(): void
     {
-        $formEvent = $this->createMock(FormEvent::class);
+        $view = new FormView();
 
-        $formEvent->expects($this->once())
-            ->method('getData')
-            ->willReturn($file = $this->createMock(File::class));
+        $fileView = new FormView($view);
+        $fileView->vars['id'] = 'file_id';
 
-        $file
-            ->expects($this->once())
-            ->method('getFile')
-            ->willReturn($this->createMock(ComponentFile::class));
+        $emptyFileView = new FormView($view);
+        $emptyFileView->vars['id'] = 'empty_file_id';
 
-        $file
-            ->expects($this->once())
-            ->method('setUpdatedAt')
-            ->with($this->isInstanceOf(\DateTime::class));
+        $view->children['file'] = $fileView;
+        $view->children['emptyFile'] = $emptyFileView;
 
-        $this->type->postSubmit($formEvent);
+        $this->type->finishView($view, $this->createMock(FormInterface::class), []);
+
+        self::assertArrayHasKey('attachmentViewOptions', $view->vars);
+        self::assertEquals(
+            ['fileSelector' => '#' . $fileView->vars['id'], 'emptyFileSelector' => '#' . $emptyFileView->vars['id']],
+            $view->vars['attachmentViewOptions']
+        );
+
+        self::assertArrayHasKey('label_attr', $view->vars);
+        self::assertArrayHasKey('for', $view->vars['label_attr']);
+        self::assertEquals($fileView->vars['id'], $view->vars['label_attr']['for']);
     }
 
-    public function testConfigureOptions(): void
+    public function configureOptionsDataProvider(): array
     {
-        $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())
-            ->method('setDefaults')
-            ->with(
-                [
+        return [
+            'default options' => [
+                'options' => [],
+                'expectedOptions' => [
                     'data_class' => File::class,
                     'checkEmptyFile' => false,
                     'allowDelete' => true,
                     'addEventSubscriber' => true,
-                    'fileOptions' => [],
-                ]
-            );
-
-        $resolver->expects($this->once())
-            ->method('setAllowedTypes')
-            ->with('fileOptions', 'array');
-
-        $resolver->expects($this->once())
-            ->method('setNormalizer')
-            ->with('fileOptions', $this->isType('callable'));
-
-        $this->type->configureOptions($resolver);
-    }
-
-    /**
-     * @dataProvider normalizeFileOptionsDataProvider
-     */
-    public function testNormalizeFileOptions(Options $allOptions, array $option, array $expectedOption): void
-    {
-        ReflectionUtil::setPropertyValue($allOptions, 'locked', true);
-
-        $this->assertEquals(
-            $expectedOption,
-            $this->type->normalizeFileOptions($allOptions, $option)
-        );
-    }
-
-    public function normalizeFileOptionsDataProvider(): array
-    {
-        return [
-            'empty options' => [
-                'allOptions' => (new OptionsResolver())->setDefaults(
-                    [
-                        'checkEmptyFile' => false,
-                    ]
-                ),
-                'option' => [],
-                'expectedOption' => [
-                    'required' => false,
-                    'label' => 'oro.attachment.file.label',
+                    'fileOptions' => [
+                        'required' => false,
+                        'label' => 'oro.attachment.file.label',
+                    ],
+                    'isExternalFile' => false,
                 ],
             ],
-            'required is set' => [
-                'allOptions' => (new OptionsResolver())->setDefaults(
-                    [
-                        'checkEmptyFile' => true,
-                    ]
-                ),
-                'option' => [
-                    'required' => false,
+            'fileOptions.required is true and fileOptions.constraints is NotBlank when checkEmptyFile is true' => [
+                'options' => [
+                    'checkEmptyFile' => true,
                 ],
-                'expectedOption' => [
-                    'required' => false,
-                    'label' => 'oro.attachment.file.label',
-                    'constraints' => [new NotBlank()],
-                ],
-            ],
-            'constraints is set' => [
-                'allOptions' => (new OptionsResolver())->setDefaults(
-                    [
-                        'checkEmptyFile' => true,
-                    ]
-                ),
-                'option' => [
-                    'constraints' => [],
-                ],
-                'expectedOption' => [
-                    'required' => true,
-                    'label' => 'oro.attachment.file.label',
-                    'constraints' => [],
+                'expectedOptions' => [
+                    'data_class' => File::class,
+                    'checkEmptyFile' => true,
+                    'allowDelete' => true,
+                    'addEventSubscriber' => true,
+                    'fileOptions' => [
+                        'required' => true,
+                        'constraints' => [new NotBlank()],
+                        'label' => 'oro.attachment.file.label',
+                    ],
+                    'isExternalFile' => false,
                 ],
             ],
-            'label is set' => [
-                'allOptions' => (new OptionsResolver())->setDefaults(
-                    [
-                        'checkEmptyFile' => false,
-                    ]
-                ),
-                'option' => [
-                    'label' => 'sample-label',
+            'fileOptions are not overridden when set explicitly' => [
+                'options' => [
+                    'checkEmptyFile' => true,
+                    'fileOptions' => [
+                        'required' => false,
+                        'constraints' => [new NotNull()],
+                        'label' => 'custom_label',
+                    ],
+                    'isExternalFile' => true,
                 ],
-                'expectedOption' => [
-                    'required' => false,
-                    'label' => 'sample-label',
+                'expectedOptions' => [
+                    'data_class' => File::class,
+                    'checkEmptyFile' => true,
+                    'allowDelete' => true,
+                    'addEventSubscriber' => true,
+                    'fileOptions' => [
+                        'required' => false,
+                        'constraints' => [new NotNull()],
+                        'label' => 'custom_label',
+                    ],
+                    'isExternalFile' => true,
                 ],
             ],
         ];

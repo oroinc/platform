@@ -234,6 +234,16 @@ class UserController extends AbstractController
     }
 
     /**
+     * @Route("/login-attempts", name="oro_user_login_attempts")
+     * @Template
+     * @AclAncestor("oro_view_user_login_attempt")
+     */
+    public function loginAttemptsAction()
+    {
+        return [];
+    }
+
+    /**
      * Returns current UserApi or creates new one
      *
      * @param User $user

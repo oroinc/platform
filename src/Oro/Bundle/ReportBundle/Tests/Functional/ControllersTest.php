@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ReportBundle\Tests\Functional;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Tests\Functional\Environment\DatagridQueryCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\ReportBundle\Entity\Report;
@@ -30,19 +30,19 @@ class ControllersTest extends WebTestCase
         $this->getDatagridQueryCollector()->disable();
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_report_index'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertEquals('Manage Custom Reports - Reports & Segments', $crawler->filter('#page-title')->html());
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertEquals('Manage Custom Reports - Reports & Segments', $crawler->filter('#page-title')->html());
     }
 
     /**
      * @param array $report
      * @dataProvider reportDataProvider
      */
-    public function testCreate($report)
+    public function testCreate(array $report): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_report_create'));
         $form = $this->getReportForm($crawler);
@@ -56,19 +56,20 @@ class ControllersTest extends WebTestCase
      * @depends testCreate
      * @dataProvider reportDataProvider
      */
-    public function testView(array $report, array $reportResult)
+    public function testView(array $report, array $reportResult): void
     {
         $id = $this->getReportId($report['oro_report_form[name]']);
 
         $this->client->request('GET', $this->getUrl('oro_report_view', ['id' => $id]));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
 
         $response = $this->client->requestGrid(Report::GRID_PREFIX . $id);
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $data = $result['data'];
 
-        for ($i = 0; $i < count($data); $i++) {
+        $num = count($data);
+        for ($i = 0; $i < $num; $i++) {
             $reportResult[$i]['id'] = $data[$i]['id'];
             $reportResult[$i]['view_link'] = $this->getUrl('oro_user_view', ['id' => $data[$i]['id']]);
         }
@@ -80,7 +81,7 @@ class ControllersTest extends WebTestCase
      * @depends testView
      * @dataProvider reportDataProvider
      */
-    public function testUpdate(array $report, array $reportResult)
+    public function testUpdate(array $report, array $reportResult): void
     {
         $id = $this->getReportId($report['oro_report_form[name]']);
 
@@ -96,10 +97,11 @@ class ControllersTest extends WebTestCase
             Report::GRID_PREFIX . $id,
             []
         );
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $data = $result['data'];
 
-        for ($i = 0; $i < count($data); $i++) {
+        $num = count($data);
+        for ($i = 0; $i < $num; $i++) {
             $reportResult[$i]['id'] = $data[$i]['id'];
             $reportResult[$i]['view_link'] = $this->getUrl('oro_user_view', ['id' => $data[$i]['id']]);
         }
@@ -107,7 +109,7 @@ class ControllersTest extends WebTestCase
         $this->assertReportRecordsEquals($reportResult, $data, (int)$result['options']['totalRecords']);
     }
 
-    public function testExport()
+    public function testExport(): void
     {
         $id = $this->getReportId('Admin_updated');
 
@@ -119,15 +121,15 @@ class ControllersTest extends WebTestCase
             ),
             [],
             [],
-            $this->generateNoHashNavigationHeader()
+            self::generateNoHashNavigationHeader()
         );
 
-        $response = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(1, $response);
-        $this->assertTrue($response['successful']);
+        $response = self::getJsonResponseContent($this->client->getResponse(), 200);
+        self::assertCount(1, $response);
+        self::assertTrue($response['successful']);
 
-        $this->assertMessageSent(
-            Topics::PRE_EXPORT,
+        self::assertMessageSent(
+            DatagridPreExportTopic::getName(),
             [
                 'format' => 'csv',
                 'notificationTemplate' => 'datagrid_export_result',
@@ -144,7 +146,7 @@ class ControllersTest extends WebTestCase
      * @depends testView
      * @dataProvider reportDataProvider
      */
-    public function testDelete(array $report)
+    public function testDelete(array $report): void
     {
         $id = $this->getReportId($report['oro_report_form[name]'] . '_updated');
 
@@ -153,21 +155,21 @@ class ControllersTest extends WebTestCase
             $this->getUrl('oro_api_delete_report', ['id' => $id])
         );
         $result = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($result, 204);
+        self::assertEmptyResponseStatusCodeEquals($result, 204);
 
         $this->client->request('GET', $this->getUrl('oro_report_update', ['id' => $id]));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 404);
+        self::assertHtmlResponseStatusCodeEquals($result, 404);
     }
 
-    public function testViewFromGrid()
+    public function testViewFromGrid(): void
     {
         $crawler = $this->client->request(
             'GET',
             $this->getUrl('oro_report_view_grid', ['gridName' => 'reports-grid'])
         );
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('reports-grid', $crawler->html());
         $this->assertEquals('reports-grid', $crawler->filter('h1.oro-subtitle')->html());
     }
@@ -177,15 +179,15 @@ class ControllersTest extends WebTestCase
      *
      * @return array
      */
-    public function reportDataProvider()
+    public function reportDataProvider(): array
     {
-        return $this->getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'reports');
+        return self::getApiRequestsData(__DIR__ . DIRECTORY_SEPARATOR . 'reports');
     }
 
     /**
      * test that both the count and the main queries are executed by datagrid query executor
      */
-    public function testReportQueries()
+    public function testReportQueries(): void
     {
         $report = [
             'oro_report_form[name]'       => 'Test',
@@ -210,7 +212,7 @@ class ControllersTest extends WebTestCase
         $this->getDatagridQueryCollector()->enable($reportDatagridName);
 
         $response = $this->client->requestGrid($reportDatagridName);
-        $this->assertJsonResponseStatusCodeEquals($response, 200);
+        self::assertJsonResponseStatusCodeEquals($response, 200);
 
         $this->assertEquals(
             [
@@ -229,10 +231,7 @@ class ControllersTest extends WebTestCase
         );
     }
 
-    /**
-     * @return DatagridQueryCollector
-     */
-    private function getDatagridQueryCollector()
+    private function getDatagridQueryCollector(): DatagridQueryCollector
     {
         return self::getContainer()->get('oro_datagrid.tests.datagrid_orm_query_collector');
     }
@@ -242,18 +241,12 @@ class ControllersTest extends WebTestCase
      *
      * @return Form
      */
-    private function getReportForm(Crawler $crawler)
+    private function getReportForm(Crawler $crawler): Form
     {
         return $crawler->selectButton('Save and Close')->form();
     }
 
-    /**
-     * @param Form $form
-     * @param array $fields
-     *
-     * @return Form $form
-     */
-    private function fillForm($form, $fields)
+    private function fillForm(Form $form, array $fields): Form
     {
         foreach ($fields as $fieldName => $value) {
             $form[$fieldName] = $value;
@@ -262,44 +255,34 @@ class ControllersTest extends WebTestCase
         return $form;
     }
 
-    /**
-     * @param string $reportName
-     *
-     * @return int
-     */
-    private function getReportId($reportName)
+    private function getReportId(string $reportName): int
     {
         $response = $this->client->requestGrid(
             'reports-grid',
             ['reports-grid[_filter][name][value]' => $reportName]
         );
 
-        $responseContent = $this->getJsonResponseContent($response, 200);
+        $responseContent = self::getJsonResponseContent($response, 200);
         $data = reset($responseContent['data']);
 
         return $data['id'];
     }
 
-    /**
-     * @param array $expected
-     * @param array $actual
-     * @param int $totalCount
-     */
-    private function assertReportRecordsEquals(array $expected, array $actual, $totalCount)
+    private function assertReportRecordsEquals(array $expected, array $actual, int $totalCount): void
     {
-        $this->assertEquals(count($expected), $totalCount);
+        self::assertEquals(count($expected), $totalCount);
         for ($i = 0; $i < $totalCount; $i++) {
             // unset datagrid system info
             unset($actual[$i]['action_configuration']);
             //compare by value
-            $this->assertEquals(array_values($expected[$i]), array_values($actual[$i]));
+            self::assertEquals(array_values($expected[$i]), array_values($actual[$i]));
         }
     }
 
-    private function assertReportSaved(Crawler $crawler)
+    private function assertReportSaved(Crawler $crawler): void
     {
         $response = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        self::assertHtmlResponseStatusCodeEquals($response, 200);
         self::assertStringContainsString('Report saved', $crawler->html());
     }
 }

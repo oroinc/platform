@@ -127,19 +127,33 @@ Delete a set of file records.
 
 ### content
 
-The content of the file as a Base64 encoded string.
+The content of the file as a Base64 encoded string. Either `externalUrl` or `content` must be specified, but not both.
 
 #### create
 
 {@inheritdoc}
 
-**The required field.**
+**The required field if `externalUrl` is not specified.**
 
 #### update
 
 {@inheritdoc}
 
 **This field must not be empty, if it is passed.**
+
+### externalUrl
+
+URL of the file that is stored externally on a third party service. Either `externalUrl` or `content` must be specified, but not both.
+
+#### create
+
+{@inheritdoc}
+
+**The required field if `content` is not specified.**
+
+#### update
+
+{@inheritdoc}
 
 ### parent
 

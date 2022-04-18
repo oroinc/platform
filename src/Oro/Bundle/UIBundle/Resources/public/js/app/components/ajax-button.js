@@ -29,7 +29,10 @@ define(function(require) {
                 );
                 mediator.execute('redirectTo', {url: redirect}, {redirect: true});
             },
-            errorHandlerMessage: __(errorMessage),
+            errorHandlerMessage: function(event, response) {
+                const responseText = $.parseJSON(response.responseText);
+                return responseText.message ? responseText.message : __(errorMessage);
+            },
             complete: function() {
                 mediator.execute('hideLoading');
             }

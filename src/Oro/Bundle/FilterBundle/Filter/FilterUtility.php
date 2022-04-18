@@ -2,28 +2,34 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+
+/**
+ * Provides a set of constants for DataGrid Filter
+ */
 class FilterUtility
 {
-    const CONDITION_OR  = 'OR';
-    const CONDITION_AND = 'AND';
+    public const CONDITION_OR  = 'OR';
+    public const CONDITION_AND = 'AND';
 
-    const CONDITION_KEY     = 'filter_condition';
-    const BY_HAVING_KEY     = 'filter_by_having';
-    const ENABLED_KEY       = 'enabled';
-    const VISIBLE_KEY       = 'visible';
-    const TYPE_KEY          = 'type';
-    const FRONTEND_TYPE_KEY = 'ftype';
-    const DATA_NAME_KEY     = 'data_name';
-    const TRANSLATABLE_KEY  = 'translatable';
-    const MIN_LENGTH_KEY    = 'min_length';
-    const MAX_LENGTH_KEY    = 'max_length';
-    const FORCE_LIKE_KEY    = 'force_like';
-    const FORM_OPTIONS_KEY  = 'options';
-    const DIVISOR_KEY       = 'divisor';
-    const TYPE_EMPTY        = 'filter_empty_option';
-    const TYPE_NOT_EMPTY    = 'filter_not_empty_option';
-    const CASE_INSENSITIVE_KEY = 'case_insensitive';
-    const VALUE_CONVERSION_KEY = 'value_conversion';
+    public const CONDITION_KEY        = 'filter_condition';
+    public const BY_HAVING_KEY        = 'filter_by_having';
+    public const RENDERABLE_KEY       = 'renderable';
+    public const VISIBLE_KEY          = 'visible';
+    public const DISABLED_KEY         = PropertyInterface::DISABLED_KEY;
+    public const TYPE_KEY             = 'type';
+    public const FRONTEND_TYPE_KEY    = 'ftype';
+    public const DATA_NAME_KEY        = 'data_name';
+    public const TRANSLATABLE_KEY     = 'translatable';
+    public const MIN_LENGTH_KEY       = 'min_length';
+    public const MAX_LENGTH_KEY       = 'max_length';
+    public const FORCE_LIKE_KEY       = 'force_like';
+    public const FORM_OPTIONS_KEY     = 'options';
+    public const DIVISOR_KEY          = 'divisor';
+    public const TYPE_EMPTY           = 'filter_empty_option';
+    public const TYPE_NOT_EMPTY       = 'filter_not_empty_option';
+    public const CASE_INSENSITIVE_KEY = 'case_insensitive';
+    public const VALUE_CONVERSION_KEY = 'value_conversion';
 
     public function getParamMap()
     {

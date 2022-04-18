@@ -197,9 +197,14 @@ class Form extends Element
         if ($field) {
             $type = $field->getAttribute('type');
             $classes = preg_split('/\s+/', (string)$field->getAttribute('class'), -1, PREG_SPLIT_NO_EMPTY);
+            $isExternalFileField = $field->getAttribute('data-is-external-file') === '1';
 
             if ('file' === $type) {
                 return $this->elementFactory->wrapElement('FileField', $field);
+            }
+
+            if ($isExternalFileField) {
+                return $this->elementFactory->wrapElement('ExternalFileField', $field);
             }
 
             if ('datetime' === $type) {
@@ -279,8 +284,13 @@ class Form extends Element
                 return $this->elementFactory->wrapElement($elementName, $sndParent);
             } elseif (in_array('control-group-oro_file', $classes, true)) {
                 $input = $sndParent->find('css', 'input[type="file"]');
+                if ($input !== null) {
+                    return $this->elementFactory->wrapElement('FileField', $input);
+                }
 
-                return $this->elementFactory->wrapElement('FileField', $input);
+                $input = $sndParent->find('css', 'input[data-is-external-file="1"]');
+
+                return $this->elementFactory->wrapElement('ExternalFileField', $input);
             } elseif ($select = $sndParent->find('css', 'select')) {
                 return $select;
             } elseif (in_array('control-group-checkbox', $classes, true)) {
@@ -445,7 +455,7 @@ class Form extends Element
                     '%s%s%s',
                     $field->getXpath(),
                     '/ancestor::div[contains(@class, "input-widget-file")]',
-                    '/following-sibling::div/span[@class="validation-failed"]'
+                    '/following-sibling::span[@class="validation-failed"]'
                 )
             );
         }

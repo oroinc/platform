@@ -9,11 +9,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
- * Based on the configuration, it determines the field type, parameters and constraints
+ * Provides a guess for form type and form options based on entity field config.
  */
 class ExtendFieldTypeGuesser extends AbstractFormGuesser
 {
@@ -35,6 +36,12 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
     /** @var array */
     protected $typeMap = [];
 
+    /** @var ExtendFieldFormTypeProvider */
+    private $extendFieldFormTypeProvider;
+
+    /** @var ExtendFieldFormOptionsProviderInterface */
+    private $extendFieldFormOptionsProvider;
+
     public function __construct(
         ManagerRegistry $managerRegistry,
         ConfigProvider $entityConfigProvider,
@@ -42,11 +49,21 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
         ConfigProvider $extendConfigProvider,
         ConfigProvider $enumConfigProvider
     ) {
-        $this->formConfigProvider   = $formConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
+        parent::__construct($managerRegistry, $entityConfigProvider);
+
+        $this->formConfigProvider = $formConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;
-        $this->managerRegistry      = $managerRegistry;
-        $this->enumConfigProvider   = $enumConfigProvider;
+    }
+
+    public function setExtendFieldFormTypeProvider(ExtendFieldFormTypeProvider $extendFieldFormTypeProvider): void
+    {
+        $this->extendFieldFormTypeProvider = $extendFieldFormTypeProvider;
+    }
+
+    public function setExtendFieldFormOptionsProvider(
+        ExtendFieldFormOptionsProviderInterface $extendFieldFormOptionsProvider
+    ): void {
+        $this->extendFieldFormOptionsProvider = $extendFieldFormOptionsProvider;
     }
 
     /**
@@ -56,7 +73,9 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
      */
     public function addExtendTypeMapping($extendType, $formType, array $formOptions = [])
     {
-        $this->typeMap[$extendType] = ['type' => $formType, 'options' => $formOptions];
+        if ($this->extendFieldFormTypeProvider instanceof ExtendFieldFormTypeProvider) {
+            $this->extendFieldFormTypeProvider->addExtendTypeMapping($extendType, $formType, $formOptions);
+        }
     }
 
     /**
@@ -68,46 +87,31 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
             return $this->createDefaultTypeGuess();
         }
 
-        $formConfig = $this->formConfigProvider->getConfig($className, $property);
-        if (!$formConfig->is('is_enabled')) {
+        $formFieldConfig = $this->formConfigProvider->getConfig($className, $property);
+        if (!$formFieldConfig->is('is_enabled')) {
             return $this->createDefaultTypeGuess();
         }
 
-        /** @var FieldConfigId $fieldConfigId */
-        $fieldConfigId = $formConfig->getId();
-        $fieldName     = $fieldConfigId->getFieldName();
+        /** @var FieldConfigId $formFieldConfigId */
+        $formFieldConfigId = $formFieldConfig->getId();
+        $fieldName = $formFieldConfigId->getFieldName();
+        $fieldType = $formFieldConfigId->getFieldType();
 
-        $typeOptions = [];
-        if ($formConfig->has('type')) {
-            $isTypeNotExists = false;
-            $type = $formConfig->get('type');
+        if ($formFieldConfig->has('type')) {
+            $type = $formFieldConfig->get('type');
         } else {
-            $isTypeNotExists = empty($this->typeMap[$fieldConfigId->getFieldType()]);
-            $type = null;
-            if (!$isTypeNotExists) {
-                $type = $this->typeMap[$fieldConfigId->getFieldType()]['type'];
-                $typeOptions = $this->typeMap[$fieldConfigId->getFieldType()]['options'];
-            }
+            $type = $this->extendFieldFormTypeProvider->getFormType($fieldType);
         }
 
-        $extendConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
-        if (!$this->isApplicableField($extendConfig) || $isTypeNotExists) {
+        /** @var FieldConfigId $extendFieldConfig */
+        $extendFieldConfig  = $this->extendConfigProvider->getConfig($className, $fieldName);
+        if ($type === '' || !$this->isApplicableField($extendFieldConfig)) {
             return $this->createDefaultTypeGuess();
         }
 
-        $options = $this->getOptions($extendConfig, $fieldConfigId);
-
-        $entityConfig = $this->entityConfigProvider->getConfig($className, $fieldName);
-
-        $options      = array_replace_recursive(
-            [
-                'label'    => $entityConfig->get('label'),
-                'required' => false,
-                'block'    => 'general',
-            ],
-            $options,
-            $typeOptions
-        );
+        $options = $this->extendFieldFormOptionsProvider instanceof ExtendFieldFormOptionsProviderInterface
+            ? $this->extendFieldFormOptionsProvider->getOptions($className, $fieldName)
+            : [];
 
         return $this->createTypeGuess($type, $options);
     }
@@ -117,67 +121,10 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
      * @param FieldConfigId   $fieldConfigId
      *
      * @return array
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function getOptions(ConfigInterface $extendConfig, FieldConfigId $fieldConfigId)
     {
-        $className = $fieldConfigId->getClassName();
-        $fieldName = $fieldConfigId->getFieldName();
-
-        $options = [];
-
-        switch ($fieldConfigId->getFieldType()) {
-            case 'boolean':
-                // Doctrine DBAL can't save null to boolean field
-                // see https://github.com/doctrine/dbal/issues/2580
-                $options['configs']['allowClear'] = false;
-                $options['choices'] = [
-                    'No' => false,
-                    'Yes' => true
-                ];
-                break;
-            case 'float':
-            case 'decimal':
-                $options['grouping'] = true;
-                break;
-            case 'enum':
-                $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
-                    ->get('enum_code');
-                break;
-            case 'multiEnum':
-                $options['expanded']  = true;
-                $options['enum_code'] = $this->enumConfigProvider->getConfig($className, $fieldName)
-                    ->get('enum_code');
-                break;
-            case RelationType::MANY_TO_ONE:
-                $options['entity_class'] = $extendConfig->get('target_entity');
-                $options['configs']      = [
-                    'placeholder'   => 'oro.form.choose_value',
-                    'component'  => 'relation',
-                    'target_entity' => str_replace('\\', '_', $extendConfig->get('target_entity')),
-                    'target_field'  => $extendConfig->get('target_field'),
-                    'properties'    => [$extendConfig->get('target_field')],
-                ];
-                break;
-            case RelationType::ONE_TO_MANY:
-            case RelationType::MANY_TO_MANY:
-                $classArray = explode('\\', $extendConfig->get('target_entity'));
-                $blockName  = array_pop($classArray);
-
-                $options['block']                 = $blockName;
-                $options['block_config']          = [
-                    $blockName => ['title' => null, 'subblocks' => [['useSpan' => false]]]
-                ];
-                $options['class']                 = $extendConfig->get('target_entity');
-                $options['selector_window_title'] = 'Select ' . $blockName;
-                $options['initial_elements']      = null;
-                if (!$extendConfig->is('without_default')) {
-                    $options['default_element'] = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
-                }
-                break;
-        }
-
-        return $options;
+        return [];
     }
 
     /**

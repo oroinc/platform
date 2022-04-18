@@ -8,6 +8,9 @@ entity_config:
                         value_type: boolean
                         allowed_type: [file, image, multiFile, multiImage]
                         create_only: true
+                        required_property:
+                            code: is_stored_externally
+                            value: false
                     form:
                         type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:

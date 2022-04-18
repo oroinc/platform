@@ -25,32 +25,21 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
-    /** @var FormFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
+    private FormFactory|\PHPUnit\Framework\MockObject\MockObject $formFactory;
 
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
+    private Session|\PHPUnit\Framework\MockObject\MockObject $session;
 
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
+    private Router|\PHPUnit\Framework\MockObject\MockObject $router;
 
-    /** @var ConfigHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $configHelper;
+    private ConfigHelper|\PHPUnit\Framework\MockObject\MockObject $configHelper;
 
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
 
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
+    private Request|\PHPUnit\Framework\MockObject\MockObject $request;
 
-    /** @var ConfigHelperHandler */
-    private $handler;
+    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var TranslatorInterface */
-    private $translator;
+    private ConfigHelperHandler $handler;
 
     protected function setUp(): void
     {
@@ -61,7 +50,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $this->form = $this->createMock(FormInterface::class);
         $this->request = $this->createMock(Request::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
+        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
         $this->handler = new ConfigHelperHandler(
             $this->formFactory,
@@ -69,18 +58,18 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
             $this->router,
             $this->configHelper,
             $this->translator,
-            $this->urlGenerator
+            $urlGenerator
         );
     }
 
-    public function testCreateFirstStepFieldForm()
+    public function testCreateFirstStepFieldForm(): void
     {
         $entityClassName = 'someClassName';
         $entityConfigModel = $this->getEntity(EntityConfigModel::class, ['className' => $entityClassName]);
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class, ['entity' => $entityConfigModel]);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('create')
             ->with(
                 FieldType::class,
@@ -89,15 +78,15 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->form);
 
-        $this->assertEquals($this->form, $this->handler->createFirstStepFieldForm($fieldConfigModel));
+        self::assertEquals($this->form, $this->handler->createFirstStepFieldForm($fieldConfigModel));
     }
 
-    public function testCreateSecondStepFieldForm()
+    public function testCreateSecondStepFieldForm(): void
     {
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
-        $this->formFactory->expects($this->once())
+        $this->formFactory->expects(self::once())
             ->method('create')
             ->with(
                 ConfigType::class,
@@ -106,136 +95,162 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->form);
 
-        $this->assertEquals($this->form, $this->handler->createSecondStepFieldForm($fieldConfigModel));
+        self::assertEquals($this->form, $this->handler->createSecondStepFieldForm($fieldConfigModel));
     }
 
-    public function testIsFormValidAfterSubmitWhenMethodIsNotPost()
+    public function testIsFormValidAfterSubmitWhenMethodIsNotPost(): void
     {
-        $this->request->expects($this->once())
+        $this->request->expects(self::once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(false);
 
-        $this->form->expects($this->never())
+        $this->form->expects(self::never())
             ->method('handleRequest');
 
-        $this->assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
+        self::assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
     }
 
-    public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsNotValid()
+    public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsNotValid(): void
     {
-        $this->request->expects($this->once())
-            ->method('isMethod')
-            ->with('POST')
-            ->willReturn(true);
+        $formName = 'sample_form';
+        $parameters = [$formName => ['sample_key' => 'sample_value']];
+        $this->request = Request::create('/', Request::METHOD_POST, $parameters);
 
-        $this->form->expects($this->once())
-            ->method('handleRequest')
-            ->with($this->request);
-        $this->form->expects($this->once())
+        $this->form->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn($formName);
+        $this->form->expects(self::once())
+            ->method('submit')
+            ->with($parameters[$formName], true);
+        $this->form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('isValid')
             ->willReturn(false);
 
-        $this->assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
+        self::assertFalse($this->handler->isFormValidAfterSubmit($this->request, $this->form));
     }
 
-    public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsValid()
+    public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsValid(): void
     {
-        $this->request->expects($this->once())
-            ->method('isMethod')
-            ->with('POST')
-            ->willReturn(true);
+        $formName = 'sample_form';
+        $parameters = [$formName => ['sample_key' => 'sample_value']];
+        $request = Request::create('/', Request::METHOD_POST, $parameters);
 
-        $this->form->expects($this->once())
-            ->method('handleRequest')
-            ->with($this->request);
-        $this->form->expects($this->once())
+        $this->form->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn($formName);
+        $this->form->expects(self::once())
+            ->method('submit')
+            ->with($parameters[$formName], true);
+        $this->form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $this->form->expects($this->once())
+        $this->form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->assertTrue($this->handler->isFormValidAfterSubmit($this->request, $this->form));
+        self::assertTrue($this->handler->isFormValidAfterSubmit($request, $this->form));
     }
 
-    public function testShowSuccessMessageAndRedirect()
+    public function testIsFormValidAfterSubmitWhenMethodIsPostAndFormIsValidButPartial(): void
+    {
+        $formName = 'sample_form';
+        $parameters = [$formName => ['sample_key' => 'sample_value', ConfigType::PARTIAL_SUBMIT => true]];
+        $request = Request::create('/', Request::METHOD_POST, $parameters);
+
+        $this->form->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn($formName);
+        $this->form->expects(self::once())
+            ->method('submit')
+            ->with($parameters[$formName], false);
+        $this->form->expects(self::once())
+            ->method('isSubmitted')
+            ->willReturn(true);
+        $this->form->expects(self::once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        self::assertFalse($this->handler->isFormValidAfterSubmit($request, $this->form));
+    }
+
+    public function testShowSuccessMessageAndRedirect(): void
     {
         $successMessage = 'Success message';
 
         $flashBag = $this->createMock(FlashBagInterface::class);
-        $flashBag->expects($this->once())
+        $flashBag->expects(self::once())
             ->method('add')
             ->with('success', $successMessage);
 
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
-        $this->router->expects($this->once())
+        $this->router->expects(self::once())
             ->method('redirect')
             ->with($fieldConfigModel);
 
         $this->handler->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
     }
 
-    public function testShowClearCacheMessage()
+    public function testShowClearCacheMessage(): void
     {
         $message = 'Translation cache update is required';
         $flashBag = $this->createMock(FlashBagInterface::class);
 
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->willReturn($message);
 
-        $flashBag->expects($this->once())
+        $flashBag->expects(self::once())
             ->method('add')
             ->with('warning', $message);
 
-        $this->session->expects($this->once())
+        $this->session->expects(self::once())
             ->method('getFlashBag')
             ->willReturn($flashBag);
 
         $this->handler->showClearCacheMessage();
     }
 
-    public function testConstructConfigResponse()
+    public function testConstructConfigResponse(): void
     {
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $formView = new FormView();
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('createView')
             ->willReturn($formView);
 
         $formAction = 'someAction';
 
         $entityConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper->expects($this->once())
+        $this->configHelper->expects(self::once())
             ->method('getEntityConfigByField')
             ->with($fieldConfigModel, 'entity')
             ->willReturn($entityConfig);
 
         $fieldConfig = $this->createMock(ConfigInterface::class);
-        $this->configHelper->expects($this->once())
+        $this->configHelper->expects(self::once())
             ->method('getFieldConfig')
             ->with($fieldConfigModel, 'entity')
             ->willReturn($fieldConfig);
 
         $modules = ['somemodule'];
-        $this->configHelper->expects($this->once())
+        $this->configHelper->expects(self::once())
             ->method('getExtendJsModules')
             ->willReturn($modules);
 
         $nonExtendedEntities = ['first', 'second'];
-        $this->configHelper->expects($this->once())
+        $this->configHelper->expects(self::once())
             ->method('getNonExtendedEntitiesClasses')
             ->willReturn($nonExtendedEntities);
 
@@ -249,26 +264,26 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
             'non_extended_entities_classes' => $nonExtendedEntities,
         ];
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedResponse,
             $this->handler->constructConfigResponse($fieldConfigModel, $form, $formAction)
         );
     }
 
-    public function testRedirect()
+    public function testRedirect(): void
     {
         /** @var FieldConfigModel $fieldConfigModel */
         $fieldConfigModel = $this->getEntity(FieldConfigModel::class);
 
         $redirectResponse = new RedirectResponse('some_url');
-        $this->router->expects($this->once())
+        $this->router->expects(self::once())
             ->method('redirect')
             ->with($fieldConfigModel)
             ->willReturn($redirectResponse);
 
         $response = $this->handler->redirect($fieldConfigModel);
 
-        $this->assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
-        $this->assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
+        self::assertEquals($redirectResponse->getStatusCode(), $response->getStatusCode());
+        self::assertEquals($redirectResponse->getTargetUrl(), $response->getTargetUrl());
     }
 }

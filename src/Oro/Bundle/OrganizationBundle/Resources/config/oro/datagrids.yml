@@ -4,9 +4,9 @@ datagrids:
         options:
             entityHint: oro.organization.businessunit.entity_plural_label
             entity_pagination: true
-            mass_actions:
-                delete:
-                    enabled: false
+        mass_actions:
+            delete:
+                disabled: true
         source:
             type: orm
             skip_acl_apply: true

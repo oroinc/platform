@@ -21,7 +21,7 @@ api:
                     property_path: _
                     depends_on: [filename]
                     form_options:
-                        property_path: file
+                        property_path: externalFile
                         allow_file_upload: true
                 parent:
                     data_type: nestedAssociation

@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Type;
 
+use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
+use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfigValidator;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
@@ -251,6 +253,9 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
             [
                 new PreloadedExtension(
                     [
+                        FileType::class => new FileType(
+                            new ExternalFileFactory($this->createMock(ClientInterface::class))
+                        ),
                         DigitalAssetInDialogType::class => $this->formType,
                         LocalizedFallbackValueCollectionType::class => new LocalizedFallbackValueCollectionType(
                             $doctrine

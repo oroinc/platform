@@ -18,7 +18,7 @@
                         <% if (obj.enableMultiselectWidget) { %>
                         <select data-action="add-filter-select" multiple data-skip-input-widgets>
                             <% _.each(filters, function (filter, name) { %>
-                                <option class="<%- filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                <option class="<%- filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.renderable) { %>selected<% } %>>
                                     <%- filter.label %>
                                 </option>
                             <% }); %>
@@ -39,7 +39,7 @@
                             multiple
                     >
                         <% _.each(filters, function (filter, name) { %>
-                            <option class="<%- filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                            <option class="<%- filter.visible ? '' : 'hidden' %>" title="<%- filter.label %>" value="<%- name %>" <% if (filter.renderable) { %>selected<% } %>>
                                 <%- filter.label %>
                             </option>
                         <% }); %>

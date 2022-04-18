@@ -44,7 +44,7 @@ Feature: Multiple Images entity field without DAM
       | Custom Image 1 | 300x300.png |
     And I save and close form
     Then I should see "User Form With Multiple Images" validation errors:
-      | Custom Image 1 | The mime type of the file is invalid ("image/png"). Allowed mime types are "image/jpeg". |
+      | Custom Image 1 | The MIME type of the file is invalid ("image/png"). Allowed MIME types are "image/jpeg". |
 
   Scenario: Check maximum number of files
     Given I fill "User Form With Multiple Images" with:

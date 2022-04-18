@@ -172,12 +172,12 @@ abstract class AbstractConfigGridListener
 
             if (isset($field['filterable']) && $field['filterable']) {
                 $filters['columns'][$fieldName] = [
-                    'data_name'                => isset($field['expression']) ? $field['expression'] : $fieldName,
-                    'type'                     => isset($field['filter_type']) ? $field['filter_type'] : 'string',
-                    'frontend_type'            => $field['frontend_type'],
-                    'label'                    => $field['label'],
-                    'options'                  => isset($field['filter_options']) ? $field['filter_options'] : [],
-                    FilterUtility::ENABLED_KEY => isset($field['show_filter']) ? $field['show_filter'] : true,
+                    'data_name'                   => $field['expression'] ?? $fieldName,
+                    'type'                        => $field['filter_type'] ?? 'string',
+                    'frontend_type'               => $field['frontend_type'],
+                    'label'                       => $field['label'],
+                    'options'                     => $field['filter_options'] ?? [],
+                    FilterUtility::RENDERABLE_KEY => $field['show_filter'] ?? true,
                 ];
 
                 if (isset($field['choices'])) {

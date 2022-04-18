@@ -104,6 +104,8 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@translator'
             - '@oro_digital_asset.import_export.digital_asset_aware_file_strategy_event_listener.memory_cache'
+        calls:
+            - [setFileImportStrategyHelper, ['@oro_attachment.import_export.file_import_strategy_helper']]
         tags:
             # Listener priority should be lower than onProcessAfter in oro_attachment.import_export.file_strategy_event_listener
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter, priority: 40 }
@@ -126,3 +128,10 @@ services:
     Oro\Bundle\DigitalAssetBundle\EntityConfig\AttachmentFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_digital_asset.provider.extend_field_form_options.file_dam:
+        class: Oro\Bundle\DigitalAssetBundle\Provider\ExtendFieldFileDamFormOptionsProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+        tags:
+            - { name: oro_entity_extend.form_options_provider }

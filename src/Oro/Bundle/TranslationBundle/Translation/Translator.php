@@ -376,7 +376,6 @@ class Translator extends BaseTranslator
         foreach ($this->strategyProvider->getStrategies() as $strategy) {
             $this->strategyProvider->setStrategy($strategy);
 
-            /* @var $translator Translator */
             $translator = new static(
                 $this->container,
                 $this->messageFormatter,
@@ -384,7 +383,6 @@ class Translator extends BaseTranslator
                 $this->loaderIds,
                 $options
             );
-
             $translator->setStrategyProvider($this->strategyProvider);
             $translator->setTranslationDomainProvider($this->translationDomainProvider);
             $translator->setEventDispatcher($this->eventDispatcher);
@@ -392,7 +390,6 @@ class Translator extends BaseTranslator
             $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
             $translator->setLogger($this->logger);
             $translator->setMessageCatalogueSanitizer($this->catalogueSanitizer);
-
             $translator->warmUp($tmpDir);
         }
 

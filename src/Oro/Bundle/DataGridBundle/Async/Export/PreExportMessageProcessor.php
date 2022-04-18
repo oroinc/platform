@@ -1,13 +1,14 @@
 <?php
+
 namespace Oro\Bundle\DataGridBundle\Async\Export;
 
-use Oro\Bundle\DataGridBundle\Async\Topics;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
+use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\DataGridBundle\Provider\DatagridModeProvider;
 use Oro\Bundle\ImportExportBundle\Async\Export\PreExportMessageProcessorAbstract;
-use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -46,7 +47,7 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::PRE_EXPORT];
+        return [DatagridPreExportTopic::getName()];
     }
 
     /**
@@ -74,12 +75,10 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         );
         $body['parameters']['gridParameters'] = $contextParameters;
 
-        $ids = $this->exportHandler->getExportingEntityIds(
+        return $this->exportHandler->getExportingEntityIds(
             $this->exportIdFetcher,
             $body['parameters']
         );
-
-        return $ids;
     }
 
     /**
@@ -87,13 +86,13 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
      */
     protected function getDelayedJobCallback(array $body, array $ids = [])
     {
-        if (! empty($ids)) {
+        if (!empty($ids)) {
             $body['parameters']['gridParameters']['_export']['ids'] = $ids;
         }
 
         return function (JobRunner $jobRunner, Job $child) use ($body) {
             $this->producer->send(
-                Topics::EXPORT,
+                DatagridExportTopic::getName(),
                 new Message(
                     array_merge($body, ['jobId' => $child->getId()]),
                     MessagePriority::LOW
@@ -109,13 +108,7 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
     {
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
-            'format' => null,
             'batchSize' => $this->batchSize,
-            'parameters' => [
-                'gridName' => null,
-                'gridParameters' => [],
-                FormatterProvider::FORMAT_TYPE => 'excel',
-            ],
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
         ], $body);
 
@@ -123,12 +116,6 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
             $this->exportIdFetcher,
             $body['parameters']
         );
-
-        if (! isset($body['parameters']['gridName'], $body['format'])) {
-            $this->logger->critical('Got invalid message');
-
-            return false;
-        }
 
         // prepare body for dependent job message
         $body['jobName'] = $body['parameters']['gridName'];
