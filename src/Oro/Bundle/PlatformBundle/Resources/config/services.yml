@@ -5,6 +5,8 @@ parameters:
 
     oro_platform.collector.template: '@@OroPlatform/Collector/platform.html.twig'
 
+    oro_platform.collect_deprecations: false
+
 services:
     oro_platform.psr7.http_factory:
         class: Oro\Bundle\PlatformBundle\Psr7\HttpFactory
