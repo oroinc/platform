@@ -132,7 +132,7 @@
 {% macro query_designer_grouping_item_template(id) %}
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%- cid %>">
-            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%- name %></td>
+            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             <td class="action-cell">
                 {% apply spaceless %}
                 <a href="#" class="btn btn-icon btn-lighter action no-hash edit-button"
