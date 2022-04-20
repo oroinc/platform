@@ -26,12 +26,6 @@ Feature: Options in Grid View
     Then I should see "View has been successfully updated" flash message
     And I should not see "Set as default" in grid view options
 
-  Scenario: Grid page should open with default grid view
-    Given I go to System/Entities/Entity Management
-    Then I should see "Test View 1"
-    And I should see "Name: contains \"Test not default\""
-    And I should not see "Set as default" in grid view options
-
   Scenario: Create new default grid view
     When I filter Name as contains "Test default"
     And I click Options in grid view
@@ -48,3 +42,10 @@ Feature: Options in Grid View
     And I type "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" in "name"
     When I click "Save" in modal window
     Then I should see "This value is too long. It should have 255 characters or less."
+    And I click "Cancel" in modal window
+
+  Scenario: Grid page should open with default grid view
+    Given I go to System/Entities/Entity Management
+    Then I should see "Test View 2"
+    And I should see "Name: contains \"Test default\""
+    And I should not see "Set as default" in grid view options
