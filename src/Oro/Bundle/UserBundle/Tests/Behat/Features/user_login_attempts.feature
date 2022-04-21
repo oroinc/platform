@@ -1,4 +1,5 @@
 @ticket-BAP-11576
+@ticket-BAP-21323
 
 Feature: User Login Attempts
   In order to have ability to manage user logins
@@ -37,3 +38,56 @@ Feature: User Login Attempts
     When I check "Impersonation" in Source filter
     Then there are 0 records in grid
     And I reset "Source" filter
+
+  Scenario: Sort by Success field
+    When I sort grid by "Success"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | No      | Default | wrong_user |          |
+      | Yes     | Default | admin      | John Doe |
+    When I sort grid by "Success"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | Yes     | Default | admin      | John Doe |
+      | No      | Default | wrong_user |          |
+
+  Scenario: Sort by Username field
+    When I sort grid by "Username"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | Yes     | Default | admin      | John Doe |
+      | No      | Default | wrong_user |          |
+    When I sort grid by "Username"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | No      | Default | wrong_user |          |
+      | Yes     | Default | admin      | John Doe |
+    When I sort grid by "Username"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | Yes     | Default | admin      | John Doe |
+      | No      | Default | wrong_user |          |
+
+  Scenario: Sort by Attempt at field
+    When I sort grid by "Attempt at"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | No      | Default | wrong_user |          |
+      | Yes     | Default | admin      | John Doe |
+    When I sort grid by "Attempt at"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | Yes     | Default | admin      | John Doe |
+      | No      | Default | wrong_user |          |
+
+  Scenario: Sort by User field
+    When I sort grid by "User"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | Yes     | Default | admin      | John Doe |
+      | No      | Default | wrong_user |          |
+    When I sort grid by "User"
+    Then I should see following grid:
+      | Success | Source  | Username   | User     |
+      | No      | Default | wrong_user |          |
+      | Yes     | Default | admin      | John Doe |

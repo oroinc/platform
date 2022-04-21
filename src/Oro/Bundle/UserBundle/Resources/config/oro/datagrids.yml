@@ -858,7 +858,7 @@ datagrids:
                 attemptAt:
                     data_name: ul.attemptAt
                 success:
-                    data_name: ul.updatedAt
+                    data_name: ul.success
                 username:
                     data_name: ul.username
                 user:
@@ -881,7 +881,7 @@ datagrids:
                     type: boolean
                 attemptAt:
                     type: datetime
-                    data_name: ul.createdAt
+                    data_name: ul.attemptAt
                 username:
                     type: string
                     data_name: ul.username
