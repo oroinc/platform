@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DigitalAssetBundle\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener as BaseFileDeleteListener;
 
@@ -17,6 +19,11 @@ class FileDeleteListener
     public function __construct(BaseFileDeleteListener $fileDeleteListener)
     {
         $this->innerFileDeleteListener = $fileDeleteListener;
+    }
+
+    public function onFlush(OnFlushEventArgs $args): void
+    {
+        $this->innerFileDeleteListener->onFlush($args);
     }
 
     public function preRemove(File $file, LifecycleEventArgs $args): void
@@ -38,5 +45,10 @@ class FileDeleteListener
         if (empty($changeSet['digitalAsset'][0]) && !$file->getDigitalAsset()) {
             $this->innerFileDeleteListener->postUpdate($file, $args);
         }
+    }
+
+    public function postFlush(PostFlushEventArgs $args): void
+    {
+        $this->innerFileDeleteListener->postFlush($args);
     }
 }
