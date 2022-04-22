@@ -5,38 +5,38 @@ namespace Oro\Component\TestUtils\ORM;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Driver\Connection;
 use Oro\Component\Testing\TempDirExtension;
+use Oro\Component\TestUtils\ORM\Mocks\ConnectionMock;
 use Oro\Component\TestUtils\ORM\Mocks\DriverMock;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\FetchIterator;
 use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls;
+use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 
 /**
  * The base class for ORM related test cases.
- *
- * This class is a clone of Doctrine\Tests\OrmTestCase that is excluded from doctrine package since v2.4.
  */
-abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
+abstract class OrmTestCase extends TestCase
 {
     use TempDirExtension;
 
-    /** @var AbstractAdapter The metadata cache that is shared between all ORM tests */
-    private $metadataCacheImpl;
-
-    /** @var array|null */
-    private $queryExpectations;
+    private ?CacheItemPoolInterface $metadataCacheImpl = null;
+    private array $queryExpectations = [];
 
     /**
      * @after
      */
-    protected function resetQueryExpectations()
+    protected function resetQueryExpectations(): void
     {
-        $this->queryExpectations = null;
+        $this->queryExpectations = [];
     }
 
-    protected function getProxyDir($shouldBeCreated = true)
+    protected function getProxyDir(bool $shouldBeCreated = true): string
     {
         return $this->getTempDir('test_orm_proxies', $shouldBeCreated);
     }
@@ -47,16 +47,13 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
      * NOTE: The created EntityManager will have its dependant DBAL parts completely
      * mocked out using a DriverMock, ConnectionMock, etc. These mocks can then
      * be configured in the tests to simulate the DBAL behavior that is desired
-     * for a particular test,
-     *
-     * @param mixed        $conn
-     * @param EventManager $eventManager
-     * @param bool         $withSharedMetadata
-     *
-     * @return EntityManagerMock
+     * for a particular test.
      */
-    protected function getTestEntityManager($conn = null, $eventManager = null, $withSharedMetadata = true)
-    {
+    protected function getTestEntityManager(
+        mixed $conn = null,
+        EventManager $eventManager = null,
+        bool $withSharedMetadata = true
+    ): EntityManagerMock {
         $config = new \Doctrine\ORM\Configuration();
         $config->setMetadataCache($this->getMetadataCacheImpl($withSharedMetadata));
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver([], true));
@@ -66,18 +63,18 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
 
         // The namespace of custom functions is hardcoded in \Oro\ORM\Query\AST\FunctionFactory::create, so we are
         // making our mock of 'CAST' available in Oro\ORM\Query\AST\Platform\Functions\Mock\ namespace:
-        if (!\class_exists('Oro\ORM\Query\AST\Platform\Functions\Mock\Cast', false)) {
-            \class_alias(
+        if (!class_exists('Oro\ORM\Query\AST\Platform\Functions\Mock\Cast', false)) {
+            class_alias(
                 \Oro\Component\TestUtils\ORM\Mocks\Cast::class,
                 'Oro\ORM\Query\AST\Platform\Functions\Mock\Cast'
             );
         }
         $config->setCustomStringFunctions(['cast' => 'Oro\ORM\Query\AST\Functions\Cast']);
 
-        if ($conn === null) {
+        if (null === $conn) {
             $conn = [
-                'driverClass'  => 'Oro\Component\TestUtils\ORM\Mocks\DriverMock',
-                'wrapperClass' => 'Oro\Component\TestUtils\ORM\Mocks\ConnectionMock',
+                'driverClass'  => DriverMock::class,
+                'wrapperClass' => ConnectionMock::class,
                 'user'         => 'john',
                 'password'     => 'wayne'
             ];
@@ -91,7 +88,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Changes a connection object for the given entity manager
+     * Changes a connection object for the given entity manager.
      */
     protected function setDriverConnection(Connection $connection, EntityManagerMock $em)
     {
@@ -101,24 +98,23 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Creates a mock for a statement which handles fetching the given records
-     *
-     * @param array $records
-     * @param array $params
-     * @param array $types
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * Creates a mock for a statement which handles fetching the given records.
      */
-    protected function createFetchStatementMock(array $records, array $params = [], array $types = [])
-    {
+    protected function createFetchStatementMock(
+        ?array $records,
+        array $params = [],
+        array $types = [],
+        ?int $affectedRowCount = null
+    ): StatementMock|MockObject {
         $statement = $this->createMock(StatementMock::class);
-        $statement->expects($this->exactly(count($records) + 1))
-            ->method('fetch')
-            ->will(
-                new \PHPUnit\Framework\MockObject\Stub\ConsecutiveCalls(
-                    array_merge($records, [false])
-                )
-            );
+        if (null === $records) {
+            $statement->expects($this->never())
+                ->method('fetch');
+        } else {
+            $statement->expects($this->exactly(count($records) + 1))
+                ->method('fetch')
+                ->will(new ConsecutiveCalls(array_merge($records, [false])));
+        }
         $statement->expects($this->any())
             ->method('getIterator')
             ->willReturn(new FetchIterator($statement));
@@ -138,19 +134,20 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
                     ->method('execute')
                     ->with($params);
             }
+            if (null !== $affectedRowCount) {
+                $statement->expects($this->once())
+                    ->method('rowCount')
+                    ->willReturn($affectedRowCount);
+            }
         }
 
         return $statement;
     }
 
     /**
-     * Creates a mock for 'Doctrine\DBAL\Driver\Connection' and sets it to the given entity manager
-     *
-     * @param EntityManagerMock $em
-     *
-     * @return Connection|\PHPUnit\Framework\MockObject\MockObject
+     * Creates a mock for 'Doctrine\DBAL\Driver\Connection' and sets it to the given entity manager.
      */
-    protected function getDriverConnectionMock(EntityManagerMock $em)
+    protected function getDriverConnectionMock(EntityManagerMock $em): Connection|MockObject
     {
         $conn = $this->createMock(Connection::class);
         $this->setDriverConnection($conn, $em);
@@ -159,13 +156,9 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Creates a mock for a statement which handles counting a number of records
-     *
-     * @param int $numberOfRecords
-     *
-     * @return \PHPUnit\Framework\MockObject\MockObject
+     * Creates a mock for a statement which handles counting a number of records.
      */
-    protected function createCountStatementMock($numberOfRecords)
+    protected function createCountStatementMock(int $numberOfRecords): StatementMock|MockObject
     {
         $countStatement = $this->createMock(StatementMock::class);
         $countStatement->expects($this->once())
@@ -175,21 +168,15 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         return $countStatement;
     }
 
-    /**
-     * @param Connection|\PHPUnit\Framework\MockObject\MockObject $conn
-     * @param string|\PHPUnit\Framework\Constraint\Constraint     $sql
-     * @param array                                               $result
-     * @param array                                               $params
-     * @param array                                               $types
-     */
     protected function setQueryExpectation(
-        \PHPUnit\Framework\MockObject\MockObject $conn,
-        $sql,
-        $result,
-        $params = [],
-        $types = []
-    ) {
-        $stmt = $this->createFetchStatementMock($result, $params, $types);
+        Connection|MockObject $conn,
+        string|Constraint $sql,
+        ?array $records,
+        array $params = [],
+        array $types = [],
+        ?int $affectedRowCount = null
+    ): void {
+        $stmt = $this->createFetchStatementMock($records, $params, $types, $affectedRowCount);
         if ($params) {
             $conn->expects($this->once())
                 ->method('prepare')
@@ -203,19 +190,14 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param string|\PHPUnit\Framework\Constraint\Constraint $sql
-     * @param array                                           $result
-     * @param array                                           $params
-     * @param array                                           $types
-     */
     protected function addQueryExpectation(
-        $sql,
-        $result,
-        $params = [],
-        $types = []
-    ) {
-        $stmt = $this->createFetchStatementMock($result, $params, $types);
+        string|Constraint $sql,
+        ?array $records,
+        array $params = [],
+        array $types = [],
+        ?int $affectedRowCount = null
+    ): void {
+        $stmt = $this->createFetchStatementMock($records, $params, $types, $affectedRowCount);
         if ($params) {
             $this->queryExpectations['prepare'][] = [$sql, $stmt];
         } else {
@@ -223,14 +205,14 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    protected function applyQueryExpectations(\PHPUnit\Framework\MockObject\MockObject $conn)
+    protected function applyQueryExpectations(Connection|MockObject $conn): void
     {
         if (!$this->queryExpectations) {
             throw new \LogicException('The addQueryExpectation() should be called before.');
         }
 
         $queryExpectations = $this->queryExpectations;
-        $this->queryExpectations = null;
+        $this->queryExpectations = [];
 
         foreach ($queryExpectations as $method => $queries) {
             $with = [];
@@ -246,14 +228,14 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    private function getMetadataCacheImpl($withSharedMetadata)
+    private function getMetadataCacheImpl(bool $withSharedMetadata): CacheItemPoolInterface
     {
         if (!$withSharedMetadata) {
             // do not cache anything to avoid influence between tests
             return new NullAdapter();
         }
 
-        if ($this->metadataCacheImpl === null) {
+        if (null === $this->metadataCacheImpl) {
             $this->metadataCacheImpl = new ArrayAdapter(0, false);
         }
 
@@ -261,7 +243,7 @@ abstract class OrmTestCase extends \PHPUnit\Framework\TestCase
     }
 
 
-    protected function getQueryCacheImpl()
+    protected function getQueryCacheImpl(): CacheItemPoolInterface
     {
         // do not cache anything to avoid influence between tests
         return new NullAdapter();
