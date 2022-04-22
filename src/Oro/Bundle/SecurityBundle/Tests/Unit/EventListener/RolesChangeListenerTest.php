@@ -4,7 +4,6 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\EventListener\RolesChangeListener;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestBusinessUnit;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestOrganization;
@@ -12,7 +11,8 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity\TestUser;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\Mocks\StatementMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
-use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 class RolesChangeListenerTest extends OrmTestCase
 {
@@ -21,40 +21,28 @@ class RolesChangeListenerTest extends OrmTestCase
     /** @var EntityManagerMock */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $conn;
-
-    /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
-
-    /** @var RolesChangeListener */
-    private $listener;
 
     protected function setUp(): void
     {
-        $this->cache = $this->createMock(AbstractAdapter::class);
+        $this->cache = $this->createMock(AdapterInterface::class);
         $this->em = $this->getTestEntityManager();
-        $reader = new AnnotationReader();
-        $doctrine = $this->createMock(ManagerRegistry::class);
 
-        $doctrine->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($this->em);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            self::ENTITY_NAMESPACE
+        ));
 
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver($reader, self::ENTITY_NAMESPACE));
-        $this->em->getConfiguration()->setEntityNamespaces(['Test' => self::ENTITY_NAMESPACE]);
-
-        $this->conn = $this->getDriverConnectionMock($this->em);
-
-        $this->listener = new RolesChangeListener('organizations');
-        $this->listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser');
-        $this->em->getEventManager()->addEventListener('onFlush', $this->listener);
+        $listener = new RolesChangeListener('organizations');
+        $listener->addSupportedClass(self::ENTITY_NAMESPACE . '\TestUser');
+        $this->em->getEventManager()->addEventListener('onFlush', $listener);
     }
 
     /**
      * {@inheritDoc}
      */
-    protected function getQueryCacheImpl()
+    protected function getQueryCacheImpl(): CacheItemPoolInterface
     {
         return $this->cache;
     }
@@ -64,7 +52,8 @@ class RolesChangeListenerTest extends OrmTestCase
         $this->cache->expects(self::never())
             ->method('clear');
 
-        $this->conn->expects(self::once())
+        $connection = $this->getDriverConnectionMock($this->em);
+        $connection->expects(self::once())
             ->method('prepare')
             ->willReturn($this->createMock(StatementMock::class));
 
@@ -78,7 +67,8 @@ class RolesChangeListenerTest extends OrmTestCase
         $this->cache->expects(self::once())
             ->method('clear');
 
-        $this->conn->expects(self::exactly(2))
+        $connection = $this->getDriverConnectionMock($this->em);
+        $connection->expects(self::exactly(3))
             ->method('prepare')
             ->willReturn($this->createMock(StatementMock::class));
 
@@ -109,7 +99,14 @@ class RolesChangeListenerTest extends OrmTestCase
             [1 => 1],
             [1 => \PDO::PARAM_INT]
         );
-        $this->applyQueryExpectations($this->conn);
+        $this->addQueryExpectation(
+            'INSERT INTO tbl_user_to_organization (user_id, organization_id) VALUES (?, ?)',
+            null,
+            [1 => 1, 2 => 10],
+            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT],
+            1
+        );
+        $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $user = $this->em->getRepository(self::ENTITY_NAMESPACE . '\TestUser')->find(1);
         $organization = $this->em->getReference(self::ENTITY_NAMESPACE . '\TestOrganization', 10);

@@ -2,30 +2,26 @@
 
 namespace Oro\Component\TestUtils\ORM\Mocks;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 /**
- * This class is a clone of namespace Doctrine\Tests\Mocks\ConnectionMock that is excluded from doctrine
- * package since v2.4.
+ * A mock class for DBAL connection.
  */
-class ConnectionMock extends \Doctrine\DBAL\Connection
+class ConnectionMock extends Connection
 {
-    private $fetchOneResult;
-    private $platformMock;
-    private $lastInsertId = 0;
-    private $inserts = [];
-    private $executeStatements = [];
+    private AbstractPlatform $platformMock;
+    private mixed $fetchOneResult;
+    private mixed $lastInsertId = 0;
 
     public function __construct(array $params, $driver, $config = null, $eventManager = null)
     {
         $this->platformMock = new DatabasePlatformMock();
-
         parent::__construct($params, $driver, $config, $eventManager);
-
-        // Override possible assignment of platform to database platform mock
-        $this->_platform = $this->platformMock;
     }
 
     /**
-     * @override
+     * {@inheritDoc}
      */
     public function getDatabasePlatform()
     {
@@ -33,23 +29,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     }
 
     /**
-     * @override
-     */
-    public function insert($tableName, array $data, array $types = [])
-    {
-        $this->inserts[$tableName][] = $data;
-    }
-
-    /**
-     * @override
-     */
-    public function executeStatement($query, array $params = [], array $types = [])
-    {
-        $this->executeStatements[] = ['query' => $query, 'params' => $params, 'types' => $types];
-    }
-
-    /**
-     * @override
+     * {@inheritDoc}
      */
     public function lastInsertId($seqName = null)
     {
@@ -57,7 +37,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     }
 
     /**
-     * @override
+     * {@inheritDoc}
      */
     public function fetchColumn($statement, array $params = [], $colnum = 0, array $types = [])
     {
@@ -65,7 +45,7 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
     }
 
     /**
-     * @override
+     * {@inheritDoc}
      */
     public function quote($input, $type = null)
     {
@@ -76,36 +56,23 @@ class ConnectionMock extends \Doctrine\DBAL\Connection
         return $input;
     }
 
-    /* Mock API */
-
-    public function setFetchOneResult($fetchOneResult)
+    public function setFetchOneResult(mixed $fetchOneResult): void
     {
         $this->fetchOneResult = $fetchOneResult;
     }
 
-    public function setDatabasePlatform($platform)
+    public function setDatabasePlatform(AbstractPlatform $platform): void
     {
         $this->platformMock = $platform;
     }
 
-    public function setLastInsertId($id)
+    public function setLastInsertId(mixed $id): void
     {
         $this->lastInsertId = $id;
     }
 
-    public function getInserts()
+    public function reset(): void
     {
-        return $this->inserts;
-    }
-
-    public function getExecuteStatements()
-    {
-        return $this->executeStatements;
-    }
-
-    public function reset()
-    {
-        $this->inserts = [];
         $this->lastInsertId = 0;
     }
 }
