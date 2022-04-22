@@ -4,6 +4,7 @@
 {% import 'OroSegmentBundle::macros.html.twig' as segmentQD %}
 {% oro_title_set({params : {"%segment.name%": entity.name, "%segment.group%": segmentGroup|trans} }) %}
 {% set pageTitle = entity.name %}
+{% set displaySQL = oro_config_value('oro_report.display_sql_query') and isDesktopVersion() %}
 
 {% block navButtons %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
@@ -52,7 +53,7 @@
             '_grid_view': {'_disabled': true},
             '_tags'     : {'_disabled': true}
         } %}
-        {% if oro_config_value('oro_report.display_sql_query') %}
+        {% if displaySQL %}
             {% set gridParams = gridParams|merge({'display_sql_query': true}) %}
         {% endif %}
         {% set params = params|default({})|merge(gridParams) %}
@@ -67,3 +68,10 @@
         </div>
     {% endif %}
 {% endblock content_data %}
+
+{% block content %}
+    {{ parent() }}
+    {% if displaySQL %}
+        <div class="sql-query-panel" data-role="sql-query-panel"></div>
+    {% endif %}
+{% endblock content %}

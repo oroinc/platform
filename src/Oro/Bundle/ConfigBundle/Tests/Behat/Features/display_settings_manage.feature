@@ -202,8 +202,11 @@ Feature: Display settings manage
     Then I should see following available "TaxonomyForm" colors:
       | Cornflower Blue, Mercury, Melrose, Mauve, Alizarin Crimson, Aqua, Aquamarine, Azure, Beige, Black, Lime |
 
-  Scenario: Change reports settings
+  Scenario: Change reports/segments settings
     Given I go to Reports & Segments/Calendar Events/Test Report
+    Then I should not see "Show SQL Query"
+    When I go to Reports & Segments/ Manage Segments
+    And I click view "Featured Products" in grid
     Then I should not see "Show SQL Query"
     When I proceed as the Config
     And fill "System Config Form" with:
@@ -211,4 +214,7 @@ Feature: Display settings manage
     And save form
     When I proceed as the Check
     And I go to Reports & Segments/Calendar Events/Test Report
+    Then I should see "Show SQL Query"
+    When I go to Reports & Segments/ Manage Segments
+    And I click view "Featured Products" in grid
     Then I should see "Show SQL Query"
