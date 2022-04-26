@@ -116,24 +116,6 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
     }
 
-    public function testSetTokenWithHttpOnlyConfig()
-    {
-        $tokenId = 'test';
-        $value = 'val';
-        $request = Request::create('/');
-
-        $this->requestStack->expects($this->any())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $storage = new CookieTokenStorage('auto', true, $this->requestStack);
-        $storage->setSameSite(Cookie::SAMESITE_STRICT);
-        $storage->setToken($tokenId, $value);
-
-        $cookie = new Cookie($tokenId, $value, 0, '/', null, null, true, false, Cookie::SAMESITE_STRICT);
-        $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
-    }
-
     public function testSetTokenWithSecureConfig()
     {
         $tokenId = 'test';

@@ -748,7 +748,7 @@ services:
         public: false
         arguments:
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
-            - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
+            - false
             - '@request_stack'
 
     oro_security.csrf_token_manager:
