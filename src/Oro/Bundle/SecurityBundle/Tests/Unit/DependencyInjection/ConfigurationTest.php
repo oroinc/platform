@@ -22,7 +22,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ],
                 'csrf_cookie' => [
                     'cookie_secure'   => 'auto',
-                    'cookie_httponly' => false,
                     'cookie_samesite' => 'lax',
                 ],
                 'login_target_path_excludes' => []

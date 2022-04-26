@@ -739,7 +739,6 @@ services:
         public: false
         arguments:
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
-            - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
             - '@request_stack'
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
 

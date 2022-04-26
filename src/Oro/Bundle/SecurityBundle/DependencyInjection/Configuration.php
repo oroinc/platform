@@ -33,7 +33,6 @@ class Configuration implements ConfigurationInterface
                 ->addDefaultsIfNotSet()
                 ->children()
                     ->enumNode('cookie_secure')->values([true, false, 'auto'])->defaultValue('auto')->end()
-                    ->booleanNode('cookie_httponly')->defaultFalse()->end()
                     ->enumNode('cookie_samesite')
                         ->values([null, Cookie::SAMESITE_LAX, Cookie::SAMESITE_STRICT, Cookie::SAMESITE_NONE])
                         ->defaultValue(Cookie::SAMESITE_LAX)
