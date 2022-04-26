@@ -226,14 +226,14 @@ class DynamicFieldsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $entity = new Entity();
         $entity->setId(1)
-            ->setMockField('mockedValue');
+            ->setMockField([]);
 
         $fieldConfigId = $this->getFieldConfigId(RelationType::MANY_TO_MANY);
 
         /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $form */
         $form = $this->getMockBuilder(FormInterface::class)
             ->getMock();
-        $form->expects($this->any())
+        $form->expects($this->once())
             ->method('getData')
             ->willReturn($entity);
 

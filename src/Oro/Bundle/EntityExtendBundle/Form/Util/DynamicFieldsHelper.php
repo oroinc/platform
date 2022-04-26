@@ -19,6 +19,9 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Provides useful methods for dynamic fields.
+ */
 class DynamicFieldsHelper
 {
     /** @var ConfigManager */
@@ -157,7 +160,7 @@ class DynamicFieldsHelper
         }
         $selectedCollection = FieldAccessor::getValue($data, $fieldName);
 
-        if ($dataId) {
+        if (!empty($selectedCollection)) {
             $view->children[$fieldName]->vars['initial_elements'] =
                 $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
         }
