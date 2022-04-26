@@ -160,7 +160,7 @@ class DynamicFieldsHelper
         }
         $selectedCollection = FieldAccessor::getValue($data, $fieldName);
 
-        if ($dataId) {
+        if (!empty($selectedCollection)) {
             $view->children[$fieldName]->vars['initial_elements'] =
                 $this->getInitialElements($selectedCollection, $defaultEntity, $extendConfig);
         }
