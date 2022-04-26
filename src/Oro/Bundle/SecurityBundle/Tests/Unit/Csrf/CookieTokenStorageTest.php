@@ -26,7 +26,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
     {
         $this->requestStack = $this->createMock(RequestStack::class);
 
-        $this->storage = new CookieTokenStorage('auto', false, $this->requestStack, Cookie::SAMESITE_STRICT);
+        $this->storage = new CookieTokenStorage('auto', $this->requestStack, Cookie::SAMESITE_STRICT);
     }
 
     public function testGetTokenNoRequest()
@@ -115,23 +115,6 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
     }
 
-    public function testSetTokenWithHttpOnlyConfig()
-    {
-        $tokenId = 'test';
-        $value = 'val';
-        $request = Request::create('/');
-
-        $this->requestStack->expects($this->any())
-            ->method('getCurrentRequest')
-            ->willReturn($request);
-
-        $storage = new CookieTokenStorage('auto', true, $this->requestStack, Cookie::SAMESITE_STRICT);
-        $storage->setToken($tokenId, $value);
-
-        $cookie = new Cookie($tokenId, $value, 0, '/', null, null, true, false, Cookie::SAMESITE_STRICT);
-        $this->assertEquals($cookie, $request->attributes->get(CookieTokenStorage::CSRF_COOKIE_ATTRIBUTE));
-    }
-
     public function testSetTokenWithSecureConfig()
     {
         $tokenId = 'test';
@@ -142,7 +125,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        $storage = new CookieTokenStorage(true, false, $this->requestStack, Cookie::SAMESITE_STRICT);
+        $storage = new CookieTokenStorage(true, $this->requestStack, Cookie::SAMESITE_STRICT);
         $storage->setToken($tokenId, $value);
 
         $cookie = new Cookie($tokenId, $value, 0, '/', null, true, false, false, Cookie::SAMESITE_STRICT);
@@ -159,7 +142,7 @@ class CookieTokenStorageTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentRequest')
             ->willReturn($request);
 
-        $storage = new CookieTokenStorage(false, false, $this->requestStack, Cookie::SAMESITE_STRICT);
+        $storage = new CookieTokenStorage(false, $this->requestStack, Cookie::SAMESITE_STRICT);
         $storage->setToken($tokenId, $value);
 
         $cookie = new Cookie($tokenId, $value, 0, '/', null, false, false, false, Cookie::SAMESITE_STRICT);
