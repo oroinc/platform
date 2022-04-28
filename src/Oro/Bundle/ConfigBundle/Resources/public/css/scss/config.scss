@@ -115,6 +115,7 @@
     padding: $content-padding $content-padding $content-padding-medium;
     width: 100%;
     overflow-y: auto;
+    flex-grow: 1;
 
     .form-horizontal {
         margin-bottom: 26px;
@@ -137,9 +138,14 @@
 }
 
 .system-configuration-content {
+    height: 100%;
+
     &-wrapper {
         padding-left: $content-padding-medium;
-        margin-bottom: 15px;
+        padding-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
     }
 
     &-header {
