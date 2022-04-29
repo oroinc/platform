@@ -111,6 +111,15 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @When /^(?:|I )save and close form for product attribute$/
+     */
+    public function iSaveAndCloseFormProdAtt()
+    {
+        $this->createOroForm()->saveAndClose();
+        $this->waitForAjax(720000); // Wait for max 12 minutes because cache update process timeout set to 10 minutes
+    }
+
+    /**
      * @When /^(?:|I )save and duplicate form$/
      */
     public function iSaveAndDuplicateForm()

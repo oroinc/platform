@@ -1,9 +1,6 @@
 @ticket-BB-16157
 @fixture-OroUserBundle:user.yml
 Feature: Reset password link expire
-  In order to ...
-  As an ...
-  I should be able to ...
 
   Scenario: Feature Background
     Given sessions active:

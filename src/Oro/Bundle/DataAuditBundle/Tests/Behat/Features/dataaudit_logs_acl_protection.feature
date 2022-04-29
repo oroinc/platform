@@ -1,9 +1,6 @@
 @ticket-BAP-9497
 @ticket-BAP-15092
 Feature: DataAudit logs acl protection
-  In order to ...
-  As an ...
-  I should be able to ...
 
   Scenario: Create different window session
     Given sessions active:
