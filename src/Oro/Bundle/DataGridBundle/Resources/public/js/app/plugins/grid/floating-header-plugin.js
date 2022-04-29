@@ -188,7 +188,7 @@ define(function(require) {
             }, this.currentFloatTheadMode === 'default');
             let mode = 'default';
             if (
-                (visibleRect.top !== tableRect.top && tableRect.bottom > this.headerHeight) ||
+                (Math.ceil(visibleRect.top) !== Math.ceil(tableRect.top) && tableRect.bottom > this.headerHeight) ||
                 this.grid.layout === 'fullscreen'
             ) {
                 mode = this.isHeaderDropdownVisible ? 'relative' : 'fixed';
@@ -226,15 +226,17 @@ define(function(require) {
                         this._ensureTHeadSizing();
                     }
                     theadRect = this.domCache.thead[0].getBoundingClientRect();
-                    this.domCache.thead.css({
-                        width: '',
-                        top: visibleRect.top - tableRect.top,
-                        left: ''
-                    });
-                    this.domCache.theadTr.css({
-                        [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
-                            ? theadRect.right - tableRect.right
-                            : tableRect.left - theadRect.left
+                    requestAnimationFrame(() => {
+                        this.domCache.thead.css({
+                            width: '',
+                            top: visibleRect.top - tableRect.top,
+                            left: ''
+                        });
+                        this.domCache.theadTr.css({
+                            [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
+                                ? theadRect.right - tableRect.right
+                                : tableRect.left - theadRect.left
+                        });
                     });
                     if (mode === 'relative') {
                         this._lastScrollTop = this.domCache.gridScrollableContainer.scrollTop();
@@ -247,33 +249,37 @@ define(function(require) {
                         this.$el.addClass('floatThead-fixed floatThead');
                         this._ensureTHeadSizing();
                     }
-                    this.domCache.thead.css({
-                        // show only visible part
-                        top: visibleRect.top,
-                        width: visibleRect.right - visibleRect.left,
-                        height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
+                    requestAnimationFrame(() => {
+                        this.domCache.thead.css({
+                            // show only visible part
+                            top: visibleRect.top,
+                            width: visibleRect.right - visibleRect.left,
+                            height: Math.min(this.headerHeight, visibleRect.bottom - visibleRect.top),
 
-                        // left side should be also tracked
-                        // gives incorrect rendering when "document" scrolled horizontally
-                        left: visibleRect.left
-                    });
-                    theadRect = this.domCache.thead[0].getBoundingClientRect();
-                    this.domCache.theadTr.css({
-                        // possible solution set scrollLeft instead
-                        // could be more fast for rendering
-                        [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
-                            ? theadRect.right - tableRect.right
-                            : tableRect.left - theadRect.left
+                            // left side should be also tracked
+                            // gives incorrect rendering when "document" scrolled horizontally
+                            left: visibleRect.left
+                        });
+                        theadRect = this.domCache.thead[0].getBoundingClientRect();
+                        this.domCache.theadTr.css({
+                            // possible solution set scrollLeft instead
+                            // could be more fast for rendering
+                            [`margin${_.isRTL() ? 'Right' : 'Left'}`]: _.isRTL()
+                                ? theadRect.right - tableRect.right
+                                : tableRect.left - theadRect.left
+                        });
                     });
                     break;
                 default:
                     if (this.currentFloatTheadMode !== mode) {
-                        this.$grid.find('.thead-sizing').remove();
-                        this.$el.removeClass('floatThead-relative floatThead-fixed floatThead');
-                        // remove extra styles
-                        this.domCache.thead.attr('style', '');
-                        this.domCache.theadTr.attr('style', '');
-                        // cleanup
+                        requestAnimationFrame(() => {
+                            this.$grid.find('.thead-sizing').remove();
+                            this.$el.removeClass('floatThead-relative floatThead-fixed floatThead');
+                            // remove extra styles
+                            this.domCache.thead.attr('style', '');
+                            this.domCache.theadTr.attr('style', '');
+                            // cleanup
+                        });
                     }
                     break;
             }

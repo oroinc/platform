@@ -232,6 +232,10 @@
     }
 }
 
+.grid-header {
+    will-change: width, height, top, right, bottom, left, margin;
+}
+
 .grid-header,
 .grid-footer {
     text-transform: uppercase;
