@@ -1,9 +1,6 @@
 @fixture-OroWorkflowBundle:Users.yml
 @fixture-OroWorkflowBundle:TestWorkflow.yml
 Feature: Workflow variables
-  In order to ...
-  As an ...
-  I should be able to ...
 
   Scenario: Set up workflow variable configuration
     Given I login as administrator

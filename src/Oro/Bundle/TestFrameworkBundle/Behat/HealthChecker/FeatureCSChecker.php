@@ -24,7 +24,6 @@ class FeatureCSChecker implements HealthCheckerInterface
         return [
             BeforeFeatureTested::BEFORE => [
                 ['checkFeatureName'],
-                ['checkFeatureDescription']
             ],
         ];
     }
@@ -65,25 +64,6 @@ class FeatureCSChecker implements HealthCheckerInterface
     public function getName()
     {
         return 'cs';
-    }
-
-    public function checkFeatureDescription(BeforeFeatureTested $event)
-    {
-        if (!$event->getFeature()->getDescription()) {
-            $this->errors[] = sprintf('Feature "%s" should have description', $event->getFeature()->getFile());
-
-            file_put_contents(
-                $event->getFeature()->getFile(),
-                preg_replace(
-                    '/Feature: (.*)/',
-                    "Feature: $1
-  In order to ...
-  As an ...
-  I should be able to ...",
-                    file_get_contents($event->getFeature()->getFile())
-                )
-            );
-        }
     }
 
     /**
