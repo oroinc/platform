@@ -5,9 +5,6 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Defines the configuration parameters recognized by SearchBundle.
- */
 class Configuration implements ConfigurationInterface
 {
     public const DEFAULT_ENGINE_DSN = 'orm:';

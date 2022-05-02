@@ -26,7 +26,7 @@ class OroSidebarExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $container->getExtensionConfig($extension->getAlias())
+            $container->getExtensionConfig('oro_sidebar')
         );
         self::assertTrue($container->hasDefinition(SidebarController::class));
         self::assertTrue($container->hasDefinition(WidgetController::class));

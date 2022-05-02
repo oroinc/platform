@@ -20,15 +20,22 @@ use Symfony\Bridge\Doctrine\DependencyInjection\CompilerPass\RegisterEventListen
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The SecurityBundle bundle class.
- */
 class OroSecurityBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function boot(): void
+    {
+        parent::boot();
+
+        CryptedStringType::setCrypter($this->container->get('oro_security.encoder.repetitive_crypter'));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -69,13 +76,5 @@ class OroSecurityBundle extends Bundle
                 )
             );
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function boot()
-    {
-        CryptedStringType::setCrypter($this->container->get('oro_security.encoder.repetitive_crypter'));
     }
 }

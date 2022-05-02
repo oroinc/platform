@@ -12,9 +12,6 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The ApiBundle bundle class.
- */
 class OroApiBundle extends Bundle
 {
     use Compiler\ApiTaggedServiceTrait;
@@ -24,7 +21,7 @@ class OroApiBundle extends Bundle
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

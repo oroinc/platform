@@ -11,9 +11,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * Loads services. Sets active theme to ThemeRegistry
- */
 class OroThemeExtension extends Extension
 {
     const THEMES_SETTINGS_PARAMETER = 'oro_theme.settings';
@@ -24,13 +21,9 @@ class OroThemeExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        array_unshift(
-            $configs,
-            array('themes' => $this->getBundlesThemesSettings($container))
-        );
+        array_unshift($configs, ['themes' => $this->getBundlesThemesSettings($container)]);
 
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $container->setParameter(self::THEMES_SETTINGS_PARAMETER, $config['themes']);
 
@@ -52,7 +45,7 @@ class OroThemeExtension extends Extension
      */
     protected function getBundlesThemesSettings(ContainerBuilder $container)
     {
-        $result = array();
+        $result = [];
 
         $configLoader = new CumulativeConfigLoader(
             'oro_theme',

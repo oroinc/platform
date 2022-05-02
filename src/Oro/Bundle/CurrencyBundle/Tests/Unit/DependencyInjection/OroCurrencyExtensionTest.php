@@ -27,9 +27,4 @@ class OroCurrencyExtensionTest extends ExtensionTestCase
         ];
         $this->assertExtensionConfigsLoaded($expectedExtensionConfigs);
     }
-
-    public function testGetAlias(): void
-    {
-        self::assertEquals('oro_currency', (new OroCurrencyExtension())->getAlias());
-    }
 }

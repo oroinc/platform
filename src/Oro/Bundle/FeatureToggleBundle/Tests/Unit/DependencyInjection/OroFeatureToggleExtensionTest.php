@@ -19,7 +19,7 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAlias()
     {
-        $this->assertEquals(OroFeatureToggleExtension::ALIAS, $this->extension->getAlias());
+        $this->assertEquals('oro_featuretoggle', $this->extension->getAlias());
     }
 
     public function testLoadWithoutConfig()

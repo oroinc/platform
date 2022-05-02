@@ -51,6 +51,6 @@ $config->setRules([
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)
-    ->setCacheFile(__DIR__ . DIRECTORY_SEPARATOR . '.php-cs-fixer.cache');
+    ->setCacheFile(sys_get_temp_dir() . DIRECTORY_SEPARATOR . '.php-cs-fixer.cache');
 
 return $config;

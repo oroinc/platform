@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Parser;
 
 class OroAttachmentExtension extends Extension implements PrependExtensionInterface
 {
-    private const IMAGINE_DATA_ROOT    = '%kernel.project_dir%/public';
+    private const IMAGINE_DATA_ROOT = '%kernel.project_dir%/public';
     private const IMAGINE_FILE_MANAGER = 'oro_attachment.manager.public_mediacache';
 
     /**
@@ -21,8 +21,7 @@ class OroAttachmentExtension extends Extension implements PrependExtensionInterf
      */
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');

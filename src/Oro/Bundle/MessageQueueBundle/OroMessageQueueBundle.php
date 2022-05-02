@@ -21,10 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * OroMessageQueueBundle incorporates the OroMessageQueue component into OroPlatform
- * and thereby provides message queue processing capabilities for all application components
- */
 class OroMessageQueueBundle extends Bundle
 {
     use TaggedServiceTrait;
@@ -32,8 +28,10 @@ class OroMessageQueueBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $container->addCompilerPass(new ConfigureDbalTransportExtensionsPass());
         $container->addCompilerPass(new BuildExtensionsPass());
         $container->addCompilerPass(new BuildMessageProcessorRegistryPass());

@@ -13,24 +13,16 @@ use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
  */
 class CumulativeResource implements ResourceInterface, SelfCheckingResourceInterface
 {
-    /** @var string */
-    private $resource;
+    private string $resource;
+    private CumulativeResourceLoaderCollection $resourceLoaders;
 
-    /** @var CumulativeResourceLoaderCollection */
-    private $resourceLoaders;
+    /** @var array [bundle class => [resource path => TRUE, ...], ...] */
+    private array $found = [];
 
-    /**
-     * The list of found the resource
-     *
-     * @var array [bundle class => [resource path => TRUE, ...], ...]
-     */
-    private $found = [];
-
-    /** @var int not serializable */
-    private $isFreshTimestamp;
-
-    /** @var bool not serializable */
-    private $isFresh;
+    /** not serializable */
+    private int $isFreshTimestamp = 0;
+    /** not serializable */
+    private bool $isFresh = false;
 
     /**
      * @param string                             $resource        The unique name of a configuration resource
@@ -53,7 +45,7 @@ class CumulativeResource implements ResourceInterface, SelfCheckingResourceInter
     /**
      * {@inheritdoc}
      */
-    public function isFresh($timestamp)
+    public function isFresh(int $timestamp): bool
     {
         if ($this->isFreshTimestamp !== $timestamp) {
             $this->isFreshTimestamp = $timestamp;
@@ -81,10 +73,7 @@ class CumulativeResource implements ResourceInterface, SelfCheckingResourceInter
     }
 
     /**
-     * Registers a resource as found one
-     *
-     * @param string $bundleClass The full name of bundle class
-     * @param string $path        The full path to the resource
+     * Registers a resource as found one.
      */
     public function addFound(string $bundleClass, string $path): void
     {
@@ -92,12 +81,7 @@ class CumulativeResource implements ResourceInterface, SelfCheckingResourceInter
     }
 
     /**
-     * Checks if a resource was registered as found one
-     *
-     * @param string $bundleClass The full name of bundle class
-     * @param string $path        The full path to the resource
-     *
-     * @return bool
+     * Checks if a resource was registered as found one.
      */
     public function isFound(string $bundleClass, string $path): bool
     {
@@ -107,7 +91,7 @@ class CumulativeResource implements ResourceInterface, SelfCheckingResourceInter
     /**
      * Gets all found resources for the given bundle
      *
-     * @param string $bundleClass The full name of bundle class
+     * @param string $bundleClass
      *
      * @return string[] A list of resources' full paths
      */
@@ -123,7 +107,7 @@ class CumulativeResource implements ResourceInterface, SelfCheckingResourceInter
      */
     public function __toString()
     {
-        return (string)$this->resource;
+        return $this->resource;
     }
 
     public function __serialize(): array

@@ -11,15 +11,12 @@ use Oro\Bundle\UIBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPas
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The UIBundle bundle class.
- */
 class OroUIBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

@@ -7,9 +7,6 @@ use Oro\Bundle\BatchBundle\DependencyInjection\Compiler\RegisterJobsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The BatchBundle bundle class.
- */
 class OroBatchBundle extends Bundle
 {
     /**
@@ -17,8 +14,9 @@ class OroBatchBundle extends Bundle
      */
     public function build(ContainerBuilder $container): void
     {
-        $container
-            ->addCompilerPass(new PushBatchLogHandlerPass())
-            ->addCompilerPass(new RegisterJobsPass());
+        parent::build($container);
+
+        $container->addCompilerPass(new PushBatchLogHandlerPass());
+        $container->addCompilerPass(new RegisterJobsPass());
     }
 }

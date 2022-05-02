@@ -6,9 +6,6 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Purifier configuration tree
- */
 class Configuration implements ConfigurationInterface
 {
     /**

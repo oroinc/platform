@@ -91,8 +91,13 @@ class AppBundle extends Bundle
         TransactionWatcherConfigurator::registerConnectionProxies($kernel->getCacheDir());
     }
 
-    public function build(ContainerBuilder $container)
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $container->addCompilerPass(
             new AddTransactionWatcherCompilerPass('oro.doctrine.connection.transaction_watcher')
         );

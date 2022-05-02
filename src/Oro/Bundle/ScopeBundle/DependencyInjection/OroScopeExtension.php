@@ -11,8 +11,6 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroScopeExtension extends Extension
 {
-    const ALIAS = 'oro_scope';
-
     /**
      * {@inheritDoc}
      */

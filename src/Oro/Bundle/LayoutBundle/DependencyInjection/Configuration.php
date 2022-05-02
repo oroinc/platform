@@ -7,9 +7,6 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Defines the configuration parameters recognized by LayoutBundle.
- */
 class Configuration implements ConfigurationInterface
 {
     private const DEFAULT_LAYOUT_TWIG_RESOURCE = '@OroLayout/Layout/div_layout.html.twig';

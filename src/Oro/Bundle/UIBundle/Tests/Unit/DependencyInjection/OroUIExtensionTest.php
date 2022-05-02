@@ -29,7 +29,7 @@ class OroUIExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $container->getExtensionConfig($extension->getAlias())
+            $container->getExtensionConfig('oro_ui')
         );
     }
 }

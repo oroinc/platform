@@ -6,9 +6,6 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Compiler\EntityFallbackFieldsSto
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The DigitalAssetBundle bundle class.
- */
 class OroDigitalAssetBundle extends Bundle
 {
     /**

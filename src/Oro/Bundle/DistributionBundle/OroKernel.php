@@ -452,7 +452,7 @@ abstract class OroKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    protected function getContainerBuilder()
+    protected function getContainerBuilder(): ContainerBuilder
     {
         $container = new ExtendedContainerBuilder();
         $container->getParameterBag()->add($this->getKernelParameters());
@@ -472,7 +472,7 @@ abstract class OroKernel extends Kernel
     /**
      * {@inheritdoc}
      */
-    protected function buildContainer()
+    protected function buildContainer(): ContainerBuilder
     {
         $container = parent::buildContainer();
 

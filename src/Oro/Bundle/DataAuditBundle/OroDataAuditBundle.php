@@ -7,17 +7,16 @@ use Oro\Bundle\DataAuditBundle\DependencyInjection\CompilerPass\EntityAuditStrat
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The OroDataAuditBundle bundle class.
- */
 class OroDataAuditBundle extends Bundle
 {
     /**
      * {@inheritDoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
+
+        $container->addCompilerPass(new EntityAuditStrategyPass());
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(
@@ -27,7 +26,5 @@ class OroDataAuditBundle extends Bundle
                 )
             );
         }
-
-        $container->addCompilerPass(new EntityAuditStrategyPass());
     }
 }

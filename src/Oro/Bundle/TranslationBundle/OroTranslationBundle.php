@@ -9,13 +9,15 @@ use Oro\Bundle\UIBundle\DependencyInjection\Compiler\DynamicAssetVersionPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The TranslationBundle bundle class.
- */
 class OroTranslationBundle extends Bundle
 {
-    public function build(ContainerBuilder $container)
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $container->addCompilerPass(new TranslationCacheWarmerPass());
         $container->addCompilerPass(new TranslatorDependencyPass());
         $container->addCompilerPass(new DebugTranslatorPass());

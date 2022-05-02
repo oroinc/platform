@@ -6,6 +6,7 @@
         <exclude-pattern>*/Tests/*</exclude-pattern>
         <exclude-pattern>*/DependencyInjection/*Extension.php</exclude-pattern>
         <exclude-pattern>*/DependencyInjection/*Configuration.php</exclude-pattern>
+        <exclude-pattern>*/*Bundle.php</exclude-pattern>
         <exclude-pattern>*/Migrations/Schema/*</exclude-pattern>
     </rule>
     <rule ref="Generic.Commenting.Todo">

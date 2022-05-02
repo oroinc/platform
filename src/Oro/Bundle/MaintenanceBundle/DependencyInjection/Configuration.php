@@ -5,11 +5,6 @@ namespace Oro\Bundle\MaintenanceBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * This is the class that validates and merges configuration for MaintenanceBundle
- *
- * @author  Gilles Gauthier <g.gauthier@lexik.fr>
- */
 class Configuration implements ConfigurationInterface
 {
     /**

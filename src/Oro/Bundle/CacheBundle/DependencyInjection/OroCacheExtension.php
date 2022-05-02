@@ -13,9 +13,6 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\LoaderChain;
 use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader as SerializerYamlFileLoader;
 
-/**
- * Container extension for OroCacheBundle.
- */
 class OroCacheExtension extends Extension
 {
     /**
@@ -30,7 +27,7 @@ class OroCacheExtension extends Extension
         $this->loadMetadataFactoryDefinition($container);
     }
 
-    protected function loadMetadataFactoryDefinition(ContainerBuilder $container)
+    private function loadMetadataFactoryDefinition(ContainerBuilder $container): void
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_cache_attributes',

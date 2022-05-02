@@ -11,12 +11,9 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * The EmailBundle bundle class.
- */
 class OroEmailBundle extends Bundle
 {
-    private const ENTITY_PROXY_NAMESPACE   = 'OroEntityProxy\OroEmailBundle';
+    private const ENTITY_PROXY_NAMESPACE = 'OroEntityProxy\OroEmailBundle';
     private const CACHED_ENTITIES_DIR_NAME = 'oro_entities';
 
     public function __construct(KernelInterface $kernel)
@@ -32,7 +29,7 @@ class OroEmailBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

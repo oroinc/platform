@@ -11,15 +11,12 @@ use Oro\Bundle\LayoutBundle\DependencyInjection\Compiler\TwigTemplateCacheWarmer
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The LayoutBundle bundle class.
- */
 class OroLayoutBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
