@@ -8,19 +8,12 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * This class contains the configuration information.
- */
 class Configuration implements ConfigurationInterface
 {
     /** @var TransportFactoryInterface[] */
     private array $factories;
-
     private string $environment;
 
-    /**
-     * @param TransportFactoryInterface[] $factories
-     */
     public function __construct(array $factories, string $environment)
     {
         $this->factories = $factories;

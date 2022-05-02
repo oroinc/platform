@@ -9,15 +9,12 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroFeatureToggleExtension extends Extension
 {
-    const ALIAS = 'oro_featuretoggle';
-
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -32,8 +29,8 @@ class OroFeatureToggleExtension extends Extension
     /**
      * {@inheritDoc}
      */
-    public function getAlias()
+    public function getAlias(): string
     {
-        return self::ALIAS;
+        return Configuration::ROOT_NODE;
     }
 }

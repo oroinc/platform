@@ -7,16 +7,13 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Configures system configuration for the LoggerBundle
- */
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NODE = 'oro_logger';
-    const LOGS_LEVEL_KEY = 'detailed_logs_level';
-    const LOGS_TIMESTAMP_KEY = 'detailed_logs_end_timestamp';
-    const EMAIL_NOTIFICATION_RECIPIENTS = 'email_notification_recipients';
-    const EMAIL_NOTIFICATION_SUBJECT = 'email_notification_subject';
+    public const ROOT_NODE = 'oro_logger';
+    public const LOGS_LEVEL_KEY = 'detailed_logs_level';
+    public const LOGS_TIMESTAMP_KEY = 'detailed_logs_end_timestamp';
+    public const EMAIL_NOTIFICATION_RECIPIENTS = 'email_notification_recipients';
+    public const EMAIL_NOTIFICATION_SUBJECT = 'email_notification_subject';
 
     /**
      * {@inheritdoc}

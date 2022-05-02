@@ -6,16 +6,15 @@ use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\CredentialsNotificationSe
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * OroImapBundle bundle class
- */
 class OroImapBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $container->addCompilerPass(new CredentialsNotificationSenderPass());
     }
 }

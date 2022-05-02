@@ -12,15 +12,12 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroUserExtension extends Extension implements PrependExtensionInterface
 {
-    const ALIAS = 'oro_user';
-
     /**
      * {@inheritDoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
@@ -50,13 +47,5 @@ class OroUserExtension extends Extension implements PrependExtensionInterface
     {
         /** @var ExtendedContainerBuilder $container */
         SecurityExtensionHelper::makeFirewallLatest($container, 'main');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getAlias()
-    {
-        return self::ALIAS;
     }
 }

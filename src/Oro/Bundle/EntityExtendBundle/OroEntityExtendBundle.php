@@ -12,9 +12,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Process;
 
-/**
- * Warms up extended entity cache during boot in a case when the cache is empty
- */
 class OroEntityExtendBundle extends Bundle
 {
     /**
@@ -24,22 +21,17 @@ class OroEntityExtendBundle extends Bundle
      * by the timeout.
      * E.g. this can occur when oro:install executes cache:clear.
      */
-    const CACHE_GENERATION_TIMEOUT = null;
-    const CACHE_CHECKOUT_INTERVAL = 1;
-    const CACHE_CHECKOUT_ATTEMPTS = 120;
+    private const CACHE_GENERATION_TIMEOUT = null;
+    private const CACHE_CHECKOUT_INTERVAL = 1;
+    private const CACHE_CHECKOUT_ATTEMPTS = 120;
 
-    /** @var KernelInterface */
-    private $kernel;
-
-    /** @var string */
-    private $cacheDir;
-
-    /** @var string */
-    private $phpExecutable;
+    private KernelInterface $kernel;
+    private string $cacheDir;
+    private ?string $phpExecutable = null;
 
     public function __construct(KernelInterface $kernel)
     {
-        $this->kernel   = $kernel;
+        $this->kernel = $kernel;
         $this->cacheDir = $kernel->getCacheDir();
 
         ExtendClassLoadingUtils::registerClassLoader($this->cacheDir);
@@ -48,15 +40,17 @@ class OroEntityExtendBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function boot()
+    public function boot(): void
     {
+        parent::boot();
+
         $this->ensureInitialized();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -164,10 +158,8 @@ class OroEntityExtendBundle extends Bundle
 
     /**
      * Finds the PHP executable.
-     *
-     * @return string
      */
-    private function getPhpExecutable()
+    private function getPhpExecutable(): string
     {
         if (null === $this->phpExecutable) {
             $this->phpExecutable = CommandExecutor::getPhpExecutable();

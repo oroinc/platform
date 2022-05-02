@@ -8,9 +8,6 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages TestFrameworkBundle service configuration
- */
 class OroTestFrameworkExtension extends Extension implements PrependExtensionInterface
 {
     /**

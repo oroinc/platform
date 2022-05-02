@@ -7,18 +7,16 @@ use Oro\Bundle\CurrencyBundle\DependencyInjection\Compiler\TwigSandboxConfigurat
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The CurrencyBundle bundle class.
- */
 class OroCurrencyBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new TwigSandboxConfigurationPass());
         parent::build($container);
+
+        $container->addCompilerPass(new TwigSandboxConfigurationPass());
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $container->addCompilerPass(

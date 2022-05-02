@@ -15,14 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-/**
- * The EntityBundle bundle class.
- */
 class OroEntityBundle extends Bundle
 {
-    /**
-     * Constructor
-     */
     public function __construct(KernelInterface $kernel)
     {
         // register logging hydrators class loader
@@ -38,9 +32,10 @@ class OroEntityBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
+
         $container->addCompilerPass(new Compiler\DatabaseCheckerCompilerPass());
         $container->addCompilerPass(new Compiler\QueryHintResolverPass());
         $container->addCompilerPass(new Compiler\EntityFieldHandlerPass());

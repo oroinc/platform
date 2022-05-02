@@ -12,9 +12,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\Mime\MimeTypes;
 
-/**
- * The AttachmentBundle bundle class.
- */
 class OroAttachmentBundle extends Bundle
 {
     /**
@@ -22,6 +19,8 @@ class OroAttachmentBundle extends Bundle
      */
     public function boot(): void
     {
+        parent::boot();
+
         $mimeTypes = MimeTypes::getDefault();
         $mimeTypes->registerGuesser(new MsMimeTypeGuesser());
         $mimeTypes->registerGuesser(new MimeTypeExtensionGuesser());

@@ -13,9 +13,6 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The PlatformBundle bundle class.
- */
 class OroPlatformBundle extends Bundle
 {
     public const PACKAGE_NAME = 'oro/platform';
@@ -23,8 +20,10 @@ class OroPlatformBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $container->addCompilerPass(new Compiler\LazyServicesCompilerPass(), PassConfig::TYPE_AFTER_REMOVING);
         $container->addCompilerPass(new Compiler\OptionalListenersCompilerPass());
         $container->addCompilerPass(new ServiceLinkCompilerPass('oro_service_link', ServiceLink::class));

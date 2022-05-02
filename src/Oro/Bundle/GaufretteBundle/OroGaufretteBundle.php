@@ -11,15 +11,22 @@ use Oro\Bundle\GaufretteBundle\Stream\Wrapper\ReadonlyStreamWrapper;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The GaufretteBundle bundle class.
- */
 class OroGaufretteBundle extends Bundle
 {
     /**
      * {@inheritDoc}
      */
-    public function build(ContainerBuilder $container)
+    public function boot(): void
+    {
+        parent::boot();
+
+        $this->registerReadonlyStreamWrapper();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -30,15 +37,6 @@ class OroGaufretteBundle extends Bundle
         /** @var OroGaufretteExtension $extension */
         $extension = $container->getExtension('oro_gaufrette');
         $extension->addConfigurationFactory(new LocalConfigurationFactory());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function boot()
-    {
-        parent::boot();
-        $this->registerReadonlyStreamWrapper();
     }
 
     private function registerReadonlyStreamWrapper(): void

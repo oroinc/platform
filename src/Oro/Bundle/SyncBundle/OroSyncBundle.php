@@ -9,15 +9,12 @@ use Oro\Bundle\SyncBundle\DependencyInjection\Compiler\WebsocketRouterConfigurat
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The SyncBundle bundle class.
- */
 class OroSyncBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

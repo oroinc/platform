@@ -16,7 +16,7 @@ class OroUserExtensionTest extends \PHPUnit\Framework\TestCase
         $extension = new OroUserExtension();
         $extension->load([], $container);
 
-        $extensionConfig = $container->getExtensionConfig($extension->getAlias());
+        $extensionConfig = $container->getExtensionConfig('oro_user');
         self::assertSame(
             [
                 [

@@ -16,11 +16,6 @@ class OroEmailExtensionTest extends ExtensionTestCase
         $this->extension = new OroEmailExtension();
     }
 
-    public function testGetAlias(): void
-    {
-        self::assertEquals('oro_email', $this->extension->getAlias());
-    }
-
     /**
      * @dataProvider prependSecurityConfigDataProvider
      */

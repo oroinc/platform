@@ -10,9 +10,6 @@ use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * Container extension for OroEmbeddedFormBundle.
- */
 class OroEmbeddedFormExtension extends Extension implements PrependExtensionInterface
 {
     const SESSION_ID_FIELD_NAME_PARAM = 'oro_embedded_form.session_id_field_name';

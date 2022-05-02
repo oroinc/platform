@@ -33,12 +33,4 @@ class OroSearchExtension extends Extension
         $loader->load('search.yml');
         $loader->load('mq_topics.yml');
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAlias()
-    {
-        return 'oro_search';
-    }
 }

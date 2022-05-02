@@ -6,15 +6,12 @@ use Oro\Bundle\MicrosoftIntegrationBundle\DependencyInjection\Compiler\Office365
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The MicrosoftIntegrationBundle bundle class.
- */
 class OroMicrosoftIntegrationBundle extends Bundle
 {
     /**
      * {@inheritDoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

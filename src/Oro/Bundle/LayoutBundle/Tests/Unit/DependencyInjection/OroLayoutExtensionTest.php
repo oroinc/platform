@@ -29,7 +29,7 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ]
             ],
-            $container->getExtensionConfig($extension->getAlias())
+            $container->getExtensionConfig('oro_layout')
         );
 
         // default renderer name
@@ -149,12 +149,5 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load($extensionConfig, $container);
 
         self::assertTrue($container->getParameter('oro_layout.debug'));
-    }
-
-    public function testGetAlias(): void
-    {
-        $extension = new OroLayoutExtension();
-
-        self::assertEquals('oro_layout', $extension->getAlias());
     }
 }

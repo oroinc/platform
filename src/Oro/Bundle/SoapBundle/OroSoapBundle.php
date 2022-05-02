@@ -9,15 +9,12 @@ use Oro\Bundle\SoapBundle\DependencyInjection\Compiler\MetadataProvidersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The SoapBundle bundle class.
- */
 class OroSoapBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

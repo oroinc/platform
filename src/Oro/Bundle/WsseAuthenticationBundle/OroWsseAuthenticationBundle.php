@@ -7,17 +7,15 @@ use Oro\Bundle\WsseAuthenticationBundle\DependencyInjection\Security\Factory\Wss
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The OroWsseAuthenticationBundle bundle class:
- *  - adds security listener factory to enable WSSE authentication
- */
 class OroWsseAuthenticationBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
+        parent::build($container);
+
         $wsseSecurityListenerFactory = new WsseSecurityListenerFactory();
 
         $container->addCompilerPass(new WsseNonceCachePass($wsseSecurityListenerFactory->getKey()));

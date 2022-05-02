@@ -7,15 +7,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages IntegrationBundle service configuration
- */
 class OroIntegrationExtension extends Extension
 {
     /**
      * {@inheritDoc}
-     *
-     * @throws \Exception
      */
     public function load(array $configs, ContainerBuilder $container)
     {

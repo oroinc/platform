@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ScopeBundle;
 
 use Oro\Bundle\ScopeBundle\DependencyInjection\Compiler\ScopeProviderPass;
-use Oro\Bundle\ScopeBundle\DependencyInjection\OroScopeExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -12,14 +11,10 @@ class OroScopeBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
-        $container->addCompilerPass(new ScopeProviderPass());
-    }
+        parent::build($container);
 
-    /** {@inheritdoc} */
-    public function getContainerExtension()
-    {
-        return new OroScopeExtension();
+        $container->addCompilerPass(new ScopeProviderPass());
     }
 }

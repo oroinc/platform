@@ -8,9 +8,6 @@ use Oro\Bundle\LoggerBundle\DependencyInjection\Compiler\LoggerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The LoggerBundle bundle class.
- */
 class OroLoggerBundle extends Bundle
 {
     /**

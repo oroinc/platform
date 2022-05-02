@@ -8,13 +8,8 @@ use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-/**
- * This is the class that loads and manages LayoutBundle service configuration
- */
 class OroLayoutExtension extends Extension implements PrependExtensionInterface
 {
-    public const ALIAS = 'oro_layout';
-
     private const RESOURCES_FOLDER_PATTERN = '[a-zA-Z][a-zA-Z0-9_\-:]*';
 
     /**
@@ -22,8 +17,7 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configuration = new Configuration();
-        $config = $this->processConfiguration($configuration, $configs);
+        $config = $this->processConfiguration(new Configuration(), $configs);
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
@@ -76,17 +70,9 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getAlias()
-    {
-        return self::ALIAS;
-    }
-
-    /**
      * @return string[]
      */
-    private function getExcludePatterns()
+    private function getExcludePatterns(): array
     {
         return [
             '#Resources/views/layouts/' . self::RESOURCES_FOLDER_PATTERN . '/theme\.yml$#',

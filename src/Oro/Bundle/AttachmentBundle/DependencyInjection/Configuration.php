@@ -8,9 +8,6 @@ use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * Configuration class for OroAttachmentBundle.
- */
 class Configuration implements ConfigurationInterface
 {
     /**

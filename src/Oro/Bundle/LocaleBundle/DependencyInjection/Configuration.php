@@ -8,9 +8,6 @@ use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-/**
- * This is the class that validates and merges configuration from your config files
- */
 class Configuration implements ConfigurationInterface
 {
     public const ROOT_NAME = 'oro_locale';

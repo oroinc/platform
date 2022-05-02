@@ -8,15 +8,12 @@ use Oro\Bundle\IntegrationBundle\DependencyInjection\CompilerPass\TypesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The IntegrationBundle bundle class.
- */
 class OroIntegrationBundle extends Bundle
 {
     /**
      * {@inheritDoc}
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 

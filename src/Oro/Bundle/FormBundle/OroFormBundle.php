@@ -8,15 +8,22 @@ use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorCompilerPass
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * The FormBundle bundle class.
- */
 class OroFormBundle extends Bundle
 {
     /**
      * {@inheritdoc}
      */
-    public function build(ContainerBuilder $container)
+    public function boot(): void
+    {
+        parent::boot();
+
+        \HTMLPurifier_URISchemeRegistry::instance()->register('tel', new HtmlPurifierTelValidator());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
@@ -32,13 +39,5 @@ class OroFormBundle extends Bundle
             'oro_form.form.handler',
             'alias'
         ));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function boot()
-    {
-        \HTMLPurifier_URISchemeRegistry::instance()->register('tel', new HtmlPurifierTelValidator());
     }
 }
