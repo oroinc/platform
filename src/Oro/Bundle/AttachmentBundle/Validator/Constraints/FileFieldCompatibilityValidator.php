@@ -50,17 +50,7 @@ class FileFieldCompatibilityValidator extends ConstraintValidator
             $constraint->fieldName
         );
 
-        if (!$fieldConfig) {
-            throw new \LogicException(
-                sprintf(
-                    'The entity of class "%s" or its field "%s" is not configurable',
-                    $constraint->entityClass,
-                    $constraint->fieldName
-                )
-            );
-        }
-
-        $isStoredExternally = $fieldConfig->get('is_stored_externally');
+        $isStoredExternally = $fieldConfig ? $fieldConfig->get('is_stored_externally') : false;
         $fieldLabel = $this->getFieldLabel($constraint->entityClass, $constraint->fieldName);
 
         if ($value instanceof ExternalFile) {

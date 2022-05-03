@@ -56,7 +56,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExceptionWhenNotConfigurableEntity(): void
+    public function testNotConfigurableEntityForRegularField(): void
     {
         $value = new SymfonyFile('sample_file.txt', false);
         $constraint = new FileFieldCompatibility(
@@ -69,17 +69,31 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn(null);
 
-        $this->expectExceptionObject(
-            new \LogicException(
-                sprintf(
-                    'The entity of class "%s" or its field "%s" is not configurable',
-                    $constraint->entityClass,
-                    $constraint->fieldName
-                )
-            )
+        $this->validator->validate($value, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testNotConfigurableEntityForExternallyStoredField(): void
+    {
+        $value = new ExternalFile('http://example.org/image.png');
+        $constraint = new FileFieldCompatibility(
+            ['entityClass' => self::ENTITY_CLASS, 'fieldName' => self::FIELD_NAME]
         );
 
+        $this->attachmentEntityConfigProvider
+            ->expects(self::once())
+            ->method('getFieldConfig')
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
+            ->willReturn(null);
+
         $this->validator->validate($value, $constraint);
+
+        $this->buildViolation($constraint->incompatibleForExternalFileMessage)
+            ->setParameter('{{ filename }}', '"' . $value->getFilename() . '"')
+            ->setParameter('{{ field }}', self::SAMPLE_FIELD_LABEL)
+            ->setCode(FileFieldCompatibility::INCOMPATIBLE_FIELD_FOR_EXTERNAL_FILE_ERROR)
+            ->assertRaised();
     }
 
     public function testExceptionWhenUnsupportedFile(): void
