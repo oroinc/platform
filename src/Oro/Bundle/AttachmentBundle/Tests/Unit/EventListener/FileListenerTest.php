@@ -83,8 +83,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
             ->method('preUpload')
             ->with($entity);
 
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUser');
+
         $this->listener->prePersist($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
+        self::assertNull($entity->getOwner());
     }
 
     public function testPrePersistWithFileObject()
@@ -115,8 +118,11 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
             ->method('preUpload')
             ->with($entity);
 
+        $this->tokenAccessor->expects(self::never())
+            ->method('getUser');
+
         $this->listener->preUpdate($entity, new LifecycleEventArgs($entity, $this->em));
-        $this->assertNull($entity->getOwner());
+        self::assertNull($entity->getOwner());
     }
 
     public function testPreUpdateWithFileObject()
