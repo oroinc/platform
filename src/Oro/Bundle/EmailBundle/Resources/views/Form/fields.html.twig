@@ -71,9 +71,14 @@
 
     {% import 'OroUIBundle::macros.html.twig' as UI %}
 
+    {% if form.parent.parent is not null %}
+        {% set parentId = form.parent.parent.vars.id %}
+    {% else %}
+        {% set parentId = form.parent.vars.id %}
+    {% endif %}
     {% set options = {
         targetSelector: '#' ~ id,
-        _sourceElement: '[name$="[' ~ depends_on_parent_field ~ ']"]',
+        _sourceElement: '#' ~ parentId ~ ' [name$="[' ~ depends_on_parent_field ~ ']"]',
         collectionOptions: {
             route: data_route,
             routeId: data_route_parameter,

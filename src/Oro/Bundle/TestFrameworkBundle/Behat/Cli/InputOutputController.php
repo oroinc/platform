@@ -73,7 +73,8 @@ class InputOutputController implements Controller
         $this->testIsolationSubscriber->setOutput($output);
         $this->testIsolationSubscriber->skipIsolatorsTags($skipIsolatorsTags);
         if ($skipAllIsolators) {
-            $this->testIsolationSubscriber->skip();
+            $skipIsolatorsTags = array_diff($this->getIsolatorTags(), ['kernel']);
+            $this->testIsolationSubscriber->skipIsolatorsTags($skipIsolatorsTags);
         }
 
         $this->messageQueueIsolationSubscriber->setOutput($output);

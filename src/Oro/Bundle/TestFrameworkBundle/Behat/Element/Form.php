@@ -5,6 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Environment\BehatSecretsReader;
+use Oro\Bundle\TestFrameworkBundle\Exception\BehatSecretsReaderException;
 use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
 
 /**
@@ -344,6 +346,7 @@ class Form extends Element
      *
      * @param $value
      * @return \DateTime|mixed
+     * @throws BehatSecretsReaderException
      */
     protected static function checkAdditionalFunctions($value)
     {
@@ -357,6 +360,9 @@ class Form extends Element
             if ('Date' === $matches['function']) {
                 $parsed =  new \DateTime($matches['value']);
                 $value = str_replace($matches[0], $parsed->format('M j, Y'), $value);
+            }
+            if ('Secret' === $matches['function']) {
+                $value = BehatSecretsReader::getInstance()->getValue($matches['value']);
             }
         }
 

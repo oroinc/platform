@@ -6,6 +6,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Listens on File lifecycle events to handle its upload.
@@ -40,8 +41,11 @@ class FileListener
 
         $this->fileManager->preUpload($entity);
         $file = $entity->getFile();
-        if (null !== $file && $file->isFile() && !$entity->getOwner()) {
-            $entity->setOwner($this->tokenAccessor->getUser());
+        if (null !== $file && !$entity->getOwner()) {
+            $owner = $this->tokenAccessor->getUser();
+            if ($owner instanceof User) {
+                $entity->setOwner($owner);
+            }
         }
     }
 

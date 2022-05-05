@@ -4,11 +4,14 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use Oro\Component\Testing\ReflectionUtil;
 
 class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,107 +41,94 @@ class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
         $this->setUpLoggerMock($this->listener);
     }
 
-    public function testPostRemoveWhenException(): void
-    {
-        $this->file->setFilename($filename = 'sample/file');
-
-        $this->fileManager
-            ->expects($this->once())
-            ->method('deleteFile')
-            ->with($filename)
-            ->willThrowException(new \Exception());
-
-        $this->assertLoggerWarningMethodCalled();
-
-        $this->listener->postRemove($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
-    }
-
     public function testPostRemove(): void
     {
-        $this->file->setFilename($filename = 'sample/file');
+        $filename = 'sample/file';
+        $this->file->setFilename($filename);
 
-        $this->fileManager
-            ->expects($this->once())
-            ->method('deleteFile')
-            ->with($filename);
+        $this->listener->postRemove($this->file, $this->createMock(LifecycleEventArgs::class));
 
-        $this->loggerMock
-            ->expects($this->never())
-            ->method('warning');
-
-        $this->listener->postRemove($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
+        $filesShouldBeDeleted = ReflectionUtil::getPropertyValue($this->listener, 'filesShouldBeDeleted');
+        self::assertEquals(['sample/file'], $filesShouldBeDeleted);
     }
 
     public function testPostUpdateWhenFilenameUnchanged(): void
     {
-        $this->entityManager
-            ->expects($this->once())
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $this->entityManager->expects($this->once())
             ->method('getUnitOfWork')
-            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
-
-        $unitOfWork
-            ->expects($this->once())
+            ->willReturn($unitOfWork);
+        $unitOfWork->expects($this->once())
             ->method('getEntityChangeSet')
             ->with($this->file)
-            ->willReturn($changeSet = ['sampleField' => ['sampleValue1', 'sampleValue2']]);
-
-        $this->fileManager
-            ->expects($this->never())
-            ->method('deleteFile');
-
-        $this->loggerMock
-            ->expects($this->never())
-            ->method('warning');
+            ->willReturn(['sampleField' => ['sampleValue1', 'sampleValue2']]);
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
-    }
 
-    public function testPostUpdateWhenException(): void
-    {
-        $this->entityManager
-            ->expects($this->once())
-            ->method('getUnitOfWork')
-            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
-
-        $unitOfWork
-            ->expects($this->once())
-            ->method('getEntityChangeSet')
-            ->with($this->file)
-            ->willReturn($changeSet = ['filename' => [$filename = 'name1', 'name2']]);
-
-        $this->fileManager
-            ->expects($this->once())
-            ->method('deleteFile')
-            ->with($filename)
-            ->willThrowException(new \Exception());
-
-        $this->assertLoggerWarningMethodCalled();
-
-        $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
+        $filesShouldBeDeleted = ReflectionUtil::getPropertyValue($this->listener, 'filesShouldBeDeleted');
+        self::assertEquals([], $filesShouldBeDeleted);
     }
 
     public function testPostUpdate(): void
     {
-        $this->entityManager
-            ->expects($this->once())
+        $filename = 'name1';
+        $unitOfWork = $this->createMock(UnitOfWork::class);
+        $this->entityManager->expects($this->once())
             ->method('getUnitOfWork')
-            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
-
-        $unitOfWork
-            ->expects($this->once())
+            ->willReturn($unitOfWork);
+        $unitOfWork->expects($this->once())
             ->method('getEntityChangeSet')
             ->with($this->file)
-            ->willReturn($changeSet = ['filename' => [$filename = 'name1', 'name2']]);
-
-        $this->fileManager
-            ->expects($this->once())
-            ->method('deleteFile')
-            ->with($filename);
-
-        $this->loggerMock
-            ->expects($this->never())
-            ->method('warning');
+            ->willReturn(['filename' => [$filename, 'name2']]);
 
         $this->listener->postUpdate($this->file, new LifecycleEventArgs($this->file, $this->entityManager));
+        $filesShouldBeDeleted = ReflectionUtil::getPropertyValue($this->listener, 'filesShouldBeDeleted');
+        self::assertEquals([$filename], $filesShouldBeDeleted);
+    }
+
+    public function testOnFlush(): void
+    {
+        ReflectionUtil::setPropertyValue($this->listener, 'filesShouldBeDeleted', ['test']);
+        $this->listener->onFlush($this->createMock(OnFlushEventArgs::class));
+        self::assertEquals([], ReflectionUtil::getPropertyValue($this->listener, 'filesShouldBeDeleted'));
+    }
+
+    public function testPostFlushWithEmptyFilesList(): void
+    {
+        $this->fileManager->expects(self::never())
+            ->method('deleteFile');
+
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
+    }
+
+    public function testPostFlushWithExceptionDuringDeletion(): void
+    {
+        $exception = new \Exception('Test exception.');
+        ReflectionUtil::setPropertyValue($this->listener, 'filesShouldBeDeleted', ['test']);
+        $this->fileManager->expects(self::once())
+            ->method('deleteFile')
+            ->with('test')
+            ->willThrowException($exception);
+
+        $this->loggerMock->expects(self::once())
+            ->method('warning')
+            ->with('Could not delete file "test"', ['e' => $exception]);
+
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
+        self::assertEquals([], ReflectionUtil::getPropertyValue($this->listener, 'filesShouldBeDeleted'));
+    }
+
+    public function testPostFlush(): void
+    {
+        ReflectionUtil::setPropertyValue($this->listener, 'filesShouldBeDeleted', ['test', 'test1']);
+        $this->fileManager->expects(self::exactly(2))
+            ->method('deleteFile')
+            ->withConsecutive(['test'], ['test1']);
+
+        $this->loggerMock->expects(self::never())
+            ->method('warning');
+
+        $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
+        self::assertEquals([], ReflectionUtil::getPropertyValue($this->listener, 'filesShouldBeDeleted'));
     }
 }

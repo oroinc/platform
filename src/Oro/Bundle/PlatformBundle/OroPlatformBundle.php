@@ -10,6 +10,7 @@ use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\LazyServicesCompilerP
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\MaintenanceListenerPriorityCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\MergeServiceLocatorsCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\OptionalListenersCompilerPass;
+use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\ProfilerStorageCompilerPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\TwigServiceLocatorPass;
 use Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UndoLazyEntityManagerPass;
@@ -91,5 +92,7 @@ class OroPlatformBundle extends Bundle
                 'oro_platform.tests.merge_service_locators.service_locator'
             ), PassConfig::TYPE_BEFORE_REMOVING);
         }
+
+        $container->addCompilerPass(new ProfilerCompilerPass());
     }
 }

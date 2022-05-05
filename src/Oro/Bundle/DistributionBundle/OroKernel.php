@@ -6,6 +6,7 @@ use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
 use Oro\Bundle\InstallerBundle\Provider\PlatformRequirementsProvider;
+use Oro\Bundle\PlatformBundle\Profiler\ProfilerConfig;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Bridge\ProxyManager\LazyProxy\Instantiator\RuntimeInstantiator;
@@ -290,7 +291,8 @@ abstract class OroKernel extends Kernel
 
         $class = $this->getContainerClass();
         $cacheDir = $this->warmupDir ?: $this->getCacheDir();
-        $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $this->debug);
+        $debug = $this->debug && ProfilerConfig::trackContainerChanges();
+        $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $debug);
         $cachePath = $cache->getPath();
 
         // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
@@ -408,7 +410,7 @@ abstract class OroKernel extends Kernel
             $container = $this->buildContainer();
             $container->compile();
         } finally {
-            if ($collectDeprecations) {
+            if ($collectDeprecations && $container->getParameter('oro_platform.collect_deprecations')) {
                 restore_error_handler();
 
                 file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));

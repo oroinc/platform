@@ -129,8 +129,10 @@ services:
         calls:
             - [setLogger, ['@logger']]
         tags:
+            - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postRemove }
             - { name: doctrine.orm.entity_listener, entity: 'Oro\Bundle\AttachmentBundle\Entity\File', event: postUpdate }
+            - { name: doctrine.event_listener, event: postFlush }
 
     oro_attachment.listener.entity_delete_listener:
         class: Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener
