@@ -22,7 +22,7 @@ Feature: My emails 
       And I should see following grid:
         | Subject               | Date        |
         | There is no spoon     | 2010-10-31 |
-      And I should see "Total Of 1 Records"
+      And I should see "Total Of 1 Record"
 
   Scenario: Filter emails by From field
     Given I login as administrator
@@ -31,4 +31,4 @@ Feature: My emails 
       And I should see following grid:
         | Subject               | Date        |
         | There is no spoon     | 2010-10-31 |
-      And I should see "Total Of 1 Records"
+      And I should see "Total Of 1 Record"

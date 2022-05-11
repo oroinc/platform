@@ -66,6 +66,18 @@
     </ul>
 {% endblock %}
 
+{% block content %}
+    {% set content_attr = content_attr|default({})|merge({
+        'class': 'workflow-container'
+    }) %}
+
+    {% set content_data_attr = content_data_attr|default({})|merge({
+        'class': ''
+    }) %}
+
+    {{ parent() }}
+{% endblock %}
+
 {% block content_data %}
     {% set transitionFormWidget %}
         {% set widgetAlias = 'transition-form' %}
