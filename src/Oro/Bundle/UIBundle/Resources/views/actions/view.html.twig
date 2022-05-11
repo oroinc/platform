@@ -22,7 +22,11 @@
 {% block content %}
 {% import '@OroUI/macros.html.twig' as UI %}
 
-<div class="layout-content"
+{% set content_attr = content_attr|default({})|merge({
+    'class': (content_attr.class is defined ? content_attr.class : 'layout-content')|trim
+}) %}
+
+<div{{ UI.attributes(content_attr) }}
         {% if pageComponent is defined %}{{ UI.renderPageComponentAttributes(pageComponent) }}{% endif %}
         >
     <div class="container-fluid page-title">
@@ -146,7 +150,10 @@
         {% placeholder page_title_after with {entity: entity} %}
     </div>
 
-    <div class="layout-content scrollable-container">
+    {% set content_data_attr = content_data_attr|default({})|merge({
+        'class': ((content_data_attr.class is defined ? content_data_attr.class : 'layout-content') ~ ' scrollable-container')|trim
+    }) %}
+    <div{{ UI.attributes(content_data_attr) }}>
         {% block content_data %}
             {% if data is defined and data.dataBlocks is defined %}
                 {% set data = oro_view_process(data, entity) %}
