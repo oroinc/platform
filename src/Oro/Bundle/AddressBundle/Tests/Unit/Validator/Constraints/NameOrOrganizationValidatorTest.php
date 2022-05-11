@@ -42,6 +42,24 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
     public function validDataProvider(): array
     {
         return [
+            '(int) 0 as first name and last name' => [
+                (new Address())->setFirstName(0)->setLastName(0)
+            ],
+            '(int) 0 as organization' => [
+                (new Address())->setOrganization(0)
+            ],
+            '(string) 0 as first name and last name' => [
+                (new Address())->setFirstName('0')->setLastName('0')
+            ],
+            '(string) 0 as organization' => [
+                (new Address())->setOrganization('0')
+            ],
+            '(float) 0.0 as first name and last name' => [
+                (new Address())->setFirstName(0.0)->setLastName(0.0)
+            ],
+            '(float) 0.0 as organization' => [
+                (new Address())->setOrganization(0.0)
+            ],
             'empty first name' => [
                 (new Address())->setLastName('test last name')->setOrganization('test organization')
             ],
@@ -92,7 +110,25 @@ class NameOrOrganizationValidatorTest extends ConstraintValidatorTestCase
             ],
             'empty last name and organization' => [
                 (new Address())->setFirstName('test first name')
-            ]
+            ],
+            'false as names' => [
+                (new Address())->setFirstName(false)->setLastName(false)
+            ],
+            'false as organization' => [
+                (new Address())->setOrganization(false)
+            ],
+            'array as names' => [
+                (new Address())->setFirstName([])->setLastName([])
+            ],
+            'array as organization' => [
+                (new Address())->setOrganization([])
+            ],
+            'empty string as names' => [
+                (new Address())->setFirstName('')->setLastName('')
+            ],
+            'empty string as organizations' => [
+                (new Address())->setOrganization('')
+            ],
         ];
     }
 }

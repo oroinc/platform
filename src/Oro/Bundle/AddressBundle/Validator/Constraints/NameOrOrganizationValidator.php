@@ -26,7 +26,7 @@ class NameOrOrganizationValidator extends ConstraintValidator
             throw new UnexpectedTypeException($entity, AbstractAddress::class);
         }
 
-        if ((!$entity->getFirstName() || !$entity->getLastName()) && !$entity->getOrganization()) {
+        if ($this->isNameOrOrganizationNotValid($entity)) {
             // organization or (first name and last name) should be filled
             $this->context->buildViolation($constraint->firstNameMessage)
                 ->atPath('firstName')
@@ -38,5 +38,17 @@ class NameOrOrganizationValidator extends ConstraintValidator
                 ->atPath('organization')
                 ->addViolation();
         }
+    }
+
+    private function isNameOrOrganizationNotValid(AbstractAddress $entity): bool
+    {
+        return $this->isEmpty($entity->getOrganization())
+            && ($this->isEmpty($entity->getFirstName()) || $this->isEmpty($entity->getLastName()));
+    }
+
+    private function isEmpty($value): bool
+    {
+        return false === $value
+            || (empty($value) && '0' != $value);
     }
 }
