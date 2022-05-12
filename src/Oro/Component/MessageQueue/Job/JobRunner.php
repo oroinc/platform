@@ -3,6 +3,7 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Exception\JobNotFoundException;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
@@ -32,8 +33,8 @@ class JobRunner
      * Creates a root job and runs the $runCallback.
      * It does not allow another job with the same name to run simultaneously.
      *
-     * @param string   $ownerId
-     * @param string   $name
+     * @param string $ownerId
+     * @param string $name
      * @param \Closure $runCallback
      *
      * @return mixed A value returned by the $runCallback or NULL if this closure cannot be run
@@ -79,7 +80,7 @@ class JobRunner
      * information about the job. In this case, after receiving the message, the subscribed message processor
      * can run and perform a delayed job by running the {@see runDelayed()} method with the job data.
      *
-     * @param string   $name
+     * @param string $name
      * @param \Closure $startCallback
      *
      * @return mixed A value returned by the $startCallback
@@ -120,7 +121,7 @@ class JobRunner
      * {@see \Oro\Component\MessageQueue\Job\DelayedJobRunnerDecoratingProcessor} which will execute runDelayed(),
      * pass the control to the given processor and then handle the result in the format applicable for runDelayed().
      *
-     * @param string   $jobId
+     * @param string $jobId
      * @param \Closure $runCallback
      *
      * @return mixed A value returned by the $runCallback
@@ -190,17 +191,23 @@ class JobRunner
     {
         return !$job->getStartedAt() || $job->getStatus() === Job::STATUS_FAILED_REDELIVERED;
     }
+
     /**
      * @param \Closure $runCallback
-     * @param Job      $job
+     * @param Job $job
      *
      * @return mixed
      */
-    private function callbackResult($runCallback, $job)
+    private function callbackResult(\Closure $runCallback, Job $job)
     {
         $jobRunner = $this->getJobRunnerForChildJob($job->getRootJob());
         try {
-            $result = call_user_func($runCallback, $jobRunner, $job);
+            return $runCallback($jobRunner, $job);
+        } catch (JobRedeliveryException $e) {
+            // do not break execution when only redelivery needed.
+            $this->jobProcessor->failAndRedeliveryChildJob($job);
+
+            throw $e;
         } catch (\Throwable $e) {
             $this->jobProcessor->failAndRedeliveryChildJob($job);
             $this->jobExtension->onError($job);
@@ -210,7 +217,5 @@ class JobRunner
                 $job->getId()
             ), 0, $e);
         }
-
-        return $result;
     }
 }
