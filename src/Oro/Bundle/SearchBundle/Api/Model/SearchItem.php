@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Api\Model;
 
 /**
- * The model for the search API resource.
+ * Represents the search result.
  */
 class SearchItem
 {

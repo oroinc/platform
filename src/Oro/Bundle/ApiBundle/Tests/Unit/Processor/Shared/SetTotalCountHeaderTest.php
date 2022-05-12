@@ -14,6 +14,9 @@ use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\QueryResolver;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|CountQueryBuilderOptimizer */
@@ -259,5 +262,38 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setQuery(new \stdClass());
         $this->context->setConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
+    }
+
+    public function testArrayData()
+    {
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setResult([['id' => 1], ['id' => 2]]);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            2,
+            $this->context->getResponseHeaders()->get('X-Include-Total-Count')
+        );
+    }
+
+    public function testObjectData()
+    {
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->setResult(new \stdClass());
+        $this->processor->process($this->context);
+
+        self::assertFalse(
+            $this->context->getResponseHeaders()->has('X-Include-Total-Count')
+        );
+    }
+
+    public function testNoData()
+    {
+        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->processor->process($this->context);
+
+        self::assertFalse(
+            $this->context->getResponseHeaders()->has('X-Include-Total-Count')
+        );
     }
 }

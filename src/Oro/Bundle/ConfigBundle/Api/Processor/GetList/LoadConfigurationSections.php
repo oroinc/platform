@@ -14,11 +14,8 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class LoadConfigurationSections implements ProcessorInterface
 {
-    /** @var ConfigurationRepository */
-    protected $configRepository;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private ConfigurationRepository $configRepository;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         ConfigurationRepository $configRepository,

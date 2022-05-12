@@ -19,17 +19,10 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class LoadErrors implements ProcessorInterface
 {
-    /** @var ErrorManager */
-    private $errorManager;
-
-    /** @var FileManager */
-    private $fileManager;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    private ErrorManager $errorManager;
+    private FileManager $fileManager;
+    private DoctrineHelper $doctrineHelper;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         ErrorManager $errorManager,
@@ -74,10 +67,8 @@ class LoadErrors implements ProcessorInterface
         $context->setResult($errors);
 
         // set callback to be used to calculate total count
-        $context->setTotalCountCallback(
-            function () use ($operationId) {
-                return $this->errorManager->getTotalErrorCount($this->fileManager, $operationId);
-            }
-        );
+        $context->setTotalCountCallback(function () use ($operationId) {
+            return $this->errorManager->getTotalErrorCount($this->fileManager, $operationId);
+        });
     }
 }
