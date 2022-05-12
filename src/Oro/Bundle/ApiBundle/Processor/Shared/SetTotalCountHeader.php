@@ -26,11 +26,8 @@ class SetTotalCountHeader implements ProcessorInterface
     public const RESPONSE_HEADER_NAME = 'X-Include-Total-Count';
     public const REQUEST_HEADER_VALUE = 'totalCount';
 
-    /** @var CountQueryBuilderOptimizer */
-    private $countQueryBuilderOptimizer;
-
-    /** @var QueryResolver */
-    private $queryResolver;
+    private CountQueryBuilderOptimizer $countQueryBuilderOptimizer;
+    private QueryResolver $queryResolver;
 
     public function __construct(
         CountQueryBuilderOptimizer $countQueryOptimizer,
@@ -63,11 +60,16 @@ class SetTotalCountHeader implements ProcessorInterface
         $totalCountCallback = $context->getTotalCountCallback();
         if (null !== $totalCountCallback) {
             $totalCount = $this->executeTotalCountCallback($totalCountCallback);
-        }
-
-        $query = $context->getQuery();
-        if (null !== $query && null === $totalCount) {
-            $totalCount = $this->calculateTotalCount($query, $context->getConfig());
+        } else {
+            $query = $context->getQuery();
+            if (null !== $query) {
+                $totalCount = $this->calculateTotalCount($query, $context->getConfig());
+            } else {
+                $data = $context->getResult();
+                if (\is_array($data)) {
+                    $totalCount = count($data);
+                }
+            }
         }
 
         if (null !== $totalCount) {
@@ -75,12 +77,7 @@ class SetTotalCountHeader implements ProcessorInterface
         }
     }
 
-    /**
-     * @param callable $callback
-     *
-     * @return int
-     */
-    private function executeTotalCountCallback($callback): int
+    private function executeTotalCountCallback(mixed $callback): int
     {
         if (!\is_callable($callback)) {
             throw new \RuntimeException(sprintf(
@@ -100,13 +97,7 @@ class SetTotalCountHeader implements ProcessorInterface
         return $totalCount;
     }
 
-    /**
-     * @param mixed                       $query
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return int
-     */
-    private function calculateTotalCount($query, ?EntityDefinitionConfig $config): int
+    private function calculateTotalCount(mixed $query, ?EntityDefinitionConfig $config): int
     {
         if ($query instanceof QueryBuilder) {
             $countQuery = $this->countQueryBuilderOptimizer

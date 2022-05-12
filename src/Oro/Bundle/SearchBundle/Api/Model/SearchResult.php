@@ -13,17 +13,10 @@ use Oro\Component\EntitySerializer\ConfigUtil;
  */
 class SearchResult
 {
-    /** @var SearchQueryInterface */
-    private $query;
-
-    /** @var bool */
-    private $hasMore;
-
-    /** @var int|null */
-    private $limit;
-
-    /** @var Result|null */
-    private $searchResult;
+    private SearchQueryInterface $query;
+    private bool $hasMore;
+    private ?int $limit = null;
+    private ?Result $searchResult = null;
 
     /**
      * @param SearchQueryInterface $query
@@ -98,12 +91,7 @@ class SearchResult
         return $this->searchResult;
     }
 
-    /**
-     * @param callable $callback
-     *
-     * @return mixed
-     */
-    private function execute($callback)
+    private function execute(callable $callback): mixed
     {
         try {
             return $callback();
