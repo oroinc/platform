@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Compatibility;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -36,7 +37,7 @@ trait TopicAwareTrait
             $this->topic->configureMessageBody($resolver);
 
             return $resolver->resolve($body);
-        } catch (\Exception $e) {
+        } catch (ExceptionInterface $e) {
             if ($logger) {
                 $logger->critical(
                     'Got invalid message.',

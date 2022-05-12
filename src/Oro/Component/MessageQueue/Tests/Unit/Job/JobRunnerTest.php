@@ -3,6 +3,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Oro\Component\MessageQueue\Exception\JobNotFoundException;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Exception\StaleJobRuntimeException;
 use Oro\Component\MessageQueue\Job\Extension\ExtensionInterface;
@@ -1179,6 +1180,63 @@ class JobRunnerTest extends \PHPUnit\Framework\TestCase
 
         $this->jobRunner->runDelayed($jobId, function () {
             throw new \Exception('Exception Message');
+        });
+    }
+
+    public function testRunDelayedCallbackThrowRedeliveryException()
+    {
+        $jobId = 2;
+        $rootJob = $this->getEntity(Job::class, ['id' => 1]);
+        $childJob = $this->getEntity(Job::class, [
+            'id' => $jobId,
+            'rootJob' => $rootJob,
+            'startedAt' => new \DateTime(),
+            'stoppedAt' => new \DateTime(),
+        ]);
+
+        $this->jobProcessor
+            ->expects($this->once())
+            ->method('findJobById')
+            ->with($jobId)
+            ->willReturn($childJob);
+
+        $this->jobProcessor
+            ->expects($this->once())
+            ->method('failAndRedeliveryChildJob')
+            ->with($childJob);
+
+        $this->jobProcessor
+            ->expects($this->never())
+            ->method('startChildJob');
+
+        $this->jobProcessor
+            ->expects($this->never())
+            ->method('successChildJob');
+
+        $this->jobProcessor
+            ->expects($this->never())
+            ->method('failChildJob');
+
+        $this->jobExtension
+            ->expects($this->never())
+            ->method('onCancel');
+
+        $this->jobExtension
+            ->expects($this->never())
+            ->method('onError');
+
+        $this->jobExtension
+            ->expects($this->once())
+            ->method('onPreRunDelayed')
+            ->with($childJob);
+
+        $this->jobExtension
+            ->expects($this->never())
+            ->method('onPostRunDelayed');
+
+        $this->expectException(JobRedeliveryException::class);
+        $this->jobRunner->runDelayed($jobId, function () {
+            throw JobRedeliveryException::create();
         });
     }
 
