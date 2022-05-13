@@ -1078,6 +1078,61 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
+    public function testForAssociationThatIsFieldInEntityAndConfiguredByTargetClassAndTargetType()
+    {
+        $entityClass = 'Test\Class';
+        $config = new EntityDefinitionConfig();
+        $withExcludedProperties = false;
+        $targetAction = 'testAction';
+
+        $associationName = 'testAssociation';
+        $field = $config->addField($associationName);
+        $field->setTargetClass('Test\AssociationTargetClass');
+        $field->setTargetType('to-one');
+
+        $entityMetadata = new EntityMetadata();
+        $entityMetadata->setClassName($entityClass);
+
+        $classMetadata = $this->getClassMetadataMock($entityClass);
+        $classMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn([$associationName]);
+        $classMetadata->expects(self::once())
+            ->method('getAssociationNames')
+            ->willReturn([]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createEntityMetadata')
+            ->with(self::identicalTo($classMetadata))
+            ->willReturn($entityMetadata);
+
+        $this->entityMetadataFactory->expects(self::never())
+            ->method('createAndAddFieldMetadata');
+        $this->objectMetadataFactory->expects(self::once())
+            ->method('createAndAddAssociationMetadata')
+            ->with(
+                self::identicalTo($entityMetadata),
+                $entityClass,
+                self::identicalTo($config),
+                $associationName,
+                self::identicalTo($field),
+                $targetAction
+            );
+
+        $result = $this->entityMetadataLoader->loadEntityMetadata(
+            $entityClass,
+            $config,
+            $withExcludedProperties,
+            $targetAction
+        );
+        self::assertSame($entityMetadata, $result);
+    }
+
     public function testForAdditionalPropertyWithoutDataType()
     {
         $entityClass = 'Test\Class';

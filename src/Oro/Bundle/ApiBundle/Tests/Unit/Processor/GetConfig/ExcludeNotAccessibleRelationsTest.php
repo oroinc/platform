@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ExcludeNotAccessibleRelations;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
@@ -837,6 +838,143 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'data_type' => 'array'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForNotManageableTargetEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class' => 'Test\Association1Target'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::never())
+            ->method('hasAssociation');
+        $rootEntityMetadata->expects(self::never())
+            ->method('getAssociationMapping');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($rootEntityMetadata);
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessibleAsAssociation')
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'target_class' => 'Test\Association1Target'
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForNotManageableTargetEntityThatDoesNotHaveAccessibleApiResource()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class' => 'Test\Association1Target'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::never())
+            ->method('hasAssociation');
+        $rootEntityMetadata->expects(self::never())
+            ->method('getAssociationMapping');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($rootEntityMetadata);
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessibleAsAssociation')
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(false);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'target_class' => 'Test\Association1Target',
+                        'exclude'      => true
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForNotManageableTargetEntityWhenSeveralTargetClassesAreAllowed()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class' => EntityIdentifier::class
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::never())
+            ->method('hasAssociation');
+        $rootEntityMetadata->expects(self::never())
+            ->method('getAssociationMapping');
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME, true)
+            ->willReturn($rootEntityMetadata);
+        $this->resourcesProvider->expects(self::never())
+            ->method('isResourceAccessibleAsAssociation');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'target_class' => EntityIdentifier::class
                     ]
                 ]
             ],

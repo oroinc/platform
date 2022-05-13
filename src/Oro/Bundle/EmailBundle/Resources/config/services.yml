@@ -1449,3 +1449,16 @@ services:
             - '@oro_email.email_address_visibility.manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.email_user_added, method: onEmailUserAdded }
+
+    oro_email.virtual_relation_provider.email_user:
+        class: Oro\Bundle\EmailBundle\Provider\EmailUserVirtualRelationsProvider
+        arguments:
+            - '@oro_entity_extend.association_manager'
+            - '@oro_entity_config.provider.entity'
+        tags:
+            - { name: oro_entity.virtual_relation_provider, priority: -150 }
+
+    oro_email.email_template_entity_provider:
+        class: Oro\Bundle\EmailBundle\Provider\EmailTemplateEntityProvider
+        parent: oro_entity.entity_provider.abstract
+        lazy: true

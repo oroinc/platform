@@ -6,10 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
+use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateEntityChoiceType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationCollectionType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType;
 use Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType;
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
@@ -76,7 +76,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
             new PreloadedExtension(
                 [
                     $this->type,
-                    new EntityChoiceType($entityProvider),
+                    new EmailTemplateEntityChoiceType($entityProvider),
                     new Select2ChoiceType(),
                     new EmailTemplateTranslationCollectionType(),
                     new EmailTemplateTranslationType($translator, $this->localizationManager),

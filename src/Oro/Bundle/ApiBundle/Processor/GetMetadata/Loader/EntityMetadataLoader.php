@@ -4,8 +4,10 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory as MetadataFactory;
+use Oro\Bundle\ApiBundle\Metadata\PropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -16,26 +18,13 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class EntityMetadataLoader
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityIdHelper */
-    protected $entityIdHelper;
-
-    /** @var MetadataFactory */
-    protected $metadataFactory;
-
-    /** @var ObjectMetadataFactory */
-    protected $objectMetadataFactory;
-
-    /** @var EntityMetadataFactory */
-    protected $entityMetadataFactory;
-
-    /** @var EntityNestedObjectMetadataFactory */
-    protected $nestedObjectMetadataFactory;
-
-    /** @var EntityNestedAssociationMetadataFactory */
-    protected $nestedAssociationMetadataFactory;
+    private DoctrineHelper $doctrineHelper;
+    private EntityIdHelper $entityIdHelper;
+    private MetadataFactory $metadataFactory;
+    private ObjectMetadataFactory $objectMetadataFactory;
+    private EntityMetadataFactory $entityMetadataFactory;
+    private EntityNestedObjectMetadataFactory $nestedObjectMetadataFactory;
+    private EntityNestedAssociationMetadataFactory $nestedAssociationMetadataFactory;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -55,24 +44,17 @@ class EntityMetadataLoader
         $this->nestedAssociationMetadataFactory = $nestedAssociationMetadataFactory;
     }
 
-    /**
-     * @param string                 $entityClass
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $withExcludedProperties
-     * @param string                 $targetAction
-     *
-     * @return EntityMetadata
-     */
     public function loadEntityMetadata(
-        $entityClass,
+        string $entityClass,
         EntityDefinitionConfig $config,
-        $withExcludedProperties,
-        $targetAction
-    ) {
+        bool $withExcludedProperties,
+        ?string $targetAction
+    ): EntityMetadata {
         // filter excluded fields on this stage though there is another processor doing the same
         // it is done due to performance reasons
         $allowedFields = $this->getAllowedFields($config, $withExcludedProperties);
 
+        /** @var ClassMetadata $classMetadata */
         $classMetadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $entityMetadata = $this->createEntityMetadata($classMetadata, $config);
         $this->loadEntityFieldsMetadata(
@@ -101,12 +83,9 @@ class EntityMetadataLoader
     }
 
     /**
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $withExcludedProperties
-     *
      * @return array [property path => field name, ...]
      */
-    protected function getAllowedFields(EntityDefinitionConfig $config, $withExcludedProperties)
+    private function getAllowedFields(EntityDefinitionConfig $config, bool $withExcludedProperties): array
     {
         $result = [];
         $fields = $config->getFields();
@@ -122,13 +101,7 @@ class EntityMetadataLoader
         return $result;
     }
 
-    /**
-     * @param ClassMetadata          $classMetadata
-     * @param EntityDefinitionConfig $config
-     *
-     * @return EntityMetadata
-     */
-    protected function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config)
+    private function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config): EntityMetadata
     {
         $entityMetadata = $this->metadataFactory->createEntityMetadata($classMetadata);
         $configuredIdFieldNames = $config->getIdentifierFieldNames();
@@ -153,27 +126,22 @@ class EntityMetadataLoader
         return $entityMetadata;
     }
 
-    /**
-     * @param EntityMetadata         $entityMetadata
-     * @param ClassMetadata          $classMetadata
-     * @param array                  $allowedFields
-     * @param EntityDefinitionConfig $config
-     * @param string                 $targetAction
-     */
-    protected function loadEntityFieldsMetadata(
+    private function loadEntityFieldsMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
         EntityDefinitionConfig $config,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): void {
         $fields = $classMetadata->getFieldNames();
         foreach ($fields as $propertyPath) {
             if (!isset($allowedFields[$propertyPath])) {
                 continue;
             }
             $fieldName = $allowedFields[$propertyPath];
+            /** @var EntityDefinitionFieldConfig $field */
             $field = $config->getField($fieldName);
+            $metadata = null;
             if ($field->isMetaProperty()) {
                 $metadata = $this->entityMetadataFactory->createAndAddMetaPropertyMetadata(
                     $entityMetadata,
@@ -182,7 +150,7 @@ class EntityMetadataLoader
                     $field,
                     $targetAction
                 );
-            } else {
+            } elseif (!$field->getTargetClass()) {
                 $metadata = $this->entityMetadataFactory->createAndAddFieldMetadata(
                     $entityMetadata,
                     $classMetadata,
@@ -191,32 +159,24 @@ class EntityMetadataLoader
                     $targetAction
                 );
             }
-            if ($field->hasDirection()) {
-                $metadata->setDirection($field->isInput(), $field->isOutput());
-            }
+            $this->setDirection($metadata, $field);
         }
     }
 
-    /**
-     * @param EntityMetadata         $entityMetadata
-     * @param ClassMetadata          $classMetadata
-     * @param array                  $allowedFields
-     * @param EntityDefinitionConfig $config
-     * @param string                 $targetAction
-     */
-    protected function loadEntityAssociationsMetadata(
+    private function loadEntityAssociationsMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         array $allowedFields,
         EntityDefinitionConfig $config,
-        $targetAction
-    ) {
+        ?string $targetAction
+    ): void {
         $associations = $classMetadata->getAssociationNames();
         foreach ($associations as $propertyPath) {
             if (!isset($allowedFields[$propertyPath])) {
                 continue;
             }
             $associationName = $allowedFields[$propertyPath];
+            /** @var EntityDefinitionFieldConfig $field */
             $field = $config->getField($associationName);
             $metadata = $this->entityMetadataFactory->createAndAddAssociationMetadata(
                 $entityMetadata,
@@ -225,28 +185,20 @@ class EntityMetadataLoader
                 $field,
                 $targetAction
             );
-            if ($field->hasDirection()) {
-                $metadata->setDirection($field->isInput(), $field->isOutput());
-            }
+            $this->setDirection($metadata, $field);
         }
     }
 
     /**
-     * @param EntityMetadata         $entityMetadata
-     * @param ClassMetadata          $classMetadata
-     * @param EntityDefinitionConfig $config
-     * @param bool                   $withExcludedProperties
-     * @param string                 $targetAction
-     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function loadEntityPropertiesMetadata(
+    private function loadEntityPropertiesMetadata(
         EntityMetadata $entityMetadata,
         ClassMetadata $classMetadata,
         EntityDefinitionConfig $config,
-        $withExcludedProperties,
-        $targetAction
-    ) {
+        bool $withExcludedProperties,
+        ?string $targetAction
+    ): void {
         $entityClass = $entityMetadata->getClassName();
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -279,7 +231,6 @@ class EntityMetadataLoader
                             $targetAction
                         );
                     } elseif ($field->getTargetClass()) {
-                        $targetClass = $field->getTargetClass();
                         $metadata = $this->objectMetadataFactory->createAndAddAssociationMetadata(
                             $entityMetadata,
                             $entityClass,
@@ -287,7 +238,7 @@ class EntityMetadataLoader
                             $fieldName,
                             $field,
                             $targetAction,
-                            $targetClass
+                            $field->getTargetClass()
                         );
                     } elseif ($dataType) {
                         $metadata = $this->objectMetadataFactory->createAndAddFieldMetadata(
@@ -308,9 +259,14 @@ class EntityMetadataLoader
                     $targetAction
                 );
             }
-            if (null !== $metadata && $field->hasDirection()) {
-                $metadata->setDirection($field->isInput(), $field->isOutput());
-            }
+            $this->setDirection($metadata, $field);
+        }
+    }
+
+    private function setDirection(?PropertyMetadata $metadata, EntityDefinitionFieldConfig $field): void
+    {
+        if (null !== $metadata && $field->hasDirection()) {
+            $metadata->setDirection($field->isInput(), $field->isOutput());
         }
     }
 }
