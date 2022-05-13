@@ -6,6 +6,6 @@ styles:
         # Styles
         - '~slick-carousel/slick/slick.scss'
         - 'bundles/oroui/css/scss/oro/loading/loading-bar.scss'
-        - 'bundles/oroui/css/scss/font-awesome/core.scss'
+        - 'bundles/oroui/css/scss/font-awesome/_core.scss'
         - 'bundles/oroviewswitcher/view-switcher/scss/styles.scss'
     output: 'css/view-switcher.css'
