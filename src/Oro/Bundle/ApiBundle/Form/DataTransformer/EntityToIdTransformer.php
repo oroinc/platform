@@ -13,11 +13,8 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
  */
 class EntityToIdTransformer extends AbstractEntityAssociationTransformer
 {
-    /** @var EntityMapper|null */
-    protected $entityMapper;
-
-    /** @var IncludedEntityCollection|null */
-    protected $includedEntities;
+    protected ?EntityMapper $entityMapper;
+    protected ?IncludedEntityCollection $includedEntities;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -32,12 +29,9 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
     }
 
     /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return object
+     * {@inheritDoc}
      */
-    protected function getEntity($entityClass, $entityId)
+    protected function getEntity(string $entityClass, mixed $entityId): ?object
     {
         $entity = $this->getIncludedEntity($entityClass, $entityId);
         if (null === $entity) {
@@ -51,13 +45,7 @@ class EntityToIdTransformer extends AbstractEntityAssociationTransformer
         return $entity;
     }
 
-    /**
-     * @param string $entityClass
-     * @param mixed  $entityId
-     *
-     * @return object|null
-     */
-    protected function getIncludedEntity($entityClass, $entityId)
+    protected function getIncludedEntity(string $entityClass, mixed $entityId): ?object
     {
         if (null === $this->includedEntities) {
             return null;

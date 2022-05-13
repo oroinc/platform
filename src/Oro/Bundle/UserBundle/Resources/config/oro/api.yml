@@ -38,6 +38,8 @@ api:
                 lastLogin:
                     form_options:
                         mapped: false
+                emailOrigins:
+                    exclude: true
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary

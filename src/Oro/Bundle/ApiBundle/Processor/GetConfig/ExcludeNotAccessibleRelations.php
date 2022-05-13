@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
@@ -21,14 +22,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ExcludeNotAccessibleRelations implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private ResourcesProvider $resourcesProvider;
+    private EntityOverrideProviderRegistry $entityOverrideProviderRegistry;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -43,7 +39,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
@@ -62,19 +58,14 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         $this->updateRelations($definition, $entityClass, $context->getVersion(), $context->getRequestType());
     }
 
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
-     * @param string                 $version
-     * @param RequestType            $requestType
-     */
     private function updateRelations(
         EntityDefinitionConfig $definition,
-        $entityClass,
-        $version,
+        string $entityClass,
+        string $version,
         RequestType $requestType
-    ) {
+    ): void {
         $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
+        /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
@@ -83,15 +74,21 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 continue;
             }
 
-            $propertyPath = $field->getPropertyPath($fieldName);
-            if (!$metadata->hasAssociation($propertyPath)) {
+            $targetClass = $field->getTargetClass();
+            $targetMetadata = null;
+            if (!$targetClass) {
+                $targetClass = $this->getAssociationTargetClass($fieldName, $field, $metadata);
+                if ($targetClass) {
+                    $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
+                }
+            }
+            if (!$targetClass || is_a($targetClass, EntityIdentifier::class, true)) {
                 continue;
             }
 
-            $mapping = $metadata->getAssociationMapping($propertyPath);
-            $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
             if (!$this->isResourceForRelatedEntityAvailable(
                 $field,
+                $targetClass,
                 $targetMetadata,
                 $version,
                 $requestType,
@@ -102,15 +99,29 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
     }
 
+    private function getAssociationTargetClass(
+        string $fieldName,
+        EntityDefinitionFieldConfig $field,
+        ClassMetadata $metadata
+    ): ?string {
+        $propertyPath = $field->getPropertyPath($fieldName);
+
+        return $metadata->hasAssociation($propertyPath)
+            ? $metadata->getAssociationMapping($propertyPath)['targetEntity']
+            : null;
+    }
+
     private function isResourceForRelatedEntityAvailable(
         EntityDefinitionFieldConfig $field,
-        ClassMetadata $targetMetadata,
+        string $targetClass,
+        ?ClassMetadata $targetMetadata,
         string $version,
         RequestType $requestType,
         EntityOverrideProviderInterface $entityOverrideProvider
     ): bool {
         if (DataType::isAssociationAsField($field->getDataType())) {
             return $this->isResourceForRelatedEntityKnown(
+                $targetClass,
                 $targetMetadata,
                 $version,
                 $requestType,
@@ -119,6 +130,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
 
         return $this->isResourceForRelatedEntityAccessible(
+            $targetClass,
             $targetMetadata,
             $version,
             $requestType,
@@ -127,16 +139,17 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     private function isResourceForRelatedEntityKnown(
-        ClassMetadata $targetMetadata,
+        string $targetClass,
+        ?ClassMetadata $targetMetadata,
         string $version,
         RequestType $requestType,
         EntityOverrideProviderInterface $entityOverrideProvider
     ): bool {
-        $targetClass = $this->resolveEntityClass($targetMetadata->name, $entityOverrideProvider);
+        $targetClass = $this->resolveEntityClass($targetClass, $entityOverrideProvider);
         if ($this->resourcesProvider->isResourceKnown($targetClass, $version, $requestType)) {
             return true;
         }
-        if (!$targetMetadata->isInheritanceTypeNone()) {
+        if (null !== $targetMetadata && !$targetMetadata->isInheritanceTypeNone()) {
             // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
                 $inheritedEntityClass = $this->resolveEntityClass($inheritedEntityClass, $entityOverrideProvider);
@@ -150,16 +163,17 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     private function isResourceForRelatedEntityAccessible(
-        ClassMetadata $targetMetadata,
+        string $targetClass,
+        ?ClassMetadata $targetMetadata,
         string $version,
         RequestType $requestType,
         EntityOverrideProviderInterface $entityOverrideProvider
     ): bool {
-        $targetClass = $this->resolveEntityClass($targetMetadata->name, $entityOverrideProvider);
+        $targetClass = $this->resolveEntityClass($targetClass, $entityOverrideProvider);
         if ($this->resourcesProvider->isResourceAccessibleAsAssociation($targetClass, $version, $requestType)) {
             return true;
         }
-        if (!$targetMetadata->isInheritanceTypeNone()) {
+        if (null !== $targetMetadata && !$targetMetadata->isInheritanceTypeNone()) {
             // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $subClass) {
                 $subClass = $this->resolveEntityClass($subClass, $entityOverrideProvider);

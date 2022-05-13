@@ -10,20 +10,11 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class TestConfigRegistry
 {
-    /** @var ConfigBagRegistry */
-    private $configBagRegistry;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var MetadataProvider */
-    private $metadataProvider;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var bool */
-    private $isResourcesCacheAffected = false;
+    private ConfigBagRegistry $configBagRegistry;
+    private ConfigProvider $configProvider;
+    private MetadataProvider $metadataProvider;
+    private ResourcesProvider $resourcesProvider;
+    private bool $isResourcesCacheAffected = false;
 
     public function __construct(
         ConfigBagRegistry $configBagRegistry,
@@ -37,45 +28,38 @@ class TestConfigRegistry
         $this->resourcesProvider = $resourcesProvider;
     }
 
-    /**
-     * @param RequestType $requestType
-     * @param string      $entityClass
-     * @param array       $config
-     * @param bool        $affectResourcesCache
-     */
-    public function appendEntityConfig(RequestType $requestType, $entityClass, array $config, $affectResourcesCache)
-    {
+    public function appendEntityConfig(
+        RequestType $requestType,
+        string $entityClass,
+        array $config,
+        bool $affectResourcesCache
+    ): void {
         $this->getConfigBag($requestType)->appendEntityConfig($entityClass, $config);
         if ($affectResourcesCache) {
             $this->isResourcesCacheAffected = true;
         }
-        $this->clearCaches();
+        $this->clearCache($this->isResourcesCacheAffected);
     }
 
-    public function restoreConfigs(RequestType $requestType)
+    public function restoreConfigs(RequestType $requestType): void
     {
         if ($this->getConfigBag($requestType)->restoreConfigs()) {
-            $this->clearCaches();
+            $this->clearCache($this->isResourcesCacheAffected);
         }
         $this->isResourcesCacheAffected = false;
     }
 
-    /**
-     * @param RequestType $requestType
-     *
-     * @return TestConfigBag
-     */
-    private function getConfigBag(RequestType $requestType)
-    {
-        return $this->configBagRegistry->getConfigBag($requestType);
-    }
-
-    private function clearCaches()
+    public function clearCache(bool $clearResourcesCache = false): void
     {
         $this->configProvider->reset();
         $this->metadataProvider->reset();
-        if ($this->isResourcesCacheAffected) {
+        if ($clearResourcesCache) {
             $this->resourcesProvider->clearCache();
         }
+    }
+
+    private function getConfigBag(RequestType $requestType): TestConfigBag
+    {
+        return $this->configBagRegistry->getConfigBag($requestType);
     }
 }

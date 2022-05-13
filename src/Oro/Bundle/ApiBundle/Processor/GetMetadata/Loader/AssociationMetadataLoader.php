@@ -14,8 +14,7 @@ use Oro\Bundle\ApiBundle\Request\DataType;
  */
 class AssociationMetadataLoader
 {
-    /** @var MetadataProvider */
-    private $metadataProvider;
+    private MetadataProvider $metadataProvider;
 
     public function __construct(MetadataProvider $metadataProvider)
     {
@@ -26,7 +25,7 @@ class AssociationMetadataLoader
         EntityMetadata $entityMetadata,
         EntityDefinitionConfig $config,
         MetadataContext $context
-    ) {
+    ): void {
         $associations = $entityMetadata->getAssociations();
         foreach ($associations as $associationName => $association) {
             if (null !== $association->getTargetMetadata()) {

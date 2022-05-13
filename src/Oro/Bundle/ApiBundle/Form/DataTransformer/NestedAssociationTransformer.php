@@ -10,16 +10,16 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 class NestedAssociationTransformer extends AbstractEntityAssociationTransformer
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    protected function getEntity($entityClass, $entityId)
+    protected function getEntity(string $entityClass, mixed $entityId): EntityIdentifier
     {
         $resolvedEntityClass = $this->resolveEntityClass($entityClass);
         $entity = $this->loadEntity($resolvedEntityClass, $entityId);
         $entityId = $this->doctrineHelper
             ->getEntityMetadataForClass($resolvedEntityClass)
             ->getIdentifierValues($entity);
-        if (\count($entityId) === 1) {
+        if (count($entityId) === 1) {
             $entityId = reset($entityId);
         }
 
