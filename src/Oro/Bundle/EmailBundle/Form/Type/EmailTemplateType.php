@@ -4,7 +4,6 @@ namespace Oro\Bundle\EmailBundle\Form\Type;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
-use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Symfony\Component\Form\AbstractType;
@@ -56,7 +55,7 @@ class EmailTemplateType extends AbstractType
                 ],
                 'required' => true,
             ])
-            ->add('entityName', EntityChoiceType::class, [
+            ->add('entityName', EmailTemplateEntityChoiceType::class, [
                 'label' => 'oro.email.emailtemplate.entity_name.label',
                 'tooltip' => 'oro.email.emailtemplate.entity_name.tooltip',
                 'required' => false,
@@ -102,7 +101,12 @@ class EmailTemplateType extends AbstractType
                     // entityName field
                     $options = $form->get('entityName')->getConfig()->getOptions();
                     $setDisabled($options);
-                    $form->add($factory->createNamed('entityName', EntityChoiceType::class, null, $options));
+                    $form->add($factory->createNamed(
+                        'entityName',
+                        EmailTemplateEntityChoiceType::class,
+                        null,
+                        $options
+                    ));
                     // name field
                     $options = $form->get('name')->getConfig()->getOptions();
                     $setDisabled($options);

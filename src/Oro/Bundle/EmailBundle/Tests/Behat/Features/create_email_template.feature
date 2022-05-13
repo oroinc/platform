@@ -10,7 +10,7 @@ Feature: Create email template
       | Owner         | John Doe      |
       | Template Name | Test Template |
       | Type          | Html          |
-      | Entity Name   | Email         |
+      | Entity Name   | User          |
       | Subject       | SampleSubject |
       | Content       | SampleContent |
     When I save form

@@ -22,7 +22,7 @@ Feature: Create email template using not english default localization
       |Owner         | John Doe       |
       |Template Name | Test Template  |
       |Type          | Html           |
-      |Entity Name   | Email          |
+      |Entity Name   | User           |
       |Subject       | Test subject   |
       |Content       | Test content   |
     And I save and close form
@@ -31,11 +31,7 @@ Feature: Create email template using not english default localization
   Scenario: Update email template
     Given I click "Edit" on first row in grid
     And fill form with:
-      |Owner         | John Doe       |
-      |Template Name | Test Template  |
-      |Type          | Html           |
-      |Entity Name   | Email          |
-      |Subject       | Test subject   |
-      |Content       | Test content   |
+      |Subject       | Test subject edited |
+      |Content       | Test content edited |
     And I save and close form
     Then I should see "Template saved" flash message
