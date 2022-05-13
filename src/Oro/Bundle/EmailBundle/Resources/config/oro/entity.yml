@@ -1,11 +1,41 @@
 oro_entity:
     exclusions:
         - { entity: Oro\Bundle\EmailBundle\Entity\EmailTemplate, field: translations }
+        - { entity: Oro\Bundle\EmailBundle\Entity\Email }
 
     entity_alias_exclusions:
         - Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent
         - Oro\Bundle\EmailBundle\Entity\EmailBody
         - Oro\Bundle\EmailBundle\Entity\EmailRecipient
 
+    virtual_fields:
+        Oro\Bundle\EmailBundle\Entity\EmailUser:
+            subject:
+                query:
+                    select:
+                        expr: email.subject
+                        label: oro.email.subject.label
+                        return_type: string
+                    join:
+                        left:
+                            - { join: entity.email, alias: email }
+            fromName:
+                query:
+                    select:
+                        expr: email.fromName
+                        label: oro.email.from_name.label
+                        return_type: string
+                    join:
+                        left:
+                            - { join: entity.email, alias: email }
+            sentAt:
+                query:
+                    select:
+                        expr: email.sentAt
+                        label: oro.email.sent_at.label
+                        return_type: datetime
+                    join:
+                        left:
+                            - { join: entity.email, alias: email }
     entity_name_formats:
         email: ~
