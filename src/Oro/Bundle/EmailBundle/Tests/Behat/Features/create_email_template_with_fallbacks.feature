@@ -13,7 +13,7 @@ Feature: Create email template with fallbacks
       | Owner         | John Doe        |
       | Template Name | Test Template   |
       | Type          | Html            |
-      | Entity Name   | Email           |
+      | Entity Name   | User            |
       | Subject       | Default subject |
       | Content       | Default content |
     When I click "Localization 1"

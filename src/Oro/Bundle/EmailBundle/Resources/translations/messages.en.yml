@@ -372,7 +372,9 @@ oro:
             folders.label:            Folders
             origin.label:             Email Origin
             unsynced_flag_count.label: Unsynced Flag Count
-            is_email_private.label:   Determinates if the email public or private
+            is_email_private:
+                label:                Private
+                description:          Determinates if the email public or private
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes
