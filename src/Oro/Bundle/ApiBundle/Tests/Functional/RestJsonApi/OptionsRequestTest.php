@@ -206,14 +206,7 @@ class OptionsRequestTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testTryOptionsMethodForSubresourceRouteWithUnknownAssociation()
@@ -225,13 +218,6 @@ class OptionsRequestTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 }
