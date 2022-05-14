@@ -400,6 +400,7 @@ class UserTest extends AbstractUserTest
     {
         $user = $this->getUser();
         $disabledOrganization = new Organization();
+        $disabledOrganization->setEnabled(false);
         $organization = new Organization();
         $organization->setEnabled(true);
 
