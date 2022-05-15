@@ -41,7 +41,7 @@ class Organization extends ExtendOrganization implements
     NotificationEmailInterface
 {
     /**
-     * @var integer
+     * @var int
      *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
@@ -101,7 +101,7 @@ class Organization extends ExtendOrganization implements
     protected $users;
 
     /**
-     * @var \Datetime $created
+     * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime", nullable=true)
      * @ConfigField(
@@ -115,7 +115,7 @@ class Organization extends ExtendOrganization implements
     protected $createdAt;
 
     /**
-     * @var \Datetime $updated
+     * @var \DateTime
      *
      * @ORM\Column(name="updated_at", type="datetime", nullable=true)
      * @ConfigField(
@@ -129,7 +129,7 @@ class Organization extends ExtendOrganization implements
     protected $updatedAt;
 
     /**
-     * @var boolean
+     * @var bool
      *
      * @ORM\Column(name="enabled", type="boolean", options={"default"="1"})
      * @ConfigField(
@@ -140,7 +140,7 @@ class Organization extends ExtendOrganization implements
      *      }
      * )
      */
-    protected $enabled;
+    protected $enabled = true;
 
     public function __construct()
     {
@@ -153,7 +153,7 @@ class Organization extends ExtendOrganization implements
     /**
      * Get id
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -217,7 +217,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @param \Datetime $createdAt
+     * @param \DateTime $createdAt
      *
      * @return $this
      */
@@ -229,7 +229,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @return \Datetime
+     * @return \DateTime
      */
     public function getCreatedAt()
     {
@@ -237,7 +237,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @param \Datetime $updatedAt
+     * @param \DateTime $updatedAt
      *
      * @return $this
      */
@@ -249,7 +249,7 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @return \Datetime
+     * @return \DateTime
      */
     public function getUpdatedAt()
     {
@@ -328,18 +328,19 @@ class Organization extends ExtendOrganization implements
     }
 
     /**
-     * @param  bool $enabled User state
+     * @param bool $enabled
+     *
      * @return $this
      */
     public function setEnabled($enabled)
     {
-        $this->enabled = (boolean)$enabled;
+        $this->enabled = (bool)$enabled;
 
         return $this;
     }
 
     /**
-     * @return Boolean true if organization is enabled, false otherwise
+     * @return bool
      */
     public function isEnabled()
     {
