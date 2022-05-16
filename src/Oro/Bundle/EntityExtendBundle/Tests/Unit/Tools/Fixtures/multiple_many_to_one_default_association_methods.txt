@@ -1,0 +1,59 @@
+namespace Test;
+
+class Entity
+{
+    /**
+     * Checks if this entity can be associated with the given target entity type
+     *
+     * @param string $targetClass The class name of the target entity
+     * @return bool
+     */
+    public function supportTestTarget($targetClass)
+    {
+        return false;
+    }
+
+    /**
+     * Gets the entities this entity is associated with
+     *
+     * @return object[]
+     */
+    public function getTestTargets()
+    {
+        $targets = [];
+        return $targets;
+    }
+
+    /**
+     * Checks is the given entity is associated with this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return bool
+     */
+    public function hasTestTarget($target)
+    {
+        return false;
+    }
+
+    /**
+     * Associates the given entity with this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function addTestTarget($target)
+    {
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+
+    /**
+     * Removes the association of the given entity and this entity
+     *
+     * @param object $target Any configurable entity that can be associated with this type of entity
+     * @return object This object
+     */
+    public function removeTestTarget($target)
+    {
+        throw new \RuntimeException(sprintf('The association with "%s" entity was not configured.', $className));
+    }
+}

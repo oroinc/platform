@@ -124,71 +124,86 @@ class ManyToManyAbstractAssociationEntityGeneratorExtensionTest extends \PHPUnit
                     'relation' => [],
                     'relationData' => []
                 ],
-                false,
+                true,
             ],
             'no relationData' => [
                 ['relation' => ['test' => 'test']],
-                false,
+                true,
             ],
             'empty' => [
                 [],
-                false,
+                true,
             ],
         ];
     }
 
-    public function testGenerate()
+    /**
+     * @dataProvider getGenerateDataProvider
+     */
+    public function testGenerate(array $schema, string $expectedResultFileName): void
     {
-        $schema = [
-            'relationData' => [
-                [
-                    'field_id' => new FieldConfigId(
-                        'extend',
-                        'Test\Entity',
-                        ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
-                        'manyToMany'
-                    ),
-                    'target_entity' => 'Test\TargetEntity1',
-                    'state' => 'Active',
-                ],
-                [
-                    'field_id' => new FieldConfigId(
-                        'extend',
-                        'Test\Entity',
-                        ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
-                        'manyToMany'
-                    ),
-                    'target_entity' => 'Test\TargetEntity2',
-                    'state' => 'Active',
-                ],
-                [ // should be ignored because field type is not manyToMany
-                    'field_id' => new FieldConfigId(
-                        'extend',
-                        'Test\Entity',
-                        ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
-                        'manyToOne'
-                    ),
-                    'target_entity' => 'Test\TargetEntity3',
-                    'state' => 'Active'
-                ],
-                [ // should be ignored because field name is not match association naming conventions
-                    'field_id' => new FieldConfigId(
-                        'extend',
-                        'Test\Entity',
-                        'testField',
-                        'manyToMany'
-                    ),
-                    'target_entity' => 'Test\TargetEntity4',
-                    'state' => 'Active',
-                ],
-            ],
-        ];
-
         $class = new ClassGenerator('Test\Entity');
 
         $this->extension->generate($schema, $class);
-        $expectedCode = \file_get_contents(__DIR__ . '/../Fixtures/many_to_many_association.txt');
+        $expectedCode = \file_get_contents(__DIR__ . $expectedResultFileName);
 
         self::assertEquals(\trim($expectedCode), \trim($class->print()));
+    }
+
+    public function getGenerateDataProvider(): array
+    {
+        return [
+            'associations' => [
+                'schema' => [
+                    'relationData' => [
+                        [
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Test\Entity',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity1', self::ASSOCIATION_KIND),
+                                'manyToMany'
+                            ),
+                            'target_entity' => 'Test\TargetEntity1',
+                            'state' => 'Active',
+                        ],
+                        [
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Test\Entity',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity2', self::ASSOCIATION_KIND),
+                                'manyToMany'
+                            ),
+                            'target_entity' => 'Test\TargetEntity2',
+                            'state' => 'Active',
+                        ],
+                        [ // should be ignored because field type is not manyToMany
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Test\Entity',
+                                ExtendHelper::buildAssociationName('Test\TargetEntity3', self::ASSOCIATION_KIND),
+                                'manyToOne'
+                            ),
+                            'target_entity' => 'Test\TargetEntity3',
+                            'state' => 'Active'
+                        ],
+                        [ // should be ignored because field name is not match association naming conventions
+                            'field_id' => new FieldConfigId(
+                                'extend',
+                                'Test\Entity',
+                                'testField',
+                                'manyToMany'
+                            ),
+                            'target_entity' => 'Test\TargetEntity4',
+                            'state' => 'Active',
+                        ],
+                    ],
+                ],
+                'expectedResultFileName' => '/../Fixtures/many_to_many_association.txt',
+            ],
+            'only default association methods' => [
+                'schema' => [],
+                'expectedResultFileName' => '/../Fixtures/many_to_many_default_association_methods.txt',
+            ],
+        ];
     }
 }
