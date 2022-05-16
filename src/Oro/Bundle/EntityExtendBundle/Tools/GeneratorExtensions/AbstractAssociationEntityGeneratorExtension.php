@@ -18,7 +18,7 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
     public function supports(array $schema): bool
     {
         if (empty($schema['relation']) || empty($schema['relationData'])) {
-            return false;
+            return $this->isDefaultAssociationMethodsNeeded();
         }
 
         $result = false;
@@ -110,21 +110,21 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $addMethodName = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
         $removeMethodName = AssociationNameGenerator::generateRemoveTargetMethodName($associationKind);
 
-        $supportMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
-        ];
+        $supportMethodBody = [];
         $getMethodBody = [
             '$targets = [];',
         ];
-        $hasMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
-        $addMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
-        ];
-        $removeMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
+        $hasMethodBody = [];
+        $addMethodBody = [];
+        $removeMethodBody = [];
+        if (isset($schema['relationData'])) {
+            $supportMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);';
+            $hasMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+            $addMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+            $removeMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+        } else {
+            $schema['relationData'] = [];
+        }
 
         foreach ($schema['relationData'] as $relationData) {
             if (!$this->isSupportedRelation($relationData)) {
@@ -228,16 +228,19 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $setMethodName = AssociationNameGenerator::generateSetTargetMethodName($associationKind);
         $resetMethodName = AssociationNameGenerator::generateResetTargetsMethodName($associationKind);
 
-        $supportMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
-        ];
+        $supportMethodBody = [];
         $getMethodBody = [];
+        $resetMethodBody = [];
         $setMethodBody = [
             'if (null === $target) { $this->' . $resetMethodName . '(); return $this; }',
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);',
-            '// This entity can be associated with only one another entity',
         ];
-        $resetMethodBody = [];
+        if (isset($schema['relationData'])) {
+            $supportMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);';
+            $setMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+            $setMethodBody[] = '// This entity can be associated with only one another entity';
+        } else {
+            $schema['relationData'] = [];
+        }
 
         foreach ($schema['relationData'] as $relationData) {
             if (!$this->isSupportedRelation($relationData)) {
@@ -316,20 +319,23 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
         $addMethodName = AssociationNameGenerator::generateAddTargetMethodName($associationKind);
         $removeMethodName = AssociationNameGenerator::generateRemoveTargetMethodName($associationKind);
 
-        $supportMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
-        ];
         $getMethodBodyWithTargetClass = [];
         $getMethodBodyWithoutTargetClass = [];
-        $hasMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
-        $addMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
-        $removeMethodBody = [
-            '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);'
-        ];
+        $supportMethodBody = [];
+        $hasMethodBody = [];
+        $addMethodBody = [];
+        $removeMethodBody = [];
+        if (isset($schema['relationData'])) {
+            $getMethodBodyWithTargetClass = [
+                '    $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
+            ];
+            $supportMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);';
+            $hasMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+            $addMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+            $removeMethodBody[] = '$className = \Doctrine\Common\Util\ClassUtils::getClass($target);';
+        } else {
+            $schema['relationData'] = [];
+        }
 
         foreach ($schema['relationData'] as $relationData) {
             if (!$this->isSupportedRelation($relationData)) {
@@ -387,7 +393,6 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             implode("\n", $getMethodBodyWithoutTargetClass),
             '    return $targets;',
             '} else {',
-            '    $className = \Doctrine\Common\Util\ClassUtils::getRealClass($targetClass);',
             implode("\n", $getMethodBodyWithTargetClass),
             '    ' . $throwStmt,
             '}',
@@ -436,5 +441,15 @@ abstract class AbstractAssociationEntityGeneratorExtension extends AbstractEntit
             ->addBody(\implode("\n", $removeMethodBody))
             ->addComment($removeMethodDocblock)
             ->addParameter('target');
+    }
+
+    /**
+     * Is default association methods should be generated
+     *
+     * @return bool
+     */
+    protected function isDefaultAssociationMethodsNeeded(): bool
+    {
+        return true;
     }
 }
