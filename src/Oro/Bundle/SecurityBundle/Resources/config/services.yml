@@ -856,3 +856,12 @@ services:
             - '@oro_ui.html_tag_helper'
         tags:
             - { name: oro_security.fields_sanitizer }
+
+    oro_security.util.same_site_url_helper:
+        class: Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper
+        arguments:
+            - '@request_stack'
+
+    Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper:
+        alias: oro_security.util.same_site_url_helper
+        public: true
