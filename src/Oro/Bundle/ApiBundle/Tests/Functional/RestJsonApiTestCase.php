@@ -194,6 +194,32 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
     }
 
     /**
+     * Asserts response status code equals to 404 (Not Found)
+     * and the response content contains "resource not accessible exception" validation error.
+     */
+    protected function assertResourceNotAccessibleResponse(Response $response): void
+    {
+        $this->assertResponseValidationError(
+            ['title' => 'resource not accessible exception', 'detail' => 'The resource is not accessible.'],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    /**
+     * Asserts response status code equals to 404 (Not Found)
+     * and the response content contains "unsupported subresource" validation error.
+     */
+    protected function assertUnsupportedSubresourceResponse(Response $response): void
+    {
+        $this->assertResponseValidationError(
+            ['title' => 'relationship constraint', 'detail' => 'Unsupported subresource.'],
+            $response,
+            Response::HTTP_NOT_FOUND
+        );
+    }
+
+    /**
      * Asserts that the response content contains the given validation error.
      */
     protected function assertResponseContainsValidationError(

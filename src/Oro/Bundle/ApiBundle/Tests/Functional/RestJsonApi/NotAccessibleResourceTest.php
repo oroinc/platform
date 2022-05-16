@@ -39,14 +39,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             $method,
             $this->getUrl($route, array_merge($routeParameters, ['entity' => $entityType]))
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function notAccessibleResourceActionsProvider(): array
@@ -299,14 +292,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testGetListWhenGetIsDisabled()
@@ -363,14 +349,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledCreate()
@@ -426,14 +405,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledUpdate()
@@ -490,14 +462,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledDelete()
@@ -554,14 +519,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledDeleteList()
@@ -617,14 +575,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledGetSubresource()
@@ -662,14 +613,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDisabledGetSubresourceWhenGetIsDisabled()
@@ -687,14 +631,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledGetSubresourceWhenGetAndGetListAreDisabled()
@@ -712,14 +649,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledGetRelationship()
@@ -775,14 +705,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDisabledGetRelationshipWhenGetIsDisabled()
@@ -800,14 +723,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledGetRelationshipWhenGetAndGetListAreDisabled()
@@ -825,14 +741,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledUpdateRelationship()
@@ -888,14 +797,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDisabledUpdateRelationshipWhenGetIsDisabled()
@@ -913,14 +815,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledUpdateRelationshipWhenGetAndGetListAreDisabled()
@@ -938,14 +833,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledAddRelationship()
@@ -1001,14 +889,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDisabledAddRelationshipWhenGetIsDisabled()
@@ -1026,14 +907,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledAddRelationshipWhenGetAndGetListAreDisabled()
@@ -1051,14 +925,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledDeleteRelationship()
@@ -1114,14 +981,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDisabledDeleteRelationshipWhenGetIsDisabled()
@@ -1139,14 +999,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledDeleteRelationshipWhenGetAndGetListAreDisabled()
@@ -1164,14 +1017,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'resource not accessible exception',
-                'detail' => 'The resource is not accessible.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertResourceNotAccessibleResponse($response);
     }
 
     public function testDisabledAllRelationshipActions()
@@ -1429,14 +1275,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPostSubresourceWithUnaccessibleTarget()
@@ -1448,14 +1287,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPatchSubresourceWithUnaccessibleTarget()
@@ -1467,14 +1299,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDeleteSubresourceWithUnaccessibleTarget()
@@ -1486,14 +1311,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testGetRelationshipWithUnaccessibleTarget()
@@ -1505,14 +1323,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPostRelationshipWithUnaccessibleTarget()
@@ -1524,14 +1335,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testPatchRelationshipWithUnaccessibleTarget()
@@ -1543,14 +1347,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testDeleteRelationshipWithUnaccessibleTarget()
@@ -1562,14 +1359,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testOptionsRelationshipWithUnaccessibleTarget()
@@ -1581,14 +1371,7 @@ class NotAccessibleResourceTest extends RestJsonApiTestCase
             [],
             false
         );
-        $this->assertResponseValidationError(
-            [
-                'title'  => 'relationship constraint',
-                'detail' => 'Unsupported subresource.'
-            ],
-            $response,
-            Response::HTTP_NOT_FOUND
-        );
+        $this->assertUnsupportedSubresourceResponse($response);
     }
 
     public function testHeadRelationshipWithUnaccessibleTarget()

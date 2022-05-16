@@ -9,14 +9,10 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
-use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
-use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\HttpFoundation\File\File as ComponentFile;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
@@ -96,38 +92,6 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(1);
 
         return $emailAttachment;
-    }
-
-    public function testLinkEmailAttachmentToTargetEntity()
-    {
-        $emailAttachment = new EmailAttachment();
-        ReflectionUtil::setId($emailAttachment, 1);
-        $emailAttachment->setContent($this->getContentMock());
-        $emailAttachment->setFileName('filename.file');
-
-        $file = new ComponentFile(__DIR__ . '/../Fixtures/attachment/test.txt');
-
-        $this->fileManager->expects($this->once())
-            ->method('writeToTemporaryFile')
-            ->with(
-                ContentDecoder::decode(
-                    $emailAttachment->getContent()->getContent(),
-                    $emailAttachment->getContent()->getContentTransferEncoding()
-                )
-            )
-            ->willReturn($file);
-        $this->configFileValidator->expects($this->once())
-            ->method('validate')
-            ->willReturn($this->createMock(ConstraintViolationList::class));
-
-        $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
-
-        $expectedFile = new UploadedFile(
-            $file->getPathname(),
-            $emailAttachment->getFileName(),
-            $emailAttachment->getContentType()
-        );
-        $this->assertEquals($expectedFile, $emailAttachment->getFile()->getFile());
     }
 
     public function testLinkEmailAttachmentToTargetEntityNotValid()

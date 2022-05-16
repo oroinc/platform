@@ -48,6 +48,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $user = new User();
         $disabledOrganization = new Organization();
+        $disabledOrganization->setEnabled(false);
         $organization = new Organization();
         $organization->setId(1);
         $organization->setName('org1');

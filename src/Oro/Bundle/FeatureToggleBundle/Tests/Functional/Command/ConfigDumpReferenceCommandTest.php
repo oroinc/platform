@@ -14,7 +14,7 @@ class ConfigDumpReferenceCommandTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testApiDocCacheClear(): void
+    public function testExecute(): void
     {
         $commandTester = $this->doExecuteCommand('oro:feature-toggle:config:dump-reference');
         $this->assertSuccessReturnCode($commandTester);

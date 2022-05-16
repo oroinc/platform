@@ -1,54 +1,46 @@
 <?php
+
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class OrganizationTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
     use EntityTestCaseTrait;
 
-    /** @var Organization */
-    private $organization;
-
-    protected function setUp(): void
+    public function testProperties(): void
     {
-        $this->organization = new Organization();
-    }
-
-    public function testProperties()
-    {
-        $now = new \DateTime('now');
-        $properties = [
+        self::assertPropertyAccessors(new Organization(), [
             ['id', 123],
             ['name', 'test'],
             ['description', 'test'],
             ['enabled', true],
-            ['createdAt', $now],
-            ['updatedAt', $now],
-        ];
-
-        $this->assertPropertyAccessors(new Organization(), $properties);
+            ['createdAt', new \DateTime('now')],
+            ['updatedAt', new \DateTime('now')],
+        ]);
     }
 
-    public function testCollections()
+    public function testCollections(): void
     {
-        $collections = [
+        self::assertPropertyCollections(new Organization(), [
             ['businessUnits', new BusinessUnit()],
             ['users', new User()]
-        ];
-
-        $this->assertPropertyCollections(new Organization(), $collections);
+        ]);
     }
 
-    public function testSerialization()
+    public function testShouldBeEnabledByDefault(): void
     {
-        /** @var Organization $organization */
-        $organization = $this->getEntity(Organization::class, ['id' => 123]);
+        $organization = new Organization();
+        self::assertTrue($organization->isEnabled());
+    }
+
+    public function testSerialization(): void
+    {
+        $organization = new Organization();
+        $organization->setId(123);
         $organization->setName('name');
         $organization->setEnabled(true);
 
@@ -60,7 +52,7 @@ class OrganizationTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($unserializedOrganization->isEnabled());
     }
 
-    public function testPreUpdate()
+    public function testPreUpdate(): void
     {
         $organization = new Organization();
 
@@ -77,7 +69,7 @@ class OrganizationTest extends \PHPUnit\Framework\TestCase
         self::assertNull($organization->getCreatedAt());
     }
 
-    public function testPrePersist()
+    public function testPrePersist(): void
     {
         $organization = new Organization();
 
@@ -98,7 +90,7 @@ class OrganizationTest extends \PHPUnit\Framework\TestCase
         self::assertLessThanOrEqual($now, $updatedAt);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $organization = new Organization();
         $organization->setName('TestOrganization');
