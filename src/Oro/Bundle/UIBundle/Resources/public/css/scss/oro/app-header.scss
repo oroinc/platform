@@ -245,7 +245,9 @@
                     width: $header-shortcut-dropdown-width;
 
                     .typeahead {
-                        width: 100%;
+                        width: auto;
+                        min-width: 100%;
+                        max-width: 500px;
                         padding: $header-shortcut-typeahead-padding;
                         border-top-left-radius: 0;
                         border-top-right-radius: 0;
