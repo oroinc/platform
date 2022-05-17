@@ -65,6 +65,7 @@
             &:hover,
             &:focus {
                 color: $menu-full-screen-button-color;
+                outline: none;
             }
         }
     }
@@ -112,6 +113,7 @@
         &:hover,
         &:focus {
             color: $menu-minimized-item-first-level-text-color-active;
+            outline: none;
         }
     }
 
@@ -267,6 +269,10 @@
             .title {
                 background-color: transparent;
             }
+        }
+
+        .highlight {
+            text-decoration: initial;
         }
     }
 

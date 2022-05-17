@@ -254,12 +254,13 @@ define(function(require) {
          * @param {String} value
          */
         search: function(value) {
+            value = value.trim();
+
             const regex = tools.safeRegExp(value, 'ig');
             const testValue = string => regex.test(string);
 
             this.searchContent.hide();
-
-            $.each(this.searchContent, (i, el) => {
+            this.searchContent.each((i, el) => {
                 const $el = $(el);
 
                 if (testValue($el.text().trim())) {
@@ -272,6 +273,7 @@ define(function(require) {
                     this.updateSearchContent($el, highlightContent);
                     $el.show();
 
+                    // Show all headings for a group which include current element
                     let groups = $el.data('related-groups');
                     if (groups) {
                         groups = groups.split(';');
@@ -280,6 +282,22 @@ define(function(require) {
                             $el.prevAll('[data-index="' + group + '"]').show();
                         });
                     }
+                }
+            });
+            // Visible items with heading
+            this.searchContent.filter((i, el) => {
+                return $(el).is(':visible') && $(el).find('.unclickable').length > 0;
+            }).each((i, el) => {
+                const $groupEls = $(el).nextAll(`[data-related-groups*="${$(el).data('index')};"]`);
+                const $allHidden = $groupEls.filter((i, el) => $(el).is(':hidden'));
+
+                // Show all related elements for group if all of them are hidden
+                if ($groupEls.length === $allHidden.length) {
+                    $groupEls.each((i, groupEl) => {
+                        // Eliminate outdated highlight
+                        this.updateSearchContent($(groupEl));
+                        $(groupEl).show();
+                    });
                 }
             });
         },
