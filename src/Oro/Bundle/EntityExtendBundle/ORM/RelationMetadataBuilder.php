@@ -25,6 +25,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
+
     private Inflector $inflector;
 
     public function __construct(
@@ -122,9 +123,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         }
         $this->setCascadeOptions($builder, $cascade);
         $this->setFetchOption($builder, $this->getFetchOption($relation));
-        if (isset($relation['orphanRemoval']) && $relation['orphanRemoval']) {
-            $builder->orphanRemoval();
-        }
+        $this->setOrphanRemoval($builder, $relation);
 
         $builder->build();
 
@@ -199,6 +198,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $builder->addInverseJoinColumn($targetJoinTableColumnName, $targetIdColumn, false, false, 'CASCADE');
         $this->setCascadeOptions($builder, $this->getCascadeOption($relation));
         $this->setFetchOption($builder, $this->getFetchOption($relation));
+        $this->setOrphanRemoval($builder, $relation);
         $builder->build();
     }
 
@@ -344,12 +344,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
             return true;
         }
 
-        $nullable = $relation['nullable'];
-        if (null === $nullable) {
-            $nullable = true;
-        }
-
-        return $nullable;
+        return (bool) ($relation['nullable'] ?? true);
     }
 
     /**
@@ -397,6 +392,13 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
 
         if (method_exists($builder, $method)) {
             $builder->$method();
+        }
+    }
+
+    private function setOrphanRemoval(AssociationBuilder $builder, array $relation): void
+    {
+        if (isset($relation['orphanRemoval']) && $relation['orphanRemoval']) {
+            $builder->orphanRemoval();
         }
     }
 }
