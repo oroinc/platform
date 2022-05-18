@@ -53,6 +53,13 @@ The current file describes significant changes in the code that may affect the u
   `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormTypeProvider` and the form options from
   `Oro\Bundle\EntityExtendBundle\Provider\ExtendFieldFormOptionsProvider` now.
 
+#### LocaleBundle
+* Added `oro:localization:localized-fallback-values:cleanup-unused` command that finds and deletes orphaned 
+  `Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue` entities that could appear due to disabled `orphanRemoval` option.
+* Added `cloneLocalizedFallbackValueAssociations()` method that is generated automatically and should be used in 
+  `__clone()` for entities with localized fallback value relations to ensure correct cloning of localized fallback value
+  collections.
+
 ## 5.0.0 (2022-01-26)
 [Show detailed list of changes](incompatibilities-5-0.md)
 
