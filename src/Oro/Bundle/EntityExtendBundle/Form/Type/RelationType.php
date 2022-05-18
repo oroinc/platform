@@ -18,12 +18,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * A form type for relations entity configuration
+ */
 class RelationType extends AbstractType
 {
-    const ALLOWED_BIDIRECTIONAL_RELATIONS = [
-        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_ONE,
-        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::MANY_TO_MANY,
-        \Oro\Bundle\EntityExtendBundle\Extend\RelationType::ONE_TO_MANY,
+    public const ALLOWED_BIDIRECTIONAL_RELATIONS = [
+        RelationTypeBase::MANY_TO_ONE,
+        RelationTypeBase::MANY_TO_MANY,
+        RelationTypeBase::ONE_TO_MANY,
     ];
 
     /** @var ConfigManager */
@@ -37,7 +40,7 @@ class RelationType extends AbstractType
 
     public function __construct(ConfigManager $configManager)
     {
-        $this->configManager   = $configManager;
+        $this->configManager = $configManager;
     }
 
     /**
