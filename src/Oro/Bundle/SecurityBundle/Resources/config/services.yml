@@ -759,6 +759,7 @@ services:
         class: Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener
         arguments:
             - '@oro_security.csrf_request_manager'
+            - '@oro_security.csrf_token_manager'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }

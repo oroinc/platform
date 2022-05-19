@@ -12,8 +12,8 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * Gives an additional chance to authorise user from the session context if
  * the current request is AJAX request (has valid "X-CSRF-Header" header)
  * and it has session identifier in cookies.
- * It is required because API can work in two modes, stateless and statefull.
- * The statefull mode is used when API is called internally from web pages as AJAX request.
+ * It is required because API can work in two modes, stateless and stateful.
+ * The stateful mode is used when API is called internally from web pages as AJAX request.
  */
 class ContextListener
 {
