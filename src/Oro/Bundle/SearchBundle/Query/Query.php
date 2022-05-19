@@ -264,7 +264,7 @@ class Query
             preg_replace(
                 '/[\s]{2,}/',
                 self::DELIMITER,
-                preg_replace('/[^\p{L}\d\s]/u', self::DELIMITER, $inputString)
+                preg_replace('/[^\p{L}\d\s]/u', self::DELIMITER, (string)$inputString)
             )
         );
     }
