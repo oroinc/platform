@@ -107,10 +107,17 @@ define(function(require) {
                 });
 
                 if (!valueExistsAlready) {
-                    this.select2.onSelect({
-                        id: this._generateId(val),
-                        text: val
-                    });
+                    const $highlighted = this.select2.results.find('.select2-highlighted');
+                    let data = $highlighted.closest('.select2-result').data('select2-data');
+
+                    if (data === void 0) {
+                        data = {
+                            id: this._generateId(val),
+                            text: val
+                        };
+                    }
+
+                    this.select2.onSelect(data);
                 } else {
                     return false;
                 }
