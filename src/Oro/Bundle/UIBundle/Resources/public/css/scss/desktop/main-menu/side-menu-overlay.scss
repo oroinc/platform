@@ -13,9 +13,9 @@
     left: 100%;
     z-index: -1;
 
-    width: 100vw;
+    width: calc(100vw - #{$menu-side-width-minimized});
     height: 100vh;
-    max-width: 100vw;
+    max-width: calc(100vw - #{$menu-side-width-minimized});
     min-width: $width-body-page;
 
     font-size: $menu-font-size;
@@ -89,7 +89,7 @@
     }
 
     &__content {
-        max-width: calc(100vw - #{$side-menu-overlay-header-height});
+        max-width: calc(100vw - #{$menu-side-width-minimized});
         height: calc(100vh - #{$side-menu-overlay-header-height});
         max-height: calc(100vh - #{$side-menu-overlay-header-height});
         padding-bottom: 16px;
@@ -165,7 +165,7 @@
         max-height: inherit;
         max-width: inherit;
         min-height: 340px;
-        height: inherit;
+        height: 100%;
         margin: 0;
         padding: 0;
         list-style: none;
@@ -283,5 +283,13 @@
 
     .divider {
         display: none;
+    }
+}
+
+/* Avoid Chrome to see Safari hack */
+@supports (-webkit-touch-callout: none) {
+    .side-menu-overlay__content {
+        /* The hack for Safari */
+        padding-bottom: 32px;
     }
 }
