@@ -146,8 +146,8 @@ define(function(require) {
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
             this.$frontDateField.attr('data-fake-front-field', '');
-            this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
-            this.$frontDateField.on('keypress keyup change focus blur', _.bind(this.checkEmpty, this));
+            this.$frontDateField.on('keyup change', this.updateOrigin.bind(this));
+            this.$frontDateField.on('keypress keyup change focus blur', this.checkEmpty.bind(this));
             this.syncPickerState();
             this.checkEmpty();
             this.$el.after(this.$frontDateField);
@@ -162,7 +162,7 @@ define(function(require) {
         initPickerWidget: function(options) {
             const widgetOptions = options.datePickerOptions;
             _.extend(widgetOptions, {
-                onSelect: _.bind(this.onSelect, this)
+                onSelect: this.onSelect.bind(this)
             });
             this.$frontDateField.datepicker(widgetOptions);
             // fix incorrect behaviour with early datepicker dispose

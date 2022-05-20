@@ -5,7 +5,7 @@ define(function(require, exports, module) {
     const moment = require('moment');
     const __ = require('orotranslation/js/translator');
     const datetimeFormatter = require('orolocale/js/formatter/datetime');
-    const DateTimePickerView = require('orofilter/js/app/views/datepicker/filter-datapicker-view').default;
+    const FilterDateTimePickerView = require('orofilter/js/app/views/datepicker/filter-datetimepicker-view').default;
     const VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     const DateFilter = require('oro/filter/date-filter');
     const tools = require('oroui/js/tools');
@@ -68,7 +68,7 @@ define(function(require, exports, module) {
 
         _getPickerConstructor: function() {
             return tools.isMobile() || !this.dateWidgetOptions.showDatevariables
-                ? DateTimePickerView : VariableDateTimePickerView;
+                ? FilterDateTimePickerView : VariableDateTimePickerView;
         },
 
         _renderCriteria: function() {
@@ -158,7 +158,8 @@ define(function(require, exports, module) {
                 timeInputAttrs: {
                     'aria-label': ariaLabel,
                     ...config.timeInputAttrs
-                }
+                },
+                timePickerOptions: {...this.timePickerOptions || {}}
             });
 
             return optionsToMerge;
