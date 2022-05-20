@@ -83,8 +83,7 @@
                     <div class="app-header__inner">
                         <div class="app-header__container">
                             {% placeholder header_logo %}
-                            <ul class="user-menu"
-                                {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
+                            <ul class="user-menu">
                                 {{ block('user_menu') }}
                             </ul>
                             <div class="app-header__search-and-shortcuts">

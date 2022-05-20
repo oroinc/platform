@@ -28,6 +28,14 @@ Feature: User menu
     Then I should see "The email was sent" flash message
     And number of records should be 1
 
+  Scenario: User menu update
+    When I go to System/User Management/Users
+    And click edit "John" in grid
+    And fill form with:
+      | Name Prefix | Mr.              |
+    And click "Save and Close"
+    Then I should see "Mr. John Doe" in the "UserMenu" element
+
   Scenario: Logout
     Given I click Logout in user menu
     And I should be on Login page
