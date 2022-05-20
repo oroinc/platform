@@ -1,6 +1,6 @@
 entity_config:
     multicurrency:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#multicurrency
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#multicurrency
         field:
             items:
                 target:

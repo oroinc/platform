@@ -44,6 +44,11 @@ class EnumFieldConfiguration implements FieldConfigInterface
                 'to a table that is used to store enum values.')
                 ->prototype('variable')->end()
             ->end()
+            ->node('immutable', 'normalized_boolean')
+                ->info('`boolean` this attribute can be used to prohibit changing the enum state (no matter ' .
+                    'whether it is enabled or not) for the entity. If TRUE than the current state cannot be changed.')
+                ->defaultFalse()
+            ->end()
         ;
     }
 }

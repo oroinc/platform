@@ -1,13 +1,13 @@
 entity_config:
     merge:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#merge
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#merge
         entity:
             items:
                 cast_method: ~
                 template: ~
                 enable: ~
                 max_entities_count: 5
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#merge
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#merge
         field:
             items:
                 label: ~

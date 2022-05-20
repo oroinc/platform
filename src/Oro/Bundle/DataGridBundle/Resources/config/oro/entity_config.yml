@@ -1,6 +1,6 @@
 entity_config:
     grid:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#grid
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#grid
         entity:
             items:
                 default:
@@ -8,7 +8,7 @@ entity_config:
                         auditable:          false
 
     entity:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#entity
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#entity
         entity:
             items:
                 grid_all_view_label:

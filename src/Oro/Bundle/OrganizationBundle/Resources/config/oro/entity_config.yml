@@ -1,6 +1,6 @@
 entity_config:
     ownership:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#ownership
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#ownership
         entity:
             items:
                 owner_type:
