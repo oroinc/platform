@@ -41,10 +41,16 @@ class ImportexportFieldConfiguration implements FieldConfigInterface
                 ->defaultFalse()
             ->end()
             ->node('immutable', 'normalized_boolean')
+                ->info('`boolean` is used to prohibit changing the import/export association state (regardless ' .
+                    'of whether it is enabled or not) for the entity. ' .
+                    'If TRUE, than the current state cannot be changed.')
+                ->defaultFalse()
             ->end()
-            ->scalarNode('fallback_field')->end()
+            ->scalarNode('fallback_field')
+                ->info('`string` attribute name of related localized fallback entities.')
+            ->end()
             ->arrayNode('short')
-                ->prototype('variable')->end()
+                ->info('`boolean` related entities with this option will be exported if they contain identity fields.')
             ->end()
         ;
     }

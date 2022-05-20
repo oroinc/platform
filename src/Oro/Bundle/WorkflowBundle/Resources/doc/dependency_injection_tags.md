@@ -30,7 +30,7 @@ oro_workflow.listener.event_trigger_collector.extension
 -------------------------------------------------------
 Service that listens for the Trigger events. Must implement [EventTriggerExtensionInterface](../../EventListener/Extension/EventTriggerExtensionInterface.php).
 
-See [Transition Triggers Configuration](https://doc.oroinc.com/backend/entities-data-management/workflows/configuration-reference.html#transition-triggers-configuration) and [Processes](https://doc.oroinc.com/backend/entities-data-management/processes/) documentation for more details.
+See [Transition Triggers Configuration](https://doc.oroinc.com/backend/entities-data-management/workflows/configuration-reference/#transition-triggers-configuration) and [Processes](https://doc.oroinc.com/backend/entities-data-management/processes/) documentation for more details.
 
 
 oro_workflow.processor

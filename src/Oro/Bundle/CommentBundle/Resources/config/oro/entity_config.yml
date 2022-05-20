@@ -1,6 +1,6 @@
 entity_config:
     comment:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#comment
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config#comment
         entity:
             items:
                 enabled:

@@ -1,6 +1,6 @@
 entity_config:
     security:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#security
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#security
         entity:
             items:
                 type:
@@ -38,7 +38,7 @@ entity_config:
                             required:       false
                             label:          oro.security.field_acl.show_restricted_fields.label
                             tooltip:        oro.security.field_acl.show_restricted_fields.tooltip
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#security
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#security
         field:
             items:
                 permissions: ~
