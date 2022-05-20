@@ -51,6 +51,12 @@ class AttributeFieldConfiguration implements FieldConfigInterface
             ->scalarNode('field_name')
                 ->info('`string` defines an attribute field name.')
             ->end()
+            ->node('immutable', 'normalized_boolean')
+                ->info('`boolean` is used to prohibit changing the attribute association state (regardless ' .
+                    'of whether it is enabled or not) for the entity. ' .
+                    'If TRUE, than the current state cannot be changed.')
+                ->defaultFalse()
+            ->end()
         ;
     }
 }

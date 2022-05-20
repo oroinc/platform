@@ -23,6 +23,14 @@ services:
         tags:
             - { name: oro_ui.content_provider, alias: mainMenu, enabled: false }
 
+    oro_navigation.content_provider.menu.usermenu:
+        class: Oro\Bundle\NavigationBundle\ContentProvider\MenuContentProvider
+        arguments:
+            - '@oro_menu.twig.extension'
+            - 'usermenu'
+        tags:
+            - { name: oro_ui.content_provider, alias: usermenu }
+
     oro_navigation.content_provider.title:
         class: Oro\Bundle\NavigationBundle\ContentProvider\TitleContentProvider
         arguments:

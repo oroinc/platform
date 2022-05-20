@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     const tools = require('oroui/js/tools');
     const __ = require('orotranslation/js/translator');
     const ChoiceFilter = require('oro/filter/choice-filter');
-    const DatePickerView = require('orofilter/js/app/views/datepicker/filter-datapicker-view').default;
+    const FilterDatePickerView = require('orofilter/js/app/views/datepicker/filter-datepicker-view').default;
     const VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     const DateVariableHelper = require('orofilter/js/date-variable-helper');
     const DateValueHelper = require('orofilter/js/date-value-helper');
@@ -270,7 +270,7 @@ define(function(require, exports, module) {
         },
 
         _getPickerConstructor: function() {
-            return this.isSimplePickerView() ? DatePickerView : VariableDatePickerView;
+            return this.isSimplePickerView() ? FilterDatePickerView : VariableDatePickerView;
         },
 
         /**

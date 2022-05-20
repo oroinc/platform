@@ -45,6 +45,12 @@ class AttachmentFieldConfiguration implements FieldConfigInterface
                 ->prototype('variable')->end()
                 ->defaultValue(['default'])
             ->end()
+            ->node('immutable', 'normalized_boolean')
+                ->info('`boolean` is used to prohibit changing the attachment association state (regardless ' .
+                    'of whether it is enabled or not) for the entity. '.
+                    'If TRUE, than the current state cannot be changed.')
+                ->defaultFalse()
+            ->end()
         ;
     }
 }

@@ -85,6 +85,11 @@ class MergeFieldConfiguration implements FieldConfigInterface
                 '‘html’ (or true), ‘html_attr’, ‘css’, ‘js’, ‘url’.')
                 ->defaultTrue()
             ->end()
+            ->node('immutable', 'normalized_boolean')
+                ->info('`boolean` this attribute can be used to prohibit changing the merge state (no matter ' .
+                    'whether it is enabled or not) for the entity. If TRUE than the current state cannot be changed.')
+                ->defaultFalse()
+            ->end()
         ;
     }
 }

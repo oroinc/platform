@@ -30,6 +30,7 @@ class DataauditFieldConfiguration implements FieldConfigInterface
                 ->info('`boolean`  this attribute can be used to prohibit changing the auditable state (regardless ' .
                 'of whether it is enabled or not) for the entity field. If TRUE, than the current state cannot ' .
                 'be changed.')
+                ->defaultFalse()
             ->end()
         ;
     }

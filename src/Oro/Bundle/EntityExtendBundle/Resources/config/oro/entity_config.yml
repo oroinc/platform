@@ -1,6 +1,6 @@
 entity_config:
     extend:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#extend
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#extend
         entity:
             jsmodules:                     ['oroentityextend/js/init-entity-extend-relation']
             grid_action:
@@ -111,7 +111,7 @@ entity_config:
                 pending_changes:
                     options:
                         auditable:          false
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#extend
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#extend
         field:
             grid_action:
                 -
@@ -350,7 +350,7 @@ entity_config:
                         auditable:          false
 
     enum:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#enum
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#enum
         entity:
             items:
                 code:
@@ -371,7 +371,7 @@ entity_config:
                 immutable_codes:
                     options:
                         auditable: false
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#enum
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#enum
         field:
             items:
                 enum_code:
@@ -431,7 +431,7 @@ entity_config:
                             tooltip:        oro.entity_extend.enum_options.tooltip
 
     search:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#search
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#search
         entity:
             items:
                 searchable:
@@ -451,7 +451,7 @@ entity_config:
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.entity.items.searchable.tooltip
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#search
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#search
         field:
             items:
                 searchable:

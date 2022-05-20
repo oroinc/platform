@@ -43,14 +43,14 @@ entity_config:
                     options:
                         auditable: false
     attribute:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#attribute
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#attribute
         entity:
             items:
                 has_attributes:
                     options:
                         require_schema_update: false
                         value_type: boolean
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#attribute
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#attribute
         field:
             form:
                 block_config:
@@ -76,7 +76,7 @@ entity_config:
                     options:
                         value_type: boolean
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No: false
@@ -88,7 +88,7 @@ entity_config:
                     options:
                         value_type: boolean
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No: false
@@ -100,7 +100,7 @@ entity_config:
                     options:
                         value_type: string
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 oro.entity_config.field_config.filter_by.exact_value.label: exact_value
@@ -113,7 +113,7 @@ entity_config:
                     options:
                         value_type: boolean
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No: false
