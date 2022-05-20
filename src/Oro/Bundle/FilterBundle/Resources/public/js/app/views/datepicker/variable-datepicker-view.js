@@ -6,7 +6,7 @@ define(function(require) {
     const TabsView = require('oroui/js/app/views/tabs-view');
     const DateVariableHelper = require('orofilter/js/date-variable-helper');
     const DateValueHelper = require('orofilter/js/date-value-helper');
-    const DatePickerView = require('orofilter/js/app/views/datepicker/filter-datapicker-view').default;
+    const FilterDatePickerView = require('orofilter/js/app/views/datepicker/filter-datepicker-view').default;
     const moment = require('moment');
     const localeSettings = require('orolocale/js/locale-settings');
     const manageFocus = require('oroui/js/tools/manage-focus').default;
@@ -30,7 +30,7 @@ define(function(require) {
         return foundKey;
     }
 
-    const VariableDatePickerView = DatePickerView.extend({
+    const VariableDatePickerView = FilterDatePickerView.extend({
         defaultTabs: [],
 
         partsDateValidation: {
