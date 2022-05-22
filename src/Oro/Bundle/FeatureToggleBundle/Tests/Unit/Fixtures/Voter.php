@@ -6,17 +6,10 @@ use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
 
 class Voter implements VoterInterface
 {
-    /** @var array */
-    protected $strategyByFeature;
+    private array $strategyByFeature;
+    private string $defaultStrategy;
 
-    /** @var string */
-    protected $defaultStrategy;
-
-    /**
-     * @param array $strategyByFeature
-     * @param int   $defaultStrategy
-     */
-    public function __construct(array $strategyByFeature, $defaultStrategy = VoterInterface::FEATURE_ABSTAIN)
+    public function __construct(array $strategyByFeature, int $defaultStrategy = VoterInterface::FEATURE_ABSTAIN)
     {
         $this->strategyByFeature = $strategyByFeature;
         $this->defaultStrategy   = $defaultStrategy;
@@ -27,7 +20,7 @@ class Voter implements VoterInterface
      */
     public function vote($feature, $scopeIdentifier = null)
     {
-        return array_key_exists($feature, $this->strategyByFeature)
+        return \array_key_exists($feature, $this->strategyByFeature)
             ? $this->strategyByFeature[$feature]
             : $this->defaultStrategy;
     }

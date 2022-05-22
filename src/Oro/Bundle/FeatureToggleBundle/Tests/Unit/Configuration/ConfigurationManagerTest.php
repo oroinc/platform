@@ -7,19 +7,16 @@ use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 
 class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configurationProvider;
+    /** @var ConfigurationProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationProvider;
 
-    /**
-     * @var ConfigurationManager
-     */
-    protected $configurationManager;
+    /** @var ConfigurationManager */
+    private $configurationManager;
 
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProvider::class);
+
         $this->configurationManager = new ConfigurationManager($this->configurationProvider);
     }
 
@@ -120,7 +117,7 @@ class ConfigurationManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getResourcesByTypeProvider
      */
-    public function testGetResourcesByType($resourceType, array $configuration, array $expectedResources)
+    public function testGetResourcesByType(string $resourceType, array $configuration, array $expectedResources)
     {
         $this->configurationProvider->expects($this->once())
             ->method('getResourcesConfiguration')

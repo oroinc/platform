@@ -707,6 +707,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function fieldShouldBeEnabled(string $fieldName): void
     {
         $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertFalse($field->hasAttribute('disabled'), sprintf('Field "%s" is disabled', $fieldName));
     }
@@ -717,6 +720,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function fieldShouldBeDisabled(string $fieldName): void
     {
         $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
     }

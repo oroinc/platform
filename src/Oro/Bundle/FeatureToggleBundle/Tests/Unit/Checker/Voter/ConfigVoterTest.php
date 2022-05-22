@@ -9,20 +9,14 @@ use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureConfigManager;
+    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureConfigManager;
 
-    /**
-     * @var ConfigVoter
-     */
-    protected $configVoter;
+    /** @var ConfigVoter */
+    private $configVoter;
 
     protected function setUp(): void
     {
@@ -34,10 +28,8 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider voteDataProvider
-     * @param bool $enabled
-     * @param int $expectedVote
      */
-    public function testVote($enabled, $expectedVote)
+    public function testVote(bool $enabled, int $expectedVote)
     {
         $feature = 'test';
         $scopeIdentifier = new \stdClass();
@@ -45,7 +37,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->featureConfigManager->expects($this->once())
             ->method('get')
-            ->with($feature, ConfigVoter::TOGGLE_KEY)
+            ->with($feature, 'toggle')
             ->willReturn($toggle);
 
         $this->configManager->expects($this->once())
@@ -72,7 +64,7 @@ class ConfigVoterTest extends \PHPUnit\Framework\TestCase
 
         $this->featureConfigManager->expects($this->once())
             ->method('get')
-            ->with($feature, ConfigVoter::TOGGLE_KEY)
+            ->with($feature, 'toggle')
             ->willReturn($toggle);
 
         $this->configManager->expects($this->never())

@@ -7,14 +7,10 @@ use Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension;
 
 class FeatureAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $featureChecker;
 
-    /**
-     * @var FeatureAwareMenuFactoryExtension
-     */
+    /** @var FeatureAwareMenuFactoryExtension */
     private $extension;
 
     protected function setUp(): void

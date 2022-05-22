@@ -406,7 +406,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         $featureChecker = $this->createMock(FeatureChecker::class);
         $featureChecker->expects($this->any())
             ->method('isResourceEnabled')
-            ->willReturnSelf();
+            ->willReturn(true);
 
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
         $provider->setFeatureChecker($featureChecker);
