@@ -4,13 +4,14 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
-use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle3\TestBundle3;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle4\TestBundle4;
+use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle5\TestBundle5;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Testing\TempDirExtension;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
@@ -44,7 +45,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             ],
             'feature3' => [
                 'label'         => 'Feature 3',
-                'toggle'        => 'toggle3',
                 'dependencies'  => ['feature1'],
                 'routes'        => [],
                 'configuration' => [],
@@ -76,6 +76,10 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'feature1' => ['feature3'],
                 'feature2' => ['feature1', 'feature3'],
                 'feature3' => []
+            ],
+            'toggles'            => [
+                'changed_toggle' => 'feature1',
+                'toggle2'        => 'feature2'
             ]
         ]
     ];
@@ -149,8 +153,8 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDependenciesConfigurationCircularReferenceTwoLevel()
     {
-        $this->expectException(CircularReferenceException::class);
-        $this->expectExceptionMessage('Feature "feature1" has circular reference on itself');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The feature "feature1" has circular reference on itself.');
 
         $configurationProvider = $this->getConfigurationProvider([TestBundle4::class]);
         $configurationProvider->getDependenciesConfiguration();
@@ -158,10 +162,32 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDependenciesConfigurationCircularReferenceOneLevel()
     {
-        $this->expectException(CircularReferenceException::class);
-        $this->expectExceptionMessage('Feature "feature1" has circular reference on itself');
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The feature "feature1" has circular reference on itself.');
 
         $configurationProvider = $this->getConfigurationProvider([TestBundle3::class]);
         $configurationProvider->getDependenciesConfiguration();
+    }
+
+    public function testGetFeatureByToggle()
+    {
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle2::class]);
+
+        self::assertEquals(
+            self::CONFIGURATION['__internal__']['toggles'],
+            $configurationProvider->getTogglesConfiguration()
+        );
+    }
+
+    public function testGetFeatureByToggleWhenSameToggleUsedForSeveralFeatures()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage(
+            'A toggle can be used for one feature only, but the toggle "toggle1" is used for two features,'
+            . ' "feature1" and "feature2".'
+        );
+
+        $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle5::class]);
+        $configurationProvider->getTogglesConfiguration();
     }
 }

@@ -71,28 +71,17 @@ class CronCommandTest extends WebTestCase
         $this->assertCount(0, $messages);
     }
 
-    public function testDisabledAllJobs()
-    {
-        $this->mockCronHelper(true);
-        $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')
-            ->setResourceEnabled(false);
-
-        $result = $this->runCommand('oro:cron', ['-vvv' => true]);
-        $this->assertNotEmpty($result);
-
-        self::assertStringContainsString('The feature that enables this command is turned off', $result);
-    }
-
-    /**
-     * @param bool $isDue
-     */
-    private function mockCronHelper($isDue = false)
+    private function mockCronHelper(bool $isDue): void
     {
         $cronExpression = $this->createMock(CronExpression::class);
-        $cronExpression->expects($this->any())->method('isDue')->willReturn($isDue);
+        $cronExpression->expects(self::any())
+            ->method('isDue')
+            ->willReturn($isDue);
 
         $mockCronHelper = $this->createMock(CronHelper::class);
-        $mockCronHelper->expects($this->any())->method('createCron')->willReturn($cronExpression);
+        $mockCronHelper->expects(self::any())
+            ->method('createCron')
+            ->willReturn($cronExpression);
 
         $this->getContainer()->set('oro_cron.helper.cron', $mockCronHelper);
     }

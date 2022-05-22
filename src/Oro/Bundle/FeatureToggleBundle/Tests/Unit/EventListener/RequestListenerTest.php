@@ -91,4 +91,26 @@ class RequestListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener->onRequest($event);
     }
+
+    public function testNoRoute(): void
+    {
+        $this->featureChecker->expects(self::never())
+            ->method('isResourceEnabled');
+
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
+            ->method('get')
+            ->with('_route')
+            ->willReturn(null);
+        $event = $this->createMock(RequestEvent::class);
+        $event->expects(self::once())
+            ->method('getRequest')
+            ->willReturn($request);
+        $event->expects(self::never())
+            ->method('isMasterRequest');
+        $event->expects(self::never())
+            ->method('setResponse');
+
+        $this->listener->onRequest($event);
+    }
 }

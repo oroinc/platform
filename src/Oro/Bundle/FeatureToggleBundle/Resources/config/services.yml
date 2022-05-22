@@ -46,7 +46,10 @@ services:
         public: true
         arguments:
             - '@oro_featuretoggle.configuration.manager'
-            - []
+            - !abstract '$voters defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleVotersPass'
+            - !abstract '$strategy defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
+            - !abstract '$allowIfAllAbstainDecisions defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
+            - !abstract '$allowIfEqualGrantedDeniedDecisions defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
 
     Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker:
         alias: oro_featuretoggle.checker.feature_checker

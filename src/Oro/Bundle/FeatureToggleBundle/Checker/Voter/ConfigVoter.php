@@ -5,19 +5,15 @@ namespace Oro\Bundle\FeatureToggleBundle\Checker\Voter;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
+/**
+ * Votes whether a feature ia available based on the state of configuration option associated with a feature.
+ */
 class ConfigVoter implements VoterInterface
 {
-    const TOGGLE_KEY = 'toggle';
+    private const TOGGLE_KEY = 'toggle';
 
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @var ConfigurationManager $featureConfigManager
-     */
-    protected $featureConfigManager;
+    private ConfigManager $configManager;
+    private ConfigurationManager $featureConfigManager;
 
     public function __construct(ConfigManager $configManager, ConfigurationManager $featureConfigManager)
     {
@@ -31,13 +27,14 @@ class ConfigVoter implements VoterInterface
     public function vote($feature, $scopeIdentifier = null)
     {
         $toggle = $this->featureConfigManager->get($feature, self::TOGGLE_KEY);
-
         if (!$toggle) {
             return self::FEATURE_ABSTAIN;
-        } elseif ($this->configManager->get($toggle, false, false, $scopeIdentifier)) {
-            return self::FEATURE_ENABLED;
-        } else {
-            return self::FEATURE_DISABLED;
         }
+
+        if ($this->configManager->get($toggle, false, false, $scopeIdentifier)) {
+            return self::FEATURE_ENABLED;
+        }
+
+        return self::FEATURE_DISABLED;
     }
 }

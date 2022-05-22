@@ -26,24 +26,7 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The strategy "wrong_strategy" is not supported.');
 
-        new FeatureChecker($this->configurationManager, [], 'wrong_strategy');
-    }
-
-    public function testSetVoters()
-    {
-        $this->configurationManager->expects(self::any())
-            ->method('get')
-            ->willReturnArgument(2);
-
-        $checker = new FeatureChecker($this->configurationManager);
-
-        $voter = $this->createMock(VoterInterface::class);
-        $voter->expects(self::once())
-            ->method('vote');
-
-        $checker->setVoters([$voter]);
-
-        $checker->isFeatureEnabled('testfeaturex');
+        new FeatureChecker($this->configurationManager, [], 'wrong_strategy', false, true);
     }
 
     /**
@@ -324,7 +307,13 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturnArgument(2);
 
-        $checker = new FeatureChecker($this->configurationManager);
+        $checker = new FeatureChecker(
+            $this->configurationManager,
+            [],
+            FeatureChecker::STRATEGY_UNANIMOUS,
+            false,
+            true
+        );
         self::assertFalse($checker->isFeatureEnabled('feature1'));
         self::assertNotEmpty(ReflectionUtil::getPropertyValue($checker, 'featuresStates'));
 
@@ -346,7 +335,13 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('get')
             ->willReturnArgument(2);
 
-        $featureChecker = new FeatureChecker($this->configurationManager, [$voter]);
+        $featureChecker = new FeatureChecker(
+            $this->configurationManager,
+            [$voter],
+            FeatureChecker::STRATEGY_UNANIMOUS,
+            false,
+            true
+        );
         $this->assertEquals($expectedResources, $featureChecker->getDisabledResourcesByType($resourceType));
     }
 
@@ -416,7 +411,13 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
             ->with('feature1', 'strategy', FeatureChecker::STRATEGY_UNANIMOUS)
             ->willReturn('unsupported');
 
-        $checker = new FeatureChecker($this->configurationManager);
+        $checker = new FeatureChecker(
+            $this->configurationManager,
+            [],
+            FeatureChecker::STRATEGY_UNANIMOUS,
+            false,
+            true
+        );
 
         $this->assertTrue($checker->isFeatureEnabled('feature1'));
     }
