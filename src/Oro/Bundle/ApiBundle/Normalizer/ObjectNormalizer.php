@@ -2,16 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Normalizer;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\SerializationHelper;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * Converts an object to an array.
@@ -25,23 +31,14 @@ class ObjectNormalizer
 {
     private const MAX_NESTING_LEVEL = 1;
 
-    /** @var ObjectNormalizerRegistry */
-    private $normalizerRegistry;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var SerializationHelper */
-    private $serializationHelper;
-
-    /** @var DataAccessorInterface */
-    private $dataAccessor;
-
-    /** @var ConfigNormalizer */
-    private $configNormalizer;
-
-    /** @var DataNormalizer */
-    private $dataNormalizer;
+    private ObjectNormalizerRegistry $normalizerRegistry;
+    private DoctrineHelper $doctrineHelper;
+    private SerializationHelper $serializationHelper;
+    private DataAccessorInterface $dataAccessor;
+    private ConfigNormalizer $configNormalizer;
+    private DataNormalizer $dataNormalizer;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private AssociationAccessExclusionProviderRegistry $associationAccessExclusionProviderRegistry;
 
     public function __construct(
         ObjectNormalizerRegistry $normalizerRegistry,
@@ -59,14 +56,17 @@ class ObjectNormalizer
         $this->dataNormalizer = $dataNormalizer;
     }
 
-    /**
-     * @param array                       $objects The list of objects to be normalized
-     * @param EntityDefinitionConfig|null $config  Normalization rules
-     * @param array                       $context Options post serializers and data transformers have access to
-     * @param bool                        $skipPostSerializationForPrimaryObjects
-     *
-     * @return array
-     */
+    public function setAuthorizationChecker(AuthorizationCheckerInterface $authorizationChecker): void
+    {
+        $this->authorizationChecker = $authorizationChecker;
+    }
+
+    public function setAssociationAccessExclusionProviderRegistry(
+        AssociationAccessExclusionProviderRegistry $registry
+    ): void {
+        $this->associationAccessExclusionProviderRegistry = $registry;
+    }
+
     public function normalizeObjects(
         array $objects,
         EntityDefinitionConfig $config = null,
@@ -110,16 +110,10 @@ class ObjectNormalizer
         return $normalizedConfig;
     }
 
-    /**
-     * @param object $entity
-     * @param int    $level
-     * @param array  $context
-     *
-     * @return array
-     */
-    private function normalizeEntity($entity, int $level, array $context): array
+    private function normalizeEntity(object $entity, int $level, array $context): array
     {
         $result = [];
+        /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadata($entity);
 
         $nextLevel = $level + 1;
@@ -142,14 +136,7 @@ class ObjectNormalizer
         return $result;
     }
 
-    /**
-     * @param object $object
-     * @param int    $level
-     * @param array  $context
-     *
-     * @return array
-     */
-    private function normalizePlainObject($object, int $level, array $context): array
+    private function normalizePlainObject(object $object, int $level, array $context): array
     {
         $result = [];
         $refl = new \ReflectionClass($object);
@@ -166,18 +153,11 @@ class ObjectNormalizer
     }
 
     /**
-     * @param object                 $object
-     * @param int                    $level
-     * @param EntityDefinitionConfig $config
-     * @param array                  $context
-     *
-     * @return array
-     *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function normalizeObjectByConfig(
-        $object,
+        object $object,
         int $level,
         EntityDefinitionConfig $config,
         array $context
@@ -190,9 +170,13 @@ class ObjectNormalizer
             ));
         }
 
+        $associationAccessExclusionProvider = $this->associationAccessExclusionProviderRegistry
+            ->getAssociationAccessExclusionProvider($context[ApiContext::REQUEST_TYPE]);
+
         $result = [];
         $referenceFields = [];
         $entityClass = $this->getEntityClass($object);
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass, false);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
@@ -209,7 +193,14 @@ class ObjectNormalizer
             }
 
             $value = null;
-            if ($this->tryGetValue($object, $propertyPath, $field, $value)) {
+            if ($this->tryGetValue(
+                $object,
+                $propertyPath,
+                $field,
+                $metadata,
+                $value,
+                $associationAccessExclusionProvider
+            )) {
                 if (null !== $value) {
                     $targetConfig = $field->getTargetEntity();
                     if (null !== $targetConfig) {
@@ -238,20 +229,70 @@ class ObjectNormalizer
     }
 
     /**
-     * @param object                      $object
-     * @param string                      $propertyName
-     * @param EntityDefinitionFieldConfig $field
-     * @param mixed                       $value
-     *
-     * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function tryGetValue($object, string $propertyName, EntityDefinitionFieldConfig $field, &$value): bool
-    {
+    private function tryGetValue(
+        object $object,
+        string $propertyName,
+        EntityDefinitionFieldConfig $field,
+        ?ClassMetadata $metadata,
+        mixed &$value,
+        AssociationAccessExclusionProviderInterface $associationAccessExclusionProvider
+    ): bool {
         $associationQuery = $field->getAssociationQuery();
-        if (null === $associationQuery) {
-            return $this->dataAccessor->tryGetValue($object, $propertyName, $value);
+        if (null !== $associationQuery) {
+            return $this->tryGetValueByAssociationQuery($object, $associationQuery, $field, $value);
         }
 
+        $result = $this->dataAccessor->tryGetValue($object, $propertyName, $value);
+        if ($result
+            && null !== $metadata
+            && $metadata->hasAssociation($propertyName)
+            && !$associationAccessExclusionProvider->isIgnoreAssociationAccessCheck($metadata->name, $propertyName)
+        ) {
+            if ($metadata->isCollectionValuedAssociation($propertyName)) {
+                if (($value instanceof Collection || \is_array($value)) && $this->hasInvisibleEntity($value)) {
+                    $value = $this->removeInvisibleEntities($value);
+                }
+            } elseif (\is_object($value) && !$this->authorizationChecker->isGranted('VIEW', $value)) {
+                $value = null;
+            }
+        }
+
+        return $result;
+    }
+
+    private function hasInvisibleEntity(Collection|array $collection): bool
+    {
+        $hasInvisibleEntity = false;
+        foreach ($collection as $item) {
+            if (\is_object($item) && !$this->authorizationChecker->isGranted('VIEW', $item)) {
+                $hasInvisibleEntity = true;
+                break;
+            }
+        }
+
+        return $hasInvisibleEntity;
+    }
+
+    private function removeInvisibleEntities(Collection|array $collection): array
+    {
+        $result = [];
+        foreach ($collection as $item) {
+            if (!\is_object($item) || $this->authorizationChecker->isGranted('VIEW', $item)) {
+                $result[] = $item;
+            }
+        }
+
+        return $result;
+    }
+
+    private function tryGetValueByAssociationQuery(
+        object $object,
+        QueryBuilder $associationQuery,
+        EntityDefinitionFieldConfig $field,
+        mixed &$value
+    ): bool {
         $qb = clone $associationQuery;
         $qb->select('r');
         $entityIdFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNames($object);
@@ -274,23 +315,21 @@ class ObjectNormalizer
     }
 
     /**
-     * @param mixed                       $value
-     * @param int                         $level
-     * @param array                       $context
-     * @param EntityDefinitionConfig|null $config
-     *
-     * @return mixed
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function normalizeValue($value, int $level, array $context, EntityDefinitionConfig $config = null)
-    {
-        if (is_array($value)) {
+    private function normalizeValue(
+        mixed $value,
+        int $level,
+        array $context,
+        EntityDefinitionConfig $config = null
+    ): mixed {
+        if (\is_array($value)) {
             $nextLevel = $level + 1;
             foreach ($value as $key => $val) {
                 $value[$key] = $this->normalizeValue($val, $nextLevel, $context, $config);
             }
             $value = $this->postSerializeCollection($value, $config, $context);
-        } elseif (is_object($value)) {
+        } elseif (\is_object($value)) {
             $objectNormalizer = $this->getObjectNormalizer($value, $context);
             if (null !== $objectNormalizer) {
                 $value = $objectNormalizer->normalize($value, $context[ApiContext::REQUEST_TYPE]);
@@ -331,7 +370,7 @@ class ObjectNormalizer
             } else {
                 throw new RuntimeException(sprintf(
                     'Instance of "%s" cannot be normalized.',
-                    get_class($value)
+                    \get_class($value)
                 ));
             }
         }
@@ -339,17 +378,10 @@ class ObjectNormalizer
         return $value;
     }
 
-    /**
-     * @param array  $serializedData
-     * @param object $object
-     * @param array  $fields
-     *
-     * @return array
-     */
-    private function handleFieldsReferencedToChildFields(array $serializedData, $object, array $fields): array
+    private function handleFieldsReferencedToChildFields(array $serializedData, object $object, array $fields): array
     {
         foreach ($fields as $fieldName => $propertyPath) {
-            if (array_key_exists($fieldName, $serializedData)) {
+            if (\array_key_exists($fieldName, $serializedData)) {
                 continue;
             }
             $lastFieldName = array_pop($propertyPath);
@@ -378,12 +410,8 @@ class ObjectNormalizer
 
     /**
      * Gets the real class name of an entity.
-     *
-     * @param object $object
-     *
-     * @return string
      */
-    private function getEntityClass($object): string
+    private function getEntityClass(object $object): string
     {
         return $object instanceof EntityIdentifier
             ? $object->getClass()
@@ -399,20 +427,15 @@ class ObjectNormalizer
     }
 
     /**
-     * Returns a value of a metadata property
-     *
-     * @param string $entityClass
-     * @param string $propertyPath
-     *
-     * @return mixed
+     * Returns a value of a metadata property.
      */
-    private function getMetadataProperty(string $entityClass, string $propertyPath)
+    private function getMetadataProperty(string $entityClass, string $propertyPath): ?string
     {
-        switch ($propertyPath) {
-            case ConfigUtil::CLASS_NAME:
-                return $entityClass;
-            case ConfigUtil::DISCRIMINATOR:
-                return $this->getEntityDiscriminator($entityClass);
+        if (ConfigUtil::CLASS_NAME === $propertyPath) {
+            return $entityClass;
+        }
+        if (ConfigUtil::DISCRIMINATOR === $propertyPath) {
+            return $this->getEntityDiscriminator($entityClass);
         }
 
         return null;
@@ -439,13 +462,7 @@ class ObjectNormalizer
         return $this->serializationHelper->postSerializeCollection($items, $config, $context);
     }
 
-    /**
-     * @param object $object
-     * @param array  $context
-     *
-     * @return ObjectNormalizerInterface|null
-     */
-    private function getObjectNormalizer($object, array $context): ?ObjectNormalizerInterface
+    private function getObjectNormalizer(object $object, array $context): ?ObjectNormalizerInterface
     {
         if (!isset($context[ApiContext::REQUEST_TYPE])) {
             throw new \InvalidArgumentException(sprintf(

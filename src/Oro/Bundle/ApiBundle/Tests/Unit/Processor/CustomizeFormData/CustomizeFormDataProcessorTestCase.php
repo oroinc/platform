@@ -5,11 +5,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
+use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Validator\ContainerConstraintValidatorFactory;
 use Symfony\Component\Validator\Validation;
 
 class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
@@ -51,9 +55,21 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
      */
     protected function getFormExtensions(): array
     {
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->expects(self::any())
+            ->method('isGranted')
+            ->willReturn(true);
+
+        $constraintValidatorFactoryContainer = TestContainerBuilder::create()
+            ->add(AccessGrantedValidator::class, new AccessGrantedValidator($authorizationChecker))
+            ->getContainer($this);
+
         $validator = Validation::createValidatorBuilder()
             ->enableAnnotationMapping(true)
             ->setDoctrineAnnotationReader(new AnnotationReader())
+            ->setConstraintValidatorFactory(
+                new ContainerConstraintValidatorFactory($constraintValidatorFactoryContainer)
+            )
             ->getValidator();
 
         return [new ValidatorExtension($validator)];

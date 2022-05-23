@@ -63,7 +63,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals(['owner', 'organization'], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertSame($user, $entity->getOwner());
     }
@@ -96,7 +96,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->never())
             ->method('getOrganization');
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals([], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertSame($user, $entity->getOwner());
     }
@@ -133,7 +133,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals(['owner', 'organization'], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertSame($businessUnit, $entity->getOwner());
     }
@@ -170,7 +170,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->never())
             ->method('getOrganization');
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals([], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertSame($businessUnit, $entity->getOwner());
     }
@@ -212,7 +212,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization2);
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals(['owner', 'organization'], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization2, $entity->getOrganization());
         $this->assertSame($businessUnit2, $entity->getOwner());
     }
@@ -244,7 +244,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals(['organization'], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertNull($entity->getOwner());
     }
@@ -273,7 +273,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals(['organization'], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertNull($entity->getOwner());
     }
@@ -302,7 +302,7 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->never())
             ->method('getOrganization');
 
-        $this->setter->setOwnershipAssociations($entity);
+        self::assertEquals([], $this->setter->setOwnershipAssociationsNew($entity));
         $this->assertSame($organization, $entity->getOrganization());
         $this->assertNull($entity->getOwner());
     }
@@ -316,6 +316,6 @@ class EntityOwnershipAssociationsSetterTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor->expects($this->never())
             ->method('getToken');
 
-        $this->setter->setOwnershipAssociations(new \stdClass());
+        self::assertEquals([], $this->setter->setOwnershipAssociationsNew(new \stdClass()));
     }
 }

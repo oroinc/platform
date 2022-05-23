@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
@@ -21,6 +22,7 @@ use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 {
@@ -42,6 +44,17 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
                 ->getContainer($this),
             $requestExpressionMatcher
         );
+
+        $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authorizationChecker->expects(self::any())
+            ->method('isGranted')
+            ->willReturn(true);
+
+        $associationAccessExclusionProviderRegistry =
+            $this->createMock(AssociationAccessExclusionProviderRegistry::class);
+        $associationAccessExclusionProviderRegistry->expects(self::never())
+            ->method('getAssociationAccessExclusionProvider');
+
         $this->objectNormalizer = new ObjectNormalizer(
             new ObjectNormalizerRegistry(
                 [['normalizer1', \DateTimeInterface::class, null]],
@@ -55,6 +68,10 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             new EntityDataAccessor(),
             new ConfigNormalizer(),
             new DataNormalizer()
+        );
+        $this->objectNormalizer->setAuthorizationChecker($authorizationChecker);
+        $this->objectNormalizer->setAssociationAccessExclusionProviderRegistry(
+            $associationAccessExclusionProviderRegistry
         );
     }
 
