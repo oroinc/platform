@@ -2655,6 +2655,27 @@ JS;
     }
 
     /**
+     * @When /^(?:|I )save and close form for product attribute$/
+     */
+    public function iSaveAndCloseFormProdAtt()
+    {
+        $page = $this->getPage();
+        $page->pressButton('Save and Close');
+        $this->waitForAjax(720000); // Wait for max 12 minutes because cache update process timeout
+    }
+
+    /**
+     * @Then /^(?:|I )reload the page after product attributes import$/
+     */
+    public function iReloadPageAfterProdAttrImport()
+    {
+        sleep(2);
+        $page = $this->getPage();
+        $page->pressButton('refresh the page');
+        $this->waitForAjax(720000); // Wait for max 12 minutes because DB update process timeout set to 10 minutes
+    }
+
+    /**
      * @Then /^(?:|I )click update cache$/
      */
     public function iClickUpdateCache()
