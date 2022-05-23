@@ -11,105 +11,55 @@ use Oro\Component\PhpUtils\ArrayUtil;
  */
 class FeatureChecker
 {
-    const STRATEGY_AFFIRMATIVE = 'affirmative';
-    const STRATEGY_CONSENSUS = 'consensus';
-    const STRATEGY_UNANIMOUS = 'unanimous';
+    public const STRATEGY_AFFIRMATIVE = 'affirmative';
+    public const STRATEGY_CONSENSUS = 'consensus';
+    public const STRATEGY_UNANIMOUS = 'unanimous';
 
-    /**
-     * @var VoterInterface[]
-     */
-    protected $voters;
+    /** @var iterable|VoterInterface[] */
+    private iterable $voters;
+    private ConfigurationManager $configManager;
+    private string $strategy;
+    private bool $allowIfAllAbstainDecisions;
+    private bool $allowIfEqualGrantedDeniedDecisions;
+    private array $featuresStates = [];
 
-    /**
-     * @var ConfigurationManager
-     */
-    protected $configManager;
-
-    /**
-     * @var string
-     */
-    protected $strategy;
-
-    /**
-     * @var bool
-     */
-    protected $allowIfAllAbstainDecisions;
-
-    /**
-     * @var bool
-     */
-    protected $allowIfEqualGrantedDeniedDecisions;
-
-    /**
-     * @var array
-     */
-    protected $featuresStates = [];
-
-    /**
-     * @var array
-     */
-    protected $supportedStrategies = [
-        self::STRATEGY_AFFIRMATIVE,
-        self::STRATEGY_CONSENSUS,
-        self::STRATEGY_UNANIMOUS
-    ];
-
-    /**
-     * @param ConfigurationManager $configManager
-     * @param array $voters
-     * @param string $strategy
-     * @param bool $allowIfAllAbstainDecisions
-     * @param bool $allowIfEqualGrantedDeniedDecisions
-     */
     public function __construct(
         ConfigurationManager $configManager,
-        array $voters = [],
-        $strategy = self::STRATEGY_UNANIMOUS,
-        $allowIfAllAbstainDecisions = false,
-        $allowIfEqualGrantedDeniedDecisions = true
+        iterable $voters,
+        string $strategy,
+        bool $allowIfAllAbstainDecisions,
+        bool $allowIfEqualGrantedDeniedDecisions
     ) {
-        if (!\in_array($strategy, $this->supportedStrategies, true)) {
+        if (self::STRATEGY_UNANIMOUS !== $strategy
+            && self::STRATEGY_AFFIRMATIVE !== $strategy
+            && self::STRATEGY_CONSENSUS !== $strategy
+        ) {
             throw new \InvalidArgumentException(sprintf('The strategy "%s" is not supported.', $strategy));
         }
 
         $this->configManager = $configManager;
-
         $this->voters = $voters;
         $this->strategy = $strategy;
-        $this->allowIfAllAbstainDecisions = (bool) $allowIfAllAbstainDecisions;
-        $this->allowIfEqualGrantedDeniedDecisions = (bool) $allowIfEqualGrantedDeniedDecisions;
+        $this->allowIfAllAbstainDecisions = $allowIfAllAbstainDecisions;
+        $this->allowIfEqualGrantedDeniedDecisions = $allowIfEqualGrantedDeniedDecisions;
     }
 
-    /**
-     * Configures the voters.
-     *
-     * @param VoterInterface[] $voters An array of VoterInterface instances
-     */
-    public function setVoters(array $voters)
+    public function isFeatureEnabled(string $feature, object|int|null $scopeIdentifier = null): bool
     {
-        $this->voters = $voters;
+        $cacheKey = $this->getCacheKey($feature, $scopeIdentifier);
+        if (!\array_key_exists($cacheKey, $this->featuresStates)) {
+            $this->featuresStates[$cacheKey] = $this->check($feature, $scopeIdentifier);
+        }
+
+        return $this->featuresStates[$cacheKey];
     }
 
-    /**
-     * @param string $feature
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    public function isFeatureEnabled($feature, $scopeIdentifier = null)
-    {
-        return $this->checkFeatureState($feature, $scopeIdentifier);
-    }
-
-    /**
-     * @param string $resource
-     * @param string $resourceType
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    public function isResourceEnabled($resource, $resourceType, $scopeIdentifier = null)
-    {
+    public function isResourceEnabled(
+        string $resource,
+        string $resourceType,
+        object|int|null $scopeIdentifier = null
+    ): bool {
         $features = $this->configManager->getFeaturesByResource($resourceType, $resource);
-
         foreach ($features as $feature) {
             if (!$this->isFeatureEnabled($feature, $scopeIdentifier)) {
                 return false;
@@ -119,16 +69,10 @@ class FeatureChecker
         return true;
     }
 
-    /**
-     * @param string $resourceType
-     *
-     * @return array
-     */
-    public function getDisabledResourcesByType($resourceType)
+    public function getDisabledResourcesByType(string $resourceType): array
     {
-        $resources = $this->configManager->getResourcesByType($resourceType);
-
         $disabledResources = [];
+        $resources = $this->configManager->getResourcesByType($resourceType);
         foreach ($resources as $resource => $features) {
             if (!ArrayUtil::some([$this, 'isFeatureEnabled'], $features)) {
                 $disabledResources[] = $resource;
@@ -138,68 +82,38 @@ class FeatureChecker
         return $disabledResources;
     }
 
-    public function resetCache()
+    public function resetCache(): void
     {
         $this->featuresStates = [];
     }
 
-    /**
-     * @param string $feature
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    protected function checkFeatureState($feature, $scopeIdentifier = null)
+    private function check(string $feature, object|int|null $scopeIdentifier): bool
     {
-        $cacheKey = $this->getCacheKey($feature, $scopeIdentifier);
-        if (!array_key_exists($cacheKey, $this->featuresStates)) {
-            $this->featuresStates[$cacheKey] = $this->check($feature, $scopeIdentifier);
+        $strategy = $this->configManager->get($feature, 'strategy', $this->strategy);
+        if (self::STRATEGY_UNANIMOUS === $strategy) {
+            return $this->checkUnanimousStrategy($feature, $scopeIdentifier);
+        }
+        if (self::STRATEGY_AFFIRMATIVE === $strategy) {
+            return $this->checkAffirmativeStrategy($feature, $scopeIdentifier);
+        }
+        if (self::STRATEGY_CONSENSUS === $strategy) {
+            return $this->checkConsensusStrategy($feature, $scopeIdentifier);
         }
 
-        return $this->featuresStates[$cacheKey];
+        return true;
     }
 
-    /**
-     * @param string $feature
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    protected function check($feature, $scopeIdentifier = null)
-    {
-        switch ($this->configManager->get($feature, 'strategy', $this->strategy)) {
-            case self::STRATEGY_AFFIRMATIVE:
-                return $this->checkAffirmativeStrategy($feature, $scopeIdentifier);
-
-            case self::STRATEGY_CONSENSUS:
-                return $this->checkConsensusStrategy($feature, $scopeIdentifier);
-
-            case self::STRATEGY_UNANIMOUS:
-                return $this->checkUnanimousStrategy($feature, $scopeIdentifier);
-
-            default:
-                return true;
-        }
-    }
-
-    /**
-     * @param string $feature
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    protected function checkAffirmativeStrategy($feature, $scopeIdentifier = null)
+    private function checkAffirmativeStrategy(string $feature, object|int|null $scopeIdentifier): bool
     {
         $disabled = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($feature, $scopeIdentifier);
-
             switch ($result) {
                 case VoterInterface::FEATURE_ENABLED:
                     return true;
-
                 case VoterInterface::FEATURE_DISABLED:
                     ++$disabled;
-
                     break;
-
                 default:
                     break;
             }
@@ -212,27 +126,18 @@ class FeatureChecker
         return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
-    /**
-     * @param string $feature
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    protected function checkConsensusStrategy($feature, $scopeIdentifier = null)
+    private function checkConsensusStrategy(string $feature, object|int|null $scopeIdentifier): bool
     {
         $enabled = 0;
         $disabled = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($feature, $scopeIdentifier);
-
             switch ($result) {
                 case VoterInterface::FEATURE_ENABLED:
                     ++$enabled;
-
                     break;
-
                 case VoterInterface::FEATURE_DISABLED:
                     ++$disabled;
-
                     break;
             }
         }
@@ -240,7 +145,6 @@ class FeatureChecker
         if ($enabled > $disabled) {
             return true;
         }
-
         if ($disabled > $enabled) {
             return false;
         }
@@ -256,26 +160,17 @@ class FeatureChecker
         return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
-    /**
-     * @param $feature
-     * @param object|int|null $scopeIdentifier
-     * @return bool
-     */
-    protected function checkUnanimousStrategy($feature, $scopeIdentifier = null)
+    private function checkUnanimousStrategy(string $feature, object|int|null $scopeIdentifier): bool
     {
         $enabled = 0;
         foreach ($this->voters as $voter) {
             $result = $voter->vote($feature, $scopeIdentifier);
-
             switch ($result) {
                 case VoterInterface::FEATURE_ENABLED:
                     ++$enabled;
-
                     break;
-
                 case VoterInterface::FEATURE_DISABLED:
                     return false;
-
                 default:
                     break;
             }
@@ -288,19 +183,14 @@ class FeatureChecker
         return $this->configManager->get($feature, 'allow_if_all_abstain', $this->allowIfAllAbstainDecisions);
     }
 
-    /**
-     * @param string $feature
-     * @param null|int|object $scopeIdentifier
-     * @return string
-     */
-    protected function getCacheKey($feature, $scopeIdentifier = null)
+    private function getCacheKey(string $feature, object|int|null $scopeIdentifier): string
     {
         $cacheKey = $feature;
         if ($scopeIdentifier) {
             if (is_scalar($scopeIdentifier)) {
                 $cacheKey .= ':' . $scopeIdentifier;
             }
-            if (is_object($scopeIdentifier)) {
+            if (\is_object($scopeIdentifier)) {
                 $cacheKey .= ':' . spl_object_hash($scopeIdentifier);
             }
         }

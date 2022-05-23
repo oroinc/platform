@@ -8,20 +8,14 @@ use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 class DependencyVoterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureConfigManager;
+    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureConfigManager;
 
-    /**
-     * @var DependencyVoter
-     */
-    protected $dependencyVoter;
+    /** @var DependencyVoter */
+    private $dependencyVoter;
 
     protected function setUp(): void
     {
@@ -33,10 +27,8 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider voteDataProvider
-     * @param bool $enabled
-     * @param int $expectedVote
      */
-    public function testVote($enabled, $expectedVote)
+    public function testVote(bool $enabled, int $expectedVote)
     {
         $feature = 'feature1';
         $dependent = 'feature2';

@@ -180,6 +180,8 @@ services:
             - '@oro_api.entity_accessor'
             - '@oro_api.object_normalizer.config_normalizer'
             - '@oro_api.object_normalizer.data_normalizer'
+            - '@security.authorization_checker'
+            - '@oro_api.association_access_exclusion_provider_registry'
 
     oro_api.object_normalizer.config_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer
@@ -387,6 +389,13 @@ services:
         arguments:
             - !abstract '$entityOverrideProviders defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
             - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\ConfigurationLoader'
+            - '@oro_api.request_expression_matcher'
+
+    oro_api.association_access_exclusion_provider_registry:
+        class: Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry
+        arguments:
+            - [] # providers
+            - ~ # service locator
             - '@oro_api.request_expression_matcher'
 
     oro_api.query_acl_helper:

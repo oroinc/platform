@@ -7,3 +7,10 @@ services:
             - '@oro_featuretoggle.configuration'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\FeatureToggleBundle\Command\ConfigDebugCommand:
+        arguments:
+            - '@oro_featuretoggle.configuration.provider'
+            - '@translator'
+        tags:
+            - { name: console.command }

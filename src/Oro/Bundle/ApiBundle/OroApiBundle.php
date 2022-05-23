@@ -83,6 +83,10 @@ class OroApiBundle extends Bundle
             'oro_api.complete_definition_helper.custom_data_type',
             'oro.api.custom_data_type_completer'
         ));
+        $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
+            'oro_api.association_access_exclusion_provider_registry',
+            'oro_api.association_access_exclusion_provider'
+        ));
         $container->addCompilerPass(new Compiler\ChunkSizeProviderCompilerPass());
         $container->addCompilerPass(new Compiler\CleanupAsyncOperationCompilerPass());
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(

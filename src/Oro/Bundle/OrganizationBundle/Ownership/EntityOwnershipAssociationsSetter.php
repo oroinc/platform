@@ -12,18 +12,13 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Provides a functionality to set an owner and an organization for an entity
- * based on the current security context these associations were not set yet.
+ * based on the current security context when these associations were not set yet.
  */
 class EntityOwnershipAssociationsSetter
 {
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
+    private PropertyAccessorInterface $propertyAccessor;
+    private TokenAccessorInterface $tokenAccessor;
+    private OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
     public function __construct(
         PropertyAccessorInterface $propertyAccessor,
@@ -36,61 +31,81 @@ class EntityOwnershipAssociationsSetter
     }
 
     /**
-     * @param object $entity
+     * Sets an owner and an organization for the given entity based on the current security context
+     * when these associations were not set yet.
+     *
+     * @result string[] The names of fields that value was changed
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function setOwnershipAssociations($entity): void
+    public function setOwnershipAssociations(object $entity): array
     {
         if (!$this->tokenAccessor->hasUser()) {
-            return;
+            return [];
         }
 
+        $result = [];
         $ownershipMetadata = $this->ownershipMetadataProvider->getMetadata(ClassUtils::getClass($entity));
         if ($ownershipMetadata->hasOwner()) {
             if ($ownershipMetadata->isUserOwned()) {
-                $this->setUser($entity, $ownershipMetadata->getOwnerFieldName());
-                $this->setOrganization($entity, $ownershipMetadata->getOrganizationFieldName());
+                $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
+                if ($this->setUser($entity, $ownerFieldName)) {
+                    $result[] = $ownerFieldName;
+                }
+                $organizationFieldName = $ownershipMetadata->getOrganizationFieldName();
+                if ($this->setOrganization($entity, $organizationFieldName)) {
+                    $result[] = $organizationFieldName;
+                }
             } elseif ($ownershipMetadata->isBusinessUnitOwned()) {
-                $this->setBusinessUnit($entity, $ownershipMetadata->getOwnerFieldName());
-                $this->setOrganization($entity, $ownershipMetadata->getOrganizationFieldName());
+                $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
+                if ($this->setBusinessUnit($entity, $ownerFieldName)) {
+                    $result[] = $ownerFieldName;
+                }
+                $organizationFieldName = $ownershipMetadata->getOrganizationFieldName();
+                if ($this->setOrganization($entity, $organizationFieldName)) {
+                    $result[] = $organizationFieldName;
+                }
             } elseif ($ownershipMetadata->isOrganizationOwned()) {
-                $this->setOrganization($entity, $ownershipMetadata->getOwnerFieldName());
+                $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
+                if ($this->setOrganization($entity, $ownerFieldName)) {
+                    $result[] = $ownerFieldName;
+                }
             }
         }
+
+        return $result;
     }
 
-    /**
-     * @param object      $entity
-     * @param string|null $userFieldName
-     */
-    private function setUser($entity, ?string $userFieldName): void
+    private function setUser(object $entity, ?string $userFieldName): bool
     {
         if (!$userFieldName) {
-            return;
+            return false;
         }
 
+        $result = false;
         $entityUser = $this->propertyAccessor->getValue($entity, $userFieldName);
         if (null === $entityUser) {
             $user = $this->getUser();
             if (null !== $user) {
                 $this->propertyAccessor->setValue($entity, $userFieldName, $user);
+                $result = true;
             }
         }
+
+        return $result;
     }
 
-    /**
-     * @param object      $entity
-     * @param string|null $businessUnitFieldName
-     */
-    private function setBusinessUnit($entity, ?string $businessUnitFieldName): void
+    private function setBusinessUnit(object $entity, ?string $businessUnitFieldName): bool
     {
         if (!$businessUnitFieldName) {
-            return;
+            return false;
         }
 
         if ($entity instanceof BusinessUnit) {
-            return;
+            return false;
         }
 
+        $result = false;
         $entityBusinessUnit = $this->propertyAccessor->getValue($entity, $businessUnitFieldName);
         if (null === $entityBusinessUnit) {
             $user = $this->getUser();
@@ -100,34 +115,34 @@ class EntityOwnershipAssociationsSetter
                     $businessUnit = $this->getBusinessUnit($user, $organization);
                     if (null !== $businessUnit) {
                         $this->propertyAccessor->setValue($entity, $businessUnitFieldName, $businessUnit);
+                        $result = true;
                     }
                 }
             }
         }
+
+        return $result;
     }
 
-    /**
-     * @param object      $entity
-     * @param string|null $organizationFieldName
-     */
-    private function setOrganization($entity, ?string $organizationFieldName): void
+    private function setOrganization(object $entity, ?string $organizationFieldName): bool
     {
         if (!$organizationFieldName) {
-            return;
+            return false;
         }
 
+        $result = false;
         $entityOrganization = $this->propertyAccessor->getValue($entity, $organizationFieldName);
         if (null === $entityOrganization) {
             $organization = $this->tokenAccessor->getOrganization();
             if (null !== $organization) {
                 $this->propertyAccessor->setValue($entity, $organizationFieldName, $organization);
+                $result = true;
             }
         }
+
+        return $result;
     }
 
-    /**
-     * @return User
-     */
     private function getUser(): ?User
     {
         $user = $this->tokenAccessor->getUser();

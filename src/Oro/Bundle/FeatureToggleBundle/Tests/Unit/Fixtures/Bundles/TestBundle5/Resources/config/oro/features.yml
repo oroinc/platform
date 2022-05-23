@@ -1,0 +1,4 @@
+features:
+    feature2:
+        label: "Feature 2"
+        toggle: toggle1

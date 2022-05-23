@@ -16,6 +16,5 @@ features:
 
     feature3:
         label: "Feature 3"
-        toggle: toggle3
         dependencies:
             - feature1

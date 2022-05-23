@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Api\Processor;
 
+use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\OrganizationBundle\Ownership\EntityOwnershipAssociationsSetter;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -13,8 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetOwnershipAssociations implements ProcessorInterface
 {
-    /** @var EntityOwnershipAssociationsSetter */
-    private $entityOwnershipAssociationsSetter;
+    private EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter;
 
     public function __construct(EntityOwnershipAssociationsSetter $entityOwnershipAssociationsSetter)
     {
@@ -24,10 +24,13 @@ class SetOwnershipAssociations implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 
-        $this->entityOwnershipAssociationsSetter->setOwnershipAssociations($context->getData());
+        $changedFieldNames = $this->entityOwnershipAssociationsSetter->setOwnershipAssociations($context->getData());
+        foreach ($changedFieldNames as $fieldName) {
+            FormUtil::removeAccessGrantedValidationConstraint($context->getForm(), $fieldName);
+        }
     }
 }

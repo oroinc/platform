@@ -10,19 +10,16 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var FeatureResourceEnabled
-     */
-    protected $condition;
+    /** @var FeatureResourceEnabled */
+    private $condition;
 
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->condition = new FeatureResourceEnabled($this->featureChecker);
         $this->condition->setContextAccessor(new ContextAccessor());
     }
@@ -171,7 +168,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
         $context = [
             'resource' => 'test',
             'type' => 'resType',
-            'identifier' => 'id'
+            'identifier' => 1
         ];
 
         $options = [
@@ -183,7 +180,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isResourceEnabled')
-            ->with('test', 'resType', 'id')
+            ->with('test', 'resType', 1)
             ->willReturn(true);
 
         $this->assertTrue($this->condition->evaluate($context));

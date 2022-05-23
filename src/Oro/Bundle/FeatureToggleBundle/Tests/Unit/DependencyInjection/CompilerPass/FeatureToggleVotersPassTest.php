@@ -3,20 +3,13 @@
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass\FeatureToggleVotersPass;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FeatureToggleVotersPass */
-    private $compiler;
-
-    protected function setUp(): void
-    {
-        $this->compiler = new FeatureToggleVotersPass();
-    }
-
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $featureCheckerDef = $container->register('oro_featuretoggle.checker.feature_checker');
@@ -28,28 +21,23 @@ class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
         $container->register('voter_3')
             ->addTag('oro_featuretogle.voter', ['priority' => -100]);
 
-        $this->compiler->process($container);
+        $compiler = new FeatureToggleVotersPass();
+        $compiler->process($container);
 
         self::assertEquals(
-            [
-                ['setVoters', [[new Reference('voter_3'), new Reference('voter_2'), new Reference('voter_1')]]]
-            ],
-            $featureCheckerDef->getMethodCalls()
+            new IteratorArgument([new Reference('voter_3'), new Reference('voter_2'), new Reference('voter_1')]),
+            $featureCheckerDef->getArgument('$voters')
         );
     }
 
-    public function testProcessWhenNoVoters()
+    public function testProcessWhenNoVoters(): void
     {
         $container = new ContainerBuilder();
         $featureCheckerDef = $container->register('oro_featuretoggle.checker.feature_checker');
 
-        $this->compiler->process($container);
+        $compiler = new FeatureToggleVotersPass();
+        $compiler->process($container);
 
-        self::assertEquals(
-            [
-                ['setVoters', [[]]]
-            ],
-            $featureCheckerDef->getMethodCalls()
-        );
+        self::assertEquals(new IteratorArgument([]), $featureCheckerDef->getArgument('$voters'));
     }
 }

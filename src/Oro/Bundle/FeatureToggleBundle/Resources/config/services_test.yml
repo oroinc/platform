@@ -1,0 +1,5 @@
+services:
+    oro_featuretoggle.checker.feature_checker.stub:
+        class: Oro\Bundle\FeatureToggleBundle\Tests\Functional\Stub\FeatureCheckerStub
+        decorates: oro_featuretoggle.checker.feature_checker
+        parent: oro_featuretoggle.checker.feature_checker
