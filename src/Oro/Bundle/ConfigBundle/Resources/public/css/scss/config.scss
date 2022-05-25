@@ -77,6 +77,11 @@
         }
     }
 
+    .control-subgroup.value-hint-container {
+        margin-top: ($content-padding-small * .5);
+        margin-right: $content-padding-small;
+    }
+
     .container-fluid::after {
         clear: none;
     }

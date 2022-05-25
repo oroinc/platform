@@ -28,20 +28,20 @@
     </div>
 {% endmacro %}
 
-{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
-    {% set tooltip_parameters = tooltip_parameters|default({}) %}
-    {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
-    {% set tooltip = tooltip_raw|trans(tooltip_parameters, "messages") %}
-    {% if (tooltip == tooltip_raw) %}
-        {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
-    {% endif %}
+{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor, tooltip_translatable) %}
+    {%- set tooltip = tooltip_raw -%}
+    {%- if tooltip_translatable is not same as(false) -%}
+        {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({})) %}
+        {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
+        {% if tooltip == tooltip_raw %}
+            {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({}), "tooltips") %}
+        {% endif %}
+    {%- endif -%}
     {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
         {% set details_enabled = details_enabled|default(false) %}
         {% set tooltip_placement = isMobileVersion() ? 'top' : tooltip_placement|default(null) %}
-
-        {# Help link logic #}
         {% if details_enabled or details_anchor or details_link %}
             {% set helpLink = details_link|default(get_help_link()) %}
             {% if details_anchor %}
@@ -52,13 +52,7 @@
                 ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
             %}
         {% endif %}
-        {# End help link logic #}
-
-        {% set tooltip = '<div class="oro-popover-content">'
-            ~ tooltip
-            ~ '</div>'
-        %}
-
+        {% set tooltip = '<div class="oro-popover-content">' ~ tooltip ~ '</div>' -%}
         <i class="fa-info-circle tooltip-icon"
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"

@@ -6,7 +6,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigBag;
 use Oro\Bundle\ConfigBundle\Provider\AbstractProvider;
 use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\ConfigBundle\Tests\Unit\Provider\AbstractProviderTest;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -14,12 +16,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UserConfigurationFormProviderTest extends AbstractProviderTest
 {
-    protected const CONFIG_NAME = 'user_configuration';
+    protected const CONFIG_SCOPE = 'user';
+    protected const TREE_NAME = 'user_configuration';
 
     /**
      * {@inheritDoc}
      */
-    public function getParentCheckboxLabel(): string
+    protected function getParentCheckboxLabel(): string
     {
         return 'oro.user.user_configuration.use_default';
     }
@@ -31,17 +34,21 @@ class UserConfigurationFormProviderTest extends AbstractProviderTest
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
+        FormRegistryInterface $formRegistry,
         AuthorizationCheckerInterface $authorizationChecker,
         ChainSearchProvider $searchProvider,
-        FormRegistryInterface $formRegistry
+        FeatureChecker $featureChecker,
+        EventDispatcherInterface $eventDispatcher
     ): AbstractProvider {
         return new UserConfigurationFormProvider(
             $configBag,
             $translator,
             $formFactory,
+            $formRegistry,
             $authorizationChecker,
             $searchProvider,
-            $formRegistry
+            $featureChecker,
+            $eventDispatcher
         );
     }
 
