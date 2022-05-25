@@ -4,7 +4,6 @@ system_configuration:
             icon:        fa-desktop
             title:       oro.ui.system_configuration.groups.application_settings.title
             page_reload: true
-            configurator: '@oro_ui.config.use_default_configurator::buildForm'
 
         application_name_settings:
             title: oro.ui.system_configuration.groups.application_name_settings.title
@@ -20,6 +19,7 @@ system_configuration:
             options:
                 default_protocol: 'http'
                 label: oro.ui.system_configuration.fields.application_url.label
+                resettable: false
                 required: true
                 constraints:
                     - Url: ~

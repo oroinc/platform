@@ -5,20 +5,16 @@ namespace Oro\Bundle\ConfigBundle\Event;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * The event that is fired when system configuration form data are retrieved and before they are saved.
+ */
 class ConfigSettingsUpdateEvent extends Event
 {
-    const FORM_PRESET = 'oro_config.settings_form_preset';
-    const BEFORE_SAVE = 'oro_config.settings_before_save';
+    public const FORM_PRESET = 'oro_config.settings_form_preset';
+    public const BEFORE_SAVE = 'oro_config.settings_before_save';
 
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @var array
-     */
-    protected $settings;
+    private ConfigManager $configManager;
+    private array $settings;
 
     public function __construct(ConfigManager $configManager, array $settings)
     {
@@ -26,30 +22,18 @@ class ConfigSettingsUpdateEvent extends Event
         $this->settings = $settings;
     }
 
-    /**
-     * @return ConfigManager
-     */
-    public function getConfigManager()
+    public function getConfigManager(): ConfigManager
     {
         return $this->configManager;
     }
 
-    /**
-     * @return array
-     */
-    public function getSettings()
+    public function getSettings(): array
     {
         return $this->settings;
     }
 
-    /**
-     * @param array $settings
-     * @return ConfigSettingsUpdateEvent
-     */
-    public function setSettings(array $settings)
+    public function setSettings(array $settings): void
     {
         $this->settings = $settings;
-
-        return $this;
     }
 }

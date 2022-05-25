@@ -22,16 +22,16 @@ class ConfigSettingsUpdateEventTest extends \PHPUnit\Framework\TestCase
         $this->event = new ConfigSettingsUpdateEvent($this->configManager, self::SETTINGS);
     }
 
-    public function testSettings()
+    public function testGetConfigManager(): void
+    {
+        $this->assertEquals($this->configManager, $this->event->getConfigManager());
+    }
+
+    public function testSettings(): void
     {
         $this->assertEquals(self::SETTINGS, $this->event->getSettings());
         $newSettings = ['c' => true];
         $this->event->setSettings($newSettings);
         $this->assertEquals($newSettings, $this->event->getSettings());
-    }
-
-    public function testGetConfigManager()
-    {
-        $this->assertEquals($this->configManager, $this->event->getConfigManager());
     }
 }

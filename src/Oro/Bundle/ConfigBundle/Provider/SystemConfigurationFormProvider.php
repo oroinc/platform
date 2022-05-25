@@ -2,32 +2,31 @@
 
 namespace Oro\Bundle\ConfigBundle\Provider;
 
+/**
+ * Provides configuration of a system configuration form on the application level.
+ */
 class SystemConfigurationFormProvider extends AbstractProvider
 {
-    const TREE_NAME = 'system_configuration';
-
     /**
      * {@inheritdoc}
      */
-    public function getTree()
+    protected function getConfigScope(): string
     {
-        return $this->getTreeData(self::TREE_NAME, self::CORRECT_FIELDS_NESTING_LEVEL);
+        return 'app';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getJsTree()
+    protected function getTreeName(): string
     {
-        return $this->getJsTreeData(self::TREE_NAME, self::CORRECT_MENU_NESTING_LEVEL);
+        return 'system_configuration';
     }
 
     /**
-     * Use default checkbox label
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    protected function getParentCheckboxLabel()
+    protected function getParentCheckboxLabel(): string
     {
         return 'oro.config.system_configuration.use_default';
     }

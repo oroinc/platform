@@ -15,10 +15,6 @@ class FormFieldTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider buildFormOptionsProvider
-     *
-     * @param array $options
-     * @param string $expectedType
-     * @param array $expectedOptions
      */
     public function testBuildForm(array $options, string $expectedType, array $expectedOptions): void
     {
@@ -34,9 +30,6 @@ class FormFieldTypeTest extends FormIntegrationTestCase
         }
     }
 
-    /**
-     * @return array
-     */
     public function buildFormOptionsProvider(): array
     {
         return [
@@ -66,9 +59,6 @@ class FormFieldTypeTest extends FormIntegrationTestCase
 
     /**
      * @dataProvider listenersDataProvider
-     *
-     * @param bool $resettable
-     * @param int $expectedCount Expected invocation count
      */
     public function testListeners(bool $resettable, int $expectedCount): void
     {
@@ -93,21 +83,17 @@ class FormFieldTypeTest extends FormIntegrationTestCase
         $formType->buildForm(
             $builder,
             [
-                'parent_checkbox_label' => '',
-                'resettable' => $resettable,
                 'target_field_type' => 'array',
                 'target_field_options' => [],
+                'resettable' => $resettable,
                 'use_parent_field_options' => [],
+                'use_parent_field_label' => '',
             ]
         );
     }
 
     /**
      * @dataProvider submitDataProvider
-     *
-     * @param array $data
-     * @param array $expected
-     * @param bool $valueDisabled
      */
     public function testSubmit(
         array $data,

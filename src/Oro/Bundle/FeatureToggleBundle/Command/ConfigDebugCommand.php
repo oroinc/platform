@@ -93,12 +93,28 @@ HELP
             if (!empty($config['description'])) {
                 $result['description'] = $this->translator->trans($config['description']);
             }
+            $this->addConfigOptionIsExists($result, $config, 'toggle');
+            $this->addConfigOptionIsExists($result, $config, 'strategy');
+            $this->addConfigOptionIsExists($result, $config, 'allow_if_all_abstain');
+            $this->addConfigOptionIsExists($result, $config, 'allow_if_equal_granted_denied');
             $otherOptions = array_diff_key($config, $result);
+            foreach ($otherOptions as $key => $value) {
+                if (\is_array($value) && empty($value)) {
+                    unset($otherOptions[$key]);
+                }
+            }
             ksort($otherOptions);
             $result = array_merge($result, $otherOptions);
         }
 
         return $result;
+    }
+
+    private function addConfigOptionIsExists(array &$result, array $config, string $optionName): void
+    {
+        if (\array_key_exists($optionName, $config)) {
+            $result[$optionName] = $config[$optionName];
+        }
     }
 
     private function dumpConfig(OutputInterface $output, array $config): void

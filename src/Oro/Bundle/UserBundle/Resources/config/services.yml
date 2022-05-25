@@ -507,7 +507,7 @@ services:
 
     oro_user.provider.user_config_form_provider:
         class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
-        parent: 'oro_config.provider.abstract_provider'
+        parent: oro_config.provider.abstract_provider
         lazy: true
 
     Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider:
