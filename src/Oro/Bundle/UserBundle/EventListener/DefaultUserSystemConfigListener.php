@@ -2,111 +2,67 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
-use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
 
+/**
+ * Transforms user ID to User entity and vise versa for a specified configuration option.
+ * When there is no user ID in the configuration option value, a default user entity is used.
+ */
 class DefaultUserSystemConfigListener
 {
-    /** @var DefaultUserProvider */
-    private $defaultUserProvider;
+    private DefaultUserProvider $defaultUserProvider;
+    private ManagerRegistry $doctrine;
+    private string $configKey;
 
-    /** @var string */
-    private $alias;
-
-    /** @var string */
-    private $configKey;
-
-    /** @var DoctrineHelper*/
-    private $doctrineHelper;
-
-    public function __construct(DefaultUserProvider $defaultUserProvider, DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        DefaultUserProvider $defaultUserProvider,
+        ManagerRegistry $doctrine,
+        string $configKey
+    ) {
         $this->defaultUserProvider = $defaultUserProvider;
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * @param string $alias
-     *
-     * @return DefaultUserSystemConfigListener
-     */
-    public function setAlias($alias)
-    {
-        $this->alias = $alias;
-
-        return $this;
-    }
-
-    /**
-     * @param string $configKey
-     *
-     * @return DefaultUserSystemConfigListener
-     */
-    public function setConfigKey($configKey)
-    {
+        $this->doctrine = $doctrine;
         $this->configKey = $configKey;
-
-        return $this;
     }
 
-    public function onFormPreSetData(ConfigSettingsUpdateEvent $event)
+    public function onFormPreSetData(ConfigSettingsUpdateEvent $event): void
     {
-        $settingsKey = $this->getSettingsKey();
+        /** @var string $settingsKey */
+        $settingsKey = str_replace(
+            ConfigManager::SECTION_MODEL_SEPARATOR,
+            ConfigManager::SECTION_VIEW_SEPARATOR,
+            $this->configKey
+        );
         $settings = $event->getSettings();
-
-        $owner = null;
+        $user = null;
         if (isset($settings[$settingsKey]['value'])) {
-            $owner = $this->getUserById($settings[$settingsKey]['value']);
+            $user = $this->findUser($settings[$settingsKey]['value']);
         }
-
-        if (!$owner) {
-            $owner = $this->defaultUserProvider->getDefaultUser($this->alias, $this->configKey);
+        if (null === $user) {
+            $user = $this->defaultUserProvider->getDefaultUser($this->configKey);
         }
-
-        $settings[$settingsKey]['value'] = $owner;
-
+        $settings[$settingsKey]['value'] = $user;
         $event->setSettings($settings);
     }
 
-    public function onSettingsSaveBefore(ConfigSettingsUpdateEvent $event)
+    public function onSettingsSaveBefore(ConfigSettingsUpdateEvent $event): void
     {
         $settings = $event->getSettings();
-
-        if (!isset($settings['value'])) {
-            return;
+        if (isset($settings[$this->configKey]['value'])) {
+            $value = $settings[$this->configKey]['value'];
+            if ($value instanceof User) {
+                $settings[$this->configKey]['value'] = $value->getId();
+                $event->setSettings($settings);
+            }
         }
-
-        if (!is_a($settings['value'], User::class)) {
-            return;
-        }
-
-        /** @var User $owner */
-        $owner = $settings['value'];
-        $settings['value'] = $owner->getId();
-        $event->setSettings($settings);
     }
 
-    /**
-     * @return string
-     */
-    private function getSettingsKey()
+    private function findUser(int $id): ?User
     {
-        return TreeUtils::getConfigKey($this->alias, $this->configKey, ConfigManager::SECTION_VIEW_SEPARATOR);
-    }
-
-    /**
-     * @param int $userId
-     *
-     * @return User|null
-     */
-    private function getUserById(int $userId)
-    {
-        return $this->doctrineHelper
-            ->getEntityRepositoryForClass(User::class)
-            ->findOneBy(['id' => $userId]);
+        return $this->doctrine->getManagerForClass(User::class)
+            ->find(User::class, $id);
     }
 }
