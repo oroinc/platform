@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Symfony\Component\Form\FormInterface;
@@ -35,7 +36,7 @@ interface ProviderInterface
     /**
      * Builds form for the given configuration tree group.
      */
-    public function getForm(string $groupName): FormInterface;
+    public function getForm(string $groupName, ConfigManager $configManager): FormInterface;
 
     /**
      * Lookup for first available groups if they are not specified yet.

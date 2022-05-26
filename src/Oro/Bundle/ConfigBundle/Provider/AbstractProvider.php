@@ -65,11 +65,6 @@ abstract class AbstractProvider implements ProviderInterface
     }
 
     /**
-     * Gets the configuration scope.
-     */
-    abstract protected function getConfigScope(): string;
-
-    /**
      * Gets the name of the configuration tree section.
      */
     abstract protected function getTreeName(): string;
@@ -390,7 +385,7 @@ abstract class AbstractProvider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getForm(string $groupName): FormInterface
+    public function getForm(string $groupName, ConfigManager $configManager): FormInterface
     {
         $toAddFields = [];
         $block = $this->getSubTree($groupName);
@@ -420,7 +415,7 @@ abstract class AbstractProvider implements ProviderInterface
             $formOptions[$field->getPropertyPath()] = $this->getFieldFormOptions($field);
         }
 
-        $event = new ConfigSettingsFormOptionsEvent($this->getConfigScope(), $formOptions);
+        $event = new ConfigSettingsFormOptionsEvent($configManager, $formOptions);
         $this->eventDispatcher->dispatch($event, ConfigSettingsFormOptionsEvent::SET_OPTIONS);
         $formOptions = $event->getAllFormOptions();
 

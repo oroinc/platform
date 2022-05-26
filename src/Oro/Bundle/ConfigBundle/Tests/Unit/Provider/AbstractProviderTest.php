@@ -5,6 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
@@ -154,6 +155,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     public function testTreeProcessing()
     {
+        $configManager = $this->createMock(ConfigManager::class);
+
         $this->featureChecker->expects(self::any())
             ->method('isResourceEnabled')
             ->willReturn(true);
@@ -163,9 +166,11 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                 self::isInstanceOf(ConfigSettingsFormOptionsEvent::class),
                 ConfigSettingsFormOptionsEvent::SET_OPTIONS
             )
-            ->willReturnCallback(function (ConfigSettingsFormOptionsEvent $event) {
+            ->willReturnCallback(function (ConfigSettingsFormOptionsEvent $event) use ($configManager) {
+                self::assertSame($configManager, $event->getConfigManager());
+
                 $formOptions = $event->getFormOptions('some_field');
-                $formOptions['value_hint'] = sprintf('config scope: %s', $event->getConfigScope());
+                $formOptions['value_hint'] = 'value hint';
                 $event->setFormOptions('some_field', $formOptions);
 
                 return $event;
@@ -173,7 +178,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         // check good_definition.yml for further details
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
-        $form = $provider->getForm('third_group');
+        $form = $provider->getForm('third_group', $configManager);
         self::assertInstanceOf(FormInterface::class, $form);
 
         // test that fields were added
@@ -184,7 +189,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             $form->get('some_field')->getConfig()->getOption('use_parent_field_label')
         );
         self::assertEquals(
-            sprintf('config scope: %s', static::CONFIG_SCOPE),
+            'value hint',
             $form->get('some_field')->getConfig()->getOption('value_hint')
         );
         self::assertEquals(
@@ -317,7 +322,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         // check good_definition_with_acl_check.yml for further details
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition_with_acl_check.yml'));
-        $form = $provider->getForm('third_group');
+        $form = $provider->getForm('third_group', $this->createMock(ConfigManager::class));
         self::assertInstanceOf(FormInterface::class, $form);
 
         // test that fields were added

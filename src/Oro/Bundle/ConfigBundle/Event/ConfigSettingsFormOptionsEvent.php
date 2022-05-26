@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ConfigBundle\Event;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -11,18 +12,18 @@ class ConfigSettingsFormOptionsEvent extends Event
 {
     public const SET_OPTIONS = 'oro_config.settings_form_options_set';
 
-    private string $configScope;
+    private ConfigManager $configManager;
     private array $allFormOptions;
 
-    public function __construct(string $configScope, array $allFormOptions)
+    public function __construct(ConfigManager $configManager, array $allFormOptions)
     {
-        $this->configScope = $configScope;
+        $this->configManager = $configManager;
         $this->allFormOptions = $allFormOptions;
     }
 
-    public function getConfigScope(): string
+    public function getConfigManager(): ConfigManager
     {
-        return $this->configScope;
+        return $this->configManager;
     }
 
     /**

@@ -10,14 +10,6 @@ class SystemConfigurationFormProvider extends AbstractProvider
     /**
      * {@inheritdoc}
      */
-    protected function getConfigScope(): string
-    {
-        return 'app';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getTreeName(): string
     {
         return 'system_configuration';
