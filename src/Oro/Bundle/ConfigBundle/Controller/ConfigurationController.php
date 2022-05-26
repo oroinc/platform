@@ -48,7 +48,8 @@ class ConfigurationController extends AbstractController
         $form = false;
 
         if ($activeSubGroup !== null) {
-            $form = $provider->getForm($activeSubGroup);
+            $manager = $this->get(ConfigManager::class);
+            $form = $provider->getForm($activeSubGroup, $manager);
 
             if ($this->get(ConfigHandler::class)->process($form, $request)) {
                 $request->getSession()->getFlashBag()->add(
@@ -64,8 +65,8 @@ class ConfigurationController extends AbstractController
                 $dataUpdateTopicSender->send($tagGenerator->generate($taggableData));
 
                 // recreate form to drop values for fields with use_parent_scope_value
-                $form = $provider->getForm($activeSubGroup);
-                $form->setData($this->get(ConfigManager::class)->getSettingsByForm($form));
+                $form = $provider->getForm($activeSubGroup, $manager);
+                $form->setData($manager->getSettingsByForm($form));
             }
         }
 

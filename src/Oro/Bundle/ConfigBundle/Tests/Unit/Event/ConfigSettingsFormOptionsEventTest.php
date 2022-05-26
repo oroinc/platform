@@ -2,27 +2,32 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsFormOptionsEvent;
 
 class ConfigSettingsFormOptionsEventTest extends \PHPUnit\Framework\TestCase
 {
-    private const CONFIG_SCOPE = 'test_config_scope';
     private const FORM_OPTIONS = [
         'key1' => ['option1' => 'value1'],
         'key2' => ['option2' => 'value2']
     ];
+
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var ConfigSettingsFormOptionsEvent */
     private $event;
 
     protected function setUp(): void
     {
-        $this->event = new ConfigSettingsFormOptionsEvent(self::CONFIG_SCOPE, self::FORM_OPTIONS);
+        $this->configManager = $this->createMock(ConfigManager::class);
+
+        $this->event = new ConfigSettingsFormOptionsEvent($this->configManager, self::FORM_OPTIONS);
     }
 
-    public function testGetConfigScope(): void
+    public function testGetConfigManager(): void
     {
-        $this->assertEquals(self::CONFIG_SCOPE, $this->event->getConfigScope());
+        $this->assertSame($this->configManager, $this->event->getConfigManager());
     }
 
     public function testFormOptions(): void

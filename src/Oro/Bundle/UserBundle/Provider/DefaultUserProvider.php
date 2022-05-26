@@ -2,42 +2,33 @@
 
 namespace Oro\Bundle\UserBundle\Provider;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides methods to get a default user for system configuration fields.
+ */
 class DefaultUserProvider
 {
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    public function __construct(ConfigManager $configManager, DoctrineHelper $doctrineHelper)
+    public function __construct(ConfigManager $configManager, ManagerRegistry $doctrine)
     {
         $this->configManager = $configManager;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
     }
 
-    /**
-     * @param string $alias
-     * @param string $configKey
-     *
-     * @return User|null
-     */
-    public function getDefaultUser($alias, $configKey)
+    public function getDefaultUser(string $configKey): ?User
     {
-        $settingsKey = TreeUtils::getConfigKey($alias, $configKey);
-        $ownerId = $this->configManager->get($settingsKey);
-        $repository = $this->doctrineHelper->getEntityRepositoryForClass(User::class);
         $owner = null;
+        $ownerId = $this->configManager->get($configKey);
         if ($ownerId) {
-            $owner = $repository->find($ownerId);
+            $owner = $this->doctrine->getManagerForClass(User::class)->find(User::class, $ownerId);
         }
-        if (!$owner) {
-            $owner = $repository->findOneBy([], ['id' => 'ASC']);
+        if (null === $owner) {
+            $owner = $this->doctrine->getRepository(User::class)->findOneBy([], ['id' => 'ASC']);
         }
 
         return $owner;

@@ -19,14 +19,6 @@ class UserConfigurationFormProvider extends AbstractProvider
     /**
      * {@inheritdoc}
      */
-    protected function getConfigScope(): string
-    {
-        return 'user';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     protected function getTreeName(): string
     {
         return 'user_configuration';
