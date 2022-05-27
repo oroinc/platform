@@ -43,23 +43,31 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        initialize: function(options) {
+        initialize(options) {
             SelectCreateInlineTypeView.__super__.initialize.call(this, options);
             _.extend(this, _.pick(options, 'urlParts', 'entityLabel', 'existingEntityGridId', 'inputSelector'));
         },
 
-        buildRouteParams: function(routeType) {
+        buildRouteParams(routeType) {
             const routeParams = this.urlParts[routeType].parameters;
             return _.extend({}, routeParams, this.$(this.inputSelector).data('select2_query_additional_params'));
         },
 
-        setEnableState: function(enabled) {
+        setEnableState(enabled) {
             this.$('button').prop('disabled', !enabled);
             this.$(this.inputSelector).select2('readonly', !enabled);
         },
 
-        onSelect: function(e) {
+        /**
+         * @param {Object} e
+         */
+        onSelect(e) {
             e.preventDefault();
+
+            if (this.dialogWidget) {
+                return;
+            }
+
             const routeName = _.result(this.urlParts.grid, 'gridWidgetView') || this.urlParts.grid.route;
             const routeParams = this.buildRouteParams('grid');
             this.dialogWidget = new DialogWidget({
@@ -143,6 +151,7 @@ define(function(require) {
 
         onDialogClose: function() {
             this.$(this.inputSelector).off('.' + this.dialogWidget._wid);
+            delete this.dialogWidget;
         },
 
         onGridRowSelect: function(data) {
@@ -174,8 +183,16 @@ define(function(require) {
             }
         },
 
+        /**
+         * @param {Object} e
+         */
         onCreate: function(e) {
             e.preventDefault();
+
+            if (this.dialogWidget) {
+                return;
+            }
+
             const routeName = this.urlParts.create.route;
             const routeParams = this.buildRouteParams('create');
             this.dialogWidget = new DialogWidget({
@@ -223,6 +240,19 @@ define(function(require) {
 
         getSelection: function() {
             return this.$(this.inputSelector).inputWidget('val');
+        },
+
+        dispose() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.dialogWidget && !this.dialogWidget.disposed) {
+                // Parent dialog with select create input is closed - current dialog should be disposed as well
+                this.dialogWidget.dispose();
+            }
+
+            return SelectCreateInlineTypeView.__super__.dispose.call(this);
         }
     });
 
