@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -59,11 +58,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->end()
             ->enumNode('strategy')
                 ->info('A strategy that should be used to decide whether the feature is enabled.')
-                ->values([
-                    FeatureChecker::STRATEGY_AFFIRMATIVE,
-                    FeatureChecker::STRATEGY_CONSENSUS,
-                    FeatureChecker::STRATEGY_UNANIMOUS
-                ])
+                ->values(['unanimous', 'affirmative', 'consensus'])
             ->end()
             ->booleanNode('allow_if_all_abstain')
                 ->info('Defines whether the feature is enabled when all voters abstained from voting.')

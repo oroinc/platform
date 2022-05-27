@@ -20,7 +20,7 @@ class OroFeatureToggleExtension extends Extension
         $loader->load('services.yml');
         $loader->load('commands.yml');
 
-        $container->getDefinition('oro_featuretoggle.checker.feature_checker')
+        $container->getDefinition('oro_featuretoggle.feature_decision_manager')
             ->setArgument('$strategy', $config['strategy'])
             ->setArgument('$allowIfAllAbstainDecisions', $config['allow_if_all_abstain'])
             ->setArgument('$allowIfEqualGrantedDeniedDecisions', $config['allow_if_equal_granted_denied']);

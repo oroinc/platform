@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -182,15 +181,8 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                         'strategy' => 'not supported'
                     ]
                 ],
-                'message' => sprintf(
-                    'The value "not supported" is not allowed for path "features.feature1.strategy". ' .
-                    'Permissible values: "%s"',
-                    implode('", "', [
-                        FeatureChecker::STRATEGY_AFFIRMATIVE,
-                        FeatureChecker::STRATEGY_CONSENSUS,
-                        FeatureChecker::STRATEGY_UNANIMOUS
-                    ])
-                )
+                'message' => 'The value "not supported" is not allowed for path "features.feature1.strategy". ' .
+                    'Permissible values: "unanimous", "affirmative", "consensus"'
             ],
             'incorrect allow_if_all_abstain' => [
                 'input' => [

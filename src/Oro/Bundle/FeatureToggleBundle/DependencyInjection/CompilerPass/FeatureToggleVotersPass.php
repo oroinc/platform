@@ -27,7 +27,7 @@ class FeatureToggleVotersPass implements CompilerPassInterface
         }
         $voters = $this->inverseSortByPriorityAndFlatten($voters);
 
-        $container->getDefinition('oro_featuretoggle.checker.feature_checker')
+        $container->getDefinition('oro_featuretoggle.feature_decision_manager')
             ->setArgument('$voters', new IteratorArgument(array_values($voters)));
     }
 }

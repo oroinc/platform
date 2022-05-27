@@ -18,11 +18,6 @@ class FeatureToggleablePassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new FeatureToggleablePass();
     }
 
-    public function testProcessWithoutCheckerService()
-    {
-        $this->compiler->process(new ContainerBuilder());
-    }
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
