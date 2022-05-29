@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Repository\MailboxRepository;
@@ -39,7 +39,7 @@ class RequestMailboxesTest extends \PHPUnit\Framework\TestCase
             ->with('demo')
             ->willReturn($demoProcess);
 
-        $doctrine = $this->createMock(Registry::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getRepository')
             ->with('OroEmailBundle:Mailbox')

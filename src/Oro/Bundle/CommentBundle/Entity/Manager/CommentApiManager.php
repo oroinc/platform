@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\CommentBundle\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
@@ -60,7 +60,7 @@ class CommentApiManager extends ApiEntityManager
     protected $htmlTagHelper;
 
     public function __construct(
-        Registry $doctrine,
+        ManagerRegistry $doctrine,
         AuthorizationCheckerInterface $authorizationChecker,
         EntityNameResolver $entityNameResolver,
         CountQueryBuilderOptimizer $countQueryBuilderOptimizer,

@@ -27,11 +27,6 @@ class FieldProviderTest extends EntityFieldProviderTest
         $this->provider->setExclusionProvider($this->exclusionProvider);
     }
 
-    /**
-     * exclusions are not used in workflow
-     *
-     * {@inheritdoc}
-     */
     public function fieldsWithRelationsExpectedDataProvider(): array
     {
         return [
@@ -271,11 +266,6 @@ class FieldProviderTest extends EntityFieldProviderTest
         return $expectedResult;
     }
 
-    /**
-     * exclusions are not used in workflow
-     *
-     * {@inheritdoc}
-     */
     public function relationsExpectedDataProvider(): array
     {
         return [

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EmailBundle\Provider\EmailAttributeProvider;
@@ -18,7 +18,7 @@ use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
 class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
@@ -35,7 +35,7 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(Registry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->nameFormatter = $this->createMock(NameFormatter::class);
         $this->emailAddressHelper = $this->createMock(EmailAddressHelper::class);

@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
@@ -23,7 +24,6 @@ use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
 use Oro\Bundle\ImportExportBundle\Job\JobResult;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class JobExecutorTest extends \PHPUnit\Framework\TestCase
@@ -35,7 +35,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
     private $connection;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
+    private $doctrine;
 
     /** @var ConnectorRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $batchJobRegistry;
@@ -53,13 +53,13 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
     private $contextAggregatorRegistry;
 
     /** @var JobExecutor */
-    private JobExecutor $executor;
+    private $executor;
 
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->connection = $this->createMock(Connection::class);
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->batchJobRegistry = $this->createMock(ConnectorRegistry::class);
         $this->contextRegistry = $this->createMock(ContextRegistry::class);
         $this->batchJobManager = $this->createMock(EntityManager::class);
@@ -70,7 +70,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('getConnection')
             ->willReturn($this->connection);
 
-        $this->managerRegistry->expects(self::any())
+        $this->doctrine->expects(self::any())
             ->method('getManager')
             ->willReturn($this->entityManager);
 
@@ -82,7 +82,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             $this->batchJobRegistry,
             $this->batchJobRepository,
             $this->contextRegistry,
-            $this->managerRegistry,
+            $this->doctrine,
             $this->contextAggregatorRegistry
         );
     }
@@ -413,7 +413,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
         $repository->expects(self::once())
             ->method('findOneBy')
             ->with(['code' => $code]);
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(JobInstance::class)
             ->willReturn($repository);
@@ -437,7 +437,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('findOneBy')
             ->with(['code' => $code])
             ->willReturn($jobInstance);
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(JobInstance::class)
             ->willReturn($repository);
@@ -466,7 +466,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('findOneBy')
             ->with(['code' => $code])
             ->willReturn($jobInstance);
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(JobInstance::class)
             ->willReturn($repository);
@@ -502,7 +502,7 @@ class JobExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('findOneBy')
             ->with(['code' => $code])
             ->willReturn($jobInstance);
-        $this->managerRegistry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(JobInstance::class)
             ->willReturn($repository);

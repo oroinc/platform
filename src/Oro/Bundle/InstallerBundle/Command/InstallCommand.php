@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Composer\Question\StrictConfirmationQuestion;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
@@ -44,15 +44,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     private InputOptionProvider $inputOptionProvider;
     private ApplicationState $applicationState;
     private ScriptManager $scriptManager;
-    private Registry $doctrine;
+    private ManagerRegistry $doctrine;
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        ContainerInterface       $container,
-        Registry                 $doctrine,
+        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         EventDispatcherInterface $eventDispatcher,
-        ApplicationState         $applicationState,
-        ScriptManager            $scriptManager
+        ApplicationState $applicationState,
+        ScriptManager $scriptManager
     ) {
         parent::__construct($container);
 

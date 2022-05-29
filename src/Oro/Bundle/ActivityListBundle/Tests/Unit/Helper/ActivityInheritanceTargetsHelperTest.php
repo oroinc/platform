@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Helper;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -13,27 +13,27 @@ use Oro\Bundle\QueryDesignerBundle\QueryDesigner\SubQueryLimitHelper;
 
 class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActivityInheritanceTargetsHelper */
-    private $activityInheritanceTargetsHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Registry */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubQueryLimitHelper */
-    protected $limitHelper;
+    /** @var SubQueryLimitHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $limitHelper;
+
+    /** @var ActivityInheritanceTargetsHelper */
+    private $activityInheritanceTargetsHelper;
 
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->limitHelper = $this->createMock(SubQueryLimitHelper::class);
 
         $this->activityInheritanceTargetsHelper = new ActivityInheritanceTargetsHelper(
             $this->configManager,
-            $this->registry,
+            $this->doctrine,
             $this->limitHelper
         );
     }
@@ -47,7 +47,9 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     public function testHasInheritancesNullModel()
     {
         $this->configManager->expects($this->once())
-            ->method('hasConfigEntityModel')->with('test')->willReturn(null);
+            ->method('hasConfigEntityModel')
+            ->with('test')
+            ->willReturn(null);
         $result = $this->activityInheritanceTargetsHelper->hasInheritances('test');
         $this->assertFalse($result);
     }
@@ -56,12 +58,17 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
-            ->method('getValues')->willReturn([]);
+            ->method('getValues')
+            ->willReturn([]);
 
         $this->configManager->expects($this->once())
-            ->method('hasConfigEntityModel')->with('test')->willReturn(true);
+            ->method('hasConfigEntityModel')
+            ->with('test')
+            ->willReturn(true);
         $this->configManager->expects($this->once())
-            ->method('getEntityConfig')->with('activity', 'test')->willReturn($config);
+            ->method('getEntityConfig')
+            ->with('activity', 'test')
+            ->willReturn($config);
 
         $result = $this->activityInheritanceTargetsHelper->hasInheritances('test');
         $this->assertFalse($result);
@@ -71,12 +78,17 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
-            ->method('getValues')->willReturn(null);
+            ->method('getValues')
+            ->willReturn(null);
 
         $this->configManager->expects($this->once())
-            ->method('hasConfigEntityModel')->with('test')->willReturn(true);
+            ->method('hasConfigEntityModel')
+            ->with('test')
+            ->willReturn(true);
         $this->configManager->expects($this->once())
-            ->method('getEntityConfig')->with('activity', 'test')->willReturn($config);
+            ->method('getEntityConfig')
+            ->with('activity', 'test')
+            ->willReturn($config);
 
         $result = $this->activityInheritanceTargetsHelper->hasInheritances('test');
         $this->assertFalse($result);
@@ -86,12 +98,17 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
-            ->method('getValues')->willReturn(['some']);
+            ->method('getValues')
+            ->willReturn(['some']);
 
         $this->configManager->expects($this->once())
-            ->method('hasConfigEntityModel')->with('test')->willReturn(true);
+            ->method('hasConfigEntityModel')
+            ->with('test')
+            ->willReturn(true);
         $this->configManager->expects($this->once())
-            ->method('getEntityConfig')->with('activity', 'test')->willReturn($config);
+            ->method('getEntityConfig')
+            ->with('activity', 'test')
+            ->willReturn($config);
 
         $result = $this->activityInheritanceTargetsHelper->hasInheritances('test');
         $this->assertFalse($result);
@@ -101,12 +118,17 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $config = $this->createMock(Config::class);
         $config->expects($this->once())
-            ->method('getValues')->willReturn(['inheritance_targets' => ['test']]);
+            ->method('getValues')
+            ->willReturn(['inheritance_targets' => ['test']]);
 
         $this->configManager->expects($this->once())
-            ->method('hasConfigEntityModel')->with('test')->willReturn(true);
+            ->method('hasConfigEntityModel')
+            ->with('test')
+            ->willReturn(true);
         $this->configManager->expects($this->once())
-            ->method('getEntityConfig')->with('activity', 'test')->willReturn($config);
+            ->method('getEntityConfig')
+            ->with('activity', 'test')
+            ->willReturn($config);
 
         $result = $this->activityInheritanceTargetsHelper->hasInheritances('test');
         $this->assertTrue($result);
@@ -146,7 +168,9 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
     {
         $em = $this->createMock(EntityManager::class);
         $expr = new Expr();
-        $em->expects($this->any())->method('getExpressionBuilder')->willReturn($expr);
+        $em->expects($this->any())
+            ->method('getExpressionBuilder')
+            ->willReturn($expr);
 
         $mainQb = new QueryBuilder($em);
         $inheritedQb = clone $mainQb;
@@ -157,7 +181,7 @@ class ActivityInheritanceTargetsHelperTest extends \PHPUnit\Framework\TestCase
         $em->expects($this->any())
             ->method('createQueryBuilder')
             ->willReturn($inheritedQb);
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($em);
 

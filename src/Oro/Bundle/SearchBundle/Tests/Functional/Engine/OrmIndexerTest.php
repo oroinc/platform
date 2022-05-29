@@ -2,6 +2,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Engine;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SearchBundle\Entity\IndexText;
 use Oro\Bundle\SearchBundle\Entity\Item as IndexItem;
 use Oro\Bundle\SearchBundle\Tests\Functional\SearchExtensionTrait;
@@ -252,10 +253,7 @@ class OrmIndexerTest extends WebTestCase
         $this->assertCount(0, $indexItemRepository->findBy(['entity' => Item::class]));
     }
 
-    /**
-     * @return \Doctrine\Bundle\DoctrineBundle\Registry
-     */
-    private function getDoctrine()
+    private function getDoctrine(): ManagerRegistry
     {
         return $this->getContainer()->get('doctrine');
     }

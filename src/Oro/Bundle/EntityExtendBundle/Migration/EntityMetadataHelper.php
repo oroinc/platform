@@ -2,34 +2,22 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Migration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Provides a way to get metadata information from the Doctrine by entity class or table name.
  */
 class EntityMetadataHelper
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $doctrine;
-
-    /**
-     * @var array {table name} => [{class name}, ...]
-     */
-    protected $tableToClassesMap;
-
-    /**
-     * @var string[] {class name} => {table name}
-     */
-    protected $classToTableMap;
-
-    /**
-     * @var string[][] {class name} => [{field name}, ...]
-     */
-    protected $classToColumnsMap;
+    private ManagerRegistry $doctrine;
+    /** @var array|null [table name => [class name, ...], ...] */
+    private ?array $tableToClassesMap = null;
+    /** @var string[]|null [class name => table name, ...] */
+    private ?array $classToTableMap = null;
+    /** @var string[][]|null [class name => [field name, ...], ...] */
+    private ?array $classToColumnsMap = null;
 
     public function __construct(ManagerRegistry $doctrine)
     {
@@ -41,7 +29,7 @@ class EntityMetadataHelper
      *
      * @return string[]
      */
-    public function getEntityClassesByTableName($tableName)
+    public function getEntityClassesByTableName(string $tableName): array
     {
         $this->ensureNameMapsLoaded();
 
@@ -50,11 +38,8 @@ class EntityMetadataHelper
 
     /**
      * Gets an entity table name by entity full class name
-     *
-     * @param string $className
-     * @return string|null
      */
-    public function getTableNameByEntityClass($className)
+    public function getTableNameByEntityClass(string $className): ?string
     {
         $this->ensureNameMapsLoaded();
 
@@ -63,42 +48,34 @@ class EntityMetadataHelper
 
     /**
      * @param string $className
+     *
      * @return string[]
      */
-    public function getEntityColumnsByEntityClass($className)
+    public function getEntityColumnsByEntityClass(string $className): array
     {
         $this->ensureNameMapsLoaded();
 
         return $this->classToColumnsMap[$className] ?? [];
     }
 
-    /**
-     * @param string $className
-     * @param string $columnName
-     * @return bool
-     */
-    public function isEntityClassContainsColumn($className, $columnName)
+    public function isEntityClassContainsColumn(string $className, string $columnName): bool
     {
         $this->ensureNameMapsLoaded();
 
         $columns = $this->getEntityColumnsByEntityClass($className);
 
-        return !$columns || in_array($columnName, $columns, true);
+        return !$columns || \in_array($columnName, $columns, true);
     }
 
     /**
      * Gets an entity field name by entity table name and column name
-     *
-     * @param string $tableName
-     * @param string $columnName
-     * @return string|null
      */
-    public function getFieldNameByColumnName($tableName, $columnName)
+    public function getFieldNameByColumnName(string $tableName, string $columnName): ?string
     {
         $classNames = $this->getEntityClassesByTableName($tableName);
         foreach ($classNames as $className) {
             $manager = $this->doctrine->getManagerForClass($className);
-            if ($manager instanceof EntityManager) {
+            if ($manager instanceof EntityManagerInterface) {
                 return $manager->getClassMetadata($className)->getFieldName($columnName);
             }
         }
@@ -110,11 +87,8 @@ class EntityMetadataHelper
      * Adds a mapping between a table name and entity class name.
      * This method can be used for new entities without doctrine mapping created during
      * loading migrations, for instance for custom entities.
-     *
-     * @param string $tableName
-     * @param string $className
      */
-    public function registerEntityClass($tableName, $className)
+    public function registerEntityClass(string $tableName, string $className): void
     {
         $this->ensureNameMapsLoaded();
 
@@ -125,7 +99,7 @@ class EntityMetadataHelper
     /**
      * Makes sure that table name <-> entity class name maps loaded
      */
-    protected function ensureNameMapsLoaded()
+    private function ensureNameMapsLoaded(): void
     {
         if (null === $this->tableToClassesMap) {
             $this->loadNameMaps();
@@ -136,7 +110,7 @@ class EntityMetadataHelper
      * Loads table name <-> entity class name maps
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function loadNameMaps()
+    private function loadNameMaps(): void
     {
         $this->tableToClassesMap = [];
         $this->classToTableMap = [];
@@ -144,7 +118,7 @@ class EntityMetadataHelper
         $names = $this->doctrine->getManagerNames();
         foreach ($names as $name => $id) {
             $manager = $this->doctrine->getManager($name);
-            if ($manager instanceof EntityManager) {
+            if ($manager instanceof EntityManagerInterface) {
                 $allMetadata = $this->getAllMetadata($manager);
                 foreach ($allMetadata as $metadata) {
                     $tableName = $metadata->getTableName();
@@ -161,7 +135,7 @@ class EntityMetadataHelper
                         }
 
                         foreach ($metadata->getAssociationMappings() as $relation) {
-                            if (array_key_exists('joinColumns', $relation) && is_array($relation['joinColumns'])) {
+                            if (\array_key_exists('joinColumns', $relation) && \is_array($relation['joinColumns'])) {
                                 foreach ($relation['joinColumns'] as $joinColumn) {
                                     $this->classToColumnsMap[$className][] = $joinColumn['name'];
                                 }
@@ -177,10 +151,11 @@ class EntityMetadataHelper
      * Loads the metadata of all entities known to the given entity manager
      * mapping driver.
      *
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
+     *
      * @return ClassMetadata[]
      */
-    protected function getAllMetadata(EntityManager $em)
+    private function getAllMetadata(EntityManagerInterface $em): array
     {
         try {
             return $em->getMetadataFactory()->getAllMetadata();
@@ -193,7 +168,7 @@ class EntityMetadataHelper
             // please note that metadata retrieved in this way is not full and can be used only to get a table name
             $result = [];
             $configuration = $em->getConfiguration();
-            $driver        = $configuration->getMetadataDriverImpl();
+            $driver = $configuration->getMetadataDriverImpl();
             $allClassNames = $driver->getAllClassNames();
             foreach ($allClassNames as $className) {
                 $metadata = new ClassMetadata($className, $configuration->getNamingStrategy());

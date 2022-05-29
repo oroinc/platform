@@ -9,8 +9,7 @@ use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
  */
 class ContextEmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
-    /** @var RelatedEmailsProvider */
-    protected $relatedEmailsProvider;
+    private RelatedEmailsProvider $relatedEmailsProvider;
 
     public function __construct(RelatedEmailsProvider $relatedEmailsProvider)
     {

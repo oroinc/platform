@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -26,7 +27,6 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class TestHelper
 {
@@ -43,17 +43,11 @@ class TestHelper
         $this->testCase = $testCase;
     }
 
-    /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTree $ownerTree
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @return AclExtensionSelector
-     */
     public function createAclExtensionSelector(
         OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
-    ) {
+    ): AclExtensionSelector {
         $doctrineHelper = $this->testCase->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -83,15 +77,6 @@ class TestHelper
     }
 
     /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTree $ownerTree
-     * @param ObjectIdAccessor $idAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param EntityOwnerAccessor $entityOwnerAccessor
-     * @param PermissionManager $permissionManager
-     * @param AclGroupProviderInterface $groupProvider
-     * @return EntityAclExtension
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -103,7 +88,7 @@ class TestHelper
         EntityOwnerAccessor $entityOwnerAccessor = null,
         PermissionManager $permissionManager = null,
         AclGroupProviderInterface $groupProvider = null
-    ) {
+    ): EntityAclExtension {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
                 ->disableOriginalConstructor()
@@ -195,21 +180,13 @@ class TestHelper
         );
     }
 
-    /**
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTree $ownerTree
-     * @param ObjectIdAccessor $idAccessor
-     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
-     * @param ConfigManager $configManager
-     * @return FieldAclExtension
-     */
     public function createFieldAclExtension(
         OwnershipMetadataProviderInterface $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
         ConfigManager $configManager = null
-    ) {
+    ): FieldAclExtension {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
                 ->disableOriginalConstructor()

@@ -3,11 +3,7 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Functional\Traits;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- * @method static ContainerInterface getContainer()
- */
 trait ConfigManagerAwareTestTrait
 {
     /**

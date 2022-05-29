@@ -321,7 +321,6 @@ services:
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_user.manager'
-            - '@doctrine'
             - '@logger'
 
     oro_user.activity_widget_provider:

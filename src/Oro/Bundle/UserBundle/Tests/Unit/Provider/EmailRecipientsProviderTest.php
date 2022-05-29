@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
@@ -11,8 +11,8 @@ use Oro\Bundle\UserBundle\Provider\EmailRecipientsProvider;
 
 class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $emailRecipientsHelper;
@@ -22,11 +22,11 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
 
         $this->emailRecipientsProvider = new EmailRecipientsProvider(
-            $this->registry,
+            $this->doctrine,
             $this->emailRecipientsHelper
         );
     }
@@ -38,9 +38,9 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     {
         $userRepository = $this->createMock(UserRepository::class);
 
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
-            ->with('OroUserBundle:User')
+            ->with(User::class)
             ->willReturn($userRepository);
 
         $this->emailRecipientsHelper->expects($this->once())

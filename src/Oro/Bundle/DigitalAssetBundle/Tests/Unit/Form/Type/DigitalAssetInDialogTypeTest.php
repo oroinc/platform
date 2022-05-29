@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
@@ -20,7 +21,6 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionType
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -177,8 +177,9 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     public function submitDataProvider(): array
     {
+        $file = new SymfonyFile('sample-path', false);
         $sourceFile = new File();
-        $sourceFile->setFile($file = new SymfonyFile('sample-path', false));
+        $sourceFile->setFile($file);
 
         return [
             'title is set, source file is uploaded' => [
@@ -196,7 +197,8 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     public function testSubmitWhenNoFile(): void
     {
-        $form = $this->factory->create(DigitalAssetInDialogType::class, $defaultData = new DigitalAsset());
+        $defaultData = new DigitalAsset();
+        $form = $this->factory->create(DigitalAssetInDialogType::class, $defaultData);
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());
@@ -215,13 +217,8 @@ class DigitalAssetInDialogTypeTest extends FormIntegrationTestCase
 
     public function testSubmitWhenNoTitle(): void
     {
-        $form = $this->factory->create(
-            DigitalAssetInDialogType::class,
-            $defaultData = new DigitalAsset(),
-            [
-                'is_image_type' => false,
-            ]
-        );
+        $defaultData = new DigitalAsset();
+        $form = $this->factory->create(DigitalAssetInDialogType::class, $defaultData, ['is_image_type' => false]);
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());

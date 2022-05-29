@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Form\EntityField\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\Processor\EntityApiHandlerProcessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\Fixtures\Stub\SomeEntity;
@@ -16,11 +16,11 @@ class EntityApiBaseHandlerTest extends TestCase
     /** @var EntityApiHandlerProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
 
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
     /** @var EntityApiBaseHandler */
     private $handler;
-
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
 
     public function methodsDataProvider(): array
     {
@@ -33,10 +33,10 @@ class EntityApiBaseHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->processor = $this->createMock(EntityApiHandlerProcessor::class);
 
-        $this->handler = new EntityApiBaseHandler($this->registry, $this->processor, new PropertyAccessor());
+        $this->handler = new EntityApiBaseHandler($this->doctrine, $this->processor, new PropertyAccessor());
     }
 
     public function testProcessUnsupportedMethod()
@@ -61,10 +61,8 @@ class EntityApiBaseHandlerTest extends TestCase
 
     /**
      * @dataProvider methodsDataProvider
-     * @param string $method
-     * @param bool $clearMissing
      */
-    public function testProcessDataEmpty($method, $clearMissing)
+    public function testProcessDataEmpty(string $method, bool $clearMissing)
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);
@@ -85,10 +83,8 @@ class EntityApiBaseHandlerTest extends TestCase
 
     /**
      * @dataProvider methodsDataProvider
-     * @param string $method
-     * @param bool $clearMissing
      */
-    public function testProcessInvalid($method, $clearMissing)
+    public function testProcessInvalid(string $method, bool $clearMissing)
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);
@@ -121,10 +117,8 @@ class EntityApiBaseHandlerTest extends TestCase
 
     /**
      * @dataProvider methodsDataProvider
-     * @param string $method
-     * @param bool $clearMissing
      */
-    public function testProcessValid($method, $clearMissing)
+    public function testProcessValid(string $method, bool $clearMissing)
     {
         $entity = new SomeEntity();
         $form = $this->createMock(FormInterface::class);
@@ -170,7 +164,7 @@ class EntityApiBaseHandlerTest extends TestCase
         $manager->expects($this->any())
             ->method('flush');
 
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
             ->willReturn($manager);
     }

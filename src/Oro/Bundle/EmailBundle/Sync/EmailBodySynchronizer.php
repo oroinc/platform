@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -14,7 +15,6 @@ use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderSelector;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -38,8 +38,8 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         EventDispatcherInterface $eventDispatcher,
         NotificationAlertManager $notificationAlertManager
     ) {
-        $this->selector        = $selector;
-        $this->doctrine        = $doctrine;
+        $this->selector = $selector;
+        $this->doctrine = $doctrine;
         $this->eventDispatcher = $eventDispatcher;
         $this->notificationAlertManager = $notificationAlertManager;
     }

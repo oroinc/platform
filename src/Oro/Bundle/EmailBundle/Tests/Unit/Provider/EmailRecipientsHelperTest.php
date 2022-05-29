@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
@@ -60,7 +60,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailOwnerProvider;
 
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $registry;
 
     /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
@@ -80,7 +80,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
-        $this->registry = $this->createMock(Registry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->addressHelper = $this->createMock(EmailAddressHelper::class);
         $this->indexer = $this->createMock(Indexer::class);
 
@@ -476,29 +476,17 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function creteRecipientEntityDataProvider()
+    public function creteRecipientEntityDataProvider(): array
     {
-        $organization = (new Organization())->setName('ORO');
-        $customer = new CustomerStub('Customer Name', $organization);
-
-        yield [
-            $customer,
-            new RecipientEntity(
-                CustomerStub::class,
-                1,
-                'NAME (Object Stub)',
-                'ORO'
-            )
-        ];
-
-        yield [
-            new AddressStub('Address Name', 'OrgName'),
-            new RecipientEntity(
-                AddressStub::class,
-                1,
-                'NAME (Object Stub)',
-                null
-            )
+        return [
+            [
+                new CustomerStub('Customer Name', (new Organization())->setName('ORO')),
+                new RecipientEntity(CustomerStub::class, 1, 'NAME (Object Stub)', 'ORO')
+            ],
+            [
+                new AddressStub('Address Name', 'OrgName'),
+                new RecipientEntity(AddressStub::class, 1, 'NAME (Object Stub)', null)
+            ]
         ];
     }
 

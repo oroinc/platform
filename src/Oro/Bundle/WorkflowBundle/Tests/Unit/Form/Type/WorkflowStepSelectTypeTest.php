@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
@@ -73,20 +73,20 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             ->method('getName')
             ->willReturn(WorkflowStep::class);
 
-        $mockEntityManager = $this->createMock(EntityManager::class);
-        $mockEntityManager->expects($this->any())
+        $em = $this->createMock(EntityManager::class);
+        $em->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->repository);
-        $mockEntityManager->expects($this->any())
+        $em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
 
-        $mockRegistry = $this->createMock(Registry::class);
-        $mockRegistry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturn($mockEntityManager);
+            ->willReturn($em);
 
-        $mockEntityType = new EntityType($mockRegistry);
+        $mockEntityType = new EntityType($doctrine);
 
         return [
             new PreloadedExtension(

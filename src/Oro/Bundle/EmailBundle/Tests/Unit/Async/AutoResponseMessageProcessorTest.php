@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponseTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -21,7 +21,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectNotToPerformAssertions();
 
         new AutoResponseMessageProcessor(
-            $this->createMock(Registry::class),
+            $this->createMock(ManagerRegistry::class),
             $this->createMock(AutoResponseManager::class),
             $this->createMock(JobRunner::class),
             $this->createMock(LoggerInterface::class)
@@ -38,7 +38,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(123)
             ->willReturn($email);
 
-        $doctrine  = $this->createMock(Registry::class);
+        $doctrine  = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())
             ->method('getRepository')
             ->with(Email::class)
@@ -82,7 +82,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with(123)
             ->willReturn(null);
 
-        $doctrine = $this->createMock(Registry::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())
             ->method('getRepository')
             ->with(Email::class)

@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
@@ -17,7 +18,6 @@ use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -27,29 +27,41 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    protected ConfigProviderMock $entityConfigProvider;
+    /** @var ConfigProviderMock */
+    protected $entityConfigProvider;
 
-    protected ConfigProviderMock $extendConfigProvider;
+    /** @var ConfigProviderMock */
+    protected $extendConfigProvider;
 
-    protected EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject $entityClassResolver;
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    protected $entityClassResolver;
 
-    protected VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject $virtualFieldProvider;
+    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $virtualFieldProvider;
 
-    protected VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject $virtualRelationProvider;
+    /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $virtualRelationProvider;
 
-    protected FieldTypeHelper $fieldTypeHelper;
+    /** @var FieldTypeHelper */
+    protected $fieldTypeHelper;
 
-    protected ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    protected $doctrine;
 
-    protected TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $translator;
 
-    protected EntityProvider $entityProvider;
+    /** @var EntityProvider */
+    protected $entityProvider;
 
-    protected EntityFieldProvider $provider;
+    /** @var EntityFieldProvider */
+    protected $provider;
 
-    protected ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject $exclusionProvider;
+    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    protected $exclusionProvider;
 
-    protected FeatureChecker|\PHPUnit\Framework\MockObject\MockObject $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    protected $featureChecker;
 
     protected function setUp(): void
     {
@@ -198,8 +210,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * exclusions are not used in workflow
-     *
-     * @return array
      */
     public function fieldsWithRelationsExpectedDataProvider(): array
     {
@@ -654,8 +664,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     *
-     * @param array $config
      */
     protected function prepare(array $config): void
     {
@@ -956,8 +964,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * exclusions are not used in workflow
-     *
-     * @return array
      */
     public function relationsExpectedDataProvider(): array
     {
@@ -980,12 +986,6 @@ class EntityFieldProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int $translate
-     * @param string $fieldLabel
-     * @param string $fieldLabelTranslated
-     * @param string|null $locale
-     * @param int $transCalls
-     *
      * @dataProvider getTranslatedFieldsDataProvider
      */
     public function testGetTranslatedFields(

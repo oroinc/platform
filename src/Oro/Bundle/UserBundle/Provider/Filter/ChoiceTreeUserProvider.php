@@ -2,45 +2,39 @@
 
 namespace Oro\Bundle\UserBundle\Provider\Filter;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides users to be displayed in datagrid filters.
+ */
 class ChoiceTreeUserProvider
 {
-    const CLASS_NAME = 'Oro\Bundle\UserBundle\Entity\User';
+    private ManagerRegistry $doctrine;
+    private AclHelper $aclHelper;
+    private DQLNameFormatter $dqlNameFormatter;
 
-    /** @var Registry */
-    protected $registry;
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /** @var DQLNameFormatter */
-    protected $dqlNameFormatter;
-
-    public function __construct(Registry $registry, AclHelper $aclHelper, DQLNameFormatter $dqlNameFormatter)
+    public function __construct(ManagerRegistry $doctrine, AclHelper $aclHelper, DQLNameFormatter $dqlNameFormatter)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->aclHelper = $aclHelper;
         $this->dqlNameFormatter = $dqlNameFormatter;
     }
 
     /**
-     * @return array
+     * @return array [['id' => user ID, 'name' => user name], ...]
      */
-    public function getList()
+    public function getList(): array
     {
         $qb = $this->createListQb();
 
         return $this->aclHelper->apply($qb)->getArrayResult();
     }
 
-    /**
-     * @return bool
-     */
-    public function shouldBeLazy()
+    public function shouldBeLazy(): bool
     {
         $qb = $this->createListQb()
             ->select('COUNT(1)');
@@ -48,13 +42,11 @@ class ChoiceTreeUserProvider
         return $this->aclHelper->apply($qb)->getSingleScalarResult() >= 500;
     }
 
-    /**
-     * @return QueryBuilder
-     */
-    protected function createListQb()
+    private function createListQb(): QueryBuilder
     {
-        return $this->registry->getManager()->getRepository(static::CLASS_NAME)->createQueryBuilder('u')
+        return $this->doctrine->getRepository(User::class)
+            ->createQueryBuilder('u')
             ->select('u.id')
-            ->addSelect(sprintf('%s AS name', $this->dqlNameFormatter->getFormattedNameDQL('u', static::CLASS_NAME)));
+            ->addSelect(sprintf('%s AS name', $this->dqlNameFormatter->getFormattedNameDQL('u', User::class)));
     }
 }

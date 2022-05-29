@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
@@ -15,17 +15,17 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Exception\LanguageNotFoundException;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
+/**
+ * Persists translations strings into DB in single transaction.
+ */
 class DatabasePersister
 {
     const BATCH_INSERT_ROWS_COUNT = 50;
 
-    /** @var Registry */
-    private $registry;
+    private ManagerRegistry $registry;
+    private TranslationManager $translationManager;
 
-    /** @var TranslationManager */
-    private $translationManager;
-
-    public function __construct(Registry $registry, TranslationManager $translationManager)
+    public function __construct(ManagerRegistry $registry, TranslationManager $translationManager)
     {
         $this->registry = $registry;
         $this->translationManager = $translationManager;
