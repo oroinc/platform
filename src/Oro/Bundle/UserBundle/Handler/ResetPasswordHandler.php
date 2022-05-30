@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
@@ -16,32 +15,27 @@ use Psr\Log\LoggerInterface;
  */
 class ResetPasswordHandler
 {
-    const TEMPLATE_NAME = 'force_reset_password';
+    private const TEMPLATE_NAME = 'force_reset_password';
 
-    /** @var Registry */
-    protected $registry;
+    private EmailNotificationManager $mailManager;
+    private UserManager $userManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         EmailNotificationManager $mailManager,
         UserManager $userManager,
-        Registry $registry,
         LoggerInterface $logger
     ) {
         $this->mailManager = $mailManager;
         $this->userManager = $userManager;
         $this->logger = $logger;
-        $this->registry = $registry;
     }
 
     /**
      * Generates reset password confirmation token, block the user from login and sends notification email.
      * Skips disabled users
-     *
-     * @param User $user
-     *
-     * @return bool Notification success
      */
-    public function resetPasswordAndNotify(User $user)
+    public function resetPasswordAndNotify(User $user): bool
     {
         if (!$user->isEnabled()) {
             return false;
@@ -68,7 +62,7 @@ class ResetPasswordHandler
         return false;
     }
 
-    protected function getNotification(User $user): TemplateEmailNotificationInterface
+    private function getNotification(User $user): TemplateEmailNotificationInterface
     {
         return new TemplateEmailNotification(
             new EmailTemplateCriteria(self::TEMPLATE_NAME, User::class),

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -20,7 +21,6 @@ use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestMailbox;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
-use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
@@ -63,8 +63,8 @@ class EmailTypeTest extends TypeTestCase
     /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
     private $mailboxManager;
 
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
@@ -127,7 +127,7 @@ class EmailTypeTest extends TypeTestCase
 
         $configManager = $this->createMock(ConfigManager::class);
 
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $helper = $this->createMock(EmailModelBuilderHelper::class);
 
@@ -138,7 +138,7 @@ class EmailTypeTest extends TypeTestCase
             $relatedEmailsProvider,
             $helper,
             $this->mailboxManager,
-            $this->registry,
+            $this->doctrine,
             $this->emailOriginHelper
         );
 
@@ -231,7 +231,7 @@ class EmailTypeTest extends TypeTestCase
         $this->mailboxManager->expects(self::once())
             ->method('findAvailableMailboxes')
             ->willReturn($response);
-        $this->registry->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getManager')
             ->willReturn($this->em);
 

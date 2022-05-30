@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DigitalAssetBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Persistence\ManagerRegistry;
 use GuzzleHttp\ClientInterface;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
@@ -17,7 +18,6 @@ use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\LocalizationCollectionType
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -52,10 +52,11 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
     public function testConfigureOptions(): void
     {
-        $this->translator
+        $translatedTitle = 'translatedTitle';
+        $this->translator->expects(self::any())
             ->method('trans')
             ->with('oro.digitalasset.controller.sections.general.label')
-            ->willReturn($translatedTitle = 'translatedTitle');
+            ->willReturn($translatedTitle);
 
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -97,8 +98,9 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
     public function submitDataProvider(): array
     {
+        $file = new SymfonyFile('sample-path', false);
         $sourceFile = new File();
-        $sourceFile->setFile($file = new SymfonyFile('sample-path', false));
+        $sourceFile->setFile($file);
 
         return [
             'title is set, source file is uploaded' => [
@@ -129,7 +131,8 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
     public function testSubmitWhenNoFile(): void
     {
-        $form = $this->factory->create(DigitalAssetType::class, $defaultData = new DigitalAsset());
+        $defaultData = new DigitalAsset();
+        $form = $this->factory->create(DigitalAssetType::class, $defaultData);
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());
@@ -146,7 +149,8 @@ class DigitalAssetTypeTest extends FormIntegrationTestCase
 
     public function testSubmitWhenNoTitle(): void
     {
-        $form = $this->factory->create(DigitalAssetType::class, $defaultData = new DigitalAsset());
+        $defaultData = new DigitalAsset();
+        $form = $this->factory->create(DigitalAssetType::class, $defaultData);
 
         $this->assertEquals($defaultData, $form->getData());
         $this->assertEquals($defaultData, $form->getViewData());

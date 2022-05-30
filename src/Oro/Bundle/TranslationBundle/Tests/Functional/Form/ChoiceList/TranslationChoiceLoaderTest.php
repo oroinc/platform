@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Form\ChoiceList;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Tests\Functional\DataFixtures\LoadAddressTypeData;
@@ -88,15 +87,11 @@ class TranslationChoiceLoaderTest extends WebTestCase
         $this->assertEquals([LoadAddressTypeData::TYPE_HOME, LoadAddressTypeData::TYPE_WORK], $values);
     }
 
-    /**
-     * @param null|QueryBuilder|\Closure $queryBuilder
-     * @return TranslationChoiceLoader
-     */
-    private function getLoader($queryBuilder): TranslationChoiceLoader
+    private function getLoader(QueryBuilder|\Closure|null $queryBuilder): TranslationChoiceLoader
     {
         return new TranslationChoiceLoader(
             AddressType::class,
-            $this->getManagerRegistry(),
+            self::getContainer()->get('doctrine'),
             self::getContainer()->get('form.choice_list_factory.default'),
             $queryBuilder
         );
@@ -104,14 +99,8 @@ class TranslationChoiceLoaderTest extends WebTestCase
 
     private function createQueryBuilder(): QueryBuilder
     {
-        return $this->getManagerRegistry()
-            ->getManagerForClass(AddressType::class)
+        return self::getContainer()->get('doctrine')
             ->getRepository(AddressType::class)
             ->createQueryBuilder('a');
-    }
-
-    private function getManagerRegistry(): Registry
-    {
-        return self::getContainer()->get('doctrine');
     }
 }

@@ -15,8 +15,5 @@ interface EmailRecipientsProviderInterface
      */
     public function getRecipients(EmailRecipientsProviderArgs $args);
 
-    /**
-     * @return string
-     */
     public function getSection(): string;
 }

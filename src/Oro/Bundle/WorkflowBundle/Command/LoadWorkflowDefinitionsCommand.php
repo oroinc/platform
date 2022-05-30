@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -26,20 +26,19 @@ class LoadWorkflowDefinitionsCommand extends Command
     private WorkflowConfigurationProvider $configurationProvider;
     private WorkflowDefinitionHandler $definitionHandler;
     private WorkflowDefinitionConfigurationBuilder $configurationBuilder;
-    private ManagerRegistry $registry;
+    private ManagerRegistry $doctrine;
 
     public function __construct(
         WorkflowConfigurationProvider $configurationProvider,
         WorkflowDefinitionHandler $definitionHandler,
         WorkflowDefinitionConfigurationBuilder $configurationBuilder,
-        ManagerRegistry $registry
+        ManagerRegistry $doctrine
     ) {
         parent::__construct();
-
         $this->configurationProvider = $configurationProvider;
         $this->definitionHandler = $definitionHandler;
         $this->configurationBuilder = $configurationBuilder;
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -97,7 +96,7 @@ HELP
             $output->writeln('Loading workflow definitions...');
 
             /** @var WorkflowDefinitionRepository $workflowDefinitionRepository */
-            $workflowDefinitionRepository = $this->registry->getRepository(WorkflowDefinition::class);
+            $workflowDefinitionRepository = $this->doctrine->getRepository(WorkflowDefinition::class);
             $workflowDefinitions = $this->configurationBuilder->buildFromConfiguration($workflowConfiguration);
 
             foreach ($workflowDefinitions as $workflowDefinition) {

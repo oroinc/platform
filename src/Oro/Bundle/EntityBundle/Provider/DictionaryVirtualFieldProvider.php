@@ -7,10 +7,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -19,26 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
 {
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var CacheInterface */
-    private $cache;
-
-    /** @var array */
-    private $virtualFields = [];
-
-    /** @var array */
-    private $virtualFieldQueries = [];
-
-    /** @var array [class name => [field name, ...], ...] */
-    private $dictionaries;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
+    private TranslatorInterface $translator;
+    private CacheInterface $cache;
+    private array $virtualFields = [];
+    private array $virtualFieldQueries = [];
+    private ?array $dictionaries = null;
     private Inflector $inflector;
 
     public function __construct(
@@ -172,7 +159,7 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
         $result = [];
         /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManagerForClass($className);
-        foreach ($virtualFields as $name => list($targetClass, $associationName, $fieldName, $combinedLabel)) {
+        foreach ($virtualFields as $name => [$targetClass, $associationName, $fieldName, $combinedLabel]) {
             $result[$name] = [
                 'query' => [
                     'select' => [

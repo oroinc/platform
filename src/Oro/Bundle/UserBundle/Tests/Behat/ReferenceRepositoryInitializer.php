@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Behat;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\ReferenceRepositoryInitializerInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -17,12 +18,12 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
     /**
      * {@inheritdoc}
      */
-    public function init(Registry $doctrine, Collection $referenceRepository)
+    public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $doctrine->getManager();
         /** @var RoleRepository $roleRepository */
-        $roleRepository = $em->getRepository('OroUserBundle:Role');
+        $roleRepository = $em->getRepository(Role::class);
         /** @var Role $role */
         $role = $roleRepository->findOneBy(['role' => User::ROLE_ADMINISTRATOR]);
 
@@ -47,8 +48,7 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $referenceRepository->set('organization', $user->getOrganization());
         $referenceRepository->set('business_unit', $user->getOwner());
 
-        $groupRepository = $em->getRepository('OroUserBundle:Group');
-
+        $groupRepository = $em->getRepository(Group::class);
         $referenceRepository->set('adminsGroup', $groupRepository->findOneBy(['name' => 'Administrators']));
 
         $referenceRepository->set(

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Manager;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository;
 use Oro\Bundle\ImportExportBundle\Manager\ImportExportResultManager;
@@ -10,14 +11,13 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTrait;
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
+    private $doctrine;
 
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
@@ -27,11 +27,11 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
         $this->importExportResultManager = new ImportExportResultManager(
-            $this->managerRegistry,
+            $this->doctrine,
             $this->tokenAccessor
         );
     }
@@ -50,7 +50,7 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->once())
             ->method('flush');
 
-        $this->managerRegistry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
@@ -153,7 +153,7 @@ class ImportExportResultManagerTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->once())
             ->method('flush');
 
-        $this->managerRegistry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 

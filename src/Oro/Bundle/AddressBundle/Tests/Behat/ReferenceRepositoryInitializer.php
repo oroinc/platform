@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Tests\Behat;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AddressBundle\Entity\AddressType;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;
@@ -46,11 +46,10 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
     /**
      * {@inheritdoc}
      */
-    public function init(Registry $doctrine, Collection $referenceRepository)
+    public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         foreach ($this->data as $className => $entities) {
             $repository = $doctrine->getManager()->getRepository($className);
-
             foreach ($entities as $referenceName => $criteria) {
                 $referenceRepository->set($referenceName, $repository->findOneBy($criteria));
             }

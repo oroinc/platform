@@ -5,6 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Job;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
 use Oro\Bundle\BatchBundle\Entity\JobExecution;
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
@@ -20,7 +21,6 @@ use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorInterface;
 use Oro\Bundle\ImportExportBundle\Job\Context\ContextAggregatorRegistry;
 use Oro\Bundle\ImportExportBundle\Job\Context\SimpleContextAggregator;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**

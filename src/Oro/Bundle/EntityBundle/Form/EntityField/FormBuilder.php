@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityBundle\Form\EntityField;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
@@ -44,12 +44,12 @@ class FormBuilder
     /** @var FormFactory */
     protected $formFactory;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     public function __construct(
         FormFactory $formFactory,
-        Registry $registry
+        ManagerRegistry $registry
     ) {
         $this->formFactory = $formFactory;
         $this->registry = $registry;

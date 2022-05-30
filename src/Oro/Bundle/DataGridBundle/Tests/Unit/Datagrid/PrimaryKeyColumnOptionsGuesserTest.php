@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\DefaultColumnOptionsGuesser;
@@ -12,16 +12,17 @@ use Symfony\Component\Form\Guess\Guess;
 
 class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var DefaultColumnOptionsGuesser */
     private $guesser;
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(Registry::class);
-        $this->guesser = new PrimaryKeyColumnOptionsGuesser($this->registry);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
+        $this->guesser = new PrimaryKeyColumnOptionsGuesser($this->doctrine);
     }
 
     /**
@@ -40,7 +41,7 @@ class PrimaryKeyColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             ->with('TestClass')
             ->willReturn($classMetadata);
 
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->with('TestClass')
             ->willReturn($manager);

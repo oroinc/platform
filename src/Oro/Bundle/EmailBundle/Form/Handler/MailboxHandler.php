@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Event\MailboxSaved;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
@@ -14,11 +14,14 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles a mailbox form.
+ */
 class MailboxHandler implements FormAwareInterface
 {
     const FORM = MailboxType::class;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var FormInterface */
@@ -39,7 +42,7 @@ class MailboxHandler implements FormAwareInterface
     public function __construct(
         FormFactoryInterface $formFactory,
         RequestStack $requestStack,
-        Registry $doctrine,
+        ManagerRegistry $doctrine,
         MailboxProcessStorage $mailboxProcessStorage,
         EventDispatcherInterface $dispatcher
     ) {

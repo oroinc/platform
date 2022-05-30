@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
@@ -17,36 +18,25 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
  */
 class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var RelatedEmailsProvider */
-    protected $relatedEmailsProvider;
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /** @var Registry */
-    protected $registry;
-
-    /** @var EmailOwnerProvider */
-    protected $emailOwnerProvider;
-
-    /** @var EmailRecipientsHelper */
-    protected $emailRecipientsHelper;
+    private TokenAccessorInterface $tokenAccessor;
+    private RelatedEmailsProvider $relatedEmailsProvider;
+    private AclHelper $aclHelper;
+    private ManagerRegistry $doctrine;
+    private EmailOwnerProvider $emailOwnerProvider;
+    private EmailRecipientsHelper $emailRecipientsHelper;
 
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
         RelatedEmailsProvider $relatedEmailsProvider,
         AclHelper $aclHelper,
-        Registry $registry,
+        ManagerRegistry $doctrine,
         EmailOwnerProvider $emailOwnerProvider,
         EmailRecipientsHelper $emailRecipientsHelper
     ) {
         $this->tokenAccessor = $tokenAccessor;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->aclHelper = $aclHelper;
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->emailOwnerProvider = $emailOwnerProvider;
         $this->emailRecipientsHelper = $emailRecipientsHelper;
     }
@@ -75,7 +65,7 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $result = [];
         foreach ($emails as $email => $name) {
-            $owner = $this->emailOwnerProvider->findEmailOwner($this->registry->getManager(), $email);
+            $owner = $this->emailOwnerProvider->findEmailOwner($this->doctrine->getManager(), $email);
             if (!$this->emailRecipientsHelper->isObjectAllowed($args, $owner)) {
                 continue;
             }
@@ -91,22 +81,26 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
     }
 
     /**
-     * @param object|null $owner
-     *
-     * @return RecipientEntity|null
+     * {@inheritdoc}
      */
-    protected function createRecipientEntity($owner = null)
+    public function getSection(): string
+    {
+        return 'oro.email.autocomplete.recently_used';
+    }
+
+    private function createRecipientEntity(?object $owner = null): ?RecipientEntity
     {
         if (!$owner) {
             return null;
         }
 
-        $metadata = $this->registry->getManager()->getClassMetadata(ClassUtils::getClass($owner));
-
-        return $this->emailRecipientsHelper->createRecipientEntity($owner, $metadata);
+        return $this->emailRecipientsHelper->createRecipientEntity(
+            $owner,
+            $this->doctrine->getManager()->getClassMetadata(ClassUtils::getClass($owner))
+        );
     }
 
-    protected function emailsFromResult(array $result)
+    private function emailsFromResult(array $result): array
     {
         $emails = [];
         foreach ($result as $row) {
@@ -116,19 +110,8 @@ class RecentEmailRecipientsProvider implements EmailRecipientsProviderInterface
         return $emails;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getSection(): string
+    private function getEmailRecipientRepository(): EmailRecipientRepository
     {
-        return 'oro.email.autocomplete.recently_used';
-    }
-
-    /**
-     * @return EmailRecipientRepository
-     */
-    protected function getEmailRecipientRepository()
-    {
-        return $this->registry->getRepository('OroEmailBundle:EmailRecipient');
+        return $this->doctrine->getRepository(EmailRecipient::class);
     }
 }

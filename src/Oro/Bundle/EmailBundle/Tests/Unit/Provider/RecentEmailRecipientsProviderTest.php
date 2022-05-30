@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
@@ -28,8 +29,8 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RelatedEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $relatedEmailsProvider;
 
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailOwnerProvider;
@@ -45,11 +46,11 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->relatedEmailsProvider = $this->createMock(RelatedEmailsProvider::class);
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
         $this->emailRecipientsHelper = $this->createMock(EmailRecipientsHelper::class);
 
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
             ->willReturn($this->createMock(EntityManager::class));
 
@@ -57,7 +58,7 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
             $this->tokenAccessor,
             $this->relatedEmailsProvider,
             $this->aclHelper,
-            $this->registry,
+            $this->doctrine,
             $this->emailOwnerProvider,
             $this->emailRecipientsHelper
         );
@@ -121,9 +122,9 @@ class RecentEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
             ->with($qb)
             ->willReturn($query);
 
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
-            ->with('OroEmailBundle:EmailRecipient')
+            ->with(EmailRecipient::class)
             ->willReturn($emailRecipientRepository);
 
         $this->emailRecipientsHelper->expects($this->any())

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -28,10 +27,10 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
 
         $this->extension->load([], $container);
 
-        $featureCheckerDef = $container->getDefinition('oro_featuretoggle.checker.feature_checker');
-        $this->assertEquals(FeatureChecker::STRATEGY_UNANIMOUS, $featureCheckerDef->getArgument('$strategy'));
-        $this->assertFalse($featureCheckerDef->getArgument('$allowIfAllAbstainDecisions'));
-        $this->assertTrue($featureCheckerDef->getArgument('$allowIfEqualGrantedDeniedDecisions'));
+        $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
+        $this->assertEquals('unanimous', $featureDecisionManagerDef->getArgument('$strategy'));
+        $this->assertFalse($featureDecisionManagerDef->getArgument('$allowIfAllAbstainDecisions'));
+        $this->assertTrue($featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions'));
     }
 
     public function testLoadWithConfig()
@@ -40,25 +39,25 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
         $container->setParameter('kernel.environment', 'prod');
 
         $config = [
-            'strategy'                      => FeatureChecker::STRATEGY_AFFIRMATIVE,
+            'strategy'                      => 'affirmative',
             'allow_if_all_abstain'          => true,
             'allow_if_equal_granted_denied' => false
         ];
 
         $this->extension->load([$config], $container);
 
-        $featureCheckerDef = $container->getDefinition('oro_featuretoggle.checker.feature_checker');
+        $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
         $this->assertEquals(
             $config['strategy'],
-            $featureCheckerDef->getArgument('$strategy')
+            $featureDecisionManagerDef->getArgument('$strategy')
         );
         $this->assertEquals(
             $config['allow_if_all_abstain'],
-            $featureCheckerDef->getArgument('$allowIfAllAbstainDecisions')
+            $featureDecisionManagerDef->getArgument('$allowIfAllAbstainDecisions')
         );
         $this->assertEquals(
             $config['allow_if_equal_granted_denied'],
-            $featureCheckerDef->getArgument('$allowIfEqualGrantedDeniedDecisions')
+            $featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions')
         );
     }
 }

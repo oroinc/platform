@@ -4,8 +4,8 @@ namespace Oro\Bundle\DigitalAssetBundle\Tests\Functional\Controller;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
-use Oro\Bundle\OrganizationBundle\Tests\Functional\OrganizationTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -14,8 +14,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  */
 class DigitalAssetControllerTest extends WebTestCase
 {
-    use OrganizationTrait;
-
     private const DIGITAL_ASSET_TITLE_1 = 'Digital Asset Title';
     private const DIGITAL_ASSET_TITLE_2 = 'Digital Asset Title (updated)';
     private const DIGITAL_ASSET_IMAGE_1 = 'digital_asset_image_1.jpg';
@@ -24,6 +22,7 @@ class DigitalAssetControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->loadFixtures([LoadOrganization::class]);
     }
 
     public function testCreate(): DigitalAsset
@@ -135,13 +134,12 @@ class DigitalAssetControllerTest extends WebTestCase
     private function getDigitalAssetCount(): int
     {
         $qb = $this->getContainer()->get('doctrine')
-            ->getManagerForClass(DigitalAsset::class)
             ->getRepository(DigitalAsset::class)
             ->createQueryBuilder('da');
         $qb
             ->select($qb->expr()->count('da'))
             ->where($qb->expr()->eq('da.organization', ':organization'))
-            ->setParameter('organization', $this->getOrganization());
+            ->setParameter('organization', $this->getReference(LoadOrganization::ORGANIZATION));
 
         return $qb->getQuery()->getSingleScalarResult();
     }

@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Async;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\Topic\SendAutoResponseTopic;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Manager\AutoResponseManager;
@@ -19,28 +18,13 @@ use Psr\Log\LoggerInterface;
  */
 class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var Registry
-     */
-    private $doctrine;
-
-    /**
-     * @var AutoResponseManager
-     */
-    private $autoResponseManager;
-
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private ManagerRegistry $doctrine;
+    private AutoResponseManager $autoResponseManager;
+    private JobRunner $jobRunner;
+    private LoggerInterface $logger;
 
     public function __construct(
-        Registry $doctrine,
+        ManagerRegistry $doctrine,
         AutoResponseManager $autoResponseManager,
         JobRunner $jobRunner,
         LoggerInterface $logger
@@ -54,12 +38,12 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     /**
      * {@inheritdoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $data = $message->getBody();
 
         /** @var Email $email */
-        $email = $this->getEmailRepository()->find($data['id']);
+        $email = $this->doctrine->getRepository(Email::class)->find($data['id']);
         if (! $email) {
             $this->logger->error(sprintf('Email was not found. id: "%s"', $data['id']));
 
@@ -76,17 +60,9 @@ class AutoResponseMessageProcessor implements MessageProcessorInterface, TopicSu
     }
 
     /**
-     * @return EntityRepository
-     */
-    protected function getEmailRepository()
-    {
-        return $this->doctrine->getRepository(Email::class);
-    }
-
-    /**
      * {@inheritdoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [SendAutoResponseTopic::getName()];
     }

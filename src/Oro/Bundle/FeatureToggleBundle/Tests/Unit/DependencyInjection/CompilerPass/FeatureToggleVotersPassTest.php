@@ -12,7 +12,7 @@ class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
     public function testProcess(): void
     {
         $container = new ContainerBuilder();
-        $featureCheckerDef = $container->register('oro_featuretoggle.checker.feature_checker');
+        $featureCheckerDef = $container->register('oro_featuretoggle.feature_decision_manager');
 
         $container->register('voter_1')
             ->addTag('oro_featuretogle.voter', ['priority' => 100]);
@@ -33,7 +33,7 @@ class FeatureToggleVotersPassTest extends \PHPUnit\Framework\TestCase
     public function testProcessWhenNoVoters(): void
     {
         $container = new ContainerBuilder();
-        $featureCheckerDef = $container->register('oro_featuretoggle.checker.feature_checker');
+        $featureCheckerDef = $container->register('oro_featuretoggle.feature_decision_manager');
 
         $compiler = new FeatureToggleVotersPass();
         $compiler->process($container);

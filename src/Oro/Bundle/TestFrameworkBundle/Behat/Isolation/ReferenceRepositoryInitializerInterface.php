@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 
 /**
@@ -12,10 +12,6 @@ interface ReferenceRepositoryInitializerInterface
 {
     /**
      * Adds references into `referenceRepository` for objects that already in database, usually persisted after install
-     *
-     * @param Registry $doctrine
-     * @param Collection $referenceRepository
-     * @return void
      */
-    public function init(Registry $doctrine, Collection $referenceRepository);
+    public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void;
 }

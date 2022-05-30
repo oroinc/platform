@@ -5,6 +5,7 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Metadata;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -18,7 +19,6 @@ use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
 use Oro\Bundle\SecurityBundle\Metadata\Label;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
@@ -94,14 +94,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $scope
-     * @param string $entityClass
-     * @param array  $values
-     *
-     * @return Config
-     */
-    private function getEntityConfig($scope, $entityClass, $values = []): Config
+    private function getEntityConfig(string $scope, string $entityClass, array $values = []): Config
     {
         return new Config(
             new EntityConfigId($scope, $entityClass),
@@ -109,15 +102,7 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $scope
-     * @param string $entityClass
-     * @param string $fieldName
-     * @param array  $values
-     *
-     * @return Config
-     */
-    private function getFieldConfig($scope, $entityClass, $fieldName, $values = [])
+    private function getFieldConfig(string $scope, string $entityClass, string $fieldName, array $values = []): Config
     {
         return new Config(
             new FieldConfigId($scope, $entityClass, $fieldName, 'string'),
@@ -239,8 +224,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isProtectedEntityDataProvider
      */
-    public function testIsProtectedEntity($entityClass, $entityGroup, $group, $expected): void
-    {
+    public function testIsProtectedEntity(
+        string $entityClass,
+        string $entityGroup,
+        string $group,
+        bool $expected
+    ): void {
         $this->cache->expects($this->once())
             ->method('getItem')
             ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)
@@ -329,8 +318,12 @@ class EntitySecurityMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getProtectedFieldNameDataProvider
      */
-    public function testGetProtectedFieldName($entityClass, $fieldName, $fieldAliases, $expected): void
-    {
+    public function testGetProtectedFieldName(
+        string $entityClass,
+        string $fieldName,
+        array $fieldAliases,
+        string $expected
+    ): void {
         $this->cache->expects($this->once())
             ->method('getItem')
             ->with('short-' . EntitySecurityMetadataProvider::ACL_SECURITY_TYPE)

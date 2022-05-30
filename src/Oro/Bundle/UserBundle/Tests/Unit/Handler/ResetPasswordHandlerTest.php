@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Handler;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
 use Oro\Bundle\NotificationBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\NotificationBundle\Model\TemplateEmailNotification;
@@ -19,9 +18,6 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var UserManager|\PHPUnit\Framework\MockObject\MockObject */
     private $userManager;
 
-    /** @var Registry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
@@ -32,12 +28,11 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $this->emailNotificationManager = $this->createMock(EmailNotificationManager::class);
         $this->userManager = $this->createMock(UserManager::class);
-        $this->registry = $this->createMock(Registry::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
         $this->handler = new ResetPasswordHandler(
             $this->emailNotificationManager,
             $this->userManager,
-            $this->registry,
             $this->logger
         );
     }
@@ -97,11 +92,11 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
         $this->emailNotificationManager->expects($this->once())
             ->method('processSingle')
             ->willReturnCallback(
-                function (TemplateEmailNotification $notification, array $params, LoggerInterface $logger) use ($user) {
+                function (TemplateEmailNotification $notification) use ($user) {
                     $this->assertSame($user, $notification->getEntity());
                     $this->assertInstanceOf(TemplateEmailNotification::class, $notification);
                     $this->assertEquals(
-                        new EmailTemplateCriteria(ResetPasswordHandler::TEMPLATE_NAME, User::class),
+                        new EmailTemplateCriteria('force_reset_password', User::class),
                         $notification->getTemplateCriteria()
                     );
                     $this->assertEquals([$user], $notification->getRecipients());
@@ -129,7 +124,7 @@ class ResetPasswordHandlerTest extends \PHPUnit\Framework\TestCase
             ->with($user);
 
         $expectedNotification = new TemplateEmailNotification(
-            new EmailTemplateCriteria(ResetPasswordHandler::TEMPLATE_NAME, User::class),
+            new EmailTemplateCriteria('force_reset_password', User::class),
             [$user],
             $user
         );

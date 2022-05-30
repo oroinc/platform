@@ -2,33 +2,32 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Component\Action\Action\AbstractAction;
-use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 
+/**
+ * The action to request/find mailboxes.
+ */
 class RequestMailboxes extends AbstractAction
 {
-    /** @var string */
-    protected $attribute;
+    private ManagerRegistry $doctrine;
+    private MailboxProcessStorage $processStorage;
 
     /** @var string */
-    protected $processType;
+    private $attribute;
 
     /** @var string */
-    protected $email;
+    private $processType;
 
-    /** @var Registry */
-    private $doctrine;
-
-    /** @var MailboxProcessStorage */
-    private $processStorage;
+    /** @var string */
+    private $email;
 
     public function __construct(
         ContextAccessor $contextAccessor,
-        Registry $doctrine,
+        ManagerRegistry $doctrine,
         MailboxProcessStorage $processStorage
     ) {
         parent::__construct($contextAccessor);
@@ -37,7 +36,7 @@ class RequestMailboxes extends AbstractAction
     }
 
     /**
-     * @param mixed $context
+     * {@inheritDoc}
      */
     protected function executeAction($context)
     {
@@ -55,15 +54,7 @@ class RequestMailboxes extends AbstractAction
     }
 
     /**
-     * Initialize action based on passed options.
-     *
-     * @param array $options
-     *
-     * @return ActionInterface
-     * @throws InvalidParameterException
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * {@inheritDoc}
      */
     public function initialize(array $options)
     {
@@ -83,8 +74,8 @@ class RequestMailboxes extends AbstractAction
             throw new InvalidParameterException('Email must be defined.');
         }
 
-        $this->attribute   = isset($options['attribute'])    ? $options['attribute']    : $options[0];
-        $this->processType = isset($options['process_type']) ? $options['process_type'] : $options[1];
-        $this->email       = isset($options['email'])        ? $options['email']        : $options[2];
+        $this->attribute = $options['attribute'] ?? $options[0];
+        $this->processType = $options['process_type'] ?? $options[1];
+        $this->email = $options['email'] ?? $options[2];
     }
 }

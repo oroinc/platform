@@ -2,32 +2,31 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Component\PhpUtils\ArrayUtil;
 
+/**
+ * Provides information about email owners.
+ */
 class EmailOwnersProvider
 {
-    /** @var EmailOwnerProviderStorage */
-    protected $emailOwnerStorage;
-
-    /** @var ActivityListChainProvider */
-    protected $activityListChainProvider;
-
-    /** @var Registry */
-    protected $registry;
+    private EmailOwnerProviderStorage $emailOwnerStorage;
+    private ActivityListChainProvider $activityListChainProvider;
+    private ManagerRegistry $doctrine;
 
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
         EmailOwnerProviderStorage $emailOwnerStorage,
-        Registry $registry
+        ManagerRegistry $doctrine
     ) {
         $this->activityListChainProvider = $activityListChainProvider;
         $this->emailOwnerStorage = $emailOwnerStorage;
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -43,9 +42,7 @@ class EmailOwnersProvider
             return [];
         }
 
-        return $this
-            ->registry
-            ->getRepository('OroEmailBundle:Email')
+        return $this->doctrine->getRepository(Email::class)
             ->getEmailsByOwnerEntity($entity, $ownerColumnName);
     }
 
@@ -63,9 +60,7 @@ class EmailOwnersProvider
             return [];
         }
 
-        return $this
-            ->registry
-            ->getRepository('OroEmailBundle:Email')
+        return $this->doctrine->getRepository(Email::class)
             ->createEmailsByOwnerEntityQbs($entity, $ownerColumnName);
     }
 
@@ -80,9 +75,7 @@ class EmailOwnersProvider
             return false;
         }
 
-        return $this
-            ->registry
-            ->getRepository('OroEmailBundle:Email')
+        return $this->doctrine->getRepository(Email::class)
             ->hasEmailsByOwnerEntity($entity, $ownerColumnName);
     }
 
@@ -117,11 +110,11 @@ class EmailOwnersProvider
      */
     public function getOwnerColumnName($entityOrClass)
     {
-        if ($provider = $this->findEmailOwnerProvider($entityOrClass)) {
-            return $this->emailOwnerStorage->getEmailOwnerFieldName($provider);
-        }
+        $provider = $this->findEmailOwnerProvider($entityOrClass);
 
-        return null;
+        return $provider
+            ? $this->emailOwnerStorage->getEmailOwnerFieldName($provider)
+            : null;
     }
 
     /**
@@ -129,7 +122,7 @@ class EmailOwnersProvider
      *
      * @return EmailOwnerProviderInterface|null
      */
-    protected function findEmailOwnerProvider($entityOrClass)
+    private function findEmailOwnerProvider($entityOrClass)
     {
         $entityClass = is_object($entityOrClass) ? ClassUtils::getClass($entityOrClass) : $entityOrClass;
 

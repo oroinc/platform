@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Type;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -26,31 +26,22 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class AutoResponseTemplateType extends AbstractType
 {
-    /** @var ConfigManager */
-    protected $cm;
-
-    /** @var ConfigManager */
-    protected $userConfig;
-
-    /** @var Registry */
-    protected $registry;
-
-    /** @var LocalizationManager */
-    protected $localizationManager;
-
-    /** @var HtmlTagHelper */
-    protected $htmlTagHelper;
+    private ConfigManager $configManager;
+    private ConfigManager $userConfig;
+    private ManagerRegistry $doctrine;
+    private LocalizationManager $localizationManager;
+    private HtmlTagHelper $htmlTagHelper;
 
     public function __construct(
-        ConfigManager $cm,
+        ConfigManager $configManager,
         ConfigManager $userConfig,
-        Registry $registry,
+        ManagerRegistry $doctrine,
         LocalizationManager $localizationManager,
         HtmlTagHelper $htmlTagHelper
     ) {
-        $this->cm = $cm;
+        $this->configManager = $configManager;
         $this->userConfig = $userConfig;
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->localizationManager = $localizationManager;
         $this->htmlTagHelper = $htmlTagHelper;
     }
@@ -105,7 +96,7 @@ class AutoResponseTemplateType extends AbstractType
 
             if (!$event->getData()) {
                 $emailTemplate = new EmailTemplate();
-                $signature = $this->htmlTagHelper->sanitize($this->cm->get('oro_email.signature', ''));
+                $signature = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature', ''));
                 $emailTemplate->setContent($signature);
                 $emailTemplate->setEntityName(Email::ENTITY_CLASS);
                 $event->setData($emailTemplate);
@@ -155,38 +146,28 @@ class AutoResponseTemplateType extends AbstractType
         return 'oro_email_autoresponse_template';
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    protected function templateExists($name)
+    private function templateExists(?string $name): bool
     {
+        if (!$name) {
+            return false;
+        }
+
         return (bool)$this->getEmailTemplateRepository()
             ->createQueryBuilder('et')
             ->select('COUNT(et.id)')
-            ->where('et.name = :name')
-            ->andWhere('et.entityName = :entityName')
-            ->setParameters([
-                'name' => $name,
-                'entityName' => Email::ENTITY_CLASS,
-            ])
+            ->where('et.name = :name AND et.entityName = :entityName')
+            ->setParameter('name', $name)
+            ->setParameter('entityName', Email::ENTITY_CLASS)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    /**
-     * @return EmailTemplateRepository
-     */
-    protected function getEmailTemplateRepository()
+    private function getEmailTemplateRepository(): EmailTemplateRepository
     {
-        return $this->registry->getRepository(EmailTemplate::class);
+        return $this->doctrine->getRepository(EmailTemplate::class);
     }
 
-    /**
-     * @return array
-     */
-    protected function getWysiwygOptions()
+    private function getWysiwygOptions(): array
     {
         if ($this->userConfig->get('oro_email.sanitize_html')) {
             return [];

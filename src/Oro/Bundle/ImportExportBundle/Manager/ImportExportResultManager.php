@@ -2,31 +2,24 @@
 
 namespace Oro\Bundle\ImportExportBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Entity\Repository\ImportExportResultRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 /**
  * Responsible for saving import/export results
  */
 class ImportExportResultManager
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $registry;
+    private ManagerRegistry $doctrine;
+    private TokenAccessorInterface $tokenAccessor;
 
-    /**
-     * @var TokenAccessorInterface
-     */
-    private $tokenAccessor;
-
-    public function __construct(ManagerRegistry $manager, TokenAccessorInterface $tokenAccessor)
+    public function __construct(ManagerRegistry $doctrine, TokenAccessorInterface $tokenAccessor)
     {
-        $this->registry = $manager;
+        $this->doctrine = $doctrine;
         $this->tokenAccessor = $tokenAccessor;
     }
 
@@ -55,8 +48,8 @@ class ImportExportResultManager
             $importExportResult->setOwner($owner);
         }
 
-        /** @var EntityManager $em */
-        $em = $this->registry->getManagerForClass(ImportExportResult::class);
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(ImportExportResult::class);
         $em->persist($importExportResult);
         $em->flush();
 
@@ -65,7 +58,7 @@ class ImportExportResultManager
 
     public function markResultsAsExpired(\DateTime $from, \DateTime $to): void
     {
-        $em = $this->registry->getManagerForClass(ImportExportResult::class);
+        $em = $this->doctrine->getManagerForClass(ImportExportResult::class);
         /** @var ImportExportResultRepository $importExportResultRepository */
         $importExportResultRepository = $em->getRepository(ImportExportResult::class);
         $importExportResultRepository->updateExpiredRecords($from, $to);

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Model\EmailAttribute;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
@@ -12,35 +12,26 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Contains methods related to email attributes
  */
 class EmailAttributeProvider
 {
-    /** @var Registry */
-    private $registry;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var NameFormatter */
-    private $nameFormatter;
-
-    /** @var EmailAddressHelper */
-    private $emailAddressHelper;
-
-    /** @var PropertyAccessor */
-    private $propertyAccessor;
+    private ManagerRegistry $doctrine;
+    private ConfigManager $configManager;
+    private NameFormatter $nameFormatter;
+    private EmailAddressHelper $emailAddressHelper;
+    private ?PropertyAccessorInterface $propertyAccessor = null;
 
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         NameFormatter $nameFormatter,
         EmailAddressHelper $emailAddressHelper
     ) {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->configManager = $configManager;
         $this->nameFormatter = $nameFormatter;
         $this->emailAddressHelper = $emailAddressHelper;
@@ -138,9 +129,8 @@ class EmailAttributeProvider
      */
     private function getMetadata($className)
     {
-        $em = $this->registry->getManagerForClass($className);
-
-        return $em->getClassMetadata($className);
+        return $this->doctrine->getManagerForClass($className)
+            ->getClassMetadata($className);
     }
 
     /**
@@ -160,12 +150,9 @@ class EmailAttributeProvider
         return $this->emailAddressHelper->buildFullEmailAddress($email, $ownerName);
     }
 
-    /**
-     * @return PropertyAccessor
-     */
-    private function getPropertyAccessor()
+    private function getPropertyAccessor(): PropertyAccessorInterface
     {
-        if (!$this->propertyAccessor) {
+        if (null === $this->propertyAccessor) {
             $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         }
 

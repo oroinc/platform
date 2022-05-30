@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -27,21 +27,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AutoResponseManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private Registry|\PHPUnit\Framework\MockObject\MockObject $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $registry;
 
-    private EmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject $emailBuilder;
+    /** @var EmailModelBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailBuilder;
 
-    private EmailModelSender|\PHPUnit\Framework\MockObject\MockObject $emailModelSender;
+    /** @var EmailModelSender|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailModelSender;
 
-    private EmailRenderer|\PHPUnit\Framework\MockObject\MockObject $emailRenderer;
+    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
+    private $emailRenderer;
 
-    private AutoResponseManager $autoResponseManager;
+    /** @var AutoResponseManager */
+    private $autoResponseManager;
 
     private ?array $definitions = null;
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(Registry::class);
+        $this->registry = $this->createMock(ManagerRegistry::class);
         $this->emailBuilder = $this->createMock(EmailModelBuilder::class);
         $this->emailModelSender = $this->createMock(EmailModelSender::class);
         $logger = $this->createMock(LoggerInterface::class);

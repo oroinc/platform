@@ -98,7 +98,7 @@ class Registry extends BaseRegistry
      *
      * The default Doctrine's implementation is overridden to avoid unnecessary loading
      * of all managers if the alias belongs to the default manager.
-     * @see \Doctrine\Bundle\DoctrineBundle\Registry::getAliasNamespace
+     * @see \Doctrine\Persistence\ManagerRegistry::getAliasNamespace
      */
     public function getAliasNamespace($alias)
     {
@@ -134,7 +134,7 @@ class Registry extends BaseRegistry
          * In this case the namespaces can be retrieved by
          * $manager->getConfiguration()->getDocumentNamespaces().
          * But this is not implemented for now because default Doctrine's implementation does not do this as well.
-         * @see \Doctrine\Bundle\DoctrineBundle\Registry::getAliasNamespace
+         * @see \Doctrine\Persistence\ManagerRegistry::getAliasNamespace
          */
 
         return [];

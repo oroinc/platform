@@ -15,10 +15,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class InputOutputController implements Controller
 {
+    private TestIsolationSubscriber $testIsolationSubscriber;
+    private MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber;
+
     public function __construct(
-        private TestIsolationSubscriber $testIsolationSubscriber,
-        private MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber
+        TestIsolationSubscriber $testIsolationSubscriber,
+        MessageQueueIsolationSubscriber $messageQueueIsolationSubscriber
     ) {
+        $this->testIsolationSubscriber = $testIsolationSubscriber;
+        $this->messageQueueIsolationSubscriber = $messageQueueIsolationSubscriber;
     }
 
     /**

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Entity\Manager\Field;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldValidator;
@@ -19,30 +19,30 @@ use Symfony\Component\Form\FormInterface;
 
 class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
+    /** @var EntityApiBaseHandler|\PHPUnit\Framework\MockObject\MockObject */
+    private $handler;
+
+    /** @var FormBuilder|\PHPUnit\Framework\MockObject\MockObject */
+    private $formBuilder;
+
+    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityRoutingHelper;
+
+    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $ownershipMetadataProvider;
+
+    /** @var EntityFieldValidator|\PHPUnit\Framework\MockObject\MockObject */
+    private $validator;
 
     /** @var EntityFieldManager */
     private $manager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $formBuilder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $ownershipMetadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->formBuilder = $this->createMock(FormBuilder::class);
         $this->handler = $this->createMock(EntityApiBaseHandler::class);
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);
@@ -50,7 +50,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
         $this->validator = $this->createMock(EntityFieldValidator::class);
 
         $this->manager = new EntityFieldManager(
-            $this->registry,
+            $this->doctrine,
             $this->formBuilder,
             $this->handler,
             $this->entityRoutingHelper,
@@ -79,7 +79,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
             ->willReturn($entityManager);
 
@@ -118,7 +118,7 @@ class EntityFieldManagerTest extends \PHPUnit\Framework\TestCase
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
             ->willReturn($entityManager);
 

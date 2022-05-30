@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\NotificationBundle\Provider;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -16,8 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EmailNotificationEntityProvider extends EntityProvider
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
+    private ManagerRegistry $doctrine;
 
     public function __construct(
         ConfigProvider $entityConfigProvider,
@@ -59,13 +58,8 @@ class EmailNotificationEntityProvider extends EntityProvider
         }
     }
 
-    /**
-     * @return EmailTemplateRepository
-     */
-    private function getEmailTemplateRepository()
+    private function getEmailTemplateRepository(): EmailTemplateRepository
     {
-        return $this->doctrine
-            ->getManagerForClass(EmailTemplate::class)
-            ->getRepository(EmailTemplate::class);
+        return $this->doctrine->getRepository(EmailTemplate::class);
     }
 }

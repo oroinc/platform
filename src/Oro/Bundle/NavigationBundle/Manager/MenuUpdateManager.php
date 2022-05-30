@@ -22,13 +22,24 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class MenuUpdateManager
 {
+    private ManagerRegistry $doctrine;
+    private MenuUpdateHelper $menuUpdateHelper;
+    private PropertyAccessorInterface $propertyAccessor;
+    private string $entityClass;
+    private string $scopeType;
+
     public function __construct(
-        private ManagerRegistry $managerRegistry,
-        private MenuUpdateHelper $menuUpdateHelper,
-        private PropertyAccessorInterface $propertyAccessor,
-        private string $entityClass,
-        private string $scopeType
+        ManagerRegistry $doctrine,
+        MenuUpdateHelper $menuUpdateHelper,
+        PropertyAccessorInterface $propertyAccessor,
+        string $entityClass,
+        string $scopeType
     ) {
+        $this->doctrine = $doctrine;
+        $this->menuUpdateHelper = $menuUpdateHelper;
+        $this->propertyAccessor = $propertyAccessor;
+        $this->entityClass = $entityClass;
+        $this->scopeType = $scopeType;
     }
 
     /**
@@ -175,7 +186,7 @@ class MenuUpdateManager
      *
      * @return ItemInterface|null
      */
-    protected function findMenuItem(ItemInterface $menu, $key): ?ItemInterface
+    private function findMenuItem(ItemInterface $menu, $key): ?ItemInterface
     {
         if ($menu->getName() === $key) {
             return $menu;
@@ -433,7 +444,7 @@ class MenuUpdateManager
      */
     private function getEntityManager()
     {
-        return $this->managerRegistry->getManagerForClass($this->entityClass);
+        return $this->doctrine->getManagerForClass($this->entityClass);
     }
 
     /**

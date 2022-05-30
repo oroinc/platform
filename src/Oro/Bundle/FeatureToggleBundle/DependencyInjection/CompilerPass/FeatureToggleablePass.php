@@ -6,6 +6,10 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Injects a feature name and the feature checker service
+ * into services marked by the "oro_featuretogle.feature" tag.
+ */
 class FeatureToggleablePass implements CompilerPassInterface
 {
     /**
@@ -13,13 +17,9 @@ class FeatureToggleablePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition('oro_featuretoggle.checker.feature_checker')) {
-            return;
-        }
-
         $services = [];
         foreach ($container->findTaggedServiceIds('oro_featuretogle.feature') as $id => $attributes) {
-            $featureName = isset($attributes[0]['feature']) ? $attributes[0]['feature'] : null;
+            $featureName = $attributes[0]['feature'] ?? null;
             if ($featureName) {
                 $container->getDefinition($id)
                     ->addMethodCall('addFeature', [$featureName]);

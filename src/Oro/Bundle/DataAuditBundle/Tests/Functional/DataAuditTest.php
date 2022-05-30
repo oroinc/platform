@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
@@ -53,7 +52,6 @@ class DataAuditTest extends WebTestCase
 
     protected function tearDown(): void
     {
-        /** @var Registry $doctrine */
         $doctrine = self::getContainer()->get('doctrine');
         $entityManager = $doctrine->getManager();
         /** @var AuditRepository $repository */

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EntityExtendBundle\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
@@ -26,14 +26,14 @@ abstract class CacheCommand extends Command
     private EntityProxyGenerator $entityProxyGenerator;
     private EntityAliasResolver $entityAliasResolver;
     protected ExtendConfigDumper $extendConfigDumper;
-    private Registry $doctrine;
+    private ManagerRegistry $doctrine;
     private KernelInterface $kernel;
 
     public function __construct(
         EntityProxyGenerator $entityProxyGenerator,
         EntityAliasResolver $entityAliasResolver,
         ExtendConfigDumper $extendConfigDumper,
-        Registry $doctrine,
+        ManagerRegistry $doctrine,
         KernelInterface $kernel
     ) {
         $this->entityProxyGenerator = $entityProxyGenerator;

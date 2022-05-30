@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Functional\OriginSyncCredentials\Driver;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\Driver\DbalWrongCredentialsOriginsDriver;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -84,7 +84,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOrigins()
     {
-        /** @var Registry $doctrine */
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $origin = new UserEmailOrigin();
@@ -105,7 +105,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOriginsByOwnerIdWithPassedId()
     {
-        /** @var Registry $doctrine */
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $userOrigin = new UserEmailOrigin();
@@ -128,7 +128,7 @@ class DbalWrongCredentialsOriginsDriverTest extends WebTestCase
 
     public function testGetAllOriginsByOwnerIdWithoutPassedId()
     {
-        /** @var Registry $doctrine */
+        /** @var ManagerRegistry $doctrine */
         $doctrine = $this->getContainer()->get('doctrine');
 
         $userOrigin = new UserEmailOrigin();

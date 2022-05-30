@@ -13,10 +13,15 @@ use Psr\Log\LoggerInterface;
  */
 class DecoratorMigrationQueryExecutor implements MigrationQueryExecutorInterface
 {
+    private MigrationQueryExecutorInterface $migrationQueryExecutor;
+    private ConfigurationHandler $configurationHandler;
+
     public function __construct(
-        private MigrationQueryExecutorInterface $migrationQueryExecutor,
-        private ConfigurationHandler $configurationHandler
+        MigrationQueryExecutorInterface $migrationQueryExecutor,
+        ConfigurationHandler $configurationHandler
     ) {
+        $this->migrationQueryExecutor = $migrationQueryExecutor;
+        $this->configurationHandler = $configurationHandler;
     }
 
     public function getConnection(): Connection

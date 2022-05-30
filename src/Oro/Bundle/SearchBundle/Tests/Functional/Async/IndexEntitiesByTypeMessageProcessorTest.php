@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Async;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SearchBundle\Async\IndexEntitiesByTypeMessageProcessor;
 use Oro\Bundle\SearchBundle\Async\Topic\IndexEntitiesByRangeTopic;
@@ -85,10 +86,7 @@ class IndexEntitiesByTypeMessageProcessorTest extends WebTestCase
         return $this->createMock(SessionInterface::class);
     }
 
-    /**
-     * @return \Doctrine\Bundle\DoctrineBundle\Registry
-     */
-    private function getDoctrine()
+    private function getDoctrine(): ManagerRegistry
     {
         return $this->getContainer()->get('doctrine');
     }

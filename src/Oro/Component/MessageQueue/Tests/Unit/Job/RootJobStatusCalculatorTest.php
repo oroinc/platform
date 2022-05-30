@@ -3,7 +3,7 @@
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
 use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EntityBundle\ORM\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -29,33 +29,29 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
     /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $messageProducer;
 
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
     /** @var RootJobStatusCalculator */
     private $rootJobStatusCalculator;
 
-    /** @var Registry */
-    private $registry;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->jobStatusChecker = new JobStatusChecker();
         $this->statusCalculatorResolver = $this->createMock(StatusCalculatorResolver::class);
         $this->messageProducer = $this->createMock(MessageProducerInterface::class);
-        $this->registry = $this->createMock(Registry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->rootJobStatusCalculator = new RootJobStatusCalculator(
             $this->jobManager,
             $this->jobStatusChecker,
             $this->statusCalculatorResolver,
             $this->messageProducer,
-            $this->registry
+            $this->doctrine
         );
 
-        $this->jobManager
-            ->expects($this->any())
+        $this->jobManager->expects($this->any())
             ->method('saveJobWithLock')
             ->willReturnCallback(fn (Job $job, callable $callback) => $callback($job));
     }
@@ -66,12 +62,10 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
     public function testJobStoppedBeforeCalculate(Job $job): void
     {
         $this->assertObjectManaged();
-        $this->statusCalculatorResolver
-            ->expects($this->never())
+        $this->statusCalculatorResolver->expects($this->never())
             ->method('getCalculatorForRootJob');
 
-        $this->messageProducer
-            ->expects($this->never())
+        $this->messageProducer->expects($this->never())
             ->method('send');
 
         $this->rootJobStatusCalculator->calculate($job);
@@ -92,22 +86,18 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
         $job = $this->getJob();
 
         $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('calculateRootJobStatus')
             ->willReturn(Job::STATUS_RUNNING);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('clean');
 
-        $this->statusCalculatorResolver
-            ->expects($this->once())
+        $this->statusCalculatorResolver->expects($this->once())
             ->method('getCalculatorForRootJob')
             ->with($job)
             ->willReturn($statusAndProgressCalculator);
 
-        $this->messageProducer
-            ->expects($this->never())
+        $this->messageProducer->expects($this->never())
             ->method('send');
 
         $this->rootJobStatusCalculator->calculate($job);
@@ -123,26 +113,21 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
         $job = $this->getJob('job', Job::STATUS_RUNNING, 1);
 
         $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('calculateRootJobStatus')
             ->willReturn(Job::STATUS_SUCCESS);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('calculateRootJobProgress')
             ->willReturn(1);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('clean');
 
-        $this->statusCalculatorResolver
-            ->expects($this->once())
+        $this->statusCalculatorResolver->expects($this->once())
             ->method('getCalculatorForRootJob')
             ->with($job)
             ->willReturn($statusAndProgressCalculator);
 
-        $this->messageProducer
-            ->expects($this->once())
+        $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(RootJobStoppedTopic::getName(), new Message(['jobId' => 1], MessagePriority::HIGH));
 
@@ -164,26 +149,21 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
         $rootJob->setChildJobs([$child1, $child2]);
 
         $statusAndProgressCalculator = $this->createMock(AbstractStatusCalculator::class);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('calculateRootJobStatus')
             ->willReturn(Job::STATUS_SUCCESS);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('calculateRootJobProgress')
             ->willReturn(1);
-        $statusAndProgressCalculator
-            ->expects($this->once())
+        $statusAndProgressCalculator->expects($this->once())
             ->method('clean');
 
-        $this->statusCalculatorResolver
-            ->expects($this->once())
+        $this->statusCalculatorResolver->expects($this->once())
             ->method('getCalculatorForRootJob')
             ->with($rootJob)
             ->willReturn($statusAndProgressCalculator);
 
-        $this->messageProducer
-            ->expects($this->once())
+        $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(RootJobStoppedTopic::getName(), new Message(['jobId' => 1], MessagePriority::HIGH));
 
@@ -202,16 +182,13 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
     private function assertObjectManaged(): void
     {
         $manager = $this->createMock(EntityManager::class);
-        $manager
-            ->expects($this->any())
+        $manager->expects($this->any())
             ->method('contains')
             ->willReturn(true);
-        $manager
-            ->expects($this->any())
+        $manager->expects($this->any())
             ->method('refresh');
 
-        $this->registry
-            ->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManager')
             ->willReturn($manager);
     }
