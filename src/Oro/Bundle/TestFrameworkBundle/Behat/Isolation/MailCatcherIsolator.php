@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -25,7 +26,14 @@ class MailCatcherIsolator implements IsolatorInterface
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Purge MailCatcher storage</info>');
-        $this->emailClient->purge();
+        try {
+            $this->emailClient->purge([
+                'timeout'         => 2,
+                'connect_timeout' => 2,
+            ]);
+        } catch (ClientExceptionInterface $e) {
+            $event->writeln('<error>MailCatcher: ' . $e->getMessage() . '</error>');
+        }
     }
 
     /** {@inheritdoc} */
