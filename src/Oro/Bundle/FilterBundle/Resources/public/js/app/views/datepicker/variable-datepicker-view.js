@@ -183,7 +183,7 @@ define(function(require) {
          */
         checkConsistency: function(target) {
             const date = this.$frontDateField.val();
-            if (!this._preventFrontendUpdate && !target && !this._isDateValid(date)) {
+            if (!this._preventFrontendUpdate && !this.$frontDateField.is(target) && !this._isDateValid(date)) {
                 this.$frontDateField.val('');
             }
         },

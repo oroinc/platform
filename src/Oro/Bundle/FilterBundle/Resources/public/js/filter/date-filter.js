@@ -728,8 +728,14 @@ define(function(require, exports, module) {
          * @inheritdoc
          */
         _readDOMValue: function() {
-            _.result(this.subview('start'), 'checkConsistency');
-            _.result(this.subview('end'), 'checkConsistency');
+            if (
+                this.subview('start') &&
+                this.subview('end') &&
+                typeof this._getPickerConstructor().prototype.checkConsistency === 'function'
+            ) {
+                this.subview('start').checkConsistency(document.activeElement);
+                this.subview('end').checkConsistency(document.activeElement);
+            }
 
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),
