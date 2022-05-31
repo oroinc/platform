@@ -135,27 +135,6 @@ class TranslationRepositoryTest extends WebTestCase
         ];
     }
 
-    public function testFindAllByLanguageAndDomain()
-    {
-        $result = array_column(
-            $this->getRepository()->findAllByLanguageAndDomain(
-                LoadLanguages::LANGUAGE2,
-                LoadTranslations::TRANSLATION_KEY_DOMAIN
-            ),
-            'key'
-        );
-
-        sort($result);
-
-        $this->assertEquals(
-            [
-                LoadTranslations::TRANSLATION_KEY_4,
-                LoadTranslations::TRANSLATION_KEY_5,
-            ],
-            $result
-        );
-    }
-
     /**
      * @dataProvider getTranslationsDataProvider
      */

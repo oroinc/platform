@@ -39,6 +39,10 @@ class IsLanguageTranslationInstallAvailableCondition extends AbstractLanguageCon
             return false;
         }
 
+        if ($language->isLocalFilesLanguage()) {
+            return false;
+        }
+
         /** If the language translations are already installed, @see IsLanguageTranslationUpdateAvailableCondition */
         if (null !== $language->getInstalledBuildDate()) {
             return false;

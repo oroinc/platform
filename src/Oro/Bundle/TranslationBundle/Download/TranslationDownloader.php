@@ -13,10 +13,6 @@ use Oro\Bundle\TranslationBundle\Exception\TranslationDownloaderException;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Component\Log\LogAndThrowExceptionTrait;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Reader\TranslationReader;
@@ -26,30 +22,20 @@ use Symfony\Component\Translation\Reader\TranslationReader;
  */
 class TranslationDownloader
 {
-    use LogAndThrowExceptionTrait;
-
     private TranslationServiceAdapterInterface $translationServiceAdapter;
     private TranslationMetricsProviderInterface $translationMetricsProvider;
     private JsTranslationDumper $jsTranslationDumper;
     private TranslationReader $translationReader;
     private DatabasePersister $databasePersister;
     private ManagerRegistry $doctrine;
-    private string $kernelCacheDir;
-    private LoggerInterface $logger; // used by a trait
 
-    /**
-     * Please note that it will also set the provided logger (or a new instance of NullLogger if none provided)
-     * on both $translationServiceAdapter and $translationReader.
-     */
     public function __construct(
         TranslationServiceAdapterInterface $translationServiceAdapter,
         TranslationMetricsProviderInterface $translationMetricsProvider,
         JsTranslationDumper $jsTranslationDumper,
         TranslationReader $translationReader,
         DatabasePersister $translationDatabasePersister,
-        ManagerRegistry $doctrine,
-        string $kernelCacheDir,
-        ?LoggerInterface $logger = null
+        ManagerRegistry $doctrine
     ) {
         $this->translationServiceAdapter = $translationServiceAdapter;
         $this->translationMetricsProvider = $translationMetricsProvider;
@@ -57,9 +43,6 @@ class TranslationDownloader
         $this->translationReader = $translationReader;
         $this->databasePersister = $translationDatabasePersister;
         $this->doctrine = $doctrine;
-        $this->kernelCacheDir = $kernelCacheDir;
-
-        $this->setLogger($logger ?? new NullLogger());
     }
 
     /**
@@ -68,10 +51,10 @@ class TranslationDownloader
      * If the specified language is available, the translation metrics are returned as an array:
      * <code>
      *     [
-     *         'code' => 'uk_UA',                       // full language code, including locality
-     *         'altCode' => 'uk',                       // optional, may not be present
-     *         'translationStatus' => 30,               // percentage of translated strings or words (varies by service)
-     *         'lastBuildDate' => \DateTimeInterface    // object with the last translation build date
+     *         'code' => 'uk_UA',                   // full language code, including locality
+     *         'altCode' => 'uk',                   // optional, may not be present
+     *         'translationStatus' => 30,           // percentage of translated strings or words (varies by service)
+     *         'lastBuildDate' => DateTimeInterface // object with the last translation build date
      *     ]
      * </code>
      *
@@ -86,9 +69,10 @@ class TranslationDownloader
      * Downloads and applies (saves to the database) translations for the specified language.
      *
      * @throws TranslationDownloaderException if the specified language is not added,
-     *                                     or if fails to update the language record after saving the translations.
-     * @throws TranslationServiceAdapterException if fails to download or extract translations.
-     * @throws TranslationDatabasePersisterException if fails to save translations to the database.
+     *                                        or if fails to update the language record after saving the translations
+     *                                        or a directory to download translations cannot be created or accessed
+     * @throws TranslationServiceAdapterException if fails to download or extract translations
+     * @throws TranslationDatabasePersisterException if fails to save translations to the database
      */
     public function downloadAndApplyTranslations(string $languageCode): void
     {
@@ -99,23 +83,23 @@ class TranslationDownloader
 
         $language = $languageRepository->findOneBy(['code' => $languageCode]);
         if (null === $language) {
-            $this->throwErrorException(
-                TranslationDownloaderException::class,
-                'Language with code "{language_code}" should be added first.',
-                ['language_code' => $languageCode]
+            throw new TranslationDownloaderException(
+                sprintf('Language with code "%s" should be added first.', $languageCode)
             );
+        }
+
+        if ($language->isLocalFilesLanguage()) {
+            return;
         }
 
         $metrics = $this->fetchLanguageMetrics($languageCode);
         if (null === $metrics) {
-            $this->throwErrorException(
-                TranslationDownloaderException::class,
-                'No available translations found for "{language_code}".',
-                ['language_code' => $languageCode]
+            throw new TranslationDownloaderException(
+                sprintf('No available translations found for "%s".', $languageCode)
             );
         }
 
-        $pathToSave = $this->getTmpDir('download_') . \DIRECTORY_SEPARATOR . $languageCode;
+        $pathToSave = $this->getTmpDir('download_') . DIRECTORY_SEPARATOR . $languageCode;
         $this->downloadTranslationsArchive($languageCode, $pathToSave);
         $this->loadTranslationsFromArchive($pathToSave, $languageCode);
 
@@ -124,10 +108,8 @@ class TranslationDownloader
         try {
             $em->flush($language);
         } catch (ORMException $e) {
-            $this->throwErrorException(
-                TranslationDownloaderException::class,
-                'Cannot update installed build date for "{language_code}".',
-                ['language_code' => $languageCode],
+            throw new TranslationDownloaderException(
+                sprintf('Cannot update installed build date for "%s".', $languageCode),
                 $e
             );
         }
@@ -141,13 +123,11 @@ class TranslationDownloader
      *
      * @throws TranslationServiceAdapterException if fails to download translations or to save the archive file
      */
-    public function downloadTranslationsArchive(
-        string $languageCode,
-        string $filePathToSaveDownloadedArchive
-    ): void {
+    public function downloadTranslationsArchive(string $languageCode, string $filePathToSaveDownloadedArchive): void
+    {
         $this->translationServiceAdapter->downloadLanguageTranslationsArchive(
             $languageCode,
-            $filePathToSaveDownloadedArchive,
+            $filePathToSaveDownloadedArchive
         );
     }
 
@@ -158,6 +138,7 @@ class TranslationDownloader
      * to the database as translations for "en" language as "en_US" and "en" are treated as the same
      * (default) language internally.
      *
+     * @throws TranslationDownloaderException if a directory to download translations cannot be created or accessed
      * @throws TranslationServiceAdapterException if fails to extract translations from the archive
      * @throws TranslationDatabasePersisterException if fails to save the translations to the database
      */
@@ -182,31 +163,23 @@ class TranslationDownloader
     /**
      * Creates a temporary directory with a unique name and returns its path.
      *
-     * @throws TranslationDownloaderException if the directory cannot be created
+     * @throws TranslationDownloaderException if the temporary directory cannot be created or accessed
      */
     public function getTmpDir(string $prefix): string
     {
-        $pathParts = [
-            \rtrim($this->kernelCacheDir, \DIRECTORY_SEPARATOR),
-            'translations',
-            \ltrim(\uniqid($prefix, false), \DIRECTORY_SEPARATOR)
-        ];
-        $path = \implode(\DIRECTORY_SEPARATOR, $pathParts);
-
+        $path = sys_get_temp_dir()
+            . DIRECTORY_SEPARATOR . 'oro_translations'
+            . DIRECTORY_SEPARATOR . ltrim(uniqid($prefix, false), DIRECTORY_SEPARATOR);
+        $isDirCreated = true;
         try {
-            if (!\is_dir($path) && !\mkdir($path, 0777, true) && !\is_dir($path)) {
-                $this->throwErrorException(
-                    TranslationDownloaderException::class,
-                    'Directory "{path}" cannot be created or accessed.',
-                    ['path' => $path]
-                );
+            if (!is_dir($path) && !mkdir($path, 0777, true) && !is_dir($path)) {
+                $isDirCreated = false;
             }
         } catch (\Throwable $e) {
-            $this->throwErrorException(
-                TranslationDownloaderException::class,
-                'Directory "{path}" cannot be created or accessed.',
-                ['path' => $path]
-            );
+            throw self::createTmpDirCreationException($path, $e);
+        }
+        if (!$isDirCreated) {
+            throw self::createTmpDirCreationException($path);
         }
 
         return $path;
@@ -217,7 +190,7 @@ class TranslationDownloader
         $finder = Finder::create()->files()->name('*' . $currentExtension)->in($inTheDirectory);
 
         foreach ($finder->files() as $file) {
-            \rename($file->getRealPath(), \str_replace($currentExtension, $newExtension, $file->getRealPath()));
+            rename($file->getRealPath(), str_replace($currentExtension, $newExtension, $file->getRealPath()));
         }
     }
 
@@ -232,10 +205,10 @@ class TranslationDownloader
         );
 
         foreach ($iterator as $path) {
-            $path->isFile() ? \unlink($path->getPathname()) : \rmdir($path->getPathname());
+            $path->isFile() ? unlink($path->getPathname()) : rmdir($path->getPathname());
         }
 
-        \rmdir($targetDir);
+        rmdir($targetDir);
     }
 
     /**
@@ -260,18 +233,13 @@ class TranslationDownloader
         }
     }
 
-    /**
-     * Additionally calls $this->translationServiceAdapter->setLogger() and $this->jsTranslationDumper->setLogger()
-     * with the provided logger instance.
-     */
-    private function setLogger(LoggerInterface $logger): void
-    {
-        $this->logger = $logger;
-        if ($this->translationServiceAdapter instanceof LoggerAwareInterface) {
-            $this->translationServiceAdapter->setLogger($this->logger);
-        }
-        if ($this->jsTranslationDumper instanceof LoggerAwareInterface) {
-            $this->jsTranslationDumper->setLogger($this->logger);
-        }
+    private static function createTmpDirCreationException(
+        string $path,
+        \Throwable $previous = null
+    ): TranslationDownloaderException {
+        return new TranslationDownloaderException(
+            sprintf('Directory "%s" cannot be created or accessed.', $path),
+            $previous
+        );
     }
 }

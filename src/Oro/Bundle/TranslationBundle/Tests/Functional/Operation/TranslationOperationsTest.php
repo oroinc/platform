@@ -3,10 +3,8 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Operation;
 
 use Oro\Bundle\ActionBundle\Tests\Functional\ActionTestCase;
-use Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheHandlerInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
-use Oro\Bundle\TranslationBundle\Tests\Functional\Stub\RebuildTranslationCacheHandlerStub;
 
 class TranslationOperationsTest extends ActionTestCase
 {
@@ -16,31 +14,6 @@ class TranslationOperationsTest extends ActionTestCase
         $this->loadFixtures([
             LoadTranslations::class
         ]);
-    }
-
-    private function getRebuildTranslationCacheHandlerStub(): RebuildTranslationCacheHandlerStub
-    {
-        return self::getContainer()->get('oro_translation.rebuild_translation_cache_handler');
-    }
-
-    public function testUpdateCacheOperation()
-    {
-        $handlerMock = $this->createMock(RebuildTranslationCacheHandlerInterface::class);
-        $handlerMock->expects($this->once())
-            ->method('rebuildCache');
-
-        $handlerStub = $this->getRebuildTranslationCacheHandlerStub();
-        $handlerStub->setRebuildCache([$handlerMock, 'rebuildCache']);
-        try {
-            $this->assertExecuteOperation(
-                'oro_translation_rebuild_cache',
-                null,
-                null,
-                ['route' => 'oro_translation_translation_index']
-            );
-        } finally {
-            $handlerStub->setRebuildCache(null);
-        }
     }
 
     /**

@@ -8,10 +8,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Download\TranslationDownloader;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
-use Oro\Component\Log\LogAndThrowExceptionTrait;
-use Psr\Log\LoggerInterface;
+use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,26 +22,21 @@ use Symfony\Component\Intl\Locales;
  */
 class OroTranslationUpdateCommand extends Command
 {
-    use LogAndThrowExceptionTrait;
-
     /** @var string */
     protected static $defaultName = 'oro:translation:update';
 
     private TranslationDownloader $translationDownloader;
     private ManagerRegistry $doctrine;
-    private ?LanguageRepository $languageRepository = null;
-    private ?LoggerInterface $logger;
+    private FileBasedLanguageHelper $fileBasedLanguageHelper;
 
     public function __construct(
         TranslationDownloader $translationDownloader,
         ManagerRegistry $doctrine,
-        ?LoggerInterface $logger
+        FileBasedLanguageHelper $fileBasedLanguageHelper
     ) {
         $this->translationDownloader = $translationDownloader;
         $this->doctrine = $doctrine;
-        /** @noinspection UnusedConstructorDependenciesInspection used by a trait */
-        $this->logger = $logger;
-
+        $this->fileBasedLanguageHelper = $fileBasedLanguageHelper;
         parent::__construct();
     }
 
@@ -78,89 +71,99 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        try {
-            if ($input->getOption('all') && !empty($input->getArgument('language'))) {
-                $this->throwErrorException(
-                    RuntimeException::class,
-                    'The --all option and the language argument ("{language}") cannot be used together.',
-                    ['language' => $input->getArgument('language')]
-                );
+
+        $langCode = $input->getArgument('language');
+
+        if ($input->getOption('all')) {
+            if ($langCode) {
+                $io->error(sprintf(
+                    'The --all option and the language argument ("%s") cannot be used together.',
+                    $langCode
+                ));
+
+                return 1;
             }
 
-            if ($input->getOption('all')) {
-                foreach ($this->getLanguages() as $language) {
-                    $this->updateLanguage($language, $io, true);
-                }
-                return 0;
-            }
-
-            if (!empty($input->getArgument('language'))) {
-                /** @var Language $language */
-                $language = $this->getRepository()->findOneBy(['code' => $input->getArgument('language')]);
-                if (!$language) {
-                    $this->throwErrorException(
-                        RuntimeException::class,
-                        'Language "{language}" is not installed.'
-                        . ' Translations can be updated only for an already installed language.',
-                        ['language' => $input->getArgument('language')]
-                    );
-                }
-                $this->updateLanguage($language, $io);
-                return 0;
-            }
-
-            $this->printInstalledLanguageInfo($io);
-        } catch (\Throwable $e) {
-            $io->error($e->getMessage());
-
-            return $e->getCode() ?: 1;
+            return $this->updateAllLanguages($io);
         }
+
+        if ($langCode) {
+            /** @var Language|null $language */
+            $language = $this->findLanguage($langCode);
+            if (null === $language) {
+                $io->error(sprintf(
+                    'Language "%s" is not installed.'
+                    . ' Translations can be updated only for an already installed language.',
+                    $langCode
+                ));
+
+                return 1;
+            }
+
+            return $this->updateLanguage($language, $io) ? 0 : 1;
+        }
+
+        $this->printInstalledLanguageInfo($io);
 
         return 0;
     }
 
-    /**
-     * @throws \RuntimeException if there are no available translations for the specified language and
-     *                           $onlyWarningOnMissingTranslations is false.
-     * @throws \Doctrine\ORM\ORMException if failed to update installedBuildDate field on the language.
-     */
+    private function updateAllLanguages(SymfonyStyle $io): int
+    {
+        $exitCode = 0;
+        foreach ($this->getLanguages() as $language) {
+            if (!$this->updateLanguage($language, $io, true)) {
+                $exitCode = 1;
+            }
+        }
+
+        return $exitCode;
+    }
+
     private function updateLanguage(
         Language $language,
         SymfonyStyle $io,
         bool $onlyWarningOnMissingTranslations = false
-    ): void {
+    ): bool {
+        $result = true;
+
         $langName = $this->getLanguageName($language);
         $langCode = $language->getCode();
 
-        $io->section(\sprintf('%s (%s):', $langName, $langCode));
+        if ($this->fileBasedLanguageHelper->isFileBasedLocale($langCode)) {
+            $io->text(sprintf('Language "%s" is file based.', $langCode));
+
+            return $result;
+        }
+
+        $io->section(sprintf('%s (%s):', $langName, $langCode));
         $io->text('Checking availability...');
         $metrics = $this->translationDownloader->fetchLanguageMetrics($langCode);
         if (null === $metrics) {
+            $message = sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode);
             if ($onlyWarningOnMissingTranslations) {
-                $io->text(\sprintf('No "%s" (%s) translations are available for download.', $langName, $langCode));
-                return;
+                $io->text($message);
+            } else {
+                $io->error($message);
+                $result = false;
             }
-            $this->throwErrorException(
-                RuntimeException::class,
-                'No "{language_name}" ({language_code}) translations are available for download.',
-                ['language_name' => $langName, 'language_code' => $langCode]
-            );
+        } else {
+            $io->text('Downloading translations...');
+            $pathToSave = $this->translationDownloader->getTmpDir('download_') . DIRECTORY_SEPARATOR . $langCode;
+            $this->translationDownloader->downloadTranslationsArchive($langCode, $pathToSave);
+
+            $io->text('Applying translations...');
+            $this->translationDownloader->loadTranslationsFromArchive($pathToSave, $langCode);
+            $language->setInstalledBuildDate($metrics['lastBuildDate']);
+
+            /** @var EntityManager $em */
+            $em = $this->doctrine->getManagerForClass(Language::class);
+            $em->flush($language);
+
+            $io->success(sprintf('Update completed for "%s" language.', $langName));
         }
 
-        $io->text('Downloading translations...');
-        $pathToSave = $this->translationDownloader->getTmpDir('download_') . DIRECTORY_SEPARATOR . $langCode;
-        $this->translationDownloader->downloadTranslationsArchive($langCode, $pathToSave);
-
-        $io->text('Applying translations...');
-        $this->translationDownloader->loadTranslationsFromArchive($pathToSave, $langCode);
-
-        $language->setInstalledBuildDate($metrics['lastBuildDate']);
-
-        /** @var EntityManager $em */
-        $em = $this->doctrine->getManagerForClass(Language::class);
-        $em->flush($language);
-
-        $io->success(\sprintf('Update completed for "%s" language.', $langName));
+        return $result;
     }
 
     private function printInstalledLanguageInfo(SymfonyStyle $io): void
@@ -192,18 +195,14 @@ HELP
         $io->table($headers, $rows);
     }
 
-    private function getRepository(): LanguageRepository
-    {
-        if (!$this->languageRepository) {
-            $this->languageRepository = $this->doctrine->getRepository(Language::class);
-        }
-
-        return $this->languageRepository;
-    }
-
     private function getLanguageName(Language $language): string
     {
         return Locales::getName($language->getCode(), 'en') ?? $language->getCode();
+    }
+
+    private function findLanguage(string $langCode): ?Language
+    {
+        return $this->getLanguageRepository()->findOneBy(['code' => $langCode]);
     }
 
     /**
@@ -211,6 +210,11 @@ HELP
      */
     private function getLanguages(): array
     {
-        return $this->getRepository()->findAll();
+        return $this->getLanguageRepository()->findAll();
+    }
+
+    private function getLanguageRepository(): LanguageRepository
+    {
+        return $this->doctrine->getRepository(Language::class);
     }
 }

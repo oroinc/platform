@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
@@ -25,6 +26,15 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translationKeysSubscriber = new WorkflowTranslationKeysSubscriber($this->translationManager);
     }
 
+    private function getTranslationKey(string $key, string $domain): TranslationKey
+    {
+        $translationKey = new TranslationKey();
+        $translationKey->setKey($key);
+        $translationKey->setDomain($domain);
+
+        return $translationKey;
+    }
+
     public function testImplementsSubscriberInterface()
     {
         $this->assertInstanceOf(EventSubscriberInterface::class, $this->translationKeysSubscriber);
@@ -37,7 +47,10 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translationManager->expects($this->once())
             ->method('findTranslationKey')
-            ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN);
+            ->with('oro.workflow.test_workflow.label', WorkflowTranslationHelper::TRANSLATION_DOMAIN)
+            ->willReturnCallback(function ($key, $domain) {
+                return $this->getTranslationKey($key, $domain);
+            });
         $this->translationManager->expects($this->once())
             ->method('flush');
 
@@ -75,10 +88,11 @@ class WorkflowTranslationKeysSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translationManager->expects($this->any())
             ->method('findTranslationKey')
+            ->with($this->anything(), WorkflowTranslationHelper::TRANSLATION_DOMAIN)
             ->willReturnCallback(function ($key, $domain) use (&$findTranslationKeys) {
-                $this->assertEquals(WorkflowTranslationHelper::TRANSLATION_DOMAIN, $domain);
-
                 $findTranslationKeys[] = $key;
+
+                return $this->getTranslationKey($key, $domain);
             });
 
         $this->translationManager->expects($this->any())

@@ -16,9 +16,11 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
     private string $codeWithout;
     private string $codeNotInstalled;
     private string $codeInstalled;
+    private string $codedFilesBased;
     private Language $languageWithoutTranslations;
     private Language $languageNotInstalled;
     private Language $languageInstalled;
+    private Language $filesBasedLanguage;
     private IsLanguageTranslationInstallAvailableCondition $condition1;
     private IsLanguageTranslationInstallAvailableCondition $condition2;
     private IsLanguageTranslationInstallAvailableCondition $condition3;
@@ -30,10 +32,12 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
         $this->codeWithout = 'fr_FR';
         $this->codeNotInstalled = 'de_DE';
         $this->codeInstalled = 'es_ES';
+        $this->codedFilesBased= 'ua_UA';
 
         $this->languageWithoutTranslations = (new Language())->setCode($this->codeWithout);
         $this->languageNotInstalled = (new Language())->setCode($this->codeNotInstalled);
         $this->languageInstalled = (new Language())->setCode($this->codeInstalled)->setInstalledBuildDate($now);
+        $this->filesBasedLanguage = (new Language())->setCode($this->codedFilesBased)->setLocalFilesLanguage(true);
 
         $languageRepository = $this->createMock(LanguageRepository::class);
         $languageRepository->expects(self::any())
@@ -42,6 +46,7 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
                 [['code' => $this->codeWithout], null, $this->languageWithoutTranslations],
                 [['code' => $this->codeNotInstalled], null, $this->languageNotInstalled],
                 [['code' => $this->codeInstalled], null, $this->languageInstalled],
+                [['code' => $this->codedFilesBased], null, $this->filesBasedLanguage],
             ]);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -127,5 +132,14 @@ class IsLanguageTranslationInstallAvailableConditionTest extends \PHPUnit\Framew
         self::assertFalse($this->condition1->evaluate($context));
         self::assertTrue($this->condition2->evaluate($context));
         self::assertFalse($this->condition3->evaluate($context));
+    }
+
+    public function testWithFilesBasedLanguage()
+    {
+        $context = ['$' => ['filesBasedLanguage' => $this->filesBasedLanguage]];
+
+        $this->condition1->initialize([new PropertyPath('$.filesBasedLanguage')]);
+
+        self::assertFalse($this->condition1->evaluate($context));
     }
 }

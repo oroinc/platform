@@ -9,7 +9,6 @@ use Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,9 +21,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
 
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $languageProvider;
-
-    /** @var OrmTranslationLoader */
-    private $translationLoader;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $input;
@@ -44,7 +40,6 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
             ->method('getCatalogue')
             ->willReturnMap($this->getCatalogueMap());
 
-        $this->translationLoader = $this->createMock(OrmTranslationLoader::class);
         $language = new Language();
 
         $entityRepository = $this->createMock(EntityRepository::class);
@@ -70,8 +65,7 @@ class OroTranslationLoadCommandTest extends \PHPUnit\Framework\TestCase
             $managerRegistry,
             $this->translator,
             $databasePersister,
-            $this->languageProvider,
-            $this->translationLoader
+            $this->languageProvider
         );
     }
 

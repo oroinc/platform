@@ -11,17 +11,16 @@ services:
     Oro\Bundle\TranslationBundle\Command\OroTranslationLoadCommand:
         arguments:
             - '@doctrine'
-            - '@translator'
+            - '@translator.default'
             - '@oro_translation.database_translation.persister'
             - '@oro_translation.provider.language'
-            - '@oro_translation.database_translation.loader'
         tags:
             - { name: console.command }
 
     Oro\Bundle\TranslationBundle\Command\OroTranslationRebuildCacheCommand:
         arguments:
             - '@oro_translation.rebuild_translation_cache_processor'
-            - '@oro_translation.message_catalogue_sanitizer'
+            - '@oro_translation.translation_message_sanitization_errors'
         tags:
             - { name: console.command }
 
@@ -29,6 +28,15 @@ services:
         arguments:
             - '@Oro\Bundle\TranslationBundle\Download\TranslationDownloader'
             - '@doctrine'
-            - '@logger'
+            - '@oro_translation.helper.file_based_language'
+        tags:
+            - { name: console.command }
+
+    Oro\Bundle\TranslationBundle\Command\DumpTranslationToFilesCommand:
+        arguments:
+            - '@translation.writer'
+            - '@translation.reader'
+            - !tagged_iterator oro_translation.catalogue_loader
+            - '%translator.default_path%'
         tags:
             - { name: console.command }

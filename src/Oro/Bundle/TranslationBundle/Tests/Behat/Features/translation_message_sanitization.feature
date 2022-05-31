@@ -16,7 +16,6 @@ Feature: Translation Message Sanitization
     And I filter Key as is equal to "oro.user.group.owner.label"
     And I edit first record from grid:
       | Translated Value | <div data-role>Owner</div> |
-    And I click "Update Cache"
 
   Scenario: Check Owner field label is sanitized
     When I go to System/ User Management/ Groups

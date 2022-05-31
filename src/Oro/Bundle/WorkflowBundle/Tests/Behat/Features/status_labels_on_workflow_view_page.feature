@@ -5,11 +5,8 @@ Feature: Status labels on workflow view page
   As an Administrator
   I want to see System and Readonly labels on view page of workflow
 
-  Scenario: Clean translation cache
+  Scenario: Feature background
     Given I login as administrator
-    When I go to System/ Localization/ Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Check labels for custom editable workflow
     Given I go to System/ Workflows

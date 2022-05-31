@@ -2,35 +2,29 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Oro\Bundle\TranslationBundle\Translation\CachingTranslationLoader;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationResource;
-use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 {
-
     /** @var LoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $innerLoader;
+
+    /** @var MemoryCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $cache;
 
     /** @var CachingTranslationLoader */
     private $cachingLoader;
 
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
     protected function setUp(): void
     {
         $this->innerLoader = $this->createMock(LoaderInterface::class);
-        $this->cache = $this->createMock(CacheInterface::class);
-        $this->cachingLoader = new CachingTranslationLoader(
-            $this->innerLoader,
-            $this->cache
-        );
+        $this->cache = $this->createMock(MemoryCache::class);
+
+        $this->cachingLoader = new CachingTranslationLoader($this->innerLoader, $this->cache);
     }
 
     public function testLoadForStringResourceType()
@@ -43,11 +37,9 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects(self::exactly(2))
             ->method('get')
-            ->willReturnCallback(function ($cacheKey, $callback) {
-                $item = $this->createMock(ItemInterface::class);
-                return $callback($item);
-            });
-        $this->innerLoader->expects(self::exactly(2))
+            ->with(sprintf('%s_%s_%s', $locale, $domain, $resource))
+            ->willReturnOnConsecutiveCalls(null, $catalogue);
+        $this->innerLoader->expects(self::once())
             ->method('load')
             ->with($resource, $locale, $domain)
             ->willReturn($catalogue);
@@ -67,21 +59,21 @@ class CachingTranslationLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $locale = 'fr';
         $domain = 'test';
-        $metadataCache = $this->createMock(DynamicTranslationMetadataCache::class);
-        $resource = new OrmTranslationResource($locale, $metadataCache);
+        $resourceFile = 'test_file.yml';
+        $resource = $this->createMock(ResourceInterface::class);
+        $resource->expects($this->atLeastOnce())
+            ->method('__toString')
+            ->willReturn($resourceFile);
 
         $catalogue = new MessageCatalogue($locale);
 
-        $saveCallback = function ($cacheKey, $callback) {
-            $item = $this->createMock(ItemInterface::class);
-            return $callback($item);
-        };
-        $this->cache->expects($this->exactly(2))
+        $this->cache->expects(self::exactly(2))
             ->method('get')
-            ->willReturnOnConsecutiveCalls(new ReturnCallback($saveCallback), $catalogue);
+            ->with(sprintf('%s_%s_%s', $locale, $domain, $resourceFile))
+            ->willReturnOnConsecutiveCalls(null, $catalogue);
         $this->innerLoader->expects($this->once())
             ->method('load')
-            ->with((string)$resource, $locale, $domain)
+            ->with($resourceFile, $locale, $domain)
             ->willReturn($catalogue);
 
         $this->assertSame(

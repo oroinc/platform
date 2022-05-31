@@ -30,7 +30,6 @@ services:
         - 'doctrine'
         - 'oro_data'
         - 'oro_entities'
-        - 'translations'
       -
         - 'validation.php'
     tags:
@@ -44,7 +43,6 @@ services:
         - 'doctrine'
         - 'oro_data'
         - 'oro_entities'
-        - 'translations'
       -
         - 'validation.php'
     tags:

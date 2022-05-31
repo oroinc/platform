@@ -9,9 +9,9 @@ use Oro\Bundle\TranslationBundle\Command\OroTranslationUpdateCommand;
 use Oro\Bundle\TranslationBundle\Download\TranslationDownloader;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
+use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
 use Oro\Component\Testing\Command\CommandTestingTrait;
 use Oro\Component\Testing\TempDirExtension;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Intl\Locales;
 
 class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
@@ -22,11 +22,11 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationDownloader|\PHPUnit\Framework\MockObject\MockObject */
     private $translationDownloader;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
     /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $languageRepository;
+
+    /** @var FileBasedLanguageHelper|\PHPUnit\Framework\MockObject\MockObject  */
+    private $fileBasedLanguageHelper;
 
     /** @var OroTranslationUpdateCommand */
     private $command;
@@ -34,8 +34,8 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->translationDownloader = $this->createMock(TranslationDownloader::class);
-        $this->logger = $this->createMock(LoggerInterface::class);
         $this->languageRepository = $this->createMock(LanguageRepository::class);
+        $this->fileBasedLanguageHelper = $this->createMock(FileBasedLanguageHelper::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -50,38 +50,51 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new OroTranslationUpdateCommand(
             $this->translationDownloader,
             $doctrine,
-            $this->logger
+            $this->fileBasedLanguageHelper
         );
+    }
+
+    private function getLanguage(string $code): Language
+    {
+        $language = new Language();
+        $language->setCode($code);
+
+        return $language;
     }
 
     public function testExecuteWithoutOptions(): void
     {
         $this->languageRepository->expects(self::once())
             ->method('findAll')
-            ->willReturn([
-                (new Language())->setCode('en_US'),
-                (new Language())->setCode('uk_UA'),
-            ]);
+            ->willReturn([$this->getLanguage('en_US'), $this->getLanguage('uk_UA')]);
+        $this->fileBasedLanguageHelper->expects(self::never())
+            ->method('isFileBasedLocale');
 
         $commandTester = $this->doExecuteCommand($this->command);
 
+        self::assertSame(0, $commandTester->getStatusCode());
         $this->assertOutputContains($commandTester, 'Available Translations');
         $this->assertOutputContains($commandTester, 'en_US');
         $this->assertOutputContains($commandTester, 'uk_UA');
     }
 
-    public function testExecute(): void
+    public function testExecuteForOneLanguage(): void
     {
         $langCode = 'fr_FR';
         $this->languageRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['code' => $langCode])
-            ->willReturn((new Language())->setCode($langCode));
+            ->willReturn($this->getLanguage($langCode));
 
         $this->translationDownloader->expects(self::once())
             ->method('fetchLanguageMetrics')
             ->with($langCode)
             ->willReturn(['code' => $langCode, 'translationStatus' => 99, 'lastBuildDate' => new \DateTime()]);
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with($langCode)
+            ->willReturn(false);
 
         $this->translationDownloader->expects(self::once())
             ->method('downloadTranslationsArchive')
@@ -93,6 +106,7 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
 
         $commandTester = $this->doExecuteCommand($this->command, ['language' => $langCode]);
 
+        self::assertSame(0, $commandTester->getStatusCode());
         $langName = Locales::getName($langCode, 'en');
         $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
         $this->assertOutputContains($commandTester, 'Checking availability...');
@@ -101,13 +115,18 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertOutputContains($commandTester, sprintf('Update completed for "%s" language.', $langName));
     }
 
-    public function testForLanguageWithoutTranslations(): void
+    public function testExecuteForLanguageWithoutTranslations(): void
     {
         $langCode = 'fr_FR';
         $this->languageRepository->expects(self::once())
             ->method('findOneBy')
             ->with(['code' => $langCode])
-            ->willReturn((new Language())->setCode($langCode));
+            ->willReturn($this->getLanguage($langCode));
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with($langCode)
+            ->willReturn(false);
 
         $this->translationDownloader->expects(self::once())
             ->method('fetchLanguageMetrics')
@@ -115,6 +134,7 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
 
         $commandTester = $this->doExecuteCommand($this->command, ['language' => $langCode]);
 
+        self::assertSame(1, $commandTester->getStatusCode());
         $langName = Locales::getName($langCode, 'en');
         $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
         $this->assertOutputContains($commandTester, 'Checking availability...');
@@ -124,38 +144,39 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithNotInstalledLanguage(): void
+    public function testExecuteWithNotInstalledLanguage(): void
     {
-        $this->logger->expects(self::once())
-            ->method('error')
-            ->with(
-                'Language "{language}" is not installed.'
-                . ' Translations can be updated only for an already installed language.',
-                self::callback(static fn ($context) => 'WR_ONG' === $context['language'])
-            );
-
         $commandTester = $this->doExecuteCommand($this->command, ['language' => 'WR_ONG']);
 
+        self::assertSame(1, $commandTester->getStatusCode());
         $this->assertProducedError(
             $commandTester,
             'Language "WR_ONG" is not installed. Translations can be updated only for an already installed language.',
         );
     }
 
-    public function testWithAllOption(): void
+    public function testExecuteWithAllOption(): void
     {
         $codes = ['de_DE', 'fr_FR', 'uk_UA'];
-        $languages = [
-            (new Language())->setCode($codes[0]),
-            (new Language())->setCode($codes[1]),
-            (new Language())->setCode($codes[2]),
-        ];
 
         $this->languageRepository->expects(self::once())
             ->method('findAll')
-            ->willReturn($languages);
+            ->willReturn(array_map(
+                function (string $code): Language {
+                    return $this->getLanguage($code);
+                },
+                $codes
+            ));
         $this->languageRepository->expects(self::never())
             ->method('findOneBy');
+
+        $this->fileBasedLanguageHelper->expects(self::exactly(3))
+            ->method('isFileBasedLocale')
+            ->willReturnMap([
+                [$codes[0], false],
+                [$codes[1], false],
+                [$codes[2], false]
+            ]);
 
         $this->translationDownloader->expects(self::exactly(3))
             ->method('fetchLanguageMetrics')
@@ -183,6 +204,7 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
 
         $commandTester = $this->doExecuteCommand($this->command, ['--all' => true]);
 
+        self::assertSame(0, $commandTester->getStatusCode());
         foreach ($codes as $index => $langCode) {
             $langName = Locales::getName($langCode, 'en');
             $this->assertOutputContains($commandTester, sprintf('%s (%s):', $langName, $langCode));
@@ -200,22 +222,77 @@ class OroTranslationUpdateCommandTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testWithAllOptionAndLanguageArgument(): void
+    public function testExecuteWithAllOptionAndLanguageArgument(): void
     {
-        $language = 'fr_FR';
+        $commandTester = $this->doExecuteCommand($this->command, ['language' => 'fr_FR', '--all' => true]);
 
-        $this->logger->expects(self::once())
-            ->method('error')
-            ->with(
-                'The --all option and the language argument ("{language}") cannot be used together.',
-                self::callback(static fn ($context) => $context['language'] === $language)
-            );
-
-        $commandTester = $this->doExecuteCommand($this->command, ['language' => $language, '--all' => true]);
-
+        self::assertSame(1, $commandTester->getStatusCode());
         $this->assertProducedError(
             $commandTester,
-            sprintf('The --all option and the language argument ("%s") cannot be used together.', $language)
+            'The --all option and the language argument ("fr_FR") cannot be used together.'
         );
+    }
+
+    public function testExecuteForOneFilesBasedLanguage(): void
+    {
+        $langCode = 'fr_FR';
+        $this->languageRepository->expects(self::once())
+            ->method('findOneBy')
+            ->with(['code' => $langCode])
+            ->willReturn($this->getLanguage($langCode));
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with($langCode)
+            ->willReturn(true);
+
+        $this->translationDownloader->expects(self::never())
+            ->method('fetchLanguageMetrics');
+
+        $this->translationDownloader->expects(self::never())
+            ->method('downloadTranslationsArchive');
+
+        $this->translationDownloader->expects(self::never())
+            ->method('loadTranslationsFromArchive');
+
+        $commandTester = $this->doExecuteCommand($this->command, ['language' => $langCode]);
+
+        self::assertSame(0, $commandTester->getStatusCode());
+        $this->assertOutputContains($commandTester, 'Language "fr_FR" is file based.');
+    }
+
+    public function testExecuteWithAllOptionWithFilesBasedLanguage(): void
+    {
+        $codes = ['uk_UA'];
+
+        $this->languageRepository->expects(self::once())
+            ->method('findAll')
+            ->willReturn(array_map(
+                function (string $code): Language {
+                    return $this->getLanguage($code);
+                },
+                $codes
+            ));
+        $this->languageRepository->expects(self::never())
+            ->method('findOneBy');
+
+        $this->fileBasedLanguageHelper->expects(self::once())
+            ->method('isFileBasedLocale')
+            ->with('uk_UA')
+            ->willReturn(true);
+
+        $this->translationDownloader->expects(self::never())
+            ->method('fetchLanguageMetrics');
+
+        $this->translationDownloader->expects(self::never())
+            ->method('downloadTranslationsArchive');
+
+        $this->translationDownloader->expects(self::never())
+            ->method('loadTranslationsFromArchive');
+
+        $commandTester = $this->doExecuteCommand($this->command, ['--all' => true]);
+
+        self::assertSame(0, $commandTester->getStatusCode());
+        $this->assertOutputContains($commandTester, 'Language "uk_UA" is file based.');
     }
 }

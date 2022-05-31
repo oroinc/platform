@@ -12,40 +12,40 @@ use Symfony\Component\Cache\Adapter\AbstractAdapter;
 class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private $doctrine;
 
     /** @var InvalidateTranslationCacheListener */
     private $listener;
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->listener = new InvalidateTranslationCacheListener($this->registry);
+        $this->listener = new InvalidateTranslationCacheListener($this->doctrine);
     }
 
-    public function testOnInvalidateTranslationCacheWhenNoClearableCacheProvider()
+    public function testOnInvalidateDynamicTranslationCacheWhenNoClearableCacheProvider(): void
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(AbstractEnumValue::class)
             ->willReturn($entityManager);
 
         $configuration = new Configuration();
+        $configuration->setQueryCache($this->createMock(AbstractAdapter::class));
+
         $entityManager->expects($this->once())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
-        $configuration->setQueryCache($this->createMock(AbstractAdapter::class));
-
-        $this->listener->onInvalidateTranslationCache();
+        $this->listener->onInvalidateDynamicTranslationCache();
     }
 
-    public function testOnInvalidateTranslationCache()
+    public function testOnInvalidateDynamicTranslationCache()
     {
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->registry->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(AbstractEnumValue::class)
             ->willReturn($entityManager);
@@ -60,6 +60,6 @@ class InvalidateTranslationCacheListenerTest extends \PHPUnit\Framework\TestCase
         $cacheProvider->expects($this->once())
             ->method('clear');
 
-        $this->listener->onInvalidateTranslationCache();
+        $this->listener->onInvalidateDynamicTranslationCache();
     }
 }

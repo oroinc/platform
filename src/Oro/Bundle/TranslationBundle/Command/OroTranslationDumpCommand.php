@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace Oro\Bundle\TranslationBundle\Command;
 
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
-use Oro\Component\Log\OutputLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
  * Dumps translations for use in JavaScript.
@@ -24,7 +24,6 @@ class OroTranslationDumpCommand extends Command
     public function __construct(JsTranslationDumper $dumper)
     {
         $this->dumper = $dumper;
-
         parent::__construct();
     }
 
@@ -55,10 +54,16 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $locales = $input->getArgument('locale');
+        $io = new SymfonyStyle($input, $output);
 
-        $this->dumper->setLogger(new OutputLogger($output));
-        $this->dumper->dumpTranslations($locales);
+        $locales = $input->getArgument('locale');
+        if (!$locales) {
+            $locales = $this->dumper->getAllLocales();
+        }
+        foreach ($locales as $locale) {
+            $translationFile = $this->dumper->dumpTranslationFile($locale);
+            $io->text('<info>[file+]</info> ' . $translationFile);
+        }
 
         return 0;
     }

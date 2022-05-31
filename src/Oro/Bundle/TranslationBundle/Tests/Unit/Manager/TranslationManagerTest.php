@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Manager;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
@@ -12,35 +12,31 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
-use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
+use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class TranslationManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationDomainProvider */
+    /** @var TranslationDomainProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $domainProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DynamicTranslationMetadataCache */
-    private $dbTranslationMetadataCache;
+    /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
+    private $dynamicTranslationCache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectManager */
-    private $objectManager;
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationKeyRepository */
+    /** @var TranslationKeyRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $translationKeyRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslationRepository */
+    /** @var TranslationRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $translationRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LanguageRepository */
+    /** @var LanguageRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $languageRepository;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
 
     /** @var TranslationManager */
     private $translationManager;
@@ -48,14 +44,13 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->domainProvider = $this->createMock(TranslationDomainProvider::class);
-        $this->dbTranslationMetadataCache = $this->createMock(DynamicTranslationMetadataCache::class);
-        $this->objectManager = $this->createMock(ObjectManager::class);
+        $this->dynamicTranslationCache = $this->createMock(DynamicTranslationCache::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
         $this->translationKeyRepository = $this->createMock(TranslationKeyRepository::class);
         $this->translationRepository = $this->createMock(TranslationRepository::class);
         $this->languageRepository = $this->createMock(LanguageRepository::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->objectManager->expects($this->any())
+        $this->entityManager->expects($this->any())
             ->method('getRepository')
             ->willReturnMap([
                 [TranslationKey::class, $this->translationKeyRepository],
@@ -63,16 +58,15 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
                 [Language::class, $this->languageRepository],
             ]);
 
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturn($this->objectManager);
+            ->willReturn($this->entityManager);
 
         $this->translationManager = new TranslationManager(
-            $registry,
+            $doctrine,
             $this->domainProvider,
-            $this->dbTranslationMetadataCache,
-            $this->eventDispatcher
+            $this->dynamicTranslationCache
         );
     }
 
@@ -103,9 +97,9 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $key = 'key';
         $domain = TranslationManager::DEFAULT_DOMAIN;
 
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('persist');
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('flush');
 
         $this->translationKeyRepository->expects($this->once())
@@ -115,7 +109,6 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $translationKey1 = $this->translationManager->findTranslationKey($key, $domain);
         $translationKey2 = $this->translationManager->findTranslationKey($key, $domain);
 
-        $this->assertInstanceOf(TranslationKey::class, $translationKey1);
         $this->assertSame($translationKey1, $translationKey2);
     }
 
@@ -136,9 +129,9 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
             ->with(['code' => $locale])
             ->willReturn((new Language())->setCode($locale));
 
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('persist');
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('flush');
 
         $translation1 = $this->translationManager->saveTranslation($key, $value, $locale, $domain);
@@ -166,9 +159,9 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
             ->with(['code' => $locale])
             ->willReturn((new Language())->setCode($locale));
 
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('persist');
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('flush');
 
         $translation = $this->translationManager->createTranslation($key, $value, $locale, $domain);
@@ -191,15 +184,19 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
 
         $translation = $this->translationManager->saveTranslation('key', 'value', 'locale', 'domain');
 
-        $this->objectManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->exactly(2))
             ->method('persist')
             ->withConsecutive(
                 [$this->identicalTo($translationKey)],
                 [$this->identicalTo($translation)]
             );
-        $this->objectManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('flush')
             ->with([$translationKey, $translation]);
+
+        $this->dynamicTranslationCache->expects($this->once())
+            ->method('delete')
+            ->with(['locale']);
 
         $this->translationManager->flush();
     }
@@ -221,32 +218,40 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('findTranslation')
             ->willReturn($translation);
 
-        $this->objectManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('persist')
             ->with($translation->getTranslationKey());
-        $this->objectManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('remove')
             ->with($translation);
-        $this->objectManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('flush')
             ->with([$translation->getTranslationKey(), $translation]);
 
         $this->assertNull($this->translationManager->saveTranslation($key, $value, $locale, $domain));
+
+        $this->dynamicTranslationCache->expects($this->once())
+            ->method('delete')
+            ->with([$locale]);
 
         $this->translationManager->flush();
     }
 
     public function testFlushWithoutChanges()
     {
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method($this->anything());
+        $this->domainProvider->expects($this->once())
+            ->method('clearCache');
+        $this->dynamicTranslationCache->expects($this->never())
+            ->method('delete');
 
         $this->translationManager->flush();
     }
 
     public function testForceFlush()
     {
-        $this->objectManager->expects($this->once())
+        $this->entityManager->expects($this->once())
             ->method('flush');
 
         $this->translationManager->flush(true);
@@ -263,32 +268,23 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager->saveTranslation('key', 'value', 'locale', 'domain');
         $this->translationManager->clear();
 
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('persist');
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('flush');
 
         $this->translationManager->flush();
     }
 
-    /**
-     * @dataProvider invalidateCacheDataProvider
-     */
-    public function testInvalidateCache(?string $with)
+    public function testInvalidateCache()
     {
-        $this->dbTranslationMetadataCache->expects($this->once())
-            ->method('updateTimestamp')
-            ->with($with);
+        $locale = 'en';
 
-        $this->translationManager->invalidateCache($with);
-    }
+        $this->dynamicTranslationCache->expects($this->once())
+            ->method('delete')
+            ->with([$locale]);
 
-    public function invalidateCacheDataProvider(): array
-    {
-        return [
-            [null],
-            ['en'],
-        ];
+        $this->translationManager->invalidateCache($locale);
     }
 
     public function testRemoveMissingTranslationKey()
@@ -299,7 +295,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
             ->method('findOneBy')
             ->willReturn(null)
             ->with(['key' => $nonExistingKey, 'domain' => $nonExistingDomain]);
-        $this->objectManager->expects($this->never())
+        $this->entityManager->expects($this->never())
             ->method('remove');
 
         $this->translationManager->removeTranslationKey($nonExistingKey, $nonExistingDomain);

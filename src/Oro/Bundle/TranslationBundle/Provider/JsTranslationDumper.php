@@ -3,20 +3,16 @@
 namespace Oro\Bundle\TranslationBundle\Provider;
 
 use Oro\Bundle\GaufretteBundle\FileManager;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 /**
  * Dump JS translations to files.
  */
-class JsTranslationDumper implements LoggerAwareInterface
+class JsTranslationDumper
 {
     private JsTranslationGenerator $generator;
     private LanguageProvider $languageProvider;
     private FileManager $fileManager;
-    private LoggerInterface $logger;
 
     public function __construct(
         JsTranslationGenerator $generator,
@@ -26,44 +22,42 @@ class JsTranslationDumper implements LoggerAwareInterface
         $this->generator = $generator;
         $this->languageProvider = $languageProvider;
         $this->fileManager = $fileManager;
-        $this->logger = new NullLogger();
     }
 
     /**
-     * {@inheritDoc}
+     * @return string[]
      */
-    public function setLogger(LoggerInterface $logger): void
+    public function getAllLocales(): array
     {
-        $this->logger = $logger;
+        return $this->languageProvider->getAvailableLanguageCodes();
     }
 
     /**
      * @param string[] $locales
-     *
-     * @return bool
      */
-    public function dumpTranslations(array $locales = []): bool
+    public function dumpTranslations(array $locales = []): void
     {
-        if (empty($locales)) {
-            $locales = $this->languageProvider->getAvailableLanguageCodes();
+        if (!$locales) {
+            $locales = $this->getAllLocales();
         }
-
         foreach ($locales as $locale) {
-            $target = $this->getTranslationFilePath($locale);
-            $this->logger->info('<info>[file+]</info> ' . $target);
-            if (false === @file_put_contents($target, $this->generator->generateJsTranslations($locale))) {
-                throw new IOException('Unable to write file ' . $target);
-            }
+            $this->dumpTranslationFile($locale);
+        }
+    }
+
+    public function dumpTranslationFile(string $locale): string
+    {
+        $translationFile = $this->getTranslationFilePath($locale);
+        if (false === @file_put_contents($translationFile, $this->generator->generateJsTranslations($locale))) {
+            throw new IOException(sprintf('Unable to write file %s.', $translationFile));
         }
 
-        return true;
+        return $translationFile;
     }
 
     public function isTranslationFileExist(string $locale): bool
     {
-        $translationFilePath = $this->getTranslationFilePath($locale);
-
-        return file_exists($translationFilePath);
+        return file_exists($this->getTranslationFilePath($locale));
     }
 
     private function getTranslationFilePath(string $locale): string

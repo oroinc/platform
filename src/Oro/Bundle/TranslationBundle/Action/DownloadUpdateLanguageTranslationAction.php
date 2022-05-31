@@ -5,6 +5,7 @@ namespace Oro\Bundle\TranslationBundle\Action;
 
 use Oro\Bundle\TranslationBundle\Download\TranslationDownloader;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Psr\Log\LoggerInterface;
 
 /**
  * Downloads and applies (loads to the database) translations for the specified language.
@@ -25,20 +26,28 @@ use Oro\Component\ConfigExpression\ContextAccessor;
 class DownloadUpdateLanguageTranslationAction extends AbstractLanguageResultAction
 {
     private TranslationDownloader $translationDownloader;
+    private LoggerInterface $logger;
 
-    public function __construct(ContextAccessor $actionContextAccessor, TranslationDownloader $translationDownloader)
-    {
+    public function __construct(
+        ContextAccessor $actionContextAccessor,
+        TranslationDownloader $translationDownloader,
+        LoggerInterface $logger
+    ) {
         parent::__construct($actionContextAccessor);
         $this->translationDownloader = $translationDownloader;
+        $this->logger = $logger;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function executeAction($context): void
     {
-        $result = null;
+        $result = true;
         try {
             $this->translationDownloader->downloadAndApplyTranslations($this->getLanguageCode($context));
-            $result = true;
         } catch (\Throwable $e) {
+            $this->logger->error('The download translations failed.', ['exception' => $e]);
             $result = false;
         }
         $this->contextAccessor->setValue($context, $this->resultPropertyPath, $result);

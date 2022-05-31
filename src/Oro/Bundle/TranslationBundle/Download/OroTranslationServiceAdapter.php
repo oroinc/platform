@@ -8,9 +8,8 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Utils;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
-use Oro\Component\Log\LogAndThrowExceptionTrait;
+use Oro\Bundle\TranslationBundle\Exception\TranslationServiceInvalidResponseException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
@@ -19,9 +18,7 @@ use Psr\Log\LoggerInterface;
  */
 final class OroTranslationServiceAdapter implements TranslationServiceAdapterInterface
 {
-    use LogAndThrowExceptionTrait;
-
-    public const TRANSLATIONS_VERSION = '4.2.0';
+    private const TRANSLATIONS_VERSION = '4.2.0';
 
     private const BASE_URI = 'https://translations.oroinc.com/api/';
     private ClientInterface $client;
@@ -32,8 +29,8 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
     /**
      * @param ClientInterface $guzzleHttpClient
      * @param LoggerInterface $logger
-     * @param string[] $translationPackageNames
-     * @param array $translationServiceCredentials empty array or ['apikey' => 'your_API_key_here']
+     * @param string[]        $translationPackageNames
+     * @param array           $translationServiceCredentials empty array or ['apikey' => 'your_API_key_here']
      */
     public function __construct(
         ClientInterface $guzzleHttpClient,
@@ -47,41 +44,19 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
         $this->apiKey = $translationServiceCredentials['apikey'] ?? '';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function fetchTranslationMetrics(): array
     {
         $response = $this->request('stats');
-
         if (200 !== $response->getStatusCode()) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Translations service not available (status code: {response_status_code}).',
-                ['response_status_code' => $response->getStatusCode()]
+            throw new TranslationServiceAdapterException(
+                sprintf('Translations service not available (status code: %d).', $response->getStatusCode())
             );
         }
 
-        $result = $this->jsonDecode($response);
-
-        if (!\is_array($result)) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Received malformed translation metrics response.',
-                ['decoded_response' => $result]
-            );
-        }
-
-        $filtered = array_filter(
-            $result,
-            static fn ($item) => isset($item['code'], $item['translationStatus'], $item['lastBuildDate'])
-        );
-
-        if (empty($filtered)) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'No valid translation metrics for any language.',
-                ['decoded_response' => $result]
-            );
-        }
-
+        $data = $this->decodeStatsResponse($response);
         $normalized = array_map(
             static function ($item) {
                 if (isset($item['RealCode'])) {
@@ -90,9 +65,10 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
                     }
                     unset($item['RealCode']);
                 }
+
                 return $item;
             },
-            $filtered
+            $data
         );
 
         $organizedByLanguage = [];
@@ -104,7 +80,7 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * All dashes used as the language-locality separators in language code will be treated as underscores
      * (e.g. "en-US" is treated as "en_US").
@@ -118,43 +94,40 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
     ): void {
         $actualFilePath = $this->normalizeFilePath($pathToSaveDownloadedArchive);
 
+        $isRemoveFileFailed = false;
         try {
             if (file_exists($actualFilePath) && false === unlink($actualFilePath)) {
-                $this->throwErrorException(
-                    TranslationServiceAdapterException::class,
-                    'Cannot overwrite the existing file "{actual_file_path}".',
-                    ['actual_file_path' => $actualFilePath]
-                );
+                $isRemoveFileFailed = true;
             }
         } catch (\Throwable $e) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Cannot overwrite the existing file "{actual_file_path}".',
-                ['actual_file_path' => $actualFilePath],
-                $e
-            );
+            throw self::createOverwriteExistingFileException($actualFilePath, $e);
+        }
+        if ($isRemoveFileFailed) {
+            throw self::createOverwriteExistingFileException($actualFilePath);
         }
 
         $languageCode = str_replace('_', '-', $languageCode);
-        $result  = $this->request('download', $languageCode, $actualFilePath);
-
+        $result = $this->request('download', $languageCode, $actualFilePath);
         if (200 !== $result->getStatusCode()) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Failed to download translations for "{language_code}" (status code: {response_status_code}).',
-                ['language_code' => $languageCode, 'response_status_code' => $result->getStatusCode()]
+            throw new TranslationServiceAdapterException(
+                sprintf(
+                    'Failed to download translations for "%s" (status code: %d).',
+                    $languageCode,
+                    $result->getStatusCode()
+                )
             );
         }
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @throws TranslationServiceAdapterException if cannot extract data from the archive
      */
     public function extractTranslationsFromArchive(string $pathToArchive, string $directoryPathToExtractTo): void
     {
         if (!\extension_loaded('zip')) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
+            throw new TranslationServiceAdapterException(
                 'PHP zip extension is required - https://php.net/manual/zip.installation.php'
             );
         }
@@ -165,45 +138,33 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
         $res = $zip->open($actualFilePath);
 
         if (true !== $res) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Cannot open the translation archive "{actual_file_path}".',
-                ['actual_file_path' => $actualFilePath]
+            throw new TranslationServiceAdapterException(
+                sprintf('Cannot open the translation archive "%s".', $actualFilePath)
             );
         }
 
+        $isExtractFailed = false;
         try {
             if (false === $zip->extractTo($directoryPathToExtractTo)) {
-                $this->throwErrorException(
-                    TranslationServiceAdapterException::class,
-                    'Failed to extract "{actual_file_path}" to "{directory_path_to_extract_to}".',
-                    ['actual_file_path' => $actualFilePath, 'directory_path_to_extract_to' => $directoryPathToExtractTo]
-                );
+                $isExtractFailed = true;
             }
         } catch (\Throwable $e) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Failed to extract "{actual_file_path}" to "{directory_path_to_extract_to}".',
-                ['actual_file_path' => $actualFilePath, 'directory_path_to_extract_to' => $directoryPathToExtractTo],
-                $e
-            );
+            throw self::createExtractException($actualFilePath, $directoryPathToExtractTo, $e);
+        }
+        if ($isExtractFailed) {
+            throw self::createExtractException($actualFilePath, $directoryPathToExtractTo);
         }
 
+        $isCloseFailed = false;
         try {
             if (false === $zip->close()) {
-                $this->throwErrorException(
-                    TranslationServiceAdapterException::class,
-                    'Failed to close the translation archive "{actual_file_path}".',
-                    ['actual_file_path' => $actualFilePath]
-                );
+                $isCloseFailed = true;
             }
         } catch (\Throwable $e) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Failed to close the translation archive "{actual_file_path}".',
-                ['actual_file_path' => $actualFilePath],
-                $e
-            );
+            throw self::createCloseTranslationArchiveException($actualFilePath, $e);
+        }
+        if ($isCloseFailed) {
+            throw self::createCloseTranslationArchiveException($actualFilePath);
         }
     }
 
@@ -211,45 +172,36 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
     {
         $data = [
             'packages' => $this->getPackagesString(),
-            'version' => self::TRANSLATIONS_VERSION
+            'version'  => self::TRANSLATIONS_VERSION
         ];
         if (null !== $language) {
             $data['language'] = $language;
         }
 
         $logData = $data;
-
         if ('' !== $this->apiKey) {
             $data['key'] = $this->apiKey;
             $logData['key'] = '********';
         }
-
         $logUri = Uri::withQueryValues(new Uri(self::BASE_URI . $uri), $logData);
         $this->logger->info('Requesting data from "{uri}".', ['uri' => (string)$logUri, 'data' => $logData]);
 
-        $requestUri = Uri::withQueryValues(new Uri(self::BASE_URI . $uri), $data);
-        $request = new Request('GET', $requestUri);
-
+        $request = new Request('GET', Uri::withQueryValues(new Uri(self::BASE_URI . $uri), $data));
         try {
             $response = $this->client->send($request, ['sink' => $outputFilePath]);
             $this->logger->debug(
                 'The translation service responded with status code {status_code}.',
                 ['status_code' => $response->getStatusCode()]
             );
+
+            return $response;
         } catch (RequestException $e) {
             $this->logger->warning($e->getMessage(), ['exception' => $e]);
-            $response = $e->getResponse();
-        } catch (GuzzleException $e) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
-                'Request to the translation service failed: {original_message}.',
-                ['original_message' => $e->getMessage()],
-                $e
-            );
-        }
 
-        /** @noinspection PhpUndefinedVariableInspection */
-        return $response;
+            return $e->getResponse();
+        } catch (GuzzleException $e) {
+            throw new TranslationServiceAdapterException('Request to the translation service failed.', $e);
+        }
     }
 
     private function getPackagesString(): string
@@ -260,27 +212,40 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
     }
 
     /**
-     * @return array|bool|float|int|object|string|null
-     *
-     * @throws TranslationServiceAdapterException if the response contents cannot be decoded
+     * @throws TranslationServiceInvalidResponseException if a response of a translation service request
+     *                                                    cannot be decoded or return invalid metrics
      */
-    private function jsonDecode(ResponseInterface $response)
+    private function decodeStatsResponse(ResponseInterface $response): array
     {
         $responseBodyContents = $response->getBody()->getContents();
-
         try {
-            $result = Utils::jsonDecode($responseBodyContents, true);
-        } catch (\GuzzleHttp\Exception\InvalidArgumentException $e) {
-            $this->throwErrorException(
-                TranslationServiceAdapterException::class,
+            $decodedData = json_decode($responseBodyContents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Exception $e) {
+            throw new TranslationServiceInvalidResponseException(
                 'Cannot decode the translation metrics response.',
-                ['response_body_contents' => $responseBodyContents],
+                $responseBodyContents,
                 $e
             );
         }
+        if (!\is_array($decodedData)) {
+            throw new TranslationServiceInvalidResponseException(
+                'Received malformed translation metrics response.',
+                $responseBodyContents
+            );
+        }
 
-        /** @noinspection PhpUndefinedVariableInspection */
-        return $result;
+        $filteredData = array_filter(
+            $decodedData,
+            static fn ($item) => isset($item['code'], $item['translationStatus'], $item['lastBuildDate'])
+        );
+        if (!$filteredData) {
+            throw new TranslationServiceInvalidResponseException(
+                'No valid translation metrics for any language.',
+                $responseBodyContents
+            );
+        }
+
+        return $filteredData;
     }
 
     /**
@@ -293,5 +258,36 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
         }
 
         return $filePath . (str_ends_with($filePath, DIRECTORY_SEPARATOR) ? 'translations' : '') . '.zip';
+    }
+
+    private static function createOverwriteExistingFileException(
+        string $actualFilePath,
+        \Throwable $previous = null
+    ): TranslationServiceAdapterException {
+        return new TranslationServiceAdapterException(
+            sprintf('Cannot overwrite the existing file "%s".', $actualFilePath),
+            $previous
+        );
+    }
+
+    private static function createExtractException(
+        string $actualFilePath,
+        string $directoryPathToExtractTo,
+        \Throwable $previous = null
+    ): TranslationServiceAdapterException {
+        return new TranslationServiceAdapterException(
+            sprintf('Failed to extract "%s" to "%s".', $actualFilePath, $directoryPathToExtractTo),
+            $previous
+        );
+    }
+
+    private static function createCloseTranslationArchiveException(
+        string $actualFilePath,
+        \Throwable $previous = null
+    ): TranslationServiceAdapterException {
+        return new TranslationServiceAdapterException(
+            sprintf('Failed to close the translation archive "%s".', $actualFilePath),
+            $previous
+        );
     }
 }

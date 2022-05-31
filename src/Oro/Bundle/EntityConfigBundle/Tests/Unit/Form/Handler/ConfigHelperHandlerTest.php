@@ -199,26 +199,6 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->showSuccessMessageAndRedirect($fieldConfigModel, $successMessage);
     }
 
-    public function testShowClearCacheMessage(): void
-    {
-        $message = 'Translation cache update is required';
-        $flashBag = $this->createMock(FlashBagInterface::class);
-
-        $this->translator->expects(self::once())
-            ->method('trans')
-            ->willReturn($message);
-
-        $flashBag->expects(self::once())
-            ->method('add')
-            ->with('warning', $message);
-
-        $this->session->expects(self::once())
-            ->method('getFlashBag')
-            ->willReturn($flashBag);
-
-        $this->handler->showClearCacheMessage();
-    }
-
     public function testConstructConfigResponse(): void
     {
         /** @var FieldConfigModel $fieldConfigModel */

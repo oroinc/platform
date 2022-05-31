@@ -14,68 +14,52 @@ class TranslationDomainProvider
 {
     private const AVAILABLE_DOMAINS_NODE = 'availableDomains';
 
-    protected ManagerRegistry $registry;
-    protected CacheInterface $cache;
-    protected ?array $availableDomains = null;
+    private ManagerRegistry $doctrine;
+    private CacheInterface $cache;
+    private ?array $availableDomains = null;
 
-    public function __construct(ManagerRegistry $registry, CacheInterface $cache)
+    public function __construct(ManagerRegistry $doctrine, CacheInterface $cache)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->cache = $cache;
     }
 
     /**
-     * Returns the list of all existing in the database translation domains.
+     * Gets the list of all translation domains.
      *
-     * @return array ['domain' => '...']
+     * @return string[]
      */
     public function getAvailableDomains(): array
     {
-        $this->ensureAvailableDomainsLoaded();
+        if (null === $this->availableDomains) {
+            $this->availableDomains = $this->cache->get(self::AVAILABLE_DOMAINS_NODE, function () {
+                return $this->getTranslationKeyRepository()->findAvailableDomains();
+            });
+        }
 
         return $this->availableDomains;
     }
 
     /**
-     * Returns the list of all existing in the database translation domains for the given locales.
+     * Gets the list of all translation domains to use as the choice list in forms.
      *
-     * @return array [['code' = '...', 'domain' => '...'], ...]
+     * @return array [domain => domain, ...]
      */
-    public function getAvailableDomainsForLocales(array $locales): array
+    public function getAvailableDomainChoices(): array
     {
-        $this->ensureAvailableDomainsLoaded();
+        $availableDomains = $this->getAvailableDomains();
 
-        $result = [];
-        foreach ($locales as $locale) {
-            foreach ($this->availableDomains as $domain) {
-                $result[] = ['code' => $locale, 'domain' => $domain];
-            }
-        }
-
-        return $result;
+        return array_combine($availableDomains, $availableDomains);
     }
 
-    public function clearCache(): TranslationDomainProvider
+    public function clearCache(): void
     {
         $this->availableDomains = null;
         $this->cache->delete(self::AVAILABLE_DOMAINS_NODE);
-
-        return $this;
-    }
-
-    protected function ensureAvailableDomainsLoaded(): void
-    {
-        if (null !== $this->availableDomains) {
-            return;
-        }
-
-        $this->availableDomains = $this->cache->get(self::AVAILABLE_DOMAINS_NODE, function () {
-            return $this->getTranslationKeyRepository()->findAvailableDomains();
-        });
     }
 
     private function getTranslationKeyRepository(): TranslationKeyRepository
     {
-        return $this->registry->getManagerForClass(TranslationKey::class)->getRepository(TranslationKey::class);
+        return $this->doctrine->getRepository(TranslationKey::class);
     }
 }

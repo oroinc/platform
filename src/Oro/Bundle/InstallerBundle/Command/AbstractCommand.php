@@ -15,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 abstract class AbstractCommand extends Command
 {
+    protected const DEFAULT_TIMEOUT = 3600;
+
     private ContainerInterface $container;
 
     public function __construct(ContainerInterface $container)
@@ -34,7 +36,7 @@ abstract class AbstractCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Maximum execution time (in seconds) of child commands',
-                CommandExecutor::DEFAULT_TIMEOUT
+                self::DEFAULT_TIMEOUT
             )
             ->setHelp(
                 $this->getHelp() . <<<'HELP'

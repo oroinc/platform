@@ -44,7 +44,7 @@ class LanguageTranslationCompletenessAndAvailabilityListener
             );
             $metrics = $this->translationMetricsProvider->getForLanguage($record->getValue('code'));
             $installedBuildDate = $record->getValue('installedBuildDate');
-            if (null !== $metrics) {
+            if (null !== $metrics && !$record->getValue('localFilesLanguage')) {
                 if (null === $installedBuildDate) {
                     $record->setValue('translationStatus', 'install_available');
                 } elseif ($installedBuildDate < $metrics['lastBuildDate']) {

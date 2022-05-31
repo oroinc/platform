@@ -33,8 +33,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
             'debug_translator' => false,
             'locales' => [],
             'default_required' => true,
-            'manager_registry' => 'doctrine',
-            'templating' => '@OroTranslation/default.html.twig'
+            'templating' => '@OroTranslation/default.html.twig',
+            'translatable_dictionaries' => []
         ];
 
         self::assertEquals(

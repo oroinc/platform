@@ -70,6 +70,13 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     protected $installedBuildDate;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="local_files_language", type="boolean", options={"default"=false})
+     */
+    private $localFilesLanguage = false;
+
+    /**
      * @return int
      */
     public function getId()
@@ -77,12 +84,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
         return $this->id;
     }
 
-    /**
-     * @param string $code
-     *
-     * @return $this
-     */
-    public function setCode($code)
+    public function setCode(string $code): Language
     {
         $this->code = $code;
 
@@ -133,6 +135,18 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
     public function setEnabled($enabled)
     {
         $this->enabled = (bool)$enabled;
+
+        return $this;
+    }
+
+    public function isLocalFilesLanguage(): bool
+    {
+        return (bool) $this->localFilesLanguage;
+    }
+
+    public function setLocalFilesLanguage(bool $localFilesLanguage): Language
+    {
+        $this->localFilesLanguage = $localFilesLanguage;
 
         return $this;
     }

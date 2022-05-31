@@ -5,51 +5,48 @@ namespace Oro\Bundle\LocaleBundle\Tests\Behat\Context;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class LocalizationContext extends OroFeatureContext
 {
     /**
      * @Given I enable the existing localizations
      */
-    public function loadFixtures()
+    public function loadFixtures(): void
     {
         $container = $this->getAppContainer();
 
+        /* @var Localization[] $localizations */
+        $localizations = $container->get('doctrine')
+            ->getRepository(Localization::class)
+            ->findAll();
+        $localizationsIds = [];
+        $locales = [];
+        foreach ($localizations as $localization) {
+            $localizationsIds[] = $localization->getId();
+            $locales[] = $localization->getLanguage()->getCode();
+        }
+        $locales = array_unique($locales);
+
         /* @var ConfigManager $configManager */
         $configManager = $container->get('oro_config.global');
-
-        /* @var Localization[] $localizations */
-        $localizations = $container
-            ->get('oro_entity.doctrine_helper')
-            ->getEntityRepository(Localization::class)
-            ->findAll();
-
-        $configManager->set(
-            'oro_locale.enabled_localizations',
-            array_map(function (Localization $item) {
-                return $item->getId();
-            }, $localizations)
-        );
+        $configManager->set('oro_locale.enabled_localizations', $localizationsIds);
         $configManager->flush();
 
         $container->get('oro_translation.provider.translation_domain')->clearCache();
-        $container->get('translator.default')->rebuildCache();
+        $container->get('oro_translation.dynamic_translation_cache')->delete($locales);
         $container->get('oro_translation.js_dumper')->dumpTranslations();
         $container->get('oro_ui.dynamic_asset_version_manager')->updateAssetVersion('translations');
     }
 
     /**
      * @Given /^I enable "(?P<localizationName>(?:[^"]|\\")*)" localization/
-     *
-     * @param string $localizationName
      */
-    public function selectLocalization($localizationName)
+    public function selectLocalization(string $localizationName): void
     {
-        /** @var ContainerInterface $container */
         $container = $this->getAppContainer();
 
-        $localization = $container->get('doctrine')->getManagerForClass(Localization::class)
+        /* @var Localization $localization */
+        $localization = $container->get('doctrine')
             ->getRepository(Localization::class)
             ->findOneBy(['name' => $localizationName]);
 
@@ -58,10 +55,7 @@ class LocalizationContext extends OroFeatureContext
         $configManager->set(
             'oro_locale.enabled_localizations',
             array_unique(
-                array_merge(
-                    $configManager->get('oro_locale.enabled_localizations'),
-                    [$localization->getId()]
-                )
+                array_merge($configManager->get('oro_locale.enabled_localizations'), [$localization->getId()])
             )
         );
         $configManager->set('oro_locale.default_localization', $localization->getId());

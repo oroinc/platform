@@ -108,7 +108,6 @@ Feature: User back office login
     Then I edit "oro_user.login.errors.bad_credentials" Translated Value as "Your login was unsuccessful - Zulu"
     And I should see following records in grid:
       |Your login was unsuccessful - Zulu|
-    And click "Update Cache"
 
   Scenario: Check translated unsuccessful login error
     Given I am logged out

@@ -1,26 +1,32 @@
 Feature: Translation cache actualization
   In order to apply translation changes on the fly (immediately)
   As a User
-  I want I want to see changed translation after translation cache actualized by reloading page
+  I want to see a changed translation immediately after the change
 
-  Scenario: Reset translation for key oro.ui.create_entity
+  Scenario: Background
     Given I login as administrator
+
+  Scenario: Change English translation
     When I go to System/Emails/Maintenance Notifications
     And I reload the page
     Then I should see "There are no maintenance notifications"
     When I go to System/Localization/Translations
+    And I check "English" in Language filter
     And I filter Key as is equal to "oro.notification.massnotification.entity_plural_label"
-    And I edit first record from grid:
-      | Translated Value |  Entities |
-    And I click "Update Cache"
+    And I edit "oro.notification.massnotification.entity_plural_label" Translated Value as "Entities"
+    Then I should see oro.notification.massnotification.entity_plural_label in grid with following data:
+      | Translated Value    | Entities |
+      | Current Value       | Entities |
+      | English Translation | Entities |
     And I go to System/Emails/Maintenance Notifications
     And I reload the page
     Then I should see "There are no entities"
-    # Change back to prevent other's features failures
+    # Revert changed value to prevent other's features failures
     When I go to System/Localization/Translations
+    And I check "English" in Language filter
     And I filter Key as is equal to "oro.notification.massnotification.entity_plural_label"
-    And I edit first record from grid:
-      | Translated Value | Maintenance Notifications |
-    And I click "Update Cache"
+    And I edit "oro.notification.massnotification.entity_plural_label" Translated Value as "Maintenance Notifications"
     Then I should see oro.notification.massnotification.entity_plural_label in grid with following data:
-      | Translated Value | Maintenance Notifications |
+      | Translated Value    | Maintenance Notifications |
+      | Current Value       | Maintenance Notifications |
+      | English Translation | Maintenance Notifications |
