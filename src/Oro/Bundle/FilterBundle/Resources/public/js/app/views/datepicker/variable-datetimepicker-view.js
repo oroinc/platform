@@ -60,7 +60,12 @@ define(function(require) {
             const date = this.$frontDateField.val();
             const time = this.$frontTimeField.val();
 
-            if (!this._preventFrontendUpdate && !target && !this._isDateTimeValid(date, time)) {
+            if (
+                !this._preventFrontendUpdate &&
+                !this.$frontDateField.is(target) &&
+                !this.$frontTimeField.is(target) &&
+                !this._isDateTimeValid(date, time)
+            ) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
