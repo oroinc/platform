@@ -10,7 +10,7 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Component\DoctrineUtils\ORM\ArrayKeyTrueHydrator;
 
 /**
- * Repository for Language entity
+ * The repository for Language entity.
  */
 class LanguageRepository extends ServiceEntityRepository
 {

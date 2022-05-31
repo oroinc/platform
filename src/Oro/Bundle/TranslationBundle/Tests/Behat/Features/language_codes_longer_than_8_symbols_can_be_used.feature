@@ -16,10 +16,6 @@ Feature: Language codes longer than 8 symbols can be used
     Then I should see "Language has been added" flash message
     When I click Enable "Azerbaijani (Latin, Azerbaijan)" in grid
     Then I should see "Language has been enabled" flash message
-    And I should see "Translation cache update is required. Click here to update" flash message
-    When I click "Click here"
-    And I click "Update Cache"
-    And I should see "The translation cache has been updated" flash message
 
   Scenario: I should be able to enable language with a code longer than 8 symbols
     Given I go to System/Localization/Localizations
@@ -31,10 +27,6 @@ Feature: Language codes longer than 8 symbols can be used
      | Formatting | Azerbaijani                     |
     When I save form
     Then I should see "Localization has been saved" flash message
-    And I should see "Translation cache update is required. Click here to update" flash message
-    When I click "Click here"
-    And I click "Update Cache"
-    And I should see "The translation cache has been updated" flash message
     When I go to System/Configuration
     And I follow "System Configuration/General Setup/Localization" on configuration sidebar
     And I fill form with:

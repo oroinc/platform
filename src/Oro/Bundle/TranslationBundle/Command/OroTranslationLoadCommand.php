@@ -8,12 +8,11 @@ use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Bundle\TranslationBundle\Translation\DatabasePersister;
-use Oro\Bundle\TranslationBundle\Translation\OrmTranslationLoader;
+use Oro\Bundle\TranslationBundle\Translation\Translator;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Loads translations to the database.
@@ -26,24 +25,20 @@ final class OroTranslationLoadCommand extends Command
     protected static $defaultName = 'oro:translation:load';
 
     private ManagerRegistry $registry;
-    private TranslatorInterface $translator;
+    private Translator $translator;
     private DatabasePersister $databasePersister;
     private LanguageProvider $languageProvider;
-    private OrmTranslationLoader $databaseTranslationLoader;
 
     public function __construct(
         ManagerRegistry $registry,
-        TranslatorInterface $translator,
+        Translator $translator,
         DatabasePersister $databasePersister,
-        LanguageProvider $languageProvider,
-        OrmTranslationLoader $databaseTranslationLoader
+        LanguageProvider $languageProvider
     ) {
         $this->registry = $registry;
         $this->translator = $translator;
         $this->databasePersister = $databasePersister;
         $this->languageProvider = $languageProvider;
-        $this->databaseTranslationLoader = $databaseTranslationLoader;
-
         parent::__construct();
     }
 
@@ -98,8 +93,6 @@ HELP
             )
         );
 
-        $this->databaseTranslationLoader->setDisabled();
-
         if ($input->getOption('rebuild-cache')) {
             $this->translator->rebuildCache();
         }
@@ -109,20 +102,18 @@ HELP
         try {
             $this->processLocales($locales, $output);
             $em->commit();
-            $output->writeln(sprintf('<info>All messages successfully processed.</info>'));
+            $output->writeln('<info>All messages successfully processed.</info>');
         } catch (\Exception $e) {
             $em->rollback();
             throw $e;
         }
 
-        $this->databaseTranslationLoader->setEnabled();
-
         if ($input->getOption('rebuild-cache')) {
-            $output->write(sprintf('<info>Rebuilding cache ... </info>'));
+            $output->write('<info>Rebuilding cache ... </info>');
             $this->translator->rebuildCache();
         }
 
-        $output->writeln(sprintf('<info>Done.</info>'));
+        $output->writeln('<info>Done.</info>');
 
         return 0;
     }

@@ -176,8 +176,6 @@ class TranslationManagerTest extends WebTestCase
 
         $existingKey = $repository->findOneBy(['key' => $key, 'domain' => $domain]);
 
-        $this->assertNotNull($existingKey);
-
         $this->assertSame($existingKey, $this->manager->findTranslationKey($key, $domain));
     }
 

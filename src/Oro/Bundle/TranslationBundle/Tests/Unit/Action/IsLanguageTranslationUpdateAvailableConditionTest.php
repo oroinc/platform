@@ -16,9 +16,11 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
     private string $codeWithout;
     private string $codeNew;
     private string $codeOld;
+    private string $codedFilesBased;
     private Language $languageWithoutTranslations;
     private Language $languageWithNewTranslations;
     private Language $languageWithOldTranslations;
+    private Language $filesBasedLanguage;
     private IsLanguageTranslationUpdateAvailableCondition $condition1;
     private IsLanguageTranslationUpdateAvailableCondition $condition2;
     private IsLanguageTranslationUpdateAvailableCondition $condition3;
@@ -32,10 +34,12 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
         $this->codeWithout = 'fr_FR';
         $this->codeNew = 'de_DE';
         $this->codeOld = 'es_ES';
+        $this->codedFilesBased= 'ua_UA';
 
         $this->languageWithoutTranslations = (new Language())->setCode($this->codeWithout)->setInstalledBuildDate($now);
         $this->languageWithNewTranslations = (new Language())->setCode($this->codeNew)->setInstalledBuildDate($now);
         $this->languageWithOldTranslations = (new Language())->setCode($this->codeOld)->setInstalledBuildDate($now);
+        $this->filesBasedLanguage = (new Language())->setCode($this->codedFilesBased)->setLocalFilesLanguage(true);
 
         $languageRepository = $this->createMock(LanguageRepository::class);
         $languageRepository->expects(self::any())
@@ -44,6 +48,7 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
                 [['code' => $this->codeWithout], null, $this->languageWithoutTranslations],
                 [['code' => $this->codeNew], null, $this->languageWithNewTranslations],
                 [['code' => $this->codeOld], null, $this->languageWithOldTranslations],
+                [['code' => $this->codedFilesBased], null, $this->filesBasedLanguage],
             ]);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -120,5 +125,14 @@ class IsLanguageTranslationUpdateAvailableConditionTest extends \PHPUnit\Framewo
         self::assertFalse($this->condition1->evaluate($context));
         self::assertTrue($this->condition2->evaluate($context));
         self::assertFalse($this->condition3->evaluate($context));
+    }
+
+    public function testWithFilesBasedLanguage()
+    {
+        $context = ['$' => ['filesBasedLanguage' => $this->filesBasedLanguage]];
+
+        $this->condition1->initialize([new PropertyPath('$.filesBasedLanguage')]);
+
+        self::assertFalse($this->condition1->evaluate($context));
     }
 }

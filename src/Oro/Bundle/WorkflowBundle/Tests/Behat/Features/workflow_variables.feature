@@ -4,10 +4,6 @@ Feature: Workflow variables
 
   Scenario: Set up workflow variable configuration
     Given I login as administrator
-    When go to System/ Localization/ Translations
-    And click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
-
     When I go to System/ User Management/ Users
     And I click "View" on row "User1 First Name User1 Last Name" in grid
     And I click "first transition"

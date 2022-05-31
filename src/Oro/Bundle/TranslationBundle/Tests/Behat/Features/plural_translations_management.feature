@@ -8,9 +8,6 @@ Feature: Plural translations management
 
   Scenario: Feature background
     Given I login as administrator
-    And I go to System/Localization/Translations
-    When I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Change language settings
     Given I go to System/Configuration

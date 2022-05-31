@@ -30,9 +30,6 @@ Feature: User role entity permissions translation
       | Label | Attachment_DE |
     And I save and close form
     Then I should see "Entity saved" flash message
-    When I go to System / Localization / Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
     When go to System / User Management / Roles
     And I click view Administrator in grid

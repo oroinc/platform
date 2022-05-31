@@ -40,6 +40,9 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testSetsTranslationCompletenessAndAvailability(): void
     {
         $this->translationKeyRepository->expects(self::any())
@@ -59,6 +62,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'code' => 'uk_UA',
             'translationCount' => 99,
             'installedBuildDate' => null,
+            'localFilesLanguage' => false
         ]);
         $languageMetrics[] = ['uk_UA', ['lastBuildDate' => $today]];
         $expectedRecords[] = new ResultRecord([
@@ -66,6 +70,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationCount' => 99,
             'translationCompleteness' => 0.99,
             'installedBuildDate' => null,
+            'localFilesLanguage' => false,
             'translationStatus' => 'install_available',
         ]);
 
@@ -75,6 +80,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'code' => 'de_DE',
             'translationCount' => 99,
             'installedBuildDate' => $yesterday,
+            'localFilesLanguage' => false
         ]);
         $languageMetrics[] = ['de_DE', ['lastBuildDate' => $today]];
         $expectedRecords[] = new ResultRecord([
@@ -82,6 +88,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationCount' => 99,
             'translationCompleteness' => 0.99,
             'installedBuildDate' => $yesterday,
+            'localFilesLanguage' => false,
             'translationStatus' => 'update_available',
         ]);
 
@@ -91,6 +98,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'code' => 'fr_FR',
             'translationCount' => 99,
             'installedBuildDate' => $today,
+            'localFilesLanguage' => false
         ]);
         $languageMetrics[] = ['fr_FR', ['lastBuildDate' => $yesterday]];
         $expectedRecords[] = new ResultRecord([
@@ -98,6 +106,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationCount' => 99,
             'translationCompleteness' => 0.99,
             'installedBuildDate' => $today,
+            'localFilesLanguage' => false,
             'translationStatus' => 'up_to_date',
         ]);
 
@@ -107,6 +116,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'code' => 'fr_CA',
             'translationCount' => 99,
             'installedBuildDate' => null,
+            'localFilesLanguage' => false
         ]);
         $languageMetrics[] = ['fr_FR', []];
         $expectedRecords[] = new ResultRecord([
@@ -114,6 +124,25 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
             'translationCount' => 99,
             'translationCompleteness' => 0.99,
             'installedBuildDate' => null,
+            'localFilesLanguage' => false,
+            'translationStatus' => 'not_available',
+        ]);
+
+        // Local files based language:
+
+        $originalRecords[] = new ResultRecord([
+            'code' => 'en_US',
+            'translationCount' => 99,
+            'installedBuildDate' => null,
+            'localFilesLanguage' => true
+        ]);
+        $languageMetrics[] = ['fr_FR', []];
+        $expectedRecords[] = new ResultRecord([
+            'code' => 'en_US',
+            'translationCount' => 99,
+            'translationCompleteness' => 0.99,
+            'installedBuildDate' => null,
+            'localFilesLanguage' => true,
             'translationStatus' => 'not_available',
         ]);
 
@@ -131,7 +160,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
     {
         $this->translationKeyRepository->expects(self::any())
             ->method('getCount')
-            ->willReturn(null);
+            ->willReturn(0);
 
         $this->translationMetricsProvider->expects(self::any())
             ->method('getForLanguage')

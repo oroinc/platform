@@ -77,10 +77,6 @@ Feature: Transition Destination Page for Workflow
     And I click "Activate"
     And I click "Activate" in modal window
     Then I should see "Deactivate"
-# Update cache
-    When I go to System/Localization/Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
     And I click Logout in user menu
 
   Scenario: Verify Transition of Entity View Page

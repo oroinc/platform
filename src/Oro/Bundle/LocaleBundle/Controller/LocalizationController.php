@@ -10,7 +10,6 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -65,21 +64,9 @@ class LocalizationController extends AbstractController
      *
      * @return array|RedirectResponse
      */
-    public function createAction(Request $request)
+    public function createAction()
     {
-        $response = $this->update(new Localization());
-
-        if ($response instanceof RedirectResponse) {
-            $message = $this->get(TranslatorInterface::class)->trans(
-                'oro.translation.translation.rebuild_cache_required',
-                [
-                    '%path%' => $this->generateUrl('oro_translation_translation_index'),
-                ]
-            );
-            $request->getSession()->getFlashBag()->add('warning', $message);
-        }
-
-        return $response;
+        return $this->update(new Localization());
     }
 
     /**
@@ -107,13 +94,9 @@ class LocalizationController extends AbstractController
      */
     protected function update(Localization $localization)
     {
-        $form = $this->createForm(LocalizationType::class, $localization);
-
-        /** @var $handler UpdateHandler */
-        $handler = $this->get(UpdateHandler::class);
-        return $handler->update(
+        return $this->get(UpdateHandler::class)->update(
             $localization,
-            $form,
+            $this->createForm(LocalizationType::class, $localization),
             $this->get(TranslatorInterface::class)->trans('oro.locale.controller.localization.saved.message')
         );
     }

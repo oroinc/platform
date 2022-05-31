@@ -1,7 +1,0 @@
-services:
-    oro_translation.tests.rebuild_translation_cache_handler:
-        class: Oro\Bundle\TranslationBundle\Tests\Functional\Stub\RebuildTranslationCacheHandlerStub
-        decorates: oro_translation.rebuild_translation_cache_handler
-        decoration_priority: -256
-        arguments:
-            - '@.inner'

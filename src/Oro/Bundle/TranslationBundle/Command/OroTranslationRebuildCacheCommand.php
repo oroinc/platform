@@ -4,9 +4,8 @@ declare(strict_types=1);
 namespace Oro\Bundle\TranslationBundle\Command;
 
 use Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheProcessor;
-use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizerInterface;
+use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -21,15 +20,15 @@ class OroTranslationRebuildCacheCommand extends Command
     protected static $defaultName = 'oro:translation:rebuild-cache';
 
     private RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor;
-    private MessageCatalogueSanitizerInterface $catalogueSanitizer;
+    private TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection;
 
     public function __construct(
         RebuildTranslationCacheProcessor $rebuildTranslationCacheProcessor,
-        MessageCatalogueSanitizerInterface $catalogueSanitizer
+        TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection
     ) {
         parent::__construct();
         $this->rebuildTranslationCacheProcessor = $rebuildTranslationCacheProcessor;
-        $this->catalogueSanitizer = $catalogueSanitizer;
+        $this->sanitizationErrorCollection = $sanitizationErrorCollection;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -68,31 +67,33 @@ HELP
         $io->success('The rebuild complete.');
 
         if ($input->getOption('show-sanitization-errors')) {
-            $this->renderSanitizationErrors($output);
+            $this->renderSanitizationErrors($io);
         }
 
         return 0;
     }
 
-    private function renderSanitizationErrors(OutputInterface $output)
+    private function renderSanitizationErrors(SymfonyStyle $io): void
     {
-        $errors = $this->catalogueSanitizer->getSanitizationErrors();
+        $errors = $this->sanitizationErrorCollection->all();
         if (!$errors) {
             return;
         }
 
-        $output->writeln('Unsafe messages');
-        $table = new Table($output);
-        $table->setHeaders(['Locale', 'Domain', 'Message Key', 'Original Message', 'Sanitized Message']);
+        $io->text('Unsafe messages');
+        $rows = [];
         foreach ($errors as $error) {
-            $table->addRow([
+            $rows[] = [
                 $error->getLocale(),
                 $error->getDomain(),
                 $error->getMessageKey(),
                 $error->getOriginalMessage(),
                 $error->getSanitizedMessage()
-            ]);
+            ];
         }
-        $table->render();
+        $io->table(
+            ['Locale', 'Domain', 'Message Key', 'Original Message', 'Sanitized Message'],
+            $rows
+        );
     }
 }

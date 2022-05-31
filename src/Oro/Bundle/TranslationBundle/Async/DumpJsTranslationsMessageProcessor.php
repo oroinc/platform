@@ -16,11 +16,8 @@ use Symfony\Component\Filesystem\Exception\IOException;
  */
 class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /** @var JsTranslationDumper */
-    private $dumper;
-
-    /** @var LoggerInterface */
-    private $logger;
+    private JsTranslationDumper $dumper;
+    private LoggerInterface $logger;
 
     public function __construct(JsTranslationDumper $dumper, LoggerInterface $logger)
     {
@@ -31,16 +28,20 @@ class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, T
     /**
      * {@inheritDoc}
      */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $this->dumper->setLogger($this->logger);
+        $locales = $this->dumper->getAllLocales();
         try {
-            $this->dumper->dumpTranslations();
+            foreach ($locales as $locale) {
+                $this->logger->info('Update JS translations for {locale}.', ['locale' => $locale]);
+                $translationFile = $this->dumper->dumpTranslationFile($locale);
+                $this->logger->info(
+                    'The JS translations for {locale} have been dumped into {file}.',
+                    ['locale' => $locale, 'file' => $translationFile]
+                );
+            }
         } catch (IOException $e) {
-            $this->logger->error(
-                'Cannot update JS translations.',
-                ['exception' => $e]
-            );
+            $this->logger->error('Cannot update JS translations.', ['exception' => $e]);
 
             return self::REJECT;
         }
@@ -51,7 +52,7 @@ class DumpJsTranslationsMessageProcessor implements MessageProcessorInterface, T
     /**
      * {@inheritDoc}
      */
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [DumpJsTranslationsTopic::getName()];
     }

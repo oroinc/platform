@@ -9,9 +9,34 @@ use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
-/** @coversDefaultClass \Oro\Bundle\TranslationBundle\Download\CachingTranslationMetricsProvider */
 class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
 {
+    private const METRICS = [
+        'uk_UA' => [
+            'code' => 'uk_UA',
+            'translationStatus' => 100,
+            'lastBuildDate' => '2020-08-24T00:00:00+0300'
+        ],
+        'de_DE' => [
+            'code' => 'de_DE',
+            'altCode' => 'de',
+            'translationStatus' => 90,
+            'lastBuildDate' => '2020-10-03T23:59:59+0100'
+        ],
+        'fr_FR' => [
+            'code' => 'fr_FR',
+            'altCode' => 'fr',
+            'translationStatus' => 80,
+            'lastBuildDate' => '2020-07-14T00:00:00+0200'
+        ],
+        'fr_CA' => [
+            'code' => 'fr_CA',
+            'altCode' => 'fr',
+            'translationStatus' => 70,
+            'lastBuildDate' => '2020-07-01T23:59:59-0400'
+        ],
+    ];
+
     /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
@@ -37,18 +62,14 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @covers ::getAll
-     * @covers ::populateMetrics
-     */
     public function testGetAll(): void
     {
-        $metrics = OroTranslationServiceAdapterTest::METRICS;
+        $metrics = self::METRICS;
 
         // once() to check that on subsequent calls to getAll() the populateMetrics() is not called again
         $this->cache->expects(self::once())
             ->method('get')
-            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->with('translation_statistic')
             ->willReturn($metrics);
 
         foreach ($metrics as $languageCode => $data) {
@@ -56,28 +77,25 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         }
 
         self::assertEquals($metrics, $this->provider->getAll());
+        // test memory cache
         self::assertEquals($metrics, $this->provider->getAll());
     }
 
-    /**
-     * @covers ::populateMetrics
-     * @covers ::fetchMetrics
-     */
     public function testPopulateMetricsFetchesMetricsFromAdapterIfNotCachedAndCachesThem(): void
     {
-        $metrics = OroTranslationServiceAdapterTest::METRICS;
+        $metrics = self::METRICS;
 
         $cache2 = $this->createMock(CacheInterface::class);
         $this->cache->expects(self::once())
             ->method('get')
-            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->with('translation_statistic')
             ->willReturnCallback(function ($cacheKey, $callback) {
                 $item = $this->createMock(ItemInterface::class);
                 return $callback($item);
             });
         $cache2->expects(self::once())
             ->method('get')
-            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->with('translation_statistic')
             ->willReturn($metrics);
 
         $this->adapter->expects(self::once())
@@ -91,16 +109,16 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         $instance2 = new CachingTranslationMetricsProvider($this->adapter, $cache2, $this->logger);
 
         $instance1->getAll();
+        // test memory cache
         $instance2->getAll();
     }
 
-    /** @covers ::getForLanguage */
     public function testGetForLanguage(): void
     {
         // once() to check that on subsequent calls to getForLanguage() the populateMetrics() is not called again
         $this->adapter->expects(self::once())
             ->method('fetchTranslationMetrics')
-            ->willReturn(OroTranslationServiceAdapterTest::METRICS);
+            ->willReturn(self::METRICS);
         $this->cache->expects(self::once())
             ->method('get')
             ->willReturnCallback(function ($cacheKey, $callback) {
@@ -108,7 +126,7 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
                 return $callback($item);
             });
 
-        $data = OroTranslationServiceAdapterTest::METRICS['uk_UA'];
+        $data = self::METRICS['uk_UA'];
         $data['lastBuildDate'] = new \DateTime($data['lastBuildDate'], new \DateTimeZone('UTC'));
 
         self::assertEquals($data, $this->provider->getForLanguage('uk_UA'));
@@ -117,11 +135,10 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->provider->getForLanguage('non-existent'));
     }
 
-    /** @covers ::convertLastBuildDateToDateTimeOrUnset */
     public function testConvertLastBuildDateToDateTimeOrUnset(): void
     {
-        $original = OroTranslationServiceAdapterTest::METRICS;
-        $expected = OroTranslationServiceAdapterTest::METRICS;
+        $original = self::METRICS;
+        $expected = self::METRICS;
 
         $original['uk_UA']['lastBuildDate'] = 'not a date string';
         unset($expected['uk_UA']['lastBuildDate']);
@@ -140,7 +157,7 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->cache->expects(self::once())
             ->method('get')
-            ->with(CachingTranslationMetricsProvider::CACHE_KEY)
+            ->with('translation_statistic')
             ->willReturnCallback(function ($cacheKey, $callback) {
                 $item = $this->createMock(ItemInterface::class);
                 return $callback($item);
@@ -157,7 +174,6 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected['fr_CA'], $actual['fr_CA']);
     }
 
-    /** @covers ::fetchMetrics */
     public function testFetchMetricsSilentlyLogsTranslationAdapterExceptions(): void
     {
         $this->cache->expects(self::any())
@@ -175,6 +191,6 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with('Failed to fetch translation metrics.', ['exception' => $adapterException]);
 
-        self::assertEquals([], $this->provider->getAll());
+        self::assertSame([], $this->provider->getAll());
     }
 }

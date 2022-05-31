@@ -12,24 +12,16 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * The datagrid mass action for reset translated values.
+ */
 class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
 {
-    const FLUSH_BATCH_SIZE = 100;
+    private const FLUSH_BATCH_SIZE = 100;
 
-    /**
-     * @var TranslationManager
-     */
-    private $translationManager;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var AclHelper
-     */
-    private $aclHelper;
+    private TranslationManager $translationManager;
+    private TranslatorInterface $translator;
+    private AclHelper $aclHelper;
 
     public function __construct(
         TranslationManager $translationManager,
@@ -47,24 +39,18 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
     public function handle(MassActionHandlerArgs $args)
     {
         $datasource = $args->getDatagrid()->getDatasource();
-
         if (!$datasource instanceof OrmDatasource) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Expected "%s", "%s" given',
-                    OrmDatasource::class,
-                    get_class($datasource)
-                )
-            );
+            throw new \InvalidArgumentException(sprintf(
+                'Expected "%s", "%s" given',
+                OrmDatasource::class,
+                get_class($datasource)
+            ));
         }
 
         $qb = clone $datasource->getQueryBuilder();
-
-        $this->removeEmptyValuesFromQB($qb);
-        $this->addRequiredParameters($qb);
-
+        $qb->addSelect('translation.scope as translation_scope');
+        $this->removeEmptyValues($qb);
         $this->aclHelper->apply($qb, 'TRANSLATE');
-
         $results = $qb->getQuery()->iterate(null, Query::HYDRATE_SCALAR);
 
         // if huge amount data must be deleted
@@ -73,81 +59,44 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
         $iteration = 0;
         foreach ($results as $result) {
             $translationData = reset($result);
-
             if ($translationData === false) {
                 continue;
             }
 
-            $this->processReset($translationData);
+            if (null !== $translationData['id']) {
+                $this->translationManager->saveTranslation(
+                    $translationData['key'],
+                    null,
+                    $translationData['code'],
+                    $translationData['domain'],
+                    $translationData['translation_scope']
+                );
+            }
             $iteration++;
 
             if ($iteration % self::FLUSH_BATCH_SIZE === 0) {
-                $this->finishBatch();
+                $this->translationManager->flush();
             }
         }
 
         if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-            $this->finishBatch();
+            $this->translationManager->flush();
         }
-
-        return $this->getResetResponse($iteration);
-    }
-
-    /**
-     * Finish processed batch
-     */
-    private function finishBatch()
-    {
-        $this->translationManager->flush();
-    }
-
-    /**
-     * @param int $entitiesCount
-     * @return MassActionResponse
-     */
-    private function getResetResponse($entitiesCount)
-    {
-        $successful = $entitiesCount > 0;
-        $options = ['count' => $entitiesCount];
 
         return new MassActionResponse(
-            $successful,
+            $iteration > 0,
             $this->translator->trans('oro.translation.action.reset.success'),
-            $options
+            ['count' => $iteration]
         );
     }
 
-    private function processReset(array $translationData)
-    {
-        if ($translationData['id'] === null) {
-            return;
-        }
-
-        $this->translationManager->saveTranslation(
-            $translationData['key'],
-            null,
-            $translationData['code'],
-            $translationData['domain'],
-            $translationData['translation_scope']
-        );
-    }
-
-    private function removeEmptyValuesFromQB(QueryBuilder $qb)
+    private function removeEmptyValues(QueryBuilder $qb): void
     {
         $valuesParameter = $qb->getParameter('values');
-
-        if (!$valuesParameter) {
+        if (null === $valuesParameter) {
             return;
         }
 
-        $values = $valuesParameter->getValue();
-        $values = array_filter($values);
-
-        $valuesParameter->setValue($values);
-    }
-
-    private function addRequiredParameters(QueryBuilder $qb)
-    {
-        $qb->addSelect('translation.scope as translation_scope');
+        $valuesParameter->setValue(array_filter($valuesParameter->getValue()));
     }
 }

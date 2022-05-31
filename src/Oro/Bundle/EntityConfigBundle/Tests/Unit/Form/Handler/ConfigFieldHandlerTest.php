@@ -78,9 +78,6 @@ class ConfigFieldHandlerTest extends \PHPUnit\Framework\TestCase
             ->method('showSuccessMessageAndRedirect')
             ->with($this->fieldConfigModel, $successMessage)
             ->willReturn($redirectResponse);
-        $this->configHelperHandler->expects($this->once())
-            ->method('showClearCacheMessage')
-            ->willReturn($this->configHelperHandler);
 
         $formAction = 'formAction';
         $response = $this->handler->handleUpdate($this->fieldConfigModel, $formAction, $successMessage);

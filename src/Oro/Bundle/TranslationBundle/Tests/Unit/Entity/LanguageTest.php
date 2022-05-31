@@ -22,6 +22,7 @@ class LanguageTest extends \PHPUnit\Framework\TestCase
             ['organization', new Organization()],
             ['createdAt', new \DateTime()],
             ['updatedAt', new \DateTime()],
+            ['localFilesLanguage', true],
         ]);
     }
 }

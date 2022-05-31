@@ -3,22 +3,22 @@
 namespace Oro\Bundle\TranslationBundle\Translation;
 
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Contracts\Cache\CacheInterface;
 
 /**
- * Adapter for caching translations
+ * The translation resource loader wrapper that caches loaded resources into a memory cache.
  */
 class CachingTranslationLoader implements LoaderInterface
 {
     private LoaderInterface $innerLoader;
-    private ?CacheInterface $cache;
+    private MemoryCache $cache;
 
-    public function __construct(LoaderInterface $innerLoader, ?CacheInterface $cache = null)
+    public function __construct(LoaderInterface $innerLoader, MemoryCache $cache)
     {
         $this->innerLoader = $innerLoader;
-        $this->cache       = $cache;
+        $this->cache = $cache;
     }
 
     public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
@@ -27,30 +27,30 @@ class CachingTranslationLoader implements LoaderInterface
         if (null === $resourceKey) {
             return $this->innerLoader->load($resource, $locale, $domain);
         }
-        if ($this->cache) {
-            $cacheKey = UniversalCacheKeyGenerator::normalizeCacheKey(
-                sprintf('%s_%s_%s', $locale, $domain, $resourceKey)
-            );
-            return $this->cache->get($cacheKey, function () use ($resource, $locale, $domain) {
-                return $this->innerLoader->load($resource, $locale, $domain);
-            });
+
+        $cacheKey = $this->getCacheKey($locale, $domain, $resourceKey);
+        $catalogue = $this->cache->get($cacheKey);
+        if (null === $catalogue) {
+            $catalogue = $this->innerLoader->load($resource, $locale, $domain);
+            $this->cache->set($cacheKey, $catalogue);
         }
-        return $this->innerLoader->load($resource, $locale, $domain);
+
+        return $catalogue;
     }
 
-    /**
-     * @param mixed $resource
-     *
-     * @return string|null
-     */
-    protected function getResourceKey(mixed $resource): ?string
+    private function getResourceKey(mixed $resource): ?string
     {
-        if (is_object($resource) && method_exists($resource, '__toString')) {
+        if (\is_object($resource) && method_exists($resource, '__toString')) {
             $resource = (string)$resource;
         }
 
-        return is_string($resource) && !empty($resource)
+        return \is_string($resource) && !empty($resource)
             ? $resource
             : null;
+    }
+
+    private function getCacheKey(string $locale, string $domain, string $resourceKey): string
+    {
+        return UniversalCacheKeyGenerator::normalizeCacheKey(sprintf('%s_%s_%s', $locale, $domain, $resourceKey));
     }
 }

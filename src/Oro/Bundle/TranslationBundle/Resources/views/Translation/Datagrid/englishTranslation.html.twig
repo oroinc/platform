@@ -1,6 +1,0 @@
-{% set originalValue = record.getValue('englishValue') %}
-{% if originalValue is null %}
-    <span class="badge badge-disabled">{{ 'N/A'|trans }}</span>
-{% else %}
-    {{ originalValue }}
-{% endif %}

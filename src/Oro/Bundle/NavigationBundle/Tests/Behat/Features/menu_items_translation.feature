@@ -39,9 +39,6 @@ Feature: Menu Items Translation
       | Formatting | German (Germany) |
     And I save and close form
     Then I should see "Localization has been saved" flash message
-    When I go to System / Localization / Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Enable German localization
     When I go to System / Configuration

@@ -4,20 +4,19 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Command;
 
 use Oro\Bundle\TranslationBundle\Cache\RebuildTranslationCacheProcessor;
 use Oro\Bundle\TranslationBundle\Command\OroTranslationRebuildCacheCommand;
-use Oro\Bundle\TranslationBundle\Translation\MessageCatalogueSanitizerInterface;
-use Oro\Bundle\TranslationBundle\Translation\SanitizationErrorInformation;
+use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError;
+use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationErrorCollection;
 use Oro\Component\Testing\Command\CommandTestingTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
 {
     use CommandTestingTrait;
 
-    /** @var RebuildTranslationCacheProcessor|MockObject */
+    /** @var RebuildTranslationCacheProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $rebuildTranslationCacheProcessor;
 
-    /** @var MessageCatalogueSanitizerInterface|MockObject */
-    private $catalogueSanitizer;
+    /** @var TranslationMessageSanitizationErrorCollection|\PHPUnit\Framework\MockObject\MockObject */
+    private $sanitizationErrorCollection;
 
     /** @var OroTranslationRebuildCacheCommand */
     private $command;
@@ -25,11 +24,11 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->rebuildTranslationCacheProcessor = $this->createMock(RebuildTranslationCacheProcessor::class);
-        $this->catalogueSanitizer = $this->createMock(MessageCatalogueSanitizerInterface::class);
+        $this->sanitizationErrorCollection = $this->createMock(TranslationMessageSanitizationErrorCollection::class);
 
         $this->command = new OroTranslationRebuildCacheCommand(
             $this->rebuildTranslationCacheProcessor,
-            $this->catalogueSanitizer
+            $this->sanitizationErrorCollection
         );
     }
 
@@ -39,7 +38,7 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
             ->method('rebuildCache')
             ->willReturn(true);
 
-        $this->catalogueSanitizer->expects($this->never())
+        $this->sanitizationErrorCollection->expects($this->never())
             ->method($this->anything());
         $commandTester = $this->doExecuteCommand($this->command);
 
@@ -54,12 +53,24 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
             ->method('rebuildCache')
             ->willReturn(true);
 
-        $this->catalogueSanitizer->expects($this->once())
-            ->method('getSanitizationErrors')
+        $this->sanitizationErrorCollection->expects($this->once())
+            ->method('all')
             ->willReturn(
                 [
-                    new SanitizationErrorInformation('en', 'messages', 'key1', 'message1', 'sanitized message 1'),
-                    new SanitizationErrorInformation('en', 'messages', 'key2', 'message2', 'sanitized message 2'),
+                    new TranslationMessageSanitizationError(
+                        'en',
+                        'messages',
+                        'key1',
+                        'message1',
+                        'sanitized message 1'
+                    ),
+                    new TranslationMessageSanitizationError(
+                        'en',
+                        'messages',
+                        'key2',
+                        'message2',
+                        'sanitized message 2'
+                    ),
                 ]
             );
 
@@ -68,12 +79,12 @@ class OroTranslationRebuildCacheCommandTest extends \PHPUnit\Framework\TestCase
         $this->assertSuccessReturnCode($commandTester);
         $this->assertOutputContains($commandTester, 'Rebuilding the translation cache ...');
         $this->assertOutputContains($commandTester, 'The rebuild complete.');
-        $sanitizationErrors = '+--------+----------+-------------+------------------+---------------------+' .
-            ' | Locale | Domain | Message Key | Original Message | Sanitized Message |' .
-            ' +--------+----------+-------------+------------------+---------------------+' .
-            ' | en | messages | key1 | message1 | sanitized message 1 |' .
-            ' | en | messages | key2 | message2 | sanitized message 2 |' .
-            ' +--------+----------+-------------+------------------+---------------------+';
+        $sanitizationErrors = ' -------- ---------- ------------- ------------------ ---------------------'
+            . ' Locale Domain Message Key Original Message Sanitized Message'
+            . ' -------- ---------- ------------- ------------------ ---------------------'
+            . ' en messages key1 message1 sanitized message 1'
+            . ' en messages key2 message2 sanitized message 2'
+            . ' -------- ---------- ------------- ------------------ ---------------------';
 
         $this->assertOutputContains($commandTester, $sanitizationErrors);
     }

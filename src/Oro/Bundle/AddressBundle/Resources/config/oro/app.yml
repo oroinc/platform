@@ -1,0 +1,14 @@
+oro_translation:
+    translatable_dictionaries:
+        Oro\Bundle\AddressBundle\Entity\AddressType:
+            label:
+                translation_key_prefix: 'address_type.'
+                key_field_name: 'name'
+        Oro\Bundle\AddressBundle\Entity\Country:
+            name:
+                translation_key_prefix: 'country.'
+                key_field_name: 'iso2Code'
+        Oro\Bundle\AddressBundle\Entity\Region:
+            name:
+                translation_key_prefix: 'region.'
+                key_field_name: 'combinedCode'

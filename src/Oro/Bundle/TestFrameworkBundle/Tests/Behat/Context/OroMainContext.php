@@ -2676,21 +2676,6 @@ JS;
     }
 
     /**
-     * @Then /^(?:|I )click update cache$/
-     */
-    public function iClickUpdateCache()
-    {
-        try {
-            $page = $this->getPage();
-
-            $page->clickLink('Update Cache');
-            $this->waitForAjax(720000); // Wait for max 12 minutes because DB update process timeout set to 10 minutes
-        } catch (\Exception $e) {
-            throw $e;
-        }
-    }
-
-    /**
      * Returns fixed step argument (\\" replaced back to ", \\# replaced back to #)
      *
      * @param string $argument

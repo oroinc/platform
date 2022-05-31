@@ -18,10 +18,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AddLanguageType extends AbstractType
 {
-    protected LanguageRepository $languageRepository;
-    protected LocaleSettings $localeSettings;
-    protected TranslationMetricsProviderInterface $translationStatisticProvider;
-    protected TranslatorInterface $translator;
+    private LanguageRepository $languageRepository;
+    private LocaleSettings $localeSettings;
+    private TranslationMetricsProviderInterface $translationStatisticProvider;
+    private TranslatorInterface $translator;
 
     public function __construct(
         LanguageRepository $languageRepository,
@@ -67,9 +67,9 @@ class AddLanguageType extends AbstractType
                 continue;
             }
             if (isset($translationMetrics[$langCode])) {
-                $availableWithTranslations[\sprintf('%s - %s', $langName, $langCode)] = $langCode;
+                $availableWithTranslations[sprintf('%s - %s', $langName, $langCode)] = $langCode;
             } else {
-                $availableWithoutTranslations[\sprintf('%s - %s', $langName, $langCode)] = $langCode;
+                $availableWithoutTranslations[sprintf('%s - %s', $langName, $langCode)] = $langCode;
             }
         }
 
