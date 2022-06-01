@@ -469,7 +469,9 @@ class User extends ExtendUser implements
     public function setUsername($username): self
     {
         parent::setUsername($username);
-        $this->usernameLowercase = mb_strtolower($username);
+        $this->usernameLowercase = $username
+            ? mb_strtolower($username)
+            : $username;
 
         return $this;
     }
@@ -864,7 +866,9 @@ class User extends ExtendUser implements
     public function setEmail($email)
     {
         $this->email = $email;
-        $this->emailLowercase = mb_strtolower($email);
+        $this->emailLowercase = $this->email
+            ? mb_strtolower($this->email)
+            : $this->email;
 
         return $this;
     }

@@ -311,7 +311,9 @@ class ActivityList extends ExtendActivityList implements DatesAwareInterface, Up
      */
     public function setSubject($subject)
     {
-        $this->subject = mb_substr($subject, 0, 250, mb_detect_encoding($subject));
+        $this->subject = $subject
+            ? mb_substr($subject, 0, 250, mb_detect_encoding($subject))
+            : $subject;
 
         return $this;
     }
