@@ -8,12 +8,8 @@ use Oro\Bundle\SecurityBundle\Test\Functional\RolePermissionExtension;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestEntityWithUserOwnership;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @dbIsolationPerTest
- */
 class AclForIncludedOwnerTest extends RestJsonApiTestCase
 {
     use RolePermissionExtension;
@@ -25,18 +21,6 @@ class AclForIncludedOwnerTest extends RestJsonApiTestCase
             '@OroApiBundle/Tests/Functional/DataFixtures/test_entity_with_user_ownership.yml',
             LoadUser::class
         ]);
-    }
-
-    /**
-     * @afterInitClient
-     */
-    protected function clearAclCache()
-    {
-        $cache = $this->getEntityManager()->getConfiguration()->getQueryCache();
-        if ($cache instanceof AdapterInterface) {
-            $cache->clear();
-        }
-        self::getContainer()->get('tests.security.acl.cache.doctrine')->clearCache();
     }
 
     public function testTryToGetTestEntityForUserWithoutPermissionsToUserEntity()
