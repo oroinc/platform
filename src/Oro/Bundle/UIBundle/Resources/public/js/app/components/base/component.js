@@ -19,8 +19,8 @@ define(function(require) {
      */
     function BaseComponent(options) {
         this.cid = _.uniqueId(this.cidPrefix);
-        _.extend(this, _.pick(options, _.result(this, 'optionNames')));
-        _.extend(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
+        Object.assign(this, _.pick(options, _.result(this, 'optionNames')));
+        Object.assign(this, options[BaseComponent.RELATED_SIBLING_COMPONENTS_PROPERTY_NAME]);
         this.initialize(options);
         this.delegateListeners();
     }
@@ -30,7 +30,7 @@ define(function(require) {
     BaseComponent.prototype.optionNames = ['model', 'collection', 'name'];
 
     // defines static methods
-    _.extend(BaseComponent, {
+    Object.assign(BaseComponent, {
         /**
          * The component may have a dependency on other components of the same componentManager (siblingComponents)
          * Dependencies can be declared in the components's prototype as `relatedSiblingComponents` property
@@ -83,16 +83,16 @@ define(function(require) {
         }
     });
 
-    _.extend(
+    Object.assign(
         BaseComponent.prototype,
         // extends BaseComponent.prototype with some Chaplin's functionality
         Chaplin.EventBroker,
         // lends useful methods Chaplin.View
-        _.pick(Chaplin.View.prototype, ['delegateListeners', 'delegateListener'])
+        _.pick(Chaplin.View.prototype, 'delegateListener')
     );
 
     // defines own properties and methods
-    _.extend(BaseComponent.prototype, /** @lends BaseComponent.prototype */ {
+    Object.assign(BaseComponent.prototype, /** @lends BaseComponent.prototype */ {
         AUXILIARY_OPTIONS: ['_sourceElement', '_subPromises', 'name'],
 
         cidPrefix: 'component',
@@ -107,6 +107,17 @@ define(function(require) {
          * Flag shows if the component is disposed or not
          */
         disposed: false,
+
+        delegateListeners() {
+            Chaplin.View.prototype.delegateListeners.call(this);
+            const siblingComponents = Object.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
+            siblingComponents.forEach(propName => {
+                if (this[propName]) {
+                    // remove reference to disposed siblingComponents
+                    this.listenToOnce(this[propName], 'dispose', () => delete this[propName]);
+                }
+            });
+        },
 
         /**
          * Runs initialization logic
@@ -128,7 +139,7 @@ define(function(require) {
             this.unsubscribeAllEvents();
             this.stopListening();
             this.off();
-            const siblingComponents = _.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
+            const siblingComponents = Object.keys(BaseComponent.getRelatedSiblingComponentNames(this.constructor));
             const optionNames = _.result(this, 'optionNames');
 
             // dispose and remove all own properties

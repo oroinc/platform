@@ -65,7 +65,9 @@ abstract class AbstractRole extends Role
      */
     protected function normalize($role)
     {
-        return strtoupper(preg_replace('/[^\w\-]/i', '_', $role));
+        return null !== $role
+            ? strtoupper(preg_replace('/[^\w\-]/i', '_', $role))
+            : '';
     }
 
     /**
@@ -74,7 +76,7 @@ abstract class AbstractRole extends Role
      */
     protected function addUniqueSuffix($role)
     {
-        return uniqid(rtrim($role, '_') . '_');
+        return uniqid((null !== $role ? rtrim($role, '_') : '') . '_');
     }
 
     /**
@@ -83,10 +85,12 @@ abstract class AbstractRole extends Role
      */
     protected function addPrefix($role)
     {
-        if ($role !== AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY
-            && !str_starts_with($role, $this->getPrefix())
-        ) {
-            $role = $this->getPrefix() . $role;
+        if (AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY !== $role) {
+            if (!$role) {
+                $role = $this->getPrefix();
+            } elseif (!str_starts_with($role, $this->getPrefix())) {
+                $role = $this->getPrefix() . $role;
+            }
         }
 
         return $role;
