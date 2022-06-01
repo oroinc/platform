@@ -1423,6 +1423,8 @@ services:
             - 'email'
             - '@doctrine'
             - '@oro_security.token_accessor'
+        calls:
+            - [ setLogger, [ '@logger' ] ]
 
     oro_email.event_listener.notification_alerts_listener:
         class: Oro\Bundle\EmailBundle\EventListener\NotificationAlertsListener

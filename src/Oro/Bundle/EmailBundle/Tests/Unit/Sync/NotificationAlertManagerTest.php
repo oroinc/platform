@@ -8,9 +8,9 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Sync\NotificationAlertManager;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
-use Oro\Bundle\NotificationBundle\Exception\NotificationAlertFetchFailedException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 
 class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,11 +26,15 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     /** @var NotificationAlertManager */
     private $notificationAlertManager;
 
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);
         $this->connection = $this->createMock(Connection::class);
         $this->tokenAccessor = $this->createMock(TokenAccessor::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -69,6 +73,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             $doctrine,
             $this->tokenAccessor
         );
+        $this->notificationAlertManager->setLogger($this->logger);
     }
 
     private function mockMetadata(): MockObject
@@ -217,16 +222,10 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->method('fetchAllAssociative')
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->getNotificationAlertsCountGroupedByUserAndType();
-            self::fail('An exception expected');
-        } catch (NotificationAlertFetchFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to fetch a notification alerts count.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with('Failed to fetch a notification alerts count.', ['exception' => $exception]);
+
+        $this->notificationAlertManager->getNotificationAlertsCountGroupedByUserAndType();
     }
 }

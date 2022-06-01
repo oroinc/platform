@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Sync;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\NotificationBundle\Exception\NotificationAlertFetchFailedException;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager as BaseManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 
@@ -41,6 +40,7 @@ class NotificationAlertManager extends BaseManager
         ]);
 
         $em = $this->getEntityManager();
+        $notificationAlerts = [];
         try {
             $sql = 'SELECT alert.user_id as user, alert.alert_type,'
                 . ' COUNT(alert.id) as notification_alert_count'
@@ -56,11 +56,7 @@ class NotificationAlertManager extends BaseManager
 
             $notificationAlerts = $em->getConnection()->fetchAllAssociative($sql, $data, $types);
         } catch (\Exception $e) {
-            throw new NotificationAlertFetchFailedException(
-                'Failed to fetch a notification alerts count.',
-                $e->getCode(),
-                $e
-            );
+            $this->logger->error('Failed to fetch a notification alerts count.', ['exception' => $e]);
         }
 
         foreach ($notificationAlerts as $notificationAlert) {
