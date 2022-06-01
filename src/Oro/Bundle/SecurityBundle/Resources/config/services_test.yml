@@ -4,7 +4,7 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
 
-    tests.security.acl.cache.doctrine:
+    oro_security.tests.security.acl.cache.doctrine:
         alias: security.acl.cache.doctrine
         public: true
 
