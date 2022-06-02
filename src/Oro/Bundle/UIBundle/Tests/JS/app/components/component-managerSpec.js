@@ -308,5 +308,38 @@ define(function(require) {
                 expect(managerB.get('component-foo')).not.toBeNull();
             });
         });
+
+        describe('delegated `init-on` event handler to third party element`', () => {
+            let manager;
+            beforeEach(function(done) {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on"></div>
+                        <div
+                            data-page-component-init-on="click #init-on"
+                            data-page-component-name="component-bar" 
+                            data-page-component-module="js/bar-component"></div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                manager.init().then(done);
+            });
+
+            it('component initially not initialized', () => {
+                expect(manager.get('component-bar')).toBeNull();
+            });
+
+            describe('after click event', () => {
+                beforeEach(function(done) {
+                    $('#init-on').click();
+                    $.when(...Object.values(manager.initPromises).map(({promise}) => promise)).then(done);
+                });
+
+                it('component gets initialized', () => {
+                    expect(manager.get('component-bar')).not.toBeNull();
+                });
+            });
+        });
     });
 });
