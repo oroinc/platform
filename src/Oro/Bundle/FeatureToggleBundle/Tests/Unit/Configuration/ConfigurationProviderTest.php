@@ -21,9 +21,9 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     private const CONFIGURATION = [
         '__features__' => [
             'feature1' => [
-                'label'         => 'Feature 1',
+                'label'         => 'feature1.label',
+                'description'   => 'feature1.description',
                 'toggle'        => 'changed_toggle',
-                'description'   => 'Description 1',
                 'dependencies'  => ['feature2'],
                 'routes'        => ['f1_route1', 'f1_route2', 'f1_route3'],
                 'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
@@ -33,7 +33,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'mq_topics'     => []
             ],
             'feature2' => [
-                'label'         => 'Feature 2',
+                'label'         => 'feature2.label',
                 'toggle'        => 'toggle2',
                 'dependencies'  => [],
                 'routes'        => ['f1_route3'],
@@ -44,7 +44,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'mq_topics'     => []
             ],
             'feature3' => [
-                'label'         => 'Feature 3',
+                'label'         => 'feature3.label',
                 'dependencies'  => ['feature1'],
                 'routes'        => [],
                 'configuration' => [],

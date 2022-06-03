@@ -719,6 +719,30 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Then /^the "(?P<elementName>(?:[^"]|\\")*)" field should be checked$/
+     */
+    public function checkboxShouldBeChecked(string $fieldName)
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertTrue($field->isChecked());
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>(?:[^"]|\\")*)" field should be unchecked$/
+     */
+    public function checkboxShouldBeUnchecked(string $fieldName)
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertFalse($field->isChecked());
+    }
+
+    /**
      * @param string $selectField
      * @param array $optionLabels
      */
