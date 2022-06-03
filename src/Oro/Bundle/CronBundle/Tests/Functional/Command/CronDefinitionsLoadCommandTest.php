@@ -18,9 +18,11 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
 
     public function testShouldLoadCommandDefinitionFromApplication()
     {
-        $this->getScheduleRepository()->createQueryBuilder('d')->delete()->getQuery()->execute();
+        /** @var EntityRepository $scheduleRepository */
+        $scheduleRepository = self::getContainer()->get('doctrine')->getRepository(Schedule::class);
+        $scheduleRepository->createQueryBuilder('d')->delete()->getQuery()->execute();
 
-        $schedules = $this->getScheduleRepository()->findAll();
+        $schedules = $scheduleRepository->findAll();
 
         //guard
         $this->assertCount(0, $schedules);
@@ -31,8 +33,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
         self::assertStringContainsString('Processing command ', $result);
         self::assertStringContainsString(' setting up schedule..', $result);
 
-        $schedules = $this->getScheduleRepository()->findAll();
-
+        $schedules = $scheduleRepository->findAll();
         $this->assertGreaterThan(0, count($schedules));
     }
 
@@ -46,13 +47,5 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
             'Skipping, the command does not implement CronCommandInterface',
             $result
         );
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    private function getScheduleRepository()
-    {
-        return $this->getContainer()->get('doctrine')->getRepository(Schedule::class);
     }
 }

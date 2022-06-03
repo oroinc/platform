@@ -6,7 +6,7 @@ datagrids:
             entityHint: oro.cron.schedule.entity_plural_label
         source:
             type: orm
-            query_builder: "@oro_cron.repository.schedule->getEnabledSchedulesQb"
+            query_builder: "@oro_cron.schedule.datagrid_helper->getEnabledSchedulesQueryBuilder"
         columns:
             command:
                 label: oro.cron.schedule.command.label
