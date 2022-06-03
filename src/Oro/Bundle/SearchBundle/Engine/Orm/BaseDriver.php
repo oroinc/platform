@@ -10,6 +10,7 @@ use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Query\Expr\Select;
 use Doctrine\ORM\QueryBuilder;
@@ -25,6 +26,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 abstract class BaseDriver implements DBALPersisterInterface
 {
@@ -128,6 +130,11 @@ abstract class BaseDriver implements DBALPersisterInterface
      * ]
      */
     private $indexUpdateData = [];
+
+    /**
+     * @var array
+     */
+    private $indexDeleteData = [];
 
     /**
      * @throws \InvalidArgumentException
@@ -724,6 +731,7 @@ abstract class BaseDriver implements DBALPersisterInterface
         $multiInsertQueryData = [];
         $this->fillQueryData($connection, $multiInsertQueryData);
 
+        $this->runDeletes($connection, $this->indexDeleteData);
         $this->runMultiInserts($connection, $multiInsertQueryData);
         $this->runUpdates($connection, $this->indexUpdateData);
 
@@ -811,6 +819,20 @@ abstract class BaseDriver implements DBALPersisterInterface
                     $data['types']
                 );
             }
+        }
+    }
+
+    /**
+     * Runs deletes taken from $deletes argument
+     */
+    private function runDeletes(Connection $connection, array $deletes): void
+    {
+        foreach ($deletes as $table => $ids) {
+            $connection->executeQuery(
+                sprintf('DELETE FROM %s WHERE id IN(:ids)', $connection->quoteIdentifier($table)),
+                ['ids' => $ids],
+                ['ids' => Connection::PARAM_INT_ARRAY]
+            );
         }
     }
 
@@ -915,11 +937,15 @@ abstract class BaseDriver implements DBALPersisterInterface
      */
     private function populateIndexByType(Collection $fields, AbstractItem $item, $type)
     {
+        $table = $this->getIndexTable($item, $type);
+        if ($fields instanceof PersistentCollection) {
+            foreach ($fields->getDeleteDiff() as $removedField) {
+                $this->indexDeleteData[$table][] = $removedField->getId();
+            }
+        }
         if ($fields->isEmpty()) {
             return;
         }
-
-        $table = $this->getIndexTable($item, $type);
 
         if (!isset($this->indexUpdateData[$table])) {
             $this->indexUpdateData[$table] = [
