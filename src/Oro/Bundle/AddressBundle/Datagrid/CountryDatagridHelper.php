@@ -3,19 +3,17 @@
 namespace Oro\Bundle\AddressBundle\Datagrid;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
+/**
+ * Provides a method to get a callback that returns a query builder for a country datagrid filter.
+ */
 class CountryDatagridHelper
 {
-    /**
-     * Returns query builder callback for country filter form type
-     *
-     * @return callable
-     */
-    public function getCountryFilterQueryBuilder()
+    public function getCountryFilterQueryBuilder(): callable
     {
-        return function (EntityRepository $er) {
-            return $er->createQueryBuilder('c')
+        return function (EntityRepository $repository): QueryBuilder {
+            return $repository->createQueryBuilder('c')
                 ->orderBy('c.name', 'ASC');
         };
     }

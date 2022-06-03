@@ -69,14 +69,12 @@ services:
         tags:
             - {name: doctrine.event_listener, event: onSchemaColumnDefinition }
 
-    oro_cron.repository.schedule:
-        class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
+    oro_cron.schedule.datagrid_helper:
+        class: Oro\Bundle\CronBundle\Datagrid\ScheduleDatagridHelper
         public: true
-        factory: ['@doctrine', getRepository]
         arguments:
-            - 'Oro\Bundle\CronBundle\Entity\Schedule'
-        calls:
-            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
+            - '@doctrine'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_cron.configuration.feature_configuration_extension:
         class: Oro\Bundle\CronBundle\Configuration\FeatureConfigurationExtension

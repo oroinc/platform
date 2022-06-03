@@ -1,10 +1,10 @@
 features:
     feature1:
-        label: "Feature 1"
+        label: feature1.label
+        description: feature1.description
         toggle: toggle1
-        description: "Description 1"
         dependencies:
-            - 'feature2'
+            - feature2
         routes:
             - f1_route1
             - f1_route2

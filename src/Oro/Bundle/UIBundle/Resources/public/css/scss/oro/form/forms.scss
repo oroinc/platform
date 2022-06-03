@@ -117,6 +117,12 @@
             .ui-dialog-resized & {
                 min-width: $field-width + $dialog-content-inner-offset;
             }
+
+            .description-container {
+                margin-top: $content-padding-small;
+                min-width: $field-width;
+                max-width: $field-width;
+            }
         }
 
         &.control-group-datetime {

@@ -104,12 +104,10 @@
         }
     }
 
-    .form-text,
-    .description-container {
+    .form-text {
         margin-top: $content-padding-small;
     }
 
-    .description-container,
     .control-subgroup-container {
         min-width: $field-width;
         max-width: $field-width;
