@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Client;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Utils;
 use Laminas\Mime\Decode;
 use Laminas\Mime\Message;
@@ -54,9 +55,14 @@ class EmailClient
         return $messages;
     }
 
-    public function purge(): void
+    /**
+     * @param array $options
+     * @return void
+     * @throws GuzzleException
+     */
+    public function purge(array $options = []): void
     {
-        $this->client->delete($this->url.'/messages');
+        $this->client->delete($this->url . '/messages', $options);
     }
 
     private function getJson(string $url): array
