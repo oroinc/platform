@@ -47,7 +47,7 @@ class PlatformCollector extends DataCollector
             Cookie::create(
                 ProfilerConfig::ENABLED_COLLECTORS_COOKIE,
                 implode('~', $this->data['enabledCollectors']),
-                0,
+                new \DateTime('next year'),
                 '/',
                 null,
                 null,
