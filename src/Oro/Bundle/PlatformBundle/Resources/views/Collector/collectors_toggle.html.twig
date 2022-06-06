@@ -1,10 +1,11 @@
 <script>
     /* eslint no-var: off */
     (function () {
+        const cookieExpires = new Date(new Date().getTime()+1000*60*60*24*365).toGMTString();
         const trackContainerCheckbox = document.getElementById('sf-toolbar--track-container');
         trackContainerCheckbox.addEventListener('click', function (event) {
             let isActive = event.target.checked === true;
-            document.cookie = 'sf_toolbar_track_container=' + isActive + ';path=/';
+            document.cookie = 'sf_toolbar_track_container=' + isActive + ';expires=' + cookieExpires + ';path=/';
         });
 
         const checkboxes = document.getElementsByClassName('sf-toolbar--collector-checkbox');
@@ -47,7 +48,7 @@
 
         function saveCollectorsToCookie(collectors) {
             collectorsCookie = collectors.join('~');
-            document.cookie = 'sf_toolbar_enabled_collectors=' + collectorsCookie + ';path=/';
+            document.cookie = 'sf_toolbar_enabled_collectors=' + collectorsCookie + ';expires=' + cookieExpires + ';path=/';
         }
     })();
 </script>
