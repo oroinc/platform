@@ -1,6 +1,6 @@
 entity_config:
     activity:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#activity
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#activity
         entity:
             items:
                 activities:
@@ -44,7 +44,7 @@ entity_config:
                         auditable:          false
 
     grid:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#grid
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#grid
         entity:
             items:
                 context:

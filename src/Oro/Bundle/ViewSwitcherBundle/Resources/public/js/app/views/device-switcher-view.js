@@ -255,7 +255,7 @@ define(function(require, exports, module) {
             });
             matcher = this.urlBase.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             matcher += '(' + views.join('|') + ')?';
-            this.urlRegExp = new RegExp('^' + matcher + '\\/');
+            this.urlRegExp = new RegExp('^' + matcher + '(\\/|$)');
         },
 
         /**
@@ -377,7 +377,7 @@ define(function(require, exports, module) {
          */
         updateUrl: function(url, activeView) {
             const viewName = activeView ? activeView : this.getActiveView();
-            const deviceFragment = this.updateUrlDeviceFragment ? this.urlBase + viewName : '';
+            const deviceFragment = this.updateUrlDeviceFragment ? viewName : '';
 
             url = this.urlBase + deviceFragment + url.replace(this.frameUrlSegment, '/').replace(/\/\//g, '/');
             url = url.replace(/\/\//g, '/');

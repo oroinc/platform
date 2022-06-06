@@ -1,6 +1,6 @@
 entity_config:
     importexport:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#importexport
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#annotation-config-field-importexport
         field:
             form:
                 block_config:
@@ -12,7 +12,7 @@ entity_config:
                     options:
                         value_type:         string
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\TextType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\TextType
                         options:
                             label:          oro.importexport.entity_config.header.label
                             required:       false
@@ -22,7 +22,7 @@ entity_config:
                     options:
                         value_type:         integer
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
                         options:
                             label:          oro.importexport.entity_config.order.label
                             empty_data:     ''
@@ -45,7 +45,7 @@ entity_config:
                     options:
                         value_type:         boolean
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.excluded.label
                             choices:
@@ -58,7 +58,7 @@ entity_config:
                     options:
                         allowed_type:       [ref-one, ref-many, manyToOne, oneToMany, manyToMany]
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             label:          oro.importexport.entity_config.full.label
                             choices:

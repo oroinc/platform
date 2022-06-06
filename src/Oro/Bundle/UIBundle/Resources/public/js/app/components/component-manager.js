@@ -16,6 +16,7 @@ define(function(require) {
         this.components = {};
         this.initPromises = {};
         this._bindContainerChangesEvents();
+        this._bindInitOnEvents();
     }
 
     ComponentManager.prototype = {
@@ -33,6 +34,7 @@ define(function(require) {
 
             const elements = this._collectElements($container);
             const elementsData = this._readElementsData(elements);
+            this._bindReferentialInitOnEvents($container);
 
             // collect nested elements' data
             elementsData.forEach(data => {
@@ -62,7 +64,7 @@ define(function(require) {
          *  - on 'content:changed' event -- updates layout
          *  - on 'content:remove' event -- disposes related components (if they are left undisposed)
          *
-         * @protected
+         * @private
          */
         _bindContainerChangesEvents() {
             // if the container catches content changed event -- updates its layout
@@ -90,13 +92,33 @@ define(function(require) {
                     });
                 });
             });
+        },
+
+        /**
+         * Bind suspended initialization handler on DOM-events
+         *
+         * @param {string[]} [events=['click', 'mouseover', 'focusin']]
+         * @param {string?} selector
+         * @param {jQuery?} $currentTarget
+         * @private
+         */
+        _bindInitOnEvents(events = ['click', 'mouseover', 'focusin'], selector, $currentTarget) {
+            const oppositeEvent = {
+                click: null,
+                mouseover: 'mouseout',
+                focusin: 'focusout'
+            };
 
             const initOnEvent = event => {
-                const tempNS = _.uniqueId('.tempEventNS');
-                const {oppositeEventName} = event.data;
-                const $target = $(event.target);
-                const $initOnContainer = $(event.currentTarget);
+                const $initOnContainer = $currentTarget || $(event.currentTarget);
+                if (!$initOnContainer.attr('data-page-component-init-on')) {
+                    // already initialized on another event (when init-on has several events at once click,focusin
+                    return;
+                }
                 $initOnContainer.removeAttr('data-page-component-init-on');
+                const tempNS = _.uniqueId('.tempEventNS');
+                const oppositeEventName = oppositeEvent[event.type];
+                const $target = $(event.target);
                 if (oppositeEventName) {
                     // listen to opposite event, and once it occurs -- invalidate initial event
                     $target.one(oppositeEventName + tempNS, () => event = null);
@@ -104,24 +126,41 @@ define(function(require) {
                 this.init(this.initOptions, $initOnContainer)
                     .done(() => {
                         $target.off(tempNS);
-                        if (event) { // re-trigger initial event if it's still valid after initialization
+                        // re-trigger initial event if it's still valid after initialization,
+                        // when it is not a delegating on a parent element mode of postponed initialization
+                        if (event && !selector) {
                             $target.trigger(event);
                         }
                     });
             };
 
-            [
-                {event: 'click', opposite: null},
-                {event: 'mouseover', opposite: 'mouseout'},
-                {event: 'focusin', opposite: 'focusout'}
-            ].forEach(({event, opposite}) => {
-                this.$el.on(
-                    `${event}${this.eventNamespace}`,
-                    `[data-page-component-init-on*="${event}"]`,
-                    {oppositeEventName: opposite},
+            events.forEach(eventName => {
+                this.$el[selector ? 'one' : 'on'](
+                    `${eventName}${this.eventNamespace}`,
+                    selector || `[data-page-component-init-on*="${eventName}"]`,
                     initOnEvent
                 );
             });
+        },
+
+        /**
+         * @param {jQuery?} $container
+         * @private
+         */
+        _bindReferentialInitOnEvents($container) {
+            ($container || this.$el).find('[data-page-component-init-on]')
+                .each((i, elem) => {
+                    const $elem = $(elem);
+                    if (!this._isInLayout($elem)) {
+                        return;
+                    }
+                    const value = $elem.attr('data-page-component-init-on').trim();
+                    const [, events, selector] = value.match(/^((?:click|focusin|mouseover|,)+)\s+(.+)$/) || [];
+                    if (events) {
+                        $elem.attr('data-page-component-init-on', 'bound');
+                        this._bindInitOnEvents(events.split(','), selector, $elem);
+                    }
+                });
         },
 
         /**
@@ -129,7 +168,7 @@ define(function(require) {
          *
          * @param {jQuery?} $container
          * @returns {Array.<jQuery>} elements
-         * @protected
+         * @private
          */
         _collectElements($container) {
             const elements = [];
@@ -169,7 +208,7 @@ define(function(require) {
          *
          * @param {jQuery} $element
          * @return {boolean}
-         * @protected
+         * @private
          */
         _isInLayout($element) {
             // find nearest marked container with separate layout
@@ -183,7 +222,7 @@ define(function(require) {
          *
          * @param {jQuery} $element
          * @return {boolean}
-         * @protected
+         * @private
          */
         _isReadyToInit($element) {
             const $initOnContainer = $element.closest('[data-page-component-init-on]', this.$el);
@@ -197,7 +236,7 @@ define(function(require) {
          *
          * @param {Array.<jQuery>} elements
          * @returns {Array.<{element: jQuery, module: string, options: Object}>}
-         * @protected
+         * @private
          */
         _readElementsData(elements) {
             const elementsData = elements.map($elem => {
@@ -215,10 +254,6 @@ define(function(require) {
                 return data;
             }).filter(Boolean);
 
-            this.$el.find('[data-page-component-init-on="asap"]')
-                .filter((i, el) => this._isInLayout($(el)))
-                .removeAttr('data-page-component-init-on');
-
             return elementsData;
         },
 
@@ -227,7 +262,7 @@ define(function(require) {
          *
          * @param {jQuery} $elem
          * @throws {Error}
-         * @protected
+         * @private
          */
         _readData($elem) {
             const data = {
@@ -256,14 +291,15 @@ define(function(require) {
          * Cleanup trace of data attributes in the DOM element
          *
          * @param {jQuery} $elem
-         * @protected
+         * @private
          */
         _cleanupData($elem) {
             $elem
                 .removeData('pageComponentModule')
                 .removeData('pageComponentOptions')
                 .removeAttr('data-page-component-module')
-                .removeAttr('data-page-component-options');
+                .removeAttr('data-page-component-options')
+                .removeAttr('data-page-component-init-on');
         },
 
         /**
@@ -271,7 +307,7 @@ define(function(require) {
          *
          * @param {{element: jQuery, module: string, options: Object}} data
          * @returns {Promise}
-         * @protected
+         * @private
          */
         _loadAndInitializeComponent(data) {
             const initDeferred = $.Deferred();
@@ -299,7 +335,7 @@ define(function(require) {
          * @param {jQuery.Deferred} initDeferred
          * @param {Object} options
          * @param {Function} Component
-         * @protected
+         * @private
          */
         _onComponentLoaded(initDeferred, options, Component) {
             if (this.disposed) {
@@ -346,7 +382,7 @@ define(function(require) {
          * @param {jQuery.Deferred} initDeferred
          * @param {Object} options
          * @param {BaseComponent|Function} Component
-         * @protected
+         * @private
          */
         _initializeComponent(initDeferred, options, Component) {
             const name = options.name;
@@ -394,6 +430,7 @@ define(function(require) {
          * @param {Object} options configuration options for a Component
          * @return {Object.<string, string>} where key is internal name for component's instance,
          *                                  value is component's name in componentManager
+         * @private
          */
         _getComponentDependencies(Component, options) {
             const dependencies = BaseComponent.getRelatedSiblingComponentNames(Component);
@@ -416,6 +453,7 @@ define(function(require) {
          * @param {Object.<string, string>} dependencies
          * @throws error on circular dependency
          * @return {Object.<string, BaseComponent|Promise|undefined>}
+         * @private
          */
         _resolveRelatedSiblings(componentName, dependencies) {
             const deps = _.mapObject(dependencies, (siblingComponentName, dependencyName) => {
@@ -446,6 +484,7 @@ define(function(require) {
          * @param {string} componentName name of depender component
          * @param {string} siblingComponentName name of dependee component
          * @return {boolean}
+         * @private
          */
         _hasCircularDependency(componentName, siblingComponentName) {
             let name;
@@ -471,7 +510,7 @@ define(function(require) {
          *
          * @param {jQuery.Deferred} initDeferred
          * @param {Error} error
-         * @protected
+         * @private
          */
         _onComponentLoadError(initDeferred, error) {
             this._handleError(null, error);
@@ -486,7 +525,7 @@ define(function(require) {
          *
          * @param {string|null} message
          * @param {Error} error
-         * @protected
+         * @private
          */
         _handleError(message, error) {
             if (console && console.error) {

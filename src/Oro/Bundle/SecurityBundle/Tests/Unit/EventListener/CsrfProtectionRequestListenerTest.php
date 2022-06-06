@@ -6,6 +6,7 @@ use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Csrf\CookieTokenStorage;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\EventListener\CsrfProtectionRequestListener;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,18 +14,23 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
 {
-    private CsrfRequestManager|\PHPUnit\Framework\MockObject\MockObject $csrfRequestManager;
+    private CsrfRequestManager|MockObject $csrfRequestManager;
+
+    private CsrfTokenManagerInterface|MockObject $csrfTokenManager;
 
     private CsrfProtectionRequestListener $listener;
 
     protected function setUp(): void
     {
         $this->csrfRequestManager = $this->createMock(CsrfRequestManager::class);
+        $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 
         $this->listener = new CsrfProtectionRequestListener($this->csrfRequestManager);
+        $this->listener->setCsrfTokenManager($this->csrfTokenManager);
     }
 
     public function testOnKernelControllerNotMasterRequest(): void
@@ -42,23 +48,6 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onKernelController($event);
     }
 
-    public function testOnKernelControllerCsrfTokenRefreshWhenCookieNotPresent(): void
-    {
-        $request = Request::create('/');
-
-        $event = new ControllerEvent(
-            $this->createMock(HttpKernelInterface::class),
-            fn ($x) => $x,
-            $request,
-            HttpKernelInterface::MAIN_REQUEST
-        );
-
-        $this->csrfRequestManager->expects(self::once())
-            ->method('refreshRequestToken');
-
-        $this->listener->onKernelController($event);
-    }
-
     public function testOnKernelControllerNoCsrfProtection(): void
     {
         $request = Request::create('/');
@@ -71,8 +60,9 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
-        $this->csrfRequestManager->expects(self::never())
-            ->method(self::anything());
+        $this->csrfTokenManager->expects($this->once())
+            ->method('getToken')
+            ->with(CsrfRequestManager::CSRF_TOKEN_ID);
 
         $this->listener->onKernelController($event);
     }
@@ -92,8 +82,11 @@ class CsrfProtectionRequestListenerTest extends \PHPUnit\Framework\TestCase
             HttpKernelInterface::MAIN_REQUEST
         );
 
+        $this->csrfTokenManager->expects($this->once())
+            ->method('getToken')
+            ->with(CsrfRequestManager::CSRF_TOKEN_ID);
         $this->csrfRequestManager->expects(self::never())
-            ->method(self::anything());
+            ->method('refreshRequestToken');
 
         $this->listener->onKernelController($event);
     }

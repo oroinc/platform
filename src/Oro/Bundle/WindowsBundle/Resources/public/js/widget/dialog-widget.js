@@ -410,12 +410,15 @@ define(function(require, exports, module) {
                 this.getLayoutElement().attr('data-layout', 'separate');
 
                 const minWidth = this.widget.dialog('option', 'minWidth');
-                const maxWidth = this.widget.dialog('option', 'maxWidth');
+                let maxWidth = this.widget.dialog('option', 'maxWidth');
 
                 if (minWidth || maxWidth) {
+                    if (maxWidth > this.getLimitToContainer().clientWidth) {
+                        maxWidth = this.getLimitToContainer().clientWidth;
+                    }
                     this.widget.dialog('instance').element.css({
                         minWidth: minWidth,
-                        maxWidth: maxWidth
+                        maxWidth: maxWidth || this.getLimitToContainer().clientWidth
                     });
                 }
             } else {

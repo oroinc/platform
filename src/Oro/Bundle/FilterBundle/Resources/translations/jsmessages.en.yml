@@ -69,6 +69,7 @@ oro:
             later_than: 'later than'
             earlier_than: 'earlier than'
             end: 'and'
+            and: 'and'
             before: 'before'
             after: 'after'
             from: 'from'

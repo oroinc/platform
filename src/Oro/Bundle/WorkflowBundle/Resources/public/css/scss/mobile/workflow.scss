@@ -19,6 +19,13 @@
     }
 }
 
+.workflow-container {
+    .box-type1 {
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
 @media only screen and (max-width: $small-devices-media-breakpoint) {
     .workflow-entity {
         display: block;

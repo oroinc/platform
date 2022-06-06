@@ -1,6 +1,6 @@
 entity_config:
     entity:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#entity
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#entity
         entity:
             form:
                 block_config:
@@ -74,7 +74,7 @@ entity_config:
                             block:          general
                             required:       false
                             strip_tags:     true
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#entity
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#entity
         field:
             form:
                 block_config:
@@ -101,7 +101,7 @@ entity_config:
                         template:           '@OroEntityConfig/Config/propertyLabel.html.twig'
                         sortable:           true
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\TextType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\TextType
                         options:
                             label:          oro.entity.entity_config.entity.field.items.label
                             tooltip:        oro.entity.entity_config.entity.field.items.label.tooltip
@@ -116,7 +116,7 @@ entity_config:
                         - Length:
                             max:            500
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\TextareaType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\TextareaType
                         options:
                             label:          oro.entity.entity_config.entity.field.items.description
                             tooltip:        oro.entity.entity_config.entity.field.items.description.tooltip
@@ -128,7 +128,7 @@ entity_config:
                         value_type: boolean
                         allowed_type: [ref-many, oneToMany]
                     form:
-                        type: Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type: Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             label: oro.entity.entity_config.entity.field.items.actualize_owning_side_on_change
                             tooltip: oro.entity.entity_config.entity.field.items.actualize_owning_side_on_change.tooltip
@@ -139,7 +139,7 @@ entity_config:
                             required: false
                             block: other
     datagrid:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#datagrid
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#datagrid
         field:
             items:
                 is_visible:
@@ -174,7 +174,7 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No:         false
@@ -191,14 +191,14 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
                         options:
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.order
                             required:       false
 
     form:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#form
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#form
         entity:
             items:
                 form_type:
@@ -206,7 +206,7 @@ entity_config:
                 form_options:
                     options:
                         auditable: false
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#form
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#form
         field:
             items:
                 form_type:
@@ -224,7 +224,7 @@ entity_config:
                             value:          Custom
 
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No:         false
@@ -232,7 +232,7 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.form.field.items.is_enabled
-    # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#view
+    # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#view
     view:
         field:
             items:
@@ -245,7 +245,7 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No:         false
@@ -262,19 +262,19 @@ entity_config:
                             code:           owner
                             value:          Custom
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\IntegerType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\IntegerType
                         options:
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.priority
                             required:       false
     grouping:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#grouping
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#grouping
         entity:
             items:
                 groups:
                     options: []
     dictionary:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#dictionary
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#dictionary
         entity:
             items:
                 virtual_fields:
@@ -287,6 +287,6 @@ entity_config:
                     options:
                         auditable: false
     fallback:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#fallback
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#fallback
         entity:
             items: ~

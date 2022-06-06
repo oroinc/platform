@@ -735,7 +735,7 @@ services:
         public: false
         arguments:
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
-            - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
+            - false
             - '@request_stack'
             - ~ #sets in Oro\Bundle\SecurityBundle\DependencyInjection\OroSecurityExtension
 
@@ -759,6 +759,8 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController, priority: -10 }
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+        calls:
+            - [ setCsrfTokenManager, ['@oro_security.csrf_token_manager']]
 
     oro_security.access_rule_executor:
         class: Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor
@@ -843,3 +845,11 @@ services:
     Oro\Bundle\SecurityBundle\EntityConfig\SecurityFieldConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_security.util.same_site_url_helper:
+        class: Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper
+        arguments:
+            - '@request_stack'
+
+    Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper:
+        alias: oro_security.util.same_site_url_helper

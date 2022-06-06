@@ -7,10 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
-use Oro\Bundle\NotificationBundle\Exception\NotificationAlertFetchFailedException;
-use Oro\Bundle\NotificationBundle\Exception\NotificationAlertUpdateFailedException;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use Psr\Log\LoggerInterface;
 
 /**
  * The service to manage a notification alerts for a resource
@@ -39,6 +38,7 @@ class NotificationAlertManager
     private string $resourceType;
     private ManagerRegistry $doctrine;
     private TokenAccessor $tokenAccessor;
+    protected LoggerInterface $logger;
 
     public function __construct(
         string $sourceType,
@@ -50,6 +50,14 @@ class NotificationAlertManager
         $this->resourceType = $resourceType;
         $this->doctrine = $doctrine;
         $this->tokenAccessor = $tokenAccessor;
+    }
+
+    /**
+     * @deprecated
+     */
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     /**
@@ -71,6 +79,7 @@ class NotificationAlertManager
     /**
      * Saves the notification alert to the storage.
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function addNotificationAlert(NotificationAlertInterface $alert, \DateTime $syncAt = null): string
     {
@@ -297,8 +306,6 @@ class NotificationAlertManager
     }
 
     /**
-     * @param array $fields
-     *
      * @return array [[alertType, notificationAlertCount], ...]
      */
     private function doGetNotificationAlertsCount(array $fields): array
@@ -326,12 +333,10 @@ class NotificationAlertManager
 
             return $em->getConnection()->fetchAllAssociative($sql, $data, $types);
         } catch (\Exception $e) {
-            throw new NotificationAlertFetchFailedException(
-                'Failed to fetch a notification alerts count.',
-                $e->getCode(),
-                $e
-            );
+            $this->logger->error('Failed to fetch a notification alerts count.', ['exception' => $e]);
         }
+
+        return [];
     }
 
     private function doCheckHasNotificationAlerts(array $fields): bool
@@ -345,6 +350,7 @@ class NotificationAlertManager
 
         [$data, $types] = $this->prepareDbalCriteria($fields);
         $em = $this->getEntityManager();
+        $hasNotificationAlerts = false;
         try {
             $sql = 'SELECT COUNT(alert.id) as notificationAlertCount FROM %s AS alert WHERE %s';
             $criteria = [];
@@ -359,17 +365,12 @@ class NotificationAlertManager
             $sql = sprintf($sql, $this->getEntityMetadata($em)->getTableName(), $criteria);
             $hasNotificationAlerts = $em->getConnection()->fetchOne($sql, $data, $types);
         } catch (\Exception $e) {
-            throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
+            $this->logger->error('Failed to fetch a notification alert.', ['exception' => $e]);
         }
 
         return (bool) $hasNotificationAlerts;
     }
 
-    /**
-     * @param array $fields
-     *
-     * @throws NotificationAlertUpdateFailedException when the notification alert resolve failed
-     */
     private function doResolveNotificationAlert(array $fields): void
     {
         [$criteria, $types] = $this->prepareDbalCriteria($fields);
@@ -385,41 +386,44 @@ class NotificationAlertManager
                 $criteria,
                 $types
             );
+
+            $this->logger->notice('Notification alert was resolved.', $fields);
         } catch (\Exception $e) {
-            throw new NotificationAlertUpdateFailedException(
+            $this->logger->error(
                 'Failed to resolve a notification alert.',
-                $e->getCode(),
-                $e
+                [
+                    'exception' => $e,
+                    'alertData' => $fields
+                ]
             );
         }
     }
 
-    /**
-     * @param array $fields
-     *
-     * @throws NotificationAlertUpdateFailedException when the notification alert insert failed
-     */
-    private function doInsertNotificationAlert(array $fields): void
+    private function doInsertNotificationAlert(array $fields): bool
     {
         [$data, $types] = $this->prepareDbalCriteria($fields);
         $em = $this->getEntityManager();
         $metadata = $this->getEntityMetadata($em);
         try {
             $em->getConnection()->insert($metadata->getTableName(), $data, $types);
+
+            $this->logger->notice(
+                'Notification alert was inserted.',
+                ['alertData' => $fields]
+            );
         } catch (\Exception $e) {
-            throw new NotificationAlertUpdateFailedException(
+            $this->logger->error(
                 'Failed to insert a new notification alert.',
-                $e->getCode(),
-                $e
+                [
+                    'exception' => $e,
+                    'alertData' => $fields
+                ]
             );
         }
+
+        return false;
     }
 
-    /**
-     * @param array $fields
-     *
-     * @return string|null
-     */
     private function doFindSimilarNotificationAlert(array $fields): ?string
     {
         unset(
@@ -445,7 +449,7 @@ class NotificationAlertManager
             $sql = sprintf($sql, $this->getEntityMetadata($em)->getTableName(), $criteria, $orderBy);
             $similarNotificationAlertId = $em->getConnection()->fetchOne($sql, $data, $types);
         } catch (\Exception $e) {
-            throw new NotificationAlertFetchFailedException('Failed to fetch a notification alert.', $e->getCode(), $e);
+            $this->logger->error('Failed to fetch a notification alert.', ['exception' => $e]);
         }
 
         return $similarNotificationAlertId ?: null;
@@ -463,11 +467,22 @@ class NotificationAlertManager
                 [self::ID => $uuid],
                 $types
             );
+
+            $this->logger->notice(
+                'Notification alert was updated.',
+                [
+                    'alertUuid' => $uuid,
+                    'alertData' => $fields
+                ]
+            );
         } catch (\Exception $e) {
-            throw new NotificationAlertUpdateFailedException(
-                'Failed to resolve a notification alert.',
-                $e->getCode(),
-                $e
+            $this->logger->error(
+                'Failed to update a notification alert.',
+                [
+                    'exception' => $e,
+                    'alertUuid' => $uuid,
+                    'alertData' => $fields
+                ]
             );
         }
     }

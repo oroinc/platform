@@ -7,12 +7,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
-use Oro\Bundle\NotificationBundle\Exception\NotificationAlertFetchFailedException;
-use Oro\Bundle\NotificationBundle\Exception\NotificationAlertUpdateFailedException;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Fixtures\NotificationAlert\TestNotificationAlert;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessor;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -32,6 +31,9 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessor|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
     /** @var NotificationAlertManager */
     private $notificationAlertManager;
 
@@ -40,6 +42,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         $this->em = $this->createMock(EntityManager::class);
         $this->connection = $this->createMock(Connection::class);
         $this->tokenAccessor = $this->createMock(TokenAccessor::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -78,6 +81,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             $doctrine,
             $this->tokenAccessor
         );
+        $this->notificationAlertManager->setLogger($this->logger);
     }
 
     private function mockMetadata(): ClassMetadata
@@ -193,6 +197,25 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                 }
             );
 
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->willReturnCallback(function (string $message, array $context) {
+                self::assertEquals('Notification alert was resolved.', $message);
+                self::assertIsString($context['id']);
+                unset($context['id']);
+                self::assertEquals(
+                    [
+                        'sourceType' => 'test_integration',
+                        'resourceType' => 'test_resource',
+                        'user' => 14,
+                        'organization' => 89
+                    ],
+                    $context
+                );
+            });
+        $this->logger->expects(self::never())
+            ->method('error');
+
         $this->notificationAlertManager->resolveNotificationAlertByIdForCurrentUser($id);
     }
 
@@ -221,6 +244,25 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                     'id'              => 'guid'
                 ]
             );
+
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->willReturnCallback(function (string $message, array $context) {
+                self::assertEquals('Notification alert was resolved.', $message);
+                self::assertIsString($context['id']);
+                unset($context['id']);
+                self::assertEquals(
+                    [
+                        'sourceType' => 'test_integration',
+                        'resourceType' => 'test_resource',
+                        'user' => 78,
+                        'organization' => 76
+                    ],
+                    $context
+                );
+            });
+        $this->logger->expects(self::never())
+            ->method('error');
 
         $this->notificationAlertManager->resolveNotificationAlertByIdForCurrentUser($id);
     }
@@ -252,17 +294,27 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             )
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->resolveNotificationAlertByIdForCurrentUser(UUIDGenerator::v4());
-            self::fail('An exception expected');
-        } catch (NotificationAlertUpdateFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to resolve a notification alert.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->willReturnCallback(function (string $message, array $context) use ($exception) {
+                self::assertEquals('Failed to resolve a notification alert.', $message);
+                self::assertIsString($context['alertData']['id']);
+                unset($context['alertData']['id']);
+                self::assertEquals(
+                    [
+                        'exception' => $exception,
+                        'alertData' => [
+                            'sourceType' => 'test_integration',
+                            'resourceType' => 'test_resource',
+                            'user' => 85,
+                            'organization' => 49
+                        ]
+                    ],
+                    $context
+                );
+            });
+
+        $this->notificationAlertManager->resolveNotificationAlertByIdForCurrentUser(UUIDGenerator::v4());
     }
 
     public function testTryToAddNotificationAlertWhenIntegrationTypesInErrorObjectAndManagerIsNotEqual(): void
@@ -348,6 +400,33 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
                 return 1;
             });
 
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->willReturnCallback(function (string $message, array $context) {
+                self::assertEquals('Notification alert was inserted.', $message);
+                self::assertIsString($context['alertData']['id']);
+                unset($context['alertData']['id']);
+                unset($context['alertData']['createdAt'], $context['alertData']['updatedAt']);
+                self::assertEquals(
+                    [
+                        'alertData' => [
+                            'operation' => 'import',
+                            'step' => 'get',
+                            'itemId' => 456,
+                            'externalId' => 'test_item_id',
+                            'resourceType' => 'test_resource',
+                            'alertType' => 'sync',
+                            'sourceType' => 'test_integration',
+                            'user' => 12,
+                            'organization' => 37
+                        ]
+                    ],
+                    $context
+                );
+            });
+        $this->logger->expects(self::never())
+            ->method('error');
+
         self::assertIsString($this->notificationAlertManager->addNotificationAlert($notificationAlert));
     }
 
@@ -392,7 +471,7 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->notificationAlertManager->hasNotificationAlerts());
     }
 
-    public function testHasNotificationAlertsWhenExceptionWasThrown()
+    public function testHasNotificationAlertsWhenExceptionWasThrown(): void
     {
         $exception = new \Exception('Error during fetch', 510);
 
@@ -400,17 +479,11 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->method('fetchOne')
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->hasNotificationAlerts();
-            self::fail('An exception expected');
-        } catch (NotificationAlertFetchFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to fetch a notification alert.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with('Failed to fetch a notification alert.', ['exception' => $exception]);
+
+        $this->notificationAlertManager->hasNotificationAlerts();
     }
 
     public function testHasNotificationAlertsByType(): void
@@ -467,19 +540,16 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->method('fetchOne')
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->hasNotificationAlertsByType('test_error_type');
-            self::fail('An exception expected');
-        } catch (NotificationAlertFetchFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to fetch a notification alert.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with('Failed to fetch a notification alert.', ['exception' => $exception]);
+
+        $this->notificationAlertManager->hasNotificationAlertsByType('test_error_type');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testAddNotificationAlertWithSyncAtParameter(): void
     {
         $syncAt = $this->createDateTime('now -1 day');
@@ -575,6 +645,33 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
 
                 return 1;
             });
+
+        $this->logger->expects(self::once())
+            ->method('notice')
+            ->willReturnCallback(function (string $message, array $context) {
+                self::assertEquals('Notification alert was inserted.', $message);
+                self::assertIsString($context['alertData']['id']);
+                unset($context['alertData']['id']);
+                unset($context['alertData']['createdAt'], $context['alertData']['updatedAt']);
+                self::assertEquals(
+                    [
+                        'alertData' => [
+                            'operation' => 'import',
+                            'step' => 'get',
+                            'itemId' => 456,
+                            'externalId' => 'test_item_id',
+                            'resourceType' => 'test_resource',
+                            'alertType' => 'sync',
+                            'sourceType' => 'test_integration',
+                            'user' => 12,
+                            'organization' => 37
+                        ]
+                    ],
+                    $context
+                );
+            });
+        $this->logger->expects(self::never())
+            ->method('error');
 
         self::assertIsString($this->notificationAlertManager->addNotificationAlert($alert, $syncAt));
     }
@@ -676,17 +773,32 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->method('insert')
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->addNotificationAlert($error);
-            self::fail('An exception expected');
-        } catch (NotificationAlertUpdateFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to insert a new notification alert.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->willReturnCallback(function (string $message, array $context) use ($exception) {
+                self::assertEquals('Failed to insert a new notification alert.', $message);
+                self::assertIsString($context['alertData']['id']);
+                unset($context['alertData']['id']);
+                self::assertInstanceOf(\DateTime::class, $context['alertData']['createdAt']);
+                unset($context['alertData']['createdAt']);
+                self::assertInstanceOf(\DateTime::class, $context['alertData']['updatedAt']);
+                unset($context['alertData']['updatedAt']);
+                self::assertEquals(
+                    [
+                        'exception' => $exception,
+                        'alertData' => [
+                            'sourceType' => 'test_integration',
+                            'resourceType' => 'test_resource',
+                            'user' => 23,
+                            'organization' => 66,
+                            'operation' => 'import'
+                        ]
+                    ],
+                    $context
+                );
+            });
+
+        $this->notificationAlertManager->addNotificationAlert($error);
     }
 
     public function testResolveNotificationAlertByItemIdForUserAndOrganization(): void
@@ -840,17 +952,26 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             )
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser('testType');
-            self::fail('An exception expected');
-        } catch (NotificationAlertUpdateFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to resolve a notification alert.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->willReturnCallback(function (string $message, array $context) use ($exception) {
+                self::assertEquals('Failed to resolve a notification alert.', $message);
+                self::assertEquals(
+                    [
+                        'exception' => $exception,
+                        'alertData' => [
+                            'sourceType' => 'test_integration',
+                            'resourceType' => 'test_resource',
+                            'user' => 85,
+                            'organization' => 49,
+                            'alertType' => 'testType'
+                        ]
+                    ],
+                    $context
+                );
+            });
+
+        $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser('testType');
     }
 
     public function testResolveNotificationAlertsByErrorTypeAndStepForCurrentUser(): void
@@ -970,20 +1091,30 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             )
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForCurrentUser(
-                'testType',
-                'testStep'
-            );
-            self::fail('An exception expected');
-        } catch (NotificationAlertUpdateFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to resolve a notification alert.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->willReturnCallback(function (string $message, array $context) use ($exception) {
+                self::assertEquals('Failed to resolve a notification alert.', $message);
+                self::assertEquals(
+                    [
+                        'exception' => $exception,
+                        'alertData' => [
+                            'sourceType' => 'test_integration',
+                            'resourceType' => 'test_resource',
+                            'user' => 79,
+                            'organization' => 85,
+                            'alertType' => 'testType',
+                            'step' => 'testStep'
+                        ]
+                    ],
+                    $context
+                );
+            });
+
+        $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeAndStepForCurrentUser(
+            'testType',
+            'testStep'
+        );
     }
 
     public function testGetNotificationAlertsCountGroupedByType(): void
@@ -1055,16 +1186,10 @@ class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
             ->method('fetchAllAssociative')
             ->willThrowException($exception);
 
-        try {
-            $this->notificationAlertManager->getNotificationAlertsCountGroupedByType();
-            self::fail('An exception expected');
-        } catch (NotificationAlertFetchFailedException $e) {
-            self::assertSame($exception, $e->getPrevious());
-            self::assertSame($exception->getCode(), $e->getCode());
-            self::assertEquals(
-                'Failed to fetch a notification alerts count.',
-                $e->getMessage()
-            );
-        }
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with('Failed to fetch a notification alerts count.', ['exception' => $exception]);
+
+        $this->notificationAlertManager->getNotificationAlertsCountGroupedByType();
     }
 }

@@ -15,3 +15,9 @@ services:
             - '@doctrine'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\LocaleBundle\Command\CleanupUnusedLocalizedFallbackValuesCommand:
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: console.command }

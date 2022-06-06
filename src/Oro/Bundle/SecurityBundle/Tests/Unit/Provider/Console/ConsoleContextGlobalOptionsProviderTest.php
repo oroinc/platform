@@ -242,6 +242,7 @@ class ConsoleContextGlobalOptionsProviderTest extends \PHPUnit\Framework\TestCas
             ->willReturn($userId, null);
 
         $organization1 = new Organization();
+        $organization1->setEnabled(false);
         $organization2 = new Organization();
         $organization2->setEnabled(true);
         $role = $this->createMock(Role::class);

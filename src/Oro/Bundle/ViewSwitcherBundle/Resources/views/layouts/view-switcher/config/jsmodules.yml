@@ -12,7 +12,6 @@ aliases:
     routing$: fosjsrouting/js/router
     slick$: slick-carousel/slick/slick
     underscore$: underscore/underscore
-app-modules: []
 configs:
     orotranslation/js/translator: {}
     oroui/js/component-shortcuts-manager: {}

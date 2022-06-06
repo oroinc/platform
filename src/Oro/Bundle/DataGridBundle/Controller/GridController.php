@@ -14,11 +14,13 @@ use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -190,7 +192,12 @@ class GridController extends AbstractController
         try {
             $response = $massActionDispatcher->dispatchByRequest($gridName, $actionName, $request);
         } catch (LogicException $e) {
-            return new JsonResponse(null, JsonResponse::HTTP_FORBIDDEN);
+            if ($this->get(KernelInterface::class)->isDebug()) {
+                throw $e;
+            } else {
+                $this->get(LoggerInterface::class)->error($e->getMessage());
+                return new JsonResponse(null, JsonResponse::HTTP_FORBIDDEN);
+            }
         }
 
         $data = [
@@ -240,7 +247,9 @@ class GridController extends AbstractController
                 MessageProducerInterface::class,
                 MassActionDispatcher::class,
                 RequestParameterBagFactory::class,
-                Manager::class
+                Manager::class,
+                KernelInterface::class,
+                LoggerInterface::class,
             ]
         );
     }

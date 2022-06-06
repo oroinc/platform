@@ -3,6 +3,15 @@ parameters:
 
     oro_platform.collector.template: '@@OroPlatform/Collector/platform.html.twig'
 
+    oro_platform.collect_deprecations: false
+
+    oro_platform.xdebug_warning_command_list:
+        - 'cache:warmup'
+        - 'cache:clear'
+        - 'oro:assets:build'
+        - 'oro:platform:update'
+        - 'oro:install'
+
 services:
     oro_platform.psr7.http_factory:
         class: Oro\Bundle\PlatformBundle\Psr7\HttpFactory
@@ -171,3 +180,10 @@ services:
 
     oro_platform.provider.dbal_type_default_value:
         class: Oro\Bundle\PlatformBundle\Provider\DbalTypeDefaultValueProvider
+
+    oro_platform.event_listener.console.xdebug_listener:
+        class: Oro\Bundle\PlatformBundle\EventListener\Console\XdebugListener
+        arguments:
+            - '%oro_platform.xdebug_warning_command_list%'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onCommandExecute}

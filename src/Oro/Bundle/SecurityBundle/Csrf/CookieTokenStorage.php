@@ -17,11 +17,14 @@ class CookieTokenStorage implements TokenStorageInterface
     /** @var mixed true, false, 'auto' */
     private $secure;
 
-    /** @var bool */
-    private $httpOnly;
-
     /** @var string|null */
     private $sameSite;
+
+    /**
+     * @var bool
+     * @deprecated
+     */
+    private $httpOnly;
 
     /** @var RequestStack */
     private $requestStack;
@@ -99,7 +102,7 @@ class CookieTokenStorage implements TokenStorageInterface
             '/',
             null,
             'auto' === $this->secure ? null : $this->secure,
-            $this->httpOnly,
+            false,
             false,
             $this->sameSite
         );

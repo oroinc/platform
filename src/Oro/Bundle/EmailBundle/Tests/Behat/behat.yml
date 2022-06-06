@@ -17,6 +17,7 @@ oro_behat_extension:
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\GoogleImapEnableContext
         - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+        - Oro\Bundle\QueryDesignerBundle\Tests\Behat\Context\QueryDesignerContext
       paths:
         - '@OroEmailBundle/Tests/Behat/Features'
   elements:
@@ -124,6 +125,12 @@ oro_behat_extension:
 
     RemoveEmail:
       selector: '.select2-search-choice-close'
+
+    Remove Email To Field:
+      selector: '[id^="s2id_oro_email_email_to"] .select2-search-choice-close'
+
+    Email To Field:
+      selector: 'input[aria-describedby^="oro_email_email_to"]'
 
     Email Templates Grid:
       selector: '[id^="grid-email-templates"]'

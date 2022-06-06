@@ -17,7 +17,7 @@
     ~ * .sticky,
     ~ * .floatThead.floatThead-fixed .grid-header:first-child,
     &.sticky {
-        transition: margin-top 500ms;
+        transition: margin-top 500ms, transform 500ms;
     }
 
     @at-root .disable-touch-scrolling#{&} {
@@ -32,7 +32,7 @@
             ~ * .sticky-pinned,
             ~ * .floatThead.floatThead-fixed .grid-header:first-child,
             &.sticky-pinned {
-                margin-top: -$app-header-height;
+                transform: translateY(-$app-header-height);
             }
         }
     }

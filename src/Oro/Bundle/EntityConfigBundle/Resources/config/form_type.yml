@@ -33,6 +33,13 @@ services:
         tags:
             - { name: form.type, alias: oro_entity_config_integer }
 
+    oro_entity_config.type.number:
+        class: Oro\Bundle\EntityConfigBundle\Form\Type\NumberType
+        arguments:
+            - '@oro_entity_config.config_type_helper'
+        tags:
+            - { name: form.type, alias: oro_entity_config_number }
+
     oro_entity_config.type.text:
         class: Oro\Bundle\EntityConfigBundle\Form\Type\TextType
         arguments:

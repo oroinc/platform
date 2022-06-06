@@ -1,0 +1,80 @@
+Oro\Bundle\EmailBundle\Entity\EmailBody:
+    emailBody1:
+        bodyContent: '<sentences(3, true)>'
+        bodyIsText: true
+    emailBody2:
+        bodyContent: '<sentences(3, true)>'
+        bodyIsText: true
+
+Oro\Bundle\UserBundle\Entity\User:
+    userCharlie:
+        firstName: Charlie
+        lastName: Sheen
+        username (unique): charlie.sheen123
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@adminRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email (unique): <email()>
+        password: password
+        salt: salts
+
+OroEntityProxy\OroEmailBundle\EmailAddressProxy:
+    charlieAddress:
+        owner: '@userCharlie'
+        email: 'charlie@sheen.com'
+
+Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin:
+    adminEmailOrigin:
+        active: true
+        name: 'internalemailorigin'
+        internalName: 'BAP_User_1'
+        mailboxName: 'Local'
+        emailUsers: ['@adminEmailUser1']
+        owner: '@admin'
+        organization: '@organization'
+
+Oro\Bundle\EmailBundle\Entity\EmailFolder:
+    adminEmailFolder:
+        name: 'sent'
+        fullName: 'sent'
+        type: 'sent'
+        origin: '@adminEmailOrigin'
+        emailUsers: ['@adminEmailUser1']
+
+Oro\Bundle\EmailBundle\Entity\Email:
+    email1:
+        subject: 'Public email'
+        emailBody: '@emailBody1'
+        sentAt: '<(new DateTime("2010-10-31"))>'
+        fromName: '"Charlie Sheen" \<charlie@sheen.com\>'
+        fromEmailAddress: '@charlieAddress'
+        internalDate: '<(new DateTime("2010-10-31"))>'
+        messageId: fsdfasdf
+        emailUsers: ['@adminEmailUser1']
+    email2:
+        subject: 'Private email'
+        emailBody: '@emailBody2'
+        sentAt: '<(new DateTime("2010-11-01"))>'
+        fromName: '@adminEmailAddress'
+        fromEmailAddress: '@adminEmailAddress'
+        internalDate: '<(new DateTime("2010-11-01"))>'
+        messageId: fsdfasdf
+        emailUsers: ['@adminEmailUser2']
+
+Oro\Bundle\EmailBundle\Entity\EmailUser:
+    adminEmailUser1:
+        email: '@email1'
+        receivedAt: '@email1->sentAt'
+        owner: '@admin'
+        organization: '@organization'
+        folders: ['@adminEmailFolder']
+        isEmailPrivate: false
+    adminEmailUser2:
+        email: '@email2'
+        receivedAt: '@email2->sentAt'
+        owner: '@userCharlie'
+        organization: '@organization'
+        folders: ['@adminEmailFolder']
+        isEmailPrivate: true

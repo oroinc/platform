@@ -515,6 +515,6 @@ abstract class AbstractScopeManager
 
     protected function resetCache(): void
     {
-        $this->cache->flushAll();
+        $this->cache->deleteAll();
     }
 }

@@ -195,6 +195,8 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetConfig\AddAssociationValidators
         arguments:
             - '@oro_api.doctrine_helper'
+        calls:
+            - [setAssociationAccessExclusionProviderRegistry, ['@oro_api.association_access_exclusion_provider_registry']]
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only&!descriptions', targetAction: update|create|update_relationship|add_relationship|delete_relationship|update_subresource|add_subresource|delete_subresource, priority: -45 }
 
