@@ -74,24 +74,32 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize(): void
     {
-        $this->assertSame(serialize([null, null, $this->entity->getUuid()]), $this->entity->serialize());
+        $this->assertSame(serialize([null, null, $this->entity->getUuid(), null]), $this->entity->serialize());
+
+        $file = $this->getEntity(
+            File::class,
+            [
+                'id' => 1,
+                'filename' => 'sample_filename',
+                'uuid' => 'test-uuid',
+                'originalFilename' => 'original-filename.png'
+            ]
+        );
 
         $this->assertEquals(
-            serialize([1, 'sample_filename', 'test-uuid']),
-            $this->getEntity(
-                File::class,
-                ['id' => 1, 'filename' => 'sample_filename', 'uuid' => 'test-uuid']
-            )->serialize()
+            serialize([1, 'sample_filename', 'test-uuid', 'original-filename.png']),
+            $file->serialize()
         );
     }
 
     public function testUnserialize(): void
     {
-        $this->entity->unserialize(serialize([1, 'sample_filename', 'test-uuid']));
+        $this->entity->unserialize(serialize([1, 'sample_filename', 'test-uuid', 'original-filename.png']));
 
         $this->assertSame('sample_filename', $this->entity->getFilename());
         $this->assertSame(1, $this->entity->getId());
         $this->assertSame('test-uuid', $this->entity->getUuid());
+        $this->assertSame('original-filename.png', $this->entity->getOriginalFilename());
     }
 
     public function testClone(): void
