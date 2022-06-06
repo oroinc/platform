@@ -52,6 +52,8 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
             $this->generateDefaultGetter($singularName, $fieldName, $class);
             $this->generateDefaultSetter($singularName, $fieldName, $class);
         }
+
+        $this->generateCloneLocalizedFallbackValueAssociationsMethod($fields, $class);
     }
 
     /**
@@ -87,8 +89,35 @@ class DefaultFallbackGeneratorExtension extends AbstractEntityGeneratorExtension
     {
         $class->addMethod($this->getMethodName($singularName, 'setDefault'))
             ->addBody(\sprintf('return $this->setDefaultFallbackValue($this->%s, $value);', $fieldName))
-            ->addComment($this->generateDocblock(['string' =>  '$value'], '$this'))
+            ->addComment($this->generateDocblock(['string' => '$value'], '$this'))
             ->addParameter('value');
+    }
+
+    /**
+     * Generates code for the cloneLocalizedFallbackValueAssociations method
+     */
+    protected function generateCloneLocalizedFallbackValueAssociationsMethod(array $fields, ClassGenerator $class): void
+    {
+        $fieldNames = !empty($fields) ? '["' . implode('", "', $fields) . '"]' : '[]';
+
+        $methodBody = <<<METHOD_BODY
+foreach ($fieldNames as \$propertyName) {
+    \$newCollection = new \Doctrine\Common\Collections\ArrayCollection();
+
+    foreach (\$this->\$propertyName as \$element) {
+        \$newCollection->add(clone \$element);
+    }
+
+    \$this->\$propertyName = \$newCollection;
+}
+
+return \$this;
+METHOD_BODY;
+
+        $class->addMethod('cloneLocalizedFallbackValueAssociations')
+            ->addBody($methodBody)
+            ->addComment('Clones a collections of LocalizedFallbackValue associations.')
+            ->setReturnType('self');
     }
 
     protected function generateDocblock(array $params, string $return = null): string

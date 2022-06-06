@@ -8,6 +8,7 @@ use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 /**
  * Implementation of double submit cookie approach to protect application against CSRF attacks
@@ -19,9 +20,19 @@ class CsrfProtectionRequestListener
     /** @var CsrfRequestManager */
     private $csrfRequestManager;
 
+    private CsrfTokenManagerInterface $csrfTokenManager;
+
     public function __construct(CsrfRequestManager $csrfRequestManager)
     {
         $this->csrfRequestManager = $csrfRequestManager;
+    }
+
+    /**
+     * @param CsrfTokenManagerInterface $csrfTokenManager
+     */
+    public function setCsrfTokenManager(CsrfTokenManagerInterface $csrfTokenManager): void
+    {
+        $this->csrfTokenManager = $csrfTokenManager;
     }
 
     /**
@@ -37,11 +48,7 @@ class CsrfProtectionRequestListener
 
         $request = $event->getRequest();
 
-        $refreshCsrfToken = false;
-        if (!$request->cookies->has(CsrfRequestManager::CSRF_TOKEN_ID)) {
-            // if CSRF cookie was not generated yet - force generation
-            $refreshCsrfToken = true;
-        }
+        $this->csrfTokenManager->getToken(csrfRequestManager::CSRF_TOKEN_ID);
 
         // check CSRF Protection annotation and validate token. Refresh used token after check
         $csrProtectionAttribute = '_' . CsrfProtection::ALIAS_NAME;
@@ -57,12 +64,8 @@ class CsrfProtectionRequestListener
                     throw new AccessDeniedHttpException('Invalid CSRF token');
                 }
 
-                $refreshCsrfToken = true;
+                $this->csrfRequestManager->refreshRequestToken();
             }
-        }
-
-        if ($refreshCsrfToken) {
-            $this->csrfRequestManager->refreshRequestToken();
         }
     }
 

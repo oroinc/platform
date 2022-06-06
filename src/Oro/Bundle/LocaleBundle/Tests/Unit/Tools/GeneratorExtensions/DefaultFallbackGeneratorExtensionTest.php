@@ -122,6 +122,28 @@ class DefaultFallbackGeneratorExtensionTest extends \PHPUnit\Framework\TestCase
                 'value' => $this->getParameter('value'),
             ]
         );
+
+        $cloneLocalizedFallbackValueAssociationsMethodBody = <<<METHOD_BODY
+foreach (["names"] as \$propertyName) {
+    \$newCollection = new \Doctrine\Common\Collections\ArrayCollection();
+
+    foreach (\$this->\$propertyName as \$element) {
+        \$newCollection->add(clone \$element);
+    }
+
+    \$this->\$propertyName = \$newCollection;
+}
+
+return \$this;
+
+METHOD_BODY;
+
+        $this->assertMethod(
+            $class,
+            'cloneLocalizedFallbackValueAssociations',
+            $cloneLocalizedFallbackValueAssociationsMethodBody,
+            "Clones a collections of LocalizedFallbackValue associations."
+        );
     }
 
     protected function getParameter(string $name, ?string $type = null, bool $nullable = false): Parameter

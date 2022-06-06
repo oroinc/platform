@@ -93,6 +93,7 @@ define(function(require) {
                     const that = this;
                     items = $(items).map(function(i, item) {
                         let view;
+                        const secureItem = _.escape(item.key);
 
                         if (item.item.dialog) {
                             const config = item.item.dialog_config;
@@ -128,14 +129,14 @@ define(function(require) {
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html(that.highlighter(item.key));
+                                .html(that.highlighter(secureItem));
 
                             if (config.iCss) {
-                                view.prepend('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>');
+                                view.prepend('<i class="' + config.iCss + ' hide-text">' + secureItem + '</i>');
                             }
                         } else {
                             view = $(that.options.item).attr('data-value', item.key);
-                            view.find('a').html(that.highlighter(item.key));
+                            view.find('a').html(that.highlighter(secureItem));
                         }
 
                         return view[0];

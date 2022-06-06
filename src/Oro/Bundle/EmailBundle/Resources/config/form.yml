@@ -266,3 +266,10 @@ services:
             - '@security.authorization_checker'
         tags:
             - { name: form.type_extension, extended_type: Oro\Bundle\EmailBundle\Form\Type\EmailType }
+
+    oro_email.form.type.email_template_entity_choice:
+        class: Oro\Bundle\EmailBundle\Form\Type\EmailTemplateEntityChoiceType
+        arguments:
+            - '@oro_email.email_template_entity_provider'
+        tags:
+            - { name: form.type, alias: oro_email_template_entity_choice }

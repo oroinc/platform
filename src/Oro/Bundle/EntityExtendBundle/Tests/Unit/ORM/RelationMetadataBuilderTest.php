@@ -679,6 +679,92 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testBuildOneToManyWithAdditionalOrphanRemovalOption()
+    {
+        $entityClass = TestClass::class;
+        $fieldName = 'srcField';
+        $fieldType = RelationType::ONE_TO_MANY;
+        $fieldId = new FieldConfigId('extend', $entityClass, $fieldName, $fieldType);
+        $fieldConfig = new Config($fieldId, ['without_default' => true]);
+
+        $targetEntityClass = TestClass2::class;
+        $targetFieldName = 'targetField';
+        $targetFieldType = RelationType::MANY_TO_ONE;
+        $targetFieldId = new FieldConfigId('extend', $targetEntityClass, $targetFieldName, $targetFieldType);
+
+        $this->configManager->expects($this->once())
+            ->method('getFieldConfig')
+            ->with('extend', $entityClass, $fieldName)
+            ->willReturn($fieldConfig);
+
+        $targetEntityConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'state' => ExtendScope::STATE_ACTIVE
+            ]
+        );
+
+        $this->configManager->expects(self::once())
+            ->method('getEntityConfig')
+            ->willReturn($targetEntityConfig);
+
+        $metadataBuilder = new ClassMetadataBuilder(new ClassMetadataInfo($entityClass));
+        $relationKey = ExtendHelper::buildRelationKey(
+            $entityClass,
+            $fieldName,
+            RelationType::ONE_TO_MANY,
+            $targetEntityClass
+        );
+        $extendConfig = $this->getEntityConfig(
+            $entityClass,
+            [
+                'relation' => [
+                    $relationKey => [
+                        'field_id'        => $fieldId,
+                        'owner'           => false,
+                        'target_entity'   => $targetEntityClass,
+                        'target_field_id' => $targetFieldId,
+                        'orphanRemoval'   => true,
+                    ]
+                ],
+                'schema'   => [
+                    'relation' => [
+                        $fieldName => []
+                    ]
+                ]
+            ]
+        );
+
+        $this->builder->build($metadataBuilder, $extendConfig);
+
+        $result = $metadataBuilder->getClassMetadata()->getAssociationMapping($fieldName);
+        $this->assertEquals(
+            [
+                'sourceEntity'     => $entityClass,
+                'targetEntity'     => $targetEntityClass,
+                'fieldName'        => $fieldName,
+                'type'             => ClassMetadataInfo::ONE_TO_MANY,
+                'isOwningSide'     => false,
+                'mappedBy'         => $targetFieldName,
+                'inversedBy'       => null,
+                'cascade'          => [],
+                'fetch'            => ClassMetadataInfo::FETCH_LAZY,
+                'isCascadeRemove'  => true,
+                'isCascadePersist' => false,
+                'isCascadeRefresh' => false,
+                'isCascadeMerge'   => false,
+                'isCascadeDetach'  => false,
+                'orphanRemoval'    => true
+            ],
+            $result
+        );
+
+        $defaultRelationFieldName = ExtendConfigDumper::DEFAULT_PREFIX . $fieldName;
+        $this->assertFalse(
+            $metadataBuilder->getClassMetadata()->hasAssociation($defaultRelationFieldName)
+        );
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
