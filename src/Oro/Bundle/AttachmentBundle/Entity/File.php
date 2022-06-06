@@ -469,6 +469,7 @@ class File extends ExtendFile implements FileExtensionInterface
             $this->filename,
             $this->uuid,
             $this->externalUrl,
+            $this->originalFilename,
         ];
     }
 
@@ -479,6 +480,7 @@ class File extends ExtendFile implements FileExtensionInterface
             $this->filename,
             $this->uuid,
             $this->externalUrl,
+            $this->originalFilename,
         ] = $serialized;
     }
 
