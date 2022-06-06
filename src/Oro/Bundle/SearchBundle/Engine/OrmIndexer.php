@@ -62,12 +62,12 @@ class OrmIndexer extends AbstractIndexer
             return false;
         }
         $sortedEntitiesData = [];
-        foreach ($entities as $entity) {
-            if (!$this->doctrineHelper->isManageableEntity($entity)) {
+        foreach ($entities as $entityItem) {
+            if (!$this->doctrineHelper->isManageableEntity($entityItem)) {
                 continue;
             }
-            $entityClass = $this->doctrineHelper->getEntityClass($entity);
-            $sortedEntitiesData[$entityClass][] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $entityClass = $this->doctrineHelper->getEntityClass($entityItem);
+            $sortedEntitiesData[$entityClass][] = $this->doctrineHelper->getSingleEntityIdentifier($entityItem);
         }
 
         $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
