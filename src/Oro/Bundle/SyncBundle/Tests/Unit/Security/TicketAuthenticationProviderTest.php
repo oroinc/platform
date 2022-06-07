@@ -139,6 +139,11 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->with(self::USERNAME)
             ->willReturn($user);
 
+        $this->userProvider->expects(self::once())
+            ->method('refreshUser')
+            ->with($user)
+            ->willReturn($user);
+
         $this->ticketDigestGenerator
             ->expects(self::once())
             ->method('generateDigest')
@@ -264,6 +269,11 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
+            ->willReturn($user);
+
+        $this->userProvider->expects(self::once())
+            ->method('refreshUser')
+            ->with($user)
             ->willReturn($user);
 
         $this->ticketDigestGenerator

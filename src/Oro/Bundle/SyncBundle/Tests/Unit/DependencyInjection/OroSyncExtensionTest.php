@@ -4,6 +4,8 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\DependencyInjection;
 
 use Monolog\Logger;
 use Oro\Bundle\SyncBundle\DependencyInjection\OroSyncExtension;
+use Oro\Bundle\SyncBundle\Test\Client\ConnectionChecker;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
@@ -17,7 +19,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testLoadException(string $param, $value, string $expected): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($expected);
 
         $container = new ContainerBuilder();
@@ -57,6 +59,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', 'prod');
 
         foreach ($params as $name => $value) {
             $container->setParameter($name, $value);
@@ -168,6 +171,7 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', $isDebug);
+        $container->setParameter('kernel.environment', 'prod');
 
         $extension = new OroSyncExtension();
         $extension->load([], $container);
@@ -220,5 +224,25 @@ class OroSyncExtensionTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    public function testLoadWhenTestEnvironment(): void
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+        $container->setParameter('kernel.environment', 'test');
+
+        $extension = new OroSyncExtension();
+        $extension->load([], $container);
+
+        self::assertEquals(
+            ConnectionChecker::class,
+            $container->getDefinition('oro_sync.test.client.connection_checker')->getClass()
+        );
+
+        self::assertEquals(
+            ['oro_sync.client.connection_checker', null, -255],
+            $container->getDefinition('oro_sync.test.client.connection_checker')->getDecoratedService()
+        );
     }
 }

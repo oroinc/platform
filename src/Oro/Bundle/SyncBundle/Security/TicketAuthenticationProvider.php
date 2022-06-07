@@ -120,6 +120,7 @@ class TicketAuthenticationProvider implements AuthenticationProviderInterface
         if ($username) {
             try {
                 $user = $this->userProvider->loadUserByUsername($username);
+                $user = $this->userProvider->refreshUser($user);
             } catch (UsernameNotFoundException $e) {
                 throw new BadCredentialsException(sprintf(
                     'Ticket "%s" for "%s" is not valid - user was not found.',
