@@ -34,13 +34,10 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     private const ATTRIBUTES_CHOICES = ['choice_1' => 1, 'choice_5' => 5, 'choice_15' => 15, 'choice_20' => 20];
 
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private $doctrine;
 
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
 
     protected function setUp(): void
     {
@@ -61,12 +58,12 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
                 return $value;
             });
 
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry->expects($this->any())
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->doctrine->expects($this->any())
             ->method('getRepository')
             ->willReturnMap([
-                ['OroLocaleBundle:Localization', null, $repositoryLocalization],
-                ['OroLocaleBundle:LocalizedFallbackValue', null, $repositoryLocalizedFallbackValue],
+                [Localization::class, null, $repositoryLocalization],
+                [LocalizedFallbackValue::class, null, $repositoryLocalizedFallbackValue],
             ]);
 
         $this->attributeManager = $this->createMock(AttributeManager::class);
@@ -85,7 +82,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         return [
             new PreloadedExtension(
                 [
-                    new LocalizedFallbackValueCollectionType($this->registry),
+                    new LocalizedFallbackValueCollectionType($this->doctrine),
                     $attributeMultiSelectType,
                     new LocalizedPropertyType(),
                     new FallbackValueType(),

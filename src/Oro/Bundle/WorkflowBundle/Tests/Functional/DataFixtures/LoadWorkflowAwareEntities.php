@@ -47,7 +47,7 @@ class LoadWorkflowAwareEntities extends AbstractFixture implements DependentFixt
         }
         $manager->flush();
 
-        $workflowDefinitionRepository = $manager->getRepository('OroWorkflowBundle:WorkflowDefinition');
+        $workflowDefinitionRepository = $manager->getRepository(WorkflowDefinition::class);
 
         // create workflow items manually (to make it faster)
         foreach ($workflowNames as $workflowName) {

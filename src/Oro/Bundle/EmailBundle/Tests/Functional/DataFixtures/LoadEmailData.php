@@ -96,7 +96,7 @@ class LoadEmailData extends AbstractFixture implements ContainerAwareInterface, 
 
     protected function loadEmailsDemo(ObjectManager $om)
     {
-        $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');
+        $adminUser = $om->getRepository(User::class)->findOneByUsername('admin');
 
         foreach ($this->templates as $index => $template) {
             $owner = $this->getEmailOwner($om);

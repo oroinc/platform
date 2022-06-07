@@ -14,25 +14,23 @@ class LocalizedFallbackValueRepositoryTest extends WebTestCase
 {
     use EntityTrait;
 
-    protected EntityManager $entityManager;
-
-    protected LocalizedFallbackValueRepository $repository;
+    private EntityManager $entityManager;
+    private LocalizedFallbackValueRepository $repository;
 
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadLocalizationData::class]);
-        $this->entityManager = self::getContainer()
-            ->get('doctrine')
+        $this->entityManager = self::getContainer()->get('doctrine')
             ->getManagerForClass(LocalizedFallbackValue::class);
-        $this->repository = $this->entityManager->getRepository('OroLocaleBundle:LocalizedFallbackValue');
+        $this->repository = $this->entityManager->getRepository(LocalizedFallbackValue::class);
     }
 
     public function testGetParentIdByFallbackValue(): void
     {
-        $localRepo = $this->entityManager->getRepository(Localization::class);
         /** @var Localization $localization */
-        $localization = $localRepo->findOneByFormattingCode('en_CA');
+        $localization = $this->entityManager->getRepository(Localization::class)
+            ->findOneBy(['formattingCode' => 'en_CA']);
         $defaultValue = $localization->getTitles()->first();
 
         $parentId = $this->repository->getParentIdByFallbackValue(Localization::class, 'titles', $defaultValue);

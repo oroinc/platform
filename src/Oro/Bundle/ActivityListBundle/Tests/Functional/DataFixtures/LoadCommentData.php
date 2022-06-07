@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
@@ -44,7 +45,7 @@ class LoadCommentData extends AbstractFixture implements DependentFixtureInterfa
     {
         $userManager = $this->container->get('oro_user.manager');
         $adminUser = $userManager->findUserByEmail(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $organization = $manager->getRepository(Organization::class)->getFirst();
 
         foreach ($this->commentData as $data) {
             $entity = new Comment();

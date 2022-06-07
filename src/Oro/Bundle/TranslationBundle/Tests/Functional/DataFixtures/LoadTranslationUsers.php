@@ -5,7 +5,9 @@ namespace Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -38,10 +40,10 @@ class LoadTranslationUsers extends AbstractFixture implements ContainerAwareInte
 
     public function loadTranslator(ObjectManager $manager, UserManager $userManager)
     {
-        $role = $manager->getRepository('OroUserBundle:Role')
+        $role = $manager->getRepository(Role::class)
             ->findOneBy(['role' => LoadTranslationRoles::ROLE_TRANSLATOR]);
 
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->findOneBy([]);
+        $organization = $manager->getRepository(Organization::class)->findOneBy([]);
 
         /* @var User $user */
         $user = $userManager->createUser();

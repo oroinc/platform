@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
@@ -59,7 +60,7 @@ class LoadTypedUserEmailOriginData extends LoadUserEmailOriginData
             ]
         ];
 
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $organization = $manager->getRepository(Organization::class)->getFirst();
 
         foreach ($data as $referenceName => $item) {
             /** @var User $owner */
