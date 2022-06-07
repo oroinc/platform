@@ -150,16 +150,20 @@ class EmailTemplateType extends AbstractType
      */
     protected function getWysiwygOptions()
     {
+        $options = [
+            'convert_urls' => false
+        ];
+
         if ($this->userConfig->get('oro_email.sanitize_html')) {
-            return [];
+            return $options;
         }
 
-        return [
+        return array_merge($options, [
             'valid_elements' => null, //all elements are valid
             'plugins' => array_merge(OroRichTextType::$defaultPlugins, ['fullpage']),
             'relative_urls' => false,
             'forced_root_block' => '',
             'entity_encoding' => 'raw',
-        ];
+        ]);
     }
 }
