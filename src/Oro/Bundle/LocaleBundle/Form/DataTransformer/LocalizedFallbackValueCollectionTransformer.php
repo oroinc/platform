@@ -88,7 +88,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         ];
 
         foreach ($value as $localizedFallbackValue) {
-            /* @var $localizedFallbackValue AbstractLocalizedFallbackValue */
+            /* @var AbstractLocalizedFallbackValue $localizedFallbackValue */
             $localization = $localizedFallbackValue->getLocalization();
             if ($localization) {
                 $key = $localization->getId();
@@ -226,7 +226,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
      */
     protected function findLocalization($id)
     {
-        $localization = $this->registry->getRepository('OroLocaleBundle:Localization')->find($id);
+        $localization = $this->registry->getRepository(Localization::class)->find($id);
 
         if (!$localization) {
             throw new TransformationFailedException(sprintf('Undefined localization with ID=%s', $id));
