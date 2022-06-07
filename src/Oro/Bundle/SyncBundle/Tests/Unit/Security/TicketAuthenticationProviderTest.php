@@ -11,7 +11,6 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
@@ -25,14 +24,11 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     private const SECRET = 'sampleSecret';
     private const TICKET_TTL = 300;
 
-    /** @var UserProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userProvider;
+    private UserProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userProvider;
 
-    /** @var TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $ticketDigestGenerator;
+    private TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $ticketDigestGenerator;
 
-    /** @var TicketAuthenticationProvider */
-    private $ticketAuthenticationProvider;
+    private TicketAuthenticationProvider $ticketAuthenticationProvider;
 
     protected function setUp(): void
     {
@@ -61,55 +57,57 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
 
     public function supportsDataProvider(): array
     {
-        $tokenWithoutNonce = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $tokenWithoutNonce = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $tokenWithoutNonce->setAttributes([]);
 
-        $tokenWithoutCreated = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $tokenWithoutCreated = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $tokenWithoutCreated->setAttributes(['nonce' => self::NONCE]);
 
-        $tokenWithAnotherProviderKey = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, 'anotherKey');
+        $tokenWithAnotherProviderKey = new TicketToken(self::USERNAME, self::TICKET_DIGEST, 'anotherKey');
         $tokenWithAnotherProviderKey->setAttributes(['nonce' => self::NONCE, 'created' => $this->getDate()]);
 
-        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $this->getDate()]);
 
         return [
-            'not supported token type'        => [
-                'token'          => $this->createMock(TokenInterface::class),
-                'expectedResult' => false
+            'not supported token type' => [
+                'token' => $this->createMock(TokenInterface::class),
+                'expectedResult' => false,
             ],
-            'token without nonce'             => [
-                'token'          => $tokenWithoutNonce,
-                'expectedResult' => false
+            'token without nonce' => [
+                'token' => $tokenWithoutNonce,
+                'expectedResult' => false,
             ],
-            'token without created'           => [
-                'token'          => $tokenWithoutCreated,
-                'expectedResult' => false
+            'token without created' => [
+                'token' => $tokenWithoutCreated,
+                'expectedResult' => false,
             ],
             'token with another provider key' => [
-                'token'          => $tokenWithAnotherProviderKey,
-                'expectedResult' => false
+                'token' => $tokenWithAnotherProviderKey,
+                'expectedResult' => false,
             ],
-            'valid token'                     => [
-                'token'          => $token,
-                'expectedResult' => true
-            ]
+            'valid token' => [
+                'token' => $token,
+                'expectedResult' => true,
+            ],
         ];
     }
 
     public function testAuthenticateTokenCreatedDateInFuture(): void
     {
         $created = $this->getDateInFuture();
-        $token = new UsernamePasswordToken(new User(), self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken(new User(), self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Ticket "%s" for "%s" is not valid, because token creation date "%s" is in future',
-            $token->getCredentials(),
-            $token->getUsername(),
-            $created
-        ));
+        $this->expectExceptionMessage(
+            sprintf(
+                'Ticket "%s" for "%s" is not valid, because token creation date "%s" is in future',
+                $token->getCredentials(),
+                $token->getUsername(),
+                $created
+            )
+        );
 
         $this->ticketAuthenticationProvider->authenticate($token);
     }
@@ -125,12 +123,17 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->setPassword($userPassword)
             ->setUserRoles($userRoles);
 
-        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
+            ->willReturn($user);
+
+        $this->userProvider->expects(self::once())
+            ->method('refreshUser')
+            ->with($user)
             ->willReturn($user);
 
         $this->ticketDigestGenerator->expects(self::once())
@@ -147,22 +150,24 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     public function testAuthenticateTokenExpired(): void
     {
         $created = $this->getDateInPast();
-        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Ticket "%s" for "%s" is expired',
-            $token->getCredentials(),
-            $token->getUsername()
-        ));
+        $this->expectExceptionMessage(
+            sprintf(
+                'Ticket "%s" for "%s" is expired',
+                $token->getCredentials(),
+                $token->getUsername()
+            )
+        );
 
         $this->ticketAuthenticationProvider->authenticate($token);
     }
 
     public function testAuthenticateUserNotFound(): void
     {
-        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $this->getDate()]);
 
         $this->userProvider->expects(self::once())
@@ -171,11 +176,13 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->willThrowException(new UsernameNotFoundException());
 
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Ticket "%s" for "%s" is not valid - user was not found.',
-            self::TICKET_DIGEST,
-            self::USERNAME
-        ));
+        $this->expectExceptionMessage(
+            sprintf(
+                'Ticket "%s" for "%s" is not valid - user was not found.',
+                self::TICKET_DIGEST,
+                self::USERNAME
+            )
+        );
 
         $this->ticketAuthenticationProvider->authenticate($token);
     }
@@ -184,7 +191,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $created = $this->getDate();
         $invalidTicketDigest = 'ticketDigestInvalid';
-        $token = new UsernamePasswordToken('', $invalidTicketDigest, self::PROVIDER_KEY);
+        $token = new TicketToken('', $invalidTicketDigest, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $this->userProvider->expects(self::never())
@@ -196,11 +203,13 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(self::TICKET_DIGEST);
 
         $this->expectException(BadCredentialsException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Ticket "%s" for "%s" is not valid - invalid digest.',
-            $invalidTicketDigest,
-            ''
-        ));
+        $this->expectExceptionMessage(
+            sprintf(
+                'Ticket "%s" for "%s" is not valid - invalid digest.',
+                $invalidTicketDigest,
+                ''
+            )
+        );
 
         $this->ticketAuthenticationProvider->authenticate($token);
     }
@@ -208,7 +217,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     public function testAuthenticateAnonymous(): void
     {
         $created = $this->getDate();
-        $token = new UsernamePasswordToken('', self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken('', self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $this->userProvider->expects(self::never())
@@ -231,7 +240,7 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
     public function testAuthenticate(): void
     {
         $created = $this->getDate();
-        $token = new UsernamePasswordToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
+        $token = new TicketToken(self::USERNAME, self::TICKET_DIGEST, self::PROVIDER_KEY);
         $token->setAttributes(['nonce' => self::NONCE, 'created' => $created]);
 
         $userPassword = 'sampleUserPassword';
@@ -244,6 +253,11 @@ class TicketAuthenticationProviderTest extends \PHPUnit\Framework\TestCase
         $this->userProvider->expects(self::once())
             ->method('loadUserByUsername')
             ->with(self::USERNAME)
+            ->willReturn($user);
+
+        $this->userProvider->expects(self::once())
+            ->method('refreshUser')
+            ->with($user)
             ->willReturn($user);
 
         $this->ticketDigestGenerator->expects(self::once())
