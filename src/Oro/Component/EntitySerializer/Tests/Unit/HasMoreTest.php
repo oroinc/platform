@@ -2,11 +2,14 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
+
 class HasMoreTest extends EntitySerializerTestCase
 {
     public function testQueryHasMaxResultsButThereIsNoHasMoreOptionInConfig()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->setMaxResults(2);
 
         $this->setQueryExpectation(
@@ -40,7 +43,7 @@ class HasMoreTest extends EntitySerializerTestCase
 
     public function testHasMoreWhenQueryHasMaxResultsAndThereAreMoreRecords()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->setMaxResults(2);
 
         $this->setQueryExpectation(
@@ -77,7 +80,7 @@ class HasMoreTest extends EntitySerializerTestCase
 
     public function testHasMoreWhenQueryHasMaxResultsAndThereAreNoMoreRecords()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->setMaxResults(2);
 
         $this->setQueryExpectation(
@@ -112,7 +115,7 @@ class HasMoreTest extends EntitySerializerTestCase
 
     public function testHasMoreWhenQueryDoesNotHaveMaxResults()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e');
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e');
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
@@ -149,7 +152,7 @@ class HasMoreTest extends EntitySerializerTestCase
      */
     public function testHasMoreWhenToManyAssociationQueryHasMaxResultsAndThereAreMoreRecords()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456, 789]);
@@ -278,7 +281,7 @@ class HasMoreTest extends EntitySerializerTestCase
      */
     public function testHasMoreWhenToManyCollapsedAssociationQueryHasMaxResultsAndThereAreMoreRecords()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456, 789]);
@@ -385,7 +388,7 @@ class HasMoreTest extends EntitySerializerTestCase
      */
     public function testHasMoreWhenToManyAssociationQueryHasMaxResultsAndThereAreNoMoreRecords()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
@@ -551,7 +554,7 @@ class HasMoreTest extends EntitySerializerTestCase
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
-            $this->em->getRepository('Test:User')->createQueryBuilder('e'),
+            $this->em->getRepository(User::class)->createQueryBuilder('e'),
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
@@ -587,7 +590,7 @@ class HasMoreTest extends EntitySerializerTestCase
 
     public function testHasMoreWhenToManyAssociationQueryDoesNotHaveMaxResults()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);

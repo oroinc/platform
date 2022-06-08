@@ -9,13 +9,14 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmManyRelationBuilder;
+use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestComment;
+use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestOrder;
+use Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\TestProduct;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class OrmManyRelationBuilderTest extends OrmTestCase
 {
-    private const NS = 'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity\\';
-
     /** @var EntityManagerMock */
     private $em;
 
@@ -28,13 +29,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Datasource\Orm\Fixtures\Entity'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
@@ -66,7 +61,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
-            ->from('Stub:TestOrder', 'o');
+            ->from(TestOrder::class, 'o');
 
         $ds = $this->getFilterDatasourceAdapter($qb);
         $expr = $this->builder->buildComparisonExpr($ds, 'o.products', 'param1', 'test', $inverse);
@@ -76,10 +71,10 @@ class OrmManyRelationBuilderTest extends OrmTestCase
 
         $operator = $inverse ? 'NOT IN' : 'IN';
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestOrder o'
+            'SELECT o.id FROM ' . TestOrder::class . ' o'
             . ' WHERE o ' . $operator . '('
             . 'SELECT filter_param1'
-            . ' FROM Stub:TestOrder filter_param1'
+            . ' FROM ' . TestOrder::class . ' filter_param1'
             . ' INNER JOIN filter_param1.products filter_param1_rel'
             . ' WHERE filter_param1_rel IN(:param1))',
             $result
@@ -93,7 +88,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
-            ->from('Stub:TestOrder', 'o');
+            ->from(TestOrder::class, 'o');
 
         $ds = $this->getFilterDatasourceAdapter($qb);
         $expr = $this->builder->buildNullValueExpr($ds, 'o.products', 'test', $inverse);
@@ -103,10 +98,10 @@ class OrmManyRelationBuilderTest extends OrmTestCase
 
         $operator = $inverse ? 'IS NOT' : 'IS';
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestOrder o'
+            'SELECT o.id FROM ' . TestOrder::class . ' o'
             . ' WHERE o IN('
             . 'SELECT null_filter_test'
-            . ' FROM Stub:TestOrder null_filter_test'
+            . ' FROM ' . TestOrder::class . ' null_filter_test'
             . ' LEFT JOIN null_filter_test.products null_filter_test_rel'
             . ' WHERE null_filter_test_rel ' . $operator . ' NULL)',
             $result
@@ -120,7 +115,7 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id, p1.id')
-            ->from('Stub:TestOrder', 'o')
+            ->from(TestOrder::class, 'o')
             ->leftJoin('o.products', 'p');
 
         $ds = $this->getFilterDatasourceAdapter($qb);
@@ -131,11 +126,11 @@ class OrmManyRelationBuilderTest extends OrmTestCase
 
         $operator = $inverse ? 'NOT IN' : 'IN';
         $this->assertEquals(
-            'SELECT o.id, p1.id FROM Stub:TestOrder o'
+            'SELECT o.id, p1.id FROM ' . TestOrder::class . ' o'
             . ' LEFT JOIN o.products p'
             . ' WHERE p ' . $operator . '('
             . 'SELECT filter_param1'
-            . ' FROM ' . self::NS . 'TestProduct filter_param1'
+            . ' FROM ' . TestProduct::class . ' filter_param1'
             . ' INNER JOIN filter_param1.notes filter_param1_rel'
             . ' WHERE filter_param1_rel IN(:param1))',
             $result
@@ -149,9 +144,9 @@ class OrmManyRelationBuilderTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id, p1.id')
-            ->from('Stub:TestOrder', 'o')
+            ->from(TestOrder::class, 'o')
             ->leftJoin('o.products', 'p')
-            ->leftJoin('Stub:TestComment', 'c', 'WITH', 'c.products = p AND p.id = 5')
+            ->leftJoin(TestComment::class, 'c', 'WITH', 'c.products = p AND p.id = 5')
             ->leftJoin('c.products', 'p1');
 
         $ds = $this->getFilterDatasourceAdapter($qb);
@@ -162,13 +157,13 @@ class OrmManyRelationBuilderTest extends OrmTestCase
 
         $operator = $inverse ? 'NOT IN' : 'IN';
         $this->assertEquals(
-            'SELECT o.id, p1.id FROM Stub:TestOrder o'
+            'SELECT o.id, p1.id FROM ' . TestOrder::class . ' o'
             . ' LEFT JOIN o.products p'
-            . ' LEFT JOIN Stub:TestComment c WITH c.products = p AND p.id = 5'
+            . ' LEFT JOIN ' . TestComment::class . ' c WITH c.products = p AND p.id = 5'
             . ' LEFT JOIN c.products p1'
             . ' WHERE p1 ' . $operator . '('
             . 'SELECT filter_param1'
-            . ' FROM ' . self::NS . 'TestProduct filter_param1'
+            . ' FROM ' . TestProduct::class . ' filter_param1'
             . ' INNER JOIN filter_param1.orders filter_param1_rel'
             . ' WHERE filter_param1_rel IN(:param1))',
             $result

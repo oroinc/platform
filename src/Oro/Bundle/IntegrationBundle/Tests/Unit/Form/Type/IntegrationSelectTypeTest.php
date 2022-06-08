@@ -34,9 +34,11 @@ class IntegrationSelectTypeTest extends OrmTestCase
 
     protected function setUp(): void
     {
+        $this->em = $this->getTestEntityManager();
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
+
         $this->registry = $this->createMock(TypesRegistry::class);
         $this->assetHelper = $this->createMock(Packages::class);
-        $this->em = $this->getTestEntityManager();
         $aclHelper = $this->createMock(AclHelper::class);
 
         $this->type = new IntegrationSelectType(
@@ -104,14 +106,6 @@ class IntegrationSelectTypeTest extends OrmTestCase
 
     public function testConfigureOptions()
     {
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'OroIntegrationBundle' => 'Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\Entity'
-        ]);
-
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);
 

@@ -101,6 +101,13 @@ services:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onUpdateAfter }
             - { name: kernel.event_listener, event: oro_config.config_manager_scope_id_change, method: onScopeIdChange }
 
+    oro_featuretoggle.event_listener.feature_checker_aware_command:
+        class: Oro\Bundle\FeatureToggleBundle\EventListener\FeatureCheckerAwareCommandListener
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand}
+
     oro_featuretoggle.event_listener.console_command:
         class: Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener
         arguments:

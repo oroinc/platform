@@ -152,7 +152,7 @@ define(function(require) {
         validate: function() {
             const isValid = this.util.validate(this.$el.val());
             this.$el.toggleClass('error', !isValid);
-            this.$el.parent().toggleClass('validation-error', !isValid);
+            this.$el.parent().toggleClass('expression-error', !isValid);
         },
 
         /**

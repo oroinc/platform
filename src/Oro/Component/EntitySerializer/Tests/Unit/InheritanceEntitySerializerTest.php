@@ -3,13 +3,14 @@
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Buyer;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Department;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Employee;
 
 class InheritanceEntitySerializerTest extends EntitySerializerTestCase
 {
     public function testManyToOne()
     {
-        $qb = $this->em->getRepository('Test:Department')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -70,7 +71,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneWithDisabledPartialLoad()
     {
-        $qb = $this->em->getRepository('Test:Department')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -140,7 +141,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToMany()
     {
-        $qb = $this->em->getRepository('Test:Department')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
@@ -237,7 +238,7 @@ class InheritanceEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToManyWithDisabledPartialLoad()
     {
-        $qb = $this->em->getRepository('Test:Department')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Department::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 

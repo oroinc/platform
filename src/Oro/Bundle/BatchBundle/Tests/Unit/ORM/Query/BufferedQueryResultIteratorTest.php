@@ -22,13 +22,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Stub' => 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub',
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
     public function testCountMethod(): void
@@ -50,7 +44,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
 
@@ -80,7 +74,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
         $iterator->setBufferSize(1);
@@ -108,7 +102,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o')
+            ->from(Entity::class, 'o')
             ->setMaxResults($maxResults);
 
         $iterator = new BufferedQueryResultIterator($source);
@@ -137,7 +131,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o')
+            ->from(Entity::class, 'o')
             ->setMaxResults($maxResults);
 
         $iterator = new BufferedQueryResultIterator($source);
@@ -170,7 +164,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
 
@@ -227,7 +221,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o')
+            ->from(Entity::class, 'o')
             ->setMaxResults($maxResults);
 
         $iterator = new BufferedQueryResultIterator($source);
@@ -273,7 +267,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o')
+            ->from(Entity::class, 'o')
             ->setMaxResults($maxResults);
 
         $iterator = new BufferedQueryResultIterator($source);
@@ -325,7 +319,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o')
+            ->from(Entity::class, 'o')
             ->setMaxResults($maxResults)
             ->setFirstResult($firstResult);
 
@@ -377,7 +371,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
         $iterator->setHydrationMode(Query::HYDRATE_OBJECT);
@@ -424,7 +418,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
         $iterator->setHydrationMode(Query::HYDRATE_ARRAY);
@@ -466,7 +460,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = new BufferedQueryResultIterator($source);
         $iterator->setReverse(true);
@@ -506,7 +500,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = (new BufferedQueryResultIterator($source))
             ->setBufferSize($bufferSize);
@@ -582,7 +576,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $source = $this->em->createQueryBuilder()
             ->select('o')
-            ->from('Stub:Entity', 'o');
+            ->from(Entity::class, 'o');
 
         $iterator = (new BufferedQueryResultIterator($source))
             ->setBufferSize(1)

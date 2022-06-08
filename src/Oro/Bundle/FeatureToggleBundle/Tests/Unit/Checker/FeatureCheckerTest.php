@@ -42,27 +42,42 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($expected, $this->featureChecker->isFeatureEnabled($feature, $scopeIdentifier));
     }
 
-    public function testIsResourceEnabled(): void
+    /**
+     * @dataProvider isResourceEnabledDataProvider
+     */
+    public function testIsResourceEnabled(array $features, bool $expected): void
     {
         $resource = 'oro_login';
         $resourceType = 'route';
         $scopeIdentifier = 1;
-        $feature = 'feature1';
-        $expected = true;
+
+        $decideResultMap = [];
+        foreach ($features as $featureName => $featureEnabled) {
+            $decideResultMap[] = [$featureName, $scopeIdentifier, $featureEnabled];
+        }
 
         $this->configManager->expects(self::once())
             ->method('getFeaturesByResource')
             ->with($resourceType, $resource)
-            ->willReturn([$feature]);
-        $this->featureDecisionManager->expects(self::once())
+            ->willReturn(array_keys($features));
+        $this->featureDecisionManager->expects(self::atLeastOnce())
             ->method('decide')
-            ->with($feature, $scopeIdentifier)
-            ->willReturn($expected);
+            ->willReturnMap($decideResultMap);
 
         $this->assertSame(
             $expected,
             $this->featureChecker->isResourceEnabled($resource, $resourceType, $scopeIdentifier)
         );
+    }
+
+    public function isResourceEnabledDataProvider(): array
+    {
+        return [
+            [['feature1' => false, 'feature2' => false], false],
+            [['feature1' => false, 'feature2' => true], false],
+            [['feature1' => true, 'feature2' => false], false],
+            [['feature1' => true, 'feature2' => true], true],
+        ];
     }
 
     /**

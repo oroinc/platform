@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Log\OutputLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,14 +27,11 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
     /** @var string */
     protected static $defaultName = 'oro:cron:email-body-sync';
 
-    protected FeatureChecker $featureChecker;
-    protected EmailBodySynchronizer $synchronizer;
+    private EmailBodySynchronizer $synchronizer;
 
-    public function __construct(FeatureChecker $featureChecker, EmailBodySynchronizer $synchronizer)
+    public function __construct(EmailBodySynchronizer $synchronizer)
     {
         parent::__construct();
-
-        $this->featureChecker = $featureChecker;
         $this->synchronizer = $synchronizer;
     }
 
@@ -49,7 +45,7 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
      */
     public function isActive()
     {
-        return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
+        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -97,12 +93,6 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->featureChecker->isFeatureEnabled('email')) {
-            $output->writeln('The email feature is disabled. The command will not run.');
-
-            return 0;
-        }
-
         $store = new SemaphoreStore();
         $lockFactory = new LockFactory($store);
 

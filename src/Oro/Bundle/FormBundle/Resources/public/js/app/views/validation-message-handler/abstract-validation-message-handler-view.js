@@ -112,6 +112,7 @@ define(function(require) {
                     }
                 });
             }
+            return this;
         },
 
         arrowModifier: function(data, options) {

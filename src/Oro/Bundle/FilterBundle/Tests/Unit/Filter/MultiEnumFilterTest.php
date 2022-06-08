@@ -12,6 +12,7 @@ use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\MultiEnumFilter;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEntity;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -33,13 +34,7 @@ class MultiEnumFilterTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
@@ -139,7 +134,7 @@ class MultiEnumFilterTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
-            ->from('Stub:TestEntity', 'o');
+            ->from(TestEntity::class, 'o');
 
         $data = [
             'value' => $values,
@@ -177,10 +172,10 @@ class MultiEnumFilterTest extends OrmTestCase
                     new TestEnumValue('val2', 'Value2')
                 ],
                 'comparisonType' => null,
-                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                'expectedDQL' => 'SELECT o.id FROM ' . TestEntity::class . ' o'
                     . ' WHERE o IN('
                     . 'SELECT filter_param1'
-                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' FROM ' . TestEntity::class . ' filter_param1'
                     . ' INNER JOIN filter_param1.values filter_param1_rel'
                     . ' WHERE filter_param1_rel IN(:param1))',
             ],
@@ -190,10 +185,10 @@ class MultiEnumFilterTest extends OrmTestCase
                     new TestEnumValue('val2', 'Value2')
                 ],
                 'comparisonType' => DictionaryFilterType::TYPE_NOT_IN,
-                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                'expectedDQL' => 'SELECT o.id FROM ' . TestEntity::class . ' o'
                     . ' WHERE o NOT IN('
                     . 'SELECT filter_param1'
-                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' FROM ' . TestEntity::class . ' filter_param1'
                     . ' INNER JOIN filter_param1.values filter_param1_rel'
                     . ' WHERE filter_param1_rel IN(:param1))',
             ],
@@ -203,10 +198,10 @@ class MultiEnumFilterTest extends OrmTestCase
                     new TestEnumValue('val2', 'Value2')
                 ],
                 'comparisonType' => (string)DictionaryFilterType::TYPE_NOT_IN,
-                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                'expectedDQL' => 'SELECT o.id FROM ' . TestEntity::class . ' o'
                     . ' WHERE o NOT IN('
                     . 'SELECT filter_param1'
-                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' FROM ' . TestEntity::class . ' filter_param1'
                     . ' INNER JOIN filter_param1.values filter_param1_rel'
                     . ' WHERE filter_param1_rel IN(:param1))',
             ],
@@ -216,10 +211,10 @@ class MultiEnumFilterTest extends OrmTestCase
                     new TestEnumValue('val2', 'Value2')
                 ],
                 'comparisonType' => DictionaryFilterType::NOT_EQUAL,
-                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                'expectedDQL' => 'SELECT o.id FROM ' . TestEntity::class . ' o'
                     . ' WHERE o NOT IN('
                     . 'SELECT filter_param1'
-                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' FROM ' . TestEntity::class . ' filter_param1'
                     . ' INNER JOIN filter_param1.values filter_param1_rel'
                     . ' WHERE filter_param1_rel IN(:param1))',
             ],
@@ -229,10 +224,10 @@ class MultiEnumFilterTest extends OrmTestCase
                     new TestEnumValue('val2', 'Value2')
                 ],
                 'comparisonType' => (string)DictionaryFilterType::NOT_EQUAL,
-                'expectedDQL' => 'SELECT o.id FROM Stub:TestEntity o'
+                'expectedDQL' => 'SELECT o.id FROM ' . TestEntity::class . ' o'
                     . ' WHERE o NOT IN('
                     . 'SELECT filter_param1'
-                    . ' FROM Stub:TestEntity filter_param1'
+                    . ' FROM ' . TestEntity::class . ' filter_param1'
                     . ' INNER JOIN filter_param1.values filter_param1_rel'
                     . ' WHERE filter_param1_rel IN(:param1))',
             ]
