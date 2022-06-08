@@ -1,4 +1,8 @@
 oro:
     search:
         quick_search:
+            select:
+                aria_label: Select the entity you want to search in
+            input:
+                aria_label: Search
             noresults: No results found

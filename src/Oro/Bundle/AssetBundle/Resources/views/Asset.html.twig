@@ -2,7 +2,7 @@
     {% if webpack_hmr_enabled() %}
         <script src="{{ asset(src|webpack_asset) }}"></script>
     {% else %}
-        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}"/>
+        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}">
     {% endif %}
 {% endmacro %}
 

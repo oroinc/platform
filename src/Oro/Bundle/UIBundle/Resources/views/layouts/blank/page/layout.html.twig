@@ -145,7 +145,8 @@
 {% block _skip_to_content_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': 'btn btn--info skip-to-content__btn',
-        'data-page-component-proxy-focus': '[data-role="page-main-container"]'
+        'data-page-component-proxy-focus': '[data-role="page-main-container"]',
+        'type': 'button'
     }) %}
 
     <div class="skip-to-content">
