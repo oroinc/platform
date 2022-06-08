@@ -68,7 +68,7 @@ class IntegrationSelectType extends AbstractType
 
             return new DoctrineChoiceLoader(
                 $em,
-                'OroIntegrationBundle:Channel',
+                Integration::class,
                 null,
                 new Loader($this->aclHelper, $em, $types)
             );
@@ -116,7 +116,7 @@ class IntegrationSelectType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {
