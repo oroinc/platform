@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\CronBundle\Tests\Unit\EventListener;
 
+use Oro\Bundle\CronBundle\EventListener\ConsoleCommandListener;
+use Oro\Bundle\CronBundle\Tests\Unit\Stub\CronCommandStub;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
-use Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,7 +25,21 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new ConsoleCommandListener($this->featureChecker);
     }
 
-    public function testWhenCommandFeatureEnabled(): void
+    public function testForCronCommand(): void
+    {
+        $this->featureChecker->expects(self::never())
+            ->method('isResourceEnabled');
+
+        $command = new CronCommandStub('oro:cron:test');
+        $output = new BufferedOutput();
+        $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
+        $this->listener->onConsoleCommand($event);
+
+        $this->assertTrue($event->commandShouldRun());
+        $this->assertEquals('', $output->fetch());
+    }
+
+    public function testWhenCommandFeatureEnabledForNotCronCommand(): void
     {
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
@@ -40,7 +55,7 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $output->fetch());
     }
 
-    public function testWhenCommandFeatureDisabled(): void
+    public function testWhenCommandFeatureDisabledForNotCronCommand(): void
     {
         $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')

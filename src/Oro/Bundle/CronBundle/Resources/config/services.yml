@@ -39,9 +39,13 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 
-    oro_cron.helper.cron:
-        class: Oro\Bundle\CronBundle\Helper\CronHelper
+    oro_cron.command_feature_checker:
+        class: Oro\Bundle\CronBundle\Command\CronCommandFeatureChecker
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
 
+    oro_cron.cron_helper:
+        class: Oro\Bundle\CronBundle\Tools\CronHelper
 
     oro_cron.engine.command_runner:
         class: Oro\Bundle\CronBundle\Engine\CommandRunner
@@ -68,6 +72,13 @@ services:
         class: Oro\Bundle\CronBundle\Migrations\Schema\v2_0\SchemaColumnDefinitionListener
         tags:
             - {name: doctrine.event_listener, event: onSchemaColumnDefinition }
+
+    oro_cron.event_listener.cron_command:
+        class: Oro\Bundle\CronBundle\EventListener\CronCommandListener
+        arguments:
+            - '@oro_cron.command_feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand}
 
     oro_cron.schedule.datagrid_helper:
         class: Oro\Bundle\CronBundle\Datagrid\ScheduleDatagridHelper

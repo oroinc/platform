@@ -3,12 +3,11 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CronBundle\Engine\CommandRunnerInterface;
 use Oro\Bundle\CronBundle\Entity\Schedule;
-use Oro\Bundle\CronBundle\Helper\CronHelper;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
+use Oro\Bundle\CronBundle\Tools\CronHelper;
 use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -27,8 +26,8 @@ class CronCommand extends Command
     private Mode $maintenanceMode;
     private CronHelper $cronHelper;
     private CommandRunnerInterface $commandRunner;
+    private CronCommandFeatureCheckerInterface $commandFeatureChecker;
     private LoggerInterface $logger;
-
     private string $environment;
 
     public function __construct(
@@ -36,15 +35,16 @@ class CronCommand extends Command
         Mode $maintenanceMode,
         CronHelper $cronHelper,
         CommandRunnerInterface $commandRunner,
+        CronCommandFeatureCheckerInterface $commandFeatureChecker,
         LoggerInterface $logger,
         string $environment
     ) {
         parent::__construct();
-
         $this->registry = $registry;
         $this->maintenanceMode = $maintenanceMode;
         $this->cronHelper = $cronHelper;
         $this->commandRunner = $commandRunner;
+        $this->commandFeatureChecker = $commandFeatureChecker;
         $this->logger = $logger;
         $this->environment = $environment;
     }
@@ -89,48 +89,53 @@ HELP
         }
 
         $schedules = $this->getAllSchedules();
-
-        /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {
+            if (!$this->commandFeatureChecker->isFeatureEnabled($schedule->getCommand())) {
+                $output->writeln(
+                    'Skipping command ' . $schedule->getCommand() . ' due to this feature is disabled',
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                continue;
+            }
+
             $cronExpression = $this->cronHelper->createCron($schedule->getDefinition());
-            if ($cronExpression->isDue()) {
-                /** @var CronCommandInterface $command */
-                $command = $this->getApplication()->get($schedule->getCommand());
+            if (!$cronExpression->isDue()) {
+                $output->writeln(
+                    'Skipping not due command '.$schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                continue;
+            }
 
-                if ($command instanceof CronCommandInterface && !$command->isActive()) {
-                    $output->writeln(
-                        'Skipping not enabled command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    continue;
-                }
+            $command = $this->getApplication()->get($schedule->getCommand());
+            if ($command instanceof CronCommandInterface && !$command->isActive()) {
+                $output->writeln(
+                    'Skipping not enabled command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                continue;
+            }
 
-                // in case of synchronous cron command - run it in separate process
-                if ($command instanceof SynchronousCommandInterface) {
-                    $output->writeln(
-                        'Running synchronous command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    CommandRunner::runCommand(
-                        $schedule->getCommand(),
-                        array_merge(
-                            $schedule->getArguments(),
-                            ['--env' => $this->environment]
-                        )
-                    );
-                } else {
-                    // in case of common cron command - send the MQ message that will run this command
-                    $output->writeln(
-                        'Scheduling run for command ' . $schedule->getCommand(),
-                        OutputInterface::VERBOSITY_DEBUG
-                    );
-                    $this->commandRunner->run(
-                        $schedule->getCommand(),
-                        $this->resolveOptions($schedule->getArguments())
-                    );
-                }
+            // in case of synchronous cron command - run it in separate process
+            if ($command instanceof SynchronousCommandInterface) {
+                $output->writeln(
+                    'Running synchronous command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                CommandRunner::runCommand(
+                    $schedule->getCommand(),
+                    array_merge($schedule->getArguments(), ['--env' => $this->environment])
+                );
             } else {
-                $output->writeln('Skipping not due command '.$schedule->getCommand(), OutputInterface::VERBOSITY_DEBUG);
+                // in case of common cron command - send the MQ message that will run this command
+                $output->writeln(
+                    'Scheduling run for command ' . $schedule->getCommand(),
+                    OutputInterface::VERBOSITY_DEBUG
+                );
+                $this->commandRunner->run(
+                    $schedule->getCommand(),
+                    $this->resolveOptions($schedule->getArguments())
+                );
             }
         }
 
@@ -143,7 +148,7 @@ HELP
      * Convert command arguments to options. It needed for correctly pass this arguments into ArrayInput:
      * new ArrayInput(['name' => 'foo', '--bar' => 'foobar']);
      */
-    protected function resolveOptions(array $commandOptions): array
+    private function resolveOptions(array $commandOptions): array
     {
         $options = [];
         foreach ($commandOptions as $key => $option) {
@@ -154,14 +159,15 @@ HELP
                 $options[$key] = $option;
             }
         }
+
         return $options;
     }
 
     /**
-     * @return ArrayCollection|Schedule[]
+     * @return Schedule[]
      */
-    private function getAllSchedules()
+    private function getAllSchedules(): array
     {
-        return new ArrayCollection($this->registry->getRepository('OroCronBundle:Schedule')->findAll());
+        return $this->registry->getRepository(Schedule::class)->findAll();
     }
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,16 +17,11 @@ class SendCredentialNotificationsCommand extends Command implements CronCommandI
     /** @var string */
     protected static $defaultName = 'oro:cron:imap-credential-notifications';
 
-    private FeatureChecker $featureChecker;
     private SyncCredentialsIssueManager $syncCredentialsIssueManager;
 
-    public function __construct(
-        FeatureChecker $featureChecker,
-        SyncCredentialsIssueManager $syncCredentialsIssueManager
-    ) {
+    public function __construct(SyncCredentialsIssueManager $syncCredentialsIssueManager)
+    {
         parent::__construct();
-
-        $this->featureChecker = $featureChecker;
         $this->syncCredentialsIssueManager = $syncCredentialsIssueManager;
     }
 
@@ -38,7 +32,7 @@ class SendCredentialNotificationsCommand extends Command implements CronCommandI
 
     public function isActive()
     {
-        return $this->featureChecker->isResourceEnabled(self::getDefaultName(), 'cron_jobs');
+        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

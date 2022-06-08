@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Helper;
+namespace Oro\Bundle\CronBundle\Tools;
 
 use Cron\CronExpression;
 
@@ -12,8 +12,8 @@ class CronHelper
     /**
      * Create a new CronExpression.
      *
-     * @param string $definition The CRON expression to create.  There are
-     *                           several special predefined values which can be used to substitute the
+     * @param string $definition The CRON expression to create.
+     *                           There are several special predefined values which can be used to substitute the
      *                           CRON expression:
      *
      *      `@yearly`, `@annually` - Run once a year, midnight, Jan. 1 - 0 0 1 1 *
@@ -24,11 +24,11 @@ class CronHelper
      *
      * @return CronExpression
      */
-    public function createCron($definition)
+    public function createCron(string $definition): CronExpression
     {
         // prevent exception "Module by zero" in cron definition
         $definition = str_replace('*/0', '*', $definition);
 
-        return CronExpression::factory($definition);
+        return new CronExpression($definition);
     }
 }

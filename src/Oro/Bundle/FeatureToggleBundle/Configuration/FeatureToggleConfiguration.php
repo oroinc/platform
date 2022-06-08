@@ -94,7 +94,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->end()
             ->arrayNode('commands')
                 ->info(
-                    'A list of commands which depend on the feature.'
+                    'A list of commands that depend on the feature.'
                     . ' Running these commands is impossible or is not reasonable when the feature is disabled.'
                 )
                 ->prototype('variable')
