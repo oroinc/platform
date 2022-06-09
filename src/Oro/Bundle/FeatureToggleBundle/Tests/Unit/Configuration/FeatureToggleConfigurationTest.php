@@ -49,7 +49,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'routes' => [],
                 'configuration' => [],
                 'entities' => [],
-                'field_configs' => [],
                 'commands' => [],
                 'mq_topics' => [],
                 'test_items' => []
@@ -69,7 +68,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
-                'field_configs' => [],
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' => true,
@@ -86,7 +84,6 @@ class FeatureToggleConfigurationTest extends \PHPUnit\Framework\TestCase
                 'routes' => ['oro_feature_route'],
                 'configuration' => ['oro_feature', 'oro_another'],
                 'entities' => [],
-                'field_configs' => [],
                 'strategy' => 'affirmative',
                 'allow_if_all_abstain' => true,
                 'allow_if_equal_granted_denied' => true,
