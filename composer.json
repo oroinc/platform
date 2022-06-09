@@ -54,7 +54,7 @@
         "symfony/property-info": "~4.4.24",
         "symfony/proxy-manager-bridge": "~4.4.24",
         "symfony/routing": "~4.4.24",
-        "symfony/security": "~4.4.24",
+        "symfony/security": "4.4.41",
         "symfony/security-core": "~4.4.24",
         "symfony/security-csrf": "~4.4.24",
         "symfony/security-guard": "~4.4.24",

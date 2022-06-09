@@ -463,6 +463,7 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
             $this->id,
             $this->filename,
             $this->uuid,
+            $this->originalFilename,
         ]);
     }
 
@@ -474,7 +475,8 @@ class File extends ExtendFile implements FileExtensionInterface, \Serializable
         [
             $this->id,
             $this->filename,
-            $this->uuid
+            $this->uuid,
+            $this->originalFilename,
         ] = unserialize($serialized);
     }
 
