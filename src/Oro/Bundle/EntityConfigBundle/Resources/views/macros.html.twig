@@ -5,17 +5,15 @@
     {% if dynamicFields is defined and dynamicFields|length %}
         {% for fieldName, item in dynamicFields %}
             {% if fieldName not in ignoredFields %}
-                {% if feature_resource_enabled(fieldName, 'field_configs') %}
-                    {{ ui.renderHtmlProperty(
-                        item.label|trans,
-                        entityConfigMacros.formatDynamicFieldValue(
-                            entity,
-                            entity_class,
-                            fieldName,
-                            item
-                        )
-                    ) }}
-                {% endif %}
+                {{ ui.renderHtmlProperty(
+                    item.label|trans,
+                    entityConfigMacros.formatDynamicFieldValue(
+                        entity,
+                        entity_class,
+                        fieldName,
+                        item
+                    )
+                ) }}
             {% endif %}
         {% endfor %}
     {% endif %}

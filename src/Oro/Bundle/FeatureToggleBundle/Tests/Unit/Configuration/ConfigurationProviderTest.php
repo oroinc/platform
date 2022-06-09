@@ -28,7 +28,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'routes'        => ['f1_route1', 'f1_route2', 'f1_route3'],
                 'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
                 'entities'      => [],
-                'field_configs' => [],
                 'commands'      => [],
                 'mq_topics'     => []
             ],
@@ -39,7 +38,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'routes'        => ['f1_route3'],
                 'configuration' => ['config_leaf2'],
                 'entities'      => [],
-                'field_configs' => [],
                 'commands'      => [],
                 'mq_topics'     => []
             ],
@@ -49,7 +47,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'routes'        => [],
                 'configuration' => [],
                 'entities'      => [],
-                'field_configs' => [],
                 'commands'      => [],
                 'mq_topics'     => []
             ]

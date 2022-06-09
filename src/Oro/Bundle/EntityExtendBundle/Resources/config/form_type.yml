@@ -35,6 +35,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Form\Type\TargetType
         arguments:
             - '@oro_entity_config.config_manager'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: form.type }
 
