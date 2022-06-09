@@ -35,6 +35,9 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         self::assertTrue($this->checker->checkConnection());
+
+        // Checks that connection check result is cached
+        self::assertTrue($this->checker->checkConnection());
     }
 
     public function testWsConnectedFail(): void
@@ -44,6 +47,27 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
         $this->client->expects(self::once())
             ->method('isConnected')
             ->willReturn(false);
+
+        self::assertFalse($this->checker->checkConnection());
+
+        // Checks that connection check result is cached
+        self::assertFalse($this->checker->checkConnection());
+    }
+
+    public function testReset(): void
+    {
+        $this->client->expects(self::exactly(2))
+            ->method('connect');
+        $this->client->expects(self::exactly(2))
+            ->method('isConnected')
+            ->willReturn(false);
+
+        self::assertFalse($this->checker->checkConnection());
+
+        // Checks that connection check result is cached
+        self::assertFalse($this->checker->checkConnection());
+
+        $this->checker->reset();
 
         self::assertFalse($this->checker->checkConnection());
     }
@@ -59,6 +83,9 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
         $this->loggerMock->expects(self::never())
             ->method(self::anything());
 
+        self::assertFalse($this->checker->checkConnection());
+
+        // Checks that connection check result is cached
         self::assertFalse($this->checker->checkConnection());
     }
 
@@ -79,6 +106,9 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->checker->setApplicationState($this->applicationState);
 
+        self::assertFalse($this->checker->checkConnection());
+
+        // Checks that connection check result is cached
         self::assertFalse($this->checker->checkConnection());
     }
 
@@ -103,6 +133,9 @@ class ConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 
         $this->checker->setApplicationState($this->applicationState);
 
+        self::assertFalse($this->checker->checkConnection());
+
+        // Checks that connection check result is cached
         self::assertFalse($this->checker->checkConnection());
     }
 }

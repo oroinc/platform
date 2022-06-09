@@ -1,0 +1,7 @@
+services:
+
+    oro_sync.test.client.connection_checker:
+        decorates: oro_sync.client.connection_checker
+        decoration_priority: -255
+        parent: oro_sync.client.connection_checker
+        class: Oro\Bundle\SyncBundle\Test\Client\ConnectionChecker

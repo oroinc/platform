@@ -13,7 +13,14 @@ class GridFilterPriceItem extends GridFilterStringItem
      */
     public function selectUnitType($filterUnitType)
     {
-        $this->find('css', 'div.product-price-unit-filter .dropdown-toggle')->click();
+        $dropdown = $this->find('css', 'div.product-price-unit-filter .dropdown-toggle');
+        if (!$dropdown) {
+            $this->selectRadioUnitType($filterUnitType);
+
+            return;
+        }
+
+        $dropdown->click();
         /** @var NodeElement[] $types */
         $types = $this->findAll('css', 'ul.dropdown-menu li a.choice-value');
 

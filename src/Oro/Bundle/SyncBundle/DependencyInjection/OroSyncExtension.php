@@ -98,6 +98,10 @@ class OroSyncExtension extends Extension
         );
 
         $this->configureLogger($container);
+
+        if ('test' === $container->getParameter('kernel.environment')) {
+            $loader->load('services_test.yml');
+        }
     }
 
     /**
