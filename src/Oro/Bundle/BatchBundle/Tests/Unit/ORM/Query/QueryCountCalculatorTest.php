@@ -48,13 +48,7 @@ class QueryCountCalculatorTest extends OrmTestCase
             ->getMock();
 
         $this->em = $this->getTestEntityManager($this->connection);
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Stub' => 'Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
     private function getQuery(string $dql, array $params = null): Query
@@ -70,7 +64,7 @@ class QueryCountCalculatorTest extends OrmTestCase
 
     public function testCalculateCountForQueryWithoutParameters()
     {
-        $query = $this->getQuery('SELECT e FROM Stub:Entity e');
+        $query = $this->getQuery('SELECT e FROM ' . Entity::class . ' e');
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_';
 
         $this->connection->expects($this->once())
@@ -86,7 +80,7 @@ class QueryCountCalculatorTest extends OrmTestCase
 
     public function testCalculateCountForQueryWithGroupBy()
     {
-        $query = $this->getQuery('SELECT e FROM Stub:Entity e GROUP BY e.b');
+        $query = $this->getQuery('SELECT e FROM ' . Entity::class . ' e GROUP BY e.b');
         $expectedSql = 'SELECT COUNT(*)'
             . ' FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ GROUP BY e0_.b)'
             . ' AS count_query';
@@ -105,7 +99,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithParameters()
     {
         $query = $this->getQuery(
-            'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
+            'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a AND e.b = :b',
             ['a' => 1, 'b' => 2]
         );
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
@@ -126,7 +120,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithParametersAndDisabledCountWalker()
     {
         $query = $this->getQuery(
-            'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
+            'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a AND e.b = :b',
             ['a' => 1, 'b' => 2]
         );
         $expectedSql = 'SELECT COUNT(*)'
@@ -149,7 +143,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithParameterUsedSeveralTimes()
     {
         $query = $this->getQuery(
-            'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
+            'SELECT DISTINCT e.a FROM ' . Entity::class . ' e WHERE e.a = :value AND e.b = :value',
             ['value' => 3]
         );
         $expectedSql = 'SELECT DISTINCT count(DISTINCT e0_.a) AS sclr_0'
@@ -171,7 +165,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithParameterUsedSeveralTimesAndDisabledCountWalker()
     {
         $query = $this->getQuery(
-            'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
+            'SELECT DISTINCT e.a FROM ' . Entity::class . ' e WHERE e.a = :value AND e.b = :value',
             ['value' => 3]
         );
         $expectedSql = 'SELECT COUNT(*)'
@@ -194,7 +188,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithPositionalParameters()
     {
         $query = $this->getQuery(
-            'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
+            'SELECT e.a FROM ' . Entity::class . ' e WHERE e.a = ?1 AND e.b = ?0',
             [3, 4]
         );
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
@@ -215,7 +209,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountForQueryWithPositionalParametersAndDisabledCountWalker()
     {
         $query = $this->getQuery(
-            'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
+            'SELECT e.a FROM ' . Entity::class . ' e WHERE e.a = ?1 AND e.b = ?0',
             [3, 4]
         );
         $expectedSql = 'SELECT COUNT(*)'
@@ -238,7 +232,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     public function testCalculateCountDistinct()
     {
         $query = $this->getQuery(
-            'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
+            'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a AND e.b = :b',
             ['a' => 1, 'b' => 2]
         );
         $expectedSql = 'SELECT count(DISTINCT e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ? AND e0_.b = ?';
@@ -263,14 +257,14 @@ class QueryCountCalculatorTest extends OrmTestCase
             'The usage of DISTINCT keyword can be forced only together with Doctrine\ORM\Tools\Pagination\CountWalker.'
         );
 
-        $query = $this->getQuery('SELECT e FROM Stub:Entity e GROUP BY e.b');
+        $query = $this->getQuery('SELECT e FROM ' . Entity::class . ' e GROUP BY e.b');
         QueryCountCalculator::calculateCountDistinct($query);
     }
 
     public function testCalculateCountWhenResultSetMappingIsAlreadyBuilt()
     {
         $query = $this->getQuery(
-            'SELECT e FROM Stub:Entity e WHERE e.a = :a',
+            'SELECT e FROM ' . Entity::class . ' e WHERE e.a = :a',
             ['a' => 1]
         );
         $expectedSql = 'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_ WHERE e0_.a = ?';

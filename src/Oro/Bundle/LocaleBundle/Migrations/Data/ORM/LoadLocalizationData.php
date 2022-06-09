@@ -8,6 +8,7 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Migrations\Data\ORM\LoadLanguageData;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -25,7 +26,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     /**
      * {@inheritdoc}
      */
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $locale = $this->getLocale();
         if (!$this->isSupportedLocale($locale)) {
@@ -60,7 +61,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         }
 
         $manager->flush();
-        /* @var $configManager ConfigManager */
+        /* @var ConfigManager $configManager */
         $configManager = $this->container->get('oro_config.global');
 
         $configManager->set(
@@ -76,32 +77,13 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         $this->addReference('default_localization', $localization);
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param string $locale
-     * @param Language $language
-     *
-     * @return Localization
-     */
-    protected function getLocalization(ObjectManager $manager, $locale, Language $language)
+    private function getLocalization(ObjectManager $manager, string $locale, Language $language): ?Localization
     {
-        return $manager->getRepository('OroLocaleBundle:Localization')
-            ->findOneBy(
-                [
-                    'language' => $language,
-                    'formattingCode' => $locale
-                ]
-            );
+        return $manager->getRepository(Localization::class)
+            ->findOneBy(['language' => $language, 'formattingCode' => $locale]);
     }
 
-    /**
-     * @param ObjectManager $manager
-     * @param string $locale
-     * @param string $languageCode
-     *
-     * @return null|Localization
-     */
-    protected function createLocalization(ObjectManager $manager, $locale, $languageCode)
+    private function createLocalization(ObjectManager $manager, string $locale, string $languageCode): ?Localization
     {
         $language = $manager->getRepository(Language::class)->findOneBy([
             'code' => $languageCode,
@@ -123,22 +105,15 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         return $localization;
     }
 
-    /**
-     * @return string
-     */
-    protected function getLocale()
+    private function getLocale(): string
     {
+        /** @var LocaleSettings $localeSettings */
         $localeSettings = $this->container->get('oro_locale.settings');
 
         return $localeSettings->getLocale();
     }
 
-    /**
-     * @param string $locale
-     *
-     * @return bool
-     */
-    protected function isSupportedLocale($locale)
+    private function isSupportedLocale(string $locale): bool
     {
         return Locales::exists($locale);
     }
@@ -146,7 +121,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
     /**
      * {@inheritdoc}
      */
-    public function getDependencies()
+    public function getDependencies(): array
     {
         return [LoadLanguageData::class];
     }

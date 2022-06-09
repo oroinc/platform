@@ -14,9 +14,10 @@ class ConsoleCommandListenerTest extends WebTestCase
         $featureChecker->setResourceEnabled('oro:feature-toggle:config:dump-reference', 'commands', false);
         try {
             $result = $this->runCommand('oro:feature-toggle:config:dump-reference');
-            self::assertStringContainsString('The feature that enables this command is turned off.', $result);
         } finally {
             $featureChecker->setResourceEnabled('oro:feature-toggle:config:dump-reference', 'commands', null);
         }
+
+        self::assertStringContainsString('The feature that enables this command is turned off.', $result);
     }
 }

@@ -10,6 +10,7 @@ use Oro\Bundle\FilterBundle\Filter\DictionaryFilter;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
+use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEntity;
 use Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures\TestEnumValue;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
@@ -31,13 +32,7 @@ class DictionaryFilterTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Stub' => 'Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->formFactory = $this->createMock(FormFactoryInterface::class);
         $doctrine = $this->createMock(ManagerRegistry::class);
@@ -112,7 +107,7 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
-            ->from('Stub:TestEntity', 'o');
+            ->from(TestEntity::class, 'o');
 
         $values = [
             new TestEnumValue('val1', 'Value1'),
@@ -141,7 +136,7 @@ class DictionaryFilterTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
 
-        self::assertEquals('SELECT o.id FROM Stub:TestEntity o WHERE test IN(:param1)', $result);
+        self::assertEquals('SELECT o.id FROM ' . TestEntity::class . ' o WHERE test IN(:param1)', $result);
         self::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 
@@ -149,7 +144,7 @@ class DictionaryFilterTest extends OrmTestCase
     {
         $qb = $this->em->createQueryBuilder()
             ->select('o.id')
-            ->from('Stub:TestEntity', 'o');
+            ->from(TestEntity::class, 'o');
 
         $values = [
             new TestEnumValue('val1', 'Value1'),
@@ -180,7 +175,7 @@ class DictionaryFilterTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
 
-        self::assertEquals('SELECT o.id FROM Stub:TestEntity o WHERE test NOT IN(:param1)', $result);
+        self::assertEquals('SELECT o.id FROM ' . TestEntity::class . ' o WHERE test NOT IN(:param1)', $result);
         self::assertEquals($values, $qb->getParameter('param1')->getValue());
     }
 

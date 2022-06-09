@@ -10,6 +10,7 @@ use Oro\Bundle\ActivityBundle\Event\Events;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity;
+use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Another;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Target;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -59,13 +60,7 @@ class ActivityManagerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => 'Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
@@ -833,7 +828,7 @@ class ActivityManagerTest extends OrmTestCase
         $targetEntityClass = Target::class;
         $targetEntityId = 123;
 
-        $qb = $this->em->getRepository('Test:Activity')->createQueryBuilder('activity')
+        $qb = $this->em->getRepository(Activity::class)->createQueryBuilder('activity')
             ->select('activity');
 
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
@@ -861,8 +856,8 @@ class ActivityManagerTest extends OrmTestCase
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
-            ->from('Test:Activity', 'activity')
-            ->from('Test:Another', 'another')
+            ->from(Activity::class, 'activity')
+            ->from(Another::class, 'another')
             ->where('another.id = activity.id');
 
         $this->manager->addFilterByTargetEntity(
@@ -874,7 +869,7 @@ class ActivityManagerTest extends OrmTestCase
 
         $this->assertEquals(
             'SELECT activity, another'
-            . ' FROM Test:Activity activity, Test:Another another'
+            . ' FROM ' . Activity::class . ' activity, ' . Another::class . ' another'
             . ' WHERE another.id = activity.id AND activity.id IN('
             . 'SELECT filterActivityEntity.id'
             . ' FROM Oro\Bundle\ActivityBundle\Tests\Unit\Fixtures\Entity\Activity filterActivityEntity'
@@ -913,8 +908,8 @@ class ActivityManagerTest extends OrmTestCase
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
-            ->from('Test:Activity', 'activity')
-            ->from('Test:Another', 'another')
+            ->from(Activity::class, 'activity')
+            ->from(Another::class, 'another')
             ->where('another.id = activity.id');
 
         $this->manager->addFilterByTargetEntity($qb, $targetEntityClass, $targetEntityId);
@@ -930,8 +925,8 @@ class ActivityManagerTest extends OrmTestCase
 
         $qb = $this->em->createQueryBuilder()
             ->select('activity, another')
-            ->from('Test:Activity', 'activity')
-            ->from('Test:Another', 'another')
+            ->from(Activity::class, 'activity')
+            ->from(Another::class, 'another')
             ->where('another.id = activity.id');
 
         $this->manager->addFilterByTargetEntity(

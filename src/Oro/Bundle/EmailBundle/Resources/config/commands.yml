@@ -16,7 +16,6 @@ services:
 
     Oro\Bundle\EmailBundle\Command\Cron\EmailBodySyncCommand:
         arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_email.email_body_synchronizer'
         tags:
             - { name: console.command }

@@ -2,7 +2,9 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
-use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -12,7 +14,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 {
     public function testReuseExistingJoin()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -63,7 +65,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testReuseExistingInnerJoin()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->innerJoin('e.owner', 'user')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -114,7 +116,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testReuseExistingJoinWithCondition()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user', 'WITH', 'e.owner = user.id AND user.name LIKE \'a%\'')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -165,7 +167,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithoutConfig()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -206,7 +208,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithExclusion()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -250,7 +252,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithComputedField()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -295,7 +297,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithExclusionAndPartialLoadDisabled()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -347,7 +349,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithSpecifiedFieldsButNoExclusionPolicy()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -396,7 +398,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithSpecifiedFieldsOnly()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -439,7 +441,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithSpecifiedFieldsAndExclusions()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -482,7 +484,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithMetadata()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -526,7 +528,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => Entity\Group::class
+                    'entity' => Group::class
                 ]
             ],
             $result
@@ -535,7 +537,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithMetadataWithoutPropertyPath()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -577,7 +579,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'        => 1,
                     'label'     => 'test_label',
-                    '__class__' => Entity\Group::class
+                    '__class__' => Group::class
                 ]
             ],
             $result
@@ -586,7 +588,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithMetadataAndExcludeAllPolicy()
     {
-        $qb = $this->em->getRepository('Test:Group')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Group::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -624,7 +626,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
                 [
                     'id'     => 1,
                     'label'  => 'test_label',
-                    'entity' => Entity\Group::class
+                    'entity' => Group::class
                 ]
             ],
             $result
@@ -637,7 +639,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testNotConfiguredRelations()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -679,7 +681,7 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSimpleEntityWithRenamedFields()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 

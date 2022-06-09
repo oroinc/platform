@@ -7,6 +7,7 @@ use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tools\DatabaseChecker;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -28,8 +29,6 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class OwnerTreeProviderTest extends OrmTestCase
 {
-    private const ENTITY_NAMESPACE = 'Oro\Bundle\SecurityBundle\Tests\Unit\Owner\Fixtures\Entity';
-
     private const ORG_1 = 1;
     private const ORG_2 = 2;
 
@@ -72,13 +71,7 @@ class OwnerTreeProviderTest extends OrmTestCase
         $conn = new ConnectionMock([], new DriverMock());
         $conn->setDatabasePlatform(new MySqlPlatform());
         $this->em = $this->getTestEntityManager($conn);
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            self::ENTITY_NAMESPACE
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => self::ENTITY_NAMESPACE
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
@@ -92,10 +85,10 @@ class OwnerTreeProviderTest extends OrmTestCase
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->ownershipMetadataProvider->expects($this->any())
             ->method('getUserClass')
-            ->willReturn(self::ENTITY_NAMESPACE . '\TestUser');
+            ->willReturn(User::class);
         $this->ownershipMetadataProvider->expects($this->any())
             ->method('getBusinessUnitClass')
-            ->willReturn(self::ENTITY_NAMESPACE . '\TestBusinessUnit');
+            ->willReturn(BusinessUnit::class);
 
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -156,9 +149,9 @@ class OwnerTreeProviderTest extends OrmTestCase
             ];
         }
         $this->addQueryExpectation(
-            'SELECT t0_.id AS id_0, t0_.organization_id AS sclr_1, t0_.parent_id AS sclr_2,'
-            . ' (CASE WHEN t0_.parent_id IS NULL THEN 0 ELSE 1 END) AS sclr_3'
-            . ' FROM tbl_business_unit t0_'
+            'SELECT o0_.id AS id_0, o0_.organization_id AS sclr_1, o0_.business_unit_owner_id AS sclr_2,'
+            . ' (CASE WHEN o0_.business_unit_owner_id IS NULL THEN 0 ELSE 1 END) AS sclr_3'
+            . ' FROM oro_business_unit o0_'
             . ' ORDER BY sclr_3 ASC, sclr_2 ASC',
             $queryResult
         );
@@ -176,12 +169,12 @@ class OwnerTreeProviderTest extends OrmTestCase
             ];
         }
         $this->addQueryExpectation(
-            'SELECT t0_.id AS id_0, t1_.id AS id_1, t0_.owner_id AS sclr_2, t2_.id AS id_3'
-            . ' FROM tbl_user t0_'
-            . ' INNER JOIN tbl_user_to_organization t3_ ON t0_.id = t3_.user_id'
-            . ' INNER JOIN tbl_organization t1_ ON t1_.id = t3_.organization_id'
-            . ' LEFT JOIN tbl_user_to_business_unit t4_ ON t0_.id = t4_.user_id'
-            . ' LEFT JOIN tbl_business_unit t2_ ON t2_.id = t4_.business_unit_id'
+            'SELECT o0_.id AS id_0, o1_.id AS id_1, o0_.business_unit_owner_id AS sclr_2, o2_.id AS id_3'
+            . ' FROM oro_user o0_'
+            . ' INNER JOIN oro_user_organization o3_ ON o0_.id = o3_.user_id'
+            . ' INNER JOIN oro_organization o1_ ON o1_.id = o3_.organization_id'
+            . ' LEFT JOIN oro_user_business_unit o4_ ON o0_.id = o4_.user_id'
+            . ' LEFT JOIN oro_business_unit o2_ ON o2_.id = o4_.business_unit_id'
             . ' ORDER BY id_1 ASC',
             $queryResult
         );
@@ -962,10 +955,8 @@ class OwnerTreeProviderTest extends OrmTestCase
                     5 => [6]
                 ],
                 [
-
-                    'businessUnitClass' => self::ENTITY_NAMESPACE . '\TestBusinessUnit',
+                    'businessUnitClass' => BusinessUnit::class,
                     'buId' => 2
-
                 ]
             ]
         ];
@@ -993,15 +984,15 @@ class OwnerTreeProviderTest extends OrmTestCase
                 ],
                 [
                     [
-                        'businessUnitClass' => self::ENTITY_NAMESPACE . '\TestBusinessUnit',
+                        'businessUnitClass' => BusinessUnit::class,
                         'buId' => 5
                     ],
                     [
-                        'businessUnitClass' => self::ENTITY_NAMESPACE . '\TestBusinessUnit',
+                        'businessUnitClass' => BusinessUnit::class,
                         'buId' => 8
                     ],
                     [
-                        'businessUnitClass' => self::ENTITY_NAMESPACE . '\TestBusinessUnit',
+                        'businessUnitClass' => BusinessUnit::class,
                         'buId' => 12
                     ]
                 ]

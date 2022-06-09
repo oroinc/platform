@@ -2,11 +2,13 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
+
 class ToOneEntitySerializerTest extends EntitySerializerTestCase
 {
     public function testManyToOneUnidirectional()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -56,7 +58,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneUnidirectionalNoIdentifierFieldInResult()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -107,7 +109,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneBidirectional()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -165,7 +167,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneBidirectionalIdOnly()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -215,7 +217,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneBidirectionalWithManyToManyIds()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -299,7 +301,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToOneBidirectionalWithManyToMany()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -389,7 +391,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneWithRenamedIdentifierField()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -446,7 +448,7 @@ class ToOneEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToOneCollapsedWithRenamedIdentifierField()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 

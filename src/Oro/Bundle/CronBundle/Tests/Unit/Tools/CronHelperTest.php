@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\CronBundle\Tests\Unit\Tools;
 
 use Cron\CronExpression;
-use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Oro\Bundle\CronBundle\Tools\CronHelper;
 
 class CronHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -30,35 +30,35 @@ class CronHelperTest extends \PHPUnit\Framework\TestCase
         return [
             'simple definition' => [
                 'definition' => '* * * * *',
-                'expectedCronExpression' => CronExpression::factory('* * * * *')
+                'expectedCronExpression' => new CronExpression('* * * * *')
             ],
             'yearly' => [
                 'definition' => '@yearly',
-                'expectedCronExpression' => CronExpression::factory('0 0 1 1 *')
+                'expectedCronExpression' => new CronExpression('0 0 1 1 *')
             ],
             'annually' => [
                 'definition' => '@annually',
-                'expectedCronExpression' => CronExpression::factory('0 0 1 1 *')
+                'expectedCronExpression' => new CronExpression('0 0 1 1 *')
             ],
             'monthly' => [
                 'definition' => '@monthly',
-                'expectedCronExpression' => CronExpression::factory('0 0 1 * *')
+                'expectedCronExpression' => new CronExpression('0 0 1 * *')
             ],
             'weekly' => [
                 'definition' => '@weekly',
-                'expectedCronExpression' => CronExpression::factory('0 0 * * 0')
+                'expectedCronExpression' => new CronExpression('0 0 * * 0')
             ],
             'daily' => [
                 'definition' => '@daily',
-                'expectedCronExpression' => CronExpression::factory('0 0 * * *')
+                'expectedCronExpression' => new CronExpression('0 0 * * *')
             ],
             'hourly' => [
                 'definition' => '@hourly',
-                'expectedCronExpression' => CronExpression::factory('0 * * * *')
+                'expectedCronExpression' => new CronExpression('0 * * * *')
             ],
             'prevent modulo by zero' => [
                 'definition' =>  '*/0 * * * *',
-                'expectedCronExpression' => CronExpression::factory('* * * * *')
+                'expectedCronExpression' => new CronExpression('* * * * *')
             ],
         ];
     }

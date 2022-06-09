@@ -17,13 +17,7 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Stub' => 'Oro\Bundle\OrganizationBundle\Tests\Unit\Ownership\Fixture\Entity'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
     /**

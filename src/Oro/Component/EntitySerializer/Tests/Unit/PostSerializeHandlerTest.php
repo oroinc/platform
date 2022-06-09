@@ -2,6 +2,8 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
+
 class PostSerializeHandlerTest extends EntitySerializerTestCase
 {
     /**
@@ -45,7 +47,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
      */
     public function testSimpleEntityWithPostSerializeAsClosure()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -155,7 +157,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
      */
     public function testSimpleEntityWithPostSerializeAsCallable()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -250,7 +252,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
 
     public function testPostSerializeForNullChild()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -307,7 +309,7 @@ class PostSerializeHandlerTest extends EntitySerializerTestCase
      */
     public function testManyToManyBidirectionalWithPostSerialize()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 

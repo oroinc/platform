@@ -4,11 +4,10 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener;
-use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Stub\CommandStub;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,39 +24,38 @@ class ConsoleCommandListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new ConsoleCommandListener($this->featureChecker);
     }
 
-    public function testWhenCommandFeatureDisabled()
+    public function testWhenCommandFeatureEnabled(): void
     {
-        $this->featureChecker->expects($this->any())
+        $this->featureChecker->expects(self::once())
+            ->method('isResourceEnabled')
+            ->with('oro:search:index', 'commands')
+            ->willReturn(true);
+
+        $command = new Command('oro:search:index');
+        $output = new BufferedOutput();
+        $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
+        $this->listener->onConsoleCommand($event);
+
+        $this->assertTrue($event->commandShouldRun());
+        $this->assertEquals('', $output->fetch());
+    }
+
+    public function testWhenCommandFeatureDisabled(): void
+    {
+        $this->featureChecker->expects(self::once())
             ->method('isResourceEnabled')
             ->with('oro:search:index', 'commands')
             ->willReturn(false);
 
         $command = new Command('oro:search:index');
-        $input = new ArrayInput([]);
-        $output = new NullOutput();
-        $event = new ConsoleCommandEvent($command, $input, $output);
-
-        $this->listener->onConsoleCommand($event);
-        $this->assertEquals(false, $event->commandShouldRun(), 'Command was not disabled even if related feature was');
-    }
-
-    public function testWhenCommandRequireFeatureChecker()
-    {
-        $this->featureChecker->expects($this->any())
-            ->method('isResourceEnabled')
-            ->willReturn(true);
-
-        $command = new CommandStub('stub:command');
-        $input = new ArrayInput([]);
-        $output = new NullOutput();
-        $event = new ConsoleCommandEvent($command, $input, $output);
-
+        $output = new BufferedOutput();
+        $event = new ConsoleCommandEvent($command, $this->createMock(InputInterface::class), $output);
         $this->listener->onConsoleCommand($event);
 
+        $this->assertFalse($event->commandShouldRun());
         $this->assertEquals(
-            $this->featureChecker,
-            $command->getFeatureChecker(),
-            'FeatureChecker was not injected properly'
+            'The feature that enables this command is turned off.',
+            str_replace(PHP_EOL, '', $output->fetch())
         );
     }
 }

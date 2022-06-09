@@ -41,23 +41,12 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
-        $doctrine->expects($this->any())
-            ->method('getAliasNamespace')
-            ->willReturnMap([
-                ['Test', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity']
-            ]);
 
         $this->entityFieldFilter = $this->createMock(EntityFieldFilterInterface::class);
         $this->entityFieldFilter->expects($this->any())
@@ -104,7 +93,6 @@ abstract class EntitySerializerTestCase extends OrmTestCase
 
     protected function assertDqlEquals(string $expected, string $actual, string $message = ''): void
     {
-        $expected = str_replace('Test:', 'Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\\', $expected);
         $this->assertEquals($expected, $actual, $message);
     }
 

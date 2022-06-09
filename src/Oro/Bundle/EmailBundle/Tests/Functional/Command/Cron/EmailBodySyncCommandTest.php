@@ -2,62 +2,54 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Command\Cron;
 
+use Oro\Bundle\ConfigBundle\Tests\Functional\Traits\ConfigManagerAwareTestTrait;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
-use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailBodySyncCommandTest extends WebTestCase
 {
-    use EmailFeatureTrait;
+    use ConfigManagerAwareTestTrait;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadEmailData::class]);
     }
 
-    /**
-     * @dataProvider paramProvider
-     *
-     * @param string $expectedContent
-     * @param array  $params
-     */
-    public function testCommandOutput($expectedContent, $params)
+    private static function getFeatureChecker(): FeatureChecker
     {
-        $result = $this->runCommand('oro:cron:email-body-sync', $params);
-
-        if ('' === $expectedContent) {
-            self::assertEmpty($result);
-        } else {
-            self::assertStringContainsString($expectedContent, $result);
-        }
+        return self::getContainer()->get('oro_featuretoggle.checker.feature_checker');
     }
 
-    public function testCommandOutputWithEmailFeatureDisabled()
+    public function testExecute(): void
     {
-        $this->disableEmailFeature();
         $result = $this->runCommand('oro:cron:email-body-sync');
-
-        self::assertStringContainsString('The email feature is disabled. The command will not run.', $result);
+        self::assertStringContainsString('All emails was processed', $result);
     }
 
-    /**
-     * @return array
-     */
-    public function paramProvider()
+    public function testHelp(): void
     {
-        return [
-            'should show help' => [
-                '$expectedContent' => 'Usage: oro:cron:email-body-sync [options]',
-                '$params'          => ['--help'],
-            ],
-            'should show success message' => [
-                '$expectedContent' => 'All emails was processed',
-                '$params'          => [],
-            ],
-        ];
+        $result = $this->runCommand('oro:cron:email-body-sync', ['--help']);
+        self::assertStringContainsString('Usage: oro:cron:email-body-sync [options]', $result);
+    }
+
+    public function testWhenEmailFeatureDisabled()
+    {
+        $configManager = self::getConfigManager();
+        $configManager->set('oro_email.feature_enabled', false);
+        $configManager->flush();
+        $featureChecker = self::getFeatureChecker();
+        $featureChecker->resetCache();
+
+        try {
+            $result = $this->runCommand('oro:cron:email-body-sync');
+        } finally {
+            $configManager->set('oro_email.feature_enabled', true);
+            $configManager->flush();
+            $featureChecker->resetCache();
+        }
+
+        self::assertStringContainsString('The feature that enables this CRON command is turned off.', $result);
     }
 }

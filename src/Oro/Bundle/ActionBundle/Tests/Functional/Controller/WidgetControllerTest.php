@@ -346,7 +346,7 @@ class WidgetControllerTest extends WebTestCase
             'existing entity short syntax' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_operation' => ['entities' => ['OroTestFrameworkBundle:TestActivity']]]
+                    ['oro_action_test_operation' => ['entities' => [TestActivity::class]]]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
@@ -372,7 +372,7 @@ class WidgetControllerTest extends WebTestCase
                     $config,
                     [
                         'oro_action_test_operation' => [
-                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Enti\UnknownEntity']
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\UnknownEntity']
                         ]
                     ]
                 ),
@@ -384,7 +384,11 @@ class WidgetControllerTest extends WebTestCase
             'unknown entity short syntax' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_operation' => ['entities' => ['OroTestFrameworkBundle:UnknownEntity']]]
+                    [
+                        'oro_action_test_operation' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\UnknownEntity']
+                        ]
+                    ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
