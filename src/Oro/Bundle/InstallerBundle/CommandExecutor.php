@@ -11,6 +11,7 @@ use Symfony\Component\Process\Process;
 
 /**
  * The class that contains a set of methods to simplify execution of console commands.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CommandExecutor extends AbstractCommandExecutor
 {
@@ -140,11 +141,11 @@ class CommandExecutor extends AbstractCommandExecutor
             $this->lastCommandLine = '';
 
             $this->application->setAutoExit(false);
-            $originalVerbosity = $this->output->getVerbosity();
+            $originalVerbosity = $this->getVerbosity();
             try {
                 $this->lastCommandExitCode = $this->application->run(new ArrayInput($params), $this->output);
             } finally {
-                $this->output->setVerbosity($originalVerbosity);
+                $this->setVerbosity($originalVerbosity);
                 $this->application->setAutoExit(true);
             }
         }
@@ -213,6 +214,14 @@ class CommandExecutor extends AbstractCommandExecutor
                     $params['-q'] = true;
                     break;
             }
+        } elseif ($this->output->isQuiet()) {
+            $toRemove = $this->getVerbosityParameters($params);
+            if ($toRemove) {
+                foreach ($toRemove as $name) {
+                    unset($params[$name]);
+                }
+                $params['-q'] = true;
+            }
         }
 
         return $params;
@@ -221,18 +230,69 @@ class CommandExecutor extends AbstractCommandExecutor
     private function hasVerbosityParameter(array $params): bool
     {
         foreach ($params as $name => $value) {
-            if ('-v' === $name
-                || '-vv' === $name
-                || '-vvv' === $name
-                || '--verbose' === $name
-                || '-q' === $name
-                || '--quiet' === $name
-            ) {
+            if ($this->isVerbosityParameter($name) || $this->isQuietVerbosityParameter($name)) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private function isVerbosityParameter(string $name): bool
+    {
+        return '-v' === $name || '-vv' === $name || '-vvv' === $name || '--verbose' === $name;
+    }
+
+    private function isQuietVerbosityParameter(string $name): bool
+    {
+        return '-q' === $name || '--quiet' === $name;
+    }
+
+    private function getVerbosityParameters(array $params): array
+    {
+        $result = [];
+        foreach ($params as $name => $value) {
+            if ($this->isVerbosityParameter($name)) {
+                $result[] = $name;
+            }
+        }
+
+        return $result;
+    }
+
+    private function getVerbosity(): array
+    {
+        /**
+         * @link https://github.com/symfony/symfony/pull/24425
+         * @see  \Symfony\Component\Console\Application::configureIO
+         */
+        return [
+            $this->output->getVerbosity(),
+            (int)getenv('SHELL_VERBOSITY'),
+            $_ENV['SHELL_VERBOSITY'] ?? null,
+            $_SERVER['SHELL_VERBOSITY'] ?? null
+        ];
+    }
+
+    /**
+     * @param array $verbosity The data returned by {@see getVerbosity}
+     */
+    private function setVerbosity(array $verbosity): void
+    {
+        $this->output->setVerbosity($verbosity[0]);
+        if (\function_exists('putenv')) {
+            @putenv('SHELL_VERBOSITY=' . $verbosity[1]);
+        }
+        if (null === $verbosity[2]) {
+            unset($_ENV['SHELL_VERBOSITY']);
+        } else {
+            $_ENV['SHELL_VERBOSITY'] = $verbosity[2];
+        }
+        if (null === $verbosity[3]) {
+            unset($_SERVER['SHELL_VERBOSITY']);
+        } else {
+            $_SERVER['SHELL_VERBOSITY'] = $verbosity[3];
+        }
     }
 
     /**
