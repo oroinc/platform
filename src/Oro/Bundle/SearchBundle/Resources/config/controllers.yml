@@ -3,7 +3,5 @@ services:
         public: true
 
     Oro\Bundle\SearchBundle\Controller\SearchController:
-        calls:
-            - [setContainer, ['@Psr\Container\ContainerInterface']]
-        tags:
-            - { name: container.service_subscriber }
+        arguments:
+            - '@oro_search.search_result_provider'

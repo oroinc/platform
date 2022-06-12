@@ -166,6 +166,21 @@ class SearchContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @Given /^(?:|I )should not see "(?P<type>[^"]+)" in search types$/
+     */
+    public function iShouldNotSeeFromSearchTypes($type)
+    {
+        $typeSelectElement = $this->createElement('TypeSelectElement');
+        self::assertTrue($typeSelectElement->isValid());
+
+        $typeSelectElement->press();
+
+        $list = $this->createElement('TypeSelectList');
+        $option = $list->find('xpath', "//li[./*[text()='$type']]");
+        self::assertTrue(null === $option || !$option->isValid(), "Type '$type' found in select entities type");
+    }
+
+    /**
      * Clear value of search type of entity in search type
      * Example: Given I click "Search"
      *          And I clear search type select

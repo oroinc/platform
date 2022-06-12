@@ -37,12 +37,11 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->searchIndexer = $this->createMock(Indexer::class);
 
         $this->innerQuery = $this->getMockBuilder(Query::class)
-            ->onlyMethods(['getCriteria', 'addSelect'])
+            ->onlyMethods(['getCriteria', 'addSelect', 'getFrom', 'from'])
             ->addMethods([
                 'setFirstResult',
                 'getFirstResult',
                 'setMaxResults',
-                'setFrom',
                 'getMaxResults',
                 'getOrderBy',
                 'getOrderDirection',
@@ -222,10 +221,28 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->query, $this->query->addSelect('field', 'decimal'));
     }
 
-    public function setFrom()
+    public function testGetFromWhenItIsNotSet()
     {
         $this->innerQuery->expects($this->once())
-            ->method('setFrom')
+            ->method('getFrom')
+            ->willReturn(false);
+
+        $this->assertNull($this->query->getFrom());
+    }
+
+    public function testGetFrom()
+    {
+        $this->innerQuery->expects($this->once())
+            ->method('getFrom')
+            ->willReturn(self::TEST_VALUE);
+
+        $this->assertEquals(self::TEST_VALUE, $this->query->getFrom());
+    }
+
+    public function testSetFrom()
+    {
+        $this->innerQuery->expects($this->once())
+            ->method('from')
             ->with(self::TEST_VALUE);
 
         $this->assertEquals($this->query, $this->query->setFrom(self::TEST_VALUE));
