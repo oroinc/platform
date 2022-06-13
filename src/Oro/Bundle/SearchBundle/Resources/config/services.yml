@@ -58,16 +58,14 @@ services:
         class: Oro\Bundle\SearchBundle\Engine\TextFilteredObjectMapper
         parent: oro_search.mapper
 
-    oro_search.provider.result_statistics_provider:
-        class: Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider
+    oro_search.search_result_provider:
+        class: Oro\Bundle\SearchBundle\Provider\SearchResultProvider
         arguments:
             - '@oro_search.index'
+            - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_entity_config.config_manager'
+            - '@event_dispatcher'
             - '@translator'
-        lazy: true
-
-    Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider:
-        alias: oro_search.provider.result_statistics_provider
 
     oro_search.formatter.result_formatter:
         class: Oro\Bundle\SearchBundle\Formatter\ResultFormatter
@@ -109,6 +107,9 @@ services:
 
     oro_search.event_listener.search_results_grid_listener:
         class: Oro\Bundle\SearchBundle\EventListener\SearchResultsGridListener
+        arguments:
+            - '@oro_search.index'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.search-grid, method: onBuildAfter }
 
