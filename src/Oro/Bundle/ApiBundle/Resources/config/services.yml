@@ -225,6 +225,7 @@ services:
             - '@oro_api.collect_resources.processor'
             - '@oro_api.resources_cache'
             - '@oro_api.resources_without_identifier_loader'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_api.subresources_provider:
         class: Oro\Bundle\ApiBundle\Provider\SubresourcesProvider

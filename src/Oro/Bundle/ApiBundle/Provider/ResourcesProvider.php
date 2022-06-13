@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -17,39 +18,35 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 class ResourcesProvider implements ResetInterface
 {
-    private const NOT_ACCESSIBLE            = 0;
-    private const ACCESSIBLE                = 1;
+    private const NOT_ACCESSIBLE = 0;
+    private const ACCESSIBLE = 1;
     private const ACCESSIBLE_AS_ASSOCIATION = 2;
 
-    /** @var ActionProcessorInterface */
-    private $processor;
-
-    /** @var ResourcesCache */
-    private $resourcesCache;
-
-    /** @var ResourcesWithoutIdentifierLoader */
-    private $resourcesWithoutIdentifierLoader;
-
+    private ActionProcessorInterface $processor;
+    private ResourcesCache $resourcesCache;
+    private ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader;
+    private FeatureChecker $featureChecker;
     /** @var array [request cache key => [ApiResource, ...], ...] */
-    private $resources = [];
-
+    private array $resources = [];
     /** @var array [request cache key => [entity class => accessible flag, ...], ...] */
-    private $accessibleResources = [];
-
+    private array $accessibleResources = [];
+    /** @var array [request cache key => [entity class => enable flag, ...], ...] */
+    private array $enabledResources = [];
     /** @var array [request cache key => [entity class => [action name, ...], ...], ...] */
-    private $excludedActions = [];
-
+    private array $excludedActions = [];
     /** @var array [request cache key => [entity class, ...], ...] */
-    private $resourcesWithoutIdentifier = [];
+    private array $resourcesWithoutIdentifier = [];
 
     public function __construct(
         ActionProcessorInterface $processor,
         ResourcesCache $resourcesCache,
-        ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader
+        ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader,
+        FeatureChecker $featureChecker
     ) {
         $this->processor = $processor;
         $this->resourcesCache = $resourcesCache;
         $this->resourcesWithoutIdentifierLoader = $resourcesWithoutIdentifierLoader;
+        $this->featureChecker = $featureChecker;
     }
 
     /**
@@ -160,6 +157,28 @@ class ResourcesProvider implements ResetInterface
     }
 
     /**
+     * Checks whether a given entity is enabled for API.
+     *
+     * @param string      $entityClass The FQCN of an entity
+     * @param string      $version     The API version
+     * @param RequestType $requestType The request type, for example "rest", "soap", etc.
+     *
+     * @return bool
+     */
+    public function isResourceEnabled(string $entityClass, string $version, RequestType $requestType): bool
+    {
+        $cacheKey = $this->getCacheKey($version, $requestType);
+        if (isset($this->enabledResources[$cacheKey][$entityClass])) {
+            return $this->enabledResources[$cacheKey][$entityClass];
+        }
+
+        $enabled = $this->featureChecker->isResourceEnabled($entityClass, 'api_resources');
+        $this->enabledResources[$cacheKey][$entityClass] = $enabled;
+
+        return $enabled;
+    }
+
+    /**
      * Gets a list of actions that cannot be used in API from for a given entity.
      *
      * @param string      $entityClass The FQCN of an entity
@@ -252,10 +271,11 @@ class ResourcesProvider implements ResetInterface
     /**
      * {@inheritdoc}
      */
-    public function reset()
+    public function reset(): void
     {
         $this->resources = [];
         $this->accessibleResources = [];
+        $this->enabledResources = [];
         $this->excludedActions = [];
         $this->resourcesWithoutIdentifier = [];
     }
@@ -324,7 +344,6 @@ class ResourcesProvider implements ResetInterface
             $this->processor->process($context);
 
             // prepare loaded data
-            /** @var ApiResource[] $resources */
             $resources = array_values($context->getResult()->toArray());
             $accessibleResources = array_fill_keys(
                 $context->getAccessibleAsAssociationResources(),
@@ -448,14 +467,11 @@ class ResourcesProvider implements ResetInterface
      */
     private function loadAccessibleResources(string $version, RequestType $requestType, string $cacheKey): array
     {
-        if ($this->hasResourcesInMemoryCache($cacheKey)) {
-            $accessibleResourcesForRequest = $this->accessibleResources[$cacheKey];
-        } else {
+        if (!$this->hasResourcesInMemoryCache($cacheKey)) {
             $this->loadResources($version, $requestType, $cacheKey);
-            $accessibleResourcesForRequest = $this->accessibleResources[$cacheKey];
         }
 
-        return $accessibleResourcesForRequest;
+        return $this->accessibleResources[$cacheKey];
     }
 
     /**
@@ -467,14 +483,11 @@ class ResourcesProvider implements ResetInterface
      */
     private function loadExcludedActions(string $version, RequestType $requestType, string $cacheKey): array
     {
-        if ($this->hasResourcesInMemoryCache($cacheKey)) {
-            $excludedActionsForRequest = $this->excludedActions[$cacheKey];
-        } else {
+        if (!$this->hasResourcesInMemoryCache($cacheKey)) {
             $this->loadResources($version, $requestType, $cacheKey);
-            $excludedActionsForRequest = $this->excludedActions[$cacheKey];
         }
 
-        return $excludedActionsForRequest;
+        return $this->excludedActions[$cacheKey];
     }
 
     /**
@@ -507,7 +520,7 @@ class ResourcesProvider implements ResetInterface
 
     private function getCacheKey(string $version, RequestType $requestType): string
     {
-        return $version . (string)$requestType;
+        return $version . $requestType;
     }
 
     /**

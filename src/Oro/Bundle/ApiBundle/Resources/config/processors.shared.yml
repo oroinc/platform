@@ -312,7 +312,7 @@ services:
     oro_api.validate_entity_type_feature:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeFeature
         arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: get_list, group: resource_check, priority: 10 }
@@ -326,7 +326,7 @@ services:
     oro_api.subresource.validate_parent_entity_type_feature:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeFeature
         arguments:
-            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_api.resources_provider'
         tags:
             - { name: oro.api.processor, action: get_subresource, group: resource_check, priority: 10 }
             - { name: oro.api.processor, action: delete_subresource, group: resource_check, priority: 10 }

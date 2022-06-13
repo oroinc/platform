@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Config\Extra\DisabledAssociationsConfigExtra;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ExcludeNotAccessibleRelations;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
@@ -12,6 +13,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 {
@@ -46,6 +48,8 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             $this->resourcesProvider,
             $entityOverrideProviderRegistry
         );
+
+        $this->context->setExtras([new DisabledAssociationsConfigExtra()]);
     }
 
     public function testProcessForNotCompletedConfig()
@@ -975,6 +979,70 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
                 'fields'           => [
                     'association1' => [
                         'target_class' => EntityIdentifier::class
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForDisabledAssociation()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => null,
+                'association2' => null
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::exactly(2))
+            ->method('hasAssociation')
+            ->willReturnMap([
+                ['association1', true],
+                ['association2', true]
+            ]);
+        $rootEntityMetadata->expects(self::exactly(2))
+            ->method('getAssociationMapping')
+            ->willReturnMap([
+                ['association1', ['targetEntity' => 'Test\Association1Target']],
+                ['association2', ['targetEntity' => 'Test\Association2Target']],
+            ]);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(3))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $this->getClassMetadataMock('Test\Association1Target')],
+                ['Test\Association2Target', true, $this->getClassMetadataMock('Test\Association2Target')]
+            ]);
+        $this->resourcesProvider->expects(self::exactly(2))
+            ->method('isResourceEnabled')
+            ->willReturnMap([
+                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
+                ['Test\Association2Target', $this->context->getVersion(), $this->context->getRequestType(), false]
+            ]);
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceAccessibleAsAssociation')
+            ->with('Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->removeExtra(DisabledAssociationsConfigExtra::NAME);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => null,
+                    'association2' => [
+                        'exclude' => true
                     ]
                 ]
             ],
