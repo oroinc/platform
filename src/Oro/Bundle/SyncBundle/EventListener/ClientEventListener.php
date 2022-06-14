@@ -5,11 +5,8 @@ namespace Oro\Bundle\SyncBundle\EventListener;
 use Gos\Bundle\WebSocketBundle\Client\Auth\WebsocketAuthenticationProviderInterface;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
-use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
-use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -25,21 +22,14 @@ class ClientEventListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var GosClientEventListener */
-    private $decoratedClientEventListener;
+    private WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider;
 
-    /** @var WebsocketAuthenticationProviderInterface */
-    private $websocketAuthenticationProvider;
-
-    /** @var ClientStorageInterface */
-    private $clientStorage;
+    private ClientStorageInterface $clientStorage;
 
     public function __construct(
-        GosClientEventListener $decoratedClientEventListener,
         WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider,
         ClientStorageInterface $clientStorage
     ) {
-        $this->decoratedClientEventListener = $decoratedClientEventListener;
         $this->websocketAuthenticationProvider = $websocketAuthenticationProvider;
         $this->clientStorage = $clientStorage;
         $this->logger = new NullLogger();
@@ -51,6 +41,8 @@ class ClientEventListener implements LoggerAwareInterface
      */
     public function onClientConnect(ClientEvent $event)
     {
+        $event->stopPropagation();
+
         $connection = $event->getConnection();
         $connection->WAMP->username = null;
 
@@ -83,13 +75,10 @@ class ClientEventListener implements LoggerAwareInterface
         $this->logger->info('{username} connected', ['storage_id' => $storageId] + $loggerContext);
     }
 
-    public function onClientDisconnect(ClientDisconnectedEvent $event)
-    {
-        $this->decoratedClientEventListener->onClientDisconnect($event);
-    }
-
     public function onClientError(ClientErrorEvent $event)
     {
+        $event->stopPropagation();
+
         $exception = $event->getThrowable();
         $connection = $event->getConnection();
 
@@ -99,8 +88,6 @@ class ClientEventListener implements LoggerAwareInterface
         ];
 
         if ($exception instanceof BadCredentialsException) {
-            $event->stopPropagation();
-
             $this->closeConnection($connection, 403);
 
             $this->logger->info(
@@ -110,11 +97,6 @@ class ClientEventListener implements LoggerAwareInterface
         } else {
             $this->logger->error('Connection error occurred', $loggerContext + ['exception' => $exception]);
         }
-    }
-
-    public function onClientRejected(ClientRejectedEvent $event)
-    {
-        $this->decoratedClientEventListener->onClientRejected($event);
     }
 
     private function closeConnection(ConnectionInterface $connection, int $status): void
