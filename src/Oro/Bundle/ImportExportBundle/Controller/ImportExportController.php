@@ -420,7 +420,7 @@ class ImportExportController extends AbstractController
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
             'csv',
-            null,
+            'import_template',
             $this->getOptionsFromRequest($request)
         );
 

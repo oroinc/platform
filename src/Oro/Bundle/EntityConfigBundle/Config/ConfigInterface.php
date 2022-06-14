@@ -56,7 +56,7 @@ interface ConfigInterface
     public function has($code);
 
     /**
-     * Checks id a value of a configuration attribute equals to $value.
+     * Checks if a value of a configuration attribute equals to $value.
      *
      * @param string $code
      * @param mixed  $value

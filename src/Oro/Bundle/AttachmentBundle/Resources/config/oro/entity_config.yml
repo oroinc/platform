@@ -80,6 +80,10 @@ entity_config:
                             subblock:       properties
                             label:          oro.attachment.config.is_stored_externally.label
                             tooltip:        oro.attachment.config.is_stored_externally.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No
                 maxsize:
                     options:
                         value_type:         integer
@@ -101,6 +105,10 @@ entity_config:
                             block:          general
                             subblock:       properties
                             tooltip:        oro.attachment.max_size.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 3
                 width:
                     options:
                         value_type:         integer
@@ -119,6 +127,10 @@ entity_config:
                             subblock:       properties
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_width.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 32
                 height:
                     options:
                         value_type:         integer
@@ -137,6 +149,10 @@ entity_config:
                             subblock:       properties
                             empty_data:     32
                             tooltip:        oro.attachment.thumb_height.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 32
                 mimetypes:
                     options:
                         allowed_type:       [file, image, multiFile, multiImage]
@@ -150,6 +166,10 @@ entity_config:
                             required:       false
                             label:          oro.attachment.mimetypes
                             tooltip:        oro.attachment.mimetypes.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: "image/png"
                 max_number_of_files:
                     options:
                         value_type:         integer
@@ -167,3 +187,7 @@ entity_config:
                             block:          general
                             subblock:       properties
                             tooltip:        oro.attachment.config.max_number_of_files.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 3

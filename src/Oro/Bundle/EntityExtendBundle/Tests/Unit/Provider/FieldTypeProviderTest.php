@@ -43,27 +43,33 @@ class FieldTypeProviderTest extends \PHPUnit\Framework\TestCase
         $scope = 'testScope';
         $code = 'test_code';
 
-        $providerConfig = [$code => ['options' => [], 'form' => []]];
+        $providerConfig = [
+            $code => [
+                'options' => [],
+                'form' => [],
+                'import_export' => ['import_template' => ['use_in_template' => true]]
+            ]
+        ];
 
         $propertyConfig = $this->createMock(PropertyConfigContainer::class);
-        $propertyConfig->expects($this->once())
+        $propertyConfig->expects(self::once())
             ->method('hasForm')
             ->with($configType, $fieldType)
             ->willReturn($propertyConfig);
-        $propertyConfig->expects($this->once())
-            ->method('getFormItems')
-            ->with($configType, $fieldType)
+        $propertyConfig->expects(self::once())
+            ->method('getItems')
+            ->with($configType)
             ->willReturn($providerConfig);
 
         $configProvider = $this->createMock(ConfigProvider::class);
-        $configProvider->expects($this->once())
+        $configProvider->expects(self::once())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfig);
-        $configProvider->expects($this->once())
+        $configProvider->expects(self::once())
             ->method('getScope')
             ->willReturn($scope);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getProviders')
             ->willReturn([$configProvider]);
 

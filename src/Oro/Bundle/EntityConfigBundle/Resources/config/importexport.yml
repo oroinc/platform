@@ -35,6 +35,7 @@ services:
         class: Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture\EntityFieldFixture
         arguments:
             - '@oro_entity_extend.field_type_provider'
+            - '@oro_entity_config.registry.attribute_type'
         tags:
             - { name: oro_importexport.template_fixture }
 
