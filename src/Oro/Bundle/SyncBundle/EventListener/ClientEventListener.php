@@ -9,6 +9,7 @@ use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
+use Gos\Bundle\WebSocketBundle\Event\ConnectionRejectedEvent;
 use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Psr\Log\LoggerAwareInterface;
@@ -25,14 +26,11 @@ class ClientEventListener implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var GosClientEventListener */
-    private $decoratedClientEventListener;
+    private GosClientEventListener $decoratedClientEventListener;
 
-    /** @var WebsocketAuthenticationProviderInterface */
-    private $websocketAuthenticationProvider;
+    private WebsocketAuthenticationProviderInterface $websocketAuthenticationProvider;
 
-    /** @var ClientStorageInterface */
-    private $clientStorage;
+    private ClientStorageInterface $clientStorage;
 
     public function __construct(
         GosClientEventListener $decoratedClientEventListener,
@@ -115,6 +113,11 @@ class ClientEventListener implements LoggerAwareInterface
     public function onClientRejected(ClientRejectedEvent $event)
     {
         $this->decoratedClientEventListener->onClientRejected($event);
+    }
+
+    public function onConnectionRejected(ConnectionRejectedEvent $event): void
+    {
+        $this->decoratedClientEventListener->onConnectionRejected($event);
     }
 
     private function closeConnection(ConnectionInterface $connection, int $status): void

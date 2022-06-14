@@ -10,6 +10,7 @@ use Gos\Bundle\WebSocketBundle\Event\ClientConnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
+use Gos\Bundle\WebSocketBundle\Event\ConnectionRejectedEvent;
 use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
 use Oro\Bundle\SyncBundle\EventListener\ClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
@@ -28,23 +29,18 @@ class ClientEventListenerTest extends TestCase
 
     private const CONNECTION_RESOURCE_ID = 45654;
 
-    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketAuthenticationProvider;
+    private WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $websocketAuthenticationProvider;
 
-    /** @var ClientStorage */
-    private $clientStorage;
+    private ClientStorage|\PHPUnit\Framework\MockObject\MockObject $clientStorage;
 
-    /** @var GosClientEventListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $decoratedClientEventListener;
+    private GosClientEventListener $decoratedClientEventListener;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $decoratedListenerLogger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $decoratedListenerLogger;
 
-    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
+    private ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /** @var ClientEventListener */
-    private $clientEventListener;
+    private ClientEventListener $clientEventListener;
 
     protected function setUp(): void
     {
@@ -200,5 +196,17 @@ class ClientEventListenerTest extends TestCase
         $this->clientEventListener->onClientError($clientErrorEvent);
 
         self::assertTrue($clientErrorEvent->isPropagationStopped());
+    }
+
+    public function testOnConnectionRejected(): void
+    {
+        $connectionRejectedEvent = new ConnectionRejectedEvent($this->connection);
+
+        $this->decoratedListenerLogger
+            ->expects(self::once())
+            ->method('warning')
+            ->with('Connection rejected');
+
+        $this->clientEventListener->onConnectionRejected($connectionRejectedEvent);
     }
 }
