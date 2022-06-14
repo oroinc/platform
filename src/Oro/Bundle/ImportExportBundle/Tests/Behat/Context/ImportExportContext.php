@@ -702,6 +702,17 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     }
 
     /**
+     * Import downloaded template file without changes
+     *
+     * @When /^(?:|I )import downloaded template file$/
+     */
+    public function iImportDownloadedTemplate()
+    {
+        $this->importFile = $this->template;
+        $this->iImportFile();
+    }
+
+    /**
      * Import filled file
      *
      * @When /^(?:|I )import file$/

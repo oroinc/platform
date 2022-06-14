@@ -16,6 +16,10 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No
     attachment:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#attachment
         entity:

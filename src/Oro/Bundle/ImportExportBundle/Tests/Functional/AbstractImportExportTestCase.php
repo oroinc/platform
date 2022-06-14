@@ -49,7 +49,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
 
         // Take the name of the file from the header because there is no alternative way to know the filename
         $contentDisposition = $this->client->getResponse()->headers->get('Content-Disposition');
-        preg_match('/^.*"?(export_template_[a-z0-9_]+.csv)"?$/', $contentDisposition, $matches);
+        preg_match('/^.*"?(import_template_[a-z0-9_]+.csv)"?$/', $contentDisposition, $matches);
 
         ob_start();
         $this->client->getResponse()->sendContent();

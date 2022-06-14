@@ -2,30 +2,40 @@
 
 namespace Oro\Bundle\EntityConfigBundle\ImportExport\TemplateFixture;
 
+use Oro\Bundle\EntityConfigBundle\Attribute\AttributeTypeRegistry;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateFixtureInterface;
 
+/**
+ * The import template fixture that sets the example of data that can be used in import
+ * of the custom fields or attributes.
+ */
 class EntityFieldFixture implements TemplateFixtureInterface
 {
-    /** @var FieldTypeProvider */
-    protected $fieldTypeProvider;
+    protected FieldTypeProvider $fieldTypeProvider;
+    private AttributeTypeRegistry $typeRegistry;
 
     public function __construct(FieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getEntityClass()
+    public function setTypeRegistry(AttributeTypeRegistry $typeRegistry)
     {
-        return 'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel';
+        $this->typeRegistry = $typeRegistry;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public function getEntityClass()
+    {
+        return FieldConfigModel::class;
+    }
+
+    /**
+     * {@inheritDoc}
      */
     public function getEntity($key)
     {
@@ -33,7 +43,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getData()
     {
@@ -51,7 +61,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function fillEntityData($key, $entity)
     {
@@ -66,26 +76,72 @@ class EntityFieldFixture implements TemplateFixtureInterface
 
         foreach ($this->fieldTypeProvider->getFieldProperties($key) as $scope => $properties) {
             $values = [];
-
-            foreach ($properties as $code => $config) {
-                if ($scope === 'enum' && $code === 'enum_options') {
-                    $values = array_merge($values, $this->getEnumValues());
+            foreach ($properties as $propertyName => $config) {
+                if (!isset($config['import_export']['import_template']['value'])) {
+                    continue;
+                }
+                $value = $config['import_export']['import_template']['value'];
+                if ($scope === 'attribute') {
+                    $this->fillAttributeScopeValue(
+                        $values,
+                        $entity,
+                        $propertyName,
+                        $value
+                    );
+                } elseif (\is_array($value)) {
+                    $this->fillArrayValue($values, $value, $propertyName);
                 } else {
-                    $value = $this->getValueFromConfig($config);
-                    if (is_bool($value)) {
-                        $value = $value ? 'yes' : 'no';
+                    if (\is_string($value)) {
+                        $value = str_replace('*type*', $key, $value);
                     }
-
-                    $values[$code] = $value === null ? $code . '_value' : $value;
+                    $values[$propertyName] = $value;
                 }
             }
-            $entity->fromArray($scope, $values, []);
+            if (count($values)) {
+                $entity->fromArray($scope, $values, []);
+            }
+        }
+    }
+
+    private function fillArrayValue(array &$scopeValues, array $valueData, string $propertyName): void
+    {
+        foreach ($valueData as $index => $data) {
+            if (\is_array($data)) {
+                foreach ($data as $parameterName => $value) {
+                    $scopeValues[sprintf('%s.%s.%s', $propertyName, $index, $parameterName)] = $value;
+                }
+            } else {
+                $scopeValues[sprintf('%s.%s', $propertyName, $index)] = $data;
+            }
+        }
+    }
+
+    private function fillAttributeScopeValue(
+        array &$scopeValues,
+        FieldConfigModel $entity,
+        string $propertyName,
+        mixed $value
+    ): void {
+        $attributeType = $this->typeRegistry->getAttributeType($entity);
+        if ($attributeType) {
+            if ($propertyName === 'searchable' && $attributeType->isSearchable($entity)) {
+                $scopeValues[$propertyName] = $value;
+            }
+
+            if (\in_array($propertyName, ['filterable', 'filter_by']) && $attributeType->isFilterable($entity)) {
+                $scopeValues[$propertyName] = $value;
+            }
+
+            if ($propertyName === 'sortable' && $attributeType->isSortable($entity)) {
+                $scopeValues[$propertyName] = $value;
+            }
         }
     }
 
     /**
      * @param array $config
      * @return string
+     * @deprecated
      */
     protected function getValueFromConfig(array $config)
     {
@@ -109,6 +165,7 @@ class EntityFieldFixture implements TemplateFixtureInterface
     /**
      * @param int $enumCount
      * @return array
+     * @deprecated
      */
     protected function getEnumValues($enumCount = 2)
     {

@@ -5,6 +5,9 @@ oro_behat_extension:
                 - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
                 - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
                 - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+                - Oro\Bundle\EntityExtendBundle\Tests\Behat\Context\FeatureContext
+                - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+                - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
             paths:
                 - '@OroEntityConfigBundle/Tests/Behat/Features'
 

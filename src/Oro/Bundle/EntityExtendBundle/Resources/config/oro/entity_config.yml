@@ -229,6 +229,10 @@ entity_config:
                             label:          oro.entity_extend.entity_config.extend.field.items.length
                             block:          general
                             subblock:       properties
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 255
 
                 precision:
                     options:
@@ -251,6 +255,10 @@ entity_config:
                             label:          oro.entity_extend.entity_config.extend.field.items.precision
                             block:          general
                             subblock:       properties
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 1
 
                 scale:
                     options:
@@ -275,6 +283,10 @@ entity_config:
                             label:          oro.entity_extend.entity_config.extend.field.items.scale
                             block:          general
                             subblock:       properties
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 0
 
                 is_deleted:
                     options:
@@ -429,6 +441,13 @@ entity_config:
                             required:       false
                             label:          oro.entity_extend.enum_options
                             tooltip:        oro.entity_extend.enum_options.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value:
+                                - {label: 'Enum value #0', is_default: Yes}
+                                - {label: 'Enum value #1', is_default: No}
+                                - {label: 'Enum value #2', is_default: No}
 
     search:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#search
@@ -451,6 +470,10 @@ entity_config:
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.entity.items.searchable.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#search
         field:
             items:
@@ -473,6 +496,10 @@ entity_config:
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
                             tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
                 title_field:
                     options:
                         value_type:         boolean
@@ -492,3 +519,6 @@ entity_config:
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.title_field
                             tooltip:        oro.entity_extend.entity_config.search.field.items.title_field.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
