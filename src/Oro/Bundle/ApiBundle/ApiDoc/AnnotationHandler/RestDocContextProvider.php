@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DisabledAssociationsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -18,17 +19,14 @@ use Symfony\Component\Routing\Route;
  */
 class RestDocContextProvider
 {
-    private const ACTION_TYPE_ATTRIBUTE  = '_action_type';
-    private const CONTROLLER_ATTRIBUTE   = '_controller';
-    private const ACTION_SUFFIX          = 'Action';
+    private const ACTION_TYPE_ATTRIBUTE = '_action_type';
+    private const CONTROLLER_ATTRIBUTE = '_controller';
+    private const ACTION_SUFFIX = 'Action';
     private const ITEM_WITHOUT_ID_ACTION = 'itemWithoutId';
-    private const ITEM_ACTION            = 'item';
+    private const ITEM_ACTION = 'item';
 
-    /** @var RestDocViewDetector */
-    private $docViewDetector;
-
-    /** @var ActionProcessorBagInterface */
-    private $processorBag;
+    private RestDocViewDetector $docViewDetector;
+    private ActionProcessorBagInterface $processorBag;
 
     public function __construct(RestDocViewDetector $docViewDetector, ActionProcessorBagInterface $processorBag)
     {
@@ -36,23 +34,16 @@ class RestDocContextProvider
         $this->processorBag = $processorBag;
     }
 
-    /**
-     * @param string      $action
-     * @param string      $entityClass
-     * @param string|null $associationName
-     * @param Route|null  $route
-     *
-     * @return Context|SubresourceContext
-     */
     public function getContext(
         string $action,
         string $entityClass,
         string $associationName = null,
         Route $route = null
-    ): Context {
+    ): Context|SubresourceContext {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
         $context = $processor->createContext();
+        $context->addConfigExtra(new DisabledAssociationsConfigExtra());
         $context->addConfigExtra(new DescriptionsConfigExtra());
         $context->getRequestType()->set($this->docViewDetector->getRequestType());
         $context->setVersion($this->docViewDetector->getVersion());

@@ -1,41 +1,46 @@
 services:
     oro_featuretoggle.expression.feature_enabled:
-        class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled'
+        class: Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureEnabled
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_action.condition, alias: feature_enabled }
 
     oro_featuretoggle.expression.feature_resource_enabled:
-        class: 'Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled'
+        class: Oro\Bundle\FeatureToggleBundle\ConfigExpression\FeatureResourceEnabled
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: oro_action.condition, alias: feature_resource_enabled }
 
     oro_featuretoggle.configuration.provider:
-        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider'
+        class: Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider
         parent: oro.static_config_provider.abstract
         arguments:
             - '%kernel.cache_dir%/oro/features.php'
             - '%kernel.debug%'
             - '%kernel.bundles%'
             - '@oro_featuretoggle.configuration'
+            - '@oro_featuretoggle.configuration_extension'
 
     oro_featuretoggle.configuration.manager:
-        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager'
+        class: Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager
         public: true
         arguments:
             - '@oro_featuretoggle.configuration.provider'
 
     oro_featuretoggle.configuration:
-        class: 'Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration'
+        class: Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration
+        arguments:
+            - '@oro_featuretoggle.configuration_extension'
+
+    oro_featuretoggle.configuration_extension:
+        class: Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension
         arguments:
             - !tagged_iterator oro_feature.config_extension
 
     oro_featuretoggle.twig.feature_extension:
-        class: 'Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension'
-        public: false
+        class: Oro\Bundle\FeatureToggleBundle\Twig\FeatureExtension
         arguments:
             - '@oro_platform.twig.service_locator'
         tags:
@@ -61,14 +66,14 @@ services:
             - !abstract '$allowIfEqualGrantedDeniedDecisions defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
 
     oro_featuretoggle.layout.data_provider.feature_provider:
-        class: 'Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider'
+        class: Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: layout.data_provider, alias: feature }
 
     oro_featuretoggle.voter.config_voter:
-        class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter'
+        class: Oro\Bundle\FeatureToggleBundle\Checker\Voter\ConfigVoter
         arguments:
             - '@oro_config.manager'
             - '@oro_featuretoggle.configuration.manager'
@@ -76,7 +81,7 @@ services:
             - { name: oro_featuretogle.voter }
 
     oro_featuretoggle.voter.dependency_voter:
-        class: 'Oro\Bundle\FeatureToggleBundle\Checker\Voter\DependencyVoter'
+        class: Oro\Bundle\FeatureToggleBundle\Checker\Voter\DependencyVoter
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_featuretoggle.configuration.manager'
@@ -84,14 +89,14 @@ services:
             - { name: oro_featuretogle.voter }
 
     oro_featuretoggle.event_listener.request:
-        class: 'Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener'
+        class: Oro\Bundle\FeatureToggleBundle\EventListener\RequestListener
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onRequest }
 
     oro_featuretoggle.event_listener.system_config:
-        class: 'Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener'
+        class: Oro\Bundle\FeatureToggleBundle\EventListener\ConfigListener
         arguments:
             - '@event_dispatcher'
             - '@oro_featuretoggle.configuration.manager'
@@ -116,7 +121,7 @@ services:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand}
 
     oro_featuretoggle.menu.feature_extension:
-        class: 'Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension'
+        class: Oro\Bundle\FeatureToggleBundle\Menu\FeatureAwareMenuFactoryExtension
         arguments:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
@@ -130,7 +135,7 @@ services:
             - { name: oro_message_queue.message_filter }
 
     oro_featuretoggle.event_listener.cache_state:
-        class:  Oro\Bundle\FeatureToggleBundle\EventListener\CacheStateChangeListener
+        class: Oro\Bundle\FeatureToggleBundle\EventListener\CacheStateChangeListener
         arguments:
             - '@oro_message_queue.consumption.cache_state'
         tags:

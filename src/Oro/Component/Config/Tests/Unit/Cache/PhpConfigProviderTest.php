@@ -15,8 +15,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $cacheFile;
+    private string $cacheFile;
 
     protected function setUp(): void
     {
@@ -58,7 +57,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsCacheFreshWhenCachedDataExist()
     {
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export(['test'], true)));
 
         $provider = $this->getProvider(['initial']);
 
@@ -70,7 +69,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
     {
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export(['test'], true)));
         $resource = new ResourceStub(__FUNCTION__);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
 
@@ -84,7 +83,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
     {
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export(['test'], true)));
         $resource = new ResourceStub(__FUNCTION__);
         $resource->setFresh(false);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
@@ -106,7 +105,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCacheTimestampWhenCachedDataExist()
     {
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export(['test'], true)));
 
         $provider = $this->getProvider(['initial']);
 
@@ -127,7 +126,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $cachedConfig = ['test'];
         $initialConfig = ['initial'];
 
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
 
         $provider = $this->getProvider($initialConfig);
 
@@ -139,7 +138,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $cachedConfig = ['test'];
         $initialConfig = ['initial'];
 
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
 
         $provider = $this->getProvider($initialConfig);
 
@@ -158,7 +157,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $cachedConfig = ['test'];
         $initialConfig = ['initial'];
 
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
 
         $provider = $this->getProvider($initialConfig);
 
@@ -171,7 +170,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $cachedConfig = ['test'];
         $initialConfig = ['initial'];
 
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
 
         $provider = $this->getProvider($initialConfig);
 
@@ -184,7 +183,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $cachedConfig = ['test'];
         $initialConfig = ['initial'];
 
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
         $resource = new ResourceStub(__FUNCTION__);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
 
@@ -199,7 +198,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
         $cachedConfig = ['test'];
         $initialConfig = ['initial'];
 
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export($cachedConfig, true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export($cachedConfig, true)));
         $resource = new ResourceStub(__FUNCTION__);
         $resource->setFresh(false);
         file_put_contents($this->cacheFile . '.meta', serialize([$resource]));
@@ -224,7 +223,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetCacheResource()
     {
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export(['test'], true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export(['test'], true)));
 
         $provider = $this->getProvider([]);
         /** @var FileResource $cacheResource */

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Command;
 
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -21,14 +22,17 @@ class ConfigDebugCommand extends Command
     protected static $defaultName = 'oro:feature-toggle:config:debug';
 
     private ConfigurationProvider $configurationProvider;
+    private ConfigurationExtension $configurationExtension;
     private TranslatorInterface $translator;
 
     public function __construct(
         ConfigurationProvider $configurationProvider,
+        ConfigurationExtension $configurationExtension,
         TranslatorInterface $translator
     ) {
         parent::__construct();
         $this->configurationProvider = $configurationProvider;
+        $this->configurationExtension = $configurationExtension;
         $this->translator = $translator;
     }
 
@@ -59,13 +63,19 @@ HELP
         $io = new SymfonyStyle($input, $output);
 
         $featuresConfig = $this->configurationProvider->getFeaturesConfiguration();
+        /** @var string|null $feature */
         $feature = $input->getArgument('feature');
         if (!$feature) {
             if ($featuresConfig) {
                 $this->dumpConfig($io, $this->getConfigs($featuresConfig, $io->isVerbose()));
             }
         } elseif (isset($featuresConfig[$feature])) {
-            $this->dumpConfig($io, [$feature => $this->getConfig($featuresConfig[$feature], true)]);
+            $this->dumpConfig(
+                $io,
+                $this->configurationExtension->completeConfiguration(
+                    [$feature => $this->getConfig($featuresConfig[$feature], true)]
+                )
+            );
         } else {
             throw new InvalidArgumentException('Unknown feature.');
         }
@@ -81,7 +91,7 @@ HELP
             $result[$featureName] = $this->getConfig($config, $verbose);
         }
 
-        return $result;
+        return $this->configurationExtension->completeConfiguration($result);
     }
 
     private function getConfig(array $config, bool $verbose): array

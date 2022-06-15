@@ -15,7 +15,7 @@ class HasAdderAndRemoverValidator extends ConstraintValidator
     /**
      * {@inheritdoc}
      */
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof HasAdderAndRemover) {
             throw new UnexpectedTypeException($constraint, HasAdderAndRemover::class);
@@ -50,12 +50,10 @@ class HasAdderAndRemoverValidator extends ConstraintValidator
                     if ($pairsText) {
                         $pairsText .= ' or ';
                     }
-                    $pairsText .= sprintf('"%s" and "%s"', $adderParam, $removerParam);
+                    $pairsText .= sprintf('"%s" and "%s"', $pair[0], $pair[1]);
                 }
-                $this->context->addViolation(
-                    sprintf($constraint->severalPairsMessage, $pairsText),
-                    $params
-                );
+                $params['{{ methodPairs }}'] = $pairsText;
+                $this->context->addViolation($constraint->severalPairsMessage, $params);
             }
         }
     }

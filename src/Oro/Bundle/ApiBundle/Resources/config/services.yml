@@ -219,12 +219,26 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: -15 }
 
+    # do not use this service directly, it is an extension point (via service decoration)
+    # for the isResourceEnabled() method of the "oro_api.resources_provider" service
+    oro_api.resource_checker:
+        class: Oro\Bundle\ApiBundle\Provider\ResourceChecker
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@oro_api.resource_checker_config_provider'
+
+    oro_api.resource_checker_config_provider:
+        class: Oro\Bundle\ApiBundle\Provider\ResourceCheckerConfigProvider
+        arguments:
+            - '%kernel.cache_dir%/oro/feature_api_resources.php'
+
     oro_api.resources_provider:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesProvider
         arguments:
             - '@oro_api.collect_resources.processor'
             - '@oro_api.resources_cache'
             - '@oro_api.resources_without_identifier_loader'
+            - '@oro_api.resource_checker'
 
     oro_api.subresources_provider:
         class: Oro\Bundle\ApiBundle\Provider\SubresourcesProvider
@@ -296,6 +310,9 @@ services:
 
     oro_api.config_extension.feature:
         class: Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension
+        arguments:
+            - '@oro_api.action_processor_bag'
+            - '@oro_api.resource_checker_config_provider'
         tags:
             - { name: oro_feature.config_extension }
 
