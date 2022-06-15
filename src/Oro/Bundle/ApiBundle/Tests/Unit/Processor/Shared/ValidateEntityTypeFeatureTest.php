@@ -31,7 +31,12 @@ class ValidateEntityTypeFeatureTest extends GetListProcessorTestCase
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($className, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $className,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(false);
 
         $this->context->setClassName($className);
@@ -44,7 +49,12 @@ class ValidateEntityTypeFeatureTest extends GetListProcessorTestCase
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($className, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $className,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setClassName($className);

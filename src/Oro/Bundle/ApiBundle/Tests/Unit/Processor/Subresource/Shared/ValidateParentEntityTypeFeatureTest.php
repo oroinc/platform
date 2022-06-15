@@ -40,7 +40,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(false);
 
         $this->context->setParentClassName($parentClassName);
@@ -59,7 +64,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
@@ -83,7 +93,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
@@ -101,7 +116,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
@@ -116,7 +136,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->configProvider->expects(self::once())
@@ -135,7 +160,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
@@ -154,7 +184,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);
@@ -175,7 +210,12 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceEnabled')
-            ->with($parentClassName, $this->context->getVersion(), $this->context->getRequestType())
+            ->with(
+                $parentClassName,
+                $this->context->getAction(),
+                $this->context->getVersion(),
+                $this->context->getRequestType()
+            )
             ->willReturn(true);
 
         $this->context->setParentClassName($parentClassName);

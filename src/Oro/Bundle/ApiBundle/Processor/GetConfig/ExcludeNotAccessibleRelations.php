@@ -59,6 +59,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         $this->updateRelations(
             $definition,
             $entityClass,
+            $context->getTargetAction(),
             $context->getVersion(),
             $context->getRequestType(),
             $context->hasExtra(DisabledAssociationsConfigExtra::NAME)
@@ -68,6 +69,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     private function updateRelations(
         EntityDefinitionConfig $definition,
         string $entityClass,
+        string $action,
         string $version,
         RequestType $requestType,
         bool $allowDisabledAssociations
@@ -98,6 +100,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 $field,
                 $targetClass,
                 $targetMetadata,
+                $action,
                 $version,
                 $requestType,
                 $allowDisabledAssociations,
@@ -124,6 +127,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         EntityDefinitionFieldConfig $field,
         string $targetClass,
         ?ClassMetadata $targetMetadata,
+        string $action,
         string $version,
         RequestType $requestType,
         bool $allowDisabledAssociations,
@@ -142,6 +146,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         return $this->isResourceForRelatedEntityAccessible(
             $targetClass,
             $targetMetadata,
+            $action,
             $version,
             $requestType,
             $allowDisabledAssociations,
@@ -176,6 +181,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     private function isResourceForRelatedEntityAccessible(
         string $targetClass,
         ?ClassMetadata $targetMetadata,
+        string $action,
         string $version,
         RequestType $requestType,
         bool $allowDisabledAssociations,
@@ -184,6 +190,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         $targetClass = $this->resolveEntityClass($targetClass, $entityOverrideProvider);
         if ($this->isResourceAccessibleAsAssociation(
             $targetClass,
+            $action,
             $version,
             $requestType,
             $allowDisabledAssociations
@@ -196,6 +203,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 $subClass = $this->resolveEntityClass($subClass, $entityOverrideProvider);
                 if ($this->isResourceAccessibleAsAssociation(
                     $subClass,
+                    $action,
                     $version,
                     $requestType,
                     $allowDisabledAssociations
@@ -210,6 +218,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
     public function isResourceAccessibleAsAssociation(
         string $targetClass,
+        string $action,
         string $version,
         RequestType $requestType,
         bool $allowDisabledAssociations
@@ -219,7 +228,7 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
 
         return
-            $this->resourcesProvider->isResourceEnabled($targetClass, $version, $requestType)
+            $this->resourcesProvider->isResourceEnabled($targetClass, $action, $version, $requestType)
             && $this->resourcesProvider->isResourceAccessibleAsAssociation($targetClass, $version, $requestType);
     }
 

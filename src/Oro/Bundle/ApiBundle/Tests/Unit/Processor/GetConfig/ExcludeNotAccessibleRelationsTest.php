@@ -17,6 +17,8 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 {
+    private const TARGET_ACTION = 'create';
+
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
 
@@ -49,6 +51,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
             $entityOverrideProviderRegistry
         );
 
+        $this->context->setTargetAction(self::TARGET_ACTION);
         $this->context->setExtras([new DisabledAssociationsConfigExtra()]);
     }
 
@@ -1024,8 +1027,20 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         $this->resourcesProvider->expects(self::exactly(2))
             ->method('isResourceEnabled')
             ->willReturnMap([
-                ['Test\Association1Target', $this->context->getVersion(), $this->context->getRequestType(), true],
-                ['Test\Association2Target', $this->context->getVersion(), $this->context->getRequestType(), false]
+                [
+                    'Test\Association1Target',
+                    self::TARGET_ACTION,
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    true
+                ],
+                [
+                    'Test\Association2Target',
+                    self::TARGET_ACTION,
+                    $this->context->getVersion(),
+                    $this->context->getRequestType(),
+                    false
+                ]
             ]);
         $this->resourcesProvider->expects(self::once())
             ->method('isResourceAccessibleAsAssociation')

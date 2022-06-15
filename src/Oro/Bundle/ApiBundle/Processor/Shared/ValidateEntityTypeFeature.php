@@ -29,6 +29,7 @@ class ValidateEntityTypeFeature implements ProcessorInterface
 
         if (!$this->resourcesProvider->isResourceEnabled(
             $context->getClassName(),
+            $context->getAction(),
             $context->getVersion(),
             $context->getRequestType()
         )) {

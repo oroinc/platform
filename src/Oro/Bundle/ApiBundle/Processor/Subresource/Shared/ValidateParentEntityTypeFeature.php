@@ -31,6 +31,7 @@ class ValidateParentEntityTypeFeature implements ProcessorInterface
 
         if (!$this->resourcesProvider->isResourceEnabled(
             $context->getParentClassName(),
+            $context->getAction(),
             $context->getVersion(),
             $context->getRequestType()
         )) {

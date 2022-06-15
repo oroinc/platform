@@ -8,7 +8,6 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -25,7 +24,7 @@ class ResourcesProvider implements ResetInterface
     private ActionProcessorInterface $processor;
     private ResourcesCache $resourcesCache;
     private ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader;
-    private FeatureChecker $featureChecker;
+    private ResourceCheckerInterface $resourceChecker;
     /** @var array [request cache key => [ApiResource, ...], ...] */
     private array $resources = [];
     /** @var array [request cache key => [entity class => accessible flag, ...], ...] */
@@ -41,12 +40,12 @@ class ResourcesProvider implements ResetInterface
         ActionProcessorInterface $processor,
         ResourcesCache $resourcesCache,
         ResourcesWithoutIdentifierLoader $resourcesWithoutIdentifierLoader,
-        FeatureChecker $featureChecker
+        ResourceCheckerInterface $resourceChecker
     ) {
         $this->processor = $processor;
         $this->resourcesCache = $resourcesCache;
         $this->resourcesWithoutIdentifierLoader = $resourcesWithoutIdentifierLoader;
-        $this->featureChecker = $featureChecker;
+        $this->resourceChecker = $resourceChecker;
     }
 
     /**
@@ -160,19 +159,24 @@ class ResourcesProvider implements ResetInterface
      * Checks whether a given entity is enabled for API.
      *
      * @param string      $entityClass The FQCN of an entity
+     * @param string      $action      The API action, {@see \Oro\Bundle\ApiBundle\Request\ApiAction}
      * @param string      $version     The API version
      * @param RequestType $requestType The request type, for example "rest", "soap", etc.
      *
      * @return bool
      */
-    public function isResourceEnabled(string $entityClass, string $version, RequestType $requestType): bool
-    {
-        $cacheKey = $this->getCacheKey($version, $requestType);
+    public function isResourceEnabled(
+        string $entityClass,
+        string $action,
+        string $version,
+        RequestType $requestType
+    ): bool {
+        $cacheKey = $action . $version . $requestType;
         if (isset($this->enabledResources[$cacheKey][$entityClass])) {
             return $this->enabledResources[$cacheKey][$entityClass];
         }
 
-        $enabled = $this->featureChecker->isResourceEnabled($entityClass, 'api_resources');
+        $enabled = $this->resourceChecker->isResourceEnabled($entityClass, $action, $version, $requestType);
         $this->enabledResources[$cacheKey][$entityClass] = $enabled;
 
         return $enabled;

@@ -13,21 +13,17 @@ class FeatureToggleConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'features';
 
-    /** @var iterable|ConfigurationExtensionInterface[] */
-    private iterable $extensions;
+    private ConfigurationExtension $extension;
 
-    /**
-     * @paran iterable|ConfigurationExtensionInterface[] $extensions
-     */
-    public function __construct(iterable $extensions)
+    public function __construct(ConfigurationExtension $extension)
     {
-        $this->extensions = $extensions;
+        $this->extension = $extension;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder(self::ROOT_NODE);
         $root = $builder->getRootNode();
@@ -35,9 +31,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
 
         $this->addFeatureConfiguration($children);
-        foreach ($this->extensions as $extension) {
-            $extension->extendConfigurationTree($children);
-        }
+        $this->extension->extendConfigurationTree($children);
 
         return $builder;
     }

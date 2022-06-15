@@ -11,14 +11,9 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $cacheFile;
-
-    /** @var ConfigCacheInterface */
-    private $cache;
-
-    /** @var PhpConfigCacheAccessor */
-    private $accessor;
+    private string $cacheFile;
+    private ConfigCacheInterface $cache;
+    private PhpConfigCacheAccessor $accessor;
 
     protected function setUp(): void
     {
@@ -44,7 +39,7 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testLoadWhenFileContentIsInvalid()
     {
-        file_put_contents($this->cacheFile, \sprintf('<?php return %s;', \var_export([], true)));
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export([], true)));
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(
@@ -86,5 +81,22 @@ class PhpConfigCacheAccessorTest extends \PHPUnit\Framework\TestCase
             $config,
             $this->accessor->load($this->cache)
         );
+    }
+
+    public function testRemove()
+    {
+        file_put_contents($this->cacheFile, sprintf('<?php return %s;', var_export([], true)));
+
+        $this->accessor->remove($this->cache);
+        self::assertFileDoesNotExist($this->cacheFile);
+    }
+
+    public function testRemoveWhenCacheFileDoesNotExist()
+    {
+        // guard
+        self::assertFileDoesNotExist($this->cacheFile);
+
+        $this->accessor->remove($this->cache);
+        self::assertFileDoesNotExist($this->cacheFile);
     }
 }
