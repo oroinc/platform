@@ -64,11 +64,13 @@ class AddAssociationValidators implements ProcessorInterface
             ) {
                 $accessGrantedConstraint = new Assert\AccessGranted(['groups' => ['api']]);
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
-                    $field->addFormConstraint(new Assert\HasAdderAndRemover([
-                        'class'    => $entityClass,
-                        'property' => $fieldName,
-                        'groups'   => ['api']
-                    ]));
+                    if (!$this->isByReference($field)) {
+                        $field->addFormConstraint(new Assert\HasAdderAndRemover([
+                            'class'    => $entityClass,
+                            'property' => $fieldName,
+                            'groups'   => ['api']
+                        ]));
+                    }
                     $field->addFormConstraint(new Assert\All($accessGrantedConstraint));
                 } else {
                     $field->addFormConstraint($accessGrantedConstraint);
@@ -86,6 +88,7 @@ class AddAssociationValidators implements ProcessorInterface
                 // to avoid duplication, check if the constraint already exist
                 // e.g. the constraint can be already added if a model for API resource inherited from ORM entity
                 if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
+                    && !$this->isByReference($field)
                     && !$this->isHasAdderAndRemoverConstraintExist($field, $entityClass, $fieldName)
                 ) {
                     $field->addFormConstraint(new Assert\HasAdderAndRemover([
@@ -96,6 +99,13 @@ class AddAssociationValidators implements ProcessorInterface
                 }
             }
         }
+    }
+
+    private function isByReference(EntityDefinitionFieldConfig $field): bool
+    {
+        $formOptions = $field->getFormOptions();
+
+        return $formOptions && isset($formOptions['by_reference']) && $formOptions['by_reference'];
     }
 
     private function isHasAdderAndRemoverConstraintExist(

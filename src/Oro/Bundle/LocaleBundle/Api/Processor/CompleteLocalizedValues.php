@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Api\Processor;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -39,7 +40,7 @@ class CompleteLocalizedValues implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */
 
@@ -56,12 +57,14 @@ class CompleteLocalizedValues implements ProcessorInterface
             return;
         }
 
+        /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         if (!$metadata->getAssociationMappings()) {
             return;
         }
 
         $entity = $form->getData();
+        /** @var EntityManagerInterface $em */
         $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
         $localizations = null;
         /** @var FormInterface $child */
@@ -80,7 +83,11 @@ class CompleteLocalizedValues implements ProcessorInterface
                     $metadata->getAssociationMapping($fieldName)
                 );
 
-                $this->propertyAccessor->setValue($entity, $fieldName, array_merge($oldValue->toArray(), $added));
+                $this->propertyAccessor->setValue(
+                    $entity,
+                    $fieldName,
+                    new ArrayCollection(array_merge($oldValue->toArray(), $added))
+                );
             }
         }
     }
@@ -105,16 +112,9 @@ class CompleteLocalizedValues implements ProcessorInterface
 
         return
             $mapping['type'] & ClassMetadata::TO_MANY
-            && \is_a($mapping['targetEntity'], AbstractLocalizedFallbackValue::class, true);
+            && is_a($mapping['targetEntity'], AbstractLocalizedFallbackValue::class, true);
     }
 
-    /**
-     * @param Collection|AbstractLocalizedFallbackValue[] $associationValue
-     * @param EntityManagerInterface                      $em
-     * @param Localization[]                              $localizations
-     * @param array                                       $mapping
-     * @return array
-     */
     private function addMissingLocalizedValues(
         Collection $associationValue,
         EntityManagerInterface $em,
@@ -132,15 +132,10 @@ class CompleteLocalizedValues implements ProcessorInterface
         return $added;
     }
 
-    /**
-     * @param Collection|AbstractLocalizedFallbackValue[] $associationValue
-     * @param Localization[]                              $localizations
-     *
-     * @return Localization[]
-     */
     private function getMissingLocalizations(Collection $associationValue, array $localizations): array
     {
         $hasDefault = false;
+        /** @var AbstractLocalizedFallbackValue $value */
         foreach ($associationValue as $value) {
             $localization = $value->getLocalization();
             if (null === $localization) {

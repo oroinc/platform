@@ -248,6 +248,96 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testProcessForByReferenceCollectionValuedAssociationOfNotManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'target_class' => 'Test\Association1Target',
+                    'target_type'  => 'to-many',
+                    'form_options' => ['by_reference' => true]
+                ],
+            ]
+        ];
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->associationAccessExclusionProviderRegistry->expects(self::never())
+            ->method('getAssociationAccessExclusionProvider');
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                'by_reference' => true
+            ],
+            $configObject->getField('association1')->getFormOptions()
+        );
+    }
+
+    public function testProcessForByReferenceCollectionValuedAssociationOfManageableEntity()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'form_options' => ['by_reference' => true]
+                ]
+            ]
+        ];
+
+        $entityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $entityMetadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('association1')
+            ->willReturn(true);
+        $entityMetadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('association1')
+            ->willReturn(true);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($entityMetadata);
+
+        $associationAccessExclusionProvider = $this->createMock(AssociationAccessExclusionProviderInterface::class);
+        $this->associationAccessExclusionProviderRegistry->expects(self::once())
+            ->method('getAssociationAccessExclusionProvider')
+            ->with($this->context->getRequestType())
+            ->willReturn($associationAccessExclusionProvider);
+        $associationAccessExclusionProvider->expects(self::once())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->with(self::TEST_CLASS_NAME, 'association1')
+            ->willReturn(false);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            [
+                'by_reference' => true,
+                'constraints'  => [
+                    new All(new AccessGranted(['groups' => ['api']]))
+                ]
+            ],
+            $configObject->getField('association1')->getFormOptions()
+        );
+    }
+
     public function testProcessForComputedCollectionValuedAssociationOfNotManageableEntity()
     {
         $config = [
