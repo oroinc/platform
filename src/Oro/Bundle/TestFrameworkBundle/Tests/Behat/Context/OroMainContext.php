@@ -2553,6 +2553,16 @@ JS;
     public function iScrollToElement($elementName)
     {
         $element = $this->elementFactory->createElement($elementName);
+        $xpath = addslashes($element->getXpath());
+        $javascipt = <<<JS
+(function() {
+    document
+        .evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+        .singleNodeValue
+        .scrollIntoView(false);
+})()
+JS;
+        $this->getSession()->getDriver()->evaluateScript($javascipt);
         $element->focus();
     }
 
