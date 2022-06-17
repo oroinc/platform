@@ -5,6 +5,7 @@ namespace Oro\Bundle\MessageQueueBundle\Consumption\Extension;
 use Oro\Component\MessageQueue\Consumption\ExtensionInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ResettableContainerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Removes all services except persistent ones from the service container
@@ -65,6 +66,15 @@ class ContainerClearer implements ClearerInterface, ChainExtensionAwareInterface
         foreach ($this->persistentServices as $serviceId) {
             if ($this->container->initialized($serviceId)) {
                 $persistentServices[$serviceId] = $this->container->get($serviceId);
+
+                /**
+                 * Resets the state of the persistent container, to prevent the issue
+                 * with persistent service re-initializing. It occurs because
+                 * logic in container service emptied internal services before do reset the state of these services.
+                 */
+                if ($persistentServices[$serviceId] instanceof ResetInterface) {
+                    $persistentServices[$serviceId]->reset();
+                }
             }
         }
 
@@ -72,8 +82,20 @@ class ContainerClearer implements ClearerInterface, ChainExtensionAwareInterface
         $this->container->reset();
 
         // restore persistent services in the container
+        $initializedPersistentServices = [];
         foreach ($persistentServices as $serviceId => $serviceInstance) {
-            $this->container->set($serviceId, $serviceInstance);
+            if ($this->container->initialized($serviceId)) {
+                $initializedPersistentServices[] = $serviceId;
+            } else {
+                $this->container->set($serviceId, $serviceInstance);
+            }
+        }
+
+        if ($initializedPersistentServices) {
+            $logger->notice(
+                'Next persistent services were already initialized during restoring: '
+                . implode(', ', $initializedPersistentServices)
+            );
         }
     }
 }
