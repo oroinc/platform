@@ -12,6 +12,8 @@ class EngineParameters
 {
     private ?string $engineName;
 
+    private ?array $engineNameAliases = [];
+
     private ?string $host;
 
     private ?string $port;
@@ -53,12 +55,17 @@ class EngineParameters
         }
     }
 
+    public function addEngineNameAlias(string $engineName, string $alias): void
+    {
+        $this->engineNameAliases[$alias] = $engineName;
+    }
+
     /**
      * @return string
      */
     public function getEngineName(): string
     {
-        return $this->engineName;
+        return $this->engineNameAliases[$this->engineName] ?? $this->engineName;
     }
 
     /**

@@ -41,6 +41,18 @@ class EngineParametersTest extends TestCase
     }
 
     /**
+     * @dataProvider engineNameAliasProvider
+     * @return void
+     */
+    public function testEngineNameAlias(string $dsn, string $expectedEngineName)
+    {
+        $engineParametersBag = new EngineParameters($dsn);
+        $engineParametersBag->addEngineNameAlias('elastic_search', 'http');
+
+        self::assertEquals($expectedEngineName, $engineParametersBag->getEngineName());
+    }
+
+    /**
      * @return array
      */
     public function invalidSearchEngineDsnProvider(): array
@@ -58,7 +70,7 @@ class EngineParametersTest extends TestCase
     public function properSearchEngineDsnProvider(): array
     {
         return [
-            'Sample 1' => [
+            'Dsn full' => [
                 'elastic-search://user:password@localhost:9200?prefix=oro',
                 [
                     'engine_name' => 'elastic_search',
@@ -73,7 +85,7 @@ class EngineParametersTest extends TestCase
                     ]
                 ]
             ],
-            'Sample 2' => [
+            'Dsn only host' => [
                 'elastic-search://localhost',
                 [
                     'engine_name' => 'elastic_search',
@@ -86,7 +98,7 @@ class EngineParametersTest extends TestCase
                     'parameters' =>  []
                 ]
             ],
-            'Sample 3' => [
+            'Dsn user and host' => [
                 'elastic-search://user:@localhost',
                 [
                     'engine_name' => 'elastic_search',
@@ -99,7 +111,7 @@ class EngineParametersTest extends TestCase
                     'parameters' =>  []
                 ]
             ],
-            'Sample 4' => [
+            'Dsn password and host' => [
                 'elastic-search://:password@localhost',
                 [
                     'engine_name' => 'elastic_search',
@@ -112,6 +124,15 @@ class EngineParametersTest extends TestCase
                     'parameters' =>  []
                 ]
             ],
+        ];
+    }
+
+    public function engineNameAliasProvider(): array
+    {
+        return [
+            'ELK engine' => ['elastic-search://user:password@localhost:9200?prefix=oro', 'elastic_search'],
+            'Http alias' => ['http://user:password@localhost:9200?prefix=oro', 'elastic_search'],
+            'Not matched engine' => ['foo://user:password@localhost:9200?prefix=oro', 'foo'],
         ];
     }
 }
