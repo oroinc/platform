@@ -29,13 +29,20 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $serviceId1 = 'foo_service';
         $service2 = new \stdClass();
         $serviceId2 = 'bar_service';
-        $this->container->expects(static::exactly(2))
+        $this->container->expects(static::exactly(4))
             ->method('initialized')
             ->withConsecutive(
                 [$serviceId1],
+                [$serviceId2],
+                [$serviceId1],
                 [$serviceId2]
             )
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(
+                true,
+                true,
+                false,
+                false
+            );
         $this->container->expects(static::exactly(2))
             ->method('get')
             ->willReturnMap([
@@ -101,10 +108,13 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 
         $fooService = new \stdClass();
 
-        $this->container->expects(self::once())
+        $this->container->expects(self::exactly(2))
             ->method('initialized')
             ->with('foo_service')
-            ->willReturn(true);
+            ->willReturnOnConsecutiveCalls(
+                true,
+                false
+            );
         $this->container->expects(self::once())
             ->method('get')
             ->with('foo_service')
@@ -114,6 +124,34 @@ class ContainerClearerTest extends \PHPUnit\Framework\TestCase
         $this->container->expects(self::once())
             ->method('set')
             ->with('foo_service', self::identicalTo($fooService));
+
+        $this->clearer->setPersistentServices(['foo_service']);
+        $this->clearer->clear($logger);
+    }
+
+    public function testClearShouldNotRestorePersistentServiceIfItWasInitializedButPresentInContainer()
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+
+        $fooService = new \stdClass();
+
+        $this->container->expects(self::exactly(2))
+            ->method('initialized')
+            ->with('foo_service')
+            ->willReturn(true);
+        $this->container->expects(self::once())
+            ->method('get')
+            ->with('foo_service')
+            ->willReturn($fooService);
+        $this->container->expects(self::once())
+            ->method('reset');
+        $this->container->expects(self::never())
+            ->method('set')
+            ->with('foo_service', self::identicalTo($fooService));
+
+        $logger->expects(self::once())
+            ->method('notice')
+            ->with('Next persistent services were already initialized during restoring: foo_service');
 
         $this->clearer->setPersistentServices(['foo_service']);
         $this->clearer->clear($logger);
