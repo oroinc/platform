@@ -31,7 +31,6 @@ define([
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
             } else {
                 mediator.trigger('datagrid:mass:frontend:execute:' + this.datagrid.name, this);
-                this.$el.dropdown('toggle');
             }
         },
 
