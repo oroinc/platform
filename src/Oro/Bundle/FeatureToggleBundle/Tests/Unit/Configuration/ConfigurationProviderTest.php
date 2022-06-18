@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Configuration;
 
+use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtension;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\FeatureToggleBundle\Configuration\FeatureToggleConfiguration;
 use Oro\Bundle\FeatureToggleBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1;
@@ -28,7 +29,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'routes'        => ['f1_route1', 'f1_route2', 'f1_route3'],
                 'configuration' => ['config_section1', 'config_leaf1', 'config_leaf2'],
                 'entities'      => [],
-                'field_configs' => [],
                 'commands'      => [],
                 'mq_topics'     => []
             ],
@@ -39,7 +39,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'routes'        => ['f1_route3'],
                 'configuration' => ['config_leaf2'],
                 'entities'      => [],
-                'field_configs' => [],
                 'commands'      => [],
                 'mq_topics'     => []
             ],
@@ -49,7 +48,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
                 'routes'        => [],
                 'configuration' => [],
                 'entities'      => [],
-                'field_configs' => [],
                 'commands'      => [],
                 'mq_topics'     => []
             ]
@@ -84,15 +82,21 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
+    /** @var ConfigurationExtension|\PHPUnit\Framework\MockObject\MockObject */
+    private $configurationExtension;
+
     private string $cacheFile;
 
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('FeatureToggleConfigurationProvider');
+        $this->configurationExtension = $this->createMock(ConfigurationExtension::class);
     }
 
-    private function getConfigurationProvider(array $bundleClasses): ConfigurationProvider
-    {
+    private function getConfigurationProvider(
+        array $bundleClasses,
+        bool $skipConfigurationExtensionExpectations = false
+    ): ConfigurationProvider {
         $bundles = [];
         foreach ($bundleClasses as $bundleClass) {
             /** @var BundleInterface $bundle */
@@ -103,11 +107,18 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             ->clear()
             ->setBundles($bundles);
 
+        if (!$skipConfigurationExtensionExpectations) {
+            $this->configurationExtension->expects(self::once())
+                ->method('processConfiguration')
+                ->willReturnArgument(0);
+        }
+
         return new ConfigurationProvider(
             $this->cacheFile,
             false,
             $bundles,
-            new FeatureToggleConfiguration([])
+            new FeatureToggleConfiguration($this->configurationExtension),
+            $this->configurationExtension
         );
     }
 
@@ -189,5 +200,20 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
         $configurationProvider = $this->getConfigurationProvider([TestBundle1::class, TestBundle5::class]);
         $configurationProvider->getTogglesConfiguration();
+    }
+
+    public function testClearCache()
+    {
+        $this->configurationExtension->expects(self::once())
+            ->method('clearConfigurationCache');
+
+        $configurationProvider = $this->getConfigurationProvider([], true);
+
+        // guard
+        $configurationProvider->getFeaturesConfiguration();
+        self::assertFileExists($this->cacheFile);
+
+        $configurationProvider->clearCache();
+        self::assertFileDoesNotExist($this->cacheFile);
     }
 }

@@ -61,6 +61,7 @@ The current file describes significant changes in the code that may affect the u
   when an entity class might not exist.
 
 #### SearchBundle
+* Changed search engine configuration: `search_engine_dsn` parameter is used instead of `search_engine_name`, `search_engine_host`, `search_engine_port`, `search_engine_index_prefix`, `search_engine_username`, `search_engine_password`, `search_engine_ssl_verification`, `search_engine_ssl_cert`,  `search_engine_ssl_cert_password`, `search_engine_ssl_key`, `search_engine_ssl_key_password`.
 * Entity title in the search index is no longer stored in the special field in the DB, now it is stored as a regular index text field called `system_entity_name`
 * Entity title is no longer returned in the search results by default, now it has to be manually added to the select section of the query
 * All entities presented in the search index now have proper entity name providers
@@ -159,9 +160,6 @@ The current file describes significant changes in the code that may affect the u
 #### Config component
 * Added sorting by depth to `Oro\Component\Config\Loader\FolderContentCumulativeLoader::getDirectoryContents()`
   to ensure that result is not affected by an operating system.
-
-#### OroSearchBundle
-* Changed search engine configuration: `search_engine_dsn` parameter is used instead of `search_engine_name`, `search_engine_host`, `search_engine_port`, `search_engine_index_prefix`, `search_engine_username`, `search_engine_password`, `search_engine_ssl_verification`, `search_engine_ssl_cert`,  `search_engine_ssl_cert_password`, `search_engine_ssl_key`, `search_engine_ssl_key_password`.
 
 #### MessageQueue Component
 * Changed `\Oro\Component\MessageQueue\Transport\MessageInterface::getBody()`, `\Oro\Component\MessageQueue\Transport\MessageInterface::setBody()`

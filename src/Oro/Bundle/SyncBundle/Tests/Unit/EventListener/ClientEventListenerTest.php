@@ -7,16 +7,12 @@ use Gos\Bundle\WebSocketBundle\Client\ClientStorage;
 use Gos\Bundle\WebSocketBundle\Client\ClientStorageInterface;
 use Gos\Bundle\WebSocketBundle\Client\Exception\StorageException;
 use Gos\Bundle\WebSocketBundle\Event\ClientConnectedEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientDisconnectedEvent;
 use Gos\Bundle\WebSocketBundle\Event\ClientErrorEvent;
-use Gos\Bundle\WebSocketBundle\Event\ClientRejectedEvent;
-use Gos\Bundle\WebSocketBundle\EventListener\ClientEventListener as GosClientEventListener;
 use Oro\Bundle\SyncBundle\EventListener\ClientEventListener;
 use Oro\Bundle\SyncBundle\Security\Token\AnonymousTicketToken;
 use Oro\Bundle\SyncBundle\Security\Token\TicketToken;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Provider\AuthenticationProviderInterface;
@@ -28,23 +24,14 @@ class ClientEventListenerTest extends TestCase
 
     private const CONNECTION_RESOURCE_ID = 45654;
 
-    /** @var WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketAuthenticationProvider;
+    private WebsocketAuthenticationProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+        $websocketAuthenticationProvider;
 
-    /** @var ClientStorage */
-    private $clientStorage;
+    private ClientStorage|\PHPUnit\Framework\MockObject\MockObject $clientStorage;
 
-    /** @var GosClientEventListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $decoratedClientEventListener;
+    private ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject $connection;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $decoratedListenerLogger;
-
-    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var ClientEventListener */
-    private $clientEventListener;
+    private ClientEventListener $clientEventListener;
 
     protected function setUp(): void
     {
@@ -52,23 +39,16 @@ class ClientEventListenerTest extends TestCase
 
         $this->clientStorage = $this->createMock(ClientStorageInterface::class);
 
-        $this->decoratedListenerLogger = $this->createMock(LoggerInterface::class);
-        $this->decoratedClientEventListener = new GosClientEventListener(
-            $this->clientStorage,
-            $this->websocketAuthenticationProvider
-        );
-        $this->decoratedClientEventListener->setLogger($this->decoratedListenerLogger);
-
         $this->connection = $this->createMock(ConnectionInterface::class);
         $this->connection->WAMP = (object)['sessionId' => '12345', 'prefixes' => []];
         $this->connection->remoteAddress = 'localhost';
         $this->connection->resourceId = self::CONNECTION_RESOURCE_ID;
 
         $this->clientEventListener = new ClientEventListener(
-            $this->decoratedClientEventListener,
             $this->websocketAuthenticationProvider,
             $this->clientStorage
         );
+
         $this->setUpLoggerMock($this->clientEventListener);
     }
 
@@ -146,30 +126,6 @@ class ClientEventListenerTest extends TestCase
         self::assertEquals($user, $this->connection->WAMP->username);
     }
 
-    public function testOnClientDisconnect(): void
-    {
-        $disconnectEvent = new ClientDisconnectedEvent($this->connection);
-
-        $this->clientStorage->expects(self::once())
-            ->method('hasClient')
-            ->willReturn(true);
-        $this->decoratedListenerLogger->expects(self::once())
-            ->method('info');
-
-        $this->clientEventListener->onClientDisconnect($disconnectEvent);
-    }
-
-    public function testOnClientRejected(): void
-    {
-        $clientRejectedEvent = new ClientRejectedEvent('sampleOrigin');
-
-        $this->decoratedListenerLogger->expects(self::once())
-            ->method('warning')
-            ->with('Client rejected, bad origin');
-
-        $this->clientEventListener->onClientRejected($clientRejectedEvent);
-    }
-
     public function testOnClientErrorGeneralException(): void
     {
         $clientErrorEvent = new ClientErrorEvent($this->connection);
@@ -184,9 +140,6 @@ class ClientEventListenerTest extends TestCase
     {
         $clientErrorEvent = new ClientErrorEvent($this->connection);
         $clientErrorEvent->setException(new BadCredentialsException());
-
-        $this->decoratedListenerLogger->expects(self::never())
-            ->method('error');
 
         $closingResponse = new Response(403);
         $this->connection->expects(self::once())

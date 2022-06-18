@@ -17,10 +17,8 @@
             <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="{{ formAction }}" method="post" class="note-form">
                 <fieldset class="form-horizontal">
                     {{ form_row(form.message) }}
-                    <div class="control-group">
-                        <div class="attachment-container">
-                            {{ form_widget(form.attachment) }}
-                        </div>
+                    <div class="control-group-container">
+                        {{ form_widget(form.attachment) }}
                     </div>
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">

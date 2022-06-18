@@ -18,18 +18,19 @@ services:
             - '@oro_sync.security.ticket_authentication_provider'
             - '%oro_sync.security.ticket_authentication_provider.key%'
 
-    # Decorates gos_web_socket.event_listener.client to disable onClientConnect event handling.
     oro_sync.event_listener.client:
         class: Oro\Bundle\SyncBundle\EventListener\ClientEventListener
-        decorates: gos_web_socket.event_listener.client
         arguments:
-            - '@.inner'
             - '@oro_sync.authentication.websocket_authentication_by_ticket_provider'
             - '@gos_web_socket.client.storage'
         calls:
             - [ setLogger, [ '@logger' ] ]
         tags:
             - { name: monolog.logger, channel: oro_websocket }
+            # Must be called before gos_web_socket.event_listener.client::onClientConnect
+            - { name: kernel.event_listener, event: 'gos_web_socket.client_connected', method: onClientConnect, priority: 100 }
+            # Must be called before gos_web_socket.event_listener.client::onClientError
+            - { name: kernel.event_listener, event: 'gos_web_socket.client_error', method: onClientError, priority: 100 }
 
     oro_sync.authentication.encoder:
         class: Symfony\Component\Security\Core\Encoder\MessageDigestPasswordEncoder

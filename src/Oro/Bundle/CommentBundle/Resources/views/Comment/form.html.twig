@@ -2,18 +2,22 @@
 
 <form method="post" class="comment-form">
     <fieldset class="form-horizontal">
-        <label class="comment-message-label">
-            {{ form_widget(form.message) }}
-        </label>
+        <div class="control-group">
+            <label class="comment-message-label">
+                {{ form_widget(form.message) }}
+            </label>
+        </div>
         {{ form_widget(form.attachment) }}
         <% if (attachmentURL) { %>
-        <div class="attachment-item">
-            <span class="attachment-item__icon fa-paperclip" aria-hidden="true"></span>
-            <a href="<%- attachmentURL.url %>" class="no-hash attachment-item__filename" title="<%- attachmentFileName %>"><%- attachmentFileName %></a>
-            <span class="attachment-item__file-size">(<%- attachmentSize %>)</span>
-            <button class="btn btn-icon btn-square-lighter attachment-item__remove" type="button" data-role="remove">
-                <span class="fa-close" aria-hidden="true"></span>
-            </button>
+        <div class="control-group">
+            <div class="attachment-item">
+                <span class="attachment-item__icon fa-paperclip" aria-hidden="true"></span>
+                <a href="<%- attachmentURL.url %>" class="no-hash attachment-item__filename" title="<%- attachmentFileName %>"><%- attachmentFileName %></a>
+                <span class="attachment-item__file-size">(<%- attachmentSize %>)</span>
+                <button class="btn btn-icon btn-square-lighter attachment-item__remove" type="button" data-role="remove">
+                    <span class="fa-close" aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
         <% } %>
         <div class="widget-actions">

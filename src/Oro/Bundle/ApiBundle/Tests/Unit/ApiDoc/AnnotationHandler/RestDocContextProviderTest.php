@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocContextProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\DisabledAssociationsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
@@ -104,7 +105,10 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($this->requestType, $context->getRequestType());
                 self::assertNotSame($this->requestType, $context->getRequestType());
                 self::assertEquals(self::VERSION, $context->getVersion());
-                self::assertEquals([new DescriptionsConfigExtra()], $context->getConfigExtras());
+                self::assertEquals(
+                    [new DisabledAssociationsConfigExtra(), new DescriptionsConfigExtra()],
+                    $context->getConfigExtras()
+                );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
                 self::assertTrue($context->isMasterRequest());
                 self::assertEquals($entityClass, $context->getClassName());
@@ -142,7 +146,10 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($this->requestType, $context->getRequestType());
                 self::assertNotSame($this->requestType, $context->getRequestType());
                 self::assertEquals(self::VERSION, $context->getVersion());
-                self::assertEquals([new DescriptionsConfigExtra()], $context->getConfigExtras());
+                self::assertEquals(
+                    [new DisabledAssociationsConfigExtra(), new DescriptionsConfigExtra()],
+                    $context->getConfigExtras()
+                );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
                 self::assertTrue($context->isMasterRequest());
                 self::assertEquals($entityClass, $context->getParentClassName());
@@ -185,7 +192,10 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($this->requestType, $context->getRequestType());
                 self::assertNotSame($this->requestType, $context->getRequestType());
                 self::assertEquals(self::VERSION, $context->getVersion());
-                self::assertEquals([new DescriptionsConfigExtra()], $context->getConfigExtras());
+                self::assertEquals(
+                    [new DisabledAssociationsConfigExtra(), new DescriptionsConfigExtra()],
+                    $context->getConfigExtras()
+                );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
                 self::assertTrue($context->isMasterRequest());
                 self::assertEquals($entityClass, $context->getClassName());
@@ -224,7 +234,10 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($this->requestType, $context->getRequestType());
                 self::assertNotSame($this->requestType, $context->getRequestType());
                 self::assertEquals(self::VERSION, $context->getVersion());
-                self::assertEquals([new DescriptionsConfigExtra()], $context->getConfigExtras());
+                self::assertEquals(
+                    [new DisabledAssociationsConfigExtra(), new DescriptionsConfigExtra()],
+                    $context->getConfigExtras()
+                );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
                 self::assertTrue($context->isMasterRequest());
                 self::assertEquals($entityClass, $context->getClassName());
@@ -269,7 +282,10 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
                 self::assertEquals($this->requestType, $context->getRequestType());
                 self::assertNotSame($this->requestType, $context->getRequestType());
                 self::assertEquals(self::VERSION, $context->getVersion());
-                self::assertEquals([new DescriptionsConfigExtra()], $context->getConfigExtras());
+                self::assertEquals(
+                    [new DisabledAssociationsConfigExtra(), new DescriptionsConfigExtra()],
+                    $context->getConfigExtras()
+                );
                 self::assertEquals(ApiActionGroup::INITIALIZE, $context->getLastGroup());
                 self::assertTrue($context->isMasterRequest());
                 self::assertEquals($entityClass, $context->getClassName());

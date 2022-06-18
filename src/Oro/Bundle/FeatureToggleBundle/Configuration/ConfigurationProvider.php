@@ -29,16 +29,19 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
     private array $bundles;
     private FeatureToggleConfiguration $configuration;
+    private ConfigurationExtension $configurationExtension;
 
     public function __construct(
         string $cacheFile,
         bool $debug,
         array $bundles,
-        FeatureToggleConfiguration $configuration
+        FeatureToggleConfiguration $configuration,
+        ConfigurationExtension $configurationExtension
     ) {
         parent::__construct($cacheFile, $debug);
         $this->bundles = $bundles;
         $this->configuration = $configuration;
+        $this->configurationExtension = $configurationExtension;
     }
 
     public function getFeaturesConfiguration(): array
@@ -67,7 +70,16 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public function clearCache(): void
+    {
+        parent::clearCache();
+        $this->configurationExtension->clearConfigurationCache();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
@@ -111,6 +123,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
     private function resolveConfiguration(array $data): array
     {
+        $data = $this->configurationExtension->processConfiguration($data);
         $dependencies = $this->resolveDependencies($data);
 
         return [

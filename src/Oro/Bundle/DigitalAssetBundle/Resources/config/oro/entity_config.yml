@@ -22,3 +22,7 @@ entity_config:
                             subblock: properties
                             label: oro.digitalasset.entity_config.attachment.field.items.use_dam.label
                             tooltip: oro.digitalasset.entity_config.attachment.field.items.use_dam.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No

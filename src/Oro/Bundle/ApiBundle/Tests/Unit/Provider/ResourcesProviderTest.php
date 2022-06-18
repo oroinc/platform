@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor;
+use Oro\Bundle\ApiBundle\Provider\ResourceCheckerInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
@@ -19,14 +20,17 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
  */
 class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CollectResourcesProcessor */
+    /** @var CollectResourcesProcessor|\PHPUnit\Framework\MockObject\MockObject */
     private $processor;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCache */
+    /** @var ResourcesCache|\PHPUnit\Framework\MockObject\MockObject */
     private $resourcesCache;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesWithoutIdentifierLoader */
+    /** @var ResourcesWithoutIdentifierLoader|\PHPUnit\Framework\MockObject\MockObject */
     private $resourcesWithoutIdentifierLoader;
+
+    /** @var ResourceCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $resourceChecker;
 
     /** @var ResourcesProvider */
     private $resourcesProvider;
@@ -36,11 +40,13 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         $this->processor = $this->createMock(CollectResourcesProcessor::class);
         $this->resourcesCache = $this->createMock(ResourcesCache::class);
         $this->resourcesWithoutIdentifierLoader = $this->createMock(ResourcesWithoutIdentifierLoader::class);
+        $this->resourceChecker = $this->createMock(ResourceCheckerInterface::class);
 
         $this->resourcesProvider = new ResourcesProvider(
             $this->processor,
             $this->resourcesCache,
-            $this->resourcesWithoutIdentifierLoader
+            $this->resourcesWithoutIdentifierLoader,
+            $this->resourceChecker
         );
     }
 
@@ -862,6 +868,34 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testIsResourceEnabled()
+    {
+        $action = 'get';
+        $version = '1.2.3';
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
+
+        $this->resourceChecker->expects(self::exactly(2))
+            ->method('isResourceEnabled')
+            ->willReturnMap([
+                ['Test\Entity1', $action, $version, $requestType, true],
+                ['Test\Entity2', $action, $version, $requestType, false]
+            ]);
+
+        self::assertTrue(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity1', $action, $version, $requestType)
+        );
+        self::assertFalse(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity2', $action, $version, $requestType)
+        );
+        // test memory cache
+        self::assertTrue(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity1', $action, $version, $requestType)
+        );
+        self::assertFalse(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity2', $action, $version, $requestType)
+        );
+    }
+
     public function testGetResourceExcludeActionsWhenCacheExists()
     {
         $version = '1.2.3';
@@ -1246,6 +1280,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testClearCache()
     {
+        $action = 'get';
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -1267,6 +1302,10 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['Test\Entity2']);
         $this->resourcesCache->expects(self::once())
             ->method('clear');
+        $this->resourceChecker->expects(self::exactly(2))
+            ->method('isResourceEnabled')
+            ->with('Test\Entity1', $action, $version, $requestType)
+            ->willReturn(true);
 
         // warmup the memory cache
         self::assertEquals(
@@ -1282,6 +1321,9 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
         self::assertTrue(
             $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity1', $action, $version, $requestType)
         );
 
         // do cache clear, including the memory cache
@@ -1302,10 +1344,14 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         self::assertTrue(
             $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
         );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity1', $action, $version, $requestType)
+        );
     }
 
     public function testReset()
     {
+        $action = 'get';
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -1327,6 +1373,10 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['Test\Entity2']);
         $this->resourcesCache->expects(self::never())
             ->method('clear');
+        $this->resourceChecker->expects(self::exactly(2))
+            ->method('isResourceEnabled')
+            ->with('Test\Entity1', $action, $version, $requestType)
+            ->willReturn(true);
 
         // warmup the memory cache
         self::assertEquals(
@@ -1342,6 +1392,9 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
         self::assertTrue(
             $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity1', $action, $version, $requestType)
         );
 
         // clear the memory cache
@@ -1361,6 +1414,9 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
         self::assertTrue(
             $this->resourcesProvider->isResourceWithoutIdentifier('Test\Entity2', $version, $requestType)
+        );
+        self::assertTrue(
+            $this->resourcesProvider->isResourceEnabled('Test\Entity1', $action, $version, $requestType)
         );
     }
 }

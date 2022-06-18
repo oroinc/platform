@@ -4,8 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
-use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 
 class GetWithTableInheritanceTest extends RestJsonApiTestCase
 {
@@ -13,8 +11,6 @@ class GetWithTableInheritanceTest extends RestJsonApiTestCase
     {
         parent::setUp();
         $this->loadFixtures([
-            LoadOrganization::class,
-            LoadBusinessUnit::class,
             '@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml'
         ]);
     }

@@ -8,7 +8,6 @@ use Symfony\Component\Config\ConfigCacheInterface;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\ResourceInterface;
 use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * The base class for configuration that should be stored in a PHP file.
@@ -99,10 +98,7 @@ abstract class PhpConfigProvider implements
         $this->config = null;
         $this->cacheTimestamp = false;
         $this->cacheFresh = null;
-        if (is_file($this->cacheFile)) {
-            $fs = new Filesystem();
-            $fs->remove($this->cacheFile);
-        }
+        $this->getCacheAccessor()->remove($this->getConfigCache());
     }
 
     /**

@@ -4,13 +4,12 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\DataConverter;
 
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 
+/**
+ * Data converter that converts imported record to the format that is used to deserialize the entity from the array.
+ */
 abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConverter
 {
-    /** @var FieldTypeProvider */
-    protected $fieldTypeProvider;
-
-    /** @var array */
-    protected $excludedFields = ['enum.enum_options', 'attachment.attachment'];
+    protected FieldTypeProvider $fieldTypeProvider;
 
     public function __construct(FieldTypeProvider $fieldTypeProvider)
     {
@@ -18,7 +17,7 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function getBackendHeader()
     {
@@ -30,39 +29,31 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
             foreach ($properties as $scope => $fields) {
                 foreach ($fields as $code => $config) {
                     $field = sprintf('%s.%s', $scope, $code);
-
-                    if (in_array($field, $this->excludedFields, true) || in_array($field, $header, true)) {
+                    if (\in_array($field, $header, true)) {
                         continue;
                     }
-                    $header[] = $field;
+
+                    if (isset($config['import_export']['import_template']['value'])
+                        && \is_array($config['import_export']['import_template']['value'])
+                    ) {
+                        $header = array_merge($header, $this->collectHeadersForArrayTemplateValue($field, $config));
+                    } else {
+                        $header[] = $field;
+                    }
                 }
             }
         }
 
-        return array_merge(
-            $header,
-            [
-                'enum.enum_options.0.label',
-                'enum.enum_options.0.is_default',
-                'enum.enum_options.1.label',
-                'enum.enum_options.1.is_default',
-                'enum.enum_options.2.label',
-                'enum.enum_options.2.is_default'
-            ]
-        );
+        return $header;
     }
 
-    /**
-     * @param $fieldType
-     * @return array
-     */
-    protected function getFieldProperties($fieldType)
+    protected function getFieldProperties(string $fieldType): array
     {
         return $this->fieldTypeProvider->getFieldProperties($fieldType);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     protected function fillEmptyColumns(array $header, array $data)
     {
@@ -72,11 +63,21 @@ abstract class AbstractFieldTemplateDataConverter extends EntityFieldDataConvert
         return parent::fillEmptyColumns($header, $data);
     }
 
-    /**
-     * @return array
-     */
-    protected function getMainHeaders()
+    abstract protected function getMainHeaders(): array;
+
+    private function collectHeadersForArrayTemplateValue(string $field, array $config): array
     {
-        return ['fieldName', 'is_serialized', 'type'];
+        $headers = [];
+        foreach ($config['import_export']['import_template']['value'] as $index => $data) {
+            if (\is_array($data)) {
+                foreach (array_keys($data) as $parameterName) {
+                    $headers[] = sprintf('%s.%s.%s', $field, $index, $parameterName);
+                }
+            } else {
+                $headers[] = sprintf('%s.%s', $field, $index);
+            }
+        }
+
+        return $headers;
     }
 }

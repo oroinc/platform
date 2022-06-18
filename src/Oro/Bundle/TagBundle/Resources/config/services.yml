@@ -19,16 +19,6 @@ services:
             - { name: container.service_subscriber, id: oro_tag.helper.taggable_helper }
             - { name: container.service_subscriber, id: oro_tag.tag.manager }
 
-    oro_tag.provider.search_provider:
-        class: Oro\Bundle\TagBundle\Provider\SearchProvider
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_search.mapper'
-            - '@oro_tag.security_provider'
-            - '@oro_search.index'
-            - '@oro_entity_config.config_manager'
-            - '@translator'
-
     # Tag API
     oro_tag.tag.manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager

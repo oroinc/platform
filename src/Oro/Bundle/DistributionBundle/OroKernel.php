@@ -5,6 +5,7 @@ namespace Oro\Bundle\DistributionBundle;
 use Oro\Bundle\DistributionBundle\Dumper\PhpBundlesDumper;
 use Oro\Bundle\DistributionBundle\Error\ErrorHandler;
 use Oro\Bundle\DistributionBundle\Resolver\DeploymentConfigResolver;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
 use Oro\Bundle\PlatformBundle\Profiler\ProfilerConfig;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
@@ -38,6 +39,15 @@ abstract class OroKernel extends Kernel
 
     /** @var array */
     private static $freshCache = [];
+
+    public function __construct(string $environment, bool $debug)
+    {
+        parent::__construct($environment, $debug);
+
+        if ($debug) {
+            ExtendReflectionErrorHandler::initialize();
+        }
+    }
 
     /**
      * {@inheritdoc}
@@ -406,7 +416,7 @@ abstract class OroKernel extends Kernel
             $container = $this->buildContainer();
             $container->compile();
         } finally {
-            if ($collectDeprecations && $container->getParameter('oro_platform.collect_deprecations')) {
+            if ($collectDeprecations && $container?->getParameter('oro_platform.collect_deprecations')) {
                 restore_error_handler();
 
                 file_put_contents($cacheDir.'/'.$class.'Deprecations.log', serialize(array_values($collectedLogs)));
