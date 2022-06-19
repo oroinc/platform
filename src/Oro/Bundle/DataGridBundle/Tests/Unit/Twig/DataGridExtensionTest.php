@@ -434,7 +434,7 @@ class DataGridExtensionTest extends \PHPUnit\Framework\TestCase
                 'page' => 5,
                 'expectedParameters' => 'foo=bar&bar=baz&grid%5Btest%5D=i%3D5'
             ],
-            'with grid params in query sting' => [
+            'with grid params in query string' => [
                 'queryString' => 'grid%5Btest%5D=i%3D4',
                 'page' => 5,
                 'expectedParameters' => 'grid%5Btest%5D=i%3D5'

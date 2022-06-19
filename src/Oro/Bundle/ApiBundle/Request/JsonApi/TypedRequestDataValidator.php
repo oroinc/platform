@@ -189,7 +189,7 @@ class TypedRequestDataValidator extends AbstractRequestDataValidator
                 $this->buildPointer($pointer, JsonApiDoc::ID),
                 \sprintf(
                     'The \'%1$s\' property of the primary data object'
-                    . ' should match \'%1$s\' parameter of the query sting',
+                    . ' should match \'%1$s\' parameter of the query string',
                     JsonApiDoc::ID
                 )
             );

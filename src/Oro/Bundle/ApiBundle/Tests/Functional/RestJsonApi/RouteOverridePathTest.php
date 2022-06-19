@@ -212,7 +212,7 @@ class RouteOverridePathTest extends RestJsonApiTestCase
             [
                 'title'  => 'conflict constraint',
                 'detail' => 'The \'id\' property of the primary data object'
-                    . ' should match \'id\' parameter of the query sting',
+                    . ' should match \'id\' parameter of the query string',
                 'source' => ['pointer' => '/data/id']
             ],
             $response,
