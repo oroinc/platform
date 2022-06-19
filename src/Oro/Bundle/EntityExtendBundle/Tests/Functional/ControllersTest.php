@@ -36,7 +36,7 @@ class ControllersTest extends AbstractConfigControllerTest
     ];
 
     /** for Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValue  */
-    private const NON_EXTENDED_ENTITY = 'Entity fallback value';
+    private const NON_EXTENDED_ENTITY = 'Entity Fallback Value';
     /** for Extend\Entity\TestEntity2 */
     private const EXTENDED_ENTITY = 'extend.entity.testentity2.entity_label';
 
