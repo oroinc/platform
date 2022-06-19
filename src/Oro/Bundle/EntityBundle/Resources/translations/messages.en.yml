@@ -66,8 +66,9 @@ oro:
             system_config.label: System Config
 
         entityfieldfallbackvalue:
-            entity_label: Entity fallback value
-            entity_plural_label: Entity fallback values
+            entity_label: Entity Fallback Value
+            entity_plural_label: Entity Fallback Values
+            entity_description: The entity fallback value represents a field that value can be a scalar, an array or it can retrieved from another source if it does not have own value.
             entity_grid_all_view_label: All %entity_plural_label%
             array_value:
                 label: Array value

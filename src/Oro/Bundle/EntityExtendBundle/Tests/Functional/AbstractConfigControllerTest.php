@@ -21,7 +21,7 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->client->useHashNavigation(false);
 
-        self::warmUpEntityCache();
+        $this->warmUpEntityCache();
     }
 
     protected function warmUpEntityCache()
@@ -90,10 +90,10 @@ abstract class AbstractConfigControllerTest extends WebTestCase
         $form->set($field);
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(2));
         $form->set($field);
-        $form["oro_entity_config_type[extend][relation][target_entity]"] = User::class;
-        $form["oro_entity_config_type[extend][relation][target_detailed][0]"] = 'username';
-        $form["oro_entity_config_type[extend][relation][target_grid][0]"] = 'username';
-        $form["oro_entity_config_type[extend][relation][target_title][0]"] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_entity]'] = User::class;
+        $form['oro_entity_config_type[extend][relation][target_detailed][0]'] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_grid][0]'] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_title][0]'] = 'username';
     }
 
     /**
@@ -113,8 +113,8 @@ abstract class AbstractConfigControllerTest extends WebTestCase
 
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
         $form->set($field);
-        $form["oro_entity_config_type[extend][relation][target_entity]"] = User::class;
-        $form["oro_entity_config_type[extend][relation][target_field]"] = 'username';
+        $form['oro_entity_config_type[extend][relation][target_entity]'] = User::class;
+        $form['oro_entity_config_type[extend][relation][target_field]'] = 'username';
     }
 
     /**
@@ -128,14 +128,14 @@ abstract class AbstractConfigControllerTest extends WebTestCase
             ' id="oro_entity_config_type_extend_relation_target_field" >' .
             '<option value="" selected="selected"></option> ' .
             '<option value="id">' .
-            'Entity fallback value' .
+            'Entity Fallback Value' .
             '</option> </select> '
         );
 
         $field = new ChoiceFormField($doc->getElementsByTagName('select')->item(0));
         $form->set($field);
-        $form["oro_entity_config_type[extend][relation][target_entity]"] = EntityFieldFallbackValue::class;
-        $form["oro_entity_config_type[extend][relation][target_field]"] = 'id';
+        $form['oro_entity_config_type[extend][relation][target_entity]'] = EntityFieldFallbackValue::class;
+        $form['oro_entity_config_type[extend][relation][target_field]'] = 'id';
     }
 
     /**
