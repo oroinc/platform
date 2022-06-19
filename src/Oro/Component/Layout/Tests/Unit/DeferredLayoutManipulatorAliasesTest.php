@@ -298,7 +298,7 @@ class DeferredLayoutManipulatorAliasesTest extends DeferredLayoutManipulatorTest
         $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
         $this->expectExceptionMessage(
             'Cannot add "test_alias" alias for "root" item.'
-            . ' Reason: The "test_alias" sting cannot be used as an alias for "root" item'
+            . ' Reason: The "test_alias" string cannot be used as an alias for "root" item'
             . ' because it is already used for "header" item.'
         );
 

@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Layout;
 
+/**
+ * Represents a collection of item aliases.
+ */
 class AliasCollection
 {
     /**
@@ -95,7 +98,7 @@ class AliasCollection
 
             throw new Exception\AliasAlreadyExistsException(
                 sprintf(
-                    'The "%s" sting cannot be used as an alias for "%s" item'
+                    'The "%s" string cannot be used as an alias for "%s" item'
                     . ' because it is already used for "%s" item.',
                     $alias,
                     $id,
