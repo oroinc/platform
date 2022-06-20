@@ -32,7 +32,7 @@
             ~ * .sticky-pinned,
             ~ * .floatThead.floatThead-fixed .grid-header:first-child,
             &.sticky-pinned {
-                transform: translateY(-$app-header-height);
+                margin-top: -$app-header-height;
             }
         }
     }
@@ -177,7 +177,6 @@
     }
 
     &__search-and-shortcuts {
-        position: relative;
         float: right;
         margin: 0;
         height: $app-header-height;
