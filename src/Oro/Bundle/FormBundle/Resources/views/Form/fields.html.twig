@@ -12,13 +12,18 @@
     {% set type = type|default('text') %}
     {# Attr "placeholder" is allowed only for next types #}
     {% if attr.placeholder is defined and type not in ['email', 'number', 'password', 'search', 'tel', 'text', 'url'] %}
-        {% set attr = layout_attr_defaults(attr, {
+        {% set attr = attr|merge({
             'data-placeholder': translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans(attr_translation_parameters, translation_domain)
         }) %}
         {% set attr = attr|filter((v, k) => k != 'placeholder') %}
     {% endif %}
     {# Attr "required" is allowed only for next types #}
     {% if required is defined and type not in ['text', 'search', 'url', 'tel', 'email', 'password', 'date', 'month', 'week', 'time', 'datetime-local', 'number', 'checkbox', 'radio', 'file'] %}
+        {% if required %}
+            {% set attr = attr|merge({
+                'x-required': 'required'
+            }) %}
+        {% endif %}
         {% set required = null %}
     {% endif %}
     {{ parent() }}
