@@ -2,6 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Decoder;
 
+use Oro\Component\PhpUtils\Encoding\Windows1250;
+
+/**
+ * Decode the given string
+ */
 class ContentDecoder
 {
     /**
@@ -27,9 +32,15 @@ class ContentDecoder
         }
         if (!empty($fromEncoding) && !empty($toEncoding) && strtolower($fromEncoding) !== strtolower($toEncoding)) {
             // Added additional option to avoid `illegal character` iconv decoding error
-            $toEncoding .= '//TRANSLIT//IGNORE';
-
-            $str = iconv($fromEncoding, $toEncoding, $str);
+            $toEncodingIconv = $toEncoding.'//TRANSLIT//IGNORE';
+            // work around for php-8.1.6-1.el8.remi iconv library version => 2.28
+            // with iconv library version => 2.35 should be reverted
+            if (Windows1250::isSupported($toEncoding, $fromEncoding)) {
+                $str = Windows1250::convert($str, $toEncoding, $fromEncoding);
+            } else {
+                $str = @iconv($fromEncoding, $toEncodingIconv, $str) ?:
+                    mb_convert_encoding($str, $toEncoding, $fromEncoding);
+            }
         }
 
         return $str;

@@ -141,7 +141,7 @@ define(function(require) {
          * receive within response. Only new form contains validation result information.
          */
         submitHandler: function() {
-            if (this.options.pageReload) {
+            if (this.options.pageReload && mediator.execute('isPageStateChanged')) {
                 mediator.off('config-form:init', this.onInitAfterSubmit)
                     .once('config-form:init', this.onInitAfterSubmit);
             }

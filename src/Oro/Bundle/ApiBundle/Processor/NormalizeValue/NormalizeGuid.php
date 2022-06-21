@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Converts a string to GUID/UUID (both are actually synonyms) string (actually a value is kept as is
- * because a sting value does not required any transformation).
+ * because a string value does not required any transformation).
  * Provides a regular expression that can be used to validate that a string represents a GUID/UUID value.
  */
 class NormalizeGuid implements ProcessorInterface
