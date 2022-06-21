@@ -16,7 +16,6 @@ class ContentDecoderTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode($str, $contentTransferEncoding, $fromEncode, $toEncode, $expected)
     {
-        $this->markTestSkipped('BAP-21416');
         $decoder = new ContentDecoder();
         $str = $decoder->decode($str, $contentTransferEncoding, $fromEncode, $toEncode);
 
