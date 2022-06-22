@@ -1,8 +1,0 @@
-oro:
-    search:
-        quick_search:
-            select:
-                aria_label: Search records by entity
-            input:
-                aria_label: Search
-            noresults: No results found
