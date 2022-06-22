@@ -90,6 +90,7 @@ class EmailContext extends OroFeatureContext implements MessageQueueProcessorAwa
      *
      * @Given /^Email should contains the following:/
      * @Given /^An email containing the following was sent:/
+     * @Given /^the email containing the following was sent:/
      */
     public function emailShouldContainsTheFollowing(TableNode $table)
     {
