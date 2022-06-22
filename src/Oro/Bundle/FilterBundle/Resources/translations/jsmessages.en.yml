@@ -111,3 +111,4 @@ oro:
             aria_label: '{{ label }} condition'
         updateButton:
             aria_label: 'Apply {{ label }}'
+            text: 'Apply'
