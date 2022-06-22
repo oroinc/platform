@@ -27,14 +27,17 @@
 {%- endblock %}
 
 {% block block_attributes_base -%}
-    {%- if attr.class is defined -%}
-        {% set attr = attr|merge({
-        class: attr.class|replace({'{{ class_prefix }}': class_prefix})
-        }) %}
-    {%- endif -%}
     {%- if hidden -%}
         {% set attr = attr|merge({
             class: attr.class|default('') ~ ' hidden'
+        }) %}
+    {%- endif -%}
+    {%- if attr.class is defined -%}
+        {% set attr = attr|merge({
+            class: attr.class|replace({'{{ class_prefix }}': class_prefix})
+        }) %}
+        {% set attr = attr|merge({
+            class: attr.class|split(' ')|array_unique|join(' ')
         }) %}
     {%- endif -%}
     {% set attributesThatContainsUri = ['src', 'href', 'action', 'cite', 'data', 'poster'] %}
@@ -101,7 +104,7 @@
         }) %}
     {% endif %}
 
-    <input{{ block('block_attributes') }}/>
+    <input{{ block('block_attributes') }}>
 {%- endblock %}
 
 {% block container_widget -%}
@@ -166,7 +169,7 @@
     {% endif %}
 
     {% apply spaceless %}
-        <meta{{ block('block_attributes') }}/>
+        <meta{{ block('block_attributes') }}>
     {% endapply %}
 {% endblock %}
 
@@ -293,7 +296,7 @@
 
     {{ form_start(form, options) }}
     {%- if form_method is defined -%}
-        <input type="hidden" name="_method" value="{{ method }}" />
+        <input type="hidden" name="_method" value="{{ method }}">
     {%- endif -%}
 {% endblock %}
 
@@ -357,7 +360,7 @@
         <input{{ block('block_attributes') }}
             type="{{ action in ['submit', 'reset'] ? action : 'button' }}"
             {%- if name is defined %} name="{{ name }}"{% endif %}
-            {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}/>
+            {%- if value is defined or text is defined %} value="{{ value is defined ? value : text|block_text(translation_domain) }}"{% endif %}>
     {% endapply %}
 {%- endblock %}
 
@@ -391,7 +394,7 @@
         }) %}
     {% endif %}
 
-    <link{{ block('block_attributes') }}/>
+    <link{{ block('block_attributes') }}>
 {% endblock %}
 
 {% block list_widget -%}

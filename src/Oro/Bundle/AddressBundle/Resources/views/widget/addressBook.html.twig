@@ -31,7 +31,7 @@
     {# widget container and actions #}
     <div class="widget-actions">
         {% if address_edit_acl_resource is not defined or is_granted(address_edit_acl_resource) %}
-        <button class="btn btn-primary" data-action-name="add_address"> + {{ 'Add Address'|trans }}</button>
+        <button class="btn btn-primary" type="button" data-action-name="add_address"> + {{ 'Add Address'|trans }}</button>
         {% endif %}
     </div>
     <div class="map-box" id="address-book"></div>

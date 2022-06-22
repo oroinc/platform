@@ -1,5 +1,34 @@
 {% extends '@OroUI/Form/fields.html.twig' %}
 
+{%- block checkbox_widget -%}
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
+{%- endblock checkbox_widget -%}
+
+{%- block radio_widget -%}
+    <input type="radio" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %}>
+{%- endblock radio_widget -%}
+
+{% block form_widget_simple %}
+    {% set type = type|default('text') %}
+    {# Attr "placeholder" is allowed only for next types #}
+    {% if attr.placeholder is defined and type not in ['email', 'number', 'password', 'search', 'tel', 'text', 'url'] %}
+        {% set attr = attr|merge({
+            'data-placeholder': translation_domain is same as(false) ? attr.placeholder : attr.placeholder|trans(attr_translation_parameters, translation_domain)
+        }) %}
+        {% set attr = attr|filter((v, k) => k != 'placeholder') %}
+    {% endif %}
+    {# Attr "required" is allowed only for next types #}
+    {% if required is defined and type not in ['text', 'search', 'url', 'tel', 'email', 'password', 'date', 'month', 'week', 'time', 'datetime-local', 'number', 'checkbox', 'radio', 'file'] %}
+        {% if required %}
+            {% set attr = attr|merge({
+                'x-required': 'required'
+            }) %}
+        {% endif %}
+        {% set required = null %}
+    {% endif %}
+    {{ parent() }}
+{% endblock %}
+
 {% block oro_select2_widget %}
     {% if configs.grid is defined and configs.grid.name is defined %}
         {% set url = path('oro_datagrid_index', {'gridName': configs.grid.name}) %}
@@ -671,12 +700,12 @@
             {{ form_widget(form) }}
 
             {% if isButtonsEnabled %}
-                <button class="add-on btn btn-icon btn-square-default entity-select-btn" aria-label="{{ 'oro.form.entity_select'|trans({'%name%': label|trans({}, translation_domain) }) }}">
+                <button class="add-on btn btn-icon btn-square-default entity-select-btn" type="button" aria-label="{{ 'oro.form.entity_select'|trans({'%name%': label|trans({}, translation_domain) }) }}">
                     <span class="fa-bars fa-offset-none" aria-hidden="true"></span>
                 </button>
 
                 {% if form.vars.create_enabled %}
-                    <button class="btn btn-icon btn-square-default entity-create-btn">
+                    <button class="btn btn-icon btn-square-default entity-create-btn" type="button" aria-label="{{ 'oro.form.entity_create'|trans({'%name%': label|trans({}, translation_domain) }) }}">
                         <span class="fa-plus fa-offset-none" aria-hidden="true"></span>
                     </button>
                 {% endif %}
