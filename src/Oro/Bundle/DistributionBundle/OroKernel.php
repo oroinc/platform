@@ -135,14 +135,67 @@ abstract class OroKernel extends Kernel
     }
 
     /**
+     * @param string $junction
+     *
+     * @return bool
+     */
+    protected function isJunction(string $junction)
+    {
+        if (!\defined('PHP_WINDOWS_VERSION_BUILD')) {
+            return false;
+        }
+
+        // Important to clear all caches first
+        clearstatcache(true, $junction);
+        if (!is_dir($junction) || is_link($junction)) {
+            return false;
+        }
+        $stat = lstat($junction);
+
+        // S_ISDIR test (S_IFDIR is 0x4000, S_IFMT is 0xF000 bitmask)
+        return $stat ? 0x4000 !== ($stat['mode'] & 0xf000) : false;
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     *
      * @return array
      */
     protected function collectBundles()
     {
-        $files = $this->findBundles([
+        $roots = [
             $this->getProjectDir() . '/src',
-            $this->getProjectDir() . '/vendor'
-        ]);
+            $this->getProjectDir() . '/vendor',
+        ];
+        $files = [];
+
+        // Resolves issues of '\RecursiveDirectoryIterator' with monolithic repository
+        // since its content is copied as junctions under Windows.
+        if (\defined('PHP_WINDOWS_VERSION_BUILD') && is_dir($this->getProjectDir() . '/vendor/oro')) {
+            $directory = new \RecursiveDirectoryIterator(
+                $this->getProjectDir() . '/vendor/oro',
+                \FilesystemIterator::FOLLOW_SYMLINKS | \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS
+            );
+            $iterator = new \RecursiveIteratorIterator($directory, \RecursiveIteratorIterator::SELF_FIRST);
+            $iterator->setMaxDepth(1);
+            /** @var \SplFileInfo $info */
+            foreach ($iterator as $info) {
+                if ($info->isFile() || !$this->isJunction($info->getPathname())) {
+                    continue;
+                }
+
+                // Resolves bundles.yml files on first level of junction so these folders do not participate
+                // in find bundles routine once again.
+                if (file_exists($info->getPathname() . '/Resources/config/oro/bundles.yml')) {
+                    $files[] = $info->getPathname() . '/Resources/config/oro/bundles.yml';
+                } else {
+                    $roots[] = $info->getPathname();
+                }
+            }
+        }
+
+        $files = array_merge($this->findBundles($roots), $files);
 
         $bundles = [];
         $exclusions = [];

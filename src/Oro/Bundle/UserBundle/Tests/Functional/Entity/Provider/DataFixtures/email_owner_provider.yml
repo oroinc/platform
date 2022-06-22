@@ -15,6 +15,8 @@ Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
 Oro\Bundle\UserBundle\Entity\Email:
     email2:
         email: 'test@example.com'
+    email2_2:
+        email: 'test@example.com'
     email3:
         email: 'test@example.com'
     email4:
@@ -38,7 +40,7 @@ Oro\Bundle\UserBundle\Entity\User:
         username: 'nancy_sallee'
         password: 'gxP1L8r86hrdUMg9wKdfnsS/EZC4a7jOIdn6BMzegqL2S6e+KBIuHCrDVciMdiR/64osNnabmFonwK8l09vQxA=='
         email: 'nancy.sallee@example.com'
-        emails: ['@email2']
+        emails: ['@email2', '@email2_2']
         organizations: ['@organization']
         organization: '@organization'
         owner: '@business_unit'

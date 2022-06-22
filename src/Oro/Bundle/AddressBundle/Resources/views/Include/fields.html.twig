@@ -20,43 +20,23 @@
         {% set attr = attr|merge({'attr': {'data-validation': { NotBlank: null}|json_encode} }) %}
     {% endif %}
 
-    {{ form_widget(form, attr) }}
-    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) %}
-    {% set regionView = regionView|default('oroaddress/js/region/view') %}
-
-    {% import '@OroUI/macros.html.twig' as UI %}
-
-    <div {{ UI.renderPageComponentAttributes({
-        view: regionView,
-        options: {
-            _sourceElement: '#' ~ country_field.vars.id,
-            target: '#' ~ id ,
-            simpleEl: '#' ~ region_text_field.vars.id,
-            collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
-            showSelect: showSelect,
-            regionRequired: required
-        }
-    }) }}></div>
-
-    <style>
-        {% if showSelect %}
-            #{{ id }} {
-                display: block;
+    {% set showSelect = (choices is not empty and region_text_field.vars.value is empty) ? ' show-select' : '' %}
+    <div class="region-widget{{ showSelect }}">
+        {{ form_widget(form, attr) }}
+        {% set regionView = regionView|default('oroaddress/js/region/view') %}
+        {% import '@OroUI/macros.html.twig' as UI %}
+        <div {{ UI.renderPageComponentAttributes({
+            view: regionView,
+            options: {
+                _sourceElement: '#' ~ country_field.vars.id,
+                target: '#' ~ id ,
+                simpleEl: '#' ~ region_text_field.vars.id,
+                collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
+                showSelect: showSelect,
+                regionRequired: required
             }
-
-            #{{ region_text_field.vars.id }} {
-                display: none;
-            }
-        {% else %}
-            #{{ id }} {
-                display: none;
-            }
-
-            #{{ region_text_field.vars.id }} {
-                display: block;
-            }
-        {% endif %}
-    </style>
+        }) }}></div>
+    </div>
 {% endblock oro_region_widget %}
 
 {% block oro_email_widget %}

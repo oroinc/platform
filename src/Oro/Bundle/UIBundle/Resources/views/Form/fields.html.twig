@@ -96,6 +96,7 @@
     {% apply spaceless %}
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal choice-widget-expanded' : 'horizontal choice-widget-expanded'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
+        {% set attr = attr|merge({'class': attr.class|split(' ')|array_unique|join(' ')}) %}
         <div {{ block('widget_container_attributes') }}>
             {% for child in form %}
                 <div class="choice-widget-expanded__item">
