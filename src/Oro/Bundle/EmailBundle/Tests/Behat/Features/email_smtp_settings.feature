@@ -1,3 +1,4 @@
+@container-incompatible
 @ticket-BAP-15487
 @ticket-BAP-17649
 

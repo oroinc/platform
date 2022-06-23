@@ -1,3 +1,4 @@
+@container-incompatible
 @ticket-BB-17850
 @ticket-BB-18073
 Feature: Digital asset removal restrictions
