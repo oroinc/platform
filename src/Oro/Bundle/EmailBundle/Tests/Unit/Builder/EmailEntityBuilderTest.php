@@ -436,4 +436,22 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($emailAttachmentContent->getContent(), $emailAttachmentContent->getContent());
         self::assertEquals($emailAttachment->getFileName(), $actualAttachment->getFileName());
     }
+
+    public function testEmailUserWithEmptyFromHeader(): void
+    {
+        $this->expectException(EmailAddressParseException::class);
+        $this->expectExceptionMessage('Missed FROM part in email message.');
+
+        $date = new \DateTime('now');
+        $this->builder->emailUser(
+            'testSubject',
+            '',
+            'test@test.com',
+            $date,
+            $date,
+            $date,
+            Email::NORMAL_IMPORTANCE,
+            ['test1@example.com']
+        );
+    }
 }
