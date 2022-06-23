@@ -1,3 +1,4 @@
+@container-incompatible
 @fixture-OroLocaleBundle:ZuluLocalization.yml
 
 Feature: Entity select fields localization

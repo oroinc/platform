@@ -1,3 +1,4 @@
+@container-incompatible
 Feature: Email SMTP settings with enabled account types
   In order to manager Email setting of application
   As an Administrator
