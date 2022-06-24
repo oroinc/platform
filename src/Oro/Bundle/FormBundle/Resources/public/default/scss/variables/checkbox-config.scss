@@ -1,0 +1,12 @@
+/* @theme: default; */
+
+$checkbox-border-radius: 3px;
+
+// Checked
+$checkbox-background-checked: get-color('ui', 'normal');
+
+// Indeterminate
+$checkbox-background-indeterminate: get-color('ui', 'normal');
+
+// Variables for radio
+$checkboxradio-icon-background-checked: get-color('ui', 'normal');

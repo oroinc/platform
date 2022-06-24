@@ -149,7 +149,7 @@
         googleWarningMessage: '.alert-warning'
     } %}
     <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
-        data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
+        data-page-component-options="{{ options|json_encode }}">
         {{ block('checkbox_widget') }}
         <div class="alert google-connection-status alert-warning" role="alert" style="display: none">
             {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}

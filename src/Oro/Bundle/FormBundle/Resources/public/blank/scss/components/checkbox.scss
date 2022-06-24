@@ -1,7 +1,6 @@
-/* @theme: admin.oro; */
+/* @theme: blank; */
 
 [type='checkbox'] {
-    border: $checkbox-border;
     border-radius: $checkbox-border-radius;
 
     @include fa-icon($icon: $checkbox-icon-checked, $extra-rules: true) {
@@ -11,7 +10,6 @@
 }
 
 [type='radio'] {
-    border: $checkbox-radio-border;
     border-radius: $checkbox-radio-border-radius;
 
     &::before {
@@ -30,6 +28,7 @@
     height: $checkbox-size-var;
     margin: $checkbox-margin;
     color: $checkbox-color;
+    border: $checkbox-border;
     appearance: $checkbox-appearance;
     vertical-align: $checkbox-vertical-align;
     display: $checkbox-display;
@@ -53,24 +52,18 @@
     }
 
     &:focus {
+        border-width: $checkbox-border-width-focus;
         border-color: $checkbox-border-color-focus;
         box-shadow: $checkbox-box-shadow-focus;
     }
 
     &:disabled {
-        opacity: $checkbox-opacity-disabled;
-    }
+        background-color: $checkbox-background-disabled;
+        border-color: $checkbox-border-color-disabled;
+        color: $checkbox-color-disabled;
 
-    + label {
-        margin-left: $checkbox-gap;
-        display: $checkbox-sibling-label-display;
-        vertical-align: $checkbox-sibling-label-vertical-align;
+        @include base-disabled-style($checkbox-opacity-disabled);
     }
-}
-
-[type='checkbox']:checked {
-    background-color: $checkbox-background-checked;
-    border-color: $checkbox-border-color-checked;
 }
 
 [type='checkbox']:indeterminate {
@@ -83,12 +76,31 @@
     }
 }
 
-[type='radio']:focus {
-    border-color: $checkbox-radio-border-color-focus;
+[type='checkbox']:checked {
+    background-color: $checkbox-background-checked;
+    border-color: $checkbox-border-color-checked;
 }
 
-[type='radio']:checked {
-    &:focus {
-        border-color: $checkbox-radio-border-color-checked-focus;
+[type='checkbox']:indeterminate,
+[type='checkbox']:checked {
+    &:disabled {
+        border-color: $checkbox-border-color-checked-disabled;
+        background-color: $checkbox-background-checked-disabled;
+    }
+}
+
+[type='radio']:checked:disabled {
+    &::before {
+        background-color: $checkbox-color-disabled;
+    }
+}
+
+.checkbox-round {
+    --checkbox-size: #{$checkbox-round-size};
+
+    border-radius: $checkbox-round-border-radius;
+
+    &::before {
+        font-size: $checkbox-round-icon-size;
     }
 }

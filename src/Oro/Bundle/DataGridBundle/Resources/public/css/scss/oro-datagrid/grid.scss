@@ -203,8 +203,13 @@
     text-align: left;
 }
 
-.boolean-cell .checkbox-view {
-    vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;
+.boolean-cell {
+    input {
+        &[type='checkbox'],
+        &[type='radio'] {
+            vertical-align: $oro-datagrid-body-cell-checkbox-vertical-align;
+        }
+    }
 }
 
 .number-cell,
