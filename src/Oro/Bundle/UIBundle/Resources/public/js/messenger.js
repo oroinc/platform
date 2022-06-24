@@ -9,15 +9,17 @@ define(function(require) {
     const mediator = require('oroui/js/mediator');
     const error = require('oroui/js/error');
     require('bootstrap');
+    const config = require('module-config').default(module.id);
 
-    const defaults = {
+    const defaults = Object.assign({
         container: '',
         temporaryContainer: '[data-role="messenger-temporary-container"]',
         delay: false,
         template: template,
         insertMethod: 'appendTo',
-        style: 'default'
-    };
+        style: 'default',
+        storageKey: 'oroAfterReloadMessages'
+    }, config);
     let queue = [];
     const groupedMessages = {};
     const notFlashTypes = ['error', 'danger', 'warning', 'alert'];
@@ -32,14 +34,20 @@ define(function(require) {
     /**
      * Same arguments as for Oro.NotificationMessage
      */
-    function showMessage(type, message, options) {
-        const opt = _.extend({}, defaults, options || {});
+    function showMessage(type, message, options = {}) {
+        const opt = Object.assign({}, defaults, options);
         resolveContainer(opt);
+
+        messenger.clear(opt.namespace, opt);
+
         const $el = $(opt.template({
             type: type,
             message: message,
             style: opt.style
         }))[opt.insertMethod](opt.container);
+
+        $el.data('_message', {type, message, options});
+
         if (opt.onClose) {
             $el.find('button.close').click(opt.onClose);
         }
@@ -71,7 +79,7 @@ define(function(require) {
      * @export oroui/js/messenger
      * @name   oro.messenger
      */
-    return {
+    const messenger = {
         /**
          * Shows notification message.
          * By default, the message is displayed until an user close it.
@@ -82,31 +90,37 @@ define(function(require) {
          * @param {string} message text of message
          * @param {Object=} options
          *
-         * @param {(string|jQuery)} options.container selector of jQuery with container element
-         * @param {(number|boolean)} options.delay time in ms to auto close message
+         * @param {(string|jQuery)=} options.container selector of jQuery with container element
+         * @param {(number|boolean)?} options.delay time in ms to auto close message
          *      or false - means to not close automatically
-         * @param {Function} options.template template function
-         * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
-         * @param {boolean} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {Function=} options.template template function
+         * @param {boolean=} options.flash flag to turn on default delay close call, it's 5s
+         * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {string=} options.namespace slot for a massage,
+         *     other existing message with the same namespace will be removed
          *
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
          */
-        notificationMessage: function(...args) {
-            const container = (args[2] || {}).container || defaults.container;
-            const afterReload = (args[2] || {}).afterReload || false;
+        notificationMessage: function(type, message, options = {}) {
+            const container = options.container || defaults.container;
+            const afterReload = options.afterReload || false;
             let afterReloadQueue = [];
             let actions = {close: $.noop};
 
+            if (!options.namespace) {
+                options.namespace = cyrb53(message + this.type).toString();
+            }
+
             if (afterReload && window.localStorage) {
-                afterReloadQueue = JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]');
-                afterReloadQueue.push(args);
-                localStorage.setItem('oroAfterReloadMessages', JSON.stringify(afterReloadQueue));
+                afterReloadQueue = JSON.parse(localStorage.getItem(defaults.storageKey) || '[]');
+                afterReloadQueue.push([type, message, options]);
+                localStorage.setItem(defaults.storageKey, JSON.stringify(afterReloadQueue));
             } else if (container && $(container).length) {
-                actions = showMessage(...args);
+                actions = showMessage(type, message, options);
             } else {
                 // if container is not ready then save message for later
-                queue.push(args);
+                queue.push([type, message, options]);
             }
             return actions;
         },
@@ -120,33 +134,24 @@ define(function(require) {
          * @param {string} message text of message
          * @param {Object=} options
          *
-         * @param {(string|jQuery)} options.container selector of jQuery with container element
-         * @param {(number|boolean)} options.delay time in ms to auto close message
+         * @param {(string|jQuery)=} options.container selector of jQuery with container element
+         * @param {(number|boolean)?} options.delay time in ms to auto close message
          *      or false - means to not close automatically
-         * @param {Function} options.template template function
-         * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
-         * @param {boolean} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {Function=} options.template template function
+         * @param {boolean=} options.flash flag to turn on default delay close call, it's 5s
+         * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
+         * @param {string=} options.namespace slot for a massage,
+         *     other existing message with the same namespace will be removed
          *
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
          */
-        notificationFlashMessage: function(type, message, options) {
-            const isFlash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
-            let namespace = (options || {}).namespace;
-
-            if (!namespace) {
-                namespace = cyrb53(message + this.type).toString();
-
-                if (!options) {
-                    options = {
-                        namespace: null
-                    };
-                }
-                options.namespace = namespace;
+        notificationFlashMessage: function(type, message, options = {}) {
+            if (!('flash' in options)) {
+                options.flash = notFlashTypes.indexOf(type) === -1 && !this._containsNoFlashTags(message);
             }
 
-            this.clear(namespace, options);
-            return this.notificationMessage(type, message, _.extend({flash: isFlash}, options));
+            return this.notificationMessage(type, message, options);
         },
 
         /**
@@ -173,8 +178,8 @@ define(function(require) {
 
         flushStoredMessages: function() {
             if (window.localStorage) {
-                queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
-                localStorage.removeItem('oroAfterReloadMessages');
+                queue = queue.concat(JSON.parse(localStorage.getItem(defaults.storageKey) || '[]'));
+                localStorage.removeItem(defaults.storageKey);
             }
 
             while (queue.length) {
@@ -224,7 +229,12 @@ define(function(require) {
         },
 
         removeTemporaryContainer: function() {
-            $(defaults.container).append($(this).children());
+            $(this).children().each((i, el) => {
+                const {type, message, options} = $(el).data('_message');
+                const {container, insertMethod, ...restOptions} = options;
+                // re-publish messages with original options into default messages container
+                _.delay(() => messenger.notificationMessage(type, message, restOptions));
+            });
         },
 
         /**
@@ -239,4 +249,6 @@ define(function(require) {
             });
         }
     };
+
+    return messenger;
 });
