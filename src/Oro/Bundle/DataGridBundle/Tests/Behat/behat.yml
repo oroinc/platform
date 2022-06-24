@@ -191,7 +191,7 @@ oro_behat_extension:
       selector: 'th.grid-header-cell-massAction div.btn-group .icon'
 
     MassActionCheckbox:
-      selector: 'th.grid-header-cell-massAction div.btn-group .checkbox-view__input'
+      selector: 'th.grid-header-cell-massAction div.btn-group input[type="checkbox"]'
 
     MassActionButton:
       selector: '.grid-header-row .action-column .dropdown button'
@@ -228,17 +228,17 @@ oro_behat_extension:
     Email Address Handle:
       selector:
         type: xpath
-        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Email Address")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::label[contains(., "Email Address")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
 
     First Name Handle:
       selector:
         type: xpath
-        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "First Name")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::label[contains(., "First Name")]/ancestor::div[contains(@class, "datagrid-manager__container")]/span[contains(@class, "ui-sortable-handle")]'
 
     Last Name In Grid Management:
       selector:
         type: xpath
-        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::span[contains(., "Last Name")]'
+        locator: '//*[contains(@class, "datagrid-manager-table")]/descendant::label[contains(., "Last Name")]'
 
     Close Fullscreen Popup:
       selector: '.fullscreen-popup .close-dialog'

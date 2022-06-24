@@ -20,7 +20,7 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $filterItem->getParent()->click();
+        $filterItem->click();
         $this->getDriver()->waitForAjax();
 
         self::assertTrue(
@@ -56,7 +56,7 @@ class FrontendGridFilterManager extends Element
             return;
         }
 
-        $visibilityCheckbox->getParent()->click();
+        $visibilityCheckbox->click();
 
         $this->getDriver()->waitForAjax();
 
@@ -121,7 +121,7 @@ class FrontendGridFilterManager extends Element
     {
         return $this->find(
             'css',
-            'li.datagrid-manager__list-item label[title="' . $title . '"] input[type=checkbox]'
+            'li.datagrid-manager__list-item label[title="' . $title . '"] input[type="checkbox"]'
         );
     }
 }

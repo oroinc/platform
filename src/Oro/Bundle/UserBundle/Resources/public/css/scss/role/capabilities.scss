@@ -27,11 +27,8 @@
     }
 
     &__item-label {
-        margin: 0;
-        position: relative;
-
-        display: inline-block;
-        padding-left: $role-capability-label-offset;
+        display: inline-flex;
+        gap: 8px;
 
         line-height: $role-capability-label-line-height;
     }

@@ -284,9 +284,10 @@ define(function(require) {
         _showAjaxSuccessMessage: function(data) {
             const defaultMessage = data.successful ? this.messages.success : this.messages.error;
             const type = data.successful ? 'success' : 'error';
+            const messageOptions = data[`${type}MessageOptions`] || this[`${type}MessageOptions`] || {};
             const message = data.message || __(defaultMessage);
             if (message) {
-                mediator.execute('showFlashMessage', type, message);
+                mediator.execute('showFlashMessage', type, message, messageOptions);
             }
         },
 

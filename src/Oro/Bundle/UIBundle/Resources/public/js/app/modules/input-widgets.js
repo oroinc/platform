@@ -3,7 +3,6 @@ import UniformSelectInputWidget from 'oroui/js/app/views/input-widget/uniform-se
 import UniformFileInputWidget from 'oroui/js/app/views/input-widget/uniform-file';
 import Select2InputWidget from 'oroui/js/app/views/input-widget/select2';
 import NumberInputWidget from 'oroui/js/app/views/input-widget/number';
-import CheckboxInputWidget from 'oroui/js/app/views/input-widget/checkbox';
 import ClearableInputWidget from 'oroui/js/app/views/input-widget/clearable';
 
 InputWidgetManager.addWidget('uniform-select', {
@@ -25,11 +24,6 @@ InputWidgetManager.addWidget('select2', {
 InputWidgetManager.addWidget('number', {
     selector: 'input[type="number"]',
     Widget: NumberInputWidget
-});
-
-InputWidgetManager.addWidget('checkbox', {
-    selector: 'input[type="checkbox"]:not(.invisible, .hide),input[type="radio"]:not(.invisible, .hide)',
-    Widget: CheckboxInputWidget
 });
 
 InputWidgetManager.addWidget('clearable', {
