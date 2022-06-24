@@ -47,6 +47,26 @@ define(function(require) {
             this.context = options.context;
         },
 
+        customizeTreeConfig(options, config) {
+            config = TreeManageView.__super__.customizeTreeConfig.call(this, options, config);
+
+            config.plugins = [
+                ...config.plugins,
+                'types'
+            ];
+
+            config.types = {
+                '#': {
+                    valid_children: ['menu_item']
+                },
+                'default': {
+                    max_depth: 3
+                }
+            };
+
+            return config;
+        },
+
         /**
          * Triggers after node selection in tree
          *

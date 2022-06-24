@@ -106,6 +106,16 @@ oro_behat_extension:
       selector:
         locator: '//ul[contains(@class,"nav-tabs")]/li/a'
         type: xpath
+        
+    RootItem:
+      selector:
+        type: xpath
+        locator: '//li[contains(@class, "jstree-node")]/a[contains(., "application_menu")]'
+
+    ProductsItem:
+      selector:
+        type: xpath
+        locator: '//li[contains(@class, "jstree-node")]/a[contains(., "application_menu")]/parent::li/ul/li[contains(@class, "jstree-node")]/a[contains(., "Products")]'
 
   pages:
     Shortcut Actionslist:
