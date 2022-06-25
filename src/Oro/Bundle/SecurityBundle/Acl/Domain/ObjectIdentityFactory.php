@@ -76,9 +76,9 @@ class ObjectIdentityFactory
      *
      * Examples:
      *     get($object)
-     *     get('Entity:AcmeBundle\SomeClass')
-     *     get('Entity:AcmeBundle:SomeEntity')
-     *     get('Action:Some Action')
+     *     get('entity:AcmeBundle\SomeClass')
+     *     get('entity:AcmeBundle:SomeEntity')
+     *     get('action:some_action')
      *
      * @param mixed $val An domain object, object identity descriptor (id:type) or ACL annotation
      *
