@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
@@ -22,6 +23,9 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var AclAnnotationProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $annotationProvider;
 
+    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $groupProvider;
+
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
@@ -33,12 +37,14 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $this->innerAuthorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->objectIdentityFactory = $this->createMock(ObjectIdentityFactory::class);
         $this->annotationProvider = $this->createMock(AclAnnotationProvider::class);
+        $this->groupProvider = $this->createMock(AclGroupProviderInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->authorizationChecker = new AuthorizationChecker(
             $this->innerAuthorizationChecker,
             $this->objectIdentityFactory,
             $this->annotationProvider,
+            $this->groupProvider,
             $this->logger
         );
     }
@@ -53,6 +59,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation->expects(self::once())
             ->method('getPermission')
             ->willReturn('TEST_PERMISSION');
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
         $this->objectIdentityFactory->expects(self::once())
             ->method('get')
             ->with($this->identicalTo($annotation))
@@ -82,6 +90,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
         $annotation->expects(self::once())
             ->method('getPermission')
             ->willReturn('TEST_PERMISSION');
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
         $this->objectIdentityFactory->expects(self::never())
             ->method('get');
         $this->annotationProvider->expects(self::once())
@@ -102,6 +112,8 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
     public function testIsGrantedWithEmptyPermission(): void
     {
         $oid = new ObjectIdentity('test', 'action');
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
         $this->objectIdentityFactory->expects(self::never())
             ->method(self::anything());
         $this->annotationProvider->expects(self::never())
@@ -135,12 +147,61 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsGrantedWithString(): void
     {
-        $oid = new ObjectIdentity('1', 'TestType');
-        $obj = 'Entity:SomeClass';
+        $oid = new ObjectIdentity('entity', 'SomeClass');
+        $obj = 'entity:SomeClass';
         $this->annotationProvider->expects(self::once())
             ->method('findAnnotationById')
             ->with('PERMISSION')
             ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with($obj)
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', $obj);
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedWithStringAndNotDefaultAclGroup(): void
+    {
+        $oid = new ObjectIdentity('entity', 'TestType');
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('group');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with('entity:group@TestType')
+            ->willReturn($oid);
+        $this->innerAuthorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('PERMISSION', $oid)
+            ->willReturn(true);
+
+        $result = $this->authorizationChecker->isGranted('PERMISSION', 'entity:TestType');
+        self::assertTrue($result);
+    }
+
+    public function testIsGrantedWithStringThatContainsAclGroup(): void
+    {
+        $oid = new ObjectIdentity('entity', 'SomeClass');
+        $obj = 'entity:group@SomeClass';
+        $this->annotationProvider->expects(self::once())
+            ->method('findAnnotationById')
+            ->with('PERMISSION')
+            ->willReturn(null);
+        $this->groupProvider->expects(self::never())
+            ->method('getGroup');
         $this->objectIdentityFactory->expects(self::once())
             ->method('get')
             ->with($obj)
@@ -156,12 +217,20 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
 
     public function testIsGrantedWithCombinedString(): void
     {
+        $oid = new ObjectIdentity('entity', 'TestType');
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
+        $this->objectIdentityFactory->expects(self::once())
+            ->method('get')
+            ->with('entity:TestType')
+            ->willReturn($oid);
         $this->innerAuthorizationChecker->expects(self::once())
             ->method('isGranted')
-            ->with('VIEW', 'entity:AcmeDemoBundle:Test')
+            ->with('VIEW', self::identicalTo($oid))
             ->willReturn(true);
 
-        $result = $this->authorizationChecker->isGranted('VIEW;entity:AcmeDemoBundle:Test');
+        $result = $this->authorizationChecker->isGranted('VIEW;entity:TestType');
         self::assertTrue($result);
     }
 
@@ -188,6 +257,9 @@ class AuthorizationCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('findAnnotationById')
             ->with('PERMISSION')
             ->willReturn(null);
+        $this->groupProvider->expects(self::once())
+            ->method('getGroup')
+            ->willReturn('');
         $this->objectIdentityFactory->expects(self::once())
             ->method('get')
             ->with($obj)

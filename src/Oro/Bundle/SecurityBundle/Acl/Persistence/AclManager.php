@@ -241,9 +241,9 @@ class AclManager extends AbstractAclManager
      *
      * Examples:
      *     getOid($object)
-     *     getOid('Entity:AcmeBundle\SomeClass')
-     *     getOid('Entity:AcmeBundle:SomeEntity')
-     *     getOid('Action:Some Action')
+     *     getOid('entity:AcmeBundle\SomeClass')
+     *     getOid('entity:AcmeBundle:SomeEntity')
+     *     getOid('action:some_action')
      *
      * @param mixed $val An domain object, object identity descriptor (id:type) or ACL annotation
      * @return OID
