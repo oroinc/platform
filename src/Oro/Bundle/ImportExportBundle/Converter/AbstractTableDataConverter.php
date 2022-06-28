@@ -58,7 +58,7 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         $filledPlainDataWithBackendHeader = $this->fillEmptyColumns(
             $this->receiveBackendHeader(),
             $plainDataWithBackendHeader
-        );
+        ); // @TODO $filledPlainDataWithBackendHeader got Tax code field.....
         $filledPlainDataWithFrontendHints = $this->replaceKeys(
             $this->receiveBackendToFrontendHeader(),
             $filledPlainDataWithBackendHeader

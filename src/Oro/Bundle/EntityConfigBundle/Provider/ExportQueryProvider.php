@@ -55,8 +55,8 @@ class ExportQueryProvider
         // Excluded fields are not used for export, so there is no need to include them to query.
         if ($this->getFieldConfig($entityName, $fieldName, 'excluded')) {
             return false;
-        }
-
+        } // @TODO stevensonkuo need to join table once field is associate.
+        // and if customer tax code export subscriber independent from entity config, how can I join tax code table to prevent lazy mode?!
         // To export field with the parameter 'full = false' or 'null' only identifier field is enough,
         // it is not necessary to join fields in query.
         if (!$this->getFieldConfig($entityName, $fieldName, 'full')) {
