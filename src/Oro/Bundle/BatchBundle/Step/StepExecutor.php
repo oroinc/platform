@@ -104,6 +104,8 @@ class StepExecutor
                         $itemsToWrite = [];
                     }
                 }
+
+                $this->reader->next();
             }
 
             if (count($itemsToWrite) > 0) {

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 abstract class IteratorBasedReader extends AbstractReader
@@ -35,10 +36,20 @@ abstract class IteratorBasedReader extends AbstractReader
             $context = $this->getContext();
             $context->incrementReadOffset();
             $context->incrementReadCount();
-            $this->sourceIterator->next();
         }
 
         return $result;
+    }
+
+    /**
+     * Separate from function read, to prevent the paging occurred before last item be passed and processed
+     * that will confuse the order of events like Events::AFTER_ENTITY_PAGE_LOADED and Events::AFTER_NORMALIZE_ENTITY
+     */
+    public function next(): void
+    {
+        if ($this->sourceIterator->valid()) {
+            $this->sourceIterator->next();
+        }
     }
 
     /**
