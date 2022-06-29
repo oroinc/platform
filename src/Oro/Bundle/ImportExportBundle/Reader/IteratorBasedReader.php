@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 abstract class IteratorBasedReader extends AbstractReader

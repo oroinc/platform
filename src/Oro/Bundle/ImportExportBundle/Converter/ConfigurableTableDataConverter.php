@@ -325,7 +325,7 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         }
 
         $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
-        // @TODO stevensonkuo event here force add tax code column.
+
         return $this->prepareDataAfterSort($event, true, true);
     }
 
