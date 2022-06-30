@@ -23,27 +23,28 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityReaderTest extends \PHPUnit\Framework\TestCase
+class EntityReaderTest extends TestCase
 {
-    /** @var ContextRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContextRegistry|MockObject */
     private $contextRegistry;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|MockObject */
     private $doctrine;
 
-    /** @var OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OwnershipMetadataProviderInterface|MockObject */
     private $ownershipMetadataProvider;
 
-    /** @var ExportQueryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExportQueryProvider|MockObject */
     private $exportQueryProvider;
 
-    /** @var EntityReaderTestAdapter */
-    private $reader;
+    private EntityReaderTestAdapter $reader;
 
     protected function setUp(): void
     {
@@ -84,9 +85,9 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $iterator->expects(self::once())
             ->method('rewind');
-        $iterator->expects(self::exactly(5))
+        $iterator->expects(self::exactly(10))
             ->method('valid')
-            ->willReturnOnConsecutiveCalls(true, true, true, false, false);
+            ->willReturnOnConsecutiveCalls(true, true, true, true, true, true, false, false, false, false);
         $iterator->expects(self::exactly(3))
             ->method('current')
             ->willReturnOnConsecutiveCalls($fooEntity, $barEntity, $bazEntity);
@@ -103,11 +104,11 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        self::assertEquals($fooEntity, $this->reader->read());
-        self::assertEquals($barEntity, $this->reader->read());
-        self::assertEquals($bazEntity, $this->reader->read());
-        self::assertNull($this->reader->read());
-        self::assertNull($this->reader->read());
+        self::assertEquals($fooEntity, $this->readAndGoNext());
+        self::assertEquals($barEntity, $this->readAndGoNext());
+        self::assertEquals($bazEntity, $this->readAndGoNext());
+        self::assertNull($this->readAndGoNext());
+        self::assertNull($this->readAndGoNext());
     }
 
     public function testReadRealIterator()
@@ -131,11 +132,11 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
 
         $this->reader->setStepExecution($this->getMockStepExecution($context));
 
-        self::assertEquals($fooEntity, $this->reader->read());
-        self::assertEquals($barEntity, $this->reader->read());
-        self::assertEquals($bazEntity, $this->reader->read());
-        self::assertNull($this->reader->read());
-        self::assertNull($this->reader->read());
+        self::assertEquals($fooEntity, $this->readAndGoNext());
+        self::assertEquals($barEntity, $this->readAndGoNext());
+        self::assertEquals($bazEntity, $this->readAndGoNext());
+        self::assertNull($this->readAndGoNext());
+        self::assertNull($this->readAndGoNext());
     }
 
     public function testReadFailsWhenNoSourceIterator()
@@ -146,7 +147,7 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->doctrine->expects(self::never())
             ->method(self::anything());
 
-        $this->reader->read();
+        $this->readAndGoNext();
     }
 
     public function testSetStepExecutionWithQueryBuilder()
@@ -507,5 +508,13 @@ class EntityReaderTest extends \PHPUnit\Framework\TestCase
         $this->reader->setDispatcher($dispatcher);
 
         $this->reader->getIds($entityName, $options);
+    }
+
+    private function readAndGoNext(): mixed
+    {
+        $item = $this->reader->read();
+        $this->reader->next();
+
+        return $item;
     }
 }
