@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
-use Iterator;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
-/**
- * An item reader that help to pass item in current cursor, move to next or pagination from a query source.
- */
 abstract class IteratorBasedReader extends AbstractReader
 {
-    private Iterator $sourceIterator;
+    /**
+     * @var \Iterator
+     */
+    private $sourceIterator;
 
-    private bool $rewound = false;
-
-    private bool $goNext = false;
+    /**
+     * @var bool
+     */
+    private $rewound = false;
 
     /**
      * {@inheritdoc}
@@ -32,36 +32,21 @@ abstract class IteratorBasedReader extends AbstractReader
         $result = null;
         if ($this->sourceIterator->valid()) {
             $result  = $this->sourceIterator->current();
-
-            $this->goNext = true;
+            $context = $this->getContext();
+            $context->incrementReadOffset();
+            $context->incrementReadCount();
+            $this->sourceIterator->next();
         }
 
         return $result;
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function next(): mixed
-    {
-        if ($this->goNext) {
-            $context = $this->getContext();
-            $context->incrementReadOffset();
-            $context->incrementReadCount();
-            $this->sourceIterator->next();
-
-            $this->goNext = false;
-        }
-
-        return null;
-    }
-
-    /**
      * Setter for iterator
      *
-     * @param Iterator $sourceIterator
+     * @param \Iterator $sourceIterator
      */
-    public function setSourceIterator(Iterator $sourceIterator = null)
+    public function setSourceIterator(\Iterator $sourceIterator = null)
     {
         $this->sourceIterator = $sourceIterator;
         $this->rewound        = false;
@@ -70,7 +55,7 @@ abstract class IteratorBasedReader extends AbstractReader
     /**
      * Getter for iterator
      *
-     * @return Iterator|null
+     * @return \Iterator|null
      */
     public function getSourceIterator()
     {

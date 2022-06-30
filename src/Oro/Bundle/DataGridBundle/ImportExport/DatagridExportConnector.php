@@ -210,9 +210,4 @@ class DatagridExportConnector implements
         $this->gridDataSource = null;
         $this->totalCount = null;
     }
-
-    public function next(): mixed
-    {
-        return null;
-    }
 }

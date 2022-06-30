@@ -120,9 +120,4 @@ class FilteredEntityReader implements ReaderInterface, BatchIdsReaderInterface, 
 
         return null;
     }
-
-    public function next(): mixed
-    {
-        return null;
-    }
 }

@@ -66,9 +66,4 @@ abstract class AbstractReader implements ReaderInterface
     {
         $this->initializeFromContext($context);
     }
-
-    public function next(): mixed
-    {
-        return null;
-    }
 }
