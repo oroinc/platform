@@ -30,9 +30,24 @@ define(function(require) {
         render: function() {
             const render = StringCell.__super__.render.call(this);
 
+            this._computeLongValueClassName();
             this.enterEditMode();
 
             return render;
+        },
+
+        /**
+         * Add specific classes to cell element if in has a long value
+         * @private
+         */
+        _computeLongValueClassName() {
+            const cellName = this.column.get('name');
+            const value = this.model.get(cellName);
+            const threshold = this.column.get('long_value_threshold');
+
+            if (value && threshold) {
+                this.$el.toggleClass(`grid-body-cell-${cellName}-long-value`, value.length >= threshold);
+            }
         },
 
         /**
