@@ -53,4 +53,12 @@ class Reader implements ItemReaderInterface, ClosableInterface
     {
         throw new \LogicException(self::LOGIC_EXCEPTION_MESSAGE);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next(): mixed
+    {
+        return null;
+    }
 }

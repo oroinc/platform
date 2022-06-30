@@ -24,4 +24,11 @@ class ReaderStub extends AbstractConfigurableStepElement implements ItemReaderIn
     {
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function next(): mixed
+    {
+    }
 }
