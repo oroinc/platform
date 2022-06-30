@@ -44,11 +44,13 @@ abstract class IteratorBasedReader extends AbstractReader
      * Separate from function read, to prevent the paging occurred before last item be passed and processed
      * that will confuse the order of events like Events::AFTER_ENTITY_PAGE_LOADED and Events::AFTER_NORMALIZE_ENTITY
      */
-    public function next(): void
+    public function next(): mixed
     {
         if ($this->sourceIterator->valid()) {
             $this->sourceIterator->next();
         }
+
+        return null;
     }
 
     /**
