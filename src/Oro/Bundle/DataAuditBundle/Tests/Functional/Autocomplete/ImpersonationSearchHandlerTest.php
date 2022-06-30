@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Autocomplete;
 
 use Oro\Bundle\DataAuditBundle\Autocomplete\ImpersonationSearchHandler;
+use Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper;
 use Oro\Bundle\DataAuditBundle\Model\EntityReference;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -27,6 +28,9 @@ class ImpersonationSearchHandlerTest extends WebTestCase
     /** @var EntityChangesToAuditEntryConverter */
     private $entityChangesToAuditEntryConverter;
 
+    /** @var AuditEntityMapper */
+    private $auditEntityMapper;
+
     protected function setUp(): void
     {
         $this->initClient();
@@ -36,6 +40,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         $this->entityChangesToAuditEntryConverter = $this->getContainer()->get(
             'oro_dataaudit.converter.entity_changes_to_audit_entry'
         );
+        $this->auditEntityMapper = $this->getContainer()->get('oro_dataaudit.loggable.audit_entity_mapper');
     }
 
     public function testSearchWithoutAudit()
@@ -273,10 +278,36 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         );
     }
 
-    private function createImpersonationAndAuditLog(Impersonation $impersonation): void
+    public function testAuditEntriesAmount()
+    {
+        $transactionId = UUIDGenerator::v4();
+        $impersonation = new Impersonation();
+        $impersonation->setUser($user = $this->getAdminUser());
+
+        $this->saveImpresonation($impersonation);
+        $this->createImpersonationAuditLog($impersonation, $transactionId);
+        $this->createImpersonationAuditLog($impersonation, $transactionId);
+
+        $auditEntryClass = $this->auditEntityMapper->getAuditEntryClass($user);
+        $auditRepository = $this->doctrineHelper->getEntityRepositoryForClass($auditEntryClass);
+
+        $auditsAmount = $auditRepository->count([
+            'transactionId' => $transactionId,
+            'objectClass' => \get_class($user),
+            'objectId' => (string) $user->getId(),
+        ]);
+
+        self::assertEquals(1, $auditsAmount);
+    }
+
+    private function createImpersonationAndAuditLog(Impersonation $impersonation, string $transactionId = null): void
     {
         $this->saveImpresonation($impersonation);
+        $this->createImpersonationAuditLog($impersonation, $transactionId);
+    }
 
+    private function createImpersonationAuditLog(Impersonation $impersonation, string $transactionId = null): void
+    {
         $this->entityChangesToAuditEntryConverter->convert(
             [
                 [
@@ -285,7 +316,7 @@ class ImpersonationSearchHandlerTest extends WebTestCase
                     'change_set' => ['namePrefix' => [null, 'MR']],
                 ],
             ],
-            UUIDGenerator::v4(),
+            $transactionId ?: UUIDGenerator::v4(),
             new \DateTime(),
             new EntityReference(get_class($this->getAdminUser()), $this->getAdminUser()->getId()),
             new EntityReference(
