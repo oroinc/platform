@@ -1,4 +1,3 @@
-@container-incompatible
 @ticket-BAP-10956
 @automatically-ticket-tagged
 

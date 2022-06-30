@@ -1,4 +1,3 @@
-@container-incompatible
 @ticket-BAP-16169
 
 Feature: Multi grid context with custom entity
