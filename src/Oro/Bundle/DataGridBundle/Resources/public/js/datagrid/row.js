@@ -117,6 +117,7 @@ define(function(require) {
             this.listenTo(this.model, 'change:row_class_name', this.onRowClassNameChanged);
             this.listenTo(this.model, 'change:isNew', this.onRowNewStatusChange);
             this.listenTo(this.dataCollection, 'add remove reset', this._updateAttributes);
+            this.listenTo(this, 'visibilityChange', this.onVisibilityChange);
 
             this.columnRenderer = new ColumnRendererComponent(options);
 
@@ -201,6 +202,10 @@ define(function(require) {
             this.$el.toggleClass('row-new', model.get('isNew'));
         },
 
+        onVisibilityChange(visibleItems) {
+            this.countCellClassName(visibleItems.length);
+        },
+
         onRowClassNameChanged: function(model) {
             const previousClass = model.previous('row_class_name');
             const newClass = _.result(this, 'className');
@@ -210,6 +215,18 @@ define(function(require) {
             if (newClass) {
                 this.$el.addClass(newClass);
             }
+        },
+
+        /**
+         * @param {number} cellsCount
+         */
+        countCellClassName(cellsCount) {
+            if (this._cellsCountClassName) {
+                this.$el.removeClass(this._cellsCountClassName);
+            }
+
+            this._cellsCountClassName = `row-${cellsCount}cells`;
+            this.$el.addClass(this._cellsCountClassName);
         },
 
         className: function() {
