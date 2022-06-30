@@ -78,6 +78,12 @@ fieldset:disabled a.btn {
         color: $btn-icon-gold-color;
     }
 
+    // fix wrong alignment of glyph container in fontawesome
+    .fa-close {
+        display: block;
+        margin-top: -1.5px;
+    }
+
     &%btn-square {
         &.dropdown-toggle:not(.dropdown-toggle--no-caret) {
             width: $btn-square-icon-dropdown-toggle-width;
