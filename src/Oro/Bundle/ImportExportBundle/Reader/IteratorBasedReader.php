@@ -4,6 +4,9 @@ namespace Oro\Bundle\ImportExportBundle\Reader;
 
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
+/**
+ * An item reader that help to pass item in current cursor, move to next or pagination from a query source.
+ */
 abstract class IteratorBasedReader extends AbstractReader
 {
     /**
@@ -41,8 +44,7 @@ abstract class IteratorBasedReader extends AbstractReader
     }
 
     /**
-     * Separate from function read, to prevent the paging occurred before last item be passed and processed
-     * that will confuse the order of events like Events::AFTER_ENTITY_PAGE_LOADED and Events::AFTER_NORMALIZE_ENTITY
+     * {@inheritdoc}
      */
     public function next(): mixed
     {
