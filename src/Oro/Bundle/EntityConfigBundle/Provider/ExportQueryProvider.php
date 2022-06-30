@@ -53,18 +53,13 @@ class ExportQueryProvider
     private function isExportable(string $entityName, string $fieldName): bool
     {
         // In batch export to join an associate field to prevent entity be loaded in lazy mode and detached accidentally
-        return !$this->getFieldConfig($entityName, $fieldName, 'excluded');
-    }
-
-    private function getFieldConfig(string $entityName, string $fieldName, string $code): bool
-    {
         if ($this->entityConfigManager->hasConfig($entityName, $fieldName)) {
             $config = $this->entityConfigManager->getFieldConfig('importexport', $entityName, $fieldName);
-            if ($config->has($code)) {
-                return $config->get($code);
+            if ($config->has('excluded')) {
+                return !$config->get('excluded');
             }
         }
 
-        return true;
+        return false;
     }
 }
