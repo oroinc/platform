@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
+use Iterator;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 /**
@@ -9,15 +10,11 @@ use Oro\Bundle\ImportExportBundle\Exception\LogicException;
  */
 abstract class IteratorBasedReader extends AbstractReader
 {
-    /**
-     * @var \Iterator
-     */
-    private $sourceIterator;
+    private Iterator $sourceIterator;
 
-    /**
-     * @var bool
-     */
-    private $rewound = false;
+    private bool $rewound = false;
+
+    private bool $goNext = false;
 
     /**
      * {@inheritdoc}
@@ -35,9 +32,8 @@ abstract class IteratorBasedReader extends AbstractReader
         $result = null;
         if ($this->sourceIterator->valid()) {
             $result  = $this->sourceIterator->current();
-            $context = $this->getContext();
-            $context->incrementReadOffset();
-            $context->incrementReadCount();
+
+            $this->goNext = true;
         }
 
         return $result;
@@ -48,8 +44,13 @@ abstract class IteratorBasedReader extends AbstractReader
      */
     public function next(): mixed
     {
-        if ($this->sourceIterator->valid()) {
+        if ($this->goNext) {
+            $context = $this->getContext();
+            $context->incrementReadOffset();
+            $context->incrementReadCount();
             $this->sourceIterator->next();
+
+            $this->goNext = false;
         }
 
         return null;
@@ -58,9 +59,9 @@ abstract class IteratorBasedReader extends AbstractReader
     /**
      * Setter for iterator
      *
-     * @param \Iterator $sourceIterator
+     * @param Iterator $sourceIterator
      */
-    public function setSourceIterator(\Iterator $sourceIterator = null)
+    public function setSourceIterator(Iterator $sourceIterator = null)
     {
         $this->sourceIterator = $sourceIterator;
         $this->rewound        = false;
@@ -69,7 +70,7 @@ abstract class IteratorBasedReader extends AbstractReader
     /**
      * Getter for iterator
      *
-     * @return \Iterator|null
+     * @return Iterator|null
      */
     public function getSourceIterator()
     {
