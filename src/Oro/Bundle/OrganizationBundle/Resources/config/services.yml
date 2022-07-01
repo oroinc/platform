@@ -258,12 +258,6 @@ services:
         arguments:
             - "@security.token_storage"
 
-    oro_sales.provider.business_unit_entity_name:
-        class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitEntityNameProvider
-        public: false
-        tags:
-            - { name: oro_entity.name_provider, priority: 100 }
-
     oro_organization.validator.parent_business_unit:
         class: Oro\Bundle\OrganizationBundle\Validator\Constraints\ParentBusinessUnitValidator
         arguments:

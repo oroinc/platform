@@ -17,7 +17,7 @@ class OroEntityExtension extends Extension
     /**
      * {@inheritdoc}
      */
-    public function load(array $configs, ContainerBuilder $container)
+    public function load(array $configs, ContainerBuilder $container): void
     {
         $this->loadHiddenFieldConfigs($container);
 
@@ -37,6 +37,9 @@ class OroEntityExtension extends Extension
             $loader->load('services_test.yml');
         }
 
+        $container->getDefinition('oro_entity.entity_name_provider.configurable')
+            ->setArgument('$fields', $config['entity_name_representation']);
+
         $container->setParameter(
             self::DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME,
             $config['default_query_cache_lifetime']
@@ -45,7 +48,7 @@ class OroEntityExtension extends Extension
         $loader->load('collectors.yml');
     }
 
-    private function loadHiddenFieldConfigs(ContainerBuilder $container)
+    private function loadHiddenFieldConfigs(ContainerBuilder $container): void
     {
         $hiddenFieldConfigs = [];
 
