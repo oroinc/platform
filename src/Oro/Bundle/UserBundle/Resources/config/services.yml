@@ -390,11 +390,6 @@ services:
         arguments:
             - '@security.authorization_checker'
 
-    oro_user.provider.role_entity_name:
-        class: Oro\Bundle\UserBundle\Provider\RoleEntityNameProvider
-        tags:
-            - { name: oro_entity.name_provider, priority: 100 }
-
     oro_user.provider.filter.user_choice_tree:
         class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
         public: true

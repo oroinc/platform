@@ -4,3 +4,9 @@ doctrine:
             date:     Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateType
             datetime: Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCDateTimeType
             time:     Oro\Bundle\LocaleBundle\DoctrineExtensions\DBAL\Types\UTCTimeType
+
+oro_entity:
+    entity_name_representation:
+        Oro\Bundle\LocaleBundle\Entity\Localization:
+            full: [ name ]
+            short: [ name ]

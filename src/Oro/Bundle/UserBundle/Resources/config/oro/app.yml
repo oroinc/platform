@@ -74,3 +74,9 @@ oro_user:
         impersonation:
             label: oro.user.login_source.impersonation
             code: 10
+
+oro_entity:
+    entity_name_representation:
+        Oro\Bundle\UserBundle\Entity\Role:
+            full: [ label ]
+            short: [ label ]

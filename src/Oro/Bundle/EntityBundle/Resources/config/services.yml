@@ -399,10 +399,19 @@ services:
     Oro\Bundle\EntityBundle\Provider\EntityNameResolver:
         alias: oro_entity.entity_name_resolver
 
+    oro_entity.entity_name_provider.configurable:
+        class: Oro\Bundle\EntityBundle\Provider\ConfigurableEntityNameProvider
+        arguments:
+            - !abstract '$fields defined in Oro\Bundle\EntityBundle\DependencyInjection\OroEntityExtension'
+            - '@doctrine'
+            - '@Doctrine\Inflector\Inflector'
+        tags:
+            - { name: oro_entity.name_provider, priority: -10 }
+
     oro_entity.entity_name_provider.default:
         class: Oro\Bundle\EntityBundle\Provider\EntityNameProvider
-        public: false
         arguments:
+            - ['firstName', 'name', 'title', 'subject']
             - '@doctrine'
             - '@oro_entity_config.provider.extend'
             - '@Doctrine\Inflector\Inflector'
@@ -411,7 +420,6 @@ services:
 
     oro_entity.entity_name_provider.dictionary:
         class: Oro\Bundle\EntityBundle\Provider\DictionaryEntityNameProvider
-        public: false
         arguments:
             - '@oro_entity_config.config_manager'
             - '@doctrine'
@@ -421,7 +429,6 @@ services:
 
     oro_entity.entity_name_provider.fallback:
         class: Oro\Bundle\EntityBundle\Provider\FallbackEntityNameProvider
-        public: false
         arguments:
             - '@doctrine'
             - '@translator'
