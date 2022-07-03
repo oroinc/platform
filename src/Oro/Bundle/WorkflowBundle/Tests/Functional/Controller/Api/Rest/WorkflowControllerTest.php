@@ -177,7 +177,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'GET',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_get',
+                'oro_api_workflow_get',
                 ['workflowItemId' => $workflowItem->getId()]
             )
         );
@@ -208,7 +208,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_start',
+                'oro_api_workflow_start',
                 [
                     'workflowName' => LoadWorkflowDefinitions::NO_START_STEP,
                     'transitionName' => LoadWorkflowDefinitions::START_TRANSITION,
@@ -247,7 +247,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_start',
+                'oro_api_workflow_start',
                 [
                     'workflowName' => 'test_flow_with_condition',
                     'transitionName' => 'start_transition',
@@ -275,7 +275,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_transit',
+                'oro_api_workflow_transit',
                 [
                     'workflowItemId' => $workflowItem->getId(),
                     'transitionName' => LoadWorkflowDefinitions::MULTISTEP_START_TRANSITION,
@@ -306,7 +306,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_transit',
+                'oro_api_workflow_transit',
                 [
                     'workflowItemId' => $workflowItem->getId(),
                     'transitionName' => 'second_point_transition',
@@ -343,7 +343,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_transit',
+                'oro_api_workflow_transit',
                 [
                     'workflowItemId' => $workflowItem->getId(),
                     'transitionName' => 'starting_point_transition',
@@ -374,7 +374,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_transit',
+                'oro_api_workflow_transit',
                 [
                     'workflowItemId' => $workflowItem->getId(),
                     'transitionName' => 'second_point_transition',
@@ -398,7 +398,7 @@ class WorkflowControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'POST',
             $this->getUrl(
-                'oro_workflow_api_rest_workflow_start',
+                'oro_api_workflow_start',
                 [
                     'workflowName' => LoadWorkflowDefinitions::WITH_INIT_OPTION,
                     'transitionName' => $transitionName,

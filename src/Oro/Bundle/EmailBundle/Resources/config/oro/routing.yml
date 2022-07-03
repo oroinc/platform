@@ -15,66 +15,6 @@ oro_mailbox_config:
 
 
 #
-# DEPRECATED OLD REST API ROUTES
-#
-
-oro_api_options_autoresponserules:
-    path: '/api/rest/{version}/autoresponserules.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\AutoResponseRuleController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_options_emailtemplates:
-    path: '/api/rest/{version}/emailtemplates.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_options_email_activity_relations:
-    path: '/api/rest/{version}/email/activity/relations.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivityEntityController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_options_email_search_relations:
-    path: '/api/rest/{version}/email/search/relations.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivitySearchController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_options_activity_email_suggestions:
-    path: '/api/rest/{version}/activity/email/suggestions.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailActivitySuggestionController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-
-#
 # OLD REST API ROUTES
 #
 

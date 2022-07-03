@@ -5,45 +5,6 @@ oro_segment:
 
 
 #
-# DEPRECATED OLD REST API ROUTES
-#
-
-oro_api_get_segment_items_deprecated:
-    path: '/api/rest/{version}/segments/{entityName}/items.{_format}'
-    methods: [GET]
-    defaults:
-        _controller: 'Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::getItemsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_post_segment_run_deprecated:
-    path: '/api/rest/{version}/segments/{id}/run.{_format}'
-    methods: [POST]
-    defaults:
-        _controller: 'Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::postRunAction'
-        _format: json
-        version: latest
-    requirements:
-        id: \d+
-        _format: json
-        version: latest|v1
-
-oro_api_options_segments:
-    path: '/api/rest/{version}/segments.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\SegmentBundle\Controller\Api\Rest\SegmentController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-
-#
 # OLD REST API ROUTES
 #
 
