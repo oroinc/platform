@@ -58,11 +58,12 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
      * @dataProvider configurableFieldDataProvider
      *
      * @param bool $isExcluded
-     * @param bool $isExportable
+     * @param bool $isFull
+     * @param bool $expected
      */
-    public function testConfigurableField(bool $isExcluded, bool $isExportable): void
+    public function testConfigurableField(bool $isExcluded, bool $isFull, bool $isExportable): void
     {
-        $this->assertEntityConfigManger($isExcluded);
+        $this->assertEntityConfigManger($isExcluded, $isFull);
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata
             ->expects($this->once())
@@ -81,11 +82,12 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
 
     public function configurableFieldDataProvider(): \Generator
     {
-        yield 'Field is not excluded' => ['isExcluded' => false, 'isExportable' => true];
-        yield 'Field is excluded' => ['isExcluded' => true, 'isExportable' => false];
+        yield 'Field is not excluded and full' => ['isExcluded' => false, 'isFull' => true, 'isExportable' => true];
+        yield 'Field is excluded' => ['isExcluded' => true, 'isFull' => true, 'isExportable' => false];
+        yield 'Field is not full' => ['isExcluded' => false, 'isFull' => false, 'isExportable' => false];
     }
 
-    private function assertEntityConfigManger(bool $isExcluded): void
+    private function assertEntityConfigManger(bool $isExcluded, bool $isFull): void
     {
         $config = $this->createMock(ConfigInterface::class);
         $config
@@ -96,7 +98,8 @@ class ExportQueryProviderTest extends \PHPUnit\Framework\TestCase
             ->expects($this->any())
             ->method('get')
             ->willReturnMap([
-                ['excluded', false, null, $isExcluded]
+                ['excluded', false, null, $isExcluded],
+                ['full', false, null, $isFull]
             ]);
 
         $this->entityConfigManager
