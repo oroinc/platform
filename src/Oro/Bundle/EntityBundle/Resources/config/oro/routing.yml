@@ -5,25 +5,6 @@ oro_entity:
 
 
 #
-# DEPRECATED OLD REST API ROUTES
-#
-
-oro_api_options_dictionary_values:
-    path: '/api/rest/{version}/dictionary/values.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\EntityBundle\Controller\Api\Rest\DictionaryController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-    options:
-        group: dictionary_entity
-        priority: -10
-
-
-#
 # OLD REST API ROUTES
 #
 
