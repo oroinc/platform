@@ -1,5 +1,6 @@
 {% set togglerId = 'dropdown-'|uniqid %}
 <button id="{{ togglerId }}"
+        type="button"
         class="dropdown-toggle{% if isMobileVersion() %} dropdown-toggle--no-caret{% endif %}"
         data-toggle="dropdown"
         aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false"

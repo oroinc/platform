@@ -9,7 +9,6 @@ use Oro\Bundle\FeatureToggleBundle\Tests\Functional\Stub\FeatureCheckerStub;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class DisabledResourceTest extends RestJsonApiTestCase
@@ -20,6 +19,7 @@ class DisabledResourceTest extends RestJsonApiTestCase
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/table_inheritance.yml'
         ]);
+        $this->client->disableReboot();
 
         /** @var FeatureCheckerStub $featureChecker */
         $featureChecker = self::getContainer()->get('oro_featuretoggle.checker.feature_checker');

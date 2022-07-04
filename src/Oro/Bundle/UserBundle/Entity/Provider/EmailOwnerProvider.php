@@ -29,12 +29,14 @@ class EmailOwnerProvider implements EmailOwnerProviderInterface
     public function findEmailOwner(EntityManagerInterface $em, string $email): ?EmailOwnerInterface
     {
         /** @var User|null $user */
-        $user = $em->getRepository(User::class)->findOneBy(['emailLowercase' => mb_strtolower($email)]);
+        $results = $em->getRepository(User::class)->findBy(['emailLowercase' => mb_strtolower($email)], null, 1);
+        $user = array_shift($results);
         if (null === $user) {
             $qb = $em->createQueryBuilder()
                 ->from(Email::class, 'ue')
                 ->select('ue')
-                ->setParameter('email', $email);
+                ->setParameter('email', $email)
+                ->setMaxResults(1);
             if ($em->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform) {
                 $qb->where('LOWER(ue.email) = LOWER(:email)');
             } else {

@@ -96,12 +96,10 @@ define(function(require) {
             this.$(this.options.selectors.childItem).removeAttr('data-layout');
 
             const self = this;
-            const valueElements = this.getValueEl(this.$el);
-            this.initLayout().done(function() {
-                valueElements.each(function() {
-                    self.cloneValueToChildren(self.getItemEl(this));
-                });
+            this.getValueEl(this.$el).each(function() {
+                self.cloneValueToChildren(self.getItemEl(this));
             });
+            this.initLayout();
         },
 
         /**
@@ -314,6 +312,7 @@ define(function(require) {
                 if (editor) {
                     editor.setMode('readonly');
                     $(editor.editorContainer).addClass('disabled');
+                    $(editor.editorContainer).children('.disabled-overlay').remove();
                     $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
                 }
             }

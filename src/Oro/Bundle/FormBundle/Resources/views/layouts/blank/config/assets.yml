@@ -1,7 +1,8 @@
 styles:
     inputs:
         - 'bundles/oroform/blank/scss/settings/global-settings.scss'
-        - 'bundles/oroform/blank/scss/variables/custom-checkbox-config.scss'
+        - 'bundles/oroform/blank/scss/variables/checkbox-config.scss'
+        - 'bundles/oroform/blank/scss/variables/checkbox-label-config.scss'
         - 'bundles/oroform/blank/scss/variables/input-config.scss'
         - 'bundles/oroform/blank/scss/variables/select-config.scss'
         - 'bundles/oroform/blank/scss/variables/textarea-config.scss'

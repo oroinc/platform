@@ -153,6 +153,9 @@ class EmailEntityBuilder
         $cc = null,
         $bcc = null
     ) {
+        if (empty($from)) {
+            throw new EmailAddressParseException('Missed FROM part in email message.');
+        }
         $result = new Email();
         $result
             ->setSubject($subject)

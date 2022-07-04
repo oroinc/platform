@@ -60,6 +60,10 @@
     .sf-toolbar-toggle-data-collectors span {
         padding-right: 10px;
     }
+
+    .sf-toolbar input[type="checkbox"] {
+        --checkbox-size: 13px;
+    }
 </style>
 <div class="sf-toolbar-info-group sf-toolbar-toggle-data-collectors">
     <div class="sf-toolbar-info-piece">
@@ -68,7 +72,7 @@
             <span>
                 {% for collectorName in collectorNames %}
                     <div>
-                    <input data-skip-input-widgets class="sf-toolbar--collector-checkbox" id="{{ collectorName }}"
+                    <input class="sf-toolbar--collector-checkbox" id="{{ collectorName }}"
                            type="checkbox"
                            {% if collectorName in collector.enabledCollectors %}checked{% endif %}>
                         <label for="{{ collectorName }}">{{ collectorName }}</label>
@@ -84,7 +88,7 @@
             </span>
         <br><br>
         <span>
-            <input data-skip-input-widgets id="sf-toolbar--track-container" type="checkbox"
+            <input id="sf-toolbar--track-container" type="checkbox"
                    {% if collector.trackContainerChanges %}checked{% endif %}>
             <label for="sf-toolbar--track-container">track service container changes</label>
             </span>

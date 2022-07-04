@@ -10,27 +10,26 @@
     &:hover,
     &[data-selected]:hover {
         border: 1px solid transparent;
-        box-shadow: 0 0 $checkbox-icon-border-shadow-size $checkbox-icon-border-color;
     }
 }
 
 .simplecolorpicker.icon,
 .simplecolorpicker span.color {
-    width: $checkbox-icon-width;
-    height: $checkbox-icon-height;
+    width: $checkbox-size;
+    height: $checkbox-size;
     margin: 4px;
 
     line-height: 1;
 
-    border-radius: $checkbox-icon-border-radius;
+    border-radius: $checkbox-border-radius;
 
     &[data-color=''],
     &[data-color='#FFFFFF'],
     &[data-color='#ffffff'] {
-        border-color: $checkbox-icon-border-color-default;
+        border-color: $primary-750;
 
         &:hover {
-            border-color: $checkbox-icon-border-color-default;
+            border-color: $primary-750;
         }
     }
 }
@@ -110,11 +109,11 @@
 .minicolors-swatch {
     position: relative;
 
-    width: $checkbox-icon-width;
-    height: $checkbox-icon-height;
+    width: $checkbox-size;
+    height: $checkbox-size;
     margin: 0;
 
-    border-radius: $checkbox-icon-border-radius;
+    border-radius: $checkbox-border-radius;
     background-position: -62px -1px;
 
     border-color: transparent;
@@ -129,7 +128,7 @@
     line-height: 1;
 
     &[data-selected] {
-        @include fa-icon($checkbox-checked-icon, before, true) {
+        @include fa-icon($checkbox-icon-checked, before, true) {
             color: $primary-inverse;
         }
     }

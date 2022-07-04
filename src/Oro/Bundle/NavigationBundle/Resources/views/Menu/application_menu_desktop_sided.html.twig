@@ -5,7 +5,7 @@
 {% block list_wrapper %}
     {# render the list of children #}
     {%- set childrenClasses = childrenClasses|merge(['menu', 'menu-level-' ~ item.level]) %}
-    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
+    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|array_unique|join(' ') }) %}
 
     {% if item.hasChildren %}
         {% if item.level == 1 %}

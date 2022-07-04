@@ -15,8 +15,11 @@
 
         padding-right: $content-padding-small;
 
-        .checkbox-view {
-            margin-right: $content-padding-small;
+        input {
+            &[type='checkbox'],
+            &[type='radio'] {
+                margin-right: $content-padding-small;
+            }
         }
     }
 

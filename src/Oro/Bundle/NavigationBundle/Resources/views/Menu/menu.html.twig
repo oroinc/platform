@@ -90,7 +90,7 @@
             {%- set classes = classes|merge([options.lastClass]) %}
         {%- endif %}
         {%- if classes is not empty %}
-            {%- set itemAttributes = itemAttributes|merge({'class': classes|join(' ')}) %}
+            {%- set itemAttributes = itemAttributes|merge({'class': classes|array_unique|join(' ')}) %}
         {%- endif %}
         {# displaying the item #}
         {% import _self as oro_menu %}
@@ -112,7 +112,7 @@
     {%- endset -%}
     {# render the list of children#}
     {%- set childrenClasses = childrenClasses|merge(['menu', 'menu-level-' ~ item.level]) %}
-    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|join(' ') }) %}
+    {%- set listAttributes = childrenAttributes|merge({'class': childrenClasses|array_unique|join(' ') }) %}
     {%- set wrapperContent = block('list_wrapper') -%}
     {% if item.uri != '#' or wrapperContent %}
         {{- elementContent|raw -}}

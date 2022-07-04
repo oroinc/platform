@@ -16,7 +16,7 @@ oro_behat_extension:
       options:
         mapping:
           RoleForTest Role:
-            locator: '//label[contains(.,"RoleForTest")]/../span/input'
+            locator: '//label[contains(.,"RoleForTest")]/../input[@type="checkbox"]'
             type: xpath
           OroCRM Organization:
             locator: '(//div[contains(@class,"organization-structure")]//input[@type="checkbox"][@data-name="organization"])[1]'

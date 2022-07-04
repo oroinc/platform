@@ -526,6 +526,16 @@
 
                 float: $select-filter-widget-checkboxes-label-float;
                 text-align: $select-filter-widget-checkboxes-label-text-align;
+                display: flex;
+                gap: 8px;
+            }
+
+            // Override style of ui-multiselect
+            input {
+                // stylelint-disable-next-line declaration-no-important
+                position: static !important;
+                // stylelint-disable-next-line declaration-no-important
+                left: auto !important;
             }
 
             li {
@@ -545,10 +555,6 @@
                 &.hidden-item {
                     height: $select-filter-widget-li-hidden-item-height;
                 }
-            }
-
-            input[type='checkbox'] {
-                margin: $select-filter-widget-checkboxes-offset;
             }
 
             &.fixed-li {

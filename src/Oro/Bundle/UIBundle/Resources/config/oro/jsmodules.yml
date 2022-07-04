@@ -88,6 +88,7 @@ configs:
     oroui/js/extend/bootstrap/bootstrap-dropdown: {}
     oroui/js/extend/scriptjs: {}
     oroui/js/fuzzy-search: {}
+    oroui/js/messenger: {}
     oroui/js/mobile/page-header: {}
     oroui/js/modal: {}
     oroui/js/tools/highlighter/highlighter-favicon: {}
@@ -116,7 +117,6 @@ dynamic-imports:
         - oroui/js/app/views/element-value-copy-to-clipboard-view
         - oroui/js/app/views/hidden-initialization-view
         - oroui/js/app/views/highlight-text-view
-        - oroui/js/app/views/input-widget/checkbox
         - oroui/js/app/views/input-widget/number
         - oroui/js/app/views/input-widget/select2
         - oroui/js/app/views/input-widget/uniform-file

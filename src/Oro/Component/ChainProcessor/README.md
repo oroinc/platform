@@ -259,7 +259,7 @@ class FormatClassNameIdPair implements ProcessorInterface
              - { name: text_representation.processor, action: get_text_representation, group: format, priority: -10 }
 ```
 
-Now we can get a test representation for almost all entities:
+Now we can get a text representation for almost all entities:
 
 ```php
     $converter = $this->getContainer()->get('text_representation.object_to_string_converter');

@@ -2,6 +2,7 @@
     {% set searchTogglerId = 'dropdown-'|uniqid %}
     <div class="dropdown header-dropdown-search">
         <button id="{{ searchTogglerId }}" class="dropdown-toggle dropdown-toggle--no-caret" data-toggle="dropdown" title="{{'Search'|trans}}"
+                type="button"
                 aria-haspopup="true" aria-expanded="false" aria-label="{{ 'Search'|trans }}"
                 data-prevent-close-on-menu-click="true">
             <span class="fa-search" aria-hidden="true"></span>
@@ -16,7 +17,7 @@
             <li class="nav-content">
                 <form method="get" action="{{ path('oro_search_results') }}" class="search-form">
                     <div class="header-search">
-                        <select data-page-component-module="oro/select2-component" name="from">
+                        <select data-page-component-module="oro/select2-component" name="from" aria-label="{{ 'oro.search.quick_search.select.aria_label'|trans }}">
                             <option value="">{{ 'All'|trans }}</option>
                             {% set searchEntities = [] %}
                             {% for className, alias in entities %}
@@ -29,7 +30,7 @@
                             {% endfor %}
                         </select>
                         <div class="search-field-container">
-                            <input type="text" class="span2 search" placeholder="" name="search" value="" autocomplete="off" data-autofocus />
+                            <input type="text" class="span2 search" placeholder="" name="search" value="" autocomplete="off" data-autofocus aria-label="{{ 'oro.search.quick_search.input.aria_label'|trans }}">
                             <ul class="search-suggestion-list" data-role="search-suggestion-list">
                                 <li class="loading" data-role="loading">
                                     <div class="loader-mask"><div class="loader-frame"></div></div>

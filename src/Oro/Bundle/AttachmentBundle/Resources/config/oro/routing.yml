@@ -35,33 +35,6 @@ oro_imagine_filter:
 
 
 #
-# DEPRECATED OLD REST API ROUTES
-#
-
-oro_api_options_attachments:
-    path: '/api/rest/{version}/attachments.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\AttachmentController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json|html
-        version: latest|v1
-
-oro_api_options_files:
-    path: '/api/rest/{version}/files.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\AttachmentBundle\Controller\Api\Rest\FileController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json|html
-        version: latest|v1
-
-
-#
 # OLD REST API ROUTES
 #
 

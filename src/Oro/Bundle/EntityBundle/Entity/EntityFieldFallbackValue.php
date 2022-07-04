@@ -7,7 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * The entity the represents a field that value can be a scalar, an array
+ * Represents a field that value can be a scalar, an array
  * or it can retrieved from another source if it does not have own value.
  * @ORM\Table(name="oro_entity_fallback_value")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EntityBundle\Entity\EntityFieldFallbackValueRepository")

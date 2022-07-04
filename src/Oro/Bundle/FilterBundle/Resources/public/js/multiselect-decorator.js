@@ -104,14 +104,12 @@ define(function(require, exports, module) {
                     const widget = this.getWidget();
 
                     multiselectfilter.element.on('multiselectfilterfilter', function(e, data) {
-                        const hasVisibleRows = multiselectfilter.rows.filter(function() {
+                        const visibleRowsCount = multiselectfilter.rows.filter(function() {
                             return $(this).css('display') !== 'none';
                         }).length;
 
-                        if (!hasVisibleRows) {
-                            multiselect.$notFound.removeClass('hide');
-                            widget.addClass('no-matches');
-                        }
+                        multiselect.$notFound.toggleClass('hide', visibleRowsCount !== 0);
+                        widget.toggleClass('no-matches', visibleRowsCount === 0);
                     });
                     multiselectfilter.input.on(`input${multiselect._namespaceID}`, e => {
                         if (e.target.value.length) {
