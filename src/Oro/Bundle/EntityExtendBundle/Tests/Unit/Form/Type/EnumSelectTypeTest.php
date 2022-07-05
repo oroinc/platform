@@ -100,6 +100,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
                 ],
                 'disabled_values' => [],
                 'excluded_values' => [],
+                'choice_translation_domain' => false,
             ],
             $resolvedOptions
         );
@@ -147,6 +148,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
                 ],
                 'disabled_values' => [],
                 'excluded_values' => [],
+                'choice_translation_domain' => false,
             ],
             $resolvedOptions
         );
