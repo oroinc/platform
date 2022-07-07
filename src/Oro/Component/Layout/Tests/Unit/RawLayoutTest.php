@@ -93,9 +93,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetParentIdWithEmptyId($id)
+    public function testGetParentIdWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -134,9 +134,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testAddWithEmptyId($id)
+    public function testAddWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -155,7 +155,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddWithInvalidId($id)
+    public function testAddWithInvalidId(string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -329,9 +329,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testRemoveWithEmptyId($id)
+    public function testRemoveWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -555,9 +555,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testMoveWithEmptyId($id)
+    public function testMoveWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -585,9 +585,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testHasPropertyWithEmptyId($id)
+    public function testHasPropertyWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -627,9 +627,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetPropertyWithEmptyId($id)
+    public function testGetPropertyWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -657,9 +657,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testSetPropertyWithEmptyId($id)
+    public function testSetPropertyWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -706,9 +706,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testAddAliasWithEmptyAlias($alias)
+    public function testAddAliasWithEmptyAlias(?string $alias)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item alias must not be empty.');
@@ -717,9 +717,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testAddAliasWithEmptyId($id)
+    public function testAddAliasWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -746,7 +746,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddAliasWithInvalidAlias($alias)
+    public function testAddAliasWithInvalidAlias(string $alias)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -763,7 +763,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidIdDataProvider
      */
-    public function testAddAliasWithInvalidId($id)
+    public function testAddAliasWithInvalidId(string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -793,7 +793,8 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\Oro\Component\Layout\Exception\AliasAlreadyExistsException::class);
         $this->expectExceptionMessage(
-            'The "test" sting cannot be used as an alias for "header" item because it is already used for "root" item.'
+            'The "test" string cannot be used as an alias for "header" item'
+            . ' because it is already used for "root" item.'
         );
 
         // prepare test data
@@ -809,7 +810,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
         $this->expectExceptionMessage(
-            'The "root" sting cannot be used as an alias for "root" item'
+            'The "root" string cannot be used as an alias for "root" item'
             . ' because an alias cannot be equal to the item id.'
         );
 
@@ -824,7 +825,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\Oro\Component\Layout\Exception\LogicException::class);
         $this->expectExceptionMessage(
-            'The "header" sting cannot be used as an alias for "root" item because'
+            'The "header" string cannot be used as an alias for "root" item because'
             . ' another item with the same id exists.'
         );
 
@@ -865,9 +866,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testRemoveAliasWithEmptyAlias($alias)
+    public function testRemoveAliasWithEmptyAlias(?string $alias)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item alias must not be empty.');
@@ -941,9 +942,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testSetBlockThemeWithEmptyId($id)
+    public function testSetBlockThemeWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -952,9 +953,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testSetBlockThemeWithEmptyTheme($theme)
+    public function testSetBlockThemeWithEmptyTheme(?string $theme)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The theme must not be empty.');
@@ -1066,9 +1067,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetHierarchyWithEmptyId($id)
+    public function testGetHierarchyWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -1114,9 +1115,9 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider             emptyStringDataProvider
+     * @dataProvider emptyStringDataProvider
      */
-    public function testGetHierarchyIteratorWithEmptyId($id)
+    public function testGetHierarchyIteratorWithEmptyId(?string $id)
     {
         $this->expectException(\Oro\Component\Layout\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('The item id must not be empty.');
@@ -1124,7 +1125,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         $this->rawLayout->getHierarchyIterator($id);
     }
 
-    public function emptyStringDataProvider()
+    public function emptyStringDataProvider(): array
     {
         return [
             [null],
@@ -1132,7 +1133,7 @@ class RawLayoutTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function invalidIdDataProvider()
+    public function invalidIdDataProvider(): array
     {
         return [
             ['-test'],

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AttachmentBundle\Migration\Extension;
 
 use Doctrine\DBAL\Schema\Schema;
+use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtensionAwareInterface;
@@ -16,6 +17,7 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
 {
     const FILE_TABLE_NAME       = 'oro_attachment_file';
     const ATTACHMENT_TABLE_NAME = 'oro_attachment';
+    const ATTACHMENT_FILE_ITEM_TABLE = 'oro_attachment_file_item';
 
     /** @var ExtendExtension */
     protected $extendExtension;
@@ -58,6 +60,38 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
     }
 
     /**
+     * @param Schema $schema
+     * @param string $sourceTable      Target entity table name
+     * @param string $sourceColumnName A column name is used to show related entity
+     * @param array  $options          Additional options for relation
+     * @param int    $maxFileSize      Max allowed file size in megabytes
+     */
+    public function addMultiFileRelation(
+        Schema $schema,
+        string $sourceTable,
+        string $sourceColumnName,
+        array $options = [],
+        $maxFileSize = 1
+    ): void {
+        $table = $schema->getTable($sourceTable);
+        $fileItemTable = $schema->getTable(self::ATTACHMENT_FILE_ITEM_TABLE);
+
+        $options['attachment']['maxsize'] = $maxFileSize;
+
+        $this->extendExtension->addOneToManyRelation(
+            $schema,
+            $table,
+            $sourceColumnName,
+            $fileItemTable,
+            ['id'],
+            ['id'],
+            ['id'],
+            $options,
+            FieldConfigHelper::MULTI_FILE_TYPE
+        );
+    }
+
+    /**
      * @param Schema   $schema
      * @param string   $sourceTable      Target entity table name
      * @param string   $sourceColumnName A column name is used to show related entity
@@ -92,6 +126,47 @@ class AttachmentExtension implements ExtendExtensionAwareInterface
             'id',
             $options,
             'image'
+        );
+    }
+
+    /**
+     * @param Schema   $schema
+     * @param string   $sourceTable      Target entity table name
+     * @param string   $sourceColumnName A column name is used to show related entity
+     * @param array    $options          Additional options for relation
+     * @param int      $maxFileSize      Max allowed file size in megabytes
+     * @param int      $thumbWidth       Thumbnail width in pixels
+     * @param int      $thumbHeight      Thumbnail height in pixels
+     * @param array    $mimeTypes        The list of allowed MIME types
+     */
+    public function addMultiImageRelation(
+        Schema $schema,
+        string $sourceTable,
+        string $sourceColumnName,
+        array $options = [],
+        int $maxFileSize = 1,
+        int $thumbWidth = 32,
+        int $thumbHeight = 32,
+        array $mimeTypes = []
+    ): void {
+        $table = $schema->getTable($sourceTable);
+        $fileItemTable = $schema->getTable(self::ATTACHMENT_FILE_ITEM_TABLE);
+
+        $options['attachment']['maxsize'] = $maxFileSize;
+        $options['attachment']['width'] = $thumbWidth;
+        $options['attachment']['height'] = $thumbHeight;
+        $options['attachment']['mimetypes'] = MimeTypesConverter::convertToString($mimeTypes);
+
+        $this->extendExtension->addOneToManyRelation(
+            $schema,
+            $table,
+            $sourceColumnName,
+            $fileItemTable,
+            ['id'],
+            ['id'],
+            ['id'],
+            $options,
+            FieldConfigHelper::MULTI_IMAGE_TYPE
         );
     }
 

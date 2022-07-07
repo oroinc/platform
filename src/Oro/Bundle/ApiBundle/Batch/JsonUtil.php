@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Batch;
 
 /**
- * The utility class that helps to convert an array to a JSON sting and vise versa.
+ * The utility class that helps to convert an array to a JSON string and vise versa.
  */
 class JsonUtil
 {

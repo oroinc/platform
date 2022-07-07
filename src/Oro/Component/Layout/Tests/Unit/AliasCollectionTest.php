@@ -71,7 +71,7 @@ class AliasCollectionTest extends \PHPUnit\Framework\TestCase
     {
         $this->expectException(\Oro\Component\Layout\Exception\AliasAlreadyExistsException::class);
         $this->expectExceptionMessage(
-            'The "test_alias" sting cannot be used as an alias for "another_id" item'
+            'The "test_alias" string cannot be used as an alias for "another_id" item'
             . ' because it is already used for "test_id" item.'
         );
 

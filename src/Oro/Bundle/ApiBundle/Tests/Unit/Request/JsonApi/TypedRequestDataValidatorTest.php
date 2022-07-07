@@ -1181,7 +1181,7 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['data' => ['type' => 'products', 'id' => '2', 'attributes' => ['foo' => 'bar']]],
-                'The \'id\' property of the primary data object should match \'id\' parameter of the query sting',
+                'The \'id\' property of the primary data object should match \'id\' parameter of the query string',
                 '/data/id',
                 Constraint::CONFLICT,
                 409

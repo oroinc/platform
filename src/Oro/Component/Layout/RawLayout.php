@@ -418,7 +418,7 @@ class RawLayout
         if ($alias === $id) {
             throw new Exception\LogicException(
                 sprintf(
-                    'The "%s" sting cannot be used as an alias for "%s" item'
+                    'The "%s" string cannot be used as an alias for "%s" item'
                     . ' because an alias cannot be equal to the item id.',
                     $alias,
                     $id
@@ -428,7 +428,7 @@ class RawLayout
         if (isset($this->items[$alias])) {
             throw new Exception\LogicException(
                 sprintf(
-                    'The "%s" sting cannot be used as an alias for "%s" item'
+                    'The "%s" string cannot be used as an alias for "%s" item'
                     . ' because another item with the same id exists.',
                     $alias,
                     $id
