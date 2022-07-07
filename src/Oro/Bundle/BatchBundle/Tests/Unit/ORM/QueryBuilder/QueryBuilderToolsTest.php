@@ -143,6 +143,14 @@ class QueryBuilderToolsTest extends \PHPUnit\Framework\TestCase
             [
                 'table.alias1 > 123 AND UPPER(table.alias2)=:alias1 OR eData=table.alias1',
                 'table.alias1 > 123 AND UPPER(table.alias2)=:alias1 OR e.data=table.alias1'
+            ],
+            [
+                "CUSTOM_FUNCTION(table.data_holder, 'alias1') > 123",
+                "CUSTOM_FUNCTION(table.data_holder, 'alias1') > 123"
+            ],
+            [
+                'CUSTOM_FUNCTION(table.data_holder, "alias1") > alias2',
+                'CUSTOM_FUNCTION(table.data_holder, "alias1") > someTable.field2'
             ]
         ];
     }

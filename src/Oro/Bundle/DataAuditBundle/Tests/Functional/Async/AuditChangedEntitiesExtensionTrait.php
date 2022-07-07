@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Async;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Entity\AuditField;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataChild;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -34,7 +35,16 @@ trait AuditChangedEntitiesExtensionTrait
 
     private function assertStoredAuditCount($expected): void
     {
-        self::assertCount($expected, $this->getEntityManager()->getRepository(Audit::class)->findAll());
+        $auditFields = $this->getEntityManager()->getRepository(AuditField::class)->findAll();
+        self::assertCount(
+            $expected,
+            $this->getEntityManager()->getRepository(Audit::class)->findAll(),
+            sprintf(
+                'Failed asserting that there are %d audit records. Changed fields: %s',
+                $expected,
+                json_encode($auditFields, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES, 2)
+            )
+        );
     }
 
     private function findLastStoredAudit(): Audit
