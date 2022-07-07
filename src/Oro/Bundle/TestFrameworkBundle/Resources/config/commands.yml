@@ -2,6 +2,10 @@ services:
     _defaults:
         public: false
 
+    Oro\Bundle\TestFrameworkBundle\Command\TestVerbosityCommand:
+        tags:
+            - { name: console.command }
+
     Oro\Bundle\TestFrameworkBundle\Command\ContainerTagsDocumentationCommand:
         arguments:
             - '@oro_test.provider.container_tags_documentation_information'

@@ -53,7 +53,8 @@
                 margin-top: $content-padding-small;
             }
 
-            td .checkbox-view {
+            td .checkbox-view,
+            .fallback-container .checkbox-view {
                 margin-top: 0;
             }
         }

@@ -108,6 +108,10 @@ entity_config:
                             block:          general
                             required:       true
                             strip_tags:     true
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 'The *type* field label'
                 description:
                     options:
                         translatable:       true
@@ -123,6 +127,10 @@ entity_config:
                             block:          general
                             required:       false
                             strip_tags:     true
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 'The *type* field description'
                 actualize_owning_side_on_change:
                     options:
                         value_type: boolean
@@ -164,6 +172,10 @@ entity_config:
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
                             tooltip:        oro.entity.entity_config.datagrid.field.items.is_visible.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: 1
                 show_filter:
                     options:
                         value_type:         boolean
@@ -182,6 +194,10 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.show_filter
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
                 order:
                     options:
                         value_type:         integer
@@ -196,6 +212,9 @@ entity_config:
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.order
                             required:       false
+                    import_export:
+                        import_template:
+                            use_in_template: true
 
     form:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#form
@@ -232,6 +251,10 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.form.field.items.is_enabled
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
     # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#view
     view:
         field:
@@ -253,6 +276,10 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.is_displayable
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: Yes
                 priority:
                     options:
                         value_type:         integer
@@ -267,6 +294,9 @@ entity_config:
                             block:          other
                             label:          oro.entity.entity_config.view.field.items.priority
                             required:       false
+                    import_export:
+                        import_template:
+                            use_in_template: true
     grouping:
         # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#grouping
         entity:

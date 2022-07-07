@@ -83,7 +83,10 @@ class ThemesRelativePathGeneratorExtension implements ConfigLayoutUpdateGenerato
 
         [$bundleClassFolder, $namespace] = $bundleClassData;
 
-        return '@' . str_replace([$bundleClassFolder, '/Resources/views'], [$namespace, ''], $absolutePath);
+        $search = [$bundleClassFolder, '/Resources/views', '\Resources\views'];
+        $replace = [$namespace, '', ''];
+
+        return '@' . str_replace($search, $replace, $absolutePath);
     }
 
     /**

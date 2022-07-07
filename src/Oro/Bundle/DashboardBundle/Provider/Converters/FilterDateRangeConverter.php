@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FilterDateRangeConverter extends ConfigValueConverterAbstract
 {
-    const MIN_DATE = '1900-01-01';
+    public const MIN_DATE = '1900-01-01';
 
     /** @var DateTimeFormatterInterface */
     protected $formatter;
@@ -67,61 +67,71 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
-        $part                = DateModifierInterface::PART_VALUE;
-        $type                = AbstractDateFilterType::TYPE_BETWEEN;
-        $cretePreviousPeriod = !empty($config['converter_attributes']['create_previous_period']);
+        $createPreviousPeriod = !empty($config['converter_attributes']['create_previous_period']);
         if (isset($value['type']) && in_array($value['type'], AbstractDateFilterType::$valueTypes)) {
-            return $this->processValueTypes($value, $cretePreviousPeriod);
-        } elseif (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
+            return $this->processValueTypes($value, $createPreviousPeriod);
+        }
+
+        if (null === $value || ($value['value']['start'] === null && $value['value']['end'] === null)) {
             return $this->processValueTypes(
                 [
                     'type' => empty($config['options']['value_types'])
                         ? AbstractDateFilterType::TYPE_ALL_TIME
                         : AbstractDateFilterType::TYPE_THIS_MONTH,
                     'value' => ['start' => null, 'end' => null],
-                    'part' => 'value',
+                    'part' => DateModifierInterface::PART_VALUE,
                 ],
-                $cretePreviousPeriod
+                $createPreviousPeriod
             );
-        } else {
-            $saveOpenRange = !empty($config['converter_attributes']['save_open_range']);
-            [$start, $end, $type] = $this->getPeriodValues($value, $saveOpenRange);
-            $start = $this->getCompiledDate($start);
-            $end   = $this->getCompiledDate($end);
-
-            //Swap start and end dates if end date is behind start date
-            if ($end && $start > $end) {
-                $e     = $end;
-                $end   = $start;
-                $start = $e;
-            }
-            if ($end) {
-                $end->setTime(23, 59, 59);
-                $end->setTime(0, 0, 0)->modify('1 day');
-            }
-            if ($start) {
-                $start->setTime(0, 0, 0);
-            }
         }
+
+        $saveOpenRange = !empty($config['converter_attributes']['save_open_range']);
+        [$start, $end, $type] = $this->getPeriodValues($value, $saveOpenRange);
+        $start = $this->getCompiledDate($start);
+        $end   = $this->getCompiledDate($end);
+
+        //Swap start and end dates if end date is behind start date
+        if ($end && $start > $end) {
+            $e     = $end;
+            $end   = $start;
+            $start = $e;
+        }
+
+        if ($start) {
+            $start->setTime(0, 0, 0);
+        }
+
         $dateData = [
             'start' => $start,
-            'end'   => $end,
-            'type'  => $type,
-            'part'  => $part
+            'type' => $type,
+            'part' => DateModifierInterface::PART_VALUE,
         ];
 
-        if ($end && $start && $cretePreviousPeriod) {
+        if ($end) {
+            /**
+             * Solves a problem "last second of the day"
+             * {@see \Oro\Bundle\FilterBundle\Filter\AbstractDateFilter} class description for more info
+             */
+            $lastSecondModifier = \DateInterval::createFromDateString('1 day');
+            $end->setTime(0, 0, 0)->add($lastSecondModifier);
+            $dateData['last_second_modifier'] = $lastSecondModifier;
+        }
+
+        $dateData['end'] = $end;
+
+        if ($end && $start && $createPreviousPeriod) {
             $diff      = $start->diff($end);
             $prevStart = clone $start;
             $prevStart->sub($diff);
             $prevEnd = clone $end;
             $prevEnd->sub($diff);
             $prevStart->setTime(0, 0, 0);
-            $prevEnd->setTime(0, 0, 0)->modify('1 day');
+            $prevEnd->setTime(0, 0, 0)->add($lastSecondModifier);
 
             $dateData['prev_start'] = $prevStart;
             $dateData['prev_end']   = $prevEnd;
@@ -139,6 +149,14 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     {
         $start = $this->getCompiledDate($value['start'] ?? '');
         $end   = $this->getCompiledDate($value['end'] ?? '');
+
+        if (isset($value['last_second_modifier'])) {
+            /**
+             * Reverts end date to the original value after the problem "last second of the day" is solved
+             * {@see \Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter::getConvertedValue}
+             */
+            $end?->sub($value['last_second_modifier']);
+        }
 
         if (is_array($value)) {
             if (isset($value['part']) && $value['part'] === DateModifierInterface::PART_ALL_TIME) {
@@ -158,7 +176,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             }
 
             if ($value['type'] === AbstractDateFilterType::TYPE_MORE_THAN
-                || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end
+                || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$end)
             ) {
                 return sprintf(
                     '%s %s',
@@ -167,7 +185,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 );
             }
             if ($value['type'] === AbstractDateFilterType::TYPE_LESS_THAN
-                || $value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$start
+                || ($value['type'] === AbstractDateFilterType::TYPE_BETWEEN && !$start)
             ) {
                 return sprintf(
                     '%s %s',
@@ -186,6 +204,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /**
      * @param array $value
+     * @param bool $saveOpenRange
      *
      * @return array
      */
@@ -210,7 +229,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
             || ($type === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
         ) {
             if (!$saveOpenRange) {
-                $endValue = new \DateTime('now', new \DateTimeZone('UTC'));
+                $endValue = null;
                 $type     = AbstractDateFilterType::TYPE_MORE_THAN;
             } else {
                 $type = AbstractDateFilterType::TYPE_BETWEEN;
@@ -222,13 +241,14 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
 
     /**
      * @param array $value
+     * @param bool $cretePreviousPeriod
      *
      * @return array
      */
     protected function processValueTypes(array $value, $cretePreviousPeriod)
     {
-        $start = $end = $part = $prevStart = $prevEnd = null;
-        $type = isset($value['type']) ? $value['type'] : AbstractDateFilterType::TYPE_BETWEEN;
+        $start = $end = $part = $prevStart = $prevEnd = $lastSecondModifier = null;
+        $type = $value['type'] ?? AbstractDateFilterType::TYPE_BETWEEN;
         if (array_key_exists($value['type'], static::$valueTypesStartVarsMap)) {
             /** @var \Carbon\Carbon $start */
             $start  = $this->dateCompiler->compile(
@@ -240,7 +260,12 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                 $end->modify($modify);
             }
             $start->setTime(0, 0, 0);
-            $end->setTime(0, 0, 0)->modify('1 day');
+            /**
+             * Solves a problem "last second of the day"
+             * {@see \Oro\Bundle\FilterBundle\Filter\AbstractDateFilter} class description for more info
+             */
+            $lastSecondModifier = \DateInterval::createFromDateString('1 day');
+            $end->setTime(0, 0, 0)->add($lastSecondModifier);
             if ($cretePreviousPeriod) {
                 $prevStart  = clone $start;
                 $prevModify = static::$valueTypesStartVarsMap[$value['type']]['modify_previous_start'];
@@ -252,27 +277,37 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
                     $prevEnd->modify($modify);
                 }
                 $prevStart->setTime(0, 0, 0);
-                $prevEnd->setTime(0, 0, 0)->modify('1 day');
+                /**
+                 * Solves a problem "last second of the day"
+                 * {@see \Oro\Bundle\FilterBundle\Filter\AbstractDateFilter} class description for more info
+                 */
+                $prevEnd->setTime(0, 0, 0)->add($lastSecondModifier);
             }
         }
         if ($value['type'] === AbstractDateFilterType::TYPE_ALL_TIME) {
             $part = DateModifierInterface::PART_ALL_TIME;
         }
 
-        return [
-            'start'      => $start,
-            'end'        => $end,
-            'type'       => $type,
-            'part'       => $part,
+        $dateData = [
+            'start' => $start,
+            'end' => $end,
+            'type' => $type,
+            'part' => $part,
             'prev_start' => $prevStart,
-            'prev_end'   => $prevEnd
+            'prev_end' => $prevEnd,
         ];
+
+        if ($lastSecondModifier) {
+            $dateData['last_second_modifier'] = $lastSecondModifier;
+        }
+
+        return $dateData;
     }
 
     protected function getCompiledDate($value)
     {
         return $value instanceof \DateTime
             ? $value
-            : $this->dateCompiler->compile($value);
+            : $this->dateCompiler->compile((string) $value);
     }
 }

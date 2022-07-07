@@ -220,12 +220,16 @@ define(function(require) {
         onSubmit: function(event) {
             let data;
             let options;
+            const $form = $(event.target);
+
+            if ($form.is('[data-prevent-submit]')) {
+                event.preventDefault();
+            }
 
             if (event.isDefaultPrevented()) {
                 return;
             }
 
-            const $form = $(event.target);
             if ($form.data('nohash') && !$form.data('sent')) {
                 $form.data('sent', true);
                 return;

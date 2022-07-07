@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataAuditBundle\Service;
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -295,6 +296,7 @@ class EntityChangesToAuditEntryConverter
             ->setParameter('transactionId', $transactionId)
             ->setParameter('objectClass', $entityClass)
             ->setParameter('objectId', (string) $entityId)
+            ->orderBy('a.version', Criteria::DESC)
             ->getQuery()
             ->getOneOrNullResult();
 

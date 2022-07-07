@@ -118,10 +118,9 @@ HELP
                     $this->definitionHandler->createWorkflowDefinition($workflowDefinition);
                 }
 
-                $output->writeln(
-                    Yaml::dump($workflowDefinition->getConfiguration(), 10),
-                    OutputInterface::VERBOSITY_VERBOSE
-                );
+                if ($output->isVerbose()) {
+                    $output->writeln(Yaml::dump($workflowDefinition->getConfiguration(), 10));
+                }
             }
             $output->writeln('');
             $output->writeln('Please run command \'<info>oro:translation:load</info>\' to load translations.');

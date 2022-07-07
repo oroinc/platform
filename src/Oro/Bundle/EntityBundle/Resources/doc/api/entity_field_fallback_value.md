@@ -22,6 +22,22 @@ The created record is returned in the response.
 
 {@inheritdoc}
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+  "data": {
+    "type": "entityfieldfallbackvalues",
+    "attributes": {
+      "fallback": null,
+      "scalarValue": "test"
+    }
+  }
+}
+```
+{@/request}
+
 ### update
 
 Edit a specific entity field fallback value record.
@@ -30,11 +46,28 @@ The updated record is returned in the response.
 
 {@inheritdoc}
 
+{@request:json_api}
+Example:
+
+```JSON
+{
+   "data": {
+      "type": "entityfieldfallbackvalues",
+      "id": "1",
+      "attributes": {
+         "fallback": null,
+         "scalarValue": "test"
+      }
+   }
+}
+```
+{@/request}
+
 ## FIELDS
 
 ### fallback
 
-The value of the fallback. Possible values: `systemConfig`.
+The value of the fallback. Possible values: `systemConfig` or `null`.
 
 ### arrayValue
 

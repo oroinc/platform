@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\ORM;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendReflectionErrorHandler;
 
 /**
  * Adds the following features to the Doctrine's ClassMetadataFactory:
@@ -119,7 +120,15 @@ class OroClassMetadataFactory extends ClassMetadataFactory
             $logger->startGetMetadataFor();
         }
 
-        $result = parent::getMetadataFor($className);
+        try {
+            $result = parent::getMetadataFor($className);
+        } catch (\ReflectionException $e) {
+            if (ExtendReflectionErrorHandler::isSupported($e)) {
+                throw ExtendReflectionErrorHandler::createException($className, $e);
+            } else {
+                throw $e;
+            }
+        }
 
         if (null !== $logger) {
             $logger->stopGetMetadataFor();

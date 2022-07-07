@@ -120,6 +120,7 @@ define(function(require) {
                 this.operateWithEditor(fieldName, editor => {
                     editor.setMode('readonly');
                     $(editor.editorContainer).addClass('disabled');
+                    $(editor.editorContainer).children('.disabled-overlay').remove();
                     $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
                 });
 
