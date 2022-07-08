@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command\Provider;
 
-use Composer\Question\StrictConfirmationQuestion;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -76,8 +75,7 @@ class InputOptionProvider
             return false;
         }
 
-        return is_a($options['class'], ConfirmationQuestion::class, true)
-            || is_a($options['class'], StrictConfirmationQuestion::class, true);
+        return is_a($options['class'], ConfirmationQuestion::class, true);
     }
 
     /**

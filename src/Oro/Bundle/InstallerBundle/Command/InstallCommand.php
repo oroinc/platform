@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Composer\Question\StrictConfirmationQuestion;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,6 +22,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -553,7 +553,7 @@ HELP
             'Load sample data (y/n)',
             null,
             [
-                'class' => StrictConfirmationQuestion::class,
+                'class' => ConfirmationQuestion::class,
                 'constructorArgs' => [false]
             ]
         );

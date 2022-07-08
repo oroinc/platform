@@ -1,0 +1,100 @@
+{
+    "packages": [
+        {
+            "name": "oro/platform",
+            "version": "1.1.0",
+            "version_normalized": "1.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/orocrm/platform.git",
+                "reference": "f9b3884bf79f3ff964529e80bbd83b77d6cfc510"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/orocrm/platform/zipball/f9b3884bf79f3ff964529e80bbd83b77d6cfc510",
+                "reference": "f9b3884bf79f3ff964529e80bbd83b77d6cfc510",
+                "shasum": ""
+            },
+            "require": {
+                "composer/composer": "1.0.0-alpha8",
+                "doctrine/orm": "2.4.1",
+                "ext-gd": "*",
+                "knplabs/knp-menu-bundle": "2.0.x-dev",
+                "liip/imagine-bundle": "1.5.*",
+                "ocramius/proxy-manager": "0.4.*",
+                "symfony/icu": "1.1.*",
+                "symfony/monolog-bundle": "2.3.0"
+            },
+            "time": "2014-04-28 09:42:03",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Oro\\Component": "src/",
+                    "Oro\\Bundle": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Oro, Inc",
+                    "homepage": "http://www.orocrm.com"
+                }
+            ],
+            "description": "Business Application Platform (BAP)",
+            "homepage": "https://github.com/orocrm/platform.git"
+        },
+        {
+            "name": "oro/crm",
+            "version": "1.1.0",
+            "version_normalized": "1.1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/orocrm/crm.git",
+                "reference": "aaebecccb56ba97b6131438bc16065b522033ed5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/orocrm/crm/zipball/aaebecccb56ba97b6131438bc16065b522033ed5",
+                "reference": "aaebecccb56ba97b6131438bc16065b522033ed5",
+                "shasum": ""
+            },
+            "require": {
+                "oro/platform": "1.1.0"
+            },
+            "time": "2014-04-28 10:35:16",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "OroCRM\\Bundle": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OSL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Oro, Inc",
+                    "homepage": "http://www.orocrm.com"
+                }
+            ],
+            "description": "OroCRM",
+            "homepage": "https://github.com/orocrm/crm.git"
+        }
+    ]
+}
