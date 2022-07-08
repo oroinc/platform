@@ -150,6 +150,62 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailBody, $email->getEmailBody());
     }
 
+    public function testSyncOneEmailBodyForEmailWithoutUsers(): void
+    {
+        $user = new User();
+        $user->setId(12);
+        $organization = new Organization();
+        $organization->setId(22);
+        $email = new TestEmailEntity(852);
+        $email->setSubject('Test Email');
+
+        $origin = new TestEmailOrigin();
+        $origin->setActive(true);
+        $origin->setOwner($user);
+        $origin->setOrganization($organization);
+        $folder = new EmailFolder();
+        $folder->setOrigin($origin);
+        $origin->addFolder($folder);
+
+        $this->selector->expects(self::never())
+            ->method('select');
+
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_email');
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('update')
+            ->with('oro_email', ['body_synced' => true], ['id' => 852]);
+        $this->em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(Email::class)
+            ->willReturn($classMetadata);
+
+        $this->em->expects(self::any())
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::never())
+            ->method('flush');
+
+        $this->logger->expects(self::never())
+            ->method('notice');
+        $this->logger->expects(self::never())
+            ->method('warning');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('addNotificationAlert');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
+
+        $this->synchronizer->syncOneEmailBody($email);
+    }
+
     public function testSyncOneEmailBodyFailure(): void
     {
         $email = new Email();
@@ -446,20 +502,8 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             );
         $this->logger->expects(self::never())
             ->method('warning');
-        $this->notificationAlertManager->expects(self::once())
-            ->method('addNotificationAlert')
-            ->willReturnCallback(function (NotificationAlertInterface $notificationAlert) {
-                self::assertEquals(
-                    'Email body save failed. Exception: test exception',
-                    $notificationAlert->toArray()['message']
-                );
-                self::assertEquals(
-                    789,
-                    $notificationAlert->toArray()['additionalInfo']['emailId']
-                );
-
-                return 'test_id';
-            });
+        $this->notificationAlertManager->expects(self::never())
+            ->method('addNotificationAlert');
         $this->notificationAlertManager->expects(self::once())
             ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
         $this->notificationAlertManager->expects(self::once())

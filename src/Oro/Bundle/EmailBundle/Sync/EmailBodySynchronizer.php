@@ -57,7 +57,6 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             // Even if email body was not loaded, email will be marked as synced to prevent sync degradation in time.
             $em = $this->getManager();
             $bodyLoaded = false;
-            $notifications = [];
             foreach ($email->getEmailUsers() as $emailUser) {
                 if (($origin = $emailUser->getOrigin()) && $origin->isActive()) {
                     foreach ($emailUser->getFolders() as $folder) {
@@ -67,14 +66,14 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                             $origin,
                             $folder
                         );
-                        $notifications = array_merge($notifications, $newNotifications);
+                        $this->processNotificationAlerts($origin, $newNotifications, $emailBodyChanged);
                         if ($emailBodyChanged) {
                             $event = new EmailBodyAdded($email);
                             try {
                                 $this->eventDispatcher->dispatch($event, EmailBodyAdded::NAME);
                             } catch (\Exception $e) {
                                 $bodyLoaded = false;
-                                $notifications = $this->processFailedDuringSaveEmail($email, $e, $notifications);
+                                $this->processFailedDuringSaveEmail($email, $e);
                             }
                             break 2;
                         }
@@ -92,11 +91,9 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                         sprintf('The "%s" (ID: %d) email body was synced.', $email->getSubject(), $email->getId())
                     );
                 } catch (\Exception $e) {
-                    $notifications = $this->processFailedDuringSaveEmail($email, $e, $notifications);
+                    $this->processFailedDuringSaveEmail($email, $e);
                 }
             }
-
-            $this->processNotificationAlerts($origin, $notifications, $emailBodyChanged);
         }
     }
 
@@ -293,18 +290,12 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         $connection->update($tableName, ['body_synced' => true], ['id' => $email->getId()]);
     }
 
-    private function processFailedDuringSaveEmail(Email $email, \Exception $exception, array $notifications): array
+    private function processFailedDuringSaveEmail(Email $email, \Exception $exception): void
     {
         $this->updateBodySyncedStateForEntity($email);
         $this->logger->info(
             sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $exception->getMessage()),
             ['exception' => $exception]
         );
-        $notifications[] = EmailSyncNotificationAlert::createForSaveItemBodyFail(
-            $email->getId(),
-            'Email body save failed. Exception: ' . $exception->getMessage()
-        );
-
-        return $notifications;
     }
 }
