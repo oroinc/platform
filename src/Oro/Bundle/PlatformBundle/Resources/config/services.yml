@@ -50,12 +50,6 @@ services:
         tags:
             - { name: container.service_locator }
 
-    oro_platform.composer.local_repo_factory:
-        class: Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory
-        public: false
-        arguments:
-            - '%oro_platform.composer.installed_json%'
-
     oro_platform.version.cache:
         parent: oro.data.cache
         tags:
@@ -69,7 +63,6 @@ services:
     oro_platform.composer.version_helper:
         class: Oro\Bundle\PlatformBundle\Composer\VersionHelper
         arguments:
-            - '@oro_platform.composer.local_repo_factory'
             - '@oro_platform.version.cache'
 
     oro_platform.form.url_generator:
@@ -81,19 +74,11 @@ services:
 
     oro_platform.provider.package:
         class: 'Oro\Bundle\PlatformBundle\Provider\PackageProvider'
-        arguments:
-            - '@oro_platform.composer.local_repo_factory'
-
-    Oro\Bundle\PlatformBundle\Provider\PackageProvider:
-        alias: oro_platform.provider.package
 
     oro_platform.provider.deployment_variables:
         class: 'Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider'
         arguments:
             - '@parameter_bag'
-
-    Oro\Bundle\PlatformBundle\Provider\DeploymentVariableProvider:
-        alias: oro_platform.provider.deployment_variables
 
     oro_platform.twig.platform_extension:
         class: Oro\Bundle\PlatformBundle\Twig\PlatformExtension
