@@ -329,8 +329,6 @@ Feature: Backend workflow configuration
     And I click "Activate" in modal window
     # for now, in UI no way to change datagrids
     And append grid "users-grid" for active workflow "Workflow Button Titles"
-    And go to System/ Localization/ Translations
-    And click "Update Cache"
 
   Scenario: Check Button Title on the datagrid with Name in the transition
     Given I go to System/ User Management/ Users

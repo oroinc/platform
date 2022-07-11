@@ -9,14 +9,19 @@ use Oro\Bundle\SecurityBundle\Configuration\PermissionConfiguration;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationProvider;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
+use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use Oro\Bundle\TestFrameworkBundle\Entity\ItemValue;
+use Oro\Bundle\TestFrameworkBundle\Entity\Product;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
+use Oro\Bundle\TestFrameworkBundle\Entity\TestActivityTarget;
+use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Config\Definition\Processor;
 
 class LoadPermissionConfigurationCommandTest extends WebTestCase
 {
-    /** @var PermissionConfigurationProvider */
-    private $provider;
+    private PermissionConfigurationProvider $provider;
 
     protected function setUp(): void
     {
@@ -92,14 +97,14 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
                         'group_names' => ['default', 'frontend', 'new_group'],
                         'apply_to_all' => false,
                         'apply_to_entities' => [
-                            'OroTestFrameworkBundle:TestActivity',
-                            'OroTestFrameworkBundle:Product',
-                            'OroTestFrameworkBundle:TestActivityTarget',
+                            TestActivity::class,
+                            Product::class,
+                            TestActivityTarget::class,
                         ],
                         'exclude_entities' => [
-                            'OroTestFrameworkBundle:Item',
-                            'OroTestFrameworkBundle:ItemValue',
-                            'OroTestFrameworkBundle:WorkflowAwareEntity',
+                            Item::class,
+                            ItemValue::class,
+                            WorkflowAwareEntity::class,
                         ],
                         'description' => 'Permission 2 description',
                     ],
@@ -120,9 +125,7 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
     private function processPermissionConfig(array $config): array
     {
-        $processor = new Processor();
-
-        return $processor->processConfiguration(new PermissionConfiguration(), [$config]);
+        return (new Processor())->processConfiguration(new PermissionConfiguration(), [$config]);
     }
 
     private function appendPermissionConfig(PermissionConfigurationProvider $provider, array $newPermissions)

@@ -21,7 +21,7 @@ trusted_data:
                 parentJoinAlias: true
                 associationName: true
         Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer:
-            tryGetValue:
+            tryGetValueByAssociationQuery:
                 fieldName: true
         Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter:
             createAssociationQuery:

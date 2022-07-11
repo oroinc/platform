@@ -22,13 +22,7 @@ class UnionQueryBuilderTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => 'Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
     public function testConstructorWithDefaultArguments()

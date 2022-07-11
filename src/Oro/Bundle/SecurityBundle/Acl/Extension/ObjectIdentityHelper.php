@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
+/**
+ * Provides a set of static methods to help working with ACL object identities.
+ */
 class ObjectIdentityHelper
 {
     const FIELD_DELIMITER = '::';
@@ -28,7 +31,7 @@ class ObjectIdentityHelper
             $type = self::getClassFromIdentityString($val);
             $id = self::getExtensionKeyFromIdentityString($val);
             if (self::isFieldEncodedKey($type)) {
-                list($type, $fieldName) = self::decodeEntityFieldInfo($type);
+                [$type, $fieldName] = self::decodeEntityFieldInfo($type);
             }
         }
 
@@ -36,15 +39,14 @@ class ObjectIdentityHelper
     }
 
     /**
-     * Return full identity string by extension key and class name.
-     *
-     * @param string $extensionKey
-     * @param string $class
-     *
-     * @return string
+     * Return full identity string by extension key, class name and optionally field name.
      */
-    public static function encodeIdentityString($extensionKey, $class)
+    public static function encodeIdentityString(string $extensionKey, string $class, string $fieldName = null): string
     {
+        if ($fieldName) {
+            $class = self::encodeEntityFieldInfo($class, $fieldName);
+        }
+
         return $extensionKey . self::IDENTITY_TYPE_DELIMITER . $class;
     }
 
@@ -152,6 +154,14 @@ class ObjectIdentityHelper
         return empty($group)
             ? $type
             : $group . self::GROUP_DELIMITER . $type;
+    }
+
+    /**
+     * Checks whether the given string contains a group identifier.
+     */
+    public static function hasGroupName(string $type): bool
+    {
+        return str_contains($type, self::GROUP_DELIMITER);
     }
 
     /**

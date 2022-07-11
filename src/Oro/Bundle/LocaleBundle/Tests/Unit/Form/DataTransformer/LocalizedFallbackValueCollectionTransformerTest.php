@@ -14,18 +14,20 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    private $registry;
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
 
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
     }
 
     public function testConstructWithInvalidValueClass()
@@ -34,7 +36,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         $this->expectExceptionMessage('Value class must extend AbstractLocalizedFallbackValue');
 
         new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             'string',
             \DateTime::class
         );
@@ -46,7 +48,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     public function testTransform(string|array $field, array|ArrayCollection|null $source, ?array $expected)
     {
         $transformer = new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             $field,
             LocalizedFallbackValue::class
         );
@@ -220,8 +222,8 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
         ?ArrayCollection $expected
     ) {
         $valueClass = CustomLocalizedFallbackValueStub::class;
-        $transformer = new LocalizedFallbackValueCollectionTransformer($this->registry, $field, $valueClass);
-        $this->addRegistryExpectations($values, $localizations, $valueClass);
+        $transformer = new LocalizedFallbackValueCollectionTransformer($this->doctrine, $field, $valueClass);
+        $this->addDoctrineExpectations($values, $localizations, $valueClass);
         $this->assertEquals($expected, $transformer->reverseTransform($source));
     }
 
@@ -319,11 +321,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     public function testTransformUnexpectedType()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array or Traversable", "DateTime" given');
 
         $transformer = new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             'text',
             LocalizedFallbackValue::class
         );
@@ -332,11 +334,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     public function testTransformUnexpectedTypeMultiField()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array or Traversable", "DateTime" given');
 
         $transformer = new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             ['text'],
             LocalizedFallbackValue::class
         );
@@ -345,11 +347,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     public function testReverseTransformUnexpectedType()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
 
         $transformer = new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             'text',
             LocalizedFallbackValue::class
         );
@@ -358,11 +360,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     public function testReverseTransformUnexpectedTypeMultiField()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "DateTime" given');
 
         $transformer = new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             ['text'],
             LocalizedFallbackValue::class
         );
@@ -371,21 +373,21 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
 
     public function testReverseTransformNoLocalization()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\TransformationFailedException::class);
+        $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Undefined localization with ID=1');
 
         $transformer = new LocalizedFallbackValueCollectionTransformer(
-            $this->registry,
+            $this->doctrine,
             'text',
             LocalizedFallbackValue::class
         );
-        $this->addRegistryExpectations([], []);
+        $this->addDoctrineExpectations([], []);
         $transformer->reverseTransform(
             [LocalizedFallbackValueCollectionType::FIELD_VALUES => [1 => 'value']]
         );
     }
 
-    private function addRegistryExpectations(
+    private function addDoctrineExpectations(
         array $values,
         array $localizations,
         string $valueClass = LocalizedFallbackValue::class
@@ -400,11 +402,11 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
             ->method('find')
             ->willReturnMap($this->convertArrayToMap($localizations));
 
-        $this->registry->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getRepository')
             ->willReturnMap([
                 [$valueClass, null, $valueRepository],
-                ['OroLocaleBundle:Localization', null, $localizationRepository],
+                [Localization::class, null, $localizationRepository],
             ]);
     }
 

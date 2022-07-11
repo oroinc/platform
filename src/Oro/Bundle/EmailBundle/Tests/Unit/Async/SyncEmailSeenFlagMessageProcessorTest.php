@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\SyncEmailSeenFlagMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topic\SyncEmailSeenFlagTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
-use Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository;
 use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
@@ -21,7 +20,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectNotToPerformAssertions();
 
         new SyncEmailSeenFlagMessageProcessor(
-            $this->createMock(Registry::class),
+            $this->createMock(ManagerRegistry::class),
             $this->createMock(EmailFlagManager::class),
             $this->createMock(LoggerInterface::class)
         );
@@ -34,17 +33,17 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('error')
             ->with('UserEmail was not found. id: "123"');
 
-        $repository = $this->createMock(EmailUserRepository::class);
-        $repository->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with(EmailUser::class, 123)
             ->willReturn(null);
 
-        $doctrine = $this->createMock(Registry::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())
-            ->method('getRepository')
+            ->method('getManagerForClass')
             ->with(EmailUser::class)
-            ->willReturn($repository);
+            ->willReturn($em);
 
         $flagManager = $this->createMock(EmailFlagManager::class);
         $flagManager->expects($this->never())
@@ -77,21 +76,15 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('changeStatusSeen')
             ->with($this->identicalTo($emailUser), true);
 
-        $repository = $this->createMock(EmailUserRepository::class);
-        $repository->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with(EmailUser::class, 123)
             ->willReturn($emailUser);
-
-        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('flush');
 
-        $doctrine = $this->createMock(Registry::class);
-        $doctrine->expects($this->once())
-            ->method('getRepository')
-            ->with(EmailUser::class)
-            ->willReturn($repository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(EmailUser::class)
@@ -118,21 +111,15 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('changeStatusSeen')
             ->with($this->identicalTo($emailUser), false);
 
-        $repository = $this->createMock(EmailUserRepository::class);
-        $repository->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
             ->method('find')
-            ->with(123)
+            ->with(EmailUser::class, 123)
             ->willReturn($emailUser);
-
-        $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
             ->method('flush');
 
-        $doctrine = $this->createMock(Registry::class);
-        $doctrine->expects($this->once())
-            ->method('getRepository')
-            ->with(EmailUser::class)
-            ->willReturn($repository);
+        $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects($this->once())
             ->method('getManagerForClass')
             ->with(EmailUser::class)

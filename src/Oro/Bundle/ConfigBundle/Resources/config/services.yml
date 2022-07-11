@@ -80,11 +80,11 @@ services:
             - '@oro_config.config_bag'
             - '@translator'
             - '@form.factory'
+            - '@form.registry'
             - '@security.authorization_checker'
             - '@oro_config.configuration_search_provider.chain'
-            - '@form.registry'
-        calls:
-            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
+            - '@oro_featuretoggle.checker.feature_checker'
+            - '@event_dispatcher'
 
     Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider:
         alias: oro_config.provider.system_configuration.form_provider
@@ -92,7 +92,7 @@ services:
     oro_config.provider.system_configuration.form_provider:
         class: Oro\Bundle\ConfigBundle\Provider\SystemConfigurationFormProvider
         public: true
-        parent: 'oro_config.provider.abstract_provider'
+        parent: oro_config.provider.abstract_provider
         lazy: true
 
     oro_config.form.config_subscriber:
@@ -172,13 +172,6 @@ services:
             - '@oro_message_queue.consumption.cache_state'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
-
-    oro_config.form.configurator.use_default_configurator.abstract:
-        class: Oro\Bundle\ConfigBundle\Form\Configurator\UseDefaultConfigurator
-        abstract: true
-        public: true
-        arguments:
-            - '@oro_config.form.handler.config'
 
     oro_config.configuration_search_provider.chain:
         class: Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider

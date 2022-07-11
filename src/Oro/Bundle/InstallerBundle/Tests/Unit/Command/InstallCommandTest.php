@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Tests\Unit\Command;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\InstallCommand;
 use Oro\Bundle\InstallerBundle\ScriptManager;
@@ -46,7 +46,7 @@ class InstallCommandTest extends TestCase
         /** @noinspection PhpParamsInspection */
         $this->command = new InstallCommand(
             $container,
-            $this->createMock(Registry::class),
+            $this->createMock(ManagerRegistry::class),
             $this->createMock(EventDispatcherInterface::class),
             $applicationState,
             $this->createMock(ScriptManager::class)

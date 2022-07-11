@@ -183,6 +183,43 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testOnRequestOnSystemEmailConfigPageWithRefreshTokensAlerts(): void
+    {
+        $event = new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(
+                [],
+                [],
+                [
+                    '_route'         => 'oro_config_configuration_system',
+                    'activeGroup'    => 'platform',
+                    'activeSubGroup' => 'email_configuration'
+                ]
+            ),
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getOrganizationId')
+            ->willReturn(456);
+
+        $this->notificationAlertManager->expects(self::once())
+            ->method('getNotificationAlertsCountGroupedByTypeForUserAndOrganization')
+            ->with(null, 456)
+            ->willReturn([
+                EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN => 1
+            ]);
+
+        $this->listener->onRequest($event);
+
+        self::assertEquals(
+            ['warning' => [
+                'translated_oro.email.sync_alert.system_origin.auth'
+            ]],
+            $this->flashbag->all()
+        );
+    }
+
     public function testOnRequestOnMyEmailConfigPageWithoutAlerts(): void
     {
         $event = new RequestEvent(
@@ -230,6 +267,33 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
                 EmailSyncNotificationAlert::ALERT_TYPE_AUTH          => 1,
                 EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER => 0,
                 'another_type'                                       => 10
+            ]);
+
+        $this->listener->onRequest($event);
+
+        self::assertEquals(['warning' => ['translated_oro.email.sync_alert.auth.short']], $this->flashbag->all());
+    }
+
+    public function testOnRequestOnMyEmailConfigPageWithRefreshTokenAuthAlerts(): void
+    {
+        $event = new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(
+                [],
+                [],
+                [
+                    '_route'         => 'oro_user_profile_configuration',
+                    'activeGroup'    => 'platform',
+                    'activeSubGroup' => 'user_email_configuration'
+                ]
+            ),
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->notificationAlertManager->expects(self::once())
+            ->method('getNotificationAlertsCountGroupedByType')
+            ->willReturn([
+                EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN => 1
             ]);
 
         $this->listener->onRequest($event);
@@ -397,6 +461,59 @@ class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
                 'translated_oro.email.sync_alert.sync',
                 'translated_oro.email.sync_alert.auth.full',
                 'translated_oro.email.sync_alert.switch_folder.full'
+            ]],
+            $this->flashbag->all()
+        );
+    }
+
+    public function testOnRequestOnMyEmailsPageWithoutSystemMailboxesAndCurrentBoxRefreshTokenAlerts(): void
+    {
+        $user = new User();
+        $user->setId(48);
+
+        $organization = new Organization();
+        $organization->setId(23);
+
+        $event = new RequestEvent(
+            $this->createMock(HttpKernelInterface::class),
+            new Request(
+                [],
+                [],
+                [
+                    '_route' => 'oro_email_user_emails'
+                ]
+            ),
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->tokenAccessor->expects(self::once())
+            ->method('getUser')
+            ->willReturn($user);
+        $this->tokenAccessor->expects(self::once())
+            ->method('getOrganization')
+            ->willReturn($organization);
+
+        $this->mailboxManager->expects(self::once())
+            ->method('findAvailableMailboxes')
+            ->with($user, $organization)
+            ->willReturn([]);
+
+        $this->router->expects(self::once())
+            ->method('generate');
+
+        $this->notificationAlertManager->expects(self::never())
+            ->method('getNotificationAlertsCountGroupedByUserAndType');
+        $this->notificationAlertManager->expects(self::once())
+            ->method('getNotificationAlertsCountGroupedByType')
+            ->willReturn([
+                EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN => 1
+            ]);
+
+        $this->listener->onRequest($event);
+
+        self::assertEquals(
+            ['warning' => [
+                'translated_oro.email.sync_alert.auth.full'
             ]],
             $this->flashbag->all()
         );

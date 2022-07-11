@@ -7,14 +7,14 @@
         {% block head %}
             <title>{% trans %}Loading...{% endtrans %}</title>
             <script id="page-title" type="text/html">{{ oro_title_render() }}</script>
-            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0{% if isMobileVersion() %}, user-scalable=no, viewport-fit=cover{% endif %}"/>
-            <meta http-equiv="cache-control" content="max-age=0" />
-            <meta http-equiv="cache-control" content="no-cache" />
-            <meta http-equiv="expires" content="0" />
-            <meta http-equiv="pragma" content="no-cache" />
+            <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0{% if isMobileVersion() %}, user-scalable=no, viewport-fit=cover{% endif %}">
+            <meta http-equiv="cache-control" content="max-age=0">
+            <meta http-equiv="cache-control" content="no-cache">
+            <meta http-equiv="expires" content="0">
+            <meta http-equiv="pragma" content="no-cache">
             {% block head_style %}
                 {% if oro_theme_icon() %}
-                    <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}" />
+                    <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}">
                 {% endif %}
                {% placeholder head_style %}
             {% endblock %}
@@ -57,7 +57,7 @@
     <div id="progressbar" class="progress-bar-container">
         <h3 class="progress-title">{{ 'oro.ui.loading'|trans }}</h3>
         <div class="progress infinite">
-            <div class="progress-bar" role="progressbar" aria-valuetext="{{ 'oro.ui.page_loading'|trans }}"></div>
+            <progress class="progress-bar" aria-valuetext="{{ 'oro.ui.page_loading'|trans }}"></progress>
         </div>
     </div>
     <div id="page" style="display:none;" class="app-page">
@@ -83,8 +83,7 @@
                     <div class="app-header__inner">
                         <div class="app-header__container">
                             {% placeholder header_logo %}
-                            <ul class="user-menu"
-                                {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/user-menu-view'}) }}>
+                            <ul class="user-menu">
                                 {{ block('user_menu') }}
                             </ul>
                             <div class="app-header__search-and-shortcuts">

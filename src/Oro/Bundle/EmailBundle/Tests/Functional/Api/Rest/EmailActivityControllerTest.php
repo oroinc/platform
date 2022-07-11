@@ -3,23 +3,18 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData;
-use Oro\Bundle\EmailBundle\Tests\Functional\EmailFeatureTrait;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EmailActivityControllerTest extends WebTestCase
 {
-    use EmailFeatureTrait;
-
     /** @var string */
     private $baseUrl;
 
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateWsseAuthHeader());
         $this->loadFixtures([LoadEmailActivityData::class]);
         $this->baseUrl = $this->getUrl('oro_api_get_email_activity_relations_by_filters');
-
-        $this->enableEmailFeature();
     }
 
     public function testGetEntities()

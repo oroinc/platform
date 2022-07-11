@@ -10,17 +10,7 @@ services:
         class: Oro\Bundle\AddressBundle\Provider\CountryProvider
         public: true
         arguments:
-            - '@oro_address.repository.country'
-
-    oro_address.repository.country:
-        alias: Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository
-
-    Oro\Bundle\AddressBundle\Entity\Repository\CountryRepository:
-        parent: oro_entity.abstract_repository
-        arguments:
-            - 'Oro\Bundle\AddressBundle\Entity\Country'
-        tags:
-            - { name: doctrine.repository_service }
+            - '@doctrine'
 
     oro_address.extension.action.type.map:
         class: Oro\Bundle\AddressBundle\Extension\Action\Actions\MapAction
@@ -41,11 +31,3 @@ services:
             - '@oro_platform.twig.service_locator'
         tags:
             - { name: twig.extension }
-
-    oro_address.listener.translator_catalogue:
-        class: Oro\Bundle\AddressBundle\EventListener\TranslatorCatalogueListener
-        lazy: true
-        arguments:
-            - '@doctrine'
-        tags:
-            - { name: kernel.event_listener, event: oro_translation.after_catalogue_dump, method: onAfterCatalogueDump }

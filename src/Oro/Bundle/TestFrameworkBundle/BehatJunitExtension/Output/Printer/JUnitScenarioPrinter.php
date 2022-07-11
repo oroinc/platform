@@ -13,6 +13,9 @@ use Behat\Testwork\Output\Printer\JUnitOutputPrinter;
 use Behat\Testwork\Tester\Result\TestResult;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\EventListener\JUnitDurationListener;
 
+/**
+ * JUnit scenario printer custom implementation
+ */
 final class JUnitScenarioPrinter
 {
     /**

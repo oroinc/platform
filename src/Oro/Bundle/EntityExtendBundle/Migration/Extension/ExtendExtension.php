@@ -32,19 +32,23 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 class ExtendExtension implements NameGeneratorAwareInterface
 {
     private const ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
-
     private const DEFAULT_IDENTITY_FIELDS = ['id'];
 
-    /**
-     * @var ExtendDbIdentifierNameGenerator
-     */
+    protected ExtendOptionsManager $extendOptionsManager;
+    protected EntityMetadataHelper $entityMetadataHelper;
+    protected PropertyConfigBag $propertyConfigBag;
+
+    /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
     public function __construct(
-        protected ExtendOptionsManager $extendOptionsManager,
-        protected EntityMetadataHelper $entityMetadataHelper,
-        protected PropertyConfigBag $propertyConfigBag
+        ExtendOptionsManager $extendOptionsManager,
+        EntityMetadataHelper $entityMetadataHelper,
+        PropertyConfigBag $propertyConfigBag
     ) {
+        $this->extendOptionsManager = $extendOptionsManager;
+        $this->entityMetadataHelper = $entityMetadataHelper;
+        $this->propertyConfigBag = $propertyConfigBag;
     }
 
     /**

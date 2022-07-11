@@ -1,6 +1,6 @@
 entity_config:
     email:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#email
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#email
         field:
             items:
                 available_in_template:
@@ -8,7 +8,7 @@ entity_config:
                         value_type:         boolean
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, ref-one, manyToOne, simple_array, guid]
                     form:
-                        type:               Symfony\Component\Form\Extension\Core\Type\ChoiceType
+                        type:               Oro\Bundle\EntityConfigBundle\Form\Type\ChoiceType
                         options:
                             choices:
                                 No:         false
@@ -16,8 +16,12 @@ entity_config:
                             placeholder:    false
                             block:          other
                             label:          oro.email.entity_config.email.field.items.available_in_template
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No
     attachment:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config.html#attachment
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config/#attachment
         entity:
             items:
                 auto_link_attachments:

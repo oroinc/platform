@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider\Filter;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -11,9 +11,12 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
+/**
+ * Provides business unit tree.
+ */
 class ChoiceTreeBusinessUnitProvider
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var AclHelper */
@@ -26,7 +29,7 @@ class ChoiceTreeBusinessUnitProvider
     protected $treeProvider;
 
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $registry,
         TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper,
         ChainOwnerTreeProvider $treeProvider

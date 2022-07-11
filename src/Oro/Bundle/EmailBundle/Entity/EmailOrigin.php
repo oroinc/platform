@@ -60,6 +60,13 @@ abstract class EmailOrigin
     protected $isActive = true;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="is_sync_enabled", type="boolean", nullable=true)
+     */
+    protected $isSyncEnabled = true;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="sync_code_updated", type="datetime", nullable=true)
@@ -398,5 +405,21 @@ abstract class EmailOrigin
         $this->mailbox = $mailbox;
 
         return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSyncEnabled(): bool
+    {
+        return $this->isSyncEnabled ?? true;
+    }
+
+    /**
+     * @param bool $isSyncEnabled
+     */
+    public function setIsSyncEnabled(bool $isSyncEnabled): void
+    {
+        $this->isSyncEnabled = $isSyncEnabled;
     }
 }

@@ -193,7 +193,9 @@ class Segment extends ExtendSegment implements GridQueryDesignerInterface
     public function setName($name)
     {
         $this->name = $name;
-        $this->nameLowercase = mb_strtolower($name);
+        $this->nameLowercase = $this->name
+            ? mb_strtolower($this->name)
+            : $this->name;
 
         return $this;
     }

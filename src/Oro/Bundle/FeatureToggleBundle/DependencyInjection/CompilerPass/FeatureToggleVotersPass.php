@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FeatureToggleBundle\DependencyInjection\CompilerPass;
 
 use Oro\Component\DependencyInjection\Compiler\TaggedServiceTrait;
+use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -24,10 +25,9 @@ class FeatureToggleVotersPass implements CompilerPassInterface
         foreach ($taggedServices as $id => $tags) {
             $voters[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
         }
-
         $voters = $this->inverseSortByPriorityAndFlatten($voters);
 
-        $container->getDefinition('oro_featuretoggle.checker.feature_checker')
-            ->addMethodCall('setVoters', [array_values($voters)]);
+        $container->getDefinition('oro_featuretoggle.feature_decision_manager')
+            ->setArgument('$voters', new IteratorArgument(array_values($voters)));
     }
 }

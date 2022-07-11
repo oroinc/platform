@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\DependencyInjection;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 
 class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,41 +23,41 @@ class OroFeatureToggleExtensionTest extends \PHPUnit\Framework\TestCase
     public function testLoadWithoutConfig()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
 
         $this->extension->load([], $container);
 
-        $this->assertEquals(
-            [
-                new Reference('oro_featuretoggle.configuration.manager'),
-                [],
-                FeatureChecker::STRATEGY_UNANIMOUS,
-                false,
-                true
-            ],
-            $container->getDefinition('oro_featuretoggle.checker.feature_checker')->getArguments()
-        );
+        $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
+        $this->assertEquals('unanimous', $featureDecisionManagerDef->getArgument('$strategy'));
+        $this->assertFalse($featureDecisionManagerDef->getArgument('$allowIfAllAbstainDecisions'));
+        $this->assertTrue($featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions'));
     }
 
     public function testLoadWithConfig()
     {
         $container = new ContainerBuilder();
+        $container->setParameter('kernel.environment', 'prod');
+
         $config = [
-            'strategy'                      => FeatureChecker::STRATEGY_AFFIRMATIVE,
+            'strategy'                      => 'affirmative',
             'allow_if_all_abstain'          => true,
             'allow_if_equal_granted_denied' => false
         ];
 
         $this->extension->load([$config], $container);
 
+        $featureDecisionManagerDef = $container->getDefinition('oro_featuretoggle.feature_decision_manager');
         $this->assertEquals(
-            [
-                new Reference('oro_featuretoggle.configuration.manager'),
-                [],
-                $config['strategy'],
-                $config['allow_if_all_abstain'],
-                $config['allow_if_equal_granted_denied']
-            ],
-            $container->getDefinition('oro_featuretoggle.checker.feature_checker')->getArguments()
+            $config['strategy'],
+            $featureDecisionManagerDef->getArgument('$strategy')
+        );
+        $this->assertEquals(
+            $config['allow_if_all_abstain'],
+            $featureDecisionManagerDef->getArgument('$allowIfAllAbstainDecisions')
+        );
+        $this->assertEquals(
+            $config['allow_if_equal_granted_denied'],
+            $featureDecisionManagerDef->getArgument('$allowIfEqualGrantedDeniedDecisions')
         );
     }
 }

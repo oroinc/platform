@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
@@ -10,13 +9,9 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithAvatars;
 
 class ControllersTest extends WebTestCase
 {
-    /** @var Registry */
-    private $registry;
-
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
-        $this->registry = $this->getContainer()->get('doctrine');
         $this->loadFixtures([LoadUserData::class, LoadUsersWithAvatars::class]);
     }
 
@@ -156,9 +151,10 @@ class ControllersTest extends WebTestCase
      */
     public function testAutoCompleteHandler(bool $active, string $handlerName, string $query): void
     {
-        $user = $this->registry->getRepository(User::class)->findOneBy(['username' => 'simple_user']);
+        $doctrine = $this->getContainer()->get('doctrine');
+        $user = $doctrine->getRepository(User::class)->findOneBy(['username' => 'simple_user']);
         $user->setEnabled($active);
-        $this->registry->getManager()->flush();
+        $doctrine->getManager()->flush();
 
         $this->client->request(
             'GET',

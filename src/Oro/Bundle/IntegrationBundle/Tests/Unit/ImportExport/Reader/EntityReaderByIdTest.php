@@ -10,6 +10,7 @@ use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\EntityConfigBundle\Provider\ExportQueryProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Reader\EntityReaderById;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
@@ -38,12 +39,7 @@ class EntityReaderByIdTest extends OrmTestCase
         $this->exportQueryProvider = $this->createMock(ExportQueryProvider::class);
 
         $this->em = $this->getTestEntityManager();
-        $config = $this->em->getConfiguration();
-        $config->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\IntegrationBundle\Entity'
-        ));
-        $config->setEntityNamespaces(['OroIntegrationBundle' => 'Oro\Bundle\IntegrationBundle\Entity']);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->reader = new EntityReaderById(
             $this->contextRegistry,
@@ -55,7 +51,7 @@ class EntityReaderByIdTest extends OrmTestCase
 
     public function testInitialization()
     {
-        $entityName = 'OroIntegrationBundle:Channel';
+        $entityName = Channel::class;
         $qb = $this->em->createQueryBuilder()
             ->select('e')
             ->from($entityName, 'e');
@@ -83,7 +79,7 @@ class EntityReaderByIdTest extends OrmTestCase
 
         $this->reader->setStepExecution($stepExecution);
 
-        $this->assertSame('SELECT e FROM OroIntegrationBundle:Channel e WHERE o.id = :id', $qb->getDQL());
+        $this->assertSame('SELECT e FROM ' . Channel::class . ' e WHERE o.id = :id', $qb->getDQL());
         $this->assertSame(self::TEST_ENTITY_ID, $qb->getParameter('id')->getValue());
     }
 }

@@ -134,21 +134,12 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
     /**
      * @Given /^complete workflow fixture loading$/
      */
-    public function completeWorkflowFixtureLoading()
+    public function completeWorkflowFixtureLoading(): void
     {
         $container = $this->getAppContainer();
-
-        $cache = $container->get('oro_workflow.cache.entity_aware');
-        $cache->invalidateActiveRelated();
-
-        $provider = $container->get('oro_translation.provider.translation_domain');
-        $provider->clearCache();
-
-        $translator = $container->get('translator.default');
-        $translator->rebuildCache();
-
-        $dumper = $container->get('oro_translation.js_dumper');
-        $dumper->dumpTranslations();
+        $container->get('oro_workflow.cache.entity_aware')->invalidateActiveRelated();
+        $container->get('oro_translation.provider.translation_domain')->clearCache();
+        $container->get('oro_translation.js_dumper')->dumpTranslations();
     }
 
     /**

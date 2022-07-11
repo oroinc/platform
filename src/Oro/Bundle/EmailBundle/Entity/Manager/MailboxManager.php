@@ -2,21 +2,24 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * Provides a set of methods to get information about mailboxes available to logged in user.
+ */
 class MailboxManager
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
-    public function __construct(Registry $registry)
+    public function __construct(ManagerRegistry $registry)
     {
         $this->registry = $registry;
     }

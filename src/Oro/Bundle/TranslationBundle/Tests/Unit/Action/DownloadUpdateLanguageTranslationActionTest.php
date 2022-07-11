@@ -8,80 +8,86 @@ use Oro\Bundle\TranslationBundle\Download\TranslationDownloader;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Exception\TranslationDownloaderException;
 use Oro\Component\ConfigExpression\ContextAccessor;
+use Oro\Component\Testing\Logger\BufferingLogger;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class DownloadUpdateLanguageTranslationActionTest extends \PHPUnit\Framework\TestCase
 {
-    private string $codeWithoutTranslations;
-    private string $codeWithTranslations;
-    private Language $languageWithoutTranslations;
-    private Language $languageWithTranslations;
-    private DownloadUpdateLanguageTranslationAction $action1;
-    private DownloadUpdateLanguageTranslationAction $action2;
+    /** @var TranslationDownloader|\PHPUnit\Framework\MockObject\MockObject */
+    private $translationDownloader;
+
+    /** @var BufferingLogger */
+    private $logger;
+
+    /** @var DownloadUpdateLanguageTranslationAction */
+    private $action;
 
     protected function setUp(): void
     {
-        $this->codeWithoutTranslations = 'fr_FR';
-        $this->codeWithTranslations = 'de_DE';
+        $this->translationDownloader = $this->createMock(TranslationDownloader::class);
+        $this->logger = new BufferingLogger();
 
-        $translationDownloader = $this->createMock(TranslationDownloader::class);
-        $translationDownloader->expects(self::any())
+        $this->action = new DownloadUpdateLanguageTranslationAction(
+            new ContextAccessor(),
+            $this->translationDownloader,
+            $this->logger
+        );
+        $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
+    }
+
+    private function getLanguage(string $languageCode): Language
+    {
+        $language = new Language();
+        $language->setCode($languageCode);
+
+        return $language;
+    }
+
+    public function languageDataProvider(): array
+    {
+        return [
+            ['en_US'],
+            [$this->getLanguage('en_US')]
+        ];
+    }
+
+    /**
+     * @dataProvider languageDataProvider
+     */
+    public function testForLanguageWithTranslations(string|Language $language): void
+    {
+        $context = new \ArrayObject(['$' => ['result1' => null, 'result2' => null]]);
+
+        $this->translationDownloader->expects(self::once())
+            ->method('downloadAndApplyTranslations');
+
+        $this->action->initialize(['language' => $language, 'result' => new PropertyPath('$.result2')]);
+        $this->action->execute($context);
+        self::assertTrue($context['$']['result2']);
+
+        self::assertEquals([], $this->logger->cleanLogs());
+    }
+
+    /**
+     * @dataProvider languageDataProvider
+     */
+    public function testForLanguageWithoutTranslations(string|Language $language): void
+    {
+        $context = new \ArrayObject(['$' => ['result1' => null, 'result2' => null]]);
+        $exception = new TranslationDownloaderException('No available translations found for "en_US".');
+
+        $this->translationDownloader->expects(self::any())
             ->method('downloadAndApplyTranslations')
-            ->willReturnCallback(function (string $languageCode) {
-                if ($this->codeWithoutTranslations === $languageCode) {
-                    throw new TranslationDownloaderException(
-                        sprintf('No available translations found for "%s".', $languageCode)
-                    );
-                }
-            });
+            ->willThrowException($exception);
 
-        $this->action1 = new DownloadUpdateLanguageTranslationAction(new ContextAccessor(), $translationDownloader);
-        $this->action2 = new DownloadUpdateLanguageTranslationAction(new ContextAccessor(), $translationDownloader);
-
-        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->action1->setDispatcher($eventDispatcher);
-        $this->action2->setDispatcher($eventDispatcher);
-
-        $this->languageWithoutTranslations = (new Language())->setCode($this->codeWithoutTranslations);
-        $this->languageWithTranslations = (new Language())->setCode($this->codeWithTranslations);
-    }
-
-    public function testWithLanguageCode(): void
-    {
-        $context = new \ArrayObject(['$' => ['result1' => null, 'result2' => null]]);
-
-        $this->action1->initialize([
-            'language' => $this->codeWithoutTranslations,
-            'result' => new PropertyPath('$.result1')
-        ]);
-        $this->action1->execute($context);
+        $this->action->initialize(['language' => $language, 'result' => new PropertyPath('$.result1')]);
+        $this->action->execute($context);
         self::assertFalse($context['$']['result1']);
 
-        $this->action2->initialize([
-            'language' => $this->codeWithTranslations,
-            'result' => new PropertyPath('$.result2')
-        ]);
-        $this->action2->execute($context);
-        self::assertTrue($context['$']['result2']);
-    }
-
-    public function testWithLanguageEntity(): void
-    {
-        $context = new \ArrayObject(['$' => ['result1' => null, 'result2' => null]]);
-
-        $this->action1->initialize([
-            'language' => $this->languageWithoutTranslations,
-            'result' => new PropertyPath('$.result1')
-        ]);
-        $this->action1->execute($context);
-        self::assertFalse($context['$']['result1']);
-
-        $this->action2->initialize([
-            'language' => $this->languageWithTranslations,
-            'result' => new PropertyPath('$.result2')
-        ]);
-        $this->action2->execute($context);
-        self::assertTrue($context['$']['result2']);
+        self::assertEquals(
+            [['error', 'The download translations failed.', ['exception' => $exception]]],
+            $this->logger->cleanLogs()
+        );
     }
 }

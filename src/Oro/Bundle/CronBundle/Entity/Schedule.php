@@ -6,10 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Represents a table with CRON jobs schedules.
  * @ORM\Table(name="oro_cron_schedule", uniqueConstraints={
  *      @ORM\UniqueConstraint(name="UQ_COMMAND", columns={"command", "args_hash", "definition"})
  * })
- * @ORM\Entity(repositoryClass="Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository")
+ * @ORM\Entity()
  * @Config(
  *      defaultValues={
  *          "entity"={

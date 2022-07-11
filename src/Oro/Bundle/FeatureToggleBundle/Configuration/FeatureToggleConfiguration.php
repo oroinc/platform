@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -14,21 +13,17 @@ class FeatureToggleConfiguration implements ConfigurationInterface
 {
     public const ROOT_NODE = 'features';
 
-    /** @var iterable|ConfigurationExtensionInterface[] */
-    private iterable $extensions;
+    private ConfigurationExtension $extension;
 
-    /**
-     * @paran iterable|ConfigurationExtensionInterface[] $extensions
-     */
-    public function __construct(iterable $extensions)
+    public function __construct(ConfigurationExtension $extension)
     {
-        $this->extensions = $extensions;
+        $this->extension = $extension;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder(self::ROOT_NODE);
         $root = $builder->getRootNode();
@@ -36,9 +31,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
         $children = $root->useAttributeAsKey('name')->prototype('array')->children();
 
         $this->addFeatureConfiguration($children);
-        foreach ($this->extensions as $extension) {
-            $extension->extendConfigurationTree($children);
-        }
+        $this->extension->extendConfigurationTree($children);
 
         return $builder;
     }
@@ -59,11 +52,7 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->end()
             ->enumNode('strategy')
                 ->info('A strategy that should be used to decide whether the feature is enabled.')
-                ->values([
-                    FeatureChecker::STRATEGY_AFFIRMATIVE,
-                    FeatureChecker::STRATEGY_CONSENSUS,
-                    FeatureChecker::STRATEGY_UNANIMOUS
-                ])
+                ->values(['unanimous', 'affirmative', 'consensus'])
             ->end()
             ->booleanNode('allow_if_all_abstain')
                 ->info('Defines whether the feature is enabled when all voters abstained from voting.')
@@ -99,14 +88,9 @@ class FeatureToggleConfiguration implements ConfigurationInterface
             ->end()
             ->arrayNode('commands')
                 ->info(
-                    'A list of commands which depend on the feature.'
+                    'A list of commands that depend on the feature.'
                     . ' Running these commands is impossible or is not reasonable when the feature is disabled.'
                 )
-                ->prototype('variable')
-                ->end()
-            ->end()
-            ->arrayNode('field_configs')
-                ->info('A list of field names regardless of an entity.')
                 ->prototype('variable')
                 ->end()
             ->end()

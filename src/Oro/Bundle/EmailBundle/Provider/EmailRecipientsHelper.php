@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailAwareRepository;
 use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
@@ -56,7 +56,7 @@ class EmailRecipientsHelper
     /** @var EmailOwnerProvider */
     protected $emailOwnerProvider;
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EmailAddressHelper */
@@ -69,7 +69,7 @@ class EmailRecipientsHelper
         ConfigManager $configManager,
         TranslatorInterface $translator,
         EmailOwnerProvider $emailOwnerProvider,
-        Registry $registry,
+        ManagerRegistry $registry,
         EmailAddressHelper $addressHelper,
         Indexer $search,
         PropertyAccessorInterface $propertyAccessor

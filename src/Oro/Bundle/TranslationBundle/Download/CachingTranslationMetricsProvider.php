@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\TranslationBundle\Download;
 
-use Exception;
+use Oro\Bundle\TranslationBundle\Exception\TranslationServiceInvalidResponseException;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -14,14 +14,16 @@ use Symfony\Contracts\Cache\ItemInterface;
  */
 class CachingTranslationMetricsProvider implements TranslationMetricsProviderInterface
 {
-    public const CACHE_KEY = 'translation_statistic';
+    private const CACHE_KEY = 'translation_statistic';
     private const CACHE_TTL = 86400;
+    private const LAST_BUILD_DATE = 'lastBuildDate';
 
-    protected CacheInterface $cache;
-    protected TranslationServiceAdapterInterface $adapter;
-    protected LoggerInterface $logger;
+    private CacheInterface $cache;
+    private TranslationServiceAdapterInterface $adapter;
+    private LoggerInterface $logger;
 
-    protected ?array $metrics = null;
+    /** @var array|null [language code => [key => value, ...], ... ] */
+    private ?array $metrics = null;
 
     public function __construct(
         TranslationServiceAdapterInterface $adapter,
@@ -36,11 +38,7 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
     public function getAll(): array
     {
         if (null === $this->metrics) {
-            $this->populateMetrics();
-        }
-
-        foreach ($this->metrics as $languageCode => $metrics) {
-            $this->metrics[$languageCode] = $this->convertLastBuildDateToDateTimeOrUnset($metrics);
+            $this->metrics = $this->loadMetrics();
         }
 
         return $this->metrics;
@@ -48,71 +46,64 @@ class CachingTranslationMetricsProvider implements TranslationMetricsProviderInt
 
     public function getForLanguage(string $languageCode): ?array
     {
-        if (null === $this->metrics) {
-            $this->populateMetrics();
-        }
+        $metrics = $this->getAll();
 
-        if (!isset($this->metrics[$languageCode])) {
-            return null;
-        }
-
-        return $this->convertLastBuildDateToDateTimeOrUnset($this->metrics[$languageCode]);
+        return $metrics[$languageCode] ?? null;
     }
 
     /**
      * Retrieves metrics from the cache if already cached, or from the translation service adapter
      * (and populates the cache) otherwise.
      */
-    private function populateMetrics(): void
+    private function loadMetrics(): array
     {
-        $data = $this->cache->get(static::CACHE_KEY, function (ItemInterface $item) {
-            $item->expiresAfter(static::CACHE_TTL);
-            return $this->fetchMetrics();
+        $data = $this->cache->get(self::CACHE_KEY, function (ItemInterface $item) {
+            $item->expiresAfter(self::CACHE_TTL);
+
+            try {
+                return $this->adapter->fetchTranslationMetrics();
+            } catch (TranslationServiceInvalidResponseException $e) {
+                $this->logger->error(
+                    'Failed to fetch translation metrics.',
+                    ['exception' => $e, 'response_body_contents' => $e->getResponse()]
+                );
+            } catch (\Throwable $e) {
+                $this->logger->error('Failed to fetch translation metrics.', ['exception' => $e]);
+            }
+
+            return null;
         });
 
-        $this->metrics = [];
+        $allMetrics = [];
         if ($data) {
             foreach ($data as $metrics) {
-                $this->metrics[$metrics['code']] = $metrics;
+                $allMetrics[$metrics['code']] = $this->updateMetrics($metrics);
             }
         }
+
+        return $allMetrics;
     }
 
     /**
      * Converts 'lastBuildDate' value into a \DateTime instance if the date-time is valid, and unsets it otherwise.
      */
-    private function convertLastBuildDateToDateTimeOrUnset(array $metrics): array
+    private function updateMetrics(array $metrics): array
     {
-        if (isset($metrics['lastBuildDate'])) {
-            if (\is_string($metrics['lastBuildDate'])) {
+        if (isset($metrics[self::LAST_BUILD_DATE])) {
+            if (\is_string($metrics[self::LAST_BUILD_DATE])) {
                 try {
-                    $metrics['lastBuildDate'] = new \DateTime(
-                        $metrics['lastBuildDate'],
+                    $metrics[self::LAST_BUILD_DATE] = new \DateTime(
+                        $metrics[self::LAST_BUILD_DATE],
                         new \DateTimeZone('UTC')
                     );
-                } catch (Exception $e) {
-                    unset($metrics['lastBuildDate']);
+                } catch (\Exception $e) {
+                    unset($metrics[self::LAST_BUILD_DATE]);
                 }
-            } elseif (!($metrics['lastBuildDate'] instanceof \DateTimeInterface)) {
-                unset($metrics['lastBuildDate']);
+            } elseif (!($metrics[self::LAST_BUILD_DATE] instanceof \DateTimeInterface)) {
+                unset($metrics[self::LAST_BUILD_DATE]);
             }
         }
 
         return $metrics;
-    }
-
-    /**
-     * Fetches translations metrics from the adapter while silencing all exceptions.
-     */
-    private function fetchMetrics(): ?array
-    {
-        try {
-            $data = $this->adapter->fetchTranslationMetrics();
-        } catch (\Throwable $e) {
-            $this->logger->error('Failed to fetch translation metrics.', ['exception' => $e]);
-            return null;
-        }
-
-        return $data;
     }
 }

@@ -6,7 +6,6 @@ namespace Oro\Bundle\ImapBundle\Command\Cron;
 use Oro\Bundle\CronBundle\Command\CronCommandInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\Log\OutputLogger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,13 +36,9 @@ class EmailSyncCommand extends Command implements CronCommandInterface
     protected static $defaultName = 'oro:cron:imap-sync';
 
     private EmailSynchronizerInterface $imapEmailSynchronizer;
-    protected FeatureChecker $featureChecker;
 
-    public function __construct(
-        FeatureChecker $featureChecker,
-        EmailSynchronizerInterface $imapEmailSynchronizer
-    ) {
-        $this->featureChecker = $featureChecker;
+    public function __construct(EmailSynchronizerInterface $imapEmailSynchronizer)
+    {
         $this->imapEmailSynchronizer = $imapEmailSynchronizer;
         parent::__construct();
     }
@@ -55,7 +50,7 @@ class EmailSyncCommand extends Command implements CronCommandInterface
 
     public function isActive()
     {
-        return $this->featureChecker->isResourceEnabled(self::$defaultName, 'cron_jobs');
+        return true;
     }
 
     /**
@@ -171,12 +166,6 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->featureChecker->isFeatureEnabled('email')) {
-            $output->writeln('The email feature is disabled. The command will not run.');
-
-            return 0;
-        }
-
         $this->imapEmailSynchronizer->setLogger(new OutputLogger($output));
 
         $force = $input->getOption('force');

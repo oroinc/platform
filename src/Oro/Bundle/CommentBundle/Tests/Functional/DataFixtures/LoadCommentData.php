@@ -5,6 +5,7 @@ namespace Oro\Bundle\CommentBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -60,7 +61,7 @@ class LoadCommentData extends AbstractCommentFixture implements ContainerAwareIn
     {
         $userManager = $this->container->get('oro_user.manager');
         $adminUser = $userManager->findUserByEmail(LoadAdminUserData::DEFAULT_ADMIN_EMAIL);
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $organization = $manager->getRepository(Organization::class)->getFirst();
 
         foreach ($this->commentData as $data) {
             $entity = new Comment();

@@ -2,33 +2,37 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Exception\LanguageNotFoundException;
+use Oro\Bundle\TranslationBundle\Helper\FileBasedLanguageHelper;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 
+/**
+ * Persists translations strings into DB in single transaction.
+ */
 class DatabasePersister
 {
-    const BATCH_INSERT_ROWS_COUNT = 50;
+    private const BATCH_INSERT_ROWS_COUNT = 50;
 
-    /** @var Registry */
-    private $registry;
+    private ManagerRegistry $doctrine;
+    private TranslationManager $translationManager;
+    private FileBasedLanguageHelper $fileBasedLanguageHelper;
 
-    /** @var TranslationManager */
-    private $translationManager;
-
-    public function __construct(Registry $registry, TranslationManager $translationManager)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        ManagerRegistry $doctrine,
+        TranslationManager $translationManager,
+        FileBasedLanguageHelper $fileBasedLanguageHelper
+    ) {
+        $this->doctrine = $doctrine;
         $this->translationManager = $translationManager;
+        $this->fileBasedLanguageHelper = $fileBasedLanguageHelper;
     }
 
     /**
@@ -36,29 +40,21 @@ class DatabasePersister
      *
      * @param string $locale
      * @param array $catalogData translations strings, format same as MassageCatalog::all() returns
-     *
      * @param int $scope
-     * @throws \Exception
      */
-    public function persist($locale, array $catalogData, $scope = Translation::SCOPE_INSTALLED)
+    public function persist(string $locale, array $catalogData, int $scope = Translation::SCOPE_INSTALLED): void
     {
-        $em = $this->getEntityManager(Translation::class);
-
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Translation::class);
         $em->beginTransaction();
         try {
-            $languageRepository = $this->getEntityRepository(Language::class);
-            /** @var TranslationRepository $translationRepository */
-            $translationRepository = $this->getEntityRepository(Translation::class);
-            $connection = $this->getConnection(Translation::class);
+            $connection = $em->getConnection();
 
-            /** @var Language $language */
-            $language = $languageRepository->findOneBy(['code' => $locale]);
-            if (!$language) {
-                throw new LanguageNotFoundException($locale);
-            }
+            $language = $this->getLanguageForLocale($locale);
+            $this->validateAndUpdateFileBasedLanguage($em, $language, $scope);
 
-            $translationKeys = $this->processTranslationKeys($catalogData);
-            $translations = $translationRepository->getTranslationsData($language->getId());
+            $translationKeys = $this->processTranslationKeys($connection, $catalogData);
+            $translations = $em->getRepository(Translation::class)->getTranslationsData($language->getId());
             $sqlData = [];
             foreach ($catalogData as $domain => $messages) {
                 foreach ($messages as $key => $value) {
@@ -67,6 +63,7 @@ class DatabasePersister
                     }
                     if (isset($translations[$translationKeys[$domain][$key]])) {
                         $this->updateTranslation(
+                            $connection,
                             $value,
                             $language->getId(),
                             $translations[$translationKeys[$domain][$key]],
@@ -80,15 +77,14 @@ class DatabasePersister
                             $connection->quote($value),
                             $scope
                         );
-
                         if (self::BATCH_INSERT_ROWS_COUNT === count($sqlData)) {
-                            $this->executeBatchTranslationInsert($sqlData);
+                            $this->executeBatchTranslationInsert($connection, $sqlData);
                             $sqlData = [];
                         }
                     }
                 }
             }
-            $this->executeBatchTranslationInsert($sqlData);
+            $this->executeBatchTranslationInsert($connection, $sqlData);
             $em->commit();
         } catch (\Exception $exception) {
             $em->rollback();
@@ -102,46 +98,39 @@ class DatabasePersister
         $this->translationManager->clear();
     }
 
-    /**
-     * @param string $class
-     * @return EntityManager
-     */
-    protected function getEntityManager($class)
+    private function getLanguageForLocale(string $locale): Language
     {
-        return $this->registry->getManagerForClass($class);
+        /** @var Language $language */
+        $language = $this->doctrine->getRepository(Language::class)->findOneBy(['code' => $locale]);
+        if (!$language) {
+            throw new LanguageNotFoundException($locale);
+        }
+
+        return $language;
     }
 
-    /**
-     * @param string $class
-     * @return Connection
-     */
-    protected function getConnection($class)
-    {
-        return $this->getEntityManager($class)->getConnection();
-    }
-
-    /**
-     * @param string $class
-     *
-     * @return EntityRepository
-     */
-    protected function getEntityRepository($class)
-    {
-        return $this->getEntityManager($class)->getRepository($class);
+    private function validateAndUpdateFileBasedLanguage(
+        EntityManagerInterface $em,
+        Language $language,
+        int $scope = Translation::SCOPE_INSTALLED
+    ): void {
+        if ($scope === Translation::SCOPE_SYSTEM
+            && !$language->isLocalFilesLanguage()
+            && $this->fileBasedLanguageHelper->isFileBasedLocale($language->getCode())
+        ) {
+            $language->setLocalFilesLanguage(true);
+            $em->persist($language);
+            $em->flush();
+        }
     }
 
     /**
      * Loads translation keys to DB if needed
-     *
-     * @param array $domains
-     *
-     * @return array
      */
-    private function processTranslationKeys(array $domains)
+    private function processTranslationKeys(Connection $connection, array $domains): array
     {
-        $connection = $this->getConnection(TranslationKey::class);
         /** @var TranslationKeyRepository $translationKeyRepository */
-        $translationKeyRepository = $this->getEntityRepository(TranslationKey::class);
+        $translationKeyRepository = $this->doctrine->getRepository(TranslationKey::class);
 
         $translationKeys = $translationKeyRepository->getTranslationKeysData();
         $sql = sprintf(
@@ -153,7 +142,7 @@ class DatabasePersister
         $needUpdate = false;
         foreach ($domains as $domain => $messages) {
             foreach ($messages as $key => $value) {
-                if (strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
+                if (\strlen($key) > MySqlPlatform::LENGTH_LIMIT_TINYTEXT) {
                     continue;
                 }
                 if (!isset($translationKeys[$domain][$key])) {
@@ -178,35 +167,45 @@ class DatabasePersister
         return $translationKeys;
     }
 
-    /**
-     * @param array $sqlData
-
-     * @return array
-     */
-    private function executeBatchTranslationInsert(array $sqlData)
+    private function executeBatchTranslationInsert(Connection $connection, array $sqlData): void
     {
-        $sql = 'INSERT INTO oro_translation (translation_key_id, language_id, value, scope) VALUES ';
         if (0 !== count($sqlData)) {
-            $this->getConnection(Translation::class)->executeQuery($sql . implode(', ', $sqlData));
+            $connection->executeQuery(
+                'INSERT INTO oro_translation (translation_key_id, language_id, value, scope) VALUES '
+                . implode(', ', $sqlData)
+            );
         }
     }
 
     /**
-     * Update translation record in DB only if record is changed and scope in DB for this record is System
-     *
-     * @param string $value
-     * @param int $languageId
-     * @param array $translationDataItem
-     * @param int $scope
-     *
-     * @return array
+     * Update translation record in DB:
+     *  - set the new translation value if record is changed and scope in DB for this record is System
+     *  - change the scope of the record to System if the existing DB value and the value from the file are the same
+     *    and the scope of the file record is System
      */
-    private function updateTranslation($value, $languageId, array $translationDataItem, $scope)
-    {
+    private function updateTranslation(
+        Connection $connection,
+        mixed $value,
+        int $languageId,
+        array $translationDataItem,
+        int $scope
+    ): void {
         if ($translationDataItem['scope'] <= $scope && $translationDataItem['value'] !== $value) {
-            $this->getConnection(Translation::class)->update(
+            $connection->update(
                 'oro_translation',
                 ['value' => $value],
+                [
+                    'translation_key_id' => $translationDataItem['translation_key_id'],
+                    'language_id' => $languageId
+                ]
+            );
+        } elseif ($translationDataItem['scope'] !== Translation::SCOPE_SYSTEM
+            && $scope === Translation::SCOPE_SYSTEM
+            && $translationDataItem['value'] === $value
+        ) {
+            $connection->update(
+                'oro_translation',
+                ['scope' => Translation::SCOPE_SYSTEM],
                 [
                     'translation_key_id' => $translationDataItem['translation_key_id'],
                     'language_id' => $languageId

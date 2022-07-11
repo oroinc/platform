@@ -3,33 +3,36 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Validates whether an feature is enabled for the type of entities specified
- * in the "class" property of the context.
+ * Validates whether a feature that related to an API resource is enabled.
  */
 class ValidateEntityTypeFeature implements ProcessorInterface
 {
-    /** @var FeatureChecker */
-    private $featureChecker;
+    private ResourcesProvider $resourcesProvider;
 
-    public function __construct(FeatureChecker $featureChecker)
+    public function __construct(ResourcesProvider $resourcesProvider)
     {
-        $this->featureChecker = $featureChecker;
+        $this->resourcesProvider = $resourcesProvider;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
-        if (!$this->featureChecker->isResourceEnabled($context->getClassName(), 'api_resources')) {
+        if (!$this->resourcesProvider->isResourceEnabled(
+            $context->getClassName(),
+            $context->getAction(),
+            $context->getVersion(),
+            $context->getRequestType()
+        )) {
             throw new NotFoundHttpException();
         }
     }

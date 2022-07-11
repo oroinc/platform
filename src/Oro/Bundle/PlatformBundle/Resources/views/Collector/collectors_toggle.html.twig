@@ -1,10 +1,11 @@
 <script>
     /* eslint no-var: off */
     (function () {
+        const cookieExpires = new Date(new Date().getTime()+1000*60*60*24*365).toGMTString();
         const trackContainerCheckbox = document.getElementById('sf-toolbar--track-container');
         trackContainerCheckbox.addEventListener('click', function (event) {
             let isActive = event.target.checked === true;
-            document.cookie = 'sf_toolbar_track_container=' + isActive + ';path=/';
+            document.cookie = 'sf_toolbar_track_container=' + isActive + ';expires=' + cookieExpires + ';path=/';
         });
 
         const checkboxes = document.getElementsByClassName('sf-toolbar--collector-checkbox');
@@ -47,7 +48,7 @@
 
         function saveCollectorsToCookie(collectors) {
             collectorsCookie = collectors.join('~');
-            document.cookie = 'sf_toolbar_enabled_collectors=' + collectorsCookie + ';path=/';
+            document.cookie = 'sf_toolbar_enabled_collectors=' + collectorsCookie + ';expires=' + cookieExpires + ';path=/';
         }
     })();
 </script>
@@ -59,6 +60,10 @@
     .sf-toolbar-toggle-data-collectors span {
         padding-right: 10px;
     }
+
+    .sf-toolbar input[type="checkbox"] {
+        --checkbox-size: 13px;
+    }
 </style>
 <div class="sf-toolbar-info-group sf-toolbar-toggle-data-collectors">
     <div class="sf-toolbar-info-piece">
@@ -67,7 +72,7 @@
             <span>
                 {% for collectorName in collectorNames %}
                     <div>
-                    <input data-skip-input-widgets class="sf-toolbar--collector-checkbox" id="{{ collectorName }}"
+                    <input class="sf-toolbar--collector-checkbox" id="{{ collectorName }}"
                            type="checkbox"
                            {% if collectorName in collector.enabledCollectors %}checked{% endif %}>
                         <label for="{{ collectorName }}">{{ collectorName }}</label>
@@ -83,7 +88,7 @@
             </span>
         <br><br>
         <span>
-            <input data-skip-input-widgets id="sf-toolbar--track-container" type="checkbox"
+            <input id="sf-toolbar--track-container" type="checkbox"
                    {% if collector.trackContainerChanges %}checked{% endif %}>
             <label for="sf-toolbar--track-container">track service container changes</label>
             </span>

@@ -11,10 +11,10 @@ export default {
      */
     focusTabbable($container, $el = null) {
         // 1. An element that was passed
-        // 2. First element inside the container matching [autofocus]
+        // 2. First element inside the container matching `.active:tabbable` or `[autofocus]`
         // 3. Tabbable element inside the container
 
-        let $elToFocus = $el !== null ? $el : $container.find('[autofocus]:first');
+        let $elToFocus = $el !== null ? $el : $container.find('.active:tabbable,[autofocus]').first();
 
         if (!$elToFocus.length) {
             $elToFocus = $(this.getFirstTabbable($container.find(':tabbable').toArray()));

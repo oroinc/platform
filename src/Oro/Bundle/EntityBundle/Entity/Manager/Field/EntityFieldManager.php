@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Entity\Manager\Field;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\Persistence\ObjectManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Form\EntityField\FormBuilder;
 use Oro\Bundle\EntityBundle\Form\EntityField\Handler\EntityApiBaseHandler;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -16,20 +15,15 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
- * Class EntityFieldManager
- * @package Oro\Bundle\EntityBundle\Entity\Manager\Field
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * Handles update of entity fields.
  */
 class EntityFieldManager
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var FormBuilder */
     protected $formBuilder;
-
-    /** @var ObjectManager */
-    protected $em;
 
     /** @var EntityApiBaseHandler */
     protected $handler;
@@ -44,7 +38,7 @@ class EntityFieldManager
     protected $entityFieldValidator;
 
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $registry,
         FormBuilder $formBuilder,
         EntityApiBaseHandler $handler,
         EntityRoutingHelper $entityRoutingHelper,
@@ -52,7 +46,6 @@ class EntityFieldManager
         EntityFieldValidator $entityFieldValidator
     ) {
         $this->registry = $registry;
-        $this->em = $this->registry->getManager();
         $this->formBuilder = $formBuilder;
         $this->handler = $handler;
         $this->entityRoutingHelper = $entityRoutingHelper;

@@ -2,28 +2,25 @@
 
 namespace Oro\Bundle\OrganizationBundle\EventListener;
 
-use Oro\Bundle\EntityBundle\ORM\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FilterBundle\Event\ChoiceTreeFilterLoadDataEvent;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
+/**
+ * Loads data for a choice tree filter for BusinessUnit entity.
+ */
 class ChoiceTreeFilterLoadDataListener
 {
-    const SUPPORTED_CLASS_NAME = 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit';
+    private ManagerRegistry $doctrine;
 
-    /** @var Registry */
-    protected $doctrine;
-
-    /**
-     * IndexerPrepareQueryListener constructor.
-     */
-    public function __construct(Registry $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
 
-    public function fillData(ChoiceTreeFilterLoadDataEvent $event)
+    public function fillData(ChoiceTreeFilterLoadDataEvent $event): void
     {
-        if ($event->getClassName() === static::SUPPORTED_CLASS_NAME) {
+        if ($event->getClassName() === BusinessUnit::class) {
             $entities = $this->doctrine->getRepository($event->getClassName())->findBy(['id'=> $event->getValues()]);
             $data = [];
             /** @var BusinessUnit $entity */
@@ -39,13 +36,7 @@ class ChoiceTreeFilterLoadDataListener
         }
     }
 
-    /**
-     * @param BusinessUnit $businessUnit
-     * @param $path
-     *
-     * @return mixed
-     */
-    protected function getPath($businessUnit, $path)
+    protected function getPath(BusinessUnit $businessUnit, array $path): array
     {
         array_unshift($path, ['name'=> $businessUnit->getName()]);
         $owner = $businessUnit->getOwner();

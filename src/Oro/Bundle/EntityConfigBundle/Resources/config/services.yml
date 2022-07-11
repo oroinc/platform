@@ -565,7 +565,7 @@ services:
         arguments:
             - '@doctrine'
         tags:
-            - { name: kernel.event_listener, event: oro_translation.invalidate_translation_cache, method: onInvalidateTranslationCache }
+            - { name: kernel.event_listener, event: oro_translation.invalidate_dynamic_translation_cache, method: onInvalidateDynamicTranslationCache }
 
     oro_entity_config.manager.attribute_group_manager:
         class: Oro\Bundle\EntityConfigBundle\Manager\AttributeGroupManager

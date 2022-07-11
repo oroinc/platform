@@ -24,6 +24,11 @@ oro:
         recent_emails_widget:
             title: Recent emails
             no_subject: "no subject"
+
+        feature:
+            label: User Emails
+            description: Enables user emails
+
         form:
             choose_template:                     Choose a Template
             add_signature:                       Add Signature

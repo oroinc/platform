@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Route;
 
-use Oro\Bundle\CallBundle\Entity\Call;
 use Oro\Bundle\UIBundle\Route\Router;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -178,10 +178,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     public function testWrongParametersRedirectAfterSave()
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->router->redirectAfterSave(
-            [],
-            []
-        );
+        $this->router->redirectAfterSave([], []);
     }
 
     public function testRedirectWillBeToTheSamePageIfInputActionIsEmpty()
@@ -219,7 +216,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode(['route' => '']));
+            ->willReturn(json_encode(['route' => ''], JSON_THROW_ON_ERROR));
 
         $this->router->redirect([]);
     }
@@ -235,7 +232,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode(['route' => ['foo' => 'bar']]));
+            ->willReturn(json_encode(['route' => ['foo' => 'bar']], JSON_THROW_ON_ERROR));
 
         $this->router->redirect([]);
     }
@@ -251,7 +248,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode(['route' => 'foo', 'params' => 'bar']));
+            ->willReturn(json_encode(['route' => 'foo', 'params' => 'bar'], JSON_THROW_ON_ERROR));
 
         $this->router->redirect([]);
     }
@@ -264,7 +261,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->request->expects($this->any())
             ->method('get')
             ->with(Router::ACTION_PARAMETER)
-            ->willReturn(json_encode($data['actionParameters']));
+            ->willReturn(json_encode($data['actionParameters'], JSON_THROW_ON_ERROR));
 
         $this->requestQuery->expects($this->once())
             ->method('all')
@@ -286,8 +283,6 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     public function redirectDataProvider(): array
     {
         $expectedId = 42;
-        $entity = $this->getEntityStub($expectedId);
-
         $expectedSecondEntityId = 21;
 
         return [
@@ -295,7 +290,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => Call::class,
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId,
                         'testQueryParameter' => 'foo'
                     ]
@@ -304,11 +299,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => Call::class,
+                            'testStaticParameter' => User::class,
                             'id' => '$id'
                         ]
                     ],
-                    'context' => $entity,
+                    'context' => $this->getEntityStub($expectedId),
                     'queryParameters' => [
                         'testQueryParameter' => 'foo'
                     ],
@@ -318,7 +313,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => Call::class,
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId,
                     ]
                 ],
@@ -326,11 +321,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => Call::class,
+                            'testStaticParameter' => User::class,
                             'id' => '$id'
                         ]
                     ],
-                    'context' => $entity,
+                    'context' => $this->getEntityStub($expectedId),
                     'queryParameters' => [
                         'testStaticParameter' => 'foo'
                     ],
@@ -340,7 +335,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => Call::class,
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId
                     ]
                 ],
@@ -348,11 +343,11 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => Call::class,
+                            'testStaticParameter' => User::class,
                             'id' => '$id'
                         ]
                     ],
-                    'context' => $entity,
+                    'context' => $this->getEntityStub($expectedId),
                     'queryParameters' => [],
                 ]
             ],
@@ -360,7 +355,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                 'expected' => [
                     'route' => 'test_route',
                     'parameters' => [
-                        'testStaticParameter' => Call::class,
+                        'testStaticParameter' => User::class,
                         'id' => $expectedId,
                         'secondId' => $expectedSecondEntityId
                     ]
@@ -369,13 +364,13 @@ class RouterTest extends \PHPUnit\Framework\TestCase
                     'actionParameters' => [
                         'route' => 'test_route',
                         'params' => [
-                            'testStaticParameter' => Call::class,
+                            'testStaticParameter' => User::class,
                             'id' => '$firstEntity.id',
                             'secondId' => '$secondEntity.id'
                         ]
                     ],
                     'context' => [
-                        'firstEntity' => $entity,
+                        'firstEntity' => $this->getEntityStub($expectedId),
                         'secondEntity' => $this->getEntityStub($expectedSecondEntityId)
                     ],
                     'queryParameters' => [],

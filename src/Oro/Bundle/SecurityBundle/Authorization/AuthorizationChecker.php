@@ -3,6 +3,8 @@
 namespace Oro\Bundle\SecurityBundle\Authorization;
 
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Psr\Log\LoggerInterface;
@@ -18,17 +20,20 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
     private AuthorizationCheckerInterface $authorizationChecker;
     private ObjectIdentityFactory $objectIdentityFactory;
     private AclAnnotationProvider $annotationProvider;
+    private AclGroupProviderInterface $groupProvider;
     private LoggerInterface $logger;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         ObjectIdentityFactory $objectIdentityFactory,
         AclAnnotationProvider $annotationProvider,
+        AclGroupProviderInterface $groupProvider,
         LoggerInterface $logger
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->objectIdentityFactory = $objectIdentityFactory;
         $this->annotationProvider = $annotationProvider;
+        $this->groupProvider = $groupProvider;
         $this->logger = $logger;
     }
 
@@ -37,10 +42,14 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
      *
      * @param mixed $attribute  Can be a role name, permission name, an ACL annotation id,
      *                          string in format "permission;descriptor"
-     *                          (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
-     *                          or something else, it depends on registered security voters
-     * @param mixed $subject    A domain object, object identity or object identity descriptor (id:type)
-     *                          (entity:Acme/DemoBundle/Entity/AcmeEntity, action:some_action)
+     *                          (VIEW;entity:Acme\DemoBundle\Entity\AcmeEntity, EXECUTE;action:acme_action)
+     *                          or something else depending on registered security voters
+     * @param mixed $subject    A domain object, an entity type descriptor
+     *                          (e.g., entity:Acme\DemoBundle\Entity\AcmeEntity, action:some_action).
+     *                          or an instance of {@see \Symfony\Component\Security\Acl\Domain\ObjectIdentity},
+     *                          {@see \Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectReference},
+     *                          {@see \Oro\Bundle\SecurityBundle\Acl\Domain\DomainObjectWrapper},
+     *                          {@see \Symfony\Component\Security\Acl\Voter\FieldVote}.
      *
      * @return bool
      */
@@ -74,6 +83,7 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
                 $delimiter = strpos($attribute, ';');
                 if ($delimiter) {
                     $subject = substr($attribute, $delimiter + 1);
+                    $subject = $this->tryGetObjectIdentity($subject) ?? $subject;
                     $attribute = substr($attribute, 0, $delimiter);
                 }
             }
@@ -91,6 +101,18 @@ class AuthorizationChecker implements AuthorizationCheckerInterface
 
     private function tryGetObjectIdentity(mixed $val): ?ObjectIdentity
     {
+        if (\is_string($val) && !ObjectIdentityHelper::hasGroupName($val)) {
+            $group = $this->groupProvider->getGroup();
+            if ($group) {
+                [$id, $type, $fieldName] = ObjectIdentityHelper::parseIdentityString($val);
+                $val = ObjectIdentityHelper::encodeIdentityString(
+                    $id,
+                    ObjectIdentityHelper::buildType($type, $group),
+                    $fieldName
+                );
+            }
+        }
+
         try {
             return $this->objectIdentityFactory->get($val);
         } catch (InvalidDomainObjectException $e) {

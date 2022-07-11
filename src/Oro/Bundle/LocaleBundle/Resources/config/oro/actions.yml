@@ -22,6 +22,3 @@ operations:
             confirmation:
                 message: oro.locale.localization.delete_confirm
                 component: oroui/js/delete-confirmation
-        actions:
-            - '@run_action_group':
-                action_group: oro_translation_language_update_cache_message

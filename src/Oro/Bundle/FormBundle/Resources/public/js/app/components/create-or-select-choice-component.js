@@ -247,6 +247,7 @@ define(function(require) {
                     if (editor && !$input.data('saved-disabled')) {
                         editor.setMode('readonly');
                         $(editor.editorContainer).addClass('disabled');
+                        $(editor.editorContainer).children('.disabled-overlay').remove();
                         $(editor.editorContainer).append('<div class="disabled-overlay"></div>');
                     }
                 });

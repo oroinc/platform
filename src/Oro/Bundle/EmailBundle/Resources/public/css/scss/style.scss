@@ -186,7 +186,8 @@
 
             .control-group {
                 .controls {
-                    input,
+                    // stylelint-disable-next-line selector-type-no-unknown
+                    #{map_get($oro-form-selectors, 'inputs')},
                     textarea,
                     .select2-container,
                     .validate-group {

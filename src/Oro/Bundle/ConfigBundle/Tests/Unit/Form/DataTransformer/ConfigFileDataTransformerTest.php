@@ -84,7 +84,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformValidFile()
     {
-        $httpFile = $this->prepareHttpFile();
+        $httpFile = $this->getHttpFile();
 
         $file = $this->createMock(File::class);
         $file->expects(self::any())
@@ -104,7 +104,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->with($httpFile, $this->constraints)
             ->willReturn([]);
 
-        $em = $this->prepareEntityManager();
+        $em = $this->getEntityManager();
         $em->expects(self::once())
             ->method('persist');
         $em->expects(self::once())
@@ -115,7 +115,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformInvalidFile()
     {
-        $httpFile = $this->prepareHttpFile();
+        $httpFile = $this->getHttpFile();
 
         $file = $this->createMock(File::class);
         $file->expects(self::any())
@@ -135,7 +135,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->with($httpFile, $this->constraints)
             ->willReturn(['violation']);
 
-        $em = $this->prepareEntityManager();
+        $em = $this->getEntityManager();
         $em->expects(self::never())
             ->method('persist');
         $em->expects(self::never())
@@ -146,7 +146,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformInvalidFileWithoutPersistedEntity()
     {
-        $httpFile = $this->prepareHttpFile();
+        $httpFile = $this->getHttpFile();
 
         $file = $this->createMock(File::class);
         $file->expects(self::any())
@@ -169,7 +169,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
             ->with($httpFile, $this->constraints)
             ->willReturn(['violation']);
 
-        $em = $this->prepareEntityManager();
+        $em = $this->getEntityManager();
         $em->expects(self::never())
             ->method('persist');
         $em->expects(self::never())
@@ -189,10 +189,7 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(null, $this->transformer->reverseTransform($file));
     }
 
-    /**
-     * @return EntityManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function prepareEntityManager()
+    private function getEntityManager(): EntityManager|\PHPUnit\Framework\MockObject\MockObject
     {
         $em = $this->createMock(EntityManager::class);
         $this->doctrineHelper->expects(self::any())
@@ -203,10 +200,10 @@ class ConfigFileDataTransformerTest extends \PHPUnit\Framework\TestCase
         return $em;
     }
 
-    private function prepareHttpFile(): HttpFile
+    private function getHttpFile(): HttpFile
     {
         return new class('', false) extends HttpFile {
-            public function isFile()
+            public function isFile(): bool
             {
                 return true;
             }

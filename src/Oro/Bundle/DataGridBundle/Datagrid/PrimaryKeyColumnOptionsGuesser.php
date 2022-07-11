@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 
 /**
@@ -10,12 +10,11 @@ use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
  */
 class PrimaryKeyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
 {
-    /** @var Registry */
-    private $registry;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(Registry $registry)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -23,7 +22,7 @@ class PrimaryKeyColumnOptionsGuesser extends AbstractColumnOptionsGuesser
      */
     public function guessFormatter($class, $property, $type): ?ColumnGuess
     {
-        $metadata = $this->registry->getManagerForClass($class)->getClassMetadata($class);
+        $metadata = $this->doctrine->getManagerForClass($class)->getClassMetadata($class);
 
         return \in_array($property, $metadata->getIdentifier(), true)
             ? new ColumnGuess(['frontend_type' => 'string'], ColumnGuess::MEDIUM_CONFIDENCE)

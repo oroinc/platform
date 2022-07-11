@@ -111,15 +111,6 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
-     * @When /^(?:|I )save and close form for product attribute$/
-     */
-    public function iSaveAndCloseFormProdAtt()
-    {
-        $this->createOroForm()->saveAndClose();
-        $this->waitForAjax(720000); // Wait for max 12 minutes because cache update process timeout set to 10 minutes
-    }
-
-    /**
      * @When /^(?:|I )save and duplicate form$/
      */
     public function iSaveAndDuplicateForm()
@@ -243,7 +234,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 self::assertEquals(
                     $value,
                     $error,
-                    "Failed asserting that $label has error $value"
+                    "Failed asserting that $label has error $value. Actual value: $error"
                 );
             }
         });
@@ -707,6 +698,9 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function fieldShouldBeEnabled(string $fieldName): void
     {
         $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertFalse($field->hasAttribute('disabled'), sprintf('Field "%s" is disabled', $fieldName));
     }
@@ -717,8 +711,35 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     public function fieldShouldBeDisabled(string $fieldName): void
     {
         $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
         self::assertNotNull($field, sprintf('Field "%s" not found', $fieldName));
         self::assertTrue($field->hasAttribute('disabled'), sprintf('Field "%s" is enabled', $fieldName));
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>(?:[^"]|\\")*)" field should be checked$/
+     */
+    public function checkboxShouldBeChecked(string $fieldName)
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertTrue($field->isChecked());
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>(?:[^"]|\\")*)" field should be unchecked$/
+     */
+    public function checkboxShouldBeUnchecked(string $fieldName)
+    {
+        $field = $this->getSession()->getPage()->findField($fieldName);
+        if (null === $field) {
+            $field = $this->getFieldInForm($fieldName, 'OroForm');
+        }
+        self::assertFalse($field->isChecked());
     }
 
     /**

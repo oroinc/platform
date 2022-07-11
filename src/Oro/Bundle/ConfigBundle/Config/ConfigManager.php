@@ -257,11 +257,12 @@ class ConfigManager
         }
 
         $oldValues = [];
-        foreach ($settings as $name => $setting) {
+        foreach ($settings as $name => $fieldSettings) {
             $oldValues[$name] = $this->getValue($name, false, false, $scopeIdentifier, true);
-
-            $eventName = sprintf('%s.%s', ConfigSettingsUpdateEvent::BEFORE_SAVE, $name);
-            $settings[$name] = $this->dispatchConfigSettingsUpdateEvent($eventName, $setting);
+            $settings[$name] = $this->dispatchConfigSettingsUpdateEvent(
+                sprintf('%s.%s', ConfigSettingsUpdateEvent::BEFORE_SAVE, $name),
+                $fieldSettings
+            );
         }
 
         $settings = $this->dispatchConfigSettingsUpdateEvent(ConfigSettingsUpdateEvent::BEFORE_SAVE, $settings);
@@ -277,15 +278,11 @@ class ConfigManager
         return $changeSet;
     }
 
-    /**
-     * @param string $eventName
-     * @param array $settings
-     * @return array
-     */
-    protected function dispatchConfigSettingsUpdateEvent($eventName, array $settings)
+    protected function dispatchConfigSettingsUpdateEvent(string $eventName, array $settings): array
     {
         $event = new ConfigSettingsUpdateEvent($this, $settings);
         $this->eventDispatcher->dispatch($event, $eventName);
+
         return $event->getSettings();
     }
 
@@ -317,30 +314,21 @@ class ConfigManager
         $this->resetMemoryCache();
     }
 
-    /**
-     * @param FormInterface $form
-     *
-     * @return array
-     */
-    public function getSettingsByForm(FormInterface $form)
+    public function getSettingsByForm(FormInterface $form): array
     {
         $settings = [];
 
         /** @var FormInterface $child */
         foreach ($form as $child) {
-            $name            = $child->getName();
-            $key             = str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name);
+            $name = $child->getName();
+            $key = str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name);
             $settings[$name] = $this->get($key, false, true);
-
-            if (!isset($settings[$name][static::USE_PARENT_SCOPE_VALUE_KEY])) {
-                $settings[$name][static::USE_PARENT_SCOPE_VALUE_KEY] = true;
+            if (!isset($settings[$name][self::USE_PARENT_SCOPE_VALUE_KEY])) {
+                $settings[$name][self::USE_PARENT_SCOPE_VALUE_KEY] = true;
             }
         }
 
-        $event = new ConfigSettingsUpdateEvent($this, $settings);
-        $this->eventDispatcher->dispatch($event, ConfigSettingsUpdateEvent::FORM_PRESET);
-
-        return $event->getSettings();
+        return $this->dispatchConfigSettingsUpdateEvent(ConfigSettingsUpdateEvent::FORM_PRESET, $settings);
     }
 
     /**
@@ -361,14 +349,14 @@ class ConfigManager
 
         $setting = $this->settings[$section][$key];
 
-        if ($setting[static::VALUE_KEY] instanceof ValueProviderInterface) {
-            $setting[static::VALUE_KEY] = $setting[static::VALUE_KEY]->getValue();
+        if ($setting[self::VALUE_KEY] instanceof ValueProviderInterface) {
+            $setting[self::VALUE_KEY] = $setting[self::VALUE_KEY]->getValue();
             // replace provider with value that it returns
-            $this->settings[$section][$key][static::VALUE_KEY] = $setting[static::VALUE_KEY];
+            $this->settings[$section][$key][self::VALUE_KEY] = $setting[self::VALUE_KEY];
         }
 
         if (!$full) {
-            return $setting[static::VALUE_KEY];
+            return $setting[self::VALUE_KEY];
         }
 
         return $setting;
@@ -435,7 +423,7 @@ class ConfigManager
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope
                 if ($this->scope !== $scopeName) {
-                    $settingValue[static::USE_PARENT_SCOPE_VALUE_KEY] = true;
+                    $settingValue[self::USE_PARENT_SCOPE_VALUE_KEY] = true;
                 }
                 break;
             }
@@ -516,7 +504,7 @@ class ConfigManager
     protected function isArrayValue($value, $full)
     {
         if ($full) {
-            return is_array($value[static::VALUE_KEY]);
+            return is_array($value[self::VALUE_KEY]);
         }
 
         return is_array($value);
@@ -530,7 +518,7 @@ class ConfigManager
      */
     protected function getPlainValue($value, $full)
     {
-        return $full ? $value[static::VALUE_KEY] : $value;
+        return $full ? $value[self::VALUE_KEY] : $value;
     }
 
     /**
@@ -546,7 +534,7 @@ class ConfigManager
             return $newValue;
         }
 
-        $value[static::VALUE_KEY] = $newValue;
+        $value[self::VALUE_KEY] = $newValue;
 
         return $value;
     }
@@ -588,7 +576,7 @@ class ConfigManager
         if (is_array($settings)) {
             foreach ($settings as $name => $value) {
                 [$section, $key] = explode(
-                    ConfigManager::SECTION_MODEL_SEPARATOR,
+                    self::SECTION_MODEL_SEPARATOR,
                     str_replace(self::SECTION_VIEW_SEPARATOR, self::SECTION_MODEL_SEPARATOR, $name)
                 );
                 if (!empty($this->settings[$section][$key])) {

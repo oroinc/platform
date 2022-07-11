@@ -4,11 +4,8 @@ Feature: Workflow transition notifications
   As an Administrator
   I want to be able to set transition for notification rules
 
-  Scenario: Update translations cache
+  Scenario: Feature background
     Given I login as administrator
-    When I go to System/Localization/Translations
-    And I click "Update Cache"
-    Then I should see "Translation Cache has been updated" flash message
 
   Scenario: Create an Email notification rule for workflow transition
     Given I go to System/Emails/Notification Rules

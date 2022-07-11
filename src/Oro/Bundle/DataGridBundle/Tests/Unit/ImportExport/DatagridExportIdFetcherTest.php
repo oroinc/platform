@@ -13,6 +13,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBeforeQuery;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
+use Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity\Test as Entity;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -47,13 +48,7 @@ class DatagridExportIdFetcherTest extends OrmTestCase
         $this->queryExecutor = $this->createMock(QueryExecutorInterface::class);
 
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => 'Oro\Bundle\DataGridBundle\Tests\Unit\DataFixtures\Entity'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->fetcher = new DatagridExportIdFetcher(
             $this->gridManagerLink,
@@ -78,13 +73,13 @@ class DatagridExportIdFetcherTest extends OrmTestCase
     public function testGetGridRootEntity()
     {
         $qb = new QueryBuilder($this->em);
-        $qb->from('Test:Test', 't')
+        $qb->from(Entity::class, 't')
             ->select('t.id');
 
         $this->assertGridCall($qb);
         $this->fetcher->setImportExportContext($this->context);
 
-        $this->assertEquals('Test:Test', $this->fetcher->getGridRootEntity());
+        $this->assertEquals(Entity::class, $this->fetcher->getGridRootEntity());
     }
 
     /**
@@ -130,41 +125,41 @@ class DatagridExportIdFetcherTest extends OrmTestCase
             'simple select' => [
                 function ($em) {
                     return (new QueryBuilder($em))
-                        ->from('Test:Test', 't')
+                        ->from(Entity::class, 't')
                         ->select('t.id', 't.name');
                 },
-                'SELECT DISTINCT t.id FROM Test:Test t INDEX BY t.id',
+                'SELECT DISTINCT t.id FROM ' . Entity::class . ' t INDEX BY t.id',
                 'id_0'
             ],
             'simple select with order by' => [
                 function ($em) {
                     return (new QueryBuilder($em))
-                        ->from('Test:Test', 't')
+                        ->from(Entity::class, 't')
                         ->select('t.id', 't.name')
                         ->orderBy('t.name', 'ASC');
                 },
-                'SELECT DISTINCT t.id FROM Test:Test t INDEX BY t.id',
+                'SELECT DISTINCT t.id FROM ' . Entity::class . ' t INDEX BY t.id',
                 'id_0'
             ],
             'select with group by' => [
                 function ($em) {
                     return (new QueryBuilder($em))
-                        ->from('Test:Test', 't')
+                        ->from(Entity::class, 't')
                         ->select('t.id', 't.name')
                         ->groupBy('t.id', 't.name');
                 },
-                'SELECT DISTINCT t.id FROM Test:Test t INDEX BY t.id',
+                'SELECT DISTINCT t.id FROM ' . Entity::class . ' t INDEX BY t.id',
                 'id_0'
             ],
             'select with group by and having' => [
                 function ($em) {
                     return (new QueryBuilder($em))
-                        ->from('Test:Test', 't')
+                        ->from(Entity::class, 't')
                         ->select('COUNT(t.id) as idCount', 't.name')
                         ->groupBy('t.id', 't.name')
                         ->having('idCount > 0');
                 },
-                'SELECT COUNT(t.id) as idCount, t.name, t.id FROM Test:Test t INDEX BY t.id ' .
+                'SELECT COUNT(t.id) as idCount, t.name, t.id FROM ' . Entity::class . ' t INDEX BY t.id ' .
                 'GROUP BY t.id, t.name, t.id HAVING idCount > 0',
                 'id_2'
             ],

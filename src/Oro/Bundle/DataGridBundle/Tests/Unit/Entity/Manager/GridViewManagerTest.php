@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
@@ -57,14 +57,14 @@ class GridViewManagerTest extends \PHPUnit\Framework\TestCase
                 [self::GRID_VIEW_USER_CLASS_NAME, $this->gridViewUserRepository]
             ]);
 
-        $registry = $this->createMock(Registry::class);
-        $registry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($manager);
 
         $this->gridViewManager = new GridViewManager(
             $this->createMock(AclHelper::class),
-            $registry,
+            $doctrine,
             $this->dataGridManager,
             $this->restrictionManager
         );

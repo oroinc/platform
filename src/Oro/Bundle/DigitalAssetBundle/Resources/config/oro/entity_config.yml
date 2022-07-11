@@ -1,6 +1,6 @@
 entity_config:
     attachment:
-        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field.html#attachment
+        # You can find out more about attributes in the documentation: https://doc.oroinc.com/backend/configuration/annotation/config-field/#attachment
         field:
             items:
                 use_dam:
@@ -22,3 +22,7 @@ entity_config:
                             subblock: properties
                             label: oro.digitalasset.entity_config.attachment.field.items.use_dam.label
                             tooltip: oro.digitalasset.entity_config.attachment.field.items.use_dam.tooltip
+                    import_export:
+                        import_template:
+                            use_in_template: true
+                            value: No

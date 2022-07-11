@@ -8,55 +8,110 @@ use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Psr\Log\NullLogger;
+use Oro\Component\Testing\Logger\BufferingLogger;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 class DumpJsTranslationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    private JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject $dumper;
+    /** @var JsTranslationDumper|\PHPUnit\Framework\MockObject\MockObject */
+    private $dumper;
 
-    private DumpJsTranslationsMessageProcessor $processor;
+    /** @var BufferingLogger */
+    private $logger;
+
+    /** @var DumpJsTranslationsMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
-        $logger = new NullLogger();
         $this->dumper = $this->createMock(JsTranslationDumper::class);
-        $this->dumper->expects($this->any())
-            ->method('setLogger')
-            ->with($logger);
+        $this->logger = new BufferingLogger();
 
-        $this->processor = new DumpJsTranslationsMessageProcessor($this->dumper, $logger);
+        $this->processor = new DumpJsTranslationsMessageProcessor($this->dumper, $this->logger);
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
-        $this->assertEquals([DumpJsTranslationsTopic::getName()], $this->processor->getSubscribedTopics());
+        self::assertEquals([DumpJsTranslationsTopic::getName()], $this->processor->getSubscribedTopics());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
-        $this->dumper->expects($this->once())
-            ->method('dumpTranslations');
+        $this->dumper->expects(self::once())
+            ->method('getAllLocales')
+            ->willReturn(['en', 'en_US']);
+        $this->dumper->expects(self::exactly(2))
+            ->method('dumpTranslationFile')
+            ->withConsecutive(['en'], ['en_US'])
+            ->willReturnOnConsecutiveCalls('en.json', 'en_us.json');
 
         $result = $this->processor->process(
             $this->createMock(MessageInterface::class),
             $this->createMock(SessionInterface::class)
         );
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
+
+        self::assertEquals(
+            [
+                [
+                    'info',
+                    'Update JS translations for {locale}.',
+                    ['locale' => 'en']
+                ],
+                [
+                    'info',
+                    'The JS translations for {locale} have been dumped into {file}.',
+                    ['locale' => 'en', 'file' => 'en.json']
+                ],
+                [
+                    'info',
+                    'Update JS translations for {locale}.',
+                    ['locale' => 'en_US']
+                ],
+                [
+                    'info',
+                    'The JS translations for {locale} have been dumped into {file}.',
+                    ['locale' => 'en_US', 'file' => 'en_us.json']
+                ]
+            ],
+            $this->logger->cleanLogs()
+        );
     }
 
-    public function testProcessWithDumperCrash()
+    public function testProcessWithDumperCrash(): void
     {
-        $this->dumper->expects($this->once())
-            ->method('dumpTranslations')
-            ->willThrowException(new IOException('test'));
+        $exception = new IOException('some error');
+
+        $this->dumper->expects(self::once())
+            ->method('getAllLocales')
+            ->willReturn(['en', 'en_US']);
+        $this->dumper->expects(self::once())
+            ->method('dumpTranslationFile')
+            ->with('en')
+            ->willThrowException($exception);
 
         $result = $this->processor->process(
             $this->createMock(MessageInterface::class),
             $this->createMock(SessionInterface::class)
         );
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
+        self::assertEquals(MessageProcessorInterface::REJECT, $result);
+
+        self::assertEquals(
+            [
+                [
+                    'info',
+                    'Update JS translations for {locale}.',
+                    ['locale' => 'en']
+                ],
+                [
+                    'error',
+                    'Cannot update JS translations.',
+                    ['exception' => $exception]
+                ]
+            ],
+            $this->logger->cleanLogs()
+        );
     }
 }

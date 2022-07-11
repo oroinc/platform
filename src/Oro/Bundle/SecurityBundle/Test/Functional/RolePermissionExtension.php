@@ -10,7 +10,6 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This trait can be used in functional tests where you need to change permissions for security roles.
@@ -23,9 +22,15 @@ trait RolePermissionExtension
      * @afterInitClient
      * @beforeResetClient
      */
-    public static function clearAclCache()
+    public static function clearAclCache(): void
     {
-        self::getContainer()->get('tests.security.acl.cache.doctrine')->clearCache();
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $cacheDriver = $em->getConfiguration()->getQueryCache();
+        if ($cacheDriver instanceof AdapterInterface) {
+            $cacheDriver->clear();
+        }
+        self::getContainer()->get('oro_security.tests.security.acl.cache.doctrine')->clearCache();
     }
 
     /**
@@ -130,11 +135,8 @@ trait RolePermissionExtension
         array $permissions,
         string $fieldName = null
     ): void {
-        /** @var ContainerInterface $container */
-        $container = self::getContainer();
-
         /** @var AclManager $aclManager */
-        $aclManager = $container->get('oro_security.acl.manager');
+        $aclManager = self::getContainer()->get('oro_security.acl.manager');
         $aclExtension = $aclManager
             ->getExtensionSelector()
             ->selectByExtensionKey(ObjectIdentityHelper::getExtensionKeyFromIdentityString($objectIdentity));
@@ -157,7 +159,7 @@ trait RolePermissionExtension
 
         if (!self::isDbIsolationPerTest()) {
             /** @var EntityManagerInterface $em */
-            $em = $container->get('doctrine')->getManager();
+            $em = self::getContainer()->get('doctrine')->getManager();
             $cacheDriver = $em->getConfiguration()->getQueryCache();
             if ($cacheDriver instanceof AdapterInterface) {
                 $cacheDriver->clear();

@@ -8,6 +8,7 @@ services:
             - '@oro_migration.tools.schema_dumper'
             - '@oro_entity_config.config_manager'
             - '%kernel.bundles%'
+            - "@=container.hasParameter('debug.file_link_format') && parameter('debug.file_link_format') ? parameter('debug.file_link_format') : 'phpstorm'"
         tags:
             - { name: console.command }
 

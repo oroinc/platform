@@ -5,7 +5,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -41,8 +43,8 @@ class LoadUserWithUserRoleData extends AbstractFixture implements ContainerAware
     {
         /** @var UserManager $userManager */
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_USER']);
+        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_USER']);
 
         $user = $userManager->createUser();
         $user

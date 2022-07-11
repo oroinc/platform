@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
-use Oro\Bundle\FeatureToggleBundle\Exception\CircularReferenceException;
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 /**
  * The provider for features configuration
@@ -24,64 +24,62 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     private const DEPENDENCIES = 'dependencies';
     private const DEPENDENT_FEATURES = 'dependent_features';
     private const DEPENDENCY_KEY = 'dependencies';
+    private const TOGGLES = 'toggles';
+    private const TOGGLE = 'toggle';
 
-    /** @var string[] */
-    private $bundles;
+    private array $bundles;
+    private FeatureToggleConfiguration $configuration;
+    private ConfigurationExtension $configurationExtension;
 
-    /** @var FeatureToggleConfiguration */
-    private $configuration;
-
-    /**
-     * @param string                     $cacheFile
-     * @param bool                       $debug
-     * @param string[]                   $bundles
-     * @param FeatureToggleConfiguration $configuration
-     */
     public function __construct(
         string $cacheFile,
         bool $debug,
         array $bundles,
-        FeatureToggleConfiguration $configuration
+        FeatureToggleConfiguration $configuration,
+        ConfigurationExtension $configurationExtension
     ) {
         parent::__construct($cacheFile, $debug);
         $this->bundles = $bundles;
         $this->configuration = $configuration;
+        $this->configurationExtension = $configurationExtension;
     }
 
-    /**
-     * @return array
-     */
-    public function getFeaturesConfiguration()
+    public function getFeaturesConfiguration(): array
     {
         return $this->getConfiguration(self::FEATURES);
     }
 
-    /**
-     * @return array
-     */
-    public function getResourcesConfiguration()
+    public function getResourcesConfiguration(): array
     {
         return $this->getInternalConfiguration(self::BY_RESOURCE);
     }
 
-    /**
-     * @return array
-     */
-    public function getDependenciesConfiguration()
+    public function getDependenciesConfiguration(): array
     {
         return $this->getInternalConfiguration(self::DEPENDENCIES);
     }
 
-    /**
-     * @return array
-     */
-    public function getDependentsConfiguration()
+    public function getDependentsConfiguration(): array
     {
         return $this->getInternalConfiguration(self::DEPENDENT_FEATURES);
     }
 
+    public function getTogglesConfiguration(): array
+    {
+        return $this->getInternalConfiguration(self::TOGGLES);
+    }
+
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     */
+    public function clearCache(): void
+    {
+        parent::clearCache();
+        $this->configurationExtension->clearConfigurationCache();
+    }
+
+    /**
+     * {@inheritDoc}
      */
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
@@ -109,22 +107,14 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $this->resolveConfiguration($processedConfig);
     }
 
-    /**
-     * @param string $sectionName
-     * @return array
-     */
-    private function getConfiguration(string $sectionName)
+    private function getConfiguration(string $sectionName): array
     {
         $configuration = $this->doGetConfig();
 
         return $configuration[$sectionName];
     }
 
-    /**
-     * @param string $sectionName
-     * @return array
-     */
-    private function getInternalConfiguration(string $sectionName)
+    private function getInternalConfiguration(string $sectionName): array
     {
         $internalConfiguration = $this->getConfiguration(self::INTERNAL);
 
@@ -133,6 +123,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
 
     private function resolveConfiguration(array $data): array
     {
+        $data = $this->configurationExtension->processConfiguration($data);
         $dependencies = $this->resolveDependencies($data);
 
         return [
@@ -140,21 +131,18 @@ class ConfigurationProvider extends PhpArrayConfigProvider
             self::INTERNAL => [
                 self::DEPENDENCIES => $dependencies,
                 self::DEPENDENT_FEATURES => $this->resolveDependentFeatures($dependencies),
-                self::BY_RESOURCE => $this->resolveResources($data)
+                self::BY_RESOURCE => $this->resolveResources($data),
+                self::TOGGLES => $this->resolveToggles($data)
             ]
         ];
     }
 
-    /**
-     * @param array $data
-     * @return array
-     */
-    private function resolveResources(array $data)
+    private function resolveResources(array $data): array
     {
         $resourceFeatures = [];
-        foreach ($data as $feature => $resourceItems) {
-            foreach ($resourceItems as $resourceName => $items) {
-                if (is_array($items) && $resourceName !== self::DEPENDENCY_KEY) {
+        foreach ($data as $feature => $config) {
+            foreach ($config as $resourceName => $items) {
+                if (\is_array($items) && $resourceName !== self::DEPENDENCY_KEY) {
                     foreach ($items as $item) {
                         $resourceFeatures[$resourceName][$item][] = $feature;
                     }
@@ -165,12 +153,30 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $resourceFeatures;
     }
 
-    /**
-     * @param array $data
-     * @return array
-     * @throws CircularReferenceException
-     */
-    private function resolveDependencies(array $data)
+    private function resolveToggles(array $data): array
+    {
+        $toggles = [];
+        foreach ($data as $feature => $config) {
+            if (empty($config[self::TOGGLE])) {
+                continue;
+            }
+            $toggle = $config[self::TOGGLE];
+            if (isset($toggles[$toggle])) {
+                throw new InvalidConfigurationException(sprintf(
+                    'A toggle can be used for one feature only, but the toggle "%s" is used for two features,'
+                    . ' "%s" and "%s".',
+                    $toggle,
+                    $toggles[$toggle],
+                    $feature
+                ));
+            }
+            $toggles[$toggle] = $feature;
+        }
+
+        return $toggles;
+    }
+
+    private function resolveDependencies(array $data): array
     {
         $featureDependencies = [];
         foreach (array_keys($data) as $feature) {
@@ -181,12 +187,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $featureDependencies;
     }
 
-    /**
-     * @param array $data
-     * @return array
-     * @throws CircularReferenceException
-     */
-    private function resolveDependentFeatures(array $data)
+    private function resolveDependentFeatures(array $data): array
     {
         $featureDependents = [];
         foreach (array_keys($data) as $feature) {
@@ -197,23 +198,16 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $featureDependents;
     }
 
-    /**
-     * @param string $feature
-     * @param array $data
-     * @param array $topLevelDependencies
-     * @return array
-     * @throws CircularReferenceException
-     */
-    private function getFeatureDependencies($feature, array $data, array $topLevelDependencies = [])
+    private function getFeatureDependencies(string $feature, array $data, array $topLevelDependencies = []): array
     {
-        $hasDependencies = !empty($data[$feature][self::DEPENDENCY_KEY]);
         $dependsOnFeatures = [];
-        if ($hasDependencies) {
-            $dependsOnFeatures = $hasDependencies ? $data[$feature][self::DEPENDENCY_KEY] : [];
+        if (!empty($data[$feature][self::DEPENDENCY_KEY])) {
+            $dependsOnFeatures = $data[$feature][self::DEPENDENCY_KEY];
             if (count(array_intersect($dependsOnFeatures, $topLevelDependencies)) > 0) {
-                throw new CircularReferenceException(
-                    sprintf('Feature "%s" has circular reference on itself', $feature)
-                );
+                throw new InvalidConfigurationException(sprintf(
+                    'The feature "%s" has circular reference on itself.',
+                    $feature
+                ));
             }
 
             foreach ($data[$feature][self::DEPENDENCY_KEY] as $dependsOnFeature) {
@@ -231,16 +225,11 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         return $dependsOnFeatures;
     }
 
-    /**
-     * @param string $feature
-     * @param array $dependenciesData
-     * @return array
-     */
-    private function getFeatureDependents($feature, array $dependenciesData)
+    private function getFeatureDependents(string $feature, array $dependenciesData): array
     {
         $depended = [];
         foreach ($dependenciesData as $featureName => $dependencies) {
-            if (in_array($feature, $dependencies, true)) {
+            if (\in_array($feature, $dependencies, true)) {
                 $depended[] = $featureName;
             }
         }

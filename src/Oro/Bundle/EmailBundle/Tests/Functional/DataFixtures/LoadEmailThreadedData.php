@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -82,7 +83,7 @@ class LoadEmailThreadedData extends AbstractFixture implements ContainerAwareInt
 
     protected function loadEmailsDemo(ObjectManager $om)
     {
-        $adminUser = $om->getRepository('OroUserBundle:User')->findOneByUsername('admin');
+        $adminUser = $om->getRepository(User::class)->findOneByUsername('admin');
 
         foreach ($this->templates as $index => $template) {
             $isHead = false;

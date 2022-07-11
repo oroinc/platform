@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailModelBuilder;
 use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -34,7 +34,7 @@ class AutoResponseManager
 {
     const INDEX_PLACEHOLDER = '__index__';
 
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /** @var EmailModelBuilder */
@@ -80,7 +80,7 @@ class AutoResponseManager
     ];
 
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $registry,
         EmailModelBuilder $emailBuilder,
         EmailModelSender $emailModelSender,
         EmailRenderer $emailRender,

@@ -345,11 +345,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_ui.config.use_default_configurator:
-        parent: oro_config.form.configurator.use_default_configurator.abstract
-        calls:
-            - ['disableUseDefaultFor', ['app', 'oro_ui', 'application_url']]
-
     oro_ui.validator.move_to_child:
         class: Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator
         arguments:

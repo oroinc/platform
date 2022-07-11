@@ -177,6 +177,16 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     /**
      * {@inheritdoc}
      */
+    public function getFrom()
+    {
+        $from = $this->query->getFrom();
+
+        return false !== $from ? $from : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setFrom($entities)
     {
         $this->query->from($entities);

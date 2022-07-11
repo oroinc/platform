@@ -93,7 +93,7 @@ class CreateUpdateConfigFieldHandler
             return $this->configHelperHandler->redirect($createActionRedirectUrl);
         }
 
-        list($fieldName, $fieldType) = $this->sessionStorage->getFieldInfo($entityConfigModel);
+        [$fieldName, $fieldType] = $this->sessionStorage->getFieldInfo($entityConfigModel);
 
         $extendEntityConfig = $this->configHelper->getEntityConfig($entityConfigModel, 'extend');
         $newFieldModel = $this->createFieldModel($fieldName, $fieldType, $extendEntityConfig, $additionalFieldOptions);
@@ -107,9 +107,7 @@ class CreateUpdateConfigFieldHandler
             $this->configManager->persist($extendEntityConfig);
             $this->configManager->flush();
 
-            return $this
-                ->configHelperHandler->showClearCacheMessage()
-                ->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
+            return $this->configHelperHandler->showSuccessMessageAndRedirect($newFieldModel, $successMessage);
         }
 
         return $this->configHelperHandler->constructConfigResponse($newFieldModel, $form, $formAction);
@@ -129,7 +127,7 @@ class CreateUpdateConfigFieldHandler
         ConfigInterface $extendEntityConfig,
         array $additionalFieldOptions = []
     ): FieldConfigModel {
-        list($fieldType, $fieldOptions) = $this->configHelper->createFieldOptions(
+        [$fieldType, $fieldOptions] = $this->configHelper->createFieldOptions(
             $extendEntityConfig,
             $fieldType,
             $additionalFieldOptions

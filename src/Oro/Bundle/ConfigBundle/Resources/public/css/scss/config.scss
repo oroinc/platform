@@ -49,11 +49,12 @@
 
     .control-subgroup {
         &:not(.parent-scope-checkbox) {
-            .checkbox-view {
+            input[type='checkbox'] {
                 margin-top: $content-padding-small;
             }
 
-            td .checkbox-view {
+            td input[type='checkbox'],
+            .fallback-container input[type='checkbox'] {
                 margin-top: 0;
             }
         }
@@ -63,8 +64,7 @@
         margin-top: ($content-padding-small * .5);
         margin-right: $content-padding-small;
 
-        label,
-        .checkbox-view__text {
+        label {
             margin: 0 $content-padding-small 0 0;
             line-height: 1.75;
             white-space: nowrap;
@@ -75,6 +75,11 @@
             flex-direction: row-reverse;
             align-items: center;
         }
+    }
+
+    .control-subgroup.value-hint-container {
+        margin-top: ($content-padding-small * .5);
+        margin-right: $content-padding-small;
     }
 
     .container-fluid::after {
@@ -99,12 +104,10 @@
         }
     }
 
-    .form-text,
-    .description-container {
+    .form-text {
         margin-top: $content-padding-small;
     }
 
-    .description-container,
     .control-subgroup-container {
         min-width: $field-width;
         max-width: $field-width;

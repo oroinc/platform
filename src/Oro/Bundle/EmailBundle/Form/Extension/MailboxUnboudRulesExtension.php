@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Extension;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Form\Type\MailboxType;
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
@@ -14,14 +14,16 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Adds "unboundRules" hidden field to {@see \Oro\Bundle\EmailBundle\Form\Type\MailboxType} form type.
+ */
 class MailboxUnboudRulesExtension extends AbstractTypeExtension
 {
-    /** @var Registry */
-    protected $registry;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(Registry $registry)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -35,8 +37,8 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
 
         $transformers = [
             new EntitiesToIdsTransformer(
-                $this->getAutoResponseRuleManager(),
-                'Oro\Bundle\EmailBundle\Entity\AutoResponseRule'
+                $this->doctrine->getManagerForClass(AutoResponseRule::class),
+                AutoResponseRule::class
             ),
             new ArrayToStringTransformer(',', true),
         ];
@@ -53,14 +55,6 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
 
             $mailbox->setAutoResponseRules(new ArrayCollection($data));
         });
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getAutoResponseRuleManager()
-    {
-        return $this->registry->getManagerForClass('Oro\Bundle\EmailBundle\Entity\AutoResponseRule');
     }
 
     /**

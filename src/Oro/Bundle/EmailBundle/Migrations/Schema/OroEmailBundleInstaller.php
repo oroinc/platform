@@ -26,7 +26,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
      */
     public function getMigrationVersion()
     {
-        return 'v1_36';
+        return 'v1_37';
     }
 
     /**
@@ -176,6 +176,7 @@ class OroEmailBundleInstaller implements Installation, DatabasePlatformAwareInte
         $table = $schema->createTable('oro_email_origin');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('isactive', 'boolean');
+        $table->addColumn('is_sync_enabled', 'boolean', ['notnull' => false]);
         $table->addColumn('sync_code_updated', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
         $table->addColumn('synchronized', 'datetime', ['notnull' => false, 'comment' => '(DC2Type:datetime)']);
         $table->addColumn('sync_code', 'integer', ['notnull' => false]);

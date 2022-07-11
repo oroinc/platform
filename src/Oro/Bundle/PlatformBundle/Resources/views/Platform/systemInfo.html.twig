@@ -65,10 +65,10 @@
             </tr>
             </thead>
             <tbody>
-            {% for package in packages %}
+            {% for packageName, package in packages %}
                 <tr>
-                    <td>{{ package.prettyName }}</td>
-                    <td>{{ package.prettyVersion }}</td>
+                    <td>{{ packageName }}</td>
+                    <td>{{ package.pretty_version }}</td>
                     <td>
                         {% for license in package.license %}
                             {{ license }}

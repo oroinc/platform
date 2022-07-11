@@ -148,6 +148,7 @@ oro:
             more: 'View More'
             less: 'View Less'
         breadcrumb.aria_label: Breadcrumbs
+        dropdown_option_aria_label: "More Actions"
 
     htmlpurifier:
         formatted_error: '- {{ message }} (near {{ place }}...)'

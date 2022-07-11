@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 /**
- * Dumps the reference structure for Resources/config/oro/features.yml.
+ * Dumps the reference structure for "Resources/config/oro/features.yml".
  */
 class ConfigDumpReferenceCommand extends Command
 {
@@ -22,12 +22,13 @@ class ConfigDumpReferenceCommand extends Command
     public function __construct(FeatureToggleConfiguration $configuration)
     {
         parent::__construct();
-
         $this->configuration = $configuration;
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function configure()
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
     {
         $this
             ->setDescription('Dumps the reference structure for Resources/config/oro/features.yml.')
@@ -43,8 +44,10 @@ HELP
         ;
     }
 
-    /** @noinspection PhpMissingParentCallCommonInspection */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    /**
+     * {@inheritDoc}
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output = new SymfonyStyle($input, $output);
 

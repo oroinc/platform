@@ -33,8 +33,8 @@ class LoadEmailSuggestionData extends AbstractFixture implements DependentFixtur
      */
     public function load(ObjectManager $manager)
     {
-        $this->em           = $manager;
-        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $this->em = $manager;
+        $this->organization = $manager->getRepository(Organization::class)->getFirst();
 
         $this->email = new Email();
         $this->email->setEmail('test1@example.com');

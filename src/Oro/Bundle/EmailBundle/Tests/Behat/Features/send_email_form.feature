@@ -1,3 +1,4 @@
+@container-incompatible
 @ticket-BAP-16290
 @fixture-OroUserBundle:user.yml
 Feature: Send email form

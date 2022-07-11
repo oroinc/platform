@@ -92,7 +92,7 @@ class ConfigurationController extends AbstractController
         $form = false;
 
         if ($activeSubGroup !== null) {
-            $form = $provider->getForm($activeSubGroup);
+            $form = $provider->getForm($activeSubGroup, $manager);
 
             if ($this->get(ConfigHandler::class)
                 ->setConfigManager($manager)

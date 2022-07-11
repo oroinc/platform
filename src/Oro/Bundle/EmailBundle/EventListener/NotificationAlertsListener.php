@@ -100,7 +100,9 @@ class NotificationAlertsListener
             $this->tokenAccessor->getOrganizationId()
         );
 
-        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])) {
+        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
+            || !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN])
+        ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.system_origin.auth');
         }
         if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER])) {
@@ -120,7 +122,9 @@ class NotificationAlertsListener
     {
         $messages = [];
         $alerts = $this->notificationAlertManager->getNotificationAlertsCountGroupedByType();
-        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])) {
+        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
+            || !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN])
+        ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.auth.short');
         }
         if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_SWITCH_FOLDER])) {
@@ -173,7 +177,9 @@ class NotificationAlertsListener
         if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_SYNC])) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.sync');
         }
-        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])) {
+        if (!empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_AUTH])
+            || !empty($alerts[EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN])
+        ) {
             $messages[] = $this->translator->trans('oro.email.sync_alert.auth.full', [
                 '%settings_url%' => $this->router->generate('oro_user_profile_configuration', [
                     'activeGroup'    => 'platform',

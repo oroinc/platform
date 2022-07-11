@@ -4,6 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
+    const mediator = require('oroui/js/mediator');
     const BaseView = require('oroui/js/app/views/base/view');
     const routing = require('routing');
     require('bootstrap');
@@ -191,7 +192,7 @@ define(function(require) {
                 $input.val('').inputWidget('refresh');
 
                 if (!dataItem.dialog) {
-                    $input.closest('form').attr('action', dataItem.url).submit();
+                    mediator.execute('redirectTo', {url: dataItem.url}, {redirect: true});
                 } else {
                     $input.parent().find('li.active > a').click();
                 }

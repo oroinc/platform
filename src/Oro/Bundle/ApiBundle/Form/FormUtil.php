@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Form;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
+use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Component\PhpUtils\ReflectionUtil;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -54,10 +56,7 @@ class FormUtil
         string $propertyName,
         EntityDefinitionConfig $config = null
     ): void {
-        $fieldName = null;
-        if (null !== $config) {
-            $fieldName = $config->findFieldNameByPropertyPath($propertyName);
-        }
+        $fieldName = $config?->findFieldNameByPropertyPath($propertyName);
         if (null === $fieldName) {
             $fieldName = $propertyName;
         }
@@ -162,6 +161,45 @@ class FormUtil
     }
 
     /**
+     * Removes {@see \Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted} validation constraint violation
+     * for a form field.
+     */
+    public static function removeAccessGrantedValidationConstraint(FormInterface $form, string $propertyPath): void
+    {
+        $field = self::findFormFieldByPropertyPath($form, $propertyPath);
+        if (null === $field) {
+            return;
+        }
+
+        $constraints = $field->getConfig()->getOption('constraints');
+        if (!$constraints) {
+            return;
+        }
+
+        $constraintIndex = null;
+        foreach ($constraints as $index => $constraint) {
+            if ($constraint instanceof AccessGranted
+                || (
+                    $constraint instanceof All
+                    && count($constraint->constraints) === 1
+                    && $constraint->constraints[0] instanceof AccessGranted
+                )
+            ) {
+                $constraintIndex = $index;
+                break;
+            }
+        }
+        if (null === $constraintIndex) {
+            return;
+        }
+
+        unset($constraints[$constraintIndex]);
+        $constraints = array_values($constraints);
+
+        self::setFormOption($field, 'constraints', $constraints);
+    }
+
+    /**
      * Finds a form field by its property path.
      */
     public static function findFormFieldByPropertyPath(FormInterface $form, string $propertyPath): ?FormInterface
@@ -210,10 +248,7 @@ class FormUtil
                 $property = ReflectionUtil::getProperty(new \ReflectionClass($cause), 'propertyPath');
                 if (null !== $property) {
                     $property->setAccessible(true);
-                    $property->setValue(
-                        $cause,
-                        str_replace($path, '.', $cause->getPropertyPath())
-                    );
+                    $property->setValue($cause, str_replace($path, '.', $cause->getPropertyPath()));
                 }
             }
         }
@@ -261,5 +296,21 @@ class FormUtil
         }
 
         return implode('.', array_reverse($path));
+    }
+
+    private static function setFormOption(FormInterface $form, string $optionName, mixed $optionValue): void
+    {
+        $fieldConfig = $form->getConfig();
+        $options = $fieldConfig->getOptions();
+        $options[$optionName] = $optionValue;
+        $optionsProperty = ReflectionUtil::getProperty(new \ReflectionClass($fieldConfig), 'options');
+        if (null === $optionsProperty) {
+            throw new \RuntimeException(sprintf(
+                'The class "%s" does not have property "options".',
+                \get_class($fieldConfig)
+            ));
+        }
+        $optionsProperty->setAccessible(true);
+        $optionsProperty->setValue($fieldConfig, $options);
     }
 }

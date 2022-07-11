@@ -7,7 +7,9 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -40,8 +42,8 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
     public function load(ObjectManager $manager)
     {
         $userManager = $this->container->get('oro_user.manager');
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
+        $organization = $manager->getRepository(Organization::class)->getFirst();
+        $role = $manager->getRepository(Role::class)->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')

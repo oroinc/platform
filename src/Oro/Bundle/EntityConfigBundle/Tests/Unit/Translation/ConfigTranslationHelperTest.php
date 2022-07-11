@@ -64,19 +64,13 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidateCache()
     {
-        $this->translationManager->expects($this->once())
-            ->method('invalidateCache');
+        $locale = 'en';
 
-        $this->helper->invalidateCache();
-    }
-
-    public function testInvalidateCacheWithLocale()
-    {
         $this->translationManager->expects($this->once())
             ->method('invalidateCache')
-            ->with('test_locale');
+            ->with($locale);
 
-        $this->helper->invalidateCache('test_locale');
+        $this->helper->invalidateCache($locale);
     }
 
     /**

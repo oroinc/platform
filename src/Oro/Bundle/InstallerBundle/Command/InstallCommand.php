@@ -3,10 +3,9 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Composer\Question\StrictConfirmationQuestion;
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
@@ -23,6 +22,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -44,15 +44,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     private InputOptionProvider $inputOptionProvider;
     private ApplicationState $applicationState;
     private ScriptManager $scriptManager;
-    private Registry $doctrine;
+    private ManagerRegistry $doctrine;
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        ContainerInterface       $container,
-        Registry                 $doctrine,
+        ContainerInterface $container,
+        ManagerRegistry $doctrine,
         EventDispatcherInterface $eventDispatcher,
-        ApplicationState         $applicationState,
-        ScriptManager            $scriptManager
+        ApplicationState $applicationState,
+        ScriptManager $scriptManager
     ) {
         parent::__construct($container);
 
@@ -338,10 +338,7 @@ HELP
 
     protected function checkRequirements(CommandExecutor $commandExecutor): int
     {
-        $commandExecutor->runCommand(
-            'oro:check-requirements',
-            ['--ignore-errors' => true, '--verbose' => 2]
-        );
+        $commandExecutor->runCommand('oro:check-requirements', ['--ignore-errors' => true, '--verbose' => 2]);
 
         return $commandExecutor->getLastCommandExitCode();
     }
@@ -556,7 +553,7 @@ HELP
             'Load sample data (y/n)',
             null,
             [
-                'class' => StrictConfirmationQuestion::class,
+                'class' => ConfirmationQuestion::class,
                 'constructorArgs' => [false]
             ]
         );

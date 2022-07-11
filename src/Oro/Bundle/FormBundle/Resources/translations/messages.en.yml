@@ -13,6 +13,7 @@ oro:
         custom_value: Custom
         tooltip.read_more: Read more
         entity_select: Select a %name%. Opens a popup
+        entity_create: Create a %name%. Opens a popup
         collection:
             add: Add
             remove: Remove

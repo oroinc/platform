@@ -8,7 +8,6 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\TranslationBundle\Download\TranslationMetricsProviderInterface;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Form\Type\AddLanguageType;
-use Oro\Bundle\TranslationBundle\Tests\Unit\Download\OroTranslationServiceAdapterTest;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -62,6 +61,26 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
 
     public function testBuildForm(): void
     {
+        $metrics = [
+            'uk_UA' => [
+                'code' => 'uk_UA',
+                'translationStatus' => 100,
+                'lastBuildDate' => '2020-08-24T00:00:00+0300'
+            ],
+            'de_DE' => [
+                'code' => 'de_DE',
+                'altCode' => 'de',
+                'translationStatus' => 90,
+                'lastBuildDate' => '2020-10-03T23:59:59+0100'
+            ],
+            'fr_FR' => [
+                'code' => 'fr_FR',
+                'altCode' => 'fr',
+                'translationStatus' => 80,
+                'lastBuildDate' => '2020-07-14T00:00:00+0200'
+            ],
+        ];
+
         $defaultLocale = 'de';
         $installedLanguages = ['en' => true, 'en_US' => true, 'uk_UA' => true];
         $allIntlLanguages = Locales::getNames($defaultLocale);
@@ -74,15 +93,15 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
 
         $this->translationStatisticProvider->expects(self::any())
             ->method('getAll')
-            ->willReturn(OroTranslationServiceAdapterTest::METRICS);
+            ->willReturn($metrics);
 
         $form = $this->factory->create(AddLanguageType::class);
         $choices = $form->getConfig()->getOption('choices');
 
-        $expectedWithTranslations = array_diff_key(
-            array_intersect_key($allIntlLanguages, OroTranslationServiceAdapterTest::METRICS),
-            $installedLanguages
-        );
+        $expectedWithTranslations = [
+            'de_DE' => $allIntlLanguages['de_DE'],
+            'fr_FR' => $allIntlLanguages['fr_FR'],
+        ];
         $expectedWithoutTranslations = array_diff_key(
             $allIntlLanguages,
             $expectedWithTranslations,
@@ -105,7 +124,6 @@ class AddLanguageTypeTest extends FormIntegrationTestCase
             ->onlyMethods(['configureOptions', 'getParent'])
             ->disableOriginalConstructor()
             ->getMock();
-
         $choiceType->expects(self::any())
             ->method('getParent')
             ->willReturn(ChoiceType::class);

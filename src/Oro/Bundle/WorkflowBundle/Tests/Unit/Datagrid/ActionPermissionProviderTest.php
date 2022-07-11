@@ -54,6 +54,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
         $systemDefinition->expects($this->any())
             ->method('getValue')
             ->willReturnMap([
+                ['name', 'test'],
                 ['system', true],
                 ['configuration', []],
             ]);
@@ -62,6 +63,7 @@ class ActionPermissionProviderTest extends \PHPUnit\Framework\TestCase
         $regularDefinition->expects($this->any())
             ->method('getValue')
             ->willReturnMap([
+                ['name', 'test'],
                 ['system', false],
                 ['configuration', []],
             ]);

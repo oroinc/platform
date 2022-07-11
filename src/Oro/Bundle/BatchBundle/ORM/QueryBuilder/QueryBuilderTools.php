@@ -236,8 +236,8 @@ class QueryBuilderTools extends AbstractQueryBuilderTools
     {
         // Do not match string if it is part of another string or parameter (starts with :)
         $searchRegExpParts = [
-            '(?<![\w:.])(' . $alias . ')(?=[^\.\w]+)',
-            '(?<![\w:.])(' . $alias . ')$'
+            '(?<![\w:.\'"])(' . $alias . ')(?=[^\.\w]+)',
+            '(?<![\w:.\'"])(' . $alias . ')$'
         ];
 
         return '/' . implode('|', $searchRegExpParts) . '/';

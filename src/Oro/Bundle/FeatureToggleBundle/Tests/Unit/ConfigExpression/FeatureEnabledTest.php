@@ -10,19 +10,16 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $featureChecker;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    /**
-     * @var FeatureEnabled
-     */
-    protected $condition;
+    /** @var FeatureEnabled */
+    private $condition;
 
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);
+
         $this->condition = new FeatureEnabled($this->featureChecker);
         $this->condition->setContextAccessor(new ContextAccessor());
     }
@@ -118,10 +115,8 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider compileDataProvider
-     * @param array $options
-     * @param string $expected
      */
-    public function testCompile(array $options, $expected)
+    public function testCompile(array $options, string $expected)
     {
         $this->condition->initialize($options);
         $actual = $this->condition->compile('$factory');
@@ -148,7 +143,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
     {
         $context = [
             'feature' => 'test',
-            'identifier' => 'id'
+            'identifier' => 1
         ];
 
         $options = [
@@ -159,7 +154,7 @@ class FeatureEnabledTest extends \PHPUnit\Framework\TestCase
 
         $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
-            ->with('test', 'id')
+            ->with('test', 1)
             ->willReturn(true);
 
         $this->assertTrue($this->condition->evaluate($context));

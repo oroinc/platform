@@ -1,5 +1,5 @@
-<?php
 {%- import _self as macros -%}
+<?php
 
 namespace {{ namespace }}\Migrations\Schema;
 
@@ -35,7 +35,7 @@ class {{ className }} implements Installation
 
         /** Foreign keys generation **/
 {% for table in schema.tables %}
-{% if (allowedTables is empty or allowedTables[table.name] is defined) and if table.ForeignKeys is not empty %}
+{% if (allowedTables is empty or allowedTables[table.name] is defined) and table.ForeignKeys is not empty %}
         $this->{{ 'add' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'ForeignKeys' }}($schema);
 {% endif %}
 {% endfor %}
@@ -43,7 +43,6 @@ class {{ className }} implements Installation
 {% for table in schema.tables %}
 {% if allowedTables is empty or allowedTables[table.name] is defined %}
 {% set methodName = 'create' ~ table.name|replace({'_': ' '})|title|replace({' ': ''}) ~ 'Table' %}
-{% endif %}
 
     /**
      * Create {{ table.name }} table
@@ -67,6 +66,7 @@ class {{ className }} implements Installation
 {% endif %}
 {% endfor %}
     }
+{% endif %}
 {% endfor %}
 {% for table in schema.tables -%}
 {% if allowedTables is empty or allowedTables[table.name] is defined %}

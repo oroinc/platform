@@ -5,9 +5,11 @@ namespace Oro\Bundle\ConfigBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\Tree\AbstractNodeDefinition;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Oro\Bundle\ConfigBundle\DependencyInjection\SystemConfiguration\ProcessorDecorator;
+use Oro\Bundle\ConfigBundle\Event\ConfigSettingsFormOptionsEvent;
 use Oro\Bundle\ConfigBundle\Exception\ItemNotFoundException;
 use Oro\Bundle\ConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
@@ -22,6 +24,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
@@ -37,7 +40,11 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 abstract class AbstractProviderTest extends FormIntegrationTestCase
 {
-    protected const CONFIG_NAME = 'system_configuration';
+    protected const CONFIG_SCOPE = 'abstract';
+    protected const TREE_NAME = 'abstract';
+
+    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $formRegistry;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
@@ -48,18 +55,23 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /** @var ChainSearchProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $searchProvider;
 
-    /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formRegistry;
+    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureChecker;
 
-    abstract public function getParentCheckboxLabel(): string;
+    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $eventDispatcher;
+
+    abstract protected function getParentCheckboxLabel(): string;
 
     abstract public function getProvider(
         ConfigBag $configBag,
         TranslatorInterface $translator,
         FormFactoryInterface $formFactory,
+        FormRegistryInterface $formRegistry,
         AuthorizationCheckerInterface $authorizationChecker,
         ChainSearchProvider $searchProvider,
-        FormRegistryInterface $formRegistry
+        FeatureChecker $featureChecker,
+        EventDispatcherInterface $eventDispatcher
     ): AbstractProvider;
 
     abstract protected function getFilePath(string $fileName): string;
@@ -79,18 +91,19 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         $formTYpe = $this->createMock(ResolvedFormType::class);
 
-        $this->formRegistry->expects($this->any())
+        $this->formRegistry->expects(self::any())
             ->method('getType')
             ->willReturn($formTYpe);
 
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->translator->expects($this->any())
+        $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
 
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-
         $this->searchProvider = $this->createMock(ChainSearchProvider::class);
+        $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
     }
 
     /**
@@ -100,10 +113,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     {
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
 
-        $this->assertEquals(
-            $expectedTree,
-            $provider->getApiTree($path)
-        );
+        self::assertEquals($expectedTree, $provider->getApiTree($path));
     }
 
     public function testGetApiTreeForUndefinedSection()
@@ -145,25 +155,50 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     public function testTreeProcessing()
     {
+        $configManager = $this->createMock(ConfigManager::class);
+
+        $this->featureChecker->expects(self::any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(
+                self::isInstanceOf(ConfigSettingsFormOptionsEvent::class),
+                ConfigSettingsFormOptionsEvent::SET_OPTIONS
+            )
+            ->willReturnCallback(function (ConfigSettingsFormOptionsEvent $event) use ($configManager) {
+                self::assertSame($configManager, $event->getConfigManager());
+
+                $formOptions = $event->getFormOptions('some_field');
+                $formOptions['value_hint'] = 'value hint';
+                $event->setFormOptions('some_field', $formOptions);
+
+                return $event;
+            });
+
         // check good_definition.yml for further details
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
-        $form = $provider->getForm('third_group');
-        $this->assertInstanceOf(FormInterface::class, $form);
+        $form = $provider->getForm('third_group', $configManager);
+        self::assertInstanceOf(FormInterface::class, $form);
 
         // test that fields were added
-        $this->assertTrue($form->has('some_field'));
-        $this->assertTrue($form->has('some_another_field'));
-        $this->assertEquals(
+        self::assertTrue($form->has('some_field'));
+        self::assertTrue($form->has('some_another_field'));
+        self::assertEquals(
             $this->getParentCheckboxLabel(),
-            $form->get('some_field')->getConfig()->getOption('parent_checkbox_label')
+            $form->get('some_field')->getConfig()->getOption('use_parent_field_label')
         );
-        $this->assertEquals(
+        self::assertEquals(
+            'value hint',
+            $form->get('some_field')->getConfig()->getOption('value_hint')
+        );
+        self::assertEquals(
             $this->getParentCheckboxLabel(),
-            $form->get('some_another_field')->getConfig()->getOption('parent_checkbox_label')
+            $form->get('some_another_field')->getConfig()->getOption('use_parent_field_label')
         );
 
         // only needed fields were added
-        $this->assertCount(2, $form);
+        self::assertCount(2, $form);
     }
 
     /**
@@ -178,6 +213,11 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     ) {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
+
+        $this->featureChecker->expects(self::any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath($filename));
         call_user_func_array([$provider, $method], $arguments);
     }
@@ -188,14 +228,14 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             'tree is not defined should trigger error' => [
                 'filename'  => 'tree_is_not_defined.yml',
                 'exception' => ItemNotFoundException::class,
-                'message'   => sprintf('Tree "%s" is not defined.', static::CONFIG_NAME),
+                'message'   => sprintf('Tree "%s" is not defined.', static::TREE_NAME),
                 'method'    => 'getTree',
                 'arguments' => []
             ],
             'tree is not defined get jsTree' => [
                 'filename'  => 'tree_is_not_defined.yml',
                 'exception' => ItemNotFoundException::class,
-                'message'   => sprintf('Tree "%s" is not defined.', static::CONFIG_NAME),
+                'message'   => sprintf('Tree "%s" is not defined.', static::TREE_NAME),
                 'method'    => 'getJsTree',
                 'arguments' => []
             ],
@@ -272,23 +312,25 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     public function testTreeProcessingWithACL()
     {
-        // check good_definition_with_acl_check.yml for further details
-        $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition_with_acl_check.yml'));
-
-        $this->authorizationChecker->expects($this->exactly(2))
+        $this->featureChecker->expects(self::any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+        $this->authorizationChecker->expects(self::exactly(2))
             ->method('isGranted')
             ->withConsecutive(['ALLOWED'], ['DENIED'])
             ->willReturnOnConsecutiveCalls(true, false);
 
-        $form = $provider->getForm('third_group');
-        $this->assertInstanceOf(FormInterface::class, $form);
+        // check good_definition_with_acl_check.yml for further details
+        $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition_with_acl_check.yml'));
+        $form = $provider->getForm('third_group', $this->createMock(ConfigManager::class));
+        self::assertInstanceOf(FormInterface::class, $form);
 
         // test that fields were added
-        $this->assertTrue($form->has('some_field'));
-        $this->assertFalse($form->has('some_another_field'));
+        self::assertTrue($form->has('some_field'));
+        self::assertFalse($form->has('some_another_field'));
 
         // only needed fields were added
-        $this->assertCount(1, $form);
+        self::assertCount(1, $form);
     }
 
     /**
@@ -300,10 +342,14 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
         string $expectedGroup,
         string $expectedSubGroup
     ) {
+        $this->featureChecker->expects(self::any())
+            ->method('isResourceEnabled')
+            ->willReturn(true);
+
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
         [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups($activeGroup, $activeSubGroup);
-        $this->assertEquals($expectedGroup, $activeGroup);
-        $this->assertEquals($expectedSubGroup, $activeSubGroup);
+        self::assertEquals($expectedGroup, $activeGroup);
+        self::assertEquals($expectedSubGroup, $activeSubGroup);
     }
 
     public function activeGroupsDataProvider(): array
@@ -353,13 +399,15 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             $configBag,
             $this->translator,
             $this->factory,
+            $this->formRegistry,
             $this->authorizationChecker,
             $this->searchProvider,
-            $this->formRegistry
+            $this->featureChecker,
+            $this->eventDispatcher
         );
     }
 
-    public function getExtensions()
+    public function getExtensions(): array
     {
         $subscriber = $this->getMockBuilder(ConfigSubscriber::class)
             ->onlyMethods(['__construct'])
@@ -388,34 +436,30 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
      */
     public function testGetFilteredTree(string $disabledNode, array $expected)
     {
-        $featureChecker = $this->createMock(FeatureChecker::class);
-        $featureChecker->expects($this->any())
+        $this->featureChecker->expects(self::any())
             ->method('isResourceEnabled')
             ->willReturnCallback(function ($resource) use ($disabledNode) {
                 return $resource !== $disabledNode;
             });
 
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
-        $provider->setFeatureChecker($featureChecker);
         $tree = $this->getNodeNamesTree($provider->getTree());
-        $this->assertEqualsCanonicalizing($expected, $tree);
+        self::assertEqualsCanonicalizing($expected, $tree);
     }
 
     public function testGetJsTree()
     {
-        $featureChecker = $this->createMock(FeatureChecker::class);
-        $featureChecker->expects($this->any())
+        $this->featureChecker->expects(self::any())
             ->method('isResourceEnabled')
-            ->willReturnSelf();
+            ->willReturn(true);
 
         $provider = $this->getProviderWithConfigLoaded($this->getFilePath('good_definition.yml'));
-        $provider->setFeatureChecker($featureChecker);
 
-        $this->searchProvider->expects($this->any())
+        $this->searchProvider->expects(self::any())
             ->method('supports')
             ->willReturn(true);
 
-        $this->searchProvider->expects($this->exactly(6))
+        $this->searchProvider->expects(self::exactly(6))
             ->method('getData')
             ->willReturnOnConsecutiveCalls(
                 ['Third group'],
@@ -471,7 +515,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             ],
         ];
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     public function featuresCheckDataProvider(): array
@@ -542,12 +586,14 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
     protected function getNodeNamesTree(AbstractNodeDefinition $node): array
     {
+        $name = $node->getName();
+
         $result = [];
         if ($node instanceof GroupNodeDefinition) {
-            $result[$node->getName()]['children'] = [];
+            $result[$name]['children'] = [];
             foreach ($node->getIterator() as $childNode) {
-                $result[$node->getName()]['children'] = array_merge(
-                    $result[$node->getName()]['children'],
+                $result[$name]['children'] = array_merge(
+                    $result[$name]['children'],
                     $this->getNodeNamesTree($childNode)
                 );
             }

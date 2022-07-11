@@ -78,6 +78,31 @@ define(function(require) {
         });
 
         describe('required sibling components', function() {
+            describe('simple dependency', function() {
+                let manager;
+                beforeEach(function(done) {
+                    window.setFixtures([
+                        '<div id="container" data-layout="separate">',
+                        '<div data-page-component-name="component-c" ' +
+                            'data-page-component-module="js/needs-a-component"></div>',
+                        '<div data-page-component-name="component-a" ' +
+                            'data-page-component-module="js/bar-component"></div>',
+                        '</div>'
+                    ].join(''));
+                    manager = new ComponentManager($('#container'));
+                    manager.init().then(done);
+                });
+
+                it('reference is established', function() {
+                    expect(manager.get('component-c').componentA).toBeDefined();
+                });
+
+                it('when sibling is disposed, then reference is undefined', function() {
+                    manager.get('component-a').dispose();
+                    expect(manager.get('component-c').componentA).toBeUndefined();
+                });
+            });
+
             describe('override required componentName with options', function() {
                 let manager;
                 beforeEach(function(done) {
@@ -306,6 +331,39 @@ define(function(require) {
 
             it('component in nested layout is initially initialized', () => {
                 expect(managerB.get('component-foo')).not.toBeNull();
+            });
+        });
+
+        describe('delegated `init-on` event handler to third party element`', () => {
+            let manager;
+            beforeEach(function(done) {
+                window.setFixtures(`
+                    <div id="container" data-layout="separate">
+                        <div id="init-on"></div>
+                        <div
+                            data-page-component-init-on="click #init-on"
+                            data-page-component-name="component-bar" 
+                            data-page-component-module="js/bar-component"></div>
+                    </div>
+                `);
+
+                manager = new ComponentManager($('#container'));
+                manager.init().then(done);
+            });
+
+            it('component initially not initialized', () => {
+                expect(manager.get('component-bar')).toBeNull();
+            });
+
+            describe('after click event', () => {
+                beforeEach(function(done) {
+                    $('#init-on').click();
+                    $.when(...Object.values(manager.initPromises).map(({promise}) => promise)).then(done);
+                });
+
+                it('component gets initialized', () => {
+                    expect(manager.get('component-bar')).not.toBeNull();
+                });
             });
         });
     });

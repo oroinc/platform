@@ -13,7 +13,7 @@ class OroTranslationBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_4';
+        return 'v1_5';
     }
 
     /**
@@ -43,6 +43,7 @@ class OroTranslationBundleInstaller implements Installation
         $table->addColumn('code', 'string', ['length' => 16]);
         $table->addColumn('enabled', 'boolean', ['default' => false]);
         $table->addColumn('installed_build_date', 'datetime', ['notnull' => false]);
+        $table->addColumn('local_files_language', 'boolean', ['default' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->setPrimaryKey(['id']);

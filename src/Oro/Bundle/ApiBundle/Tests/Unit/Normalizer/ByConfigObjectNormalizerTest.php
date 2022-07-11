@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
@@ -15,6 +17,8 @@ use Oro\Bundle\ApiBundle\Normalizer\ConfigNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderInterface;
+use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
@@ -26,24 +30,49 @@ use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
+class ByConfigObjectNormalizerTest extends OrmTestCase
 {
+    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $authorizationChecker;
+
+    /** @var AssociationAccessExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $associationAccessExclusionProvider;
+
     /** @var ObjectNormalizer */
     private $objectNormalizer;
 
     protected function setUp(): void
     {
+        $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $this->associationAccessExclusionProvider =
+            $this->createMock(AssociationAccessExclusionProviderInterface::class);
+
+        $associationAccessExclusionProviderRegistry =
+            $this->createMock(AssociationAccessExclusionProviderRegistry::class);
+        $associationAccessExclusionProviderRegistry->expects(self::any())
+            ->method('getAssociationAccessExclusionProvider')
+            ->with($this->getRequestType())
+            ->willReturn($this->associationAccessExclusionProvider);
+
+        $em = $this->getTestEntityManager();
+        $em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
+            new AnnotationReader(),
+            'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity'
+        ));
+
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
             ->method('getManagerForClass')
-            ->willReturn(null);
+            ->willReturn($em);
 
         $this->objectNormalizer = new ObjectNormalizer(
             new ObjectNormalizerRegistry(
@@ -55,14 +84,21 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             new SerializationHelper(new DataTransformer($this->createMock(ContainerInterface::class))),
             new EntityDataAccessor(),
             new ConfigNormalizer(),
-            new DataNormalizer()
+            new DataNormalizer(),
+            $this->authorizationChecker,
+            $associationAccessExclusionProviderRegistry
         );
+    }
+
+    private function getRequestType(): RequestType
+    {
+        return new RequestType([RequestType::REST]);
     }
 
     private function normalizeObject(object $object, EntityDefinitionConfig $config = null, array $context = []): array
     {
         if (!isset($context[ApiContext::REQUEST_TYPE])) {
-            $context[ApiContext::REQUEST_TYPE] = new RequestType([RequestType::REST]);
+            $context[ApiContext::REQUEST_TYPE] = $this->getRequestType();
         }
         $normalizedObjects = $this->objectNormalizer->normalizeObjects([$object], $config, $context);
 
@@ -124,10 +160,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -154,10 +192,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -188,11 +228,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config),
-            ['key' => 'context value']
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config), ['key' => 'context value']);
 
         self::assertEquals(
             [
@@ -210,8 +251,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         $object->setName('test_name');
 
         $config = [
-            'exclusion_policy'          => 'all',
-            'fields'                    => [
+            'exclusion_policy' => 'all',
+            'fields'           => [
                 'id'   => null,
                 'name' => null
             ]
@@ -223,7 +264,7 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
             return $item;
         });
-        $configObject->setPostSerializeCollectionHandler(function (array $items, array $context) {
+        $configObject->setPostSerializeCollectionHandler(function (array $items) {
             foreach ($items as $key => $item) {
                 $items[$key]['name'] .= ' + collection';
             }
@@ -231,11 +272,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             return $items;
         });
 
-        $result = $this->normalizeObject(
-            $object,
-            $configObject,
-            ['key' => 'context value']
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $configObject, ['key' => 'context value']);
 
         self::assertEquals(
             [
@@ -279,10 +321,21 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             return $item;
         });
 
-        $result = $this->normalizeObject(
-            $this->createProductObject(),
-            $configObject
-        );
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(3))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getCategory())],
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getCategory())]
+            )
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $configObject);
 
         self::assertEquals(
             [
@@ -327,10 +380,13 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $product,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -363,10 +419,21 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $this->createProductObject(),
-            $this->createConfigObject($config)
-        );
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(3))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(0))],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(1))],
+            )
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -382,9 +449,6 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
     public function testNormalizeObjectWithArrayToManyRelation()
     {
-        $data = $this->createProductObject();
-        $data->getOwner()->setGroups($data->getOwner()->getGroups()->toArray());
-
         $config = [
             'exclusion_policy' => 'all',
             'fields'           => [
@@ -405,10 +469,22 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $data,
-            $this->createConfigObject($config)
-        );
+        $product = $this->createProductObject();
+        $product->getOwner()->setGroups($product->getOwner()->getGroups()->toArray());
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(3))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()[0])],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()[1])],
+            )
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -456,10 +532,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $product,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($product->getOwner()))
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -514,11 +595,22 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             }
         );
 
-        $result = $this->normalizeObject(
-            $this->createProductObject(),
-            $configObject,
-            ['key' => 'context value']
-        );
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(4))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getCategory())],
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(0))],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(1))],
+            )
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $configObject, ['key' => 'context value']);
 
         self::assertEquals(
             [
@@ -573,10 +665,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $product,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($product->getOwner()))
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -635,10 +732,19 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $product,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(3))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getCategory())],
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(0))],
+            )
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -699,10 +805,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $product,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($product->getOwner()))
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -759,10 +870,19 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $product,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(3))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getCategory())],
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(0))],
+            )
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -802,6 +922,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $configObject = $this->createConfigObject($config);
         $srcConfig = $configObject->toArray();
+
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
         $this->normalizeObject($object, $configObject);
 
         self::assertEquals($srcConfig, $configObject->toArray());
@@ -823,10 +949,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -851,10 +979,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -883,10 +1013,12 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config));
 
         self::assertEquals(
             [
@@ -918,10 +1050,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             return $item;
         });
 
-        $result = $this->normalizeObject(
-            $this->createProductObject(),
-            $configObject
-        );
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $result = $this->normalizeObject($product, $configObject);
 
         self::assertEquals(
             [
@@ -954,10 +1090,17 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             return $item;
         });
 
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::never())
+            ->method('isIgnoreAssociationAccessCheck');
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
         $normalizedObjects = $this->objectNormalizer->normalizeObjects(
-            [$this->createProductObject()],
+            [$product],
             $configObject,
-            [ApiContext::REQUEST_TYPE => new RequestType([RequestType::REST])],
+            [ApiContext::REQUEST_TYPE => $this->getRequestType()],
             true
         );
         $result = reset($normalizedObjects);
@@ -1000,10 +1143,17 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             return $item;
         });
 
-        $result = $this->normalizeObject(
-            $this->createProductObject(),
-            $configObject
-        );
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($product->getOwner()))
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $configObject);
 
         self::assertEquals(
             [
@@ -1048,10 +1198,17 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             return $item;
         });
 
-        $result = $this->normalizeObject(
-            $this->createProductObject(),
-            $configObject
-        );
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($product->getOwner()))
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($product, $configObject);
 
         self::assertEquals(
             [
@@ -1083,19 +1240,25 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $object = new Entity\EntityWithoutGettersAndSetters();
         $object->id = 123;
-        $object->category = new EntityIdentifier('category1', 'Test\Category');
+        $object->category = new EntityIdentifier('category1', Entity\Category::class);
 
-        $result = $this->normalizeObject(
-            $object,
-            $this->createConfigObject($config)
-        );
+        $this->associationAccessExclusionProvider->expects(self::once())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->with(Entity\EntityWithoutGettersAndSetters::class, 'category')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($object->category))
+            ->willReturn(true);
+
+        $result = $this->normalizeObject($object, $this->createConfigObject($config));
 
         self::assertEquals(
             [
                 'id'       => 123,
                 'category' => [
                     'id'        => 'category1',
-                    '__class__' => 'Test\Category'
+                    '__class__' => Entity\Category::class
                 ]
             ],
             $result
@@ -1120,9 +1283,156 @@ class ByConfigObjectNormalizerTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->normalizeObject(
-            $this->createProductObject(),
-            $this->createConfigObject($config)
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::any())
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::any())
+            ->method('isGranted')
+            ->willReturn(true);
+
+        $this->normalizeObject($product, $this->createConfigObject($config));
+    }
+
+    public function testNormalizeObjectWhenNoViewAccessToSameEntities()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'name'      => null,
+                'category1' => [
+                    'exclusion_policy' => 'all',
+                    'property_path'    => 'category',
+                    'fields'           => 'label'
+                ],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'    => null,
+                        'groups1' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'groups',
+                            'fields'           => 'id'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->getField('owner')->getTargetEntity()->setPostSerializeHandler(
+            function (array $item, array $context) {
+                $item['name'] .= sprintf('_additional[%s]', $context['key']);
+
+                return $item;
+            }
+        );
+
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::exactly(3))
+            ->method('isIgnoreAssociationAccessCheck')
+            ->withConsecutive(
+                [Entity\Product::class, 'category'],
+                [Entity\Product::class, 'owner'],
+                [Entity\User::class, 'groups']
+            )
+            ->willReturn(false);
+        $this->authorizationChecker->expects(self::exactly(5))
+            ->method('isGranted')
+            ->withConsecutive(
+                ['VIEW', self::identicalTo($product->getCategory())],
+                ['VIEW', self::identicalTo($product->getOwner())],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(0))],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(0))],
+                ['VIEW', self::identicalTo($product->getOwner()->getGroups()->get(1))],
+            )
+            ->willReturnOnConsecutiveCalls(
+                false,
+                true,
+                false,
+                false,
+                true,
+            );
+
+        $result = $this->normalizeObject($product, $configObject, ['key' => 'context value']);
+
+        self::assertEquals(
+            [
+                'id'        => 123,
+                'name'      => 'product_name',
+                'category1' => null,
+                'owner'     => [
+                    'name'    => 'user_name_additional[context value]',
+                    'groups1' => [22]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWhenIgnoreViewAccessToSameEntities()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'name'      => null,
+                'category1' => [
+                    'exclusion_policy' => 'all',
+                    'property_path'    => 'category',
+                    'fields'           => 'label'
+                ],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'    => null,
+                        'groups1' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'groups',
+                            'fields'           => 'id'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $configObject = $this->createConfigObject($config);
+        $configObject->getField('owner')->getTargetEntity()->setPostSerializeHandler(
+            function (array $item, array $context) {
+                $item['name'] .= sprintf('_additional[%s]', $context['key']);
+
+                return $item;
+            }
+        );
+
+        $product = $this->createProductObject();
+
+        $this->associationAccessExclusionProvider->expects(self::exactly(3))
+            ->method('isIgnoreAssociationAccessCheck')
+            ->willReturnMap([
+                [Entity\Product::class, 'category', false],
+                [Entity\Product::class, 'owner', true],
+                [Entity\User::class, 'groups', true]
+            ]);
+        $this->authorizationChecker->expects(self::once())
+            ->method('isGranted')
+            ->with('VIEW', self::identicalTo($product->getCategory()))
+            ->willReturn(false);
+
+        $result = $this->normalizeObject($product, $configObject, ['key' => 'context value']);
+
+        self::assertEquals(
+            [
+                'id'        => 123,
+                'name'      => 'product_name',
+                'category1' => null,
+                'owner'     => [
+                    'name'    => 'user_name_additional[context value]',
+                    'groups1' => [11, 22]
+                ]
+            ],
+            $result
         );
     }
 }

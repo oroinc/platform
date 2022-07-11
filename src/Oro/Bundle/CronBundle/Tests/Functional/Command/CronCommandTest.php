@@ -4,7 +4,8 @@ namespace Oro\Bundle\CronBundle\Tests\Functional\Command;
 
 use Cron\CronExpression;
 use Oro\Bundle\CronBundle\Async\Topic\RunCommandTopic;
-use Oro\Bundle\CronBundle\Helper\CronHelper;
+use Oro\Bundle\CronBundle\Tests\Functional\Stub\CronHelperStub;
+use Oro\Bundle\FeatureToggleBundle\Tests\Functional\Stub\FeatureCheckerStub;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -20,7 +21,28 @@ class CronCommandTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testShouldRunAndScheduleIfCommandDue()
+    protected function tearDown(): void
+    {
+        $this->getCronHelperStub()->setCron(null);
+        parent::tearDown();
+    }
+
+    private function getCronHelperStub(): CronHelperStub
+    {
+        return self::getContainer()->get('oro_cron.tests.cron_helper');
+    }
+
+    private function mockCronHelper(bool $isDue): void
+    {
+        $cronExpression = $this->createMock(CronExpression::class);
+        $cronExpression->expects(self::any())
+            ->method('isDue')
+            ->willReturn($isDue);
+
+        $this->getCronHelperStub()->setCron($cronExpression);
+    }
+
+    public function testShouldRunAndScheduleIfCommandDue(): void
     {
         $this->mockCronHelper(true);
 
@@ -31,7 +53,7 @@ class CronCommandTest extends WebTestCase
         self::assertStringContainsString('All commands scheduled', $result);
     }
 
-    public function testShouldRunAndNotScheduleIfNotCommandDue()
+    public function testShouldRunAndNotScheduleIfNotCommandDue(): void
     {
         $this->mockCronHelper(false);
 
@@ -42,18 +64,16 @@ class CronCommandTest extends WebTestCase
         self::assertStringContainsString('All commands scheduled', $result);
     }
 
-    public function testShouldSendMessageIfCommandDue()
+    public function testShouldSendMessageIfCommandDue(): void
     {
         $this->mockCronHelper(true);
 
         $this->runCommand('oro:cron');
 
         $messages = self::getMessageCollector()->getTopicSentMessages(RunCommandTopic::getName());
-
         $this->assertGreaterThan(0, $messages);
 
         $message = $messages[0];
-
         $this->assertIsArray($message);
         $this->assertArrayHasKey('message', $message);
         $this->assertIsArray($message['message']);
@@ -61,39 +81,30 @@ class CronCommandTest extends WebTestCase
         $this->assertArrayHasKey('arguments', $message['message']);
     }
 
-    public function testShouldNotSendMessagesIfNotCommandDue()
+    public function testShouldNotSendMessagesIfNotCommandDue(): void
     {
         $this->mockCronHelper(false);
+
         $this->runCommand('oro:cron');
 
-        $messages = self::getSentMessages();
-
-        $this->assertCount(0, $messages);
+        $this->assertCount(0, self::getSentMessages());
     }
 
-    public function testDisabledAllJobs()
+    public function testShouldNotSendMessagesIfFeatureDisabled(): void
     {
         $this->mockCronHelper(true);
-        $this->getContainer()->get('oro_featuretoggle.checker.feature_checker')
-            ->setResourceEnabled(false);
 
-        $result = $this->runCommand('oro:cron', ['-vvv' => true]);
-        $this->assertNotEmpty($result);
+        /** @var FeatureCheckerStub $featureChecker */
+        $featureChecker = self::getContainer()->get('oro_featuretoggle.checker.feature_checker');
+        $featureChecker->setResourceTypeEnabled('cron_jobs', false);
+        try {
+            $result = $this->runCommand('oro:cron');
+        } finally {
+            $featureChecker->setResourceTypeEnabled('cron_jobs', null);
+        }
 
-        self::assertStringContainsString('The feature that enables this command is turned off', $result);
-    }
-
-    /**
-     * @param bool $isDue
-     */
-    private function mockCronHelper($isDue = false)
-    {
-        $cronExpression = $this->createMock(CronExpression::class);
-        $cronExpression->expects($this->any())->method('isDue')->willReturn($isDue);
-
-        $mockCronHelper = $this->createMock(CronHelper::class);
-        $mockCronHelper->expects($this->any())->method('createCron')->willReturn($cronExpression);
-
-        $this->getContainer()->set('oro_cron.helper.cron', $mockCronHelper);
+        $this->assertCount(0, self::getSentMessages());
+        self::assertStringContainsString('Skipping command', $result);
+        self::assertStringContainsString('due to this feature is disabled', $result);
     }
 }

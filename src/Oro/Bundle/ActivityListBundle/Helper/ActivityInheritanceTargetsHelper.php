@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Helper;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -17,32 +17,26 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 class ActivityInheritanceTargetsHelper
 {
-    protected const MAX_INHERITANCE_TARGETS = 10000;
+    private const MAX_INHERITANCE_TARGETS = 10000;
 
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
+    private SubQueryLimitHelper $limitHelper;
 
-    /** @var Registry */
-    protected $registry;
-
-    /** @var SubQueryLimitHelper */
-    protected $limitHelper;
-
-    public function __construct(ConfigManager $configManager, Registry $registry, SubQueryLimitHelper $limitHelper)
-    {
+    public function __construct(
+        ConfigManager $configManager,
+        ManagerRegistry $doctrine,
+        SubQueryLimitHelper $limitHelper
+    ) {
         $this->configManager = $configManager;
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->limitHelper = $limitHelper;
     }
 
     /**
      * Check exists inheritance targets by target entity
-     *
-     * @param string $entityClass
-     *
-     * @return bool
      */
-    public function hasInheritances($entityClass)
+    public function hasInheritances(string $entityClass): bool
     {
         if ($this->configManager->hasConfigEntityModel($entityClass)) {
             $configValues = $this->getConfigForClass($entityClass);
@@ -57,14 +51,13 @@ class ActivityInheritanceTargetsHelper
     /**
      * Apply to given query builder object additional conditions
      * for integrate activity lists from inheritance target
-     *
-     * @param QueryBuilder $qb
-     * @param array $inheritanceTarget
-     * @param string $aliasSuffix
-     * @param string $entityIdExpr
      */
-    public function applyInheritanceActivity(QueryBuilder $qb, $inheritanceTarget, $aliasSuffix, $entityIdExpr)
-    {
+    public function applyInheritanceActivity(
+        QueryBuilder $qb,
+        array $inheritanceTarget,
+        string $aliasSuffix,
+        string $entityIdExpr
+    ): void {
         QueryBuilderUtil::checkIdentifier($aliasSuffix);
         $alias = 'ta_' . $aliasSuffix;
         $qb->leftJoin(QueryBuilderUtil::getField('activity', $inheritanceTarget['targetClassAlias']), $alias);
@@ -79,12 +72,7 @@ class ActivityInheritanceTargetsHelper
         ));
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    public function getInheritanceTargetsRelations($entityClass)
+    public function getInheritanceTargetsRelations(string $entityClass): array
     {
         $filteredTargets = [];
 
@@ -96,11 +84,7 @@ class ActivityInheritanceTargetsHelper
         return $filteredTargets;
     }
 
-    /**
-     * @param string $entityClass
-     * @return array
-     */
-    public function getInheritanceTargets($entityClass)
+    public function getInheritanceTargets(string $entityClass): array
     {
         $configValues = $this->configManager->getEntityConfig('activity', $entityClass)->getValues();
         if ($this->hasValueInInheritanceTargets($configValues)) {
@@ -110,21 +94,17 @@ class ActivityInheritanceTargetsHelper
         return [];
     }
 
-    /**
-     * @param string $target
-     * @param string[] $path
-     * @param string $entityIdExpr
-     * @param string $uniqueKey
-     *
-     * @return QueryBuilder
-     */
-    protected function getSubQuery($target, $path, $entityIdExpr, $uniqueKey)
-    {
+    private function getSubQuery(
+        string $target,
+        array $path,
+        string $entityIdExpr,
+        string $uniqueKey
+    ): QueryBuilder {
         QueryBuilderUtil::checkIdentifier($uniqueKey);
         $alias = 'inherit_' . $uniqueKey;
 
         /** @var QueryBuilder $subQueryBuilder */
-        $subQueryBuilder = $this->registry->getManagerForClass($target)->createQueryBuilder();
+        $subQueryBuilder = $this->doctrine->getManagerForClass($target)->createQueryBuilder();
         $subQueryBuilder->select($alias . '.id')->from($target, $alias);
 
         foreach ($path as $key => $field) {
@@ -154,14 +134,7 @@ class ActivityInheritanceTargetsHelper
         return $subQueryBuilder;
     }
 
-    /**
-     * Get Association name
-     *
-     * @param string $className
-     *
-     * @return string
-     */
-    protected function getAssociationName($className)
+    private function getAssociationName(string $className): string
     {
         return ExtendHelper::buildAssociationName(
             $className,
@@ -169,18 +142,13 @@ class ActivityInheritanceTargetsHelper
         );
     }
 
-    /**
-     * @param array $inheritanceTargets
-     *
-     * @return array
-     */
-    protected function prepareTargetData($inheritanceTargets)
+    private function prepareTargetData(array $inheritanceTargets): array
     {
         $filteredTargets = [];
         foreach ($inheritanceTargets as $value) {
             if ($this->hasConfigForInheritanceTarget($value)) {
                 $configTarget = $this->getConfigForClass($value['target']);
-                if (array_key_exists('activities', $configTarget)) {
+                if (\array_key_exists('activities', $configTarget)) {
                     $item['targetClass'] = $value['target'];
                     $item['targetClassAlias'] = $this->getAssociationName($value['target']);
                     $item['path'] = $value['path'];
@@ -192,41 +160,26 @@ class ActivityInheritanceTargetsHelper
         return $filteredTargets;
     }
 
-    /**
-     * @param $configValues
-     *
-     * @return bool
-     */
-    protected function hasValueInInheritanceTargets($configValues)
+    private function hasValueInInheritanceTargets(mixed $configValues): bool
     {
-        return is_array($configValues) && array_key_exists('inheritance_targets', $configValues)
-            && is_array($configValues['inheritance_targets']);
+        return
+            \is_array($configValues)
+            && \array_key_exists('inheritance_targets', $configValues)
+            && \is_array($configValues['inheritance_targets']);
     }
 
-    /**
-     * @param $className
-     *
-     * @return array
-     */
-    protected function getConfigForClass($className)
+    private function getConfigForClass(string $className): ?array
     {
-        return $this
-            ->configManager
+        return $this->configManager
             ->getEntityConfig('activity', $className)
             ->getValues();
     }
 
-    /**
-     * @param $value
-     *
-     * @return bool
-     */
-    protected function hasConfigForInheritanceTarget($value)
+    private function hasConfigForInheritanceTarget(mixed $value): bool
     {
-        $result = is_array($value)
-            && array_key_exists('target', $value)
+        return
+            \is_array($value)
+            && \array_key_exists('target', $value)
             && $this->configManager->hasConfigEntityModel($value['target']);
-
-        return $result;
     }
 }

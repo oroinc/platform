@@ -28,6 +28,11 @@ define(function(require) {
         checkboxSelector: '[data-role="changeUseDefault"]',
 
         /**
+         * @property {String}
+         */
+        itemUseFallback: '.fallback-item-use-fallback input',
+
+        /**
          * @inheritdoc
          */
         events: {
@@ -78,6 +83,7 @@ define(function(require) {
             const valueEls = $controls.find(':input, a.btn, button')
                 .not(this.$(this.checkboxSelector))
                 .not('[readonly]');
+            const itemUseFallbackEls = $controls.find(this.itemUseFallback);
 
             valueEls.each(function(i, el) {
                 const $el = $(el);
@@ -89,6 +95,11 @@ define(function(require) {
                     .trigger(value ? 'disable' : 'enable')
                     .inputWidget('refresh');
             });
+
+            // Force to refresh fallback fields after re-enable
+            if (!value) {
+                itemUseFallbackEls.trigger('change');
+            }
 
             if (this.prepareTinymce) {
                 this._prepareTinymce($controls.find('textarea'));

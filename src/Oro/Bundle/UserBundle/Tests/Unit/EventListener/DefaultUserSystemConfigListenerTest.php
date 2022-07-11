@@ -2,169 +2,168 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
-use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class DefaultUserSystemConfigListenerTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
+    private const CONFIG_KEY = 'alias.config_key';
+    private const SETTINGS_KEY = 'alias___config_key';
 
     /** @var DefaultUserProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $defaultUserProvider;
 
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrine;
+
     /** @var DefaultUserSystemConfigListener */
     private $listener;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
 
     protected function setUp(): void
     {
         $this->defaultUserProvider = $this->createMock(DefaultUserProvider::class);
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->listener = new DefaultUserSystemConfigListener($this->defaultUserProvider, $this->doctrineHelper);
-        $this->listener->setAlias('alias');
-        $this->listener->setConfigKey('config_key');
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
+        $this->listener = new DefaultUserSystemConfigListener(
+            $this->defaultUserProvider,
+            $this->doctrine,
+            self::CONFIG_KEY
+        );
     }
 
-    public function testOnFormPreSetData()
+    private function getUser(int $id): User
+    {
+        $user = new User();
+        $user->setId($id);
+
+        return $user;
+    }
+
+    public function testOnFormPreSetData(): void
     {
         $id = 1;
-        $key = $this->getConfigKey();
-        $owner = new User();
+        $user = $this->getUser($id);
 
-        $userRepository = $this->getUserRepository($id, $owner);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepositoryForClass')
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())
+            ->method('find')
+            ->with(User::class, $id)
+            ->willReturn($user);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
             ->with(User::class)
-            ->willReturn($userRepository);
+            ->willReturn($em);
 
-        $this->defaultUserProvider->expects($this->never())
+        $this->defaultUserProvider->expects(self::never())
             ->method('getDefaultUser');
 
-        $event = $this->getEvent([$key => ['value' => $id]]);
+        $event = new ConfigSettingsUpdateEvent(
+            $this->createMock(ConfigManager::class),
+            [self::SETTINGS_KEY => ['value' => $id]]
+        );
         $this->listener->onFormPreSetData($event);
 
-        $this->assertEquals([$key => ['value' => $owner]], $event->getSettings());
+        self::assertEquals([self::SETTINGS_KEY => ['value' => $user]], $event->getSettings());
     }
 
-    public function testOnFormPreSetDataWhenNotSet()
+    public function testOnFormPreSetDataWhenNoUserIdInConfigAndDefaultUserFound(): void
     {
-        $key = $this->getConfigKey();
-        $owner = new User();
+        $user = $this->getUser(1);
 
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityRepositoryForClass');
+        $this->doctrine->expects(self::never())
+            ->method('getManagerForClass');
 
-        $this->defaultUserProvider->expects($this->once())
+        $this->defaultUserProvider->expects(self::once())
             ->method('getDefaultUser')
-            ->with('alias', 'config_key')
-            ->willReturn($owner);
-
-        $event = $this->getEvent([$key => ['value' => null]]);
-        $this->listener->onFormPreSetData($event);
-
-        $this->assertEquals([$key => ['value' => $owner]], $event->getSettings());
-    }
-
-    public function testOnFormPreSetDataWhenUserNotFound()
-    {
-        $id = 1;
-        $key = $this->getConfigKey();
-        $owner = new User();
-
-        $userRepository = $this->getUserRepository($id, null);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityRepositoryForClass')
-            ->with(User::class)
-            ->willReturn($userRepository);
-
-        $this->defaultUserProvider->expects($this->once())
-            ->method('getDefaultUser')
-            ->with('alias', 'config_key')
-            ->willReturn($owner);
-
-        $event = $this->getEvent([$key => ['value' => $id]]);
-        $this->listener->onFormPreSetData($event);
-
-        $this->assertEquals([$key => ['value' => $owner]], $event->getSettings());
-    }
-
-    public function testOnSettingsSaveBeforeWithWrongArrayStructure()
-    {
-        $settingsKey = $this->getConfigKey();
-        $settings = ['value' => [$settingsKey => new \stdClass()]];
-        $event = $this->getEvent($settings);
-
-        $this->listener->onSettingsSaveBefore($event);
-
-        $this->assertEquals(new \stdClass(), $event->getSettings()['value'][$settingsKey]);
-    }
-
-    public function testOnSettingsSaveBeforeWithWrongInstance()
-    {
-        $settingsKey = $this->getConfigKey();
-        $settings = [$settingsKey => ['value' => new \stdClass()]];
-        $event = $this->getEvent($settings);
-
-        $this->listener->onSettingsSaveBefore($event);
-
-        $this->assertEquals(new \stdClass(), $event->getSettings()[$settingsKey]['value']);
-    }
-
-    public function testOnSettingsSaveBefore()
-    {
-        $owner = $this->getEntity(User::class, ['id' => 1]);
-        $event = $this->getEvent(['value' => $owner]);
-
-        $this->listener->onSettingsSaveBefore($event);
-
-        $this->assertEquals(['value' => 1], $event->getSettings());
-    }
-
-    /**
-     * @param array $settings
-     *
-     * @return ConfigSettingsUpdateEvent
-     */
-    private function getEvent(array $settings)
-    {
-        $configManager = $this->createMock(ConfigManager::class);
-
-        return new ConfigSettingsUpdateEvent($configManager, $settings);
-    }
-
-    /**
-     * @return string
-     */
-    private function getConfigKey()
-    {
-        return TreeUtils::getConfigKey('alias', 'config_key', ConfigManager::SECTION_VIEW_SEPARATOR);
-    }
-
-    /**
-     * @param int       $id
-     * @param User|null $user
-     *
-     * @return EntityRepository|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getUserRepository(int $id, User $user = null)
-    {
-        $userRepository = $this->createMock(EntityRepository::class);
-        $userRepository->expects($this->once())
-            ->method('findOneBy')
-            ->with(['id' => $id])
+            ->with(self::CONFIG_KEY)
             ->willReturn($user);
 
-        return $userRepository;
+        $event = new ConfigSettingsUpdateEvent(
+            $this->createMock(ConfigManager::class),
+            [self::SETTINGS_KEY => ['value' => null]]
+        );
+        $this->listener->onFormPreSetData($event);
+
+        self::assertEquals([self::SETTINGS_KEY => ['value' => $user]], $event->getSettings());
+    }
+
+    public function testOnFormPreSetDataWhenNoUserIdInConfigAndDefaultUserNotFound(): void
+    {
+        $this->doctrine->expects(self::never())
+            ->method('getManagerForClass');
+
+        $this->defaultUserProvider->expects(self::once())
+            ->method('getDefaultUser')
+            ->with(self::CONFIG_KEY)
+            ->willReturn(null);
+
+        $settings = [self::SETTINGS_KEY => ['value' => null]];
+        $event = new ConfigSettingsUpdateEvent($this->createMock(ConfigManager::class), $settings);
+        $this->listener->onFormPreSetData($event);
+
+        self::assertEquals($settings, $event->getSettings());
+    }
+
+    public function testOnFormPreSetDataWhenUserNotFound(): void
+    {
+        $id = 1;
+        $user = $this->getUser(2);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())
+            ->method('find')
+            ->with(User::class, $id)
+            ->willReturn(null);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($em);
+
+        $this->defaultUserProvider->expects(self::once())
+            ->method('getDefaultUser')
+            ->with(self::CONFIG_KEY)
+            ->willReturn($user);
+
+        $event = new ConfigSettingsUpdateEvent(
+            $this->createMock(ConfigManager::class),
+            [self::SETTINGS_KEY => ['value' => $id]]
+        );
+        $this->listener->onFormPreSetData($event);
+
+        self::assertEquals([self::SETTINGS_KEY => ['value' => $user]], $event->getSettings());
+    }
+
+    public function testOnSettingsSaveBeforeWhenNoSupportedConfigKey(): void
+    {
+        $settings = ['another.key' => ['value' => new \stdClass()]];
+        $event = new ConfigSettingsUpdateEvent($this->createMock(ConfigManager::class), $settings);
+        $this->listener->onSettingsSaveBefore($event);
+
+        self::assertEquals($settings, $event->getSettings());
+    }
+
+    public function testOnSettingsSaveBeforeWithWrongInstance(): void
+    {
+        $settings = [self::CONFIG_KEY => ['value' => new \stdClass()]];
+        $event = new ConfigSettingsUpdateEvent($this->createMock(ConfigManager::class), $settings);
+        $this->listener->onSettingsSaveBefore($event);
+
+        self::assertEquals($settings, $event->getSettings());
+    }
+
+    public function testOnSettingsSaveBefore(): void
+    {
+        $event = new ConfigSettingsUpdateEvent(
+            $this->createMock(ConfigManager::class),
+            [self::CONFIG_KEY => ['value' => $this->getUser(1)]]
+        );
+        $this->listener->onSettingsSaveBefore($event);
+
+        self::assertEquals([self::CONFIG_KEY => ['value' => 1]], $event->getSettings());
     }
 }

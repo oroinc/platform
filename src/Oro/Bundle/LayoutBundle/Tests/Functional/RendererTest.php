@@ -309,19 +309,19 @@ class RendererTest extends LayoutTestCase
 <html>
     <head>
         <title>Page Title</title>
-        <meta charset="UTF-8"/>
+        <meta charset="UTF-8">
         <style type="text/css" scoped="scoped">
             body { color: red; }
         </style>
         <script type="text/javascript" async="async">
             alert('test');
         </script>
-        <link rel="stylesheet" href="test_external.css"/>
+        <link rel="stylesheet" href="test_external.css">
     </head>
 <body class="content-body test-body class2" data-json="{&quot;0&quot;:&quot;test1&quot;}">
     <button type="button" name="btn1"><i class="fa-plus hide-text"></i>Btn1</button>
-    <input type="text" name="search"/>
-    <input type="submit" name="btn2" value="Btn2"/>
+    <input type="text" name="search">
+    <input type="submit" name="btn2" value="Btn2">
     <ul>
         <li>Hi World!</li>
         <li class="list-item-2"><a href="http://example.com">Hi World!</a></li>

@@ -73,7 +73,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize(): void
     {
-        self::assertSame([null, null, $this->entity->getUuid(), null], $this->entity->__serialize());
+        self::assertSame([null, null, $this->entity->getUuid(), null, null, null], $this->entity->__serialize());
 
         $file = $this->getEntity(
             File::class,
@@ -82,14 +82,26 @@ class FileTest extends \PHPUnit\Framework\TestCase
                 'filename' => 'sample_filename',
                 'uuid' => 'test-uuid',
                 'externalUrl' => 'http://example.org/image.png',
+                'originalFilename' => 'original-filename.png',
+                'mimeType' => 'image/png',
             ]
         );
-        self::assertEquals([1, 'sample_filename', 'test-uuid', 'http://example.org/image.png'], $file->__serialize());
+        self::assertEquals(
+            [1, 'sample_filename', 'test-uuid', 'http://example.org/image.png', 'original-filename.png', 'image/png'],
+            $file->__serialize()
+        );
     }
 
     public function testUnserialize(): void
     {
-        $this->entity->__unserialize([1, 'sample_filename', 'test-uuid', 'http://example.org/image.png']);
+        $this->entity->__unserialize([
+            1,
+            'sample_filename',
+            'test-uuid',
+            'http://example.org/image.png',
+            'original-filename.png',
+            'image/png'
+        ]);
         $data = serialize($this->entity);
         /** @var File $entity */
         $entity = unserialize($data);
@@ -97,6 +109,8 @@ class FileTest extends \PHPUnit\Framework\TestCase
         self::assertSame(1, $entity->getId());
         self::assertSame('test-uuid', $entity->getUuid());
         self::assertEquals('http://example.org/image.png', $entity->getExternalUrl());
+        self::assertEquals('original-filename.png', $entity->getOriginalFilename());
+        self::assertEquals('image/png', $entity->getMimeType());
     }
 
     public function testClone(): void

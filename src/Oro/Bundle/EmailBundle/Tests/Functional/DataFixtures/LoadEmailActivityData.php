@@ -57,7 +57,7 @@ class LoadEmailActivityData extends AbstractFixture implements ContainerAwareInt
     public function load(ObjectManager $manager)
     {
         $this->em = $manager;
-        $this->organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $this->organization = $manager->getRepository(Organization::class)->getFirst();
 
         $user1 = $this->createUser('Richard', 'Bradley');
         $user2 = $this->createUser('Brenda', 'Brock');

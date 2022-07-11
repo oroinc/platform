@@ -10,44 +10,6 @@ oro_tag_bundle.taxonomy:
 
 
 #
-# DEPRECATED OLD REST API ROUTES
-#
-
-oro_api_options_tags:
-    path: '/api/rest/{version}/tags.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\TagBundle\Controller\Api\Rest\TagController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_options_taxonomies:
-    path: '/api/rest/{version}/taxonomies.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\TagBundle\Controller\Api\Rest\TaxonomyController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-oro_api_options_taggables:
-    path: '/api/rest/{version}/taggables.{_format}'
-    methods: [OPTIONS]
-    defaults:
-        _controller: 'Oro\Bundle\TagBundle\Controller\Api\Rest\TaggableController::optionsAction'
-        _format: json
-        version: latest
-    requirements:
-        _format: json
-        version: latest|v1
-
-
-#
 # OLD REST API ROUTES
 #
 

@@ -2553,6 +2553,16 @@ JS;
     public function iScrollToElement($elementName)
     {
         $element = $this->elementFactory->createElement($elementName);
+        $xpath = addslashes($element->getXpath());
+        $javascipt = <<<JS
+(function() {
+    document
+        .evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
+        .singleNodeValue
+        .scrollIntoView(false);
+})()
+JS;
+        $this->getSession()->getDriver()->evaluateScript($javascipt);
         $element->focus();
     }
 
@@ -2655,18 +2665,24 @@ JS;
     }
 
     /**
-     * @Then /^(?:|I )click update cache$/
+     * @When /^(?:|I )save and close form for product attribute$/
      */
-    public function iClickUpdateCache()
+    public function iSaveAndCloseFormProdAtt()
     {
-        try {
-            $page = $this->getPage();
+        $page = $this->getPage();
+        $page->pressButton('Save and Close');
+        $this->waitForAjax(720000); // Wait for max 12 minutes because cache update process timeout
+    }
 
-            $page->clickLink('Update Cache');
-            $this->waitForAjax(720000); // Wait for max 12 minutes because DB update process timeout set to 10 minutes
-        } catch (\Exception $e) {
-            throw $e;
-        }
+    /**
+     * @Then /^(?:|I )reload the page after product attributes import$/
+     */
+    public function iReloadPageAfterProdAttrImport()
+    {
+        sleep(2);
+        $page = $this->getPage();
+        $page->pressButton('refresh the page');
+        $this->waitForAjax(720000); // Wait for max 12 minutes because DB update process timeout set to 10 minutes
     }
 
     /**

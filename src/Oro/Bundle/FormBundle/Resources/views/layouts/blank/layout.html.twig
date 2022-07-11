@@ -7,14 +7,9 @@
 
 {% block input_widget %}
     {% if type == 'checkbox' %}
-        {% set attr = layout_attr_defaults(attr, {
-            '~class': ' custom-checkbox__input'
-        }) %}
-
-        <label {% if attr.id is not empty %} for="{{ attr.id }}" {% endif %} class="custom-checkbox">
+        <label class="checkbox-label">
             {{ parent() }}
-            <span class="custom-checkbox__icon"></span>
-            <span class="custom-checkbox__text">{{ label|block_text(translation_domain) }} </span>
+            {{- label|block_text(translation_domain) -}}
         </label>
     {% else %}
         {% set attr = layout_attr_defaults(attr, {

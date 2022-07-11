@@ -1,3 +1,7 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
+
 Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
     test_department:
         name: TestDepartment

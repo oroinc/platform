@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\ActivityListBundle\Provider;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\AccessRule\ActivityListAccessRule;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
@@ -24,25 +25,18 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 {
-    /** @var Registry */
-    protected $registry;
-
-    /** @var ActivityManager */
-    protected $activityManager;
-
-    /** @var RelatedEmailsProvider */
-    protected $relatedEmailsProvider;
-
-    /** @var AclHelper */
-    private $aclHelper;
+    private ManagerRegistry $doctrine;
+    private ActivityManager $activityManager;
+    private RelatedEmailsProvider $relatedEmailsProvider;
+    private AclHelper $aclHelper;
 
     public function __construct(
-        Registry $registry,
+        ManagerRegistry $doctrine,
         ActivityManager $activityManager,
         RelatedEmailsProvider $relatedEmailsProvider,
         AclHelper $aclHelper
     ) {
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->activityManager = $activityManager;
         $this->relatedEmailsProvider = $relatedEmailsProvider;
         $this->aclHelper = $aclHelper;
@@ -59,10 +53,9 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
 
         $relatedEntity = $args->getRelatedEntity();
         $relatedEntityClass = ClassUtils::getClass($relatedEntity);
-        $em = $this->registry->getManagerForClass($relatedEntityClass);
-        $metadata = $em->getClassMetadata($relatedEntityClass);
-        $idNames = $metadata->getIdentifierFieldNames();
-
+        $idNames = $this->doctrine->getManagerForClass($relatedEntityClass)
+            ->getClassMetadata($relatedEntityClass)
+            ->getIdentifierFieldNames();
         if (count($idNames) !== 1) {
             return [];
         }
@@ -126,41 +119,21 @@ class EmailRecipientsProvider implements EmailRecipientsProviderInterface
         return 'oro.email.autocomplete.contexts';
     }
 
-    /**
-     * @param string $relatedEntityClass
-     * @param mixed $relatedEntityId
-     *
-     * @return QueryBuilder
-     */
-    protected function createActivityListQb($relatedEntityClass, $relatedEntityId)
+    private function createActivityListQb(string $relatedEntityClass, mixed $relatedEntityId): QueryBuilder
     {
-        $activityListQb = $this->getActivityListRepository()->getBaseActivityListQueryBuilder(
-            $relatedEntityClass,
-            $relatedEntityId
-        );
-
-        $activityListQb
+        return $this->getActivityListRepository()
+            ->getBaseActivityListQueryBuilder($relatedEntityClass, $relatedEntityId)
             ->select('activity.relatedActivityId')
             ->andWhere('activity.relatedActivityClass = :related_activity_class');
-
-        return $activityListQb;
     }
 
-    /**
-     * @return ActivityListRepository
-     */
-    protected function getActivityListRepository()
+    private function getActivityListRepository(): ActivityListRepository
     {
-        return $this->getRepository('OroActivityListBundle:ActivityList');
+        return $this->doctrine->getRepository(ActivityList::class);
     }
 
-    /**
-     * @param string $persistentObjectName
-     *
-     * @return EntityRepository
-     */
-    protected function getRepository($persistentObjectName)
+    private function getRepository(string $persistentObjectName): EntityRepository
     {
-        return $this->registry->getRepository($persistentObjectName);
+        return $this->doctrine->getRepository($persistentObjectName);
     }
 }

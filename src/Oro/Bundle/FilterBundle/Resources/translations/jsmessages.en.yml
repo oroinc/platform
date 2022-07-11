@@ -66,7 +66,7 @@ oro:
                 aria_label: '{{ label }} filter to date value'
             later_than: 'later than'
             earlier_than: 'earlier than'
-            end: 'and'
+            and: 'and'
             before: 'before'
             after: 'after'
             from: 'from'
@@ -119,3 +119,4 @@ oro:
             aria_label: '{{ label }} condition'
         updateButton:
             aria_label: 'Apply {{ label }}'
+            text: 'Apply'

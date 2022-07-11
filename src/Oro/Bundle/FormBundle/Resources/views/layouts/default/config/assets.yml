@@ -2,8 +2,7 @@ styles:
     inputs:
         - 'bundles/oroform/default/scss/settings/global-settings.scss'
         - 'bundles/oroform/default/scss/variables/catalog-switcher-config.scss'
-        - 'bundles/oroform/default/scss/variables/custom-checkbox-config.scss'
-        - 'bundles/oroform/default/scss/variables/custom-radio-config.scss'
+        - 'bundles/oroform/default/scss/variables/checkbox-config.scss'
         - 'bundles/oroform/default/scss/variables/datepicker-config.scss'
         - 'bundles/oroform/default/scss/variables/input-config.scss'
         - 'bundles/oroform/default/scss/variables/select-config.scss'

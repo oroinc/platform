@@ -28,6 +28,21 @@ class TranslationControllerTest extends WebTestCase
         return $this->getContainer()->get('doctrine');
     }
 
+    private function getTranslations(string $locale, string $domain): array
+    {
+        return $this->getDoctrine()->getRepository(Translation::class)->createQueryBuilder('t')
+            ->distinct(true)
+            ->select('t.id, t.value, k.key, k.domain, l.code')
+            ->join('t.language', 'l')
+            ->join('t.translationKey', 'k')
+            ->where('l.code = :code AND k.domain = :domain AND t.scope > :scope')
+            ->setParameter('code', $locale)
+            ->setParameter('domain', $domain)
+            ->setParameter('scope', Translation::SCOPE_SYSTEM)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     public function testIndex()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_translation_translation_index'));
@@ -70,9 +85,7 @@ class TranslationControllerTest extends WebTestCase
             ]
         );
 
-        $translations = $this->getDoctrine()->getRepository(Translation::class)
-            ->findAllByLanguageAndDomain(LoadLanguages::LANGUAGE1, LoadTranslations::TRANSLATION_KEY_DOMAIN);
-
+        $translations = $this->getTranslations(LoadLanguages::LANGUAGE1, LoadTranslations::TRANSLATION_KEY_DOMAIN);
         foreach ($translations as $translation) {
             self::assertStringContainsString(sprintf('"id":"%d"', $translation['id']), $response);
             self::assertStringContainsString(sprintf('"key":"%s"', $translation['key']), $response);

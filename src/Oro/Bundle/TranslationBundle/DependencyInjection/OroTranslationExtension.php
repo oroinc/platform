@@ -26,10 +26,6 @@ class OroTranslationExtension extends Extension
         $loader->load('controllers_api.yml');
         $loader->load('mq_topics.yml');
 
-        if ('test' === $container->getParameter('kernel.environment')) {
-            $loader->load('services_test.yml');
-        }
-
         $container->getDefinition('oro_translation.js_generator')
             ->setArgument('$domains', $config['js_translation']['domains']);
         $container->getDefinition('oro_translation.twig.translation.extension')
@@ -40,14 +36,29 @@ class OroTranslationExtension extends Extension
             $config['translation_service']['apikey']
         );
 
-        $container->setParameter('oro_translation.package_names', \array_unique($config['package_names']));
-
+        $container->setParameter('oro_translation.package_names', array_unique($config['package_names']));
         $container->setParameter('oro_translation.debug_translator', $config['debug_translator']);
         $container->setParameter('oro_translation.locales', $config['locales']);
         $container->setParameter('oro_translation.default_required', $config['default_required']);
-        $container->setAlias('oro_translation.manager_registry', $config['manager_registry']);
         $container->setParameter('oro_translation.templating', $config['templating']);
 
-        $container->prependExtensionConfig($this->getAlias(), \array_intersect_key($config, \array_flip(['settings'])));
+        $this->configureTranslatableDictionaries($container, $config['translatable_dictionaries']);
+
+        $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+    }
+
+    private function configureTranslatableDictionaries(ContainerBuilder $container, array $config): void
+    {
+        $listenerDef = $container->getDefinition('oro_translation.event_listener.update_translatable_dictionaries');
+        foreach ($config as $entityClass => $fields) {
+            foreach ($fields as $translatableFieldName => $fieldConfig) {
+                $listenerDef->addMethodCall('addEntity', [
+                    $entityClass,
+                    $translatableFieldName,
+                    $fieldConfig['translation_key_prefix'],
+                    $fieldConfig['key_field_name']
+                ]);
+            }
+        }
     }
 }

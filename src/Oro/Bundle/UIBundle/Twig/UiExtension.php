@@ -48,6 +48,7 @@ use Twig\TwigFunction;
  *   - oro_preg_replace
  *   - oro_sort_by
  *   - url_decode
+ *   - array_unique
  *
  * Provides a Twig tag to work with placeholders:
  *   - placeholder
@@ -104,6 +105,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
             new TwigFilter('oro_sort_by', [$this, 'sortBy']),
             new TwigFilter('url_decode', 'urldecode'),
             new TwigFilter('url_add_query_parameters', [$this, 'urlAddQueryParameters']),
+            new TwigFilter('array_unique', 'array_unique'),
         ];
     }
 

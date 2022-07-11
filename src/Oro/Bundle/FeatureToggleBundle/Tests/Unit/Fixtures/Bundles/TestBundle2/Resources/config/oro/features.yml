@@ -7,7 +7,7 @@ features:
             - config_leaf2
 
     feature2:
-        label: "Feature 2"
+        label: feature2.label
         toggle: toggle2
         routes:
             - f1_route3
@@ -15,7 +15,6 @@ features:
             - config_leaf2
 
     feature3:
-        label: "Feature 3"
-        toggle: toggle3
+        label: feature3.label
         dependencies:
             - feature1

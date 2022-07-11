@@ -14,6 +14,7 @@ datagrids:
                     - languageOwner.id as owner
                     - COUNT(translation) as translationCount
                     - language.installedBuildDate
+                    - language.localFilesLanguage
                 from:
                     - { table: 'Oro\Bundle\TranslationBundle\Entity\Language', alias: language }
                 join:
@@ -162,11 +163,8 @@ datagrids:
             status:
                 label: oro.translation.translation.status.label
                 frontend_type: boolean
-            englishTranslation:
+            englishValue:
                 label: oro.translation.translation.english_translation.label
-                type: twig
-                frontend_type: html
-                template: '@OroTranslation/Translation/Datagrid/englishTranslation.html.twig'
             value:
                 label: oro.translation.translation.value.label
                 inline_editing:
@@ -181,9 +179,6 @@ datagrids:
                             - domain
             current:
                 label: oro.translation.translation.current.label
-                type: twig
-                frontend_type: html
-                template: '@OroTranslation/Translation/Datagrid/current.html.twig'
             key:
                 label: oro.translation.translation_key.key.label
             domain:
@@ -197,7 +192,7 @@ datagrids:
                     data_name: language.id
                 status:
                     data_name: status
-                englishTranslation:
+                englishValue:
                     data_name: englishValue
                 value:
                     data_name: value
@@ -218,7 +213,7 @@ datagrids:
                 status:
                     type: boolean
                     data_name: status
-                englishTranslation:
+                englishValue:
                     type: string
                     data_name: englishValue
                 value_trans:
@@ -233,7 +228,7 @@ datagrids:
                     data_name: domain
                     options:
                         field_options:
-                            choices: "@oro_translation.provider.translation_domain->getAvailableDomains"
+                            choices: "@oro_translation.provider.translation_domain->getAvailableDomainChoices"
                             multiple: true
         properties:
             id: ~

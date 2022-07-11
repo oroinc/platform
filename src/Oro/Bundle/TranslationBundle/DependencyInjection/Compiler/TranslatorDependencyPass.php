@@ -13,47 +13,36 @@ use Symfony\Component\DependencyInjection\Reference;
 class TranslatorDependencyPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $translatorDef = $container->getDefinition('translator.default');
-        $translatorDef->setClass(Translator::class);
-
-        $translatorDef->addMethodCall(
-            'setDatabaseMetadataCache',
-            [new Reference('oro_translation.database_translation.metadata.cache')]
-        );
-        $translatorDef->addMethodCall(
-            'setResourceCache',
-            [new Reference('oro_translation.resource.cache')]
-        );
-
-        $translatorDef->addMethodCall(
-            'setStrategyProvider',
-            [new Reference('oro_translation.strategy.provider')]
-        );
-
-        $translatorDef->addMethodCall(
-            'setTranslationDomainProvider',
-            [new Reference('oro_translation.provider.translation_domain')]
-        );
-
-        $translatorDef->addMethodCall(
-            'setEventDispatcher',
-            [new Reference('event_dispatcher')]
-        );
-
-        $translatorDef->addMethodCall('setLogger', [new Reference('logger')]);
-
-        $translatorDef->addMethodCall(
-            'setApplicationState',
-            [new Reference('oro_distribution.handler.application_status')]
-        );
-        $translatorDef->addMethodCall(
-            'setMessageCatalogueSanitizer',
-            [new Reference('oro_translation.message_catalogue_sanitizer')]
-        );
-        $translatorDef->setPublic(true);
+        $container->getDefinition('translator.default')
+            ->setClass(Translator::class)
+            ->setPublic(true)
+            ->addMethodCall(
+                'setStrategyProvider',
+                [new Reference('oro_translation.strategy.provider')]
+            )
+            ->addMethodCall(
+                'setResourceCache',
+                [new Reference('oro_translation.resource.cache')]
+            )
+            ->addMethodCall(
+                'setLogger',
+                [new Reference('logger')]
+            )
+            ->addMethodCall(
+                'setMessageCatalogueSanitizer',
+                [new Reference('oro_translation.message_catalogue_sanitizer')]
+            )
+            ->addMethodCall(
+                'setSanitizationErrorCollection',
+                [new Reference('oro_translation.translation_message_sanitization_errors')]
+            )
+            ->addMethodCall(
+                'setDynamicTranslationProvider',
+                [new Reference('oro_translation.dynamic_translation_provider')]
+            );
     }
 }

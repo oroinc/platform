@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -36,7 +36,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getAllMetadata')
             ->willReturn([$testEntityMetadata, $testEntity2Metadata]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
@@ -68,7 +68,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getAllMetadata')
             ->willReturn([$metadata]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
@@ -98,7 +98,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getAllMetadata')
             ->willReturn([$metadata]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
@@ -158,7 +158,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getAllMetadata')
             ->willReturn([$metadata]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
@@ -210,7 +210,7 @@ class EntityMetadataHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getAllMetadata')
             ->willReturn([$metadata]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);

@@ -15,10 +15,16 @@ class ImagineUrlProvider implements ImagineUrlProviderInterface
 
     private FilterConfiguration $filterConfiguration;
 
-    public function __construct(UrlGeneratorInterface $urlGenerator, FilterConfiguration $filterConfiguration)
-    {
+    private FilenameExtensionHelper $filenameExtensionHelper;
+
+    public function __construct(
+        UrlGeneratorInterface $urlGenerator,
+        FilterConfiguration $filterConfiguration,
+        FilenameExtensionHelper $filenameExtensionHelper
+    ) {
         $this->urlGenerator = $urlGenerator;
         $this->filterConfiguration = $filterConfiguration;
+        $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
     public function getFilteredImageUrl(
@@ -31,10 +37,8 @@ class ImagineUrlProvider implements ImagineUrlProviderInterface
             $format = $this->filterConfiguration->get($filterName)['format'] ?? '';
         }
 
-        $path = FilenameExtensionHelper::addExtension(ltrim($path, '/'), $format);
-
         $params = [
-            'path' => $path,
+            'path' => $this->filenameExtensionHelper->addExtension(ltrim($path, '/'), $format),
             'filter' => $filterName,
         ];
 

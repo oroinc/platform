@@ -122,23 +122,6 @@ class ConfigHelperHandler
     }
 
     /**
-     * @return $this
-     */
-    public function showClearCacheMessage()
-    {
-        $message = $this->translator->trans(
-            'oro.translation.translation.rebuild_cache_required',
-            [
-                '%path%' => $this->urlGenerator->generate('oro_translation_translation_index'),
-            ]
-        );
-
-        $this->session->getFlashBag()->add('warning', $message);
-
-        return $this;
-    }
-
-    /**
      * @param ConfigModel|string $entityOrUrl
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */

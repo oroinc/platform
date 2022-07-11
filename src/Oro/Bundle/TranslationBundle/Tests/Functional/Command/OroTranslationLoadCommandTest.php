@@ -45,8 +45,6 @@ class OroTranslationLoadCommandTest extends WebTestCase
 
     public function testExecuteWithRebuildCache()
     {
-        $this->markTestSkipped('Skipped due takes much time to rebuild translation cache');
-
         $result = $this->runCommand('oro:translation:load', [
             '--languages=' . LoadLanguages::LANGUAGE1,
             '--rebuild-cache'

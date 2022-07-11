@@ -40,20 +40,105 @@ abstract class AbstractRenameField extends AbstractFixture implements ContainerA
                 $definition['grouping_columns'][$key]['name'] = $this->replaceFieldName($columnData['name']);
             }
 
-            foreach ($definition['filters'] ?? [] as $key => $filterData) {
-                if ($filterData === 'OR' || $filterData === 'AND') {
-                    // Skips iteration if it is an "AND" or "OR" operator.
-                    continue;
-                }
-
-                $definition['filters'][$key]['columnName'] = $this->replaceFieldName($filterData['columnName']);
-            }
+            $definition['filters'] = $this->replaceFiltersFieldName($definition['filters']);
 
             $report->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
             $manager->persist($report);
         }
 
         $manager->flush();
+    }
+
+    /**
+     * Recursion inside this method handles the case when filter aggregate array of filters,
+     * For example this is a fragment of existing definition:
+     * [
+     *      'columns' => [
+     *              0 => array (
+     *                  'name' => 'username',
+     *                  'label' => 'Email',
+     *                  'func' => '',
+     *                  'sorting' => '',
+     *              ),
+     *              1 => array (
+     *                  'name' => 'enabled',
+     *                  'label' => 'Enabled',
+     *                  'func' => '',
+     *                  'sorting' => '',
+     *              ),
+     *              2 => array (
+     *                  'name' => 'customerOro\\Bundle\\CustomerBundle\\Entity\\Customer::dt_status',
+     *                  'label' => 'Status',
+     *                  'func' => '',
+     *                  'sorting' => '',
+     *              ),
+     *              3 => array (
+     *                  'name' => 'userRolesOro\\Bundle\\CustomerBundle\\Entity\\CustomerUserRole::label',
+     *                  'label' => 'Label',
+     *                  'func' => '',
+     *                  'sorting' => '',
+     *              ),
+     *      ],
+     *      'filters' => [
+     *          [
+     *              'columnName' => 'customerOro\\Bundle\\CustomerBundle\\Entity\\Customer::dt_status',
+     *              'criterion' => [
+     *                  'filter' => 'enum',
+     *                  'data' => [
+     *                      'type' => '1',
+     *                      'value' => ['inactive'],
+     *                      'params' => ['class' => 'Extend\\Entity\\EV_Dt_Status']
+     *                  ]
+     *              ]
+     *          ],
+     *          'AND',
+     *          [
+     *              'columnName' => 'enabled',
+     *              'criterion' => [
+     *                  'filter' => 'boolean',
+     *                  'data' => ['value' => '1']
+     *              ]
+     *          ],
+     *          'AND',
+     *          [
+     *              [
+     *                  'columnName' => 'userRolesOro\\Bundle\\CustomerBundle\\Entity\\CustomerUserRole::label',
+     *                  'criterion' => [
+     *                      'filter' => 'string',
+     *                      'data' => ['value' => 'Admin', 'type' => '1']
+     *                  ]
+     *              ],
+     *              'OR',
+     *              [
+     *                  'columnName' => 'userRolesOro\\Bundle\\CustomerBundle\\Entity\\CustomerUserRole::label',
+     *                  'criterion' => [
+     *                      'filter' => 'string',
+     *                      'data' => [
+     *                          'value' => 'price',
+     *                          'type' => '1',
+     *                      ]
+     *                  ]
+     *              ]
+     *          ]
+     *  ......
+     * ]
+     */
+    private function replaceFiltersFieldName(array $filters): array
+    {
+        foreach ($filters as &$filterData) {
+            if (!is_array($filterData)) {
+                // Skips iteration if it is an "AND" or "OR" operator.
+                continue;
+            }
+
+            if (isset($filterData['columnName'])) {
+                $filterData['columnName'] = $this->replaceFieldName($filterData['columnName']);
+            } else {
+                $filterData = $this->replaceFiltersFieldName($filterData);
+            }
+        }
+
+        return $filters;
     }
 
     private function replaceFieldName(string $columnName): string

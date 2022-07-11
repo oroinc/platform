@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Composer;
 
+use Composer\InstalledVersions;
 use Oro\Bundle\CacheBundle\Generator\UniversalCacheKeyGenerator;
 use Oro\Bundle\PlatformBundle\OroPlatformBundle;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -13,13 +14,11 @@ class VersionHelper
 {
     private const UNDEFINED_VERSION = 'N/A';
 
-    private LocalRepositoryFactory $factory;
     private CacheInterface $cache;
     private array $packageVersions = [];
 
-    public function __construct(LocalRepositoryFactory $factory, CacheInterface $cache)
+    public function __construct(CacheInterface $cache)
     {
-        $this->factory = $factory;
         $this->cache = $cache;
     }
 
@@ -40,12 +39,10 @@ class VersionHelper
 
     private function getPackageVersion(string $packageName): string
     {
-        $packages = $this->factory->getLocalRepository()->findPackages($packageName);
-        $package = current($packages);
-        if (!$package) {
+        if (!InstalledVersions::isInstalled($packageName)) {
             return self::UNDEFINED_VERSION;
         }
 
-        return $package->getPrettyVersion();
+        return InstalledVersions::getPrettyVersion($packageName);
     }
 }

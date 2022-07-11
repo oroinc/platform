@@ -1,0 +1,8 @@
+oro_entity:
+    entity_name_representation:
+        Oro\Bundle\OrganizationBundle\Entity\Organization:
+            full: [ name ]
+            short: [ name ]
+        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+            full: [ name ]
+            short: [ name ]

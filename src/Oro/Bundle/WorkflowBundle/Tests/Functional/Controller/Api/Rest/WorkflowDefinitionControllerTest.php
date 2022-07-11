@@ -26,7 +26,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'POST',
-            $this->getUrl('oro_workflow_api_rest_workflowdefinition_post'),
+            $this->getUrl('oro_api_workflow_definition_post'),
             array_merge_recursive(
                 $this->getTestConfiguration(),
                 [
@@ -56,7 +56,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
 
         $this->client->jsonRequest(
             'POST',
-            $this->getUrl('oro_workflow_api_rest_workflowdefinition_post'),
+            $this->getUrl('oro_api_workflow_definition_post'),
             $this->getTestConfiguration()
         );
 
@@ -80,7 +80,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'GET',
             $this->getUrl(
-                'oro_workflow_api_rest_workflowdefinition_get',
+                'oro_api_workflow_definition_get',
                 ['workflowDefinition' => self::TEST_DEFINITION_NAME]
             )
         );
@@ -148,7 +148,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
-                'oro_workflow_api_rest_workflowdefinition_put',
+                'oro_api_workflow_definition_put',
                 ['workflowDefinition' => self::TEST_DEFINITION_NAME]
             ),
             $updated
@@ -181,7 +181,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'PUT',
             $this->getUrl(
-                'oro_workflow_api_rest_workflowdefinition_put',
+                'oro_api_workflow_definition_put',
                 ['workflowDefinition' => self::TEST_DEFINITION_NAME]
             ),
             array_merge_recursive(
@@ -221,7 +221,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
         $this->client->jsonRequest(
             'DELETE',
             $this->getUrl(
-                'oro_workflow_api_rest_workflowdefinition_delete',
+                'oro_api_workflow_definition_delete',
                 ['workflowDefinition' => self::TEST_DEFINITION_NAME]
             )
         );

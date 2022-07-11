@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\TranslationBundle\Download;
 
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
+use Oro\Bundle\TranslationBundle\Exception\TranslationServiceInvalidResponseException;
 
 /**
  * An interface for 3-rd party translation service adapter implementations.
@@ -27,9 +28,9 @@ interface TranslationServiceAdapterInterface
      * ]
      * </code>
      *
-     * @throws TranslationServiceAdapterException if the service does not provide metrics, or is unavailable,
-     *                                         or if the response cannot be decoded,
-     *                                         or if the response has no valid metrics
+     * @throws TranslationServiceAdapterException if a translation service is unavailable
+     * @throws TranslationServiceInvalidResponseException if a response of a translation service request
+     *                                                    cannot be decoded or return invalid metrics
      */
     public function fetchTranslationMetrics(): array;
 

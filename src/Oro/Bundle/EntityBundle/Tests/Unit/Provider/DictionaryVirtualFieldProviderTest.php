@@ -6,22 +6,22 @@ use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
 use Oro\Bundle\EntityBundle\Provider\DictionaryVirtualFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
     /** @var AbstractAdapter|\PHPUnit\Framework\MockObject\MockObject */
@@ -364,7 +364,6 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
                     case 'Acme\TestBundle\Entity\Dictionary2':
                         return $this->createEntityConfig('dictionary', $class, ['virtual_fields' => ['id', 'name']]);
                     case 'Acme\TestBundle\Entity\Dictionary3':
-                        return $this->createEntityConfig('dictionary', $class);
                     case 'Acme\TestBundle\Entity\Dictionary4':
                         return $this->createEntityConfig('dictionary', $class);
                     default:
@@ -396,13 +395,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    /**
-     * @param string $scope
-     * @param string $className
-     * @param array  $values
-     * @return Config
-     */
-    private function createEntityConfig($scope, $className, $values = [])
+    private function createEntityConfig(string $scope, string $className, array $values = []): Config
     {
         $config = new Config(new EntityConfigId($scope, $className));
         $config->setValues($values);
@@ -410,14 +403,11 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    /**
-     * @param array  $fields key = fieldName, value = fieldType
-     * @param string $idFieldName
-     *
-     * @return ClassMetadata
-     */
-    private function createDictionaryMetadata($className, $fields = [], $idFieldName = 'id')
-    {
+    private function createDictionaryMetadata(
+        string $className,
+        array $fields = [],
+        string $idFieldName = 'id'
+    ): ClassMetadata {
         if (empty($fields)) {
             $fields = ['id' => 'integer', 'name' => 'string'];
         }

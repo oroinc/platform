@@ -18,11 +18,11 @@ const CellLinksPlugin = BasePlugin.extend({
         CellLinksPlugin.__super__.enable.call(this);
     },
 
-    processColumnsAndListenEvents: function() {
+    processColumnsAndListenEvents() {
         this.processColumns();
     },
 
-    processColumns: function() {
+    processColumns() {
         const {rowClickAction} = this.main;
 
         if (rowClickAction && rowClickAction.prototype.link) {
@@ -34,31 +34,35 @@ const CellLinksPlugin = BasePlugin.extend({
         this.main.columns.each(this.patchCellConstructor.bind(this));
     },
 
-    patchCellConstructor: function(column) {
+    patchCellConstructor(column) {
         const Cell = column.get('cell');
         const clickRowActionLink = this.clickRowActionLink;
 
         const extended = Cell.extend({
             rowUrl: null,
 
+            main: this.main,
+
             delegateEvents() {
                 Cell.__super__.delegateEvents.call(this);
                 this.rowUrl = clickRowActionLink ? this.model.get(clickRowActionLink) : false;
 
                 if (this.rowUrl) {
+                    const debouncedCreateCellLinkView = _.debounce(this.createCellLinkView.bind(this), 50);
+                    const debouncedDestroyCellLinkView = _.debounce(this.destroyCellLinkView.bind(this), 50);
+
                     if (!isTouchDevice()) {
-                        this.$el.on(`mouseenter${this.eventNamespace()}`, this.createCellLinkView.bind(this));
-                        this.$el.on(`mouseleave${this.eventNamespace()}`, this.destroyCellLinkView.bind(this));
+                        this.$el.off(`mouseenter${this.eventNamespace()} mouseleave${this.eventNamespace()}`);
+                        this.$el.on(`mouseenter${this.eventNamespace()}`, debouncedCreateCellLinkView);
+                        this.$el.on(`mouseleave${this.eventNamespace()}`, debouncedDestroyCellLinkView);
                     } else {
-                        this.createCellLinkView = _.debounce(this.createCellLinkView.bind(this), 50);
-                        this.destroyCellLinkView = _.debounce(this.destroyCellLinkView.bind(this), 50);
-                        this.$el.on(`touchstart${this.eventNamespace()}`, this.createCellLinkView.bind(this));
+                        this.$el.on(`touchstart${this.eventNamespace()}`, debouncedCreateCellLinkView);
                         this.$el.on(
                             `touchend${this.eventNamespace()} touchcancel${this.eventNamespace()}`,
-                            this.destroyCellLinkView.bind(this)
+                            debouncedDestroyCellLinkView
                         );
                     }
-                    this.listenTo(this, 'before-enter-edit-mode', this.disposeCellLink.bind(this));
+                    this.listenTo(this, 'before-enter-edit-mode', this.destroyCellLinkView.bind(this));
                 }
             },
 
@@ -66,8 +70,16 @@ const CellLinksPlugin = BasePlugin.extend({
                 return !_.isUndefined(this.skipRowClick) && this.skipRowClick;
             },
 
+            isSelectedText() {
+                return window.getSelection().toString().length;
+            },
+
             createCellLinkView(event) {
-                if (this.inEditMode() || (event.type === 'touchstart' && event.target.tagName === 'A')) {
+                if (this.inEditMode() ||
+                    (event.type === 'touchstart' && event.target.tagName === 'A') ||
+                    this.isSelectedText() ||
+                    this.subview('cell-link')
+                ) {
                     return;
                 }
 
@@ -86,8 +98,9 @@ const CellLinksPlugin = BasePlugin.extend({
             },
 
             disposeCellLink() {
-                if (this.subview('cell-link')) {
+                if (this.subview('cell-link') && !this.subview('cell-link').disposed) {
                     this.subview('cell-link').dispose();
+                    this.removeSubview('cell-link');
                 }
             }
         });

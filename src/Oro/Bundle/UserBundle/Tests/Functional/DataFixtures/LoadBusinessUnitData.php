@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Functional\DataFixtures;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class LoadBusinessUnitData extends AbstractFixture
 {
@@ -16,7 +17,7 @@ class LoadBusinessUnitData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
-        $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
+        $organization = $manager->getRepository(Organization::class)->getFirst();
         $businessUnits = [self::BUSINESS_UNIT_1, self::BUSINESS_UNIT_2];
         foreach ($businessUnits as $businessUnitName) {
             $businessUnit = new BusinessUnit();

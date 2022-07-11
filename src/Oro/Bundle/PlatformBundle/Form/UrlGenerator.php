@@ -32,16 +32,16 @@ class UrlGenerator
         return $this->cacheProvider->get('url', function () {
             $packages = $this->packageProvider->getOroPackages(false);
             $url = self::URL;
-            foreach ($packages as $package) {
+            foreach ($packages as $packageName => $packageData) {
                 $packageName = str_replace(
                     PackageProvider::ORO_NAMESPACE . PackageProvider::NAMESPACE_DELIMITER,
                     '',
-                    $package->getPrettyName()
+                    $packageName
                 );
                 if (!array_key_exists($packageName, self::$aliases)) {
                     continue;
                 }
-                $url .= sprintf('%s/%s/', self::$aliases[$packageName], $package->getPrettyVersion());
+                $url .= sprintf('%s/%s/', self::$aliases[$packageName], $packageData['pretty_version']);
             }
             $url .= self::FORM_JS;
             return $url;

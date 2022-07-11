@@ -15,6 +15,7 @@ aliases:
 configs:
     orotranslation/js/translator: {}
     oroui/js/component-shortcuts-manager: {}
+    oroui/js/messenger: {}
     oroviewswitcher/js/app/views/demo/demo: {}
     oroviewswitcher/js/app/views/device-switcher-view: {}
 dynamic-imports:

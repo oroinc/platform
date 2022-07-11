@@ -28,20 +28,20 @@
     </div>
 {% endmacro %}
 
-{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
-    {% set tooltip_parameters = tooltip_parameters|default({}) %}
-    {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
-    {% set tooltip = tooltip_raw|trans(tooltip_parameters, "messages") %}
-    {% if (tooltip == tooltip_raw) %}
-        {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
-    {% endif %}
+{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor, tooltip_translatable) %}
+    {%- set tooltip = tooltip_raw -%}
+    {%- if tooltip_translatable is not same as(false) -%}
+        {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({})) %}
+        {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
+        {% if tooltip == tooltip_raw %}
+            {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({}), "tooltips") %}
+        {% endif %}
+    {%- endif -%}
     {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
         {% set details_enabled = details_enabled|default(false) %}
         {% set tooltip_placement = isMobileVersion() ? 'top' : tooltip_placement|default(null) %}
-
-        {# Help link logic #}
         {% if details_enabled or details_anchor or details_link %}
             {% set helpLink = details_link|default(get_help_link()) %}
             {% if details_anchor %}
@@ -52,13 +52,7 @@
                 ~ 'oro.form.tooltip.read_more'|trans ~ '</a></div></div>'
             %}
         {% endif %}
-        {# End help link logic #}
-
-        {% set tooltip = '<div class="oro-popover-content">'
-            ~ tooltip
-            ~ '</div>'
-        %}
-
+        {% set tooltip = '<div class="oro-popover-content">' ~ tooltip ~ '</div>' -%}
         <i class="fa-info-circle tooltip-icon"
            {% if tooltip_placement %}data-placement="{{ tooltip_placement }}"{% endif %}
            data-content="{{ tooltip }}"
@@ -332,7 +326,16 @@
                 data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
             {% endfor %}
         {% endif %}
-        class="{{ parameters.class is defined? parameters.class : '' }} {{ parameters.aCss is defined? parameters.aCss : '' }}"
+        {% set classes = '' %}
+        {% if parameters.class is defined %}
+            {% set classes = classes ~ ' ' ~ parameters.class|trim %}
+        {% endif %}
+        {% if parameters.aCss is defined %}
+            {% set classes = classes ~ ' ' ~ parameters.aCss|trim %}
+        {% endif %}
+        {% if classes|length %}
+            class="{{ classes|split(' ')|array_unique|join(' ') }}"
+        {% endif %}
         {% if parameters.role is defined %}role="{{ parameters.role }}"{% endif %}
         {% if parameters.title is defined and parameters.title is not empty %}title="{{ parameters.title }}"{% endif %}>{{ iconHtml|trim|raw }}
         {{- parameters.label|trim }}
@@ -375,7 +378,7 @@
     {% set togglerId = 'dropdown-'|uniqid %}
     <div class="btn-group">
         <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle" data-toggle="dropdown"
-           aria-haspopup="true" aria-expanded="false" data-placement="bottom-end"
+           aria-haspopup="true" aria-expanded="false" data-placement="{{ parameters.placement is defined ? parameters.placement : 'bottom-end' }}"
            data-inherit-parent-width="loosely"
         >
             {% if parameters.iCss is defined %}
@@ -656,6 +659,7 @@
             'dataRedirect' - url to redirect to after the operation is finished
             'successMessage' - message to display after the operation is finished
             'title' - button title
+            'ariaLabel' - button aria-label
             'label' - button label
             'labelInIcon' - defines whether the label is included in the icon (true by default)
             'visible' - defines whether the button is visible (true by default)
@@ -704,7 +708,7 @@
 {% macro clientControlAttrs(parameters) %}
     {% import _self as UIMacro %}
     {% if (parameters.class is defined) %}
-        class="{{ parameters.class }}"
+        class="{{ parameters.class|split(' ')|array_unique|join(' ') }}"
     {% endif %}
     {% if (parameters.id is defined) %}
         id="{{ parameters.id }}"
@@ -809,11 +813,19 @@
     {% set parameters = parameters|merge({
         class: parameters.class|default('') ~ ' ' ~ parameters.btnCss|default('btn')
     })%}
+    {% set type = parameters.type is defined ? parameters.type : 'button' %}
     {% apply spaceless %}
         <button {{- UIMacro.clientControlAttrs(parameters) -}}
-            {% if (parameters.title is defined) %}
-                title="{{ parameters.title }}"
-            {% endif %}>
+            type="{{ type }}"
+        {% if (parameters.title is defined) %}
+            title="{{ parameters.title }}"
+        {% endif %}
+        {%- if (parameters.dataUrlRaw is defined) -%}
+            data-url="{{ parameters.dataUrlRaw|raw }}"
+        {% elseif (parameters.dataUrl is defined) %}
+            data-url="{{ parameters.dataUrl }}"
+        {%- endif -%}
+        >
             {{- UIMacro.clientControlIcon(parameters) -}}
             {{- parameters.label is defined ? parameters.label : '' -}}
         </button>
@@ -1406,7 +1418,7 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone"><bdo dir="ltr">{{ title }}</bdo></a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone nowrap"><bdo dir="ltr">{{ title }}</bdo></a>
     {% endif %}
 {%- endmacro -%}
 
@@ -1553,15 +1565,15 @@
             - data_page_component_module - Class for data-page-component-module attribute
             - show_form_when_empty - Show select box when a form is empty
 #}
-{% macro sortable_list_view(widget, attr = {}, options = {}, widgetContainerAttributes) %}
+{% macro sortable_list_view(widget, attr = {}, options = {}) %}
+    {% set originalAttr = attr %}
     {% import _self as UIMacro %}
 
     {% if widget.vars.prototype is defined %}
-        {% set prototype_html = UIMacro.sortable_list_view_collection_prototype(widget, options, widgetContainerAttributes) %}
+        {% set prototype_html = UIMacro.sortable_list_view_collection_prototype(widget, options, attr) %}
     {% endif %}
 
     {% set attr = attr|merge({'class': (attr.class is defined ? attr.class ~ ' ' : '') ~ 'oro-item-collection grid-container' }) %}
-
     {% set id = widget.vars.id ~ '_collection' %}
     <div class="{{ options.collection_class|default('') }} drag-n-drop-sorting-view" {% if options.data_page_component_module is defined %} data-page-component-module="{{ options.data_page_component_module|escape }}"{% endif %}>
         <div class="drag-n-drop-sorting-view__wrapper row-oro" {{ UIMacro.renderPageComponentAttributes({
@@ -1576,8 +1588,8 @@
                 <table class="grid table-hover table table-bordered">
                     <thead>
                     <tr>
-                        <th class="drag-n-drop-sorting-view__column"><span>{{ options.column_label|default('') }}</span></th>
-                        <th class="drag-n-drop-sorting-view__column_options"><span>{{ options.column_options_label|default('') }}</span></th>
+                        <th class="drag-n-drop-sorting-view__column" scope="col"><span>{{ options.column_label|default('') }}</span></th>
+                        <th class="drag-n-drop-sorting-view__column_options" scope="col"><span>{{ options.column_options_label|default('') }}</span></th>
                         {% if form.mergeAllowed is defined %}
                             <th></th>
                         {% endif %}
@@ -1586,6 +1598,7 @@
                     <tbody class="sortable-wrapper" data-last-index="{{ widget.children|length}}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                     {% if widget.children|length %}
                         {% for child in widget.children %}
+                            {% set widgetContainerAttributes = originalAttr|filter((v, k) => k not in  ['id', 'class']) %}
                             {{ UIMacro.sortable_list_view_collection_prototype(child, options, widgetContainerAttributes) }}
                         {% endfor %}
                     {% elseif options.show_form_when_empty is defined and prototype_html is defined %}
@@ -1610,7 +1623,11 @@
         {% set name = widget.vars.full_name %}
     {% endif %}
     {% apply spaceless %}
-    <tr data-content="{{ name }}" data-validation-optional-group {{ widgetContainerAttributes }}
+        {% import _self as UIMacro %}
+        {% if 'data-validation-optional-group' not in widgetContainerAttributes %}
+            {% set widgetContainerAttributes = widgetContainerAttributes|merge({'data-validation-optional-group': ''}) %}
+        {% endif %}
+        <tr data-content="{{ name }}" {{ UIMacro.attributes(widgetContainerAttributes) }}
             class="{{ options.collection_class|default('') }}">
         {{ form_widget(form) }}
     </tr>

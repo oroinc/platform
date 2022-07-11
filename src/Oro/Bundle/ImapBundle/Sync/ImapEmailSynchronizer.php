@@ -114,7 +114,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         try {
             $accessToken = $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null;
         } catch (RefreshOAuthAccessTokenFailureException $e) {
-            $notification = EmailSyncNotificationAlert::createForAuthFail($e->getMessage());
+            $notification = EmailSyncNotificationAlert::createForRefreshTokenFail($e->getMessage());
             $this->notificationsBag->addNotification($notification);
 
             throw $e;

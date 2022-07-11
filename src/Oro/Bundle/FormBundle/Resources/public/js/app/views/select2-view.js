@@ -34,7 +34,11 @@ define(function(require) {
             this.select2Config = _.result(options, 'select2Config') || _.extend({}, this.select2Config);
 
             const $emptyOption = this.$el.find('option[value=""]');
-            if (this.select2Config.allowClear === undefined && (!this.$el[0].required || $emptyOption.length)) {
+            // "Required" attribute is not allowed for '<input type="hidden">
+            // such input might be used as the initializing element for Select2
+            const notRequired = this.$el.is(':hidden') ? !this.$el.attr('x-required') : !this.$el[0].required;
+
+            if (this.select2Config.allowClear === undefined && (notRequired || $emptyOption.length)) {
                 this.select2Config.allowClear = true;
             }
             if (this.select2Config.allowClear && !this.select2Config.placeholderOption && $emptyOption.length) {

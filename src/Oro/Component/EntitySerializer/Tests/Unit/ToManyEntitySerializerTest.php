@@ -2,6 +2,10 @@
 
 namespace Oro\Component\EntitySerializer\Tests\Unit;
 
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\Role;
+use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\User;
+
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -13,7 +17,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToManyUnidirectional()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
@@ -115,7 +119,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToManyUnidirectionalWithSubQueryLimit()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id IN (:ids)')
             ->setParameter('ids', [123, 456]);
 
@@ -236,7 +240,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSubQueryLimitAndStringEntityId()
     {
-        $qb = $this->em->getRepository('Test:Role')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Role::class)->createQueryBuilder('e')
             ->where('e.code IN (:ids)')
             ->setParameter('ids', ['id1', 'id2']);
 
@@ -387,7 +391,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
         $result = $this->serializer->serialize(
-            $this->em->getRepository('Test:User')->createQueryBuilder('e'),
+            $this->em->getRepository(User::class)->createQueryBuilder('e'),
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
@@ -422,7 +426,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToManyUnidirectionalIdOnly()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -488,7 +492,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
 
     public function testManyToManyBidirectionalIdOnlyAndOrderBy()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -559,7 +563,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToManyBidirectionalWithManyToOne()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -667,7 +671,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToManyBidirectionalWithManyToMany()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -794,7 +798,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
      */
     public function testManyToManyBidirectionalAndMasResultsAndOrderBy()
     {
-        $qb = $this->em->getRepository('Test:User')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(User::class)->createQueryBuilder('e')
             ->where('e.id = :id')
             ->setParameter('id', 1);
 
@@ -893,7 +897,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSerializeWithFieldsFilterAndEnabledToManyAssociation()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user')
             ->where('e.id = :id')
             ->setParameter('id', 1);
@@ -977,7 +981,7 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
 
     public function testSerializeWithFieldsFilterAndDisabledToManyAssociation()
     {
-        $qb = $this->em->getRepository('Test:Product')->createQueryBuilder('e')
+        $qb = $this->em->getRepository(Product::class)->createQueryBuilder('e')
             ->leftJoin('e.owner', 'user')
             ->where('e.id = :id')
             ->setParameter('id', 1);

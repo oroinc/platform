@@ -8,10 +8,10 @@ Feature: Mime types upload settings admin configuration
 
   Scenario: Update mime type section in upload settings
     Given I login as administrator
-    And I go to System/Configuration
+    When I go to System/Configuration
     And I follow "System Configuration/General Setup/Upload Settings" on configuration sidebar
     And uncheck "Use default" for "File MIME types" field
-    And I should see "File MIME Types" with options:
+    Then I should see "File MIME Types" with options:
       | Value                                                                     |
       | text/csv                                                                  |
       | text/plain                                                                |
@@ -26,15 +26,17 @@ Feature: Mime types upload settings admin configuration
       | image/gif                                                                 |
       | image/jpeg                                                                |
       | image/png                                                                 |
-    And I should not see "image/svg+xml" for "File MIME Types" select
-    And I unselect "application/vnd.ms-excel" option from "File MIME Types"
+      | image/svg                                                                 |
+      | image/svg+xml                                                             |
+    When I unselect "application/vnd.ms-excel" option from "File MIME Types"
     And uncheck "Use default" for "Image MIME types" field
-    And I should see "Image MIME Types" with options:
-      | Value      |
-      | image/gif  |
-      | image/jpeg |
-      | image/png  |
-    And I should not see "image/svg+xml" for "Image MIME Types" select
-    And I unselect "image/png" option from "Image MIME Types"
+    Then I should see "Image MIME Types" with options:
+      | Value         |
+      | image/gif     |
+      | image/jpeg    |
+      | image/png     |
+      | image/svg     |
+      | image/svg+xml |
+    When I unselect "image/png" option from "Image MIME Types"
     And I submit form
     Then I should see "Configuration saved" flash message

@@ -3,72 +3,48 @@
 namespace Oro\Bundle\ConfigBundle\Provider;
 
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\DataTransformerInterface;
 use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Provides Config for the form
+ * Represents a service that provides configuration of a system configuration form.
  */
 interface ProviderInterface
 {
     /**
-     * Returns a tree is used to build API data
-     *
-     * @param string|null $path The path to API section. For example: look-and-feel/grid
-     *
-     * @return SectionDefinition|null
+     * Gets the configuration tree that is used to build API data.
      */
-    public function getApiTree($path = null);
+    public function getApiTree(?string $path = null): ?SectionDefinition;
 
     /**
-     * Returns specified tree
-     *
-     * @return GroupNodeDefinition
+     * Gets the configuration tree.
      */
-    public function getTree();
+    public function getTree(): GroupNodeDefinition;
 
     /**
-     * Return specified tree for js-tree component
-     *
-     * @return array
+     * Gets the configuration tree for js-tree component.
      */
-    public function getJsTree();
+    public function getJsTree(): array;
 
     /**
-     * Retrieve slice of specified tree in point of subtree
-     *
-     * @param string $subTreeName
-     *
-     * @return GroupNodeDefinition
+     * Gets a slice of the configuration tree in point of subtree.
      */
-    public function getSubTree($subTreeName);
+    public function getSubTree(string $subTreeName): GroupNodeDefinition;
 
     /**
-     * Builds form for specified tree group
-     *
-     * @param string $groupName
-     *
-     * @return FormInterface
+     * Builds form for the given configuration tree group.
      */
-    public function getForm($groupName);
+    public function getForm(string $groupName, ConfigManager $configManager): FormInterface;
 
     /**
-     * Lookup for first available groups if they are not specified yet
-     *
-     * @param string $activeGroup
-     * @param string $activeSubGroup
-     *
-     * @return array
+     * Lookup for first available groups if they are not specified yet.
      */
-    public function chooseActiveGroups($activeGroup, $activeSubGroup);
+    public function chooseActiveGroups(?string $activeGroup, ?string $activeSubGroup): array;
 
     /**
-     * Returns a data transformer for the specified field
-     *
-     * @param string $key
-     *
-     * @return DataTransformerInterface|null
+     * Gets a data transformer for the given field.
      */
-    public function getDataTransformer($key);
+    public function getDataTransformer(string $key): ?DataTransformerInterface;
 }

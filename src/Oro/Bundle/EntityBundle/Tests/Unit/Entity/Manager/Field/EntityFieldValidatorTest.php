@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Entity\Manager\Field;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\CustomGridFieldValidatorInterface;
@@ -32,12 +32,12 @@ class EntityFieldValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('getClassMetadata')
             ->willReturn($this->classMetadata);
 
-        $registry = $this->createMock(Registry::class);
-        $registry->expects(self::once())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::once())
             ->method('getManager')
             ->willReturn($objectManager);
 
-        $this->validator = new EntityFieldValidator($registry, $this->translation);
+        $this->validator = new EntityFieldValidator($doctrine, $this->translation);
     }
 
     public function testPositiveValidate()

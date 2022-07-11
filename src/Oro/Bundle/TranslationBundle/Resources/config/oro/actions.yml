@@ -35,8 +35,6 @@ operations:
             - '@flash_message':
                 message: oro.translation.language.message.added
                 type: 'success'
-            - '@run_action_group':
-                action_group: oro_translation_language_update_cache_message
             - '@refresh_grid': oro-translation-language-grid
 
     oro_translation_language_disable:
@@ -197,8 +195,6 @@ operations:
                     - '@flash_message':
                         message: $.successMessage
                         type: 'success'
-                    - '@run_action_group':
-                        action_group: oro_translation_language_update_cache_message
             - '@tree':
                 conditions:
                     '@equal': [$.installed, false]
@@ -246,30 +242,6 @@ operations:
             - '@assign_value': [$.errorMessage, 'oro.translation.language.error.update']
         preconditions:
             '@is_language_translation_update_available': $.data
-
-    oro_translation_rebuild_cache:
-        label: oro.translation.action.rebuild_cache.label
-        applications: [default]
-        routes:
-            - oro_translation_translation_index
-        button_options:
-            icon: fa-refresh
-            class: btn-danger icons-holder-text
-        acl_resource: oro_translation_language_translate
-        actions:
-            - '@rebuild_translation_cache':
-                attribute: $.result
-            - '@flash_message':
-                conditions:
-                    '@equal': ['$.result[successful]', true]
-                message: oro.translation.translation.message.rebuild_cache
-                type: success
-            - '@flash_message':
-                  conditions:
-                      '@equal': ['$.result[successful]', false]
-                  message: '$.result[message]'
-                  translate: false
-                  type: error
 
     oro_translation_translation_reset:
         label: oro.translation.action.reset.hint
@@ -330,18 +302,3 @@ action_groups:
         actions:
             - '@assign_value': [$.data.enabled, $.value]
             - '@flush_entity': $.data
-
-    oro_translation_language_update_cache_message:
-        acl_resource: oro_translation_translation_update
-        actions:
-            - '@assign_url':
-                attribute: $.rebuildCacheUrl
-                route: oro_translation_translation_index
-            - '@trans':
-                attribute: $.rebuildCacheMessage
-                id: oro.translation.translation.rebuild_cache_required
-                params:
-                    '%%path%%': $.rebuildCacheUrl
-            - '@flash_message':
-                message: $.rebuildCacheMessage
-                type: 'warning'

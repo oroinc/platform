@@ -6,8 +6,9 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_maintenance.maintenance'
-            - '@oro_cron.helper.cron'
+            - '@oro_cron.cron_helper'
             - '@oro_cron.async.command_runner'
+            - '@oro_cron.command_feature_checker'
             - '@logger'
             - '%kernel.environment%'
         tags:

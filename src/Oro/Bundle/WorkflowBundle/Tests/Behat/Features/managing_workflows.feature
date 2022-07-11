@@ -120,8 +120,7 @@ Feature: Managing workflows
     Given I sort grid by Related Entity
     And I click "Clone" on row "Glorious workflow" in grid
     When I save and close form
-    Then I should see "Translation cache update is required. Click here to update" flash message
-    And I should see "Workflow saved." flash message
+    Then I should see "Workflow saved." flash message
     When I go to System/ Workflows
     Then I should see Copy of Glorious workflow in grid with following data:
       | Related Entity  | Business Unit              |

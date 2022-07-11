@@ -10,19 +10,13 @@ use Symfony\Component\Process\PhpExecutableFinder;
  */
 abstract class AbstractCommandExecutor
 {
-    /** var string|null */
+    /** @var string|null */
     protected $env;
 
     /** @var array */
     protected $defaultOptions;
 
-    /**
-     * @param string $command
-     * @param array  $params
-     *
-     * @return array
-     */
-    protected function prepareParameters($command, array $params): array
+    protected function prepareParameters(string $command, array $params): array
     {
         $params = array_merge(
             [

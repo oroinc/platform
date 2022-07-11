@@ -28,7 +28,7 @@ oro:
                 button.label: Export
 
         export_template:
-            label: Export template
+            label: Download Import Template
 
         entity_config:
             block_title:    "Import & Export"

@@ -1,0 +1,3 @@
+Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue:
+  unused_lfv{1..5}:
+    string: 'Unused Localized Fallback Value'

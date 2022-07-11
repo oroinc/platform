@@ -2,23 +2,19 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
-use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
-use Oro\Bundle\TranslationBundle\Event\AfterCatalogueDump;
-use Oro\Bundle\TranslationBundle\Event\InvalidateTranslationCacheEvent;
-use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
+use Oro\Bundle\CacheBundle\Provider\MemoryCache;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Formatter\MessageFormatter;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\MessageCatalogueInterface;
-use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Decorates Symfony translator by extending it, adds loading of dynamic resources for translations and ability to
@@ -31,49 +27,27 @@ class Translator extends BaseTranslator
 {
     public const DEFAULT_LOCALE = 'en';
 
-    protected ?DynamicTranslationMetadataCache $databaseTranslationMetadataCache = null;
-    protected ?CacheInterface $resourceCache = null;
-    /**
-     *  [
-     *      locale => [
-     *          [
-     *              'resource' => DynamicResourceInterface,
-     *              'format'   => string,
-     *              'code'     => string,
-     *              'domain'   => string
-     *          ],
-     *          ...
-     *      ],
-     *      ...
-     *  ]
-     */
-    protected array $dynamicResources = [];
-    protected array $registeredResources = [];
-    protected bool $installed;
-    protected ?string $strategyName = null;
-    protected MessageFormatter $messageFormatter;
-    protected array $originalOptions;
-    protected array $resourceFiles = [];
+    private MessageFormatter $messageFormatter;
     private TranslationStrategyProvider $strategyProvider;
-    private TranslationDomainProvider $translationDomainProvider;
-    private EventDispatcherInterface $eventDispatcher;
+    private MemoryCache $resourceCache;
     private LoggerInterface $logger;
+    private MessageCatalogueSanitizer $catalogueSanitizer;
+    private TranslationMessageSanitizationErrorCollection $sanitizationErrorCollection;
+    private ?DynamicTranslationProviderInterface $dynamicTranslationProvider = null;
+    private array $originalOptions;
+    private array $resourceFiles;
     private array $cacheVary;
-    private MessageCatalogueSanitizerInterface $catalogueSanitizer;
-    private ApplicationState $applicationState;
+    private array $loadedFallbackLocales = [];
+    private ?string $appliedStrategyName = null;
+    private ?string $appliedLocale = null;
+    private bool $enableDumpCatalogue = false;
+    private bool $disableResetCatalogues = false;
 
-    /**
-     * @param ContainerInterface $container
-     * @param MessageFormatter $formatter
-     * @param null $defaultLocale
-     * @param array $loaderIds
-     * @param array $options
-     */
     public function __construct(
         ContainerInterface $container,
         MessageFormatter $formatter,
-        $defaultLocale = null,
-        $loaderIds = [],
+        string $defaultLocale = null,
+        array $loaderIds = [],
         array $options = []
     ) {
         parent::__construct($container, $formatter, $defaultLocale, $loaderIds, $options);
@@ -85,24 +59,14 @@ class Translator extends BaseTranslator
         $this->logger = new NullLogger();
     }
 
-    public function setMessageCatalogueSanitizer(MessageCatalogueSanitizerInterface $catalogueSanitizer): void
-    {
-        $this->catalogueSanitizer = $catalogueSanitizer;
-    }
-
     public function setStrategyProvider(TranslationStrategyProvider $strategyProvider): void
     {
         $this->strategyProvider = $strategyProvider;
     }
 
-    public function setTranslationDomainProvider(TranslationDomainProvider $translationDomainProvider): void
+    public function setResourceCache(MemoryCache $cache): void
     {
-        $this->translationDomainProvider = $translationDomainProvider;
-    }
-
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): void
-    {
-        $this->eventDispatcher = $eventDispatcher;
+        $this->resourceCache = $cache;
     }
 
     public function setLogger(LoggerInterface $logger): void
@@ -110,58 +74,62 @@ class Translator extends BaseTranslator
         $this->logger = $logger;
     }
 
-    public function setApplicationState(ApplicationState $applicationState): void
+    public function setMessageCatalogueSanitizer(MessageCatalogueSanitizer $catalogueSanitizer): void
     {
-        $this->applicationState = $applicationState;
-        $this->installed = $applicationState->isInstalled();
+        $this->catalogueSanitizer = $catalogueSanitizer;
+    }
+
+    public function setSanitizationErrorCollection(TranslationMessageSanitizationErrorCollection $collection): void
+    {
+        $this->sanitizationErrorCollection = $collection;
+    }
+
+    public function setDynamicTranslationProvider(DynamicTranslationProviderInterface $provider): void
+    {
+        $this->dynamicTranslationProvider = $provider;
+        $this->dynamicTranslationProvider->setFallbackLocales($this->getFallbackLocales());
     }
 
     /**
-     * Collector of translations
-     *
-     * Collects all translations for corresponded domains and locale,
+     * Collects all translations for the given domains and locale,
      * takes in account fallback of locales.
      * Method is used for exposing of collected translations.
      *
-     * @param array $domains list of required domains, by default empty, means all domains
-     * @param string|null $locale locale of translations, by default is current locale
+     * @param string[]    $domains The list of domains; the empty list means all domains
+     * @param string|null $locale  The locale or null to use the default
      *
-     * @return array
+     * @return array [domain => [message id => message, ...], ...]
      */
     public function getTranslations(array $domains = [], ?string $locale = null): array
     {
-        // if new strategy was selected
-        if ($this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
-            $this->applyCurrentStrategy();
-        }
-
         if (null === $locale) {
             $locale = $this->getLocale();
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
-        $fallbackCatalogues = array();
-        $fallbackCatalogues[] = $catalogue = $this->catalogues[$locale];
-        while ($catalogue = $catalogue->getFallbackCatalogue()) {
+        /** @var MessageCatalogueInterface[] $fallbackCatalogues */
+        $fallbackCatalogues = [];
+        $catalogue = $this->getCatalogue($locale);
+        while (null !== $catalogue) {
             $fallbackCatalogues[] = $catalogue;
+            $catalogue = $catalogue->getFallbackCatalogue();
         }
+        $fallbackCatalogues = array_reverse($fallbackCatalogues);
 
         $domains = array_flip($domains);
-        $translations = array();
-        for ($i = count($fallbackCatalogues) - 1; $i >= 0; $i--) {
-            $localeTranslations = $fallbackCatalogues[$i]->all();
+        $translations = [];
+        foreach ($fallbackCatalogues as $fallbackCatalogue) {
+            $localeTranslations = $fallbackCatalogue->all();
             // if there are domains -> filter only their translations
             if ($domains) {
                 $localeTranslations = array_intersect_key($localeTranslations, $domains);
             }
             foreach ($localeTranslations as $domain => $domainTranslations) {
-                if (!empty($translations[$domain])) {
-                    $translations[$domain] = array_merge($translations[$domain], $domainTranslations);
-                } else {
-                    $translations[$domain] = $domainTranslations;
+                $translations[$domain] = empty($translations[$domain])
+                    ? $domainTranslations
+                    : array_merge($translations[$domain], $domainTranslations);
+                $dynamicTranslations = $this->dynamicTranslationProvider->getTranslations($domain, $locale);
+                if ($dynamicTranslations) {
+                    $translations[$domain] = array_replace($translations[$domain], $dynamicTranslations);
                 }
             }
         }
@@ -169,8 +137,38 @@ class Translator extends BaseTranslator
         return $translations;
     }
 
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): ?string
+    /**
+     * {@inheritDoc}
+     */
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
     {
+        if (!$id) {
+            return '';
+        }
+
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+        if (null === $domain) {
+            $domain = 'messages';
+        }
+
+        $catalogue = $this->getCatalogue($locale);
+        while (null !== $catalogue) {
+            $catalogueLocale = $catalogue->getLocale();
+            if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $catalogueLocale)) {
+                return $this->messageFormatter->format(
+                    $this->dynamicTranslationProvider->getTranslation($id, $domain, $catalogueLocale),
+                    $catalogueLocale,
+                    $parameters
+                );
+            }
+            if ($catalogue->defines($id, $domain)) {
+                break;
+            }
+            $catalogue = $catalogue->getFallbackCatalogue();
+        }
+
         try {
             return parent::trans($id, $parameters, $domain, $locale);
         } catch (InvalidArgumentException $e) {
@@ -191,239 +189,252 @@ class Translator extends BaseTranslator
      */
     public function hasTrans(string $id, ?string $domain = null, ?string $locale = null): bool
     {
+        if (!$id) {
+            return false;
+        }
+
         if (null === $locale) {
             $locale = $this->getLocale();
         }
-
         if (null === $domain) {
             $domain = 'messages';
         }
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->loadCatalogue($locale);
-        }
-
-        $id = (string)$id;
-
-        $catalogue = $this->catalogues[$locale];
-        $result = $catalogue->defines($id, $domain);
-        while (!$result && $catalogue = $catalogue->getFallbackCatalogue()) {
-            $result = $catalogue->defines($id, $domain);
+        $result = false;
+        $catalogue = $this->getCatalogue($locale);
+        while (null !== $catalogue) {
+            if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $locale)
+                || $catalogue->defines($id, $domain)
+            ) {
+                $result = true;
+                break;
+            }
+            $catalogue = $catalogue->getFallbackCatalogue();
         }
 
         return $result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function addLoader(string $format, LoaderInterface $loader): void
     {
-        if (null !== $this->resourceCache) {
-            // wrap a resource loader by a caching loader to prevent loading of the same resource several times
-            // it strongly decreases a translation catalogue loading time
-            // for example a time of translation cache warming up is decreased in about 4 times
-            $loader = new CachingTranslationLoader($loader, $this->resourceCache);
-        }
-        parent::addLoader($format, $loader);
+        // wrap a resource loader by a caching loader to prevent loading of the same resource several times
+        // it strongly decreases a translation catalogue loading time
+        // for example a time of translation cache warming up is decreased in about 4 times
+        parent::addLoader($format, new CachingTranslationLoader($loader, $this->resourceCache));
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public function setFallbackLocales(array $locales): void
+    {
+        $loadedCatalogues = $this->disableResetCatalogues ? $this->catalogues : [];
+
+        parent::setFallbackLocales($locales);
+        $this->dynamicTranslationProvider?->setFallbackLocales($locales);
+        $this->cacheVary['fallback_locales'] = $locales;
+
+        foreach ($loadedCatalogues as $locale => $catalogue) {
+            if (!isset($this->catalogues[$locale])) {
+                $this->catalogues[$locale] = $catalogue;
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getCatalogue(string $locale = null): MessageCatalogueInterface
     {
-        // if new strategy was selected
-        if ($this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
-            $this->applyCurrentStrategy();
-        }
+        $this->applyFallbackLocales($locale);
 
         return parent::getCatalogue($locale);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function addResource(string $format, $resource, string $locale, string $domain = null): void
     {
-        if (is_string($resource)) {
+        if (\is_string($resource)) {
             $this->resourceFiles[$locale][] = $resource;
         }
 
         parent::addResource($format, $resource, $locale, $domain);
     }
 
-    public function warmUp(string $cacheDir): void
+    /**
+     * {@inheritDoc}
+     */
+    public function warmUp(string $cacheDir): array
     {
         // skip warmUp when translator doesn't use cache
-        if (null === $this->options['cache_dir']) {
-            return;
+        if (null !== $this->options['cache_dir']) {
+            $this->rebuildCache();
         }
 
-        $this->applyCurrentStrategy();
-
-        // load catalogues only for needed locales. We cannot call parent::warmUp() because it would load catalogues
-        // for all resources found in filesystem
-        $locales = array_unique($this->getFallbackLocales());
-        foreach ($locales as $locale) {
-            // no need to reset catalogue like it is done in parent::warmUp() because all catalogues are already cleared
-            // in applyCurrentStrategy(), so we are just loading new catalogue
-            $this->loadCatalogue($locale);
-        }
+        return [];
     }
 
     /**
-     * Removes all cached message catalogs.
+     * Rebuilds all cached message catalogues.
      */
-    public function clearCache(): void
-    {
-        $this->applyCurrentStrategy();
-        $locales = array_unique($this->getFallbackLocales());
-
-        $affectedLocales = [];
-
-        foreach ($locales as $locale) {
-            $catalogueFile = $this->getCatalogueCachePath($locale);
-            if ($this->isCatalogueCacheFileExits($catalogueFile)) {
-                // The file cache should be invalidated before removal
-                // @see https://bugs.php.net/bug.php?id=75939
-                if (function_exists('opcache_invalidate')) {
-                    opcache_invalidate($catalogueFile, true);
-                }
-                clearstatcache(true, $catalogueFile);
-                unlink($catalogueFile);
-                $affectedLocales[] = $locale;
-            }
-        }
-
-        if (!empty($affectedLocales) && $this->isApplicationInstalled()) {
-            if (count($locales) === 1) {
-                $this->dispatchInvalidateTranslationCacheEvent(reset($locales));
-            } else {
-                $this->dispatchInvalidateTranslationCacheEvent();
-            }
-        }
-    }
-
-    /**
-     * Rebuilds all cached message catalogs, w/o any delay at clients side
-     */
-    public function rebuildCache()
+    public function rebuildCache(): void
     {
         $cacheDir = $this->originalOptions['cache_dir'];
+        $options = array_merge($this->originalOptions, [
+            'cache_dir'      => $cacheDir . uniqid('', true),
+            'resource_files' => array_map(static function (array $localeResources) {
+                return array_unique($localeResources);
+            }, $this->resourceFiles)
+        ]);
 
-        $tmpDir = $cacheDir . uniqid('', true);
-
-        $options = array_merge(
-            $this->originalOptions,
-            [
-                'cache_dir' => $tmpDir,
-                'resource_files' => array_map(
-                    static function (array $localeResources) {
-                        return array_unique($localeResources);
-                    },
-                    $this->resourceFiles
-                )
-            ]
-        );
-
-        // save current translation strategy
         $currentStrategy = $this->strategyProvider->getStrategy();
-
-        // build translation cache for each translation strategy in tmp cache directory
-        foreach ($this->strategyProvider->getStrategies() as $strategy) {
-            $this->strategyProvider->setStrategy($strategy);
-
-            $translator = new static(
-                $this->container,
-                $this->messageFormatter,
-                $this->getLocale(),
-                $this->loaderIds,
-                $options
-            );
-            $translator->setStrategyProvider($this->strategyProvider);
-            $translator->setTranslationDomainProvider($this->translationDomainProvider);
-            $translator->setEventDispatcher($this->eventDispatcher);
-            $translator->setApplicationState($this->applicationState);
-            $translator->setDatabaseMetadataCache($this->databaseTranslationMetadataCache);
-            $translator->setLogger($this->logger);
-            $translator->setMessageCatalogueSanitizer($this->catalogueSanitizer);
-            $translator->warmUp($tmpDir);
-        }
-
-        $filesystem = new Filesystem();
-
-        // replace current cache with new cache
-        $iterator = new \IteratorIterator(new \DirectoryIterator($tmpDir));
-        foreach ($iterator as $path) {
-            if (!$path->isFile()) {
-                continue;
+        try {
+            $strategies = $this->strategyProvider->getStrategies();
+            foreach ($strategies as $strategy) {
+                $this->buildCatalogueFiles($strategy, $cacheDir, $options);
             }
-            $filesystem->copy($path->getPathName(), $cacheDir . DIRECTORY_SEPARATOR . $path->getFileName(), true);
-            $filesystem->remove($path->getPathName());
+        } finally {
+            $this->strategyProvider->setStrategy($currentStrategy);
+            $this->applyFallbackLocales();
+        }
+    }
+
+    private function buildCatalogueFiles(
+        TranslationStrategyInterface $strategy,
+        string $cacheDir,
+        array $options
+    ): void {
+        $this->strategyProvider->setStrategy($strategy);
+
+        $locales = $this->strategyProvider->getAllFallbackLocales($strategy);
+        foreach ($locales as $locale) {
+            $this->newTranslator($locale, $options)->loadCatalogues();
         }
 
-        $filesystem->remove($tmpDir);
+        $this->moveCatalogueFiles($options['cache_dir'], $cacheDir);
+    }
 
-        // restore translation strategy and apply it to make use of new cache
-        $this->strategyProvider->setStrategy($currentStrategy);
-        $this->applyCurrentStrategy();
 
-        if ($this->isApplicationInstalled()) {
-            $this->dispatchInvalidateTranslationCacheEvent();
+    private function newTranslator(string $locale, array $options): static
+    {
+        $translator = new static($this->container, $this->messageFormatter, $locale, $this->loaderIds, $options);
+        $translator->setStrategyProvider($this->strategyProvider);
+        $translator->setResourceCache($this->resourceCache);
+        $translator->setLogger($this->logger);
+        $translator->setMessageCatalogueSanitizer($this->catalogueSanitizer);
+        $translator->setSanitizationErrorCollection($this->sanitizationErrorCollection);
+        $translator->setDynamicTranslationProvider($this->dynamicTranslationProvider);
+
+        return $translator;
+    }
+
+    private function loadCatalogues(): void
+    {
+        $locale = $this->getLocale();
+        $this->applyFallbackLocales($locale);
+
+        $this->enableDumpCatalogue = true;
+        try {
+            $this->loadCatalogue($locale);
+        } finally {
+            $this->enableDumpCatalogue = false;
+        }
+        $this->dynamicTranslationProvider->warmUp($locale);
+
+        $sanitizationErrors = $this->sanitizationErrorCollection->all();
+        foreach ($sanitizationErrors as $sanitizationError) {
+            $this->logger->warning('Unsafe translation message found', ['error' => $sanitizationError]);
+        }
+    }
+
+    private function moveCatalogueFiles(string $fromDir, string $toDir): void
+    {
+        $filesystem = new Filesystem();
+        $iterator = new \IteratorIterator(new \DirectoryIterator($fromDir));
+        /** @var \SplFileInfo $file */
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                $filePath = $file->getPathname();
+                $filesystem->copy($filePath, $toDir . DIRECTORY_SEPARATOR . $file->getFilename(), true);
+                $filesystem->remove($filePath);
+            }
+        }
+        $filesystem->remove($fromDir);
+    }
+
+    private function applyFallbackLocales(?string $locale = null): void
+    {
+        if (null === $locale) {
+            $locale = $this->getLocale();
+        }
+        $strategyName = $this->strategyProvider->getStrategy()->getName();
+        if ($this->appliedLocale !== $locale || $this->appliedStrategyName !== $strategyName) {
+            $this->appliedLocale = $locale;
+            $this->appliedStrategyName = $strategyName;
+            $this->setFallbackLocales($this->computeFallbackLocales($locale));
         }
     }
 
     /**
-     * Sets a cache of dynamic translation metadata
+     * {@inheritDoc}
      */
-    public function setDatabaseMetadataCache(DynamicTranslationMetadataCache $cache): void
-    {
-        $this->databaseTranslationMetadataCache = $cache;
-    }
-
-    /**
-     * Sets a cache of loaded translation resources
-     */
-    public function setResourceCache(CacheInterface $cache): void
-    {
-        $this->resourceCache = $cache;
-    }
-
-    protected function applyCurrentStrategy(): void
-    {
-        $strategy = $this->strategyProvider->getStrategy();
-
-        // store current strategy name to skip all following requests to it
-        $this->strategyName = $strategy->getName();
-
-        // use current set of fallback locales to build translation cache
-        $fallbackLocales = $this->strategyProvider->getAllFallbackLocales($strategy);
-
-        // set new fallback locales and clear catalogues to generate new ones for new strategy
-        $this->setFallbackLocales($fallbackLocales);
-        $this->cacheVary['fallback_locales'] = $fallbackLocales;
-    }
-
     protected function computeFallbackLocales($locale): array
     {
-        return $this->strategyProvider->getFallbackLocales($this->strategyProvider->getStrategy(), $locale);
+        $strategy = $this->strategyProvider->getStrategy();
+        $strategyName = $strategy->getName();
+        if (!isset($this->loadedFallbackLocales[$strategyName][$locale])) {
+            $this->loadedFallbackLocales[$strategyName][$locale] = $this->strategyProvider->getFallbackLocales(
+                $strategy,
+                $locale
+            );
+        }
+
+        return $this->loadedFallbackLocales[$strategyName][$locale];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function loadCatalogue($locale): void
     {
-        $this->initializeDynamicResources($locale);
-        $isCacheReady = $this->isCatalogueCacheFileExits($this->getCatalogueCachePath($locale));
-        parent::loadCatalogue($locale);
-
-        if (!$isCacheReady && $this->isApplicationInstalled()) {
-            $this->eventDispatcher->dispatch(
-                new AfterCatalogueDump($this->catalogues[$locale]),
-                AfterCatalogueDump::NAME
-            );
+        if ($this->enableDumpCatalogue || $this->isCatalogueCacheFileExits($this->getCatalogueCachePath($locale))) {
+            parent::loadCatalogue($locale);
+        } else {
+            // make sure that all fallback catalogues are loaded
+            // to avoid re-initialization of already dumped catalogues
+            $fallbackLocales = $this->computeFallbackLocales($locale);
+            if ($fallbackLocales) {
+                $currentLocale = $this->getLocale();
+                $this->disableResetCatalogues = true;
+                try {
+                    foreach ($fallbackLocales as $fallbackLocale) {
+                        if ($fallbackLocale !== $locale) {
+                            $this->getCatalogue($fallbackLocale);
+                        }
+                    }
+                    $this->applyFallbackLocales($currentLocale);
+                } finally {
+                    $this->disableResetCatalogues = false;
+                }
+            }
+            // initialize empty catalogue
+            $this->initializeCatalogue($locale);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function initialize(): void
     {
         // save already loaded catalogues which are used as fallbacks to prevent their reloading second time
         // it change Symfony`s translator behavior and allows us to apply only already dumped catalogues in fallbacks
         $loadedCatalogues = array_intersect_key($this->catalogues, array_flip($this->getFallbackLocales()));
-
-        // add dynamic resources just before the initialization
-        // to be sure that they overrides static translations
-        $this->registerDynamicResources();
 
         parent::initialize();
 
@@ -431,58 +442,17 @@ class Translator extends BaseTranslator
         $this->catalogues = array_merge($this->catalogues, array_diff_key($loadedCatalogues, $this->catalogues));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function initializeCatalogue($locale): void
     {
         parent::initializeCatalogue($locale);
 
-        if (!isset($this->catalogues[$locale])) {
-            $this->catalogues[$locale] = new MessageCatalogue($locale);
-        } else {
+        if (isset($this->catalogues[$locale])) {
             $this->catalogueSanitizer->sanitizeCatalogue($this->catalogues[$locale]);
-            foreach ($this->catalogueSanitizer->getSanitizationErrors() as $sanitizationError) {
-                $this->logger->warning('Unsafe translation message found', ['error' => $sanitizationError]);
-            }
-        }
-    }
-
-    protected function initializeDynamicResources(string $locale): void
-    {
-        $this->ensureDynamicResourcesLoaded($locale);
-
-        $isAnyCatalogFileRemoved = false;
-
-        // check if any dynamic resource is changed and update translation catalogue if needed
-        if (!empty($this->dynamicResources[$locale])) {
-            $catalogueFile = $this->getCatalogueCachePath($locale);
-            if ($this->isCatalogueCacheFileExits($catalogueFile)) {
-                $time = filemtime($catalogueFile);
-                foreach ($this->dynamicResources[$locale] as $item) {
-                    /** @var DynamicResourceInterface $dynamicResource */
-                    $dynamicResource = $item['resource'];
-                    if (!$dynamicResource->isFresh($time)) {
-                        // The file cache should be invalidated before removal
-                        // @see https://bugs.php.net/bug.php?id=75939
-                        if (function_exists('opcache_invalidate')) {
-                            opcache_invalidate($catalogueFile, true);
-                        }
-                        clearstatcache(true, $catalogueFile);
-                        // remove translation catalogue to allow parent class to rebuild it
-                        unlink($catalogueFile);
-                        // make sure that translations will be loaded from source resources
-                        if (null !== $this->resourceCache) {
-                            $this->resourceCache->clear();
-                        }
-
-                        $isAnyCatalogFileRemoved = true;
-
-                        break;
-                    }
-                }
-            }
-        }
-
-        if ($isAnyCatalogFileRemoved && $this->isApplicationInstalled()) {
-            $this->dispatchInvalidateTranslationCacheEvent($locale);
+        } else {
+            $this->catalogues[$locale] = new MessageCatalogue($locale);
         }
     }
 
@@ -505,69 +475,5 @@ class Translator extends BaseTranslator
         clearstatcache(true, $path);
 
         return is_file($path);
-    }
-
-    /**
-     * Adds dynamic translation resources to the translator
-     */
-    protected function registerDynamicResources(): void
-    {
-        foreach ($this->dynamicResources as $items) {
-            foreach ($items as $item) {
-                if (in_array($item, $this->registeredResources, true)) {
-                    continue;
-                }
-                $this->registeredResources[] = $item;
-                $this->addResource($item['format'], $item['resource'], $item['code'], $item['domain']);
-            }
-        }
-    }
-
-    /**
-     * Makes sure that dynamic translation resources are added to $this->dynamicResources
-     */
-    protected function ensureDynamicResourcesLoaded(string $locale): void
-    {
-        if (null !== $this->databaseTranslationMetadataCache && $this->isApplicationInstalled()) {
-            $hasDatabaseResources = false;
-            if (!empty($this->dynamicResources[$locale])) {
-                foreach ($this->dynamicResources[$locale] as $item) {
-                    if ($item['format'] === 'oro_database_translation') {
-                        $hasDatabaseResources = true;
-                        break;
-                    }
-                }
-            }
-            if (!$hasDatabaseResources) {
-                $locales = $this->getFallbackLocales();
-                array_unshift($locales, $locale);
-                $locales = array_unique($locales);
-
-                $availableDomainsData = $this->translationDomainProvider
-                    ->getAvailableDomainsForLocales($locales);
-                foreach ($availableDomainsData as $item) {
-                    $item['resource'] = new OrmTranslationResource(
-                        $item['code'],
-                        $this->databaseTranslationMetadataCache
-                    );
-                    $item['format'] = 'oro_database_translation';
-
-                    $this->dynamicResources[$item['code']][] = $item;
-                }
-            }
-        }
-    }
-
-    private function isApplicationInstalled(): bool
-    {
-        return !empty($this->installed);
-    }
-
-    private function dispatchInvalidateTranslationCacheEvent(?string $locale = null): void
-    {
-        $this->eventDispatcher->dispatch(
-            new InvalidateTranslationCacheEvent($locale),
-            InvalidateTranslationCacheEvent::NAME
-        );
     }
 }

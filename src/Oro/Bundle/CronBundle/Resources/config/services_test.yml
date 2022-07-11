@@ -1,9 +1,7 @@
 services:
-    oro_cron.helper.cron:
-        class: 'Oro\Bundle\CronBundle\Helper\CronHelper'
+    oro_cron.tests.cron_helper:
+        class: Oro\Bundle\CronBundle\Tests\Functional\Stub\CronHelperStub
         public: true
-
-    oro_featuretoggle.checker.feature_checker.stub:
-        class: 'Oro\Bundle\CronBundle\Tests\Functional\Stub\FeatureCheckerStub'
-        decorates: 'oro_featuretoggle.checker.feature_checker'
-        parent: 'oro_featuretoggle.checker.feature_checker'
+        decorates: oro_cron.cron_helper
+        arguments:
+            - '@.inner'

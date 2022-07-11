@@ -21,7 +21,5 @@ Feature: All Grid View Label
     Then I should see "Configuration saved" flash message
 
   Scenario: Check All grid view label is changed
-    Given I go to System/Localization/Translations
-    When I click "Update Cache"
     And I go to System/User Management/Groups
     Then I should see "All ZuluGroups"

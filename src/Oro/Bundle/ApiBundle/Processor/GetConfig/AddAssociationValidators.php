@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Validator\Constraints as Assert;
@@ -16,48 +19,61 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class AddAssociationValidators implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper $doctrineHelper;
+    private AssociationAccessExclusionProviderRegistry $associationAccessExclusionProviderRegistry;
 
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        AssociationAccessExclusionProviderRegistry $associationAccessExclusionProviderRegistry
+    ) {
         $this->doctrineHelper = $doctrineHelper;
+        $this->associationAccessExclusionProviderRegistry = $associationAccessExclusionProviderRegistry;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
         $entityClass = $context->getClassName();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $this->addValidatorsForEntityAssociations($definition, $entityClass);
+            $this->addValidatorsForEntityAssociations($definition, $entityClass, $context->getRequestType());
         } else {
             $this->addValidatorsForObjectAssociations($definition, $entityClass);
         }
     }
 
-    private function addValidatorsForEntityAssociations(EntityDefinitionConfig $definition, string $entityClass): void
-    {
+    private function addValidatorsForEntityAssociations(
+        EntityDefinitionConfig $definition,
+        string $entityClass,
+        RequestType $requestType
+    ): void {
+        $associationAccessExclusionProvider = $this->associationAccessExclusionProviderRegistry
+            ->getAssociationAccessExclusionProvider($requestType);
+        /** @var ClassMetadata $metadata */
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $fieldName = $field->getPropertyPath($fieldName);
             if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
                 && $metadata->hasAssociation($fieldName)
+                && !$associationAccessExclusionProvider->isIgnoreAssociationAccessCheck($entityClass, $fieldName)
             ) {
+                $accessGrantedConstraint = new Assert\AccessGranted(['groups' => ['api']]);
                 if ($metadata->isCollectionValuedAssociation($fieldName)) {
-                    $field->addFormConstraint(new Assert\HasAdderAndRemover([
-                        'class'    => $entityClass,
-                        'property' => $fieldName,
-                        'groups'   => ['api']
-                    ]));
-                    $field->addFormConstraint(new Assert\All(new Assert\AccessGranted(['groups' => ['api']])));
+                    if (!$this->isByReference($field)) {
+                        $field->addFormConstraint(new Assert\HasAdderAndRemover([
+                            'class'    => $entityClass,
+                            'property' => $fieldName,
+                            'groups'   => ['api']
+                        ]));
+                    }
+                    $field->addFormConstraint(new Assert\All($accessGrantedConstraint));
                 } else {
-                    $field->addFormConstraint(new Assert\AccessGranted(['groups' => ['api']]));
+                    $field->addFormConstraint($accessGrantedConstraint);
                 }
             }
         }
@@ -72,6 +88,7 @@ class AddAssociationValidators implements ProcessorInterface
                 // to avoid duplication, check if the constraint already exist
                 // e.g. the constraint can be already added if a model for API resource inherited from ORM entity
                 if (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName
+                    && !$this->isByReference($field)
                     && !$this->isHasAdderAndRemoverConstraintExist($field, $entityClass, $fieldName)
                 ) {
                     $field->addFormConstraint(new Assert\HasAdderAndRemover([
@@ -82,6 +99,13 @@ class AddAssociationValidators implements ProcessorInterface
                 }
             }
         }
+    }
+
+    private function isByReference(EntityDefinitionFieldConfig $field): bool
+    {
+        $formOptions = $field->getFormOptions();
+
+        return $formOptions && isset($formOptions['by_reference']) && $formOptions['by_reference'];
     }
 
     private function isHasAdderAndRemoverConstraintExist(

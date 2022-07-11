@@ -321,7 +321,6 @@ services:
         arguments:
             - '@oro_notification.manager.email_notification'
             - '@oro_user.manager'
-            - '@doctrine'
             - '@logger'
 
     oro_user.activity_widget_provider:
@@ -390,11 +389,6 @@ services:
         public: true
         arguments:
             - '@security.authorization_checker'
-
-    oro_user.provider.role_entity_name:
-        class: Oro\Bundle\UserBundle\Provider\RoleEntityNameProvider
-        tags:
-            - { name: oro_entity.name_provider, priority: 100 }
 
     oro_user.provider.filter.user_choice_tree:
         class: Oro\Bundle\UserBundle\Provider\Filter\ChoiceTreeUserProvider
@@ -507,7 +501,7 @@ services:
 
     oro_user.provider.user_config_form_provider:
         class: Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider
-        parent: 'oro_config.provider.abstract_provider'
+        parent: oro_config.provider.abstract_provider
         lazy: true
 
     Oro\Bundle\UserBundle\Provider\UserConfigurationFormProvider:
@@ -577,14 +571,7 @@ services:
         class: Oro\Bundle\UserBundle\Provider\DefaultUserProvider
         arguments:
             - '@oro_config.manager'
-            - '@oro_entity.doctrine_helper'
-
-    oro_user.event_listener.default_user_system_config:
-        class: Oro\Bundle\UserBundle\EventListener\DefaultUserSystemConfigListener
-        abstract: true
-        arguments:
-            - '@oro_user.provider.default_user'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
 
     oro_user.event_listener.turn_off_caching:
         class: Oro\Bundle\UserBundle\EventListener\TurnOffCachingListener

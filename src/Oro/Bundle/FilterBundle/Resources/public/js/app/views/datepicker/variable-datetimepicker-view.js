@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    const _ = require('underscore');
+    const $ = require('jquery');
     const VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     const dateTimePickerViewMixin = require('oroui/js/app/views/datepicker/datetimepicker-view-mixin');
     const moment = require('moment');
 
-    const VariableDateTimePickerView = VariableDatePickerView.extend(_.extend({}, dateTimePickerViewMixin, {
+    const VariableDateTimePickerView = VariableDatePickerView.extend(Object.assign({}, dateTimePickerViewMixin, {
         /**
          * Default options
          */
-        defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
+        defaults: $.extend(true, {}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
         partsDateTimeValidation: {
             value: function(date, time) {
@@ -60,7 +60,12 @@ define(function(require) {
             const date = this.$frontDateField.val();
             const time = this.$frontTimeField.val();
 
-            if (!this._preventFrontendUpdate && !target && !this._isDateTimeValid(date, time)) {
+            if (
+                !this._preventFrontendUpdate &&
+                !this.$frontDateField.is(target) &&
+                !this.$frontTimeField.is(target) &&
+                !this._isDateTimeValid(date, time)
+            ) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }

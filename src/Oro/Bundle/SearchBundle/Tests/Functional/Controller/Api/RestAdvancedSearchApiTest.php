@@ -25,8 +25,6 @@ class RestAdvancedSearchApiTest extends SearchBundleWebTestCase
      */
     public function testAdvancedSearch(array $request, array $response)
     {
-        self::markTestSkipped('Must be fixed in BAP-21374');
-
         $this->addOroDefaultPrefixToUrlInParameterArray($response['rest']['data'], 'record_url');
         $queryString = $request['query'];
         $this->client->request(

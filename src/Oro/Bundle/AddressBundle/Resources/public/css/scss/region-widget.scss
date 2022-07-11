@@ -1,0 +1,17 @@
+/* @theme: admin.oro; */
+
+.region-widget {
+    select {
+        display: none;
+    }
+
+    &.show-select {
+        select {
+            display: block;
+        }
+
+        input {
+            display: none;
+        }
+    }
+}

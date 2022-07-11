@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DisabledAssociationsConfigExtra;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
@@ -55,14 +56,23 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             return;
         }
 
-        $this->updateRelations($definition, $entityClass, $context->getVersion(), $context->getRequestType());
+        $this->updateRelations(
+            $definition,
+            $entityClass,
+            $context->getTargetAction(),
+            $context->getVersion(),
+            $context->getRequestType(),
+            $context->hasExtra(DisabledAssociationsConfigExtra::NAME)
+        );
     }
 
     private function updateRelations(
         EntityDefinitionConfig $definition,
         string $entityClass,
+        string $action,
         string $version,
-        RequestType $requestType
+        RequestType $requestType,
+        bool $allowDisabledAssociations
     ): void {
         $entityOverrideProvider = $this->entityOverrideProviderRegistry->getEntityOverrideProvider($requestType);
         /** @var ClassMetadata $metadata */
@@ -90,8 +100,10 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
                 $field,
                 $targetClass,
                 $targetMetadata,
+                $action,
                 $version,
                 $requestType,
+                $allowDisabledAssociations,
                 $entityOverrideProvider
             )) {
                 $field->setExcluded();
@@ -115,8 +127,10 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         EntityDefinitionFieldConfig $field,
         string $targetClass,
         ?ClassMetadata $targetMetadata,
+        string $action,
         string $version,
         RequestType $requestType,
+        bool $allowDisabledAssociations,
         EntityOverrideProviderInterface $entityOverrideProvider
     ): bool {
         if (DataType::isAssociationAsField($field->getDataType())) {
@@ -132,8 +146,10 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         return $this->isResourceForRelatedEntityAccessible(
             $targetClass,
             $targetMetadata,
+            $action,
             $version,
             $requestType,
+            $allowDisabledAssociations,
             $entityOverrideProvider
         );
     }
@@ -165,25 +181,55 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     private function isResourceForRelatedEntityAccessible(
         string $targetClass,
         ?ClassMetadata $targetMetadata,
+        string $action,
         string $version,
         RequestType $requestType,
+        bool $allowDisabledAssociations,
         EntityOverrideProviderInterface $entityOverrideProvider
     ): bool {
         $targetClass = $this->resolveEntityClass($targetClass, $entityOverrideProvider);
-        if ($this->resourcesProvider->isResourceAccessibleAsAssociation($targetClass, $version, $requestType)) {
+        if ($this->isResourceAccessibleAsAssociation(
+            $targetClass,
+            $action,
+            $version,
+            $requestType,
+            $allowDisabledAssociations
+        )) {
             return true;
         }
         if (null !== $targetMetadata && !$targetMetadata->isInheritanceTypeNone()) {
             // check that at least one inherited entity has API resource
             foreach ($targetMetadata->subClasses as $subClass) {
                 $subClass = $this->resolveEntityClass($subClass, $entityOverrideProvider);
-                if ($this->resourcesProvider->isResourceAccessibleAsAssociation($subClass, $version, $requestType)) {
+                if ($this->isResourceAccessibleAsAssociation(
+                    $subClass,
+                    $action,
+                    $version,
+                    $requestType,
+                    $allowDisabledAssociations
+                )) {
                     return true;
                 }
             }
         }
 
         return false;
+    }
+
+    public function isResourceAccessibleAsAssociation(
+        string $targetClass,
+        string $action,
+        string $version,
+        RequestType $requestType,
+        bool $allowDisabledAssociations
+    ): bool {
+        if ($allowDisabledAssociations) {
+            return $this->resourcesProvider->isResourceAccessibleAsAssociation($targetClass, $version, $requestType);
+        }
+
+        return
+            $this->resourcesProvider->isResourceEnabled($targetClass, $action, $version, $requestType)
+            && $this->resourcesProvider->isResourceAccessibleAsAssociation($targetClass, $version, $requestType);
     }
 
     private function resolveEntityClass(

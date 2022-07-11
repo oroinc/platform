@@ -1,6 +1,6 @@
 <% if (editable) { %>
 <label <% if (description) {%> title="<%- description %>"<% } %>
-    class="shift-checkbox role-capability__item-label<% if (isAccessLevelChanged) {%> role-capability__item-label_changed<% } %>"
+    class="checkbox-label role-capability__item-label<% if (isAccessLevelChanged) {%> role-capability__item-label_changed<% } %>"
     ><input type="checkbox" value="<%- selected_access_level %>"
         <% if (access_level === selected_access_level) { %> checked<% } %>><%- label %></label>
 <% } else { %>

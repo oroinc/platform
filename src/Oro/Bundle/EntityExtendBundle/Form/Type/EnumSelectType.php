@@ -46,6 +46,7 @@ class EnumSelectType extends AbstractEnumType
                 'configs'     => $defaultConfigs,
                 'disabled_values' => [],
                 'excluded_values' => [],
+                'choice_translation_domain' => false, // Enums should use the Gedmo for translations
             ]
         );
 

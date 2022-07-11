@@ -136,6 +136,15 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
                 'src' => '/url/thumbnail.jpg',
                 'sources' => [],
             ]);
+        $this->pictureSourcesProvider
+            ->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($attachment)
+            ->willReturn([
+                'src' => '/url/file.jpg',
+                'sources' => [],
+            ]);
+
         $this->attachmentManager
             ->expects(self::once())
             ->method('getFileUrl')
@@ -149,18 +158,15 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
             ->method('getAttachmentIconClass')
             ->with($attachment)
             ->willReturn('fa-file-o');
-        $this->attachmentManager
-            ->expects(self::once())
-            ->method('isWebpEnabledIfSupported')
-            ->willReturn(false);
 
         $result = $this->attachmentProvider->getAttachmentInfo($entity);
 
         self::assertEquals(
             [
                 'attachmentURL' => [
-                    'url' => '/attachment/download/file.jpg',
+                    'url' => '/url/file.jpg',
                     'sources' => [],
+                    'downloadUrl' => '/attachment/download/file.jpg',
                 ],
                 'attachmentSize' => '500.00 B',
                 'attachmentFileName' => 'original_file_name',
@@ -203,6 +209,20 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
             ]);
+        $this->pictureSourcesProvider
+            ->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($attachment)
+            ->willReturn([
+                'src' => '/url/file.jpg',
+                'sources' => [
+                    [
+                        'srcset' => '/url/to/original/filtered/file.jpg.webp',
+                        'type' => 'image/webp',
+                    ],
+                ],
+            ]);
+
         $this->attachmentManager
             ->expects(self::once())
             ->method('getFileUrl')
@@ -210,31 +230,23 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn('/attachment/download/file.jpg');
         $this->attachmentManager
             ->expects(self::once())
-            ->method('getFilteredImageUrl')
-            ->with($attachment, 'original', 'webp')
-            ->willReturn('/url/to/original/filtered/file.jpg.webp');
-        $this->attachmentManager
-            ->expects(self::once())
             ->method('getAttachmentIconClass')
             ->with($attachment)
             ->willReturn('fa-file-o');
-        $this->attachmentManager
-            ->expects(self::once())
-            ->method('isWebpEnabledIfSupported')
-            ->willReturn(true);
 
         $result = $this->attachmentProvider->getAttachmentInfo($entity);
 
         self::assertEquals(
             [
                 'attachmentURL' => [
-                    'url' => '/attachment/download/file.jpg',
+                    'url' => '/url/file.jpg',
                     'sources' => [
                         [
                             'srcset' => '/url/to/original/filtered/file.jpg.webp',
                             'type' => 'image/webp',
                         ],
                     ],
+                    'downloadUrl' => '/attachment/download/file.jpg',
                 ],
                 'attachmentSize' => '500.00 B',
                 'attachmentFileName' => 'original_file_name',

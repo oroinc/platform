@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ImapBundle\Exception;
 
+use Oro\Bundle\EmailBundle\Exception\DisableOriginSyncExceptionInterface;
+
 /**
  * This exception is thrown when receiving the access token by the refresh token failed.
  */
-class RefreshOAuthAccessTokenFailureException extends \RuntimeException
+class RefreshOAuthAccessTokenFailureException extends \RuntimeException implements DisableOriginSyncExceptionInterface
 {
     private string $reason;
     private string $refreshToken;

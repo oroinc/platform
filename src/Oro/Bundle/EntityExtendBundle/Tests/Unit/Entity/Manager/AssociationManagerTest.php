@@ -47,13 +47,7 @@ class AssociationManagerTest extends OrmTestCase
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
-        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(
-            new AnnotationReader(),
-            'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations'
-        ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Associations'
-        ]);
+        $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
 
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->aclHelper = $this->createMock(AclHelper::class);

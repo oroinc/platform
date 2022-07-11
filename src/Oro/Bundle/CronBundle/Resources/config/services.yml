@@ -39,9 +39,13 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 
-    oro_cron.helper.cron:
-        class: Oro\Bundle\CronBundle\Helper\CronHelper
+    oro_cron.command_feature_checker:
+        class: Oro\Bundle\CronBundle\Command\CronCommandFeatureChecker
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
 
+    oro_cron.cron_helper:
+        class: Oro\Bundle\CronBundle\Tools\CronHelper
 
     oro_cron.engine.command_runner:
         class: Oro\Bundle\CronBundle\Engine\CommandRunner
@@ -69,14 +73,19 @@ services:
         tags:
             - {name: doctrine.event_listener, event: onSchemaColumnDefinition }
 
-    oro_cron.repository.schedule:
-        class: Oro\Bundle\CronBundle\Entity\Repository\ScheduleRepository
-        public: true
-        factory: ['@doctrine', getRepository]
+    oro_cron.event_listener.cron_command:
+        class: Oro\Bundle\CronBundle\EventListener\CronCommandListener
         arguments:
-            - 'Oro\Bundle\CronBundle\Entity\Schedule'
-        calls:
-            - [setFeatureChecker, ['@oro_featuretoggle.checker.feature_checker']]
+            - '@oro_cron.command_feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand}
+
+    oro_cron.schedule.datagrid_helper:
+        class: Oro\Bundle\CronBundle\Datagrid\ScheduleDatagridHelper
+        public: true
+        arguments:
+            - '@doctrine'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_cron.configuration.feature_configuration_extension:
         class: Oro\Bundle\CronBundle\Configuration\FeatureConfigurationExtension
