@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Imagine\Provider;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider;
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
@@ -17,8 +18,10 @@ class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
         $filterConfiguration = $this->createMock(FilterConfiguration::class);
+        $filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);
 
         $this->provider = new ImagineUrlProvider($this->urlGenerator, $filterConfiguration);
+        $this->provider->setFilenameExtensionHelper($filenameExtensionHelper);
 
         $filterConfiguration
             ->expects(self::any())
@@ -91,6 +94,12 @@ class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
                 'filterName' => 'empty_filter',
                 'format' => 'webp',
                 'expected_path' => 'sample/image.webp',
+            ],
+            'extension is not added for unsupported mime type' => [
+                'path' => '/sample/image.svg',
+                'filterName' => 'webp_filter',
+                'format' => 'webp',
+                'expected_path' => 'sample/image.svg',
             ],
         ];
     }

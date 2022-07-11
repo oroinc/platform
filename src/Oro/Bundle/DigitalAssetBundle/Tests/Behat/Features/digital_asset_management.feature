@@ -17,7 +17,7 @@ Feature:  Digital asset management
       | Title | Not supported mime type |
     When I save form
     Then I should see validation errors:
-      | File | The MIME type of the file is invalid ("text/html"). Allowed MIME types are "text/csv", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png", "image/webp". |
+      | File | The MIME type of the file is invalid ("text/html"). Allowed MIME types are "image/svg+xml", "image/svg", "text/csv", "text/plain", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/pdf", "application/zip", "image/gif", "image/jpeg", "image/png", "image/webp". |
 
   Scenario: Create digital assets with jpg mime types
     Given I fill "Digital Asset Form" with:

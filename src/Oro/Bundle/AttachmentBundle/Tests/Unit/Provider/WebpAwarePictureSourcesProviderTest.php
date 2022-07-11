@@ -8,6 +8,9 @@ use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\WebpAwarePictureSourcesProvider;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
 {
     private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerProvider;
@@ -25,6 +28,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
             $this->innerProvider,
             $this->attachmentManager
         );
+        $this->provider->setUnsupportedMimeTypes(['image/svg']);
     }
 
     public function testGetFilteredPictureSourcesNoFile(): void
@@ -173,6 +177,41 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'image/webp',
                     ],
                 ],
+            ],
+            $this->provider->getFilteredPictureSources($image, $filterName)
+        );
+    }
+
+    public function testGetFilteredPictureSourcesUnsupportedMimeType(): void
+    {
+        $image = (new File())
+            ->setFilename('image.svg')
+            ->setMimeType('image/svg');
+        $filterName = 'original';
+        $filteredImageUrl = '/url/to/image.svg';
+
+        $this->innerProvider
+            ->expects(self::once())
+            ->method('getFilteredPictureSources')
+            ->with($image, $filterName)
+            ->willReturn([
+                'src' => $filteredImageUrl,
+                'sources' => [],
+            ]);
+
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('isWebpEnabledIfSupported')
+            ->willReturn(true);
+        $this->attachmentManager
+            ->expects(self::never())
+            ->method('getFilteredImageUrl')
+            ->with(self::anything());
+
+        self::assertEquals(
+            [
+                'src' => $filteredImageUrl,
+                'sources' => [],
             ],
             $this->provider->getFilteredPictureSources($image, $filterName)
         );
@@ -330,6 +369,42 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                         'type' => 'image/webp',
                     ],
                 ],
+            ],
+            $this->provider->getResizedPictureSources($image, $width, $height)
+        );
+    }
+
+    public function testGetResizedPictureSourcesUnsupportedMimeType(): void
+    {
+        $image = (new File())
+            ->setFilename('image.jpg')
+            ->setMimeType('image/svg');
+        $width = 42;
+        $height = 24;
+        $resizedImageUrl = '/42/24/image.svg';
+
+        $this->innerProvider
+            ->expects(self::once())
+            ->method('getResizedPictureSources')
+            ->with($image, $width, $height)
+            ->willReturn([
+                'src' => $resizedImageUrl,
+                'sources' => [],
+            ]);
+
+        $this->attachmentManager
+            ->expects(self::once())
+            ->method('isWebpEnabledIfSupported')
+            ->willReturn(true);
+        $this->attachmentManager
+            ->expects(self::never())
+            ->method('getResizedImageUrl')
+            ->with(self::anything());
+
+        self::assertEquals(
+            [
+                'src' => $resizedImageUrl,
+                'sources' => [],
             ],
             $this->provider->getResizedPictureSources($image, $width, $height)
         );

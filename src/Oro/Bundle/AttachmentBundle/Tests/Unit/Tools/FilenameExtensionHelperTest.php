@@ -6,33 +6,160 @@ use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 
 class FilenameExtensionHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider addExtensionDataProvider
-     *
-     * @param string $filename
-     * @param string $extension
-     * @param string $expectedFilename
-     */
-    public function testAddExtension(string $filename, string $extension, string $expectedFilename): void
+    private FilenameExtensionHelper $filenameExtensionHelper;
+
+    protected function setUp(): void
     {
-        self::assertEquals($expectedFilename, FilenameExtensionHelper::addExtension($filename, $extension));
+        $this->filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);
     }
 
+    /**
+     * @dataProvider addExtensionDataProvider
+     */
+    public function testAddExtension(
+        string $filename,
+        string $extension,
+        array $fileMimeTypes,
+        string $expectedFilename
+    ): void {
+        self::assertEquals(
+            $expectedFilename,
+            $this->filenameExtensionHelper->addExtensionIfSupportedMimeTypes($filename, $extension, $fileMimeTypes)
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function addExtensionDataProvider(): array
     {
         return [
-            ['filename' => '', 'extension' => '', 'expectedFilename' => ''],
-            ['filename' => 'sample', 'extension' => '', 'expectedFilename' => 'sample'],
-            ['filename' => 'sample', 'extension' => ' ', 'expectedFilename' => 'sample'],
-            ['filename' => 'sample', 'extension' => 'png', 'expectedFilename' => 'sample.png'],
-            ['filename' => 'sample', 'extension' => ' png ', 'expectedFilename' => 'sample.png'],
-            ['filename' => 'sample.png', 'extension' => 'png', 'expectedFilename' => 'sample.png'],
-            ['filename' => 'sample.png', 'extension' => 'PnG', 'expectedFilename' => 'sample.png'],
-            ['filename' => 'sample.png', 'extension' => 'webp', 'expectedFilename' => 'sample.png.webp'],
-            ['filename' => 'sample.jpg', 'extension' => 'jpeg', 'expectedFilename' => 'sample.jpg'],
-            ['filename' => 'sample.jpg', 'extension' => 'JPEG', 'expectedFilename' => 'sample.jpg'],
-            ['filename' => 'sample.jpeg', 'extension' => 'jpg', 'expectedFilename' => 'sample.jpeg'],
-            ['filename' => 'sample.jpeg', 'extension' => 'webp', 'expectedFilename' => 'sample.jpeg.webp'],
+            [
+                'filename' => '',
+                'extension' => '',
+                'fileMimeTypes' => [],
+                'expectedFilename' => '',
+            ],
+            [
+                'filename' => 'sample',
+                'extension' => '',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample',
+            ],
+            [
+                'filename' => 'sample',
+                'extension' => ' ',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample',
+            ],
+            [
+                'filename' => 'sample',
+                'extension' => 'png',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.png',
+            ],
+            [
+                'filename' => 'sample',
+                'extension' => ' png ',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.png',
+            ],
+            [
+                'filename' => 'sample.png',
+                'extension' => 'png',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.png',
+            ],
+            [
+                'filename' => 'sample.png',
+                'extension' => 'PnG',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.png',
+            ],
+            [
+                'filename' => 'sample.png',
+                'extension' => 'webp',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.png.webp',
+            ],
+            [
+                'filename' => 'sample.jpg',
+                'extension' => 'jpeg',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.jpg',
+            ],
+            [
+                'filename' => 'sample.jpg',
+                'extension' => 'JPEG',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.jpg',
+            ],
+            [
+                'filename' => 'sample.jpeg',
+                'extension' => 'jpg',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.jpeg',
+            ],
+            [
+                'filename' => 'sample.jpeg',
+                'extension' => 'webp',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.jpeg.webp',
+            ],
+            [
+                'filename' => 'sample.svg',
+                'extension' => '',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.svg',
+            ],
+            [
+                'filename' => 'sample.svg',
+                'extension' => 'svg',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.svg',
+            ],
+            [
+                'filename' => 'sample.svg',
+                'extension' => 'webp',
+                'fileMimeTypes' => [],
+                'expectedFilename' => 'sample.svg',
+            ],
+            [
+                'filename' => '',
+                'extension' => '',
+                'fileMimeTypes' => ['image/svg', 'image/png'],
+                'expectedFilename' => '',
+            ],
+            [
+                'filename' => 'sample',
+                'extension' => '',
+                'fileMimeTypes' => ['image/svg', 'image/png'],
+                'expectedFilename' => 'sample',
+            ],
+            [
+                'filename' => 'sample',
+                'extension' => 'svg',
+                'fileMimeTypes' => ['image/svg', 'image/png'],
+                'expectedFilename' => 'sample',
+            ],
+            [
+                'filename' => 'sample.svg',
+                'extension' => '',
+                'fileMimeTypes' => ['image/svg', 'image/png'],
+                'expectedFilename' => 'sample.svg',
+            ],
+            [
+                'filename' => 'sample.svg',
+                'extension' => 'svg',
+                'fileMimeTypes' => ['image/svg', 'image/png'],
+                'expectedFilename' => 'sample.svg',
+            ],
+            [
+                'filename' => 'sample.svg',
+                'extension' => 'webp',
+                'fileMimeTypes' => ['image/svg', 'image/png'],
+                'expectedFilename' => 'sample.svg',
+            ],
         ];
     }
 

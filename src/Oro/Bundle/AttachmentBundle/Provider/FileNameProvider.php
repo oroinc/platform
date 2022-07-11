@@ -14,9 +14,16 @@ class FileNameProvider implements FileNameProviderInterface
 {
     private FilterConfiguration $filterConfiguration;
 
+    private ?FilenameExtensionHelper $filenameExtensionHelper = null;
+
     public function __construct(FilterConfiguration $filterConfiguration)
     {
         $this->filterConfiguration = $filterConfiguration;
+    }
+
+    public function setFilenameExtensionHelper(FilenameExtensionHelper $filenameExtensionHelper): void
+    {
+        $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
     /**
@@ -36,6 +43,9 @@ class FileNameProvider implements FileNameProviderInterface
     {
         if (!$format) {
             $format = $this->filterConfiguration->get($filterName)['format'] ?? '';
+            if (!$format) {
+                $format = (string) $file->getExtension();
+            }
         }
 
         return $this->getNameWithFormat($file, $format);
@@ -48,7 +58,13 @@ class FileNameProvider implements FileNameProviderInterface
 
     private function getNameWithFormat(File $file, string $format): string
     {
-        $filename = FilenameExtensionHelper::addExtension((string) $file->getFilename(), $format);
+        $filename = $this->filenameExtensionHelper
+            ? $this->filenameExtensionHelper->addExtensionIfSupportedMimeTypes(
+                (string) $file->getFilename(),
+                $format,
+                [$file->getMimeType()]
+            )
+            : FilenameExtensionHelper::addExtension((string) $file->getFilename(), $format);
 
         return FilenameSanitizer::sanitizeFilename($filename);
     }

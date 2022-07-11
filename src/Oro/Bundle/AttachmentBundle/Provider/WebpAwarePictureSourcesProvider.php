@@ -14,12 +14,19 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
 
     private AttachmentManager $attachmentManager;
 
+    private array $unsupportedMimeTypes = [];
+
     public function __construct(
         PictureSourcesProviderInterface $innerPictureSourcesProvider,
         AttachmentManager $attachmentManager
     ) {
         $this->innerPictureSourcesProvider = $innerPictureSourcesProvider;
         $this->attachmentManager = $attachmentManager;
+    }
+
+    public function setUnsupportedMimeTypes(array $unsupportedMimeTypes): void
+    {
+        $this->unsupportedMimeTypes = $unsupportedMimeTypes;
     }
 
     /**
@@ -35,6 +42,7 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
             && $file->getExternalUrl() === null
             && $file->getExtension() !== 'webp'
             && $this->attachmentManager->isWebpEnabledIfSupported()
+            && !in_array($file->getMimeType(), $this->unsupportedMimeTypes, true)
         ) {
             $sources['sources'][] = [
                 'srcset' => $this->attachmentManager->getFilteredImageUrl($file, $filterName, 'webp'),
@@ -58,6 +66,7 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
             && $file->getExternalUrl() === null
             && $file->getExtension() !== 'webp'
             && $this->attachmentManager->isWebpEnabledIfSupported()
+            && !in_array($file->getMimeType(), $this->unsupportedMimeTypes, true)
         ) {
             $sources['sources'][] = [
                 'srcset' => $this->attachmentManager->getResizedImageUrl($file, $width, $height, 'webp'),
