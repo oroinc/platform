@@ -34,7 +34,7 @@ class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new OAuthSubscriber($this->translator, $this->oauthManagerRegistry);
     }
 
-    public function testExtendForm()
+    public function testExtendForm(): void
     {
         $form = $this->createMock(Form::class);
         $form->expects($this->exactly(2))
@@ -48,7 +48,7 @@ class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->extendForm($formEvent);
     }
 
-    public function testExtendFormWithEmptyOrigin()
+    public function testExtendFormWithEmptyOrigin(): void
     {
         $form = $this->createMock(Form::class);
         $form->expects($this->never())

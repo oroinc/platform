@@ -42,10 +42,12 @@ oro.imap:
         user.label: User
         password.label: Password
         connect: Connect
+        reconnect: Reconnect
         connect_and_retrieve_folders: Check connection/Retrieve folders
         tooltip: If the value has changed, a new mailbox will be registered and all data from the currently configured mailbox will be lost.
         reset_email.label: Connected Account
         disconnect.label: Disconnect
+        reconnect_description: Email synchronization has been disabled. Please click Reconnect to enable the sync.
     oauth:
         manager:
             token.error: Invalid Token Response

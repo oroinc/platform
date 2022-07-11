@@ -72,19 +72,27 @@ class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
     public function testGenerateWithFilter(): void
     {
         $route = 'test';
-        $parameters = ['id' => 1, 'filter' => 'test_filter'];
+        $parameters = ['id' => 1, 'filter' => 'test_filter', 'filename' => 'image.jpg'];
 
         $filterHash = md5(json_encode(['size' => ['height' => 'auto']]));
 
         $this->attachmentHashProvider
             ->expects(self::once())
             ->method('getFilterConfigHash')
-            ->with($parameters['filter'], '')
+            ->with($parameters['filter'], 'jpg')
             ->willReturn($filterHash);
 
         $this->urlGenerator->expects(self::once())
             ->method('generate')
-            ->with($route, ['id' => 1, 'filter' => 'test_filter', 'filterMd5' => $filterHash])
+            ->with(
+                $route,
+                [
+                    'id' => 1,
+                    'filter' => 'test_filter',
+                    'filterMd5' => $filterHash,
+                    'filename' => 'image.jpg',
+                ]
+            )
             ->willReturn('/test/1');
         self::assertSame('/test/1', $this->filterAwareGenerator->generate($route, $parameters));
     }
