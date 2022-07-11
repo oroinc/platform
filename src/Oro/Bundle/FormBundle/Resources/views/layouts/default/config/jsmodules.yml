@@ -7,7 +7,7 @@ aliases:
     oro/select2-tree-autocomplete-component$: oroform/js/app/components/select2-tree-autocomplete-component
     xregexp$: xregexp/xregexp-all
 app-modules:
-    - oroform/blank/js/app/modules/validator-constraints-module
+    - oroform/default/js/app/modules/validator-constraints-module
 configs:
     oroform/js/extend/validate: {}
 dynamic-imports:
@@ -28,6 +28,7 @@ dynamic-imports:
         - oroform/js/validator/datetime
         - oroform/js/validator/email
         - oroform/js/validator/length
+        - oroform/js/validator/not-blank-group
         - oroform/js/validator/notblank
         - oroform/js/validator/notnull
         - oroform/js/validator/number
@@ -36,12 +37,11 @@ dynamic-imports:
         - oroform/js/validator/range
         - oroform/js/validator/regex
         - oroform/js/validator/repeated
-        - oroform/js/validator/not-blank-group
         - oroform/js/validator/time
         - oroform/js/validator/type
 #        - oroform/js/validator/url # turned off, due to it is too heavy and not in use on the front
 map:
-    "*":
+    '*':
         jquery.validate: oroform/js/extend/validate
     oroform/js/extend/validate:
         jquery.validate: jquery.validate

@@ -2,7 +2,7 @@ aliases:
     asap$: asap/asap
     backbone$: backbone/backbone
     base64$: oroui/js/extend/base64
-    bootstrap$: oroui/blank/js/bootstrap
+    bootstrap$: oroui/default/js/bootstrap
     bootstrap-alert$: '@oroinc/bootstrap/js/dist/alert'
     bootstrap-dropdown$: '@oroinc/bootstrap/js/dist/dropdown'
     bootstrap-modal$: '@oroinc/bootstrap/js/dist/modal'
@@ -10,7 +10,7 @@ aliases:
     bootstrap-scrollspy$: '@oroinc/bootstrap/js/dist/scrollspy'
     bootstrap-tab$: '@oroinc/bootstrap/js/dist/tab'
     bootstrap-tooltip$: '@oroinc/bootstrap/js/dist/tooltip'
-    bootstrap-typeahead$: 'oroui/lib/bootstrap/bootstrap-typeahead'
+    bootstrap-typeahead$: oroui/lib/bootstrap/bootstrap-typeahead
     bootstrap-util$: '@oroinc/bootstrap/js/dist/util'
     chaplin$: oroui/lib/chaplin
     controllers/page-controller$: oroui/js/app/controllers/page-controller
@@ -27,9 +27,9 @@ aliases:
     jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
     jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
     jquery.numeric$: jquery-numeric/jquery.numeric
-    jquery.select2$: "@oroinc/select2/select2"
+    jquery.select2$: '@oroinc/select2/select2'
     jquery.timepicker$: timepicker/jquery.timepicker
-    jquery.uniform$: "@oroinc/jquery.uniform/src/js/jquery.uniform"
+    jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oroui/js/widget-manager$: oroui/js/widget/widget-manager
@@ -76,7 +76,7 @@ dynamic-imports:
     commons:
         - controllers/page-controller
         - oro/block-widget
-        - oroui/blank/js/extend/bootstrap
+        - oroui/default/js/extend/bootstrap
         - oroui/js/app/components/ajax-button
         - oroui/js/app/components/app-loading-bar-component
         - oroui/js/app/components/app-loading-mask-component
@@ -113,10 +113,10 @@ dynamic-imports:
         - oroui/js/widget/collapse-group-widget
         - oroui/js/widget/collapse-widget
 map:
-    "*":
+    '*':
         alert.js: bootstrap-alert
         backbone: oroui/js/extend/backbone
-        bootstrap: oroui/blank/js/extend/bootstrap
+        bootstrap: oroui/default/js/extend/bootstrap
         chaplin: oroui/js/extend/chaplin
         dropdown.js: bootstrap-dropdown
         jquery: oroui/js/extend/jquery
@@ -142,7 +142,7 @@ map:
         backbone: backbone
     extend-popper:
         popper: popper
-    oroui/blank/js/extend/bootstrap:
+    oroui/default/js/extend/bootstrap:
         bootstrap: bootstrap
     oroui/js/app/components/base/component:
         backbone: backbone

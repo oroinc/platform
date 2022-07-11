@@ -6,5 +6,5 @@ dynamic-imports:
         - oro/select2-attribute-autocomplete-component
         - oroentityconfig/js/attribute-group-collection-component
         - oroentityconfig/js/components/attribute-import-sync-notifier
-        - oroentityconfig/js/views/wysiwyg-content-preview
         - oroentityconfig/js/views/required-property-view
+        - oroentityconfig/js/views/wysiwyg-content-preview

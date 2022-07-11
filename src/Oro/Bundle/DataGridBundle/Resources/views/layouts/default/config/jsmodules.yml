@@ -1,5 +1,5 @@
 aliases:
-    backbone-pageable-collection$: "@oroinc/backbone.pageable/lib/backbone-pageable"
+    backbone-pageable-collection$: '@oroinc/backbone.pageable/lib/backbone-pageable'
     backgrid$: orodatagrid/js/extend/backgrid
     oro/datagrid/action/abstract-action$: orodatagrid/js/datagrid/action/abstract-action
     oro/datagrid/action/ajax-action$: orodatagrid/js/datagrid/action/ajax-action
@@ -120,6 +120,6 @@ dynamic-imports:
     orodatagrid-scroll-plugin:
         - orodatagrid/js/app/plugins/grid/sticked-scrollbar-plugin
 map:
-    "*":
-        orodatagrid/templates/datagrid/grid.html: orodatagrid/blank/templates/datagrid/grid.html
-        orodatagrid/templates/datagrid/no-data.html: orodatagrid/blank/templates/datagrid/no-data.html
+    '*':
+        orodatagrid/templates/datagrid/grid.html: orodatagrid/default/templates/datagrid/grid.html
+        orodatagrid/templates/datagrid/no-data.html: orodatagrid/default/templates/datagrid/no-data.html

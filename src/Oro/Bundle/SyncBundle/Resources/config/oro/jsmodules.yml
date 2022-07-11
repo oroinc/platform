@@ -1,5 +1,5 @@
 aliases:
-    autobahn$: "@oroinc/autobahnjs/autobahn/autobahn"
+    autobahn$: '@oroinc/autobahnjs/autobahn/autobahn'
     vertx$: orosync/js/extend/vertx
     when$: when/when
 app-modules:
@@ -13,7 +13,7 @@ dynamic-imports:
         - orosync/js/sync
         - orosync/js/sync/wamp
 map:
-    "*":
+    '*':
         autobahn: orosync/js/extend/autobahn
     orosync/js/extend/autobahn:
         autobahn: autobahn

@@ -1,5 +1,5 @@
 aliases:
-    backbone-pageable-collection$: "@oroinc/backbone.pageable/lib/backbone-pageable"
+    backbone-pageable-collection$: '@oroinc/backbone.pageable/lib/backbone-pageable'
     backgrid$: orodatagrid/js/extend/backgrid
     oro/datagrid/action/abstract-action$: orodatagrid/js/datagrid/action/abstract-action
     oro/datagrid/action/ajax-action$: orodatagrid/js/datagrid/action/ajax-action
