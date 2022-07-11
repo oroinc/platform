@@ -78,7 +78,7 @@ class OAuthSubscriber implements EventSubscriberInterface
         $accountType = $emailOrigin->getAccountType();
         $isDisabled = $this->isDisabledAvailable($accountType);
         if (!empty($token) || $isDisabled) {
-            if (!$form->has('checkFolder')) {
+            if (!$form->has('checkFolder') && $emailOrigin->isSyncEnabled()) {
                 $form->add('checkFolder', ButtonType::class, [
                     'label' => $this->translator->trans('oro.email.retrieve_folders.label'),
                     'attr' => ['class' => 'btn btn-primary']
@@ -93,7 +93,15 @@ class OAuthSubscriber implements EventSubscriberInterface
             }
 
             if ($form->has('check')) {
-                $form->remove('check');
+                if ($emailOrigin->isSyncEnabled()) {
+                    $form->remove('check');
+                } elseif (null !== $emailOrigin->getId()) {
+                    $form->remove('check');
+                    $form->add('check', ButtonType::class, [
+                        'label' => $this->translator->trans('oro.imap.configuration.reconnect'),
+                        'attr' => ['class' => 'btn btn-primary']
+                    ]);
+                }
             }
         }
     }

@@ -45,6 +45,33 @@ class EmailSyncNotificationAlertTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testCreateForRefreshTokenFail(): void
+    {
+        $organizationId = 13;
+        $originId = 5;
+
+        $alert = EmailSyncNotificationAlert::createForRefreshTokenFail('Refresh token fail.');
+        $alert->setOrganizationId($organizationId);
+        $alert->setEmailOriginId($originId);
+
+        $data = $alert->toArray();
+        self::assertIsString($data['id']);
+        unset($data['id']);
+        self::assertEquals(
+            [
+                'sourceType'      => 'EmailSync',
+                'resourceType'    => 'email',
+                'alertType'       => 'refresh token',
+                'operation'       => 'import',
+                'user'            => null,
+                'organization'    => $organizationId,
+                'message'         => 'Refresh token fail.',
+                'additionalInfo'  => ['emailOriginId' => 5]
+            ],
+            $data
+        );
+    }
+
     public function testCreateForGetListFail(): void
     {
         $userId = 1;

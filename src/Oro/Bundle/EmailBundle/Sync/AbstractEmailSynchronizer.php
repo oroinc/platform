@@ -8,6 +8,7 @@ use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Exception\DisableOriginSyncExceptionInterface;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
@@ -275,6 +276,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             if ($processor instanceof LoggerAwareInterface) {
                 $processor->setLogger($this->logger);
             }
+        } catch (DisableOriginSyncExceptionInterface $ex) {
+            $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
+            $this->disableSyncForOrigin($origin);
+
+            throw $ex;
         } catch (\Exception $ex) {
             $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
 
@@ -285,6 +291,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
 
         try {
             $this->delegateToProcessor($origin, $processor, $settings);
+        } catch (DisableOriginSyncExceptionInterface $ex) {
+            $this->logger->error(sprintf('The synchronization failed. Error: %s', $ex->getMessage()));
+            $this->disableSyncForOrigin($origin);
+
+            throw $ex;
         } catch (SyncFolderTimeoutException $ex) {
             $this->logger->info($ex->getMessage());
             $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS);
@@ -384,9 +395,6 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     /**
      * Updates a state of the given email origin
      *
-     * @param EmailOrigin $origin
-     * @param int $syncCode Can be one of self::SYNC_CODE_* constants
-     * @param \DateTime|null $synchronizedAt
      * @return bool true if the synchronization code was updated; false if no any changes are needed
      */
     protected function changeOriginSyncState(EmailOrigin $origin, $syncCode, $synchronizedAt = null)
@@ -421,9 +429,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     }
 
     /**
-     *  Attempts to sets the state of a given email origin to failed.
+     *  Attempts to set the state of a given email origin to failed.
      */
-    protected function setOriginSyncStateToFailed(EmailOrigin $origin)
+    protected function setOriginSyncStateToFailed(EmailOrigin $origin): void
     {
         try {
             $this->changeOriginSyncState($origin, self::SYNC_CODE_FAILURE);
@@ -431,6 +439,34 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
             // ignore any exception here
             $this->logger->error(
                 sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
+                ['exception' => $innerEx]
+            );
+        }
+    }
+
+    /**
+     *  Attempts to disable origin sync and sets the state of a given email origin to failed.
+     */
+    protected function disableSyncForOrigin(EmailOrigin $origin): void
+    {
+        try {
+            $syncCode = self::SYNC_CODE_FAILURE;
+            $repo = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
+            $qb = $repo->createQueryBuilder('o')
+                ->update()
+                ->set('o.syncCode', ':code')
+                ->set('o.syncCodeUpdatedAt', ':updated')
+                ->set('o.isSyncEnabled', ':isSyncEnabled')
+                ->where('o.id = :id')
+                ->setParameter('code', $syncCode)
+                ->setParameter('updated', $this->getCurrentUtcDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('id', $origin->getId())
+                ->setParameter('isSyncEnabled', false);
+            $qb->getQuery()->execute();
+        } catch (\Exception $innerEx) {
+            // ignore any exception here
+            $this->logger->error(
+                sprintf('Cannot disable the origin sync. Error: %s', $innerEx->getMessage()),
                 ['exception' => $innerEx]
             );
         }
@@ -473,9 +509,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
+            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)
             ->setParameter('inProcessForce', self::SYNC_CODE_IN_PROCESS_FORCE)
+            ->setParameter('isSyncEnabled', false)
             ->setParameter('success', self::SYNC_CODE_SUCCESS)
             ->setParameter('isActive', true)
             ->setParameter('now', $now, Types::DATETIME_MUTABLE)
@@ -544,7 +582,9 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $queryBuilder = $repo->createQueryBuilder('o')
             ->where('o.isActive = :isActive AND o.id = :id')
+            ->andWhere('o.isSyncEnabled != :isSyncEnabled')
             ->setParameter('isActive', true)
+            ->setParameter('isSyncEnabled', false)
             ->setParameter('id', $originId)
             ->setMaxResults(1);
 

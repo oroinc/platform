@@ -140,7 +140,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('warning');
         $this->notificationAlertManager->expects(self::never())
             ->method('addNotificationAlert');
-        $this->notificationAlertManager->expects(self::once())
+        $this->notificationAlertManager->expects(self::exactly(2))
             ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
         $this->notificationAlertManager->expects(self::once())
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
@@ -271,7 +271,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
                 return 'test_id';
             });
-        $this->notificationAlertManager->expects(self::once())
+        $this->notificationAlertManager->expects(self::exactly(2))
             ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
         $this->notificationAlertManager->expects(self::never())
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
@@ -351,7 +351,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
 
                 return 'test_id';
             });
-        $this->notificationAlertManager->expects(self::once())
+        $this->notificationAlertManager->expects(self::exactly(2))
             ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
         $this->notificationAlertManager->expects(self::never())
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
@@ -495,16 +495,14 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($connection);
 
         $this->logger->expects(self::once())
-            ->method('info')
+            ->method('warning')
             ->with(
                 'Load email body failed. Email id: 789. Error: test exception',
                 ['exception' => $exception]
             );
-        $this->logger->expects(self::never())
-            ->method('warning');
         $this->notificationAlertManager->expects(self::never())
             ->method('addNotificationAlert');
-        $this->notificationAlertManager->expects(self::once())
+        $this->notificationAlertManager->expects(self::exactly(2))
             ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
         $this->notificationAlertManager->expects(self::once())
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
@@ -603,7 +601,7 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
             ->method('warning');
         $this->notificationAlertManager->expects(self::never())
             ->method('addNotificationAlert');
-        $this->notificationAlertManager->expects(self::once())
+        $this->notificationAlertManager->expects(self::exactly(2))
             ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
         $this->notificationAlertManager->expects(self::once())
             ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
@@ -611,5 +609,59 @@ class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->synchronizer->sync();
 
         $this->assertSame($emailBody, $email->getEmailBody());
+    }
+
+    public function testSyncOneEmailBodyWithDisabledOrigin(): void
+    {
+        $email = new TestEmailEntity(848);
+        $email->setSubject('test2 email');
+        $emailUser = new EmailUser();
+
+        $user = new User();
+        $user->setId(85);
+        $organization = new Organization();
+        $organization->setId(789);
+        $origin = new TestEmailOrigin(489);
+        $origin->setActive(true);
+        $origin->setIsSyncEnabled(false);
+        $origin->setOwner($user);
+        $origin->setOrganization($organization);
+        $folder = new EmailFolder();
+        $folder->setOrigin($origin);
+        $origin->addFolder($folder);
+        $emailUser->setOrigin($origin);
+        $emailUser->addFolder($folder);
+        $email->addEmailUser($emailUser);
+
+        $this->selector->expects(self::never())
+            ->method('select');
+
+        $classMetadata = $this->createMock(ClassMetadataInfo::class);
+        $classMetadata->expects(self::once())
+            ->method('getTableName')
+            ->willReturn('oro_email');
+        $connection = $this->createMock(Connection::class);
+        $connection->expects(self::once())
+            ->method('update')
+            ->with('oro_email', ['body_synced' => true], ['id' => 848]);
+        $this->em->expects(self::exactly(2))
+            ->method('isOpen')
+            ->willReturn(true);
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(Email::class)
+            ->willReturn($classMetadata);
+        $this->em->expects(self::once())
+            ->method('getConnection')
+            ->willReturn($connection);
+
+        $this->notificationAlertManager->expects(self::never())
+            ->method('addNotificationAlert');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeForUserAndOrganization');
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization');
+
+        $this->synchronizer->syncOneEmailBody($email);
     }
 }

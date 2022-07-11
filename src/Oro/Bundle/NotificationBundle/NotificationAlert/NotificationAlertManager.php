@@ -179,11 +179,15 @@ class NotificationAlertManager
 
     public function resolveNotificationAlertsByAlertTypeForCurrentUser(string $alertType): void
     {
-        $this->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
-            $alertType,
-            $this->tokenAccessor->getUserId(),
-            $this->tokenAccessor->getOrganizationId()
-        );
+        $user = $this->tokenAccessor->getUserId();
+        $organization = $this->tokenAccessor->getOrganizationId();
+        if (null !== $user && null !== $organization) {
+            $this->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                $alertType,
+                $user,
+                $organization
+            );
+        }
     }
 
     public function resolveNotificationAlertsByAlertTypeForUserAndOrganization(

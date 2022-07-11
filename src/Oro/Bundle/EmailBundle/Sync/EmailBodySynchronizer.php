@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Exception\DisableOriginSyncExceptionInterface;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Exception\SyncWithNotificationAlertException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
@@ -58,7 +59,8 @@ class EmailBodySynchronizer implements LoggerAwareInterface
             $em = $this->getManager();
             $bodyLoaded = false;
             foreach ($email->getEmailUsers() as $emailUser) {
-                if (($origin = $emailUser->getOrigin()) && $origin->isActive()) {
+                $origin = $emailUser->getOrigin();
+                if ($origin && $origin->isActive() && $origin->isSyncEnabled()) {
                     foreach ($emailUser->getFolders() as $folder) {
                         [$bodyLoaded, $emailBodyChanged, $newNotifications] = $this->loadBody(
                             $email,
@@ -198,6 +200,16 @@ class EmailBodySynchronizer implements LoggerAwareInterface
                 $email->getId(),
                 'Attempt to load email body failed. Error: ' . $e->getMessage()
             );
+        } catch (DisableOriginSyncExceptionInterface $e) {
+            $this->disableSyncForOrigin($origin, $em);
+            $this->logger->notice(
+                sprintf(
+                    'Attempt to load email body from remote server failed.Error: %s',
+                    $e->getMessage()
+                ),
+                ['exception' => $e]
+            );
+            $notifications[] = EmailSyncNotificationAlert::createForRefreshTokenFail();
         } catch (\Doctrine\ORM\NoResultException $e) {
             $this->logger->notice(
                 sprintf(
@@ -251,9 +263,14 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         $authAlertsExist = false;
         /** @var $notificationAlert EmailSyncNotificationAlert */
         foreach ($notificationAlerts as $notificationAlert) {
-            if (EmailSyncNotificationAlert::ALERT_TYPE_AUTH === $notificationAlert->getAlertType()) {
-                $authAlertsExist = true;
-            }
+            $authAlertsExist = \in_array(
+                $notificationAlert->getAlertType(),
+                [
+                    EmailSyncNotificationAlert::ALERT_TYPE_AUTH,
+                    EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN
+                ],
+                true
+            );
 
             $notificationAlert->setUserId($userId);
             $notificationAlert->setOrganizationId($organizationId);
@@ -265,6 +282,11 @@ class EmailBodySynchronizer implements LoggerAwareInterface
         if (false === $authAlertsExist) {
             $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
                 EmailSyncNotificationAlert::ALERT_TYPE_AUTH,
+                $userId,
+                $organizationId
+            );
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForUserAndOrganization(
+                EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN,
                 $userId,
                 $organizationId
             );
@@ -293,9 +315,16 @@ class EmailBodySynchronizer implements LoggerAwareInterface
     private function processFailedDuringSaveEmail(Email $email, \Exception $exception): void
     {
         $this->updateBodySyncedStateForEntity($email);
-        $this->logger->info(
+        $this->logger->warning(
             sprintf('Load email body failed. Email id: %d. Error: %s', $email->getId(), $exception->getMessage()),
             ['exception' => $exception]
         );
+    }
+
+    private function disableSyncForOrigin(EmailOrigin $origin, EntityManager $em): void
+    {
+        $origin->setIsSyncEnabled(false);
+        $em->persist($origin);
+        $em->flush();
     }
 }
