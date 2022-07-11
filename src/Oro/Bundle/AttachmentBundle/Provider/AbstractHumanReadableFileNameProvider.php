@@ -18,9 +18,14 @@ abstract class AbstractHumanReadableFileNameProvider implements FileNameProvider
 
     protected FileNameProviderInterface $innerProvider;
 
-    public function __construct(FileNameProviderInterface $innerProvider)
-    {
+    private FilenameExtensionHelper $filenameExtensionHelper;
+
+    public function __construct(
+        FileNameProviderInterface $innerProvider,
+        FilenameExtensionHelper $filenameExtensionHelper
+    ) {
         $this->innerProvider = $innerProvider;
+        $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
     public function getFileName(File $file): string
@@ -64,7 +69,7 @@ abstract class AbstractHumanReadableFileNameProvider implements FileNameProvider
             $filename = $hash . self::ORIGINAL_FILE_NAME_SEPARATOR . $file->getOriginalFilename();
         }
 
-        $filename = FilenameExtensionHelper::addExtension($filename, $format);
+        $filename = $this->filenameExtensionHelper->addExtension($filename, $format, [$file->getMimeType()]);
 
         return FilenameSanitizer::sanitizeFilename($filename);
     }

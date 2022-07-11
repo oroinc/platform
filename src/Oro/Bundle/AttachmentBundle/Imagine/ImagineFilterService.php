@@ -22,16 +22,20 @@ class ImagineFilterService
 
     private ResizedImageProviderInterface $resizedImageProvider;
 
+    private FilenameExtensionHelper $filenameExtensionHelper;
+
     public function __construct(
         DataManager $dataManager,
         CacheManager $cacheManager,
         FilterConfiguration $filterConfiguration,
-        ResizedImageProviderInterface $resizedImageProvider
+        ResizedImageProviderInterface $resizedImageProvider,
+        FilenameExtensionHelper $filenameExtensionHelper
     ) {
         $this->dataManager = $dataManager;
         $this->cacheManager = $cacheManager;
         $this->filterConfiguration = $filterConfiguration;
         $this->resizedImageProvider = $resizedImageProvider;
+        $this->filenameExtensionHelper = $filenameExtensionHelper;
     }
 
     /**
@@ -48,7 +52,7 @@ class ImagineFilterService
             $format = $this->filterConfiguration->get($filterName)['format'] ?? '';
         }
 
-        $targetPath = FilenameExtensionHelper::addExtension($path, $format);
+        $targetPath = $this->filenameExtensionHelper->addExtension($path, $format);
 
         if (!$this->cacheManager->isStored($targetPath, $filterName, $resolver)) {
             $filteredImageBinary = $this->getFilteredImageBinary($path, $filterName, $format);
