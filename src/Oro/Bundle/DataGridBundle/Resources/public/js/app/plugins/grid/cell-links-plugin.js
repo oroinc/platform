@@ -56,10 +56,13 @@ const CellLinksPlugin = BasePlugin.extend({
                         this.$el.on(`mouseenter${this.eventNamespace()}`, debouncedCreateCellLinkView);
                         this.$el.on(`mouseleave${this.eventNamespace()}`, debouncedDestroyCellLinkView);
                     } else {
-                        this.$el.on(`touchstart${this.eventNamespace()}`, debouncedCreateCellLinkView);
+                        this.$el.off(`touchstart${this.eventNamespace()}
+                            touchend${this.eventNamespace()}
+                            touchcancel${this.eventNamespace()}`);
+                        this.$el.on(`touchstart${this.eventNamespace()}`, this.createCellLinkView.bind(this));
                         this.$el.on(
                             `touchend${this.eventNamespace()} touchcancel${this.eventNamespace()}`,
-                            debouncedDestroyCellLinkView
+                            this.destroyCellLinkView.bind(this)
                         );
                     }
                     this.listenTo(this, 'before-enter-edit-mode', this.destroyCellLinkView.bind(this));
@@ -83,13 +86,25 @@ const CellLinksPlugin = BasePlugin.extend({
                     return;
                 }
 
-                this.subview('cell-link', new CellLinkView({
-                    container: this.$el,
-                    url: this.rowUrl
-                }));
+                if (isTouchDevice()) {
+                    this.timeoutId = setTimeout(() => {
+                        this.subview('cell-link', new CellLinkView({
+                            container: this.$el,
+                            url: this.rowUrl
+                        }));
+                    }, 100);
+                } else {
+                    this.subview('cell-link', new CellLinkView({
+                        container: this.$el,
+                        url: this.rowUrl
+                    }));
+                }
             },
 
             destroyCellLinkView() {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
                 this.disposeCellLink();
             },
 
