@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
@@ -30,6 +31,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 {
     use SearchMappingTypeCastingHandlersTestTrait;
 
+    private const TEST_ID = 1;
     private const TEST_COUNT = 10;
     private const TEST_PRICE = 150;
 
@@ -50,6 +52,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
 
     /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
     protected $nameResolver;
+
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    protected $doctrineHelper;
 
     /** @var SearchMappingProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $mappingProvider;
@@ -181,21 +186,27 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $categories = ['<p>men</p>', '<p>women</p>'];
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function setUp(): void
     {
         $this->manufacturer = new Manufacturer();
+        $this->manufacturer->setId(42);
         $this->manufacturer->setName('<p>adidas</p>');
         $this->product = new Product();
         $this->product
+            ->setId(self::TEST_ID)
             ->setName('<p>test product</p>')
             ->setCount(self::TEST_COUNT)
             ->setPrice(self::TEST_PRICE)
             ->setManufacturer($this->manufacturer)
             ->setDescription('<p>description</p>')
             ->setCreateDate(new \DateTime('2022-12-12 12:13:14', new \DateTimeZone('UTC')));
-        foreach ($this->categories as $categoryName) {
+        foreach ($this->categories as $key => $categoryName) {
             $category = new Category();
             $category
+                ->setId($key + 100)
                 ->setName($categoryName)
                 ->addProduct($this->product);
             $this->product->addCategory($category);
@@ -214,6 +225,16 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(
                 function ($entity) {
                     return $entity->getName();
+                }
+            );
+
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->with($this->isType('object'))
+            ->willReturnCallback(
+                function ($entity) {
+                    return $entity->getId();
                 }
             );
 
@@ -266,6 +287,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->nameResolver,
+            $this->doctrineHelper,
             $this->dispatcher,
             $this->htmlTagHelper,
             new DateTimeFormatter()
@@ -299,7 +321,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'price' => $this->product->getPrice(),
             ],
             'integer' => [
-                'count' => $this->product->getCount(),
+                'system_entity_id' => self::TEST_ID,
+                'count'            => $this->product->getCount(),
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
@@ -341,7 +364,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'price' => $this->product->getPrice()
             ],
             'integer' => [
-                'count' => $this->product->getCount()
+                'system_entity_id' => self::TEST_ID,
+                'count'            => $this->product->getCount(),
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
@@ -376,6 +400,9 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     Indexer::TEXT_ALL_DATA_FIELD => $allTextData
                 ]
             ),
+            'integer' => [
+                'system_entity_id' => self::TEST_ID,
+            ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
             ]
@@ -409,7 +436,8 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'price' => 0.0
             ],
             'integer' => [
-                'count' => 0
+                'system_entity_id' => self::TEST_ID,
+                'count'            => 0,
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()
@@ -444,7 +472,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                     $productName,
                     implode(' ', $this->categories)
                 )
-            ])
+            ]),
+            'integer' => [
+                'system_entity_id' => $this->manufacturer->getId(),
+            ],
         ];
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->manufacturer));
     }
@@ -468,7 +499,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'products'                   => $productName,
                 'manufacturers'              => $manufacturerName,
                 Indexer::TEXT_ALL_DATA_FIELD => $categoryName . ' ' . $productName . ' ' . $manufacturerName
-            ])
+            ]),
+            'integer' => [
+                'system_entity_id' => $this->category->getId(),
+            ],
         ];
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($this->category));
     }
@@ -481,6 +515,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     public function testMapObjectForNullFieldsAndManyToOneRelation()
     {
         $product = new Product();
+        $product->setId(42);
         $product->setName('test product');
 
         $expectedMapping = [
@@ -489,7 +524,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 'name'                       => $product->getName(),
                 'all_data'                   => $product->getName(),
                 Indexer::TEXT_ALL_DATA_FIELD => $product->getName()
-            ]
+            ],
+            'integer' => [
+                'system_entity_id' => $product->getId(),
+            ],
         ];
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($product));
     }
@@ -497,6 +535,7 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
     public function testMapObjectForNullManyToManyRelation()
     {
         $category = new Category();
+        $category->setId(777);
         $category->setName('men');
 
         $expectedMapping = [
@@ -504,7 +543,10 @@ class ObjectMapperTest extends \PHPUnit\Framework\TestCase
                 Indexer::NAME_FIELD          => $category->getName(),
                 'name'                       => $category->getName(),
                 Indexer::TEXT_ALL_DATA_FIELD => $category->getName()
-            ]
+            ],
+            'integer' => [
+                'system_entity_id' => $category->getId(),
+            ],
         ];
         $this->assertEquals($expectedMapping, $this->mapper->mapObject($category));
     }
