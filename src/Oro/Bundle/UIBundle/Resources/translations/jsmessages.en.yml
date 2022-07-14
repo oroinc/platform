@@ -169,6 +169,7 @@ oro:
         messages:
             'AttrValidator: Attribute removed': 'The "{{ name }}" attribute with duplicate value "{{ value }}" on "{{ tagName }}" should be removed'
             reserved_id: 'The "id" attribute values that start with "{{ id }}" are reserved, please use a different ID.'
+            exist_id: 'The "id" attribute values that start with "{{ id }}" already exist on the page, please use a different ID.'
             invalid_styles: 'CSS syntax error "{{ reason }}" in a column: {{ column }}'
             invalid_styles_short: 'CSS syntax error "{{ reason }}"'
         lock_editor:
