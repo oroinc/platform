@@ -682,7 +682,8 @@ abstract class BaseDriver implements DBALPersisterInterface
             $qb->orderBy('search.weight', Criteria::DESC);
         }
 
-        $qb->addOrderBy('search.id', Criteria::DESC);
+        $qb->addOrderBy('search.recordId', Criteria::DESC)
+            ->addOrderBy('search.id', Criteria::DESC);
     }
 
     /**
