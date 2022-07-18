@@ -108,10 +108,12 @@ class StaticSegmentManager
         $identifier,
         $addSnapshotFields = true
     ): string {
+        // Use Order By to fix deadlock with multi-row INSERT's and 'ON CONFLICT DO NOTHING'.
         if (!$segment->getRecordsLimit()) {
             if ($addSnapshotFields) {
                 $this->addSegmentSnapshotFields($queryBuilder, $segment);
             }
+            $queryBuilder->addOrderBy(sprintf('%s.%s', $this->getFromTableAlias($queryBuilder), $identifier), 'ASC');
             $finalSelectSql = $queryBuilder->getQuery()->getSQL();
         } else {
             $queryBuilder->setMaxResults($segment->getRecordsLimit());
@@ -125,8 +127,11 @@ class StaticSegmentManager
             $purifiedSelectSql = $queryBuilder->getQuery()->getSQL();
             $originalIdentifierDoctrineAlias = $this->getDoctrineIdentifierAlias($identifier, $originalSelectSql);
 
-            $finalSelectSql = "$purifiedSelectSql JOIN ($originalSelectSql) " .
-                "AS result_table ON result_table.$originalIdentifierDoctrineAlias=$identifier";
+            $finalSelectSql = <<<SQL
+                $purifiedSelectSql JOIN ($originalSelectSql)
+                AS result_table ON result_table.$originalIdentifierDoctrineAlias=$identifier
+                ORDER BY $originalIdentifierDoctrineAlias ASC
+            SQL;
         }
 
         return $finalSelectSql;
@@ -221,7 +226,11 @@ class StaticSegmentManager
         array $values,
         array $types
     ) {
-        $dbQuery = 'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) (%s)';
+        $dbQuery = <<<SQL
+            INSERT INTO oro_segment_snapshot ($fieldToSelect, segment_id, createdat) (%s)
+            ON CONFLICT (segment_id, integer_entity_id) DO NOTHING
+        SQL;
+
         $dbQuery = sprintf($dbQuery, $selectSql);
 
         $this->em->getConnection()->executeQuery($dbQuery, $values, $types);
@@ -251,10 +260,13 @@ class StaticSegmentManager
         }
 
         if ($insertValues) {
-            $this->em->getConnection()->executeStatement(
-                'INSERT INTO oro_segment_snapshot (' . $fieldToSelect . ', segment_id, createdat) VALUES'
-                . implode(',', $insertValues)
-            );
+            $insertValues = implode(',', $insertValues);
+            $sql = <<<SQL
+                INSERT INTO oro_segment_snapshot ($fieldToSelect, segment_id, createdat) VALUES
+                $insertValues ON CONFLICT (segment_id, integer_entity_id) DO NOTHING
+            SQL;
+
+            $this->em->getConnection()->executeStatement($sql);
         }
     }
 
