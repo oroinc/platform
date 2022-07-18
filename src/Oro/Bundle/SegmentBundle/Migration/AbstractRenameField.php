@@ -40,7 +40,7 @@ abstract class AbstractRenameField extends AbstractFixture implements ContainerA
                 $definition['grouping_columns'][$key]['name'] = $this->replaceFieldName($columnData['name']);
             }
 
-            $definition['filters'] = $this->replaceFiltersFieldName($definition['filters']);
+            $definition['filters'] = $this->replaceFiltersFieldName($definition['filters'] ?? []);
 
             $report->setDefinition(QueryDefinitionUtil::encodeDefinition($definition));
             $manager->persist($report);
