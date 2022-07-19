@@ -48,8 +48,17 @@ class JsTranslationDumper
     public function dumpTranslationFile(string $locale): string
     {
         $translationFile = $this->getTranslationFilePath($locale);
-        if (false === @file_put_contents($translationFile, $this->generator->generateJsTranslations($locale))) {
-            throw new IOException(sprintf('Unable to write file %s.', $translationFile));
+        try {
+            $content = $this->generator->generateJsTranslations($locale);
+            $this->fileManager->writeToStorage($content, $translationFile);
+        } catch (\Exception $e) {
+            $message = sprintf(
+                'An error occurred while dumping content to %s, %s',
+                $translationFile,
+                $e->getMessage()
+            );
+
+            throw new IOException($message, $e->getCode(), $e);
         }
 
         return $translationFile;
@@ -57,11 +66,11 @@ class JsTranslationDumper
 
     public function isTranslationFileExist(string $locale): bool
     {
-        return file_exists($this->getTranslationFilePath($locale));
+        return $this->fileManager->hasFile($this->getTranslationFilePath($locale));
     }
 
     private function getTranslationFilePath(string $locale): string
     {
-        return $this->fileManager->getFilePath(sprintf('translation/%s.json', $locale));
+        return sprintf('translation/%s.json', $locale);
     }
 }
