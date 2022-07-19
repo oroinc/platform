@@ -2,7 +2,15 @@
   Added during the fix of the bug: https://magecore.atlassian.net/browse/BB-7435
   Should be refactor after closed https://magecore.atlassian.net/browse/BAP-13952
 */
+
 .oro-workflow-transition-form {
+    display: block;
+
+    width: 395px;
+    height: 120px;
+
+    resize: none;
+
     textarea {
         @extend .textarea;
     }

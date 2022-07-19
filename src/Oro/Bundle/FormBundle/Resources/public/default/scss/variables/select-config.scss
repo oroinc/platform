@@ -2,29 +2,43 @@
 
 @use 'sass:string';
 
-$select-font-family: $base-font;
-$select-color: get-color('additional', 'dark');
+$use-base-style-for-select: true !default;
+
+// Default State
+$select-font-size: $base-ui-element-font-size !default;
+$select-font-family: $base-font !default;
+$select-line-height: $base-ui-element-line-height !default;
+
+$select-padding: 9px 22px 8px 11px !default;
+$select-padding--m: 8px 22px 8px 9px !default;
+$select-padding--s: 5px 22px 4px 8px !default;
+$select-height--s: 32px !default;
 
 $select-placeholder-color: get-color('additional', 'middle');
 
-$select-firefox-height: null;
-$select-firefox-line-height: null;
-$select-firefox-inner-offset-top: null;
-$select-firefox-inner-offset-bottom: null;
-$select-padding: 9px 22px 8px 11px;
-$select-padding--m: 8px 22px 8px 9px;
-$select-padding--s: 5px 22px 4px 8px;
-$select-height--s: 32px;
-$select-arrow-color: get-color('additional', 'dark');
-$select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional', 'ultra');
+$select-firefox-height: null !default;
+$select-firefox-line-height: null !default;
+$select-firefox-inner-offset-top: null !default;
+$select-firefox-inner-offset-bottom: null !default;
 
-// Hover
-$select-border-color-hover-state: get-color('additional', 'dark');
+$select-border: $base-ui-element-border !default;
+$select-border-radius: $base-ui-element-border-radius !default;
+$select-background-color: $base-ui-element-bg-color !default;
+$select-color: get-color('additional', 'dark') !default;
+$select-disable-platform-style: true !default;
+$select-arrow-color: get-color('additional', 'dark') !default;
+$select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional', 'ultra') !default;
+
+$select-border-color-hover-state: get-color('additional', 'dark') !default;
 $select-box-shadow-hover-state: inset 0 1px 1px transparentize(get-color('additional', 'ultra'), .75),
-                                      0 0 8px transparentize(get-color('ui', 'focus'), .6);
+                                      0 0 8px transparentize(get-color('ui', 'focus'), .6) !default;
 
-// Error
-$select-border-color-error-state: get-color('ui', 'error-dark');
+// Focus State
+$select-border-color-focus-state: $base-ui-element-border-color-focus !default;
+$select-box-shadow-focus-state: $base-ui-element-focus-style !default;
+
+// Error State
+$select-border-color-error-state: get-color('ui', 'error-dark') !default;
 $select-box-shadow-error-state: 0 1px 7px 0 transparentize(get-color('ui', 'error-dark'), .6);
 
 // Disabled

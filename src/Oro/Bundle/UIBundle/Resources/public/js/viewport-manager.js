@@ -13,7 +13,7 @@ define(function(require, exports, module) {
              * Default values of breakpoints synchronized with scss breakpoints
              * @type {Array}
              *
-             * [Default Breakpoints](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/UIBundle/Resources/public/blank/scss/settings/partials/_breakpoints.scss)
+             * [Default Breakpoints](https://github.com/oroinc/platform/blob/master/src/Oro/Bundle/UIBundle/Resources/public/default/scss/settings/_breakpoints.scss)
              */
             screenMap: []
         },

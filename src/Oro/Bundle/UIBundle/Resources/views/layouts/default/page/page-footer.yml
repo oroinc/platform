@@ -1,0 +1,22 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: '@OroUI/layouts/default/page/page-footer.html.twig'
+
+        - '@addTree':
+            items:
+                page_footer:
+                    blockType: container
+                    prepend: false
+                page_footer_container:
+                    blockType: container
+                page_footer_base:
+                    blockType: container
+                page_footer_side:
+                    blockType: container
+            tree:
+                page_container:
+                    page_footer:
+                        page_footer_container:
+                            page_footer_base: ~
+                            page_footer_side: ~

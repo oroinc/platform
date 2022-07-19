@@ -1,0 +1,23 @@
+/* @theme: default; */
+
+@import './functions';
+
+// Mixin for generate loading skeleton
+// @param: List $particles
+// @example
+// @include skeleton(
+//     skeleton-rect($color: #800, $width: 129px, $height: 24px, $x: 0, $y: 0, $radius: 3px),
+//     skeleton-ellipse($color: #800, $width: 129px, $height: 24px, $x: 0, $y: 0),
+//     (
+//         skeleton-rect($color: #800, $width: 129px, $height: 24px, $x: 0, $y: 0, $radius: 3px),
+//         skeleton-ellipse($color: #800, $width: 129px, $height: 24px, $x: 0, $y: 0),
+//     ),
+// );
+@mixin skeleton($particles...) {
+    $list-normalized: skeleton-normalize($particles...);
+
+    background-image: skeleton-image($list-normalized...);
+    background-size: skeleton-size($list-normalized...);
+    background-position: skeleton-position($list-normalized...);
+    background-repeat: no-repeat;
+}
