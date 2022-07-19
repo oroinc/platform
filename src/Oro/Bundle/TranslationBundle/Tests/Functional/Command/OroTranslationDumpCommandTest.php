@@ -2,30 +2,52 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Functional\Command;
 
+use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\Constraint\IsEqual;
 
 class OroTranslationDumpCommandTest extends WebTestCase
 {
     use TempDirExtension;
 
     private const COMMAND_NAME = 'oro:translation:dump';
-    private const GAUFRETTE_BASE_PATH = 'gaufrette://public_js/js/translation/';
+    private const GAUFRETTE_BASE_PATH = 'translation/';
 
     private string $tempDir;
+
+    private static FileManager $fileManager;
 
     protected function setUp(): void
     {
         $this->initClient();
+        self::$fileManager = $this->getContainer()->get('oro_navigation.file_manager.public_js');
         $this->tempDir = $this->getTempDir('translation_dump_command');
+    }
+
+    public static function assertFileExists(string $filename, string $message = ''): void
+    {
+        static::assertTrue(self::$fileManager->hasFile($filename), $message);
+    }
+
+    public static function assertStringEqualsFile(
+        string $expectedFile,
+        string $actualString,
+        string $message = ''
+    ): void {
+        static::assertFileExists($expectedFile, $message);
+
+        $constraint = new IsEqual(self::$fileManager->getFile($expectedFile)->getContent());
+
+        static::assertThat($actualString, $constraint, $message);
     }
 
     private function doTest(array $targetFilePaths, array $locales): void
     {
         $backupFilePaths = [];
         foreach ($targetFilePaths as $k => $targetFilePath) {
-            if (file_exists($targetFilePath)) {
+            if (self::$fileManager->hasFile($targetFilePath)) {
                 $backupFilePath = $this->tempDir . DIRECTORY_SEPARATOR . sprintf('trans_%s.bkp', $k);
                 $backupFilePaths[$targetFilePath] = $backupFilePath;
                 $this->moveFile($targetFilePath, $backupFilePath);
@@ -52,9 +74,9 @@ class OroTranslationDumpCommandTest extends WebTestCase
 
     private function moveFile(string $from, string $to): void
     {
-        // the rename() function cannot be used across stream wrappers
-        file_put_contents($to, file_get_contents($from));
-        unlink($from);
+        $content = self::$fileManager->getFile($from)->getContent();
+        self::$fileManager->writeToStorage($content, $to);
+        self::$fileManager->deleteFile($from);
     }
 
     public function testExecuteForOneLocale(): void
