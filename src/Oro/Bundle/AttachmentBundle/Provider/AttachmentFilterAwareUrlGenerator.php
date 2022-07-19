@@ -36,8 +36,13 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface, Logger
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
         if (!empty($parameters['filter'])) {
-            $parameters['filterMd5'] = $this->getFilterHash($parameters['filter'], $parameters['format'] ?? '');
+            $format = $parameters['format'] ?? '';
             unset($parameters['format']);
+            if (!$format) {
+                $format = pathinfo($parameters['filename'], PATHINFO_EXTENSION);
+            }
+
+            $parameters['filterMd5'] = $this->getFilterHash($parameters['filter'], $format);
         }
 
         try {

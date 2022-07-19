@@ -20,7 +20,7 @@ class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame(
             [
                 'kernel.environment' => 'prod',
-                'oro_attachment.liip_imagine.unsupported_mime_types' => ['image/svg+xml'],
+                'oro_attachment.liip_imagine.unsupported_mime_types' => ['image/svg+xml', 'image/svg'],
                 'liip_imagine.controller.filter_action' => 'oro_attachment.controller.imagine::filterAction',
                 'oro_attachment.debug_images' => true,
                 'oro_attachment.upload_file_mime_types' => [],

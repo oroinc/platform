@@ -10,7 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(
  *      name="oro_segment_snapshot",
  *      uniqueConstraints={
- *          @ORM\UniqueConstraint(columns={"segment_id", "entity_id"})
+ *          @ORM\UniqueConstraint(columns={"segment_id", "entity_id"}),
+ *          @ORM\UniqueConstraint(columns={"segment_id", "integer_entity_id"})
  *      },
  *      indexes={
  *          @ORM\Index(name="sgmnt_snpsht_int_entity_idx", columns={"integer_entity_id"}),

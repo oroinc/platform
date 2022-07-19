@@ -131,9 +131,10 @@ services:
     oro_imap.listener.user_email_origin:
         class: Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
         arguments:
-            - '@doctrine'
+            - '@oro_email.email_notification_alert_manager'
         tags:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin, event: preUpdate }
 
     oro_imap.manager.clear:
         class: Oro\Bundle\ImapBundle\Manager\ImapClearManager

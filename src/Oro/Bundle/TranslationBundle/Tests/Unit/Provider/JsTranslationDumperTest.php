@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
+use Gaufrette\Filesystem;
+use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationDumper;
 use Oro\Bundle\TranslationBundle\Provider\JsTranslationGenerator;
 use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\Constraint\IsEqual;
 use Symfony\Component\Filesystem\Exception\IOException;
 
 class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
@@ -20,7 +24,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
     private $languageProvider;
 
     /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
+    private static $fileManager;
 
     /** @var JsTranslationDumper */
     private $dumper;
@@ -29,13 +33,34 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
     {
         $this->generator = $this->createMock(JsTranslationGenerator::class);
         $this->languageProvider = $this->createMock(LanguageProvider::class);
-        $this->fileManager = $this->createMock(FileManager::class);
+        self::$fileManager = new FileManager('js_trans_dumper');
+        self::$fileManager->setProtocol('gaufrette');
+        self::$fileManager->setFilesystemMap(new FilesystemMap([
+            'js_trans_dumper' => new Filesystem(new LocalAdapter($this->getTempDir('js_trans_dumper'))),
+        ]));
 
         $this->dumper = new JsTranslationDumper(
             $this->generator,
             $this->languageProvider,
-            $this->fileManager
+            self::$fileManager
         );
+    }
+
+    public static function assertFileExists(string $filename, string $message = ''): void
+    {
+        static::assertTrue(self::$fileManager->hasFile($filename), $message);
+    }
+
+    public static function assertStringEqualsFile(
+        string $expectedFile,
+        string $actualString,
+        string $message = ''
+    ): void {
+        static::assertFileExists($expectedFile, $message);
+
+        $constraint = new IsEqual(self::$fileManager->getFile($expectedFile)->getContent());
+
+        static::assertThat($actualString, $constraint, $message);
     }
 
     public function testGetAllLocales(): void
@@ -51,62 +76,47 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
     public function testDumpTranslations(): void
     {
-        $translationFile = $this->getTempDir('js_trans_dumper') . DIRECTORY_SEPARATOR . 'en.json';
+        $translationFileName = 'translation/en.json';
         $translationFileContent = 'test';
 
-        $this->languageProvider->expects(self::once())
+        $this->languageProvider->expects($this->once())
             ->method('getAvailableLanguageCodes')
             ->willReturn(['en']);
 
-        $this->fileManager->expects(self::once())
-            ->method('getFilePath')
-            ->with('translation/en.json')
-            ->willReturn($translationFile);
-
-        $this->generator->expects(self::once())
+        $this->generator->expects($this->once())
             ->method('generateJsTranslations')
             ->with('en')
             ->willReturn($translationFileContent);
 
         $this->dumper->dumpTranslations();
 
-        self::assertFileExists($translationFile);
-        self::assertStringEqualsFile($translationFile, $translationFileContent);
+        self::assertFileExists($translationFileName);
+        self::assertStringEqualsFile($translationFileName, $translationFileContent);
     }
 
     public function testDumpTranslationsWithLocales(): void
     {
-        $translationFile = $this->getTempDir('js_trans_dumper') . DIRECTORY_SEPARATOR . 'en_US.json';
+        $translationFileName = 'translation/en_US.json';
         $translationFileContent = 'test';
 
-        $this->languageProvider->expects(self::never())
+        $this->languageProvider->expects($this->never())
             ->method('getAvailableLanguageCodes');
 
-        $this->fileManager->expects(self::once())
-            ->method('getFilePath')
-            ->with('translation/en_US.json')
-            ->willReturn($translationFile);
-
-        $this->generator->expects(self::once())
+        $this->generator->expects($this->once())
             ->method('generateJsTranslations')
             ->with('en_US')
             ->willReturn($translationFileContent);
 
         $this->dumper->dumpTranslations(['en_US']);
 
-        self::assertFileExists($translationFile);
-        self::assertStringEqualsFile($translationFile, $translationFileContent);
+        self::assertFileExists($translationFileName);
+        self::assertStringEqualsFile($translationFileName, $translationFileContent);
     }
 
     public function testDumpTranslationFile(): void
     {
-        $translationFile = $this->getTempDir('js_trans_dumper') . DIRECTORY_SEPARATOR . 'en_US.json';
+        $translationFileName = 'translation/en_US.json';
         $translationFileContent = 'test';
-
-        $this->fileManager->expects(self::once())
-            ->method('getFilePath')
-            ->with('translation/en_US.json')
-            ->willReturn($translationFile);
 
         $this->generator->expects(self::once())
             ->method('generateJsTranslations')
@@ -115,60 +125,60 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
 
         $this->dumper->dumpTranslationFile('en_US');
 
-        self::assertFileExists($translationFile);
-        self::assertStringEqualsFile($translationFile, $translationFileContent);
+        self::assertFileExists($translationFileName);
+        self::assertStringEqualsFile($translationFileName, $translationFileContent);
     }
 
     public function testDumpTranslationFileWhenItIsFailed(): void
     {
-        $translationFile = $this->getTempDir('js_trans_dumper') . DIRECTORY_SEPARATOR . 'en_US.json';
-        touch($translationFile);
-        if (false === chmod($translationFile, 0444)) {
-            self::fail('Cannot set the file permissions necessary for this test.');
-        }
+        $translationFileName = 'translation/en.json';
+        $translationFileContent = 'test';
 
-        $this->fileManager->expects(self::once())
-            ->method('getFilePath')
-            ->with('translation/en_US.json')
-            ->willReturn($translationFile);
-        $this->generator->expects(self::once())
+        $exception = new \Exception('Authentication failed.');
+        $ioExceptionMessage = sprintf(
+            'An error occurred while dumping content to %s, %s',
+            $translationFileName,
+            $exception->getMessage()
+        );
+
+        $this->languageProvider->expects($this->once())
+            ->method('getAvailableLanguageCodes')
+            ->willReturn(['en']);
+
+        $fileManager = $this->createMock(FileManager::class);
+
+        $fileManager->expects($this->once())
+            ->method('writeToStorage')
+            ->willThrowException($exception);
+
+        $this->generator->expects($this->once())
             ->method('generateJsTranslations')
-            ->with('en_US')
-            ->willReturn('test');
+            ->with('en')
+            ->willReturn($translationFileContent);
 
         $this->expectException(IOException::class);
-        $this->expectExceptionMessage(sprintf('Unable to write file %s.', $translationFile));
+        $this->expectExceptionMessage($ioExceptionMessage);
 
-        try {
-            $this->dumper->dumpTranslationFile('en_US');
-        } finally {
-            chmod($translationFile, 0744);
-            unlink($translationFile);
-        }
+        $dumper = new JsTranslationDumper(
+            $this->generator,
+            $this->languageProvider,
+            $fileManager
+        );
+        $dumper->dumpTranslations();
     }
 
     public function testIsTranslationFileExistForExistingFile(): void
     {
-        $translationFile = $this->getTempDir('js_trans_dumper') . DIRECTORY_SEPARATOR . 'en.json';
-        file_put_contents($translationFile, 'test');
+        $translationFileName = 'translation/en_GB.json';
+        $translationFileContent = 'test';
 
-        $this->fileManager->expects(self::once())
-            ->method('getFilePath')
-            ->with('translation/en.json')
-            ->willReturn($translationFile);
+        self::$fileManager->writeToStorage($translationFileContent, $translationFileName);
 
-        self::assertTrue($this->dumper->isTranslationFileExist('en'));
+        self::assertTrue($this->dumper->isTranslationFileExist('en_GB'));
     }
 
     public function testIsTranslationFileExistWhenFileDoesNotExist(): void
     {
-        $translationFile = $this->getTempDir('js_trans_dumper') . DIRECTORY_SEPARATOR . 'en.json';
-
-        $this->fileManager->expects(self::once())
-            ->method('getFilePath')
-            ->with('translation/en.json')
-            ->willReturn($translationFile);
-
-        self::assertFalse($this->dumper->isTranslationFileExist('en'));
+        self::assertFalse($this->dumper->isTranslationFileExist('en_AU'));
     }
 }
