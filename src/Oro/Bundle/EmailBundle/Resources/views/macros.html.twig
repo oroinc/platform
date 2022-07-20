@@ -603,32 +603,38 @@
         <div class="navigation navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="pull-left pull-left-extra">
-                    {% if pageTitle is iterable %}
-                        {% for title in pageTitle%}
-                            {% if not loop.last %}
-                                <div class="sub-title">
-                                    {% if title is iterable and title.link is defined and title.label is defined %}
-                                        <a href="{{ title.link }}">{{ title.label }}</a>
-                                    {% else %}
-                                        {{ title }}
-                                    {% endif %}
-                                </div>
-                                <span class="separator">/</span>
-                            {% else %}
-                                <h1 class="page-title__entity-title">
-                                    {% if title is iterable and title.link is defined and title.label is defined %}
-                                        <a href="{{ title.link }}">{{ title.label }}</a>
-                                    {% else %}
-                                        {{ title }}
-                                    {% endif %}
-                                </h1>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <h1 class="page-title__entity-title">
-                            {{ pageTitle }}
-                        </h1>
-                    {% endif %}
+                    <div class="page-title__path">
+                        <div class="top-row">
+                            <div class="page-title__entity-title-wrapper">
+                                {% if pageTitle is iterable %}
+                                    {% for title in pageTitle%}
+                                        {% if not loop.last %}
+                                            <div class="sub-title">
+                                                {% if title is iterable and title.link is defined and title.label is defined %}
+                                                    <a href="{{ title.link }}">{{ title.label }}</a>
+                                                {% else %}
+                                                    {{ title }}
+                                                {% endif %}
+                                            </div>
+                                            <span class="separator">/</span>
+                                        {% else %}
+                                            <h1 class="page-title__entity-title">
+                                                {% if title is iterable and title.link is defined and title.label is defined %}
+                                                    <a href="{{ title.link }}">{{ title.label }}</a>
+                                                {% else %}
+                                                    {{ title }}
+                                                {% endif %}
+                                            </h1>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <h1 class="page-title__entity-title">
+                                        {{ pageTitle }}
+                                    </h1>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="pull-right title-buttons-container">
                     {{ buttons|raw }}
