@@ -1,10 +1,21 @@
 /* @theme: admin.oro; */
 
 .activity-list-widget {
+    .pagination {
+        margin: 0;
+    }
+
     .grid-toolbar {
-        display: flex;
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            'filter filter'
+            'start end';
         padding: 0 0 $content-padding-small;
+
+        .pagination {
+            grid-area: start;
+        }
     }
 
     .filter-box {
@@ -15,10 +26,6 @@
 
     .filter-item {
         margin-bottom: $activity-mobile-toolbar-item-offset;
-    }
-
-    .pagination {
-        margin: 0;
     }
 
     .accordion-group {
