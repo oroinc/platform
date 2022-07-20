@@ -215,7 +215,7 @@ define(function(require, exports, module) {
         const $elem = $(this.findLastActive() || (this.errorList.length && this.errorList[0].element) || []);
         const $firstValidationError = $('.validation-failed').filter(':visible').first();
 
-        if ($elem.is('.select2[type=hidden]')) {
+        if ($elem.is('.select2[type=hidden]') || $elem.is('select.select2')) {
             $elem.parent().find('input.select2-focusser')
                 .focus()
                 .trigger('focusin');
