@@ -40,7 +40,7 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\GridRow
 
     GridTable:
-      selector: '.grid-container table.grid'
+      selector: '.grid-container table.grid-main-container'
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Table
 
     GridRowAction:

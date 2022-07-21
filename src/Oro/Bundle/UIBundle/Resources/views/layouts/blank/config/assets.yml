@@ -18,7 +18,6 @@ styles:
         - 'bundles/oroui/blank/scss/variables/page-subtitle-config.scss'
         - 'bundles/oroui/blank/scss/variables/responsive-video-config.scss'
         - 'bundles/oroui/blank/scss/variables/title-config.scss'
-        - 'bundles/oroui/blank/scss/variables/grid-config.scss'
         - 'bundles/oroui/blank/scss/variables/link-config.scss'
         - 'bundles/oroui/blank/scss/variables/notifications-config.scss'
         - 'bundles/oroui/blank/scss/variables/section-title-config.scss'
