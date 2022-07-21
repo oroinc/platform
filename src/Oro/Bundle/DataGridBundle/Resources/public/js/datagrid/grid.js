@@ -71,7 +71,7 @@ define(function(require) {
 
         /** @property {Object} */
         selectors: {
-            grid: '.grid',
+            grid: '.grid-main-container',
             toolbar: '[data-grid-toolbar]',
             toolbars: {
                 top: '[data-grid-toolbar=top]',

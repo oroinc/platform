@@ -16,13 +16,13 @@ const AccessibilityPlugin = BasePlugin.extend({
 
     events() {
         return {
-            'select2-close table.grid'() {
+            'select2-close table.grid-main-container'() {
                 this._forceInnerFocus = true;
             },
-            'focusin table.grid': 'onFocusin',
-            'focusout table.grid': 'onFocusout',
-            'keydown table.grid': 'onKeyDown',
-            'keyup table.grid': 'onKeyUp'
+            'focusin table.grid-main-container': 'onFocusin',
+            'focusout table.grid-main-container': 'onFocusout',
+            'keydown table.grid-main-container': 'onKeyDown',
+            'keyup table.grid-main-container': 'onKeyUp'
         };
     },
 
@@ -81,7 +81,7 @@ const AccessibilityPlugin = BasePlugin.extend({
         });
 
         this.listenToOnce(this.main, 'rendered', () => {
-            this.$table = this.main.$('table.grid');
+            this.$table = this.main.$('table.grid-main-container');
             // enable plugin only when the grid table is rendered
             this.enable();
         });
