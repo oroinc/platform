@@ -243,7 +243,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 self::assertEquals(
                     $value,
                     $error,
-                    "Failed asserting that $label has error $value"
+                    "Failed asserting that $label has error $value. Actual value: $error"
                 );
             }
         });

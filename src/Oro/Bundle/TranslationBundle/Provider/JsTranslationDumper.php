@@ -85,8 +85,17 @@ class JsTranslationDumper implements LoggerAwareInterface
             $this->logger->info('<info>[file+]</info> ' . $target);
 
             $content = $this->translationController->renderJsTranslationContent($this->translationDomains, $locale);
-            if (false === @file_put_contents($target, $content)) {
-                throw new IOException('Unable to write file ' . $target);
+            try {
+                $this->fileManager->writeToStorage($content, $target);
+            } catch (\Exception $e) {
+                $message = sprintf(
+                    'An error occurred while dumping content to %s, %s',
+                    $target,
+                    $e->getMessage()
+                );
+                $this->logger->error($message);
+
+                throw new IOException($message, $e->getCode(), $e);
             }
         }
 
@@ -95,13 +104,11 @@ class JsTranslationDumper implements LoggerAwareInterface
 
     public function isTranslationFileExist(string $locale): bool
     {
-        $translationFilePath = $this->getTranslationFilePath($locale);
-
-        return file_exists($translationFilePath);
+        return $this->fileManager->hasFile($this->getTranslationFilePath($locale));
     }
 
     private function getTranslationFilePath(string $locale): string
     {
-        return $this->fileManager->getFilePath(sprintf('translation/%s.json', $locale));
+        return sprintf('translation/%s.json', $locale);
     }
 }

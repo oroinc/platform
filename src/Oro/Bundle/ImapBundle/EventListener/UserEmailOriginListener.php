@@ -4,17 +4,21 @@ namespace Oro\Bundle\ImapBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
- * This entity listener handles prePersist doctrine entity event
- * and creates ImapEmailFolder entities based on information from UserEmailOrigin
+ * This entity listener handles next doctrine entity events:
+ * - prePersist: creates ImapEmailFolder entities based on information from UserEmailOrigin;
+ * - preUpdate: enables sync of the UserEmailOrigin if refresh token has changed.
  */
 class UserEmailOriginListener
 {
@@ -39,8 +43,14 @@ class UserEmailOriginListener
      */
     protected $oauthManagerRegistry;
 
-    /** @var Registry */
+    /**
+     * @deprecated
+     *
+     * @var Registry
+     */
     protected $doctrine;
+
+    private NotificationAlertManager $notificationAlertManager;
 
     public function __construct(
         SymmetricCrypterInterface $crypter,
@@ -55,6 +65,14 @@ class UserEmailOriginListener
     }
 
     /**
+     * @deprecated
+     */
+    public function setNotificationAlertManager(NotificationAlertManager $notificationAlertManager): void
+    {
+        $this->notificationAlertManager = $notificationAlertManager;
+    }
+
+    /**
      * Create ImapEmailFolder instances for each newly created EmailFolder related to UserEmailOrigin
      */
     public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $args)
@@ -64,6 +82,28 @@ class UserEmailOriginListener
             $folders = $origin->getRootFolders();
 
             $this->createImapEmailFolders($folders, $manager);
+        }
+    }
+
+    public function preUpdate(UserEmailOrigin $origin, PreUpdateEventArgs $args): void
+    {
+        if ($args->hasChangedField('refreshToken')
+            && false === $origin->isSyncEnabled()
+            && $args->getOldValue('refreshToken') !== $args->getNewValue('refreshToken')
+        ) {
+            $origin->setIsSyncEnabled(true);
+            $em = $args->getEntityManager();
+            $em->getUnitOfWork()->recomputeSingleEntityChangeSet(
+                $em->getClassMetadata(UserEmailOrigin::class),
+                $origin
+            );
+
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser(
+                EmailSyncNotificationAlert::ALERT_TYPE_AUTH
+            );
+            $this->notificationAlertManager->resolveNotificationAlertsByAlertTypeForCurrentUser(
+                EmailSyncNotificationAlert::ALERT_TYPE_REFRESH_TOKEN
+            );
         }
     }
 

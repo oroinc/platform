@@ -26,6 +26,11 @@ trait AppKernelAwareTrait
 
     protected function getAppContainer(): ContainerInterface
     {
-        return $this->appContainer ?: ($this->appContainer = $this->appKernel->getContainer());
+        if (!$this->appContainer) {
+            $this->appKernel->boot();
+            $this->appContainer = $this->appKernel->getContainer();
+        }
+
+        return $this->appContainer;
     }
 }

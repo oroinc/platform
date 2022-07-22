@@ -135,8 +135,11 @@ services:
             - '@oro_imap.connector.factory'
             - '@doctrine'
             - '@oro_imap.oauth_manager_registry'
+        calls:
+            - [ setNotificationAlertManager, [ '@oro_email.email_notification_alert_manager' ] ]
         tags:
             - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin, event: prePersist }
+            - { name: doctrine.orm.entity_listener, entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin, event: preUpdate }
 
     oro_imap.manager.clear:
         class: Oro\Bundle\ImapBundle\Manager\ImapClearManager

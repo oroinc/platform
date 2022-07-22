@@ -1,12 +1,23 @@
+oro_attachment:
+    upload_file_mime_types:
+        - image/svg+xml
+        - image/svg
+    upload_image_mime_types:
+        - image/svg+xml
+        - image/svg
+
+parameters:
+    oro_attachment.liip_imagine.unsupported_mime_types: ['image/svg+xml', 'image/svg']
+
 services:
-  oro_attachment.behat.provider.image_file_names:
-    alias: oro_attachment.provider.image_file_names
-    public: true
+    oro_attachment.behat.provider.image_file_names:
+        alias: oro_attachment.provider.image_file_names
+        public: true
 
-  oro_attachment.behat.media_cache_manager_registry:
-    alias: oro_attachment.media_cache_manager_registry
-    public: true
+    oro_attachment.behat.media_cache_manager_registry:
+        alias: oro_attachment.media_cache_manager_registry
+        public: true
 
-  oro_attachment.behat.tools.webp_configuration:
-    alias: oro_attachment.tools.webp_configuration
-    public: true
+    oro_attachment.behat.tools.webp_configuration:
+        alias: oro_attachment.tools.webp_configuration
+        public: true

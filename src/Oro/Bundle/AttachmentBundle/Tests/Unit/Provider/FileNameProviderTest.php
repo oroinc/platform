@@ -5,19 +5,26 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProvider;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class FileNameProviderTest extends \PHPUnit\Framework\TestCase
 {
-    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfiguration;
+    private FileNameProvider $fileNameProvider;
 
     protected function setUp(): void
     {
-        $this->filterConfiguration = $this->createMock(FilterConfiguration::class);
-
-        $this->filterConfiguration
+        $filterConfiguration = $this->createMock(FilterConfiguration::class);
+        $filterConfiguration
             ->expects(self::any())
             ->method('get')
             ->willReturnMap([['png_filter', ['format' => 'png']], ['empty_filter', []]]);
+        $filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);
+
+        $this->fileNameProvider = new FileNameProvider($filterConfiguration);
+        $this->fileNameProvider->setFilenameExtensionHelper($filenameExtensionHelper);
     }
 
     public function testGetFileName(): void
@@ -25,8 +32,7 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $file->setFilename('filename.jpeg');
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename(), $provider->getFileName($file));
+        self::assertSame($file->getFilename(), $this->fileNameProvider->getFileName($file));
     }
 
     public function testGetFilteredImageName(): void
@@ -36,8 +42,7 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('jpeg');
         $filterName = 'empty_filter';
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename(), $provider->getFilteredImageName($file, $filterName));
+        self::assertSame($file->getFilename(), $this->fileNameProvider->getFilteredImageName($file, $filterName));
     }
 
     public function testGetFilteredImageNameReturnsWithPngExtensionIfFilterHasPngFormat(): void
@@ -47,8 +52,10 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('jpeg');
         $filterName = 'png_filter';
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename() . '.png', $provider->getFilteredImageName($file, $filterName));
+        self::assertSame(
+            $file->getFilename() . '.png',
+            $this->fileNameProvider->getFilteredImageName($file, $filterName)
+        );
     }
 
     public function testGetFilteredImageNameReturnsUnchangedIfFilterHasPngFormatAndImageToo(): void
@@ -58,8 +65,18 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('png');
         $filterName = 'png_filter';
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename(), $provider->getFilteredImageName($file, $filterName));
+        self::assertSame($file->getFilename(), $this->fileNameProvider->getFilteredImageName($file, $filterName));
+    }
+
+    public function testGetFilteredImageNameReturnsUnchangedIfFileHasUnsupportedMimeType(): void
+    {
+        $file = new File();
+        $file->setFilename('filename.svg');
+        $file->setExtension('svg');
+        $file->setMimeType('image/svg');
+        $filterName = 'png_filter';
+
+        self::assertSame($file->getFilename(), $this->fileNameProvider->getFilteredImageName($file, $filterName));
     }
 
     public function testGetFilteredImageNameWithWebpExtensionEvenIfFilterHasPngFormat(): void
@@ -69,8 +86,10 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('png');
         $filterName = 'png_filter';
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename() . '.webp', $provider->getFilteredImageName($file, $filterName, 'webp'));
+        self::assertSame(
+            $file->getFilename() . '.webp',
+            $this->fileNameProvider->getFilteredImageName($file, $filterName, 'webp')
+        );
     }
 
     public function testGetFilteredImageNameReturnsUnchangedWhenSameFormat(): void
@@ -81,8 +100,10 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('jpeg');
         $filterName = 'empty_filter';
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename(), $provider->getFilteredImageName($file, $filterName, 'jpeg'));
+        self::assertSame(
+            $file->getFilename(),
+            $this->fileNameProvider->getFilteredImageName($file, $filterName, 'jpeg')
+        );
     }
 
     public function testGetFilteredImageNameReturnsWithNewExtensionWhenNewFormat(): void
@@ -93,8 +114,10 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $file->setExtension('jpeg');
         $filterName = 'empty_filter';
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename() . '.webp', $provider->getFilteredImageName($file, $filterName, 'webp'));
+        self::assertSame(
+            $file->getFilename() . '.webp',
+            $this->fileNameProvider->getFilteredImageName($file, $filterName, 'webp')
+        );
     }
 
     public function testGetResizedImageName(): void
@@ -105,8 +128,7 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $width = 42;
         $height = 142;
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename(), $provider->getResizedImageName($file, $width, $height));
+        self::assertSame($file->getFilename(), $this->fileNameProvider->getResizedImageName($file, $width, $height));
     }
 
     public function testGetResizedImageNameReturnsUnchangedWhenSameFormat(): void
@@ -118,8 +140,26 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $width = 42;
         $height = 142;
 
-        $provider = new FileNameProvider($this->filterConfiguration);
-        self::assertSame($file->getFilename(), $provider->getResizedImageName($file, $width, $height, 'jpeg'));
+        self::assertSame(
+            $file->getFilename(),
+            $this->fileNameProvider->getResizedImageName($file, $width, $height, 'jpeg')
+        );
+    }
+
+    public function testGetResizedImageNameReturnsUnchangedIfFileHasUnsupportedMimeType(): void
+    {
+        $file = new File();
+        $file->setFilename('filename.svg');
+        $file->setOriginalFilename('original-filename.svg');
+        $file->setExtension('svg');
+        $file->setMimeType('image/svg');
+        $width = 42;
+        $height = 142;
+
+        self::assertSame(
+            $file->getFilename(),
+            $this->fileNameProvider->getResizedImageName($file, $width, $height, 'webp')
+        );
     }
 
     public function testGetResizedImageNameReturnsWithNewExtensionWhenNewFormat(): void
@@ -131,10 +171,9 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
         $width = 42;
         $height = 142;
 
-        $provider = new FileNameProvider($this->filterConfiguration);
         self::assertSame(
             $file->getFilename() . '.webp',
-            $provider->getResizedImageName($file, $width, $height, 'webp')
+            $this->fileNameProvider->getResizedImageName($file, $width, $height, 'webp')
         );
     }
 }

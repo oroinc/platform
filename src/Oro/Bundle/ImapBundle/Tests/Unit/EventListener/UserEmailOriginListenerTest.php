@@ -5,7 +5,11 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\EventListener;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Sync\NotificationAlertManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
@@ -21,6 +25,9 @@ class UserEmailOriginListenerTest extends \PHPUnit\Framework\TestCase
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
+
+    /** @var NotificationAlertManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $notificationAlertManager;
 
     /** UserEmailOriginListener */
     private $listener;
@@ -38,12 +45,15 @@ class UserEmailOriginListenerTest extends \PHPUnit\Framework\TestCase
             ->method('createImapConnector')
             ->willReturn($this->createMock(ImapConnector::class));
 
+        $this->notificationAlertManager = $this->createMock(NotificationAlertManager::class);
+
         $this->listener = new UserEmailOriginListener(
             $this->createMock(SymmetricCrypterInterface::class),
             $connectorFactory,
             $doctrine,
             $this->createMock(OAuthManagerRegistry::class)
         );
+        $this->listener->setNotificationAlertManager($this->notificationAlertManager);
     }
 
     public function testPrePersistOnEmptyOriginFolders(): void
@@ -87,5 +97,62 @@ class UserEmailOriginListenerTest extends \PHPUnit\Framework\TestCase
             ->with($expectedImapEmailFolder);
 
         $this->listener->prePersist($origin, $this->createMock(LifecycleEventArgs::class));
+    }
+
+    public function testPreUpdateWithNonChangedRefreshToken(): void
+    {
+        $origin = new UserEmailOrigin();
+        $origin->setIsSyncEnabled(false);
+        $changeSet = [];
+
+        $event = new PreUpdateEventArgs($origin, $this->em, $changeSet);
+
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeForCurrentUser');
+
+        $this->listener->preUpdate($origin, $event);
+        self::assertFalse($origin->isSyncEnabled());
+    }
+
+    public function testPreUpdateWithChangedRefreshTokenAndEnabledOrigin(): void
+    {
+        $origin = new UserEmailOrigin();
+        $origin->setIsSyncEnabled(true);
+        $changeSet = ['refreshToken' => ['old', 'new']];
+
+        $event = new PreUpdateEventArgs($origin, $this->em, $changeSet);
+
+        $this->notificationAlertManager->expects(self::never())
+            ->method('resolveNotificationAlertsByAlertTypeForCurrentUser');
+
+        $this->listener->preUpdate($origin, $event);
+        self::assertTrue($origin->isSyncEnabled());
+    }
+
+    public function testPreUpdateWithChangedRefreshToken(): void
+    {
+        $origin = new UserEmailOrigin();
+        $origin->setIsSyncEnabled(false);
+        $changeSet = ['refreshToken' => ['old', 'new']];
+
+        $event = new PreUpdateEventArgs($origin, $this->em, $changeSet);
+
+        $metadata = new ClassMetadata(UserEmailOrigin::class);
+        $uow = $this->createMock(UnitOfWork::class);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->willReturn($metadata);
+        $this->em->expects(self::once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+        $uow->expects(self::once())
+            ->method('recomputeSingleEntityChangeSet')
+            ->with($metadata, $origin);
+        $this->notificationAlertManager->expects(self::exactly(2))
+            ->method('resolveNotificationAlertsByAlertTypeForCurrentUser');
+
+        $this->listener->preUpdate($origin, $event);
+        self::assertTrue($origin->isSyncEnabled());
     }
 }
