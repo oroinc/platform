@@ -502,4 +502,28 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
             $provider->getProviderForOwnerEntity($testEntity)
         );
     }
+
+    public function testGetActivityListEntitiesByActivityEntityForEntityWithoutId()
+    {
+        $testEntity = new \stdClass();
+        $testEntity->subject = 'testSubject';
+        $testEntity->description = 'testDescription';
+        $testEntity->owner = new User();
+        $testEntity->updatedBy = new User();
+
+        $this->testActivityProvider->setTargets([new \stdClass()]);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($entity) use ($testEntity) {
+                if ($entity === $testEntity) {
+                    return self::TEST_ACTIVITY_CLASS;
+                }
+
+                return get_class($entity);
+            });
+
+        $provider = $this->getActivityListChainProvider();
+        $result = $provider->getActivityListEntitiesByActivityEntity($testEntity);
+        $this->assertNull($result);
+    }
 }
