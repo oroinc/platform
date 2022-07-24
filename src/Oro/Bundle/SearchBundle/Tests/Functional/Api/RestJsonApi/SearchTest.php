@@ -94,6 +94,9 @@ class SearchTest extends RestJsonApiTestCase
                 [
                     'type'          => 'search',
                     'id'            => 'businessunits-' . $businessUnitId,
+                    'links'         => [
+                        'entityUrl' => $this->getUrl('oro_business_unit_view', ['id' => $businessUnitId], true)
+                    ],
                     'attributes'    => [
                         'entityTitle' => 'Main'
                     ],
@@ -116,6 +119,9 @@ class SearchTest extends RestJsonApiTestCase
                 [
                     'type'          => 'search',
                     'id'            => 'businessunits-' . $businessUnitId,
+                    'links'         => [
+                        'entityUrl' => $this->getUrl('oro_business_unit_view', ['id' => $businessUnitId], true)
+                    ],
                     'attributes'    => [
                         'entityTitle' => 'Main'
                     ],
@@ -180,6 +186,9 @@ class SearchTest extends RestJsonApiTestCase
                 [
                     'type'          => 'search',
                     'id'            => 'businessunits-' . $businessUnitId,
+                    'links'         => [
+                        'entityUrl' => $this->getUrl('oro_business_unit_view', ['id' => $businessUnitId], true)
+                    ],
                     'attributes'    => [
                         'entityTitle' => 'Main'
                     ],
