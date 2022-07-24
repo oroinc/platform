@@ -15,6 +15,10 @@ search:
     Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
         alias:                          oro_business_unit
         search_template:                '@OroOrganization/Search/businessUnitResult.html.twig'
+        route:
+            name:                       oro_business_unit_view
+            parameters:
+                id:                     id
         fields:
             -
                 name:                   id
