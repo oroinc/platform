@@ -55,7 +55,8 @@ services:
 
     oro_attachment.form.file_subscriber:
         class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\FileSubscriber
-        arguments: ['@oro_attachment.validator.file_config_validator']
+        arguments:
+            - '@oro_attachment.validator.file_config_validator'
 
     oro_attachment.validator.file_config_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator
@@ -75,7 +76,8 @@ services:
 
     oro_attachment.form.multiple_file_subscriber:
         class: Oro\Bundle\AttachmentBundle\Form\EventSubscriber\MultipleFileSubscriber
-        arguments: ['@oro_attachment.validator.multiple_file_config_validator']
+        arguments:
+            - '@oro_attachment.validator.multiple_file_config_validator'
 
     oro_attachment.validator.multiple_file_config_validator:
         class: Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator

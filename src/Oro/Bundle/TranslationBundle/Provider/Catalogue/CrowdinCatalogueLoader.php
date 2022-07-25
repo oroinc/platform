@@ -41,13 +41,16 @@ class CrowdinCatalogueLoader implements CatalogueLoaderInterface
         $archivePath = $tmpDir . 'temp.zip';
 
         $this->translationServiceAdapter->downloadLanguageTranslationsArchive($locale, $archivePath);
-        $this->translationServiceAdapter->extractTranslationsFromArchive($archivePath, $filesPath);
 
         // We treat "en_US" and "en" as the same language, and we use "en" to designate its translations internally.
         // It may be removed once the default locale is changed to 'en_US" (BB-19560).
         if ('en' === $locale) {
-            // renames all *.en_US.yml translation files to *.en.yml
+            $this->translationServiceAdapter->extractTranslationsFromArchive($archivePath, $filesPath, 'en_US');
+            // renames all *.en_US.csv translation files to *.en.csv
+            $this->changeFileExtensions('.en_US.csv', '.en.csv', $filesPath);
             $this->changeFileExtensions('.en_US.yml', '.en.yml', $filesPath);
+        } else {
+            $this->translationServiceAdapter->extractTranslationsFromArchive($archivePath, $filesPath, $locale);
         }
 
         $catalogue = new MessageCatalogue($locale);

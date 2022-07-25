@@ -144,15 +144,17 @@ class TranslationDownloader
      */
     public function loadTranslationsFromArchive(string $pathToArchiveFile, string $languageCode): void
     {
-        $targetDir = $this->getTmpDir('extracted_' . $languageCode);
-
-        $this->translationServiceAdapter->extractTranslationsFromArchive($pathToArchiveFile, $targetDir);
+        $targetDir = $this->getTmpDir('extracted_' . $languageCode . '_');
 
         // We treat "en_US" and "en" as the same language and we use "en" to designate its translations internally.
         // It may be removed once the default locale is changed to 'en_US" (BB-19560).
         if ('en' === $languageCode) {
-            // renames all *.en_US.yml translation files to *.en.yml
-            $this->changeFileExtensions('.en_US.yml', '.en.yml', $targetDir);
+            $this->translationServiceAdapter->extractTranslationsFromArchive($pathToArchiveFile, $targetDir, 'en_US');
+            // renames all *.en_US.csv translation files to *.en.csv
+            $this->changeFileExtensions('.en_US.csv', '.en.csv', $targetDir);
+        } else {
+            $this->translationServiceAdapter
+                ->extractTranslationsFromArchive($pathToArchiveFile, $targetDir, $languageCode);
         }
 
         $this->saveTranslationsToDatabase($languageCode, $targetDir);
