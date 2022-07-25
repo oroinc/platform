@@ -15,7 +15,7 @@ use Oro\Bundle\TranslationBundle\Test\TranslationArchiveGenerator;
 use Oro\Component\Testing\Logger\BufferingLogger;
 use Oro\Component\Testing\TempDirExtension;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Translation\Loader\CsvFileLoader;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -422,14 +422,14 @@ class OroTranslationServiceAdapterTest extends TestCase
 
         $targetDir = $this->getTempDir('extract_translations');
 
-        $this->adapter->extractTranslationsFromArchive($filePath, $targetDir);
-        $messagesPath = $targetDir . DIRECTORY_SEPARATOR . 'messages.uk_UA.yml';
-        $validationPath = $targetDir . DIRECTORY_SEPARATOR . 'validation.uk_UA.yml';
+        $this->adapter->extractTranslationsFromArchive($filePath, $targetDir, 'uk_UA');
+        $messagesPath = $targetDir . DIRECTORY_SEPARATOR . 'messages.uk_UA.csv';
+        $validationPath = $targetDir . DIRECTORY_SEPARATOR . 'validation.uk_UA.csv';
         self::assertFileExists($messagesPath);
         self::assertFileExists($validationPath);
         $actualTranslations = [
-            'messages'   => Yaml::parseFile($messagesPath),
-            'validation' => Yaml::parseFile($validationPath),
+            'messages'   => (new CsvFileLoader())->load($messagesPath, 'uk_UA', 'messages')->all('messages'),
+            'validation' => (new CsvFileLoader())->load($validationPath, 'uk_UA', 'validation')->all('validation'),
         ];
         self::assertEquals($expectedTranslations, $actualTranslations);
     }
@@ -444,7 +444,7 @@ class OroTranslationServiceAdapterTest extends TestCase
         $this->expectException(TranslationServiceAdapterException::class);
         $this->expectExceptionMessage('Cannot open the translation archive "' . $filePath . '".');
 
-        $this->adapter->extractTranslationsFromArchive($filePath, $targetDir);
+        $this->adapter->extractTranslationsFromArchive($filePath, $targetDir, 'uk_UA');
     }
 
     public function testExtractTranslationsFromArchiveThrowsExceptionIfExtractionFails(): void
@@ -465,7 +465,7 @@ class OroTranslationServiceAdapterTest extends TestCase
         $this->expectExceptionMessage('Failed to extract "' . $filePath . '" to "' . $targetDir . '".');
 
         try {
-            $this->adapter->extractTranslationsFromArchive($filePath, $targetDir);
+            $this->adapter->extractTranslationsFromArchive($filePath, $targetDir, 'uk_UA');
         } finally {
             chmod($targetDir, 0755);
         }
