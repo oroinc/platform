@@ -6,9 +6,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsChunkProcessor;
 use Oro\Bundle\DataAuditBundle\Async\AuditChangedEntitiesInverseCollectionsProcessor;
 use Oro\Bundle\DataAuditBundle\Async\Topics;
+use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
+use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\DataFixtures\LoadTestAuditDataWithOneToManyData;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
 use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -17,12 +21,14 @@ use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\NullLogger;
 
 class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
 {
     use MessageQueueExtension;
     use MessageQueueAssertTrait;
     use AuditChangedEntitiesExtensionTrait;
+    use JobsAwareTestTrait;
 
     /** @var AuditChangedEntitiesInverseCollectionsProcessor */
     private $processor;
@@ -39,6 +45,49 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
             ->get('oro_dataaudit.async.audit_changed_entities_inverse_collections');
         $this->chunkProcessor = $this->getContainer()
             ->get('oro_dataaudit.async.audit_changed_entities_inverse_collections_chunk');
+    }
+
+    public function testChunkProcessorProcessResult()
+    {
+        $testAuditOwner = $this->getReference('testAuditOwner');
+        $session = $this->getConnection()->createSession();
+        $job = $this->createUniqueJob();
+        $message = $this->createMessage([
+            'jobId' => $job->getId(),
+            'timestamp' => time(),
+            'transaction_id' => 'aTransactionId',
+            'entityData' => [
+                'entity_class' => TestAuditDataOwner::class,
+                'entity_id' => $testAuditOwner->getId(),
+                'change_set' => ['stringProperty' => [null, 'aNewValue']],
+                'set' => 'updated',
+                'fields' => [],
+            ]
+        ]);
+
+        $converter = $this->createMock(EntityChangesToAuditEntryConverter::class);
+        $logger = $this->createMock(NullLogger::class);
+        $chunkProcessor = new AuditChangedEntitiesInverseCollectionsChunkProcessor(
+            $converter,
+            $this->getJobRunner(),
+            $logger
+        );
+
+        $logger->expects($this->never())->method('log');
+        $processResult = $chunkProcessor->process($message, $session);
+        $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::ACK, $processResult);
+
+        $logger->expects($this->once())->method('warning');
+        $exception = new WrongDataAuditEntryStateException((new Audit())->setObjectName('ObjectName'));
+        $converter->method('convert')->willThrowException($exception);
+
+        $processResult = $chunkProcessor->process($message, $session);
+        $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::REQUEUE, $processResult);
+
+        $logger->expects($this->once())->method('error');
+        $converter->method('convert')->willThrowException(new \Exception('exception'));
+        $processResult = $chunkProcessor->process($message, $session);
+        $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkProcessor::REJECT, $processResult);
     }
 
     public function testCouldBeGetInverseCollectionFromContainerAsService(): void
@@ -102,8 +151,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
 
     private function processedMessages(): void
     {
-        $connection = $this->getConnection();
-        $session = $connection->createSession();
+        $session = $this->getConnection()->createSession();
         foreach (self::getSentMessages() as $sentMessage) {
             /** @var ClientMessage $message */
             $message = $sentMessage['message'];
@@ -145,11 +193,6 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
         }
     }
 
-    /**
-     * @param array $body
-     *
-     * @return Message
-     */
     private function createMessage(array $body): MessageInterface
     {
         $message = new Message();
