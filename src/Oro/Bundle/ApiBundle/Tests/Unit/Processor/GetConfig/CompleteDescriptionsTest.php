@@ -1192,6 +1192,48 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testFilterDescriptionWhenItExistsInConfigForEntityWithInherit()
+    {
+        $entityClass = TestEntityWithInherit::class;
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'testField' => null
+            ]
+        ];
+        $filters = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'testField' => [
+                    'description' => 'filter description'
+                ]
+            ]
+        ];
+
+        $this->resourcesProvider->expects(self::once())
+            ->method('isResourceKnown')
+            ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(true);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction('get_list');
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'testField' => [
+                        'description' => 'filter description'
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
     public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholderButNoAndCommonDescription()
     {
         $entityClass = TestEntity::class;
