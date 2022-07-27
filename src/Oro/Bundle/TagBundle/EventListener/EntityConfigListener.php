@@ -6,21 +6,19 @@ use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
+/**
+ * Deletes tags relations for $className in cases when "tagging" option has been disabled for it.
+ */
 class EntityConfigListener
 {
-    /** @var TagManager */
-    protected $tagManager;
+    private TagManager $tagManager;
 
-    /** @param TagManager $tagManager */
     public function __construct(TagManager $tagManager)
     {
         $this->tagManager = $tagManager;
     }
 
-    /**
-     * Deletes tags relations for $className in cases when "tagging" option has been disabled for it.
-     */
-    public function postFlush(PostFlushConfigEvent $event)
+    public function postFlush(PostFlushConfigEvent $event): void
     {
         foreach ($event->getModels() as $model) {
             if ($model instanceof EntityConfigModel) {
@@ -31,7 +29,7 @@ class EntityConfigListener
                 );
 
                 if (isset($changeSet['enabled']) && $changeSet['enabled'][0] && (!$changeSet['enabled'][1])) {
-                    $this->tagManager->deleteRelations($className);
+                    $this->tagManager->deleteAllTagging($className);
                 }
             }
         }

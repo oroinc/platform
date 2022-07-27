@@ -21,12 +21,14 @@ oro:
             search_result: Records tagged as "%name%"
 
         created_by.label:    Created By
-        entity_description:  Show records tagged by this tag
+        entity_description:  A non-hierarchical keyword assigned to a record. Can be used for filtering.
         entity_label:        Tag
         entity_plural_label: Tags
         entity_grid_all_view_label: All %entity_plural_label%
         id.label:            Id
-        name.label:          Name
+        name:
+            label:           Name
+            description:     The name of a tag.
         owner.label:         Owner
         tagging.label:       Tagging
         updated_by.label:    Updated By
@@ -58,6 +60,7 @@ oro:
 
         taxonomy:
             label:                  Taxonomy
+            description:            The taxonomic unit associated with a tag.
             entity_label:           Taxonomy
             entity_plural_label:    Taxonomies
             entity_grid_all_view_label: All %entity_plural_label%
@@ -69,7 +72,7 @@ oro:
             id.label:               Id
             name:
                 label:              Name
-                description:        A name of a taxonomic unit.
+                description:        The name of a taxonomic unit.
             organization.label:     Organization
             tags.label:             Tags
             created:

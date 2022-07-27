@@ -37,9 +37,6 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
     private $metadataProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigLoaderFactory */
-    private $configLoaderFactory;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagRegistry */
     private $configBagRegistry;
 
@@ -53,26 +50,26 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->metadataProvider = $this->createMock(MetadataProvider::class);
-        $this->configLoaderFactory = $this->createMock(ConfigLoaderFactory::class);
         $this->configBagRegistry = $this->createMock(ConfigBagRegistry::class);
+
+        $configLoaderFactory = $this->createMock(ConfigLoaderFactory::class);
+        $configLoaderFactory->expects(self::any())
+            ->method('getLoader')
+            ->willReturnMap([
+                [ConfigUtil::SUBRESOURCES, new SubresourcesConfigLoader()],
+                [ConfigUtil::ACTIONS, new ActionsConfigLoader()]
+            ]);
 
         $this->context = new CollectSubresourcesContext();
         $this->context->getRequestType()->add(RequestType::REST);
         $this->context->setVersion('1.1');
 
         $this->processor = new LoadFromConfigBag(
-            $this->configLoaderFactory,
+            $configLoaderFactory,
             $this->configBagRegistry,
             $this->configProvider,
             $this->metadataProvider
         );
-
-        $this->configLoaderFactory->expects(self::any())
-            ->method('getLoader')
-            ->willReturnMap([
-                [ConfigUtil::SUBRESOURCES, new SubresourcesConfigLoader()],
-                [ConfigUtil::ACTIONS, new ActionsConfigLoader()]
-            ]);
     }
 
     private function getApiResourceSubresources(ApiResource $resource): ApiResourceSubresourcesCollection

@@ -97,6 +97,11 @@ class JsValidationExtension extends AbstractTypeExtension
             unset($data['Callback']);
         }
 
+        if ($data['NotBlank']['allowNull'] ?? false) {
+            // Since an empty string equals to null on the frontend side
+            unset($data['NotBlank']);
+        }
+
         if ($data) {
             if (!empty($data['NotBlank'])) {
                 $view->vars['attr']['data-required'] = true;

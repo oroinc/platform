@@ -1,0 +1,31 @@
+dependencies:
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
+    - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser
+
+Oro\Bundle\TagBundle\Entity\Taxonomy:
+    taxonomy1:
+        name: 'taxonomy1'
+        backgroundColor: '#FF0000'
+        owner: '@user'
+        organization: '@organization'
+    taxonomy{2..3}:
+        name: 'taxonomy<current()>'
+        owner: '@user'
+        organization: '@organization'
+
+Oro\Bundle\TagBundle\Entity\Tag:
+    tag{1..2}:
+        name: 'tag<current()>'
+        owner: '@user'
+        organization: '@organization'
+        taxonomy: '@taxonomy1'
+    tag3:
+        name: 'tag3'
+        owner: '@user'
+        organization: '@organization'
+
+Oro\Bundle\TestFrameworkBundle\Entity\TestActivity:
+    activity{1..3}:
+        message: 'Activity <current()>'
+        owner: '@user'
+        organization: '@organization'

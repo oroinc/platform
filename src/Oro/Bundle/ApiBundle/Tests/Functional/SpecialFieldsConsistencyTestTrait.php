@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
@@ -32,8 +33,12 @@ trait SpecialFieldsConsistencyTestTrait
         $entities = $this->getEntities();
         foreach ($entities as $entity) {
             [$entityClass, $excludedActions] = $entity;
-            $entityType = $this->getEntityType($entityClass);
-            if ($this->isSkippedEntity($entityClass, $entityType)) {
+            $entityType = ValueNormalizerUtil::tryConvertToEntityType(
+                $this->getValueNormalizer(),
+                $entityClass,
+                $this->getRequestType()
+            );
+            if (!$entityType || $this->isSkippedEntity($entityClass, $entityType)) {
                 continue;
             }
 
