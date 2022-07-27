@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 class SetDefaultOrderingTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrineHelper;
 
     /** @var SetDefaultOrdering */
@@ -28,10 +28,31 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         $this->context->setConfig(new EntityDefinitionConfig());
     }
 
+    public function testProcessWhenSetDefaultOrderingIsAlreadyProcessed()
+    {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityIdentifierFieldNamesForClass');
+
+        $this->context->setProcessed(SetDefaultOrdering::OPERATION_NAME);
+        $this->context->setCriteria(new Criteria());
+        $this->processor->process($this->context);
+
+        self::assertEquals([], $this->context->getCriteria()->getOrderings());
+        self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
+    }
+
     public function testProcessWhenCriteriaObjectDoesNotExist()
     {
+        $this->doctrineHelper->expects(self::never())
+            ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityIdentifierFieldNamesForClass');
+
         $this->processor->process($this->context);
         self::assertNull($this->context->getCriteria());
+        self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
     public function testProcessWhenCriteriaObjectAlreadyHasOrdering()
@@ -41,10 +62,16 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         $criteria = new Criteria();
         $criteria->orderBy($ordering);
 
+        $this->doctrineHelper->expects(self::never())
+            ->method('getManageableEntityClass');
+        $this->doctrineHelper->expects(self::never())
+            ->method('getEntityIdentifierFieldNamesForClass');
+
         $this->context->setCriteria($criteria);
         $this->processor->process($this->context);
 
         self::assertEquals($ordering, $this->context->getCriteria()->getOrderings());
+        self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
     public function testProcessForManageableEntity()
@@ -61,6 +88,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(['id' => 'ASC'], $this->context->getCriteria()->getOrderings());
+        self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
     public function testProcessForNotManageableEntity()
@@ -79,5 +107,6 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals(['originalId' => 'ASC'], $this->context->getCriteria()->getOrderings());
+        self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 }

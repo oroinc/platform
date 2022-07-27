@@ -19,7 +19,7 @@ class SearchTest extends RestJsonApiTestCase
     {
         parent::setUp();
         // do the reindex because by some unknown reasons the search index is empty
-        // after upgrade from old application version, e.g. from the version 2.0.0
+        // after upgrade from old application version
         $indexer = self::getContainer()->get('oro_search.search.engine.indexer');
         $indexer->reindex(User::class);
         $indexer->reindex(BusinessUnit::class);

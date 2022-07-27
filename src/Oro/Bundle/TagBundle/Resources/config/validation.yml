@@ -3,15 +3,20 @@ Oro\Bundle\TagBundle\Entity\Tag:
         - Oro\Bundle\OrganizationBundle\Validator\Constraints\OrganizationUniqueEntity: name
     properties:
         name:
-            - NotBlank:     ~
+            - NotBlank: ~
             - Length:
-                max:        50
+                max: 50
         organization:
             - NotBlank: ~
 
 Oro\Bundle\TagBundle\Entity\Taxonomy:
     properties:
         name:
-            - NotBlank:     ~
+            - NotBlank: ~
             - Length:
-                max:        50
+                max: 50
+        backgroundColor:
+            - NotBlank:
+                  allowNull: true
+            - CssColor:
+                  formats: hex_long

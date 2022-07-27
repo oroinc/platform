@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\SearchBundle\Api\Model\SearchItem;
 use Oro\Bundle\SearchBundle\Api\SearchEntityListFilterHelper;
-use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndex;
+use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -21,18 +21,18 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class LoadEntitiesBySearchText implements ProcessorInterface
 {
-    private SearchIndex $searchIndex;
+    private SearchIndexer $searchIndexer;
     private SearchEntityListFilterHelper $searchEntityListFilterHelper;
     private ValueNormalizer $valueNormalizer;
     private EventDispatcherInterface $eventDispatcher;
 
     public function __construct(
-        SearchIndex $searchIndex,
+        SearchIndexer $searchIndexer,
         SearchEntityListFilterHelper $searchEntityListFilterHelper,
         ValueNormalizer $valueNormalizer,
         EventDispatcherInterface $eventDispatcher
     ) {
-        $this->searchIndex = $searchIndex;
+        $this->searchIndexer = $searchIndexer;
         $this->searchEntityListFilterHelper = $searchEntityListFilterHelper;
         $this->valueNormalizer = $valueNormalizer;
         $this->eventDispatcher = $eventDispatcher;
@@ -74,7 +74,7 @@ class LoadEntitiesBySearchText implements ProcessorInterface
 
         $criteria = $context->getCriteria();
         $limit = $criteria->getMaxResults();
-        $searchResult = $this->searchIndex->simpleSearch(
+        $searchResult = $this->searchIndexer->simpleSearch(
             $context->getFilterValues()->get('searchText')?->getValue(),
             $criteria->getFirstResult(),
             (null !== $limit && $context->getConfig()->getHasMore()) ? $limit + 1 : $limit,

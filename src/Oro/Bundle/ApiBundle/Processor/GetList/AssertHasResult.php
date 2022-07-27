@@ -12,24 +12,23 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AssertHasResult implements ProcessorInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var GetListContext $context */
+
         if (!$context->hasResult()) {
             $query = $context->getQuery();
-            if (null === $query) {
-                throw new NotFoundHttpException('Unsupported request.');
-            } else {
-                throw new NotFoundHttpException(
-                    sprintf(
-                        'Unsupported query type: %s.',
-                        is_object($query) ? get_class($query) : gettype($query)
-                    )
-                );
+            if (null !== $query) {
+                throw new NotFoundHttpException(sprintf(
+                    'Unsupported query type: %s.',
+                    \is_object($query) ? \get_class($query) : gettype($query)
+                ));
             }
-        } elseif (!is_array($context->getResult())) {
+            throw new NotFoundHttpException('Unsupported request.');
+        }
+        if (!\is_array($context->getResult())) {
             throw new NotFoundHttpException('Getting a list of entities failed.');
         }
     }
