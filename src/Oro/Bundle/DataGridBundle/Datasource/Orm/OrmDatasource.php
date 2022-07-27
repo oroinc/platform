@@ -4,10 +4,9 @@ namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
+use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\ConfigProcessorInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
@@ -20,7 +19,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 /**
  * Allows to create datagrids from ORM queries.
  */
-class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterface
+class OrmDatasource implements DatasourceInterface, BindParametersInterface
 {
     const TYPE = 'orm';
 
@@ -45,7 +44,7 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var ParameterBinderInterface */
+    /** @var ParameterBinder */
     protected $parameterBinder;
 
     /** @var QueryHintResolver */
@@ -57,7 +56,7 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     public function __construct(
         ConfigProcessorInterface $processor,
         EventDispatcherInterface $eventDispatcher,
-        ParameterBinderInterface $parameterBinder,
+        ParameterBinder $parameterBinder,
         QueryHintResolver $queryHintResolver,
         QueryExecutorInterface $queryExecutor
     ) {
@@ -169,13 +168,13 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
     /**
      * {@inheritdoc}
      */
-    public function bindParameters(array $datasourceToDatagridParameters, $append = true)
+    public function bindParameters(array $datasourceToDatagridParameters, bool $append = true): void
     {
         if (!$this->datagrid) {
             throw new BadMethodCallException('Method is not allowed when datasource is not processed.');
         }
 
-        return $this->parameterBinder->bindParameters($this->datagrid, $datasourceToDatagridParameters, $append);
+        $this->parameterBinder->bindParameters($this->datagrid, $datasourceToDatagridParameters, $append);
     }
 
     public function __clone()
