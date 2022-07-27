@@ -168,15 +168,6 @@ class OrmDatasource implements DatasourceInterface, ParameterBinderAwareInterfac
 
     /**
      * {@inheritdoc}
-     *  @deprecated since 2.0.
-     */
-    public function getParameterBinder()
-    {
-        return $this->parameterBinder;
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function bindParameters(array $datasourceToDatagridParameters, $append = true)
     {

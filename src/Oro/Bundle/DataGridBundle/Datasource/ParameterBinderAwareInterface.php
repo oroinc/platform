@@ -8,15 +8,6 @@ namespace Oro\Bundle\DataGridBundle\Datasource;
 interface ParameterBinderAwareInterface
 {
     /**
-     * Gets parameter binder.
-     *
-     * @deprecated since 2.0.
-     *
-     * @return ParameterBinderInterface
-     */
-    public function getParameterBinder();
-
-    /**
      * Binds datagrid parameters to datasource query.
      *
      * @see ParameterBinderInterface::bindParameters
