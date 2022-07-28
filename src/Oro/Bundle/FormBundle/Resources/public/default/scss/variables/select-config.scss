@@ -26,7 +26,7 @@ $select-border-radius: $base-ui-element-border-radius !default;
 $select-background-color: $base-ui-element-bg-color !default;
 $select-color: get-color('additional', 'dark') !default;
 $select-disable-platform-style: true !default;
-$select-arrow-color: get-color('additional', 'dark') !default;
+$select-arrow-color: $base-ui-element-arrow-color !default;
 $select-bg: url('data:image/svg+xml;utf8,<svg width="10" height="6" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M0 .027l4.99 5.954L9.98.027z" fill="#{str-replace(string.unquote('#{$select-arrow-color}'), '#', '%23')}" fill-rule="evenodd"/></svg>') no-repeat right 8px center get-color('additional', 'ultra') !default;
 
 $select-border-color-hover-state: get-color('additional', 'dark') !default;
