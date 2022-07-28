@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
+use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
@@ -58,7 +58,7 @@ class CellSelectionListener
         $datagrid = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
 
-        if (!$datasource instanceof ParameterBinderAwareInterface) {
+        if (!$datasource instanceof BindParametersInterface) {
             return;
         }
 

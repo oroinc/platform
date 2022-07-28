@@ -16,6 +16,8 @@ layout:
                     blockType: container
                 __datagrid_toolbar_actions:
                     blockType: container
+                __datagrid_toolbar_actions_panel:
+                    blockType: container
                 __datagrid_toolbar_page_size:
                     blockType: block
                 __datagrid_toolbar_pagination:
@@ -33,7 +35,7 @@ layout:
                             __datagrid_toolbar_mass_actions: ~
                             __datagrid_toolbar_extra_actions: ~
                         __datagrid_toolbar_tools_container:
-                            __datagrid_toolbar_actions: ~
+                            __datagrid_toolbar_actions:
+                                __datagrid_toolbar_actions_panel: ~
                             __datagrid_toolbar_page_size: ~
                         __datagrid_toolbar_pagination: ~
-

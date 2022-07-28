@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -14,7 +13,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 /**
  * Binds parameters from datagrid to it's datasource query
  */
-class ParameterBinder implements ParameterBinderInterface
+class ParameterBinder
 {
     /**
      * Binds datagrid parameters to datasource query.
