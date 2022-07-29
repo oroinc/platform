@@ -47,11 +47,19 @@ services:
         calls:
             - [setExtensionManager, ['@oro_migration.migrations.extension_manager']]
             - [setNameGenerator, ['@oro_migration.db_id_name_generator']]
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_migration.migration.pre_up.listener:
         class: Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
+
+    oro_migration.migration.reset_container.listener:
+        class: Oro\Bundle\MigrationBundle\EventListener\ResetContainerMigrationListener
+        calls:
+            - [setContainer, ['@service_container']]
+        tags:
+            - { name: kernel.event_listener, event: oro_migration.migration.post_up, method: onPostUp }
 
     oro_migration.migrations.extension_manager:
         class: Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
