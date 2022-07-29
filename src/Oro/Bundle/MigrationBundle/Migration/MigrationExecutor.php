@@ -15,30 +15,25 @@ use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
+use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
+use Oro\Bundle\MigrationBundle\Event\PostUpMigrationLifeCycleEvent;
 use Oro\Bundle\MigrationBundle\Exception\InvalidNameException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Execute list of migrations
+ */
 class MigrationExecutor
 {
     /**
      * @var MigrationQueryExecutor
      */
     protected $queryExecutor;
-
-    /**
-     * @var OroDataCacheManager
-     */
-    protected $cacheManager;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var MigrationExtensionManager
-     */
-    protected $extensionManager;
+    protected OroDataCacheManager $cacheManager;
+    protected LoggerInterface $logger;
+    protected ?MigrationExtensionManager $extensionManager = null;
+    protected ?EventDispatcherInterface $eventDispatcher = null;
 
     public function __construct(MigrationQueryExecutor $queryExecutor, OroDataCacheManager $cacheManager)
     {
@@ -75,6 +70,11 @@ class MigrationExecutor
         $this->extensionManager->setDatabasePlatform($connection->getDatabasePlatform());
     }
 
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
     /**
      * Executes UP method for the given migrations
      *
@@ -102,6 +102,8 @@ class MigrationExecutor
                 $item->setFailed();
                 $failedMigrations[] = get_class($migration);
             }
+
+            $this->onPostUp($item);
         }
 
         if (!empty($failedMigrations)) {
@@ -332,5 +334,15 @@ class MigrationExecutor
             $platform->supportsSequences() ? $sm->listSequences() : [],
             $sm->createSchemaConfig()
         );
+    }
+
+    protected function onPostUp(MigrationState $state): void
+    {
+        if ($this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(
+                new PostUpMigrationLifeCycleEvent($state),
+                MigrationEvents::MIGRATION_POST_UP
+            );
+        }
     }
 }
