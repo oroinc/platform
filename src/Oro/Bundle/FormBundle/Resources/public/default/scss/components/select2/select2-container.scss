@@ -3,6 +3,7 @@
 .select2-container {
     display: inline-block;
     width: 100%;
+    padding: 0;
 
     background: $select2-container-background;
 
@@ -316,26 +317,16 @@
 
 /* stylelint-disable no-descending-specificity */
 .oro-select2 {
-    padding: 0;
-
     &--size {
         &-m {
             .select2-choice {
                 padding: $select2-container-size-m;
-
-                .select2-arrow {
-                    right: $select2-container-size-m;
-                }
             }
         }
 
         &-s {
             .select2-choice {
                 padding: $select2-container-size-s;
-
-                .select2-arrow {
-                    right: $select2-container-size-s;
-                }
             }
         }
     }

@@ -15,7 +15,7 @@ $base-ui-element-color: get-color('additional', 'darker') !default;
 $base-ui-element-placeholder-color: get-color('additional', 'middle');
 $base-ui-element-height-size-m: 38px !default;
 
-$base-ui-element-arrow-color: ('additional', 'dark') !default;
+$base-ui-element-arrow-color: get-color('additional', 'dark') !default;
 
 $base-ui-element-border-color-focus: transparent !default;
 $base-ui-element-focus-style: 0 0 0 2px get-color('ui', 'focus'),
