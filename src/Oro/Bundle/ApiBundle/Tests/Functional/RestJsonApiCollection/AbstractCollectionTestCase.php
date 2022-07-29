@@ -12,11 +12,6 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 abstract class AbstractCollectionTestCase extends RestJsonApiTestCase
 {
-    protected function setUp(): void
-    {
-        self::markTestSkipped('Must be fixed in BAP-21553');
-    }
-
     abstract protected function getCollectionEntityClass(): string;
 
     abstract protected function getCollectionItemEntityClass(): string;

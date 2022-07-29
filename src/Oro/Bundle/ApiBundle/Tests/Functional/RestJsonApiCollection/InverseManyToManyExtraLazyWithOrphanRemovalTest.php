@@ -12,8 +12,6 @@ class InverseManyToManyExtraLazyWithOrphanRemovalTest extends AbstractManyToMany
 {
     protected function setUp(): void
     {
-        self::markTestSkipped('Must be fixed in BAP-21553');
-
         parent::setUp();
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/collection/imtm_extra_lazy_with_orphan_removal.yml'
