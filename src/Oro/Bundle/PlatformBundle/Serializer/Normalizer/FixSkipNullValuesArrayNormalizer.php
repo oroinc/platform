@@ -82,6 +82,8 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface, Serialize
         foreach ($data as $index => $value) {
             if (\is_array($value) && !empty($value)) {
                 $value = self::removeNullValues($value, $format, $context, $normalizer);
+            } elseif (\is_object($value) && null !== $normalizer) {
+                $value = $normalizer->normalize($value, $format, $context);
             }
             $result[$index] = $value;
         }
