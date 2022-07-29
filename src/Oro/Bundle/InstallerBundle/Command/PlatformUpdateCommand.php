@@ -39,6 +39,12 @@ class PlatformUpdateCommand extends AbstractCommand
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force the execution')
             ->addOption('skip-assets', null, InputOption::VALUE_NONE, 'Skip install/build of frontend assets')
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink the assets instead of copying them')
+            ->addOption(
+                'relative-symlink',
+                null,
+                InputOption::VALUE_NONE,
+                'Symlink the assets using relative path instead of absolute'
+            )
             ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->setDescription('Updates the application state.')
@@ -64,6 +70,11 @@ instead of copying the assets (it may be useful during development):
 
   <info>php %command.full_name% --force --symlink</info>
 
+If the <info>--relative-symlink</info> option is provided, the command creates symlinks using relative paths instead
+of absolute:
+
+  <info>php %command.full_name% --force --relative-symlink</info>
+
 The <info>--skip-download-translations</info> and <info>--skip-translations</info> options can be used
 to skip the step of downloading translations (already downloaded translations
 will be applied if present), or skip applying the translations completely:
@@ -76,6 +87,7 @@ HELP
             ->addUsage('--force')
             ->addUsage('--force --skip-assets')
             ->addUsage('--force --symlink')
+            ->addUsage('--force --relative-symlink')
             ->addUsage('--force --skip-download-translations')
             ->addUsage('--force --skip-translations')
         ;
@@ -178,6 +190,11 @@ HELP
             $assetsOptions = [];
             if ($input->hasOption('symlink') && $input->getOption('symlink')) {
                 $assetsOptions['--symlink'] = true;
+            }
+
+            if ($input->hasOption('relative-symlink') && $input->getOption('relative-symlink')) {
+                $assetsOptions['--symlink'] = true;
+                $assetsOptions['--relative'] = true;
             }
 
             $commandExecutor
