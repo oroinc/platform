@@ -4,9 +4,13 @@ namespace Oro\Bundle\EntityConfigBundle\Migration;
 
 use Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\MigrationBundle\Migration\ResetContainerMigration;
 use Psr\Log\LoggerInterface;
 
-class UpdateEntityConfigMigrationQuery implements MigrationQuery
+/**
+ * Update entity configs
+ */
+class UpdateEntityConfigMigrationQuery implements MigrationQuery, ResetContainerMigration
 {
     /**
      * @var CommandExecutor
