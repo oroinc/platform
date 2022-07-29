@@ -34,6 +34,25 @@ class TaggableHelper
     }
 
     /**
+     * Gets a list of taggable entities.
+     *
+     * @return string[]
+     */
+    public function getTaggableEntities(): array
+    {
+        $taggableEntities = [];
+        $configs = $this->tagConfigProvider->getConfigs();
+        foreach ($configs as $config) {
+            $entityClass = $config->getId()->getClassName();
+            if (self::isImplementsTaggable($entityClass) || $config->is('enabled')) {
+                $taggableEntities[] = $entityClass;
+            }
+        }
+
+        return $taggableEntities;
+    }
+
+    /**
      * Checks if tags should be automatically rendered in the entity view
      *
      * @param $entity

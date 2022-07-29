@@ -167,11 +167,7 @@ class RegisterDynamicFilters extends RegisterFilters
     {
         return Error::createValidationError(Constraint::FILTER)
             ->setInnerException($e)
-            ->setSource(
-                ErrorSource::createByParameter(
-                    $e->getFilterValue()->getSourceKey() ?: $filterKey
-                )
-            );
+            ->setSource(ErrorSource::createByParameter($e->getFilterValue()->getSourceKey() ?: $filterKey));
     }
 
     private function renameFilters(FilterCollection $filterCollection, array $renameMap): void

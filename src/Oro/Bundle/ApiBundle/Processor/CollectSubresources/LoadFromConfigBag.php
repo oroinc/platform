@@ -24,11 +24,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class LoadFromConfigBag extends LoadSubresources
 {
-    /** @var ConfigLoaderFactory */
-    private $configLoaderFactory;
-
-    /** @var ConfigBagRegistry */
-    private $configBagRegistry;
+    private ConfigLoaderFactory $configLoaderFactory;
+    private ConfigBagRegistry $configBagRegistry;
 
     public function __construct(
         ConfigLoaderFactory $configLoaderFactory,
@@ -44,13 +41,13 @@ class LoadFromConfigBag extends LoadSubresources
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */
 
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-        $accessibleResources = \array_fill_keys($context->getAccessibleResources(), true);
+        $accessibleResources = array_fill_keys($context->getAccessibleResources(), true);
         $subresources = $context->getResult();
 
         $resources = $context->getResources();
@@ -120,9 +117,10 @@ class LoadFromConfigBag extends LoadSubresources
                             $this->getSubresourceExcludedActions($resource)
                         );
                         $this->updateSubresourceTargetFromConfig($subresource, $subresourceConfig);
+                        $this->updateSubresourceActions($subresource, $subresourceConfig);
                     }
                 } catch (\Throwable $e) {
-                    throw new \RuntimeException(\sprintf(
+                    throw new \RuntimeException(sprintf(
                         'Invalid configuration for "%s" subresource of "%s" entity. %s',
                         $associationName,
                         $entityClass,
@@ -137,18 +135,12 @@ class LoadFromConfigBag extends LoadSubresources
                     $subresource,
                     $subresourceConfig
                 );
-            }
-            if (SubresourceUtil::isAccessibleSubresource($subresource, $accessibleResources)) {
                 $this->updateSubresourceActions($subresource, $subresourceConfig);
             }
         }
     }
 
     /**
-     * @param string      $entityClass
-     * @param string      $version
-     * @param RequestType $requestType
-     *
      * @return SubresourceConfig[] [association name => SubresourceConfig, ...]
      */
     private function getSubresourceConfigs(string $entityClass, string $version, RequestType $requestType): array
@@ -235,7 +227,7 @@ class LoadFromConfigBag extends LoadSubresources
     ): void {
         $targetClass = $subresourceConfig->getTargetClass();
         if ($targetClass && $targetClass !== $subresource->getTargetClassName()) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The target class for "%s" subresource of "%s" entity'
                 . ' cannot be overridden by a configuration.'
                 . 'Existing target class: %s. Target class from a configuration: %s.',
@@ -248,7 +240,7 @@ class LoadFromConfigBag extends LoadSubresources
         if (($targetClass || $subresourceConfig->hasTargetType())
             && $subresourceConfig->isCollectionValuedAssociation() !== $subresource->isCollection()
         ) {
-            throw new \RuntimeException(\sprintf(
+            throw new \RuntimeException(sprintf(
                 'The target type for "%s" subresource of "%s" entity'
                 . ' cannot be overridden by a configuration.'
                 . 'Existing target type: %s. Target type from a configuration: %s.',
@@ -307,10 +299,7 @@ class LoadFromConfigBag extends LoadSubresources
     ): void {
         $subresourceAction = $subresource->getAction($actionName);
         if (null !== $subresourceAction && !$subresourceAction->hasExcluded()) {
-            $action = null;
-            if (null !== $actions) {
-                $action = $actions->getAction($actionName);
-            }
+            $action = $actions?->getAction($actionName);
             if (null === $action) {
                 $subresourceAction->setExcluded(false);
             } elseif ($action->isExcluded()) {
@@ -323,15 +312,11 @@ class LoadFromConfigBag extends LoadSubresources
 
     private function loadSubresourcesConfig(array $subresourcesConfig): SubresourcesConfig
     {
-        $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES);
-
-        return $actionsLoader->load($subresourcesConfig);
+        return $this->configLoaderFactory->getLoader(ConfigUtil::SUBRESOURCES)->load($subresourcesConfig);
     }
 
     private function loadActionsConfig(array $actionsConfig): ActionsConfig
     {
-        $actionsLoader = $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS);
-
-        return $actionsLoader->load($actionsConfig);
+        return $this->configLoaderFactory->getLoader(ConfigUtil::ACTIONS)->load($actionsConfig);
     }
 }

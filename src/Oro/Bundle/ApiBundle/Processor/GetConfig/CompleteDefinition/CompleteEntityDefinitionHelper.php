@@ -588,7 +588,7 @@ class CompleteEntityDefinitionHelper
                 } else {
                     $targetField = $targetDefinition->addField(
                         $targetPropertyName,
-                        $targetFullDefinition->findField($targetPropertyName, true)
+                        $this->findTargetField($targetFullDefinition, $targetPropertyName)
                     );
                     $targetField->setExcluded();
                 }
@@ -625,6 +625,18 @@ class CompleteEntityDefinitionHelper
 
             $targetDefinition = $targetField->getOrCreateTargetEntity();
         }
+    }
+
+    private function findTargetField(
+        EntityDefinitionConfig $definition,
+        string $propertyName
+    ): ?EntityDefinitionFieldConfig {
+        $field = $definition->findField($propertyName, true);
+        if (null === $field) {
+            $field = $definition->findField($propertyName);
+        }
+
+        return $field;
     }
 
     /**

@@ -26,15 +26,23 @@ trusted_data:
         Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql:
             setTextOrderBy:
                 index: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getSearchResult:
+                maxResults: true
     properties:
         Oro\Bundle\SearchBundle\Engine\Orm\BaseDriver:
             createQueryBuilder:
                 entityName: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getSearchResult:
+                firstResult: true
     safe_methods:
         Oro\Bundle\SearchBundle\Formatter\ResultFormatter:
             getEntityIdentifier: true
         Oro\Bundle\SearchBundle\Engine\FulltextIndexManager:
             getQuery: true
+        Oro\Bundle\SearchBundle\Api\Model\LoadEntityIdsBySearchQuery:
+            getOrderBy: true
     check_methods_safety:
         Oro\Bundle\SearchBundle\Engine\Orm\PdoPgsql:
             getJoinAlias: true

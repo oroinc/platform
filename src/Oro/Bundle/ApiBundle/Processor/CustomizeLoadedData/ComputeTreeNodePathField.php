@@ -14,23 +14,12 @@ use Oro\Component\EntitySerializer\EntitySerializer;
  */
 class ComputeTreeNodePathField implements ProcessorInterface
 {
-    /** @var EntitySerializer */
-    protected $entitySerializer;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var string */
-    protected $pathField;
-
-    /** @var string */
-    protected $materializedPathField = 'materializedPath';
-
-    /** @var string */
-    protected $materializedPathDelimiter = '_';
-
-    /** @var string|null */
-    protected $sourceEntityClass;
+    protected EntitySerializer $entitySerializer;
+    protected DoctrineHelper $doctrineHelper;
+    protected string $pathField;
+    protected string $materializedPathField = 'materializedPath';
+    protected string $materializedPathDelimiter = '_';
+    protected ?string $sourceEntityClass = null;
 
     public function __construct(
         EntitySerializer $entitySerializer,
@@ -60,7 +49,7 @@ class ComputeTreeNodePathField implements ProcessorInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
@@ -99,10 +88,8 @@ class ComputeTreeNodePathField implements ProcessorInterface
         $context->setData($data);
     }
 
-    protected function getNodeEntityClass(
-        CustomizeLoadedDataContext $context,
-        EntityDefinitionConfig $config
-    ): string {
+    protected function getNodeEntityClass(CustomizeLoadedDataContext $context, EntityDefinitionConfig $config): string
+    {
         return $this->doctrineHelper->getManageableEntityClass(
             $this->sourceEntityClass ?? $context->getClassName(),
             $config
@@ -110,15 +97,12 @@ class ComputeTreeNodePathField implements ProcessorInterface
     }
 
     /**
-     * @param array  $data
-     * @param string $idFieldName
-     *
      * @return array [node id => [parent node id, ...], ...]
      */
     protected function getParentNodes(array $data, string $idFieldName): array
     {
         $parentNodes = [];
-        foreach ($data as $key => $item) {
+        foreach ($data as $item) {
             $parentIds = [];
             $materializedPath = explode($this->materializedPathDelimiter, $item[$this->materializedPathField]);
             // skip the last element because it is the same as the current node id
@@ -143,12 +127,6 @@ class ComputeTreeNodePathField implements ProcessorInterface
     }
 
     /**
-     * @param string                 $nodeEntityClass
-     * @param string                 $nodeEntityIdFieldName
-     * @param array                  $nodeIds
-     * @param EntityDefinitionConfig $config
-     * @param array                  $normalizationContext
-     *
      * @return array [node id => node data, ...]
      */
     protected function loadNodesData(
@@ -163,7 +141,6 @@ class ComputeTreeNodePathField implements ProcessorInterface
         $nodes = $this->entitySerializer->serialize($qb, $config, $normalizationContext);
 
         $result = [];
-        $config->getIdentifierFieldNames();
         foreach ($nodes as $node) {
             $result[$node[$nodeEntityIdFieldName]] = $node;
         }

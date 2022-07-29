@@ -3,9 +3,7 @@ services:
         class: Oro\Bundle\TagBundle\Entity\TagManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - 'Oro\Bundle\TagBundle\Entity\Tag'
-            - 'Oro\Bundle\TagBundle\Entity\Tagging'
+            - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@router'

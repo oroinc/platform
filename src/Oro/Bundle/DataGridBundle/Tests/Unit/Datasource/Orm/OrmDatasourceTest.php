@@ -9,8 +9,8 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
@@ -28,7 +28,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
-    /** @var ParameterBinderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ParameterBinder|\PHPUnit\Framework\MockObject\MockObject */
     private $parameterBinder;
 
     /** @var QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject */
@@ -44,7 +44,7 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
     {
         $this->processor = $this->createMock(YamlProcessor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->parameterBinder = $this->createMock(ParameterBinderInterface::class);
+        $this->parameterBinder = $this->createMock(ParameterBinder::class);
         $this->queryHintResolver = $this->createMock(QueryHintResolver::class);
         $this->queryExecutor = $this->createMock(QueryExecutorInterface::class);
 
