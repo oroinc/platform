@@ -34,8 +34,6 @@ class JobExecutor
 {
     const CONNECTOR_NAME = 'oro_importexport';
 
-    /** @deprecated since 2.1, please use JOB_IMPORT_VALIDATION_FROM_CSV instead */
-    const JOB_VALIDATE_IMPORT_FROM_CSV   = 'entity_import_validation_from_csv';
     const JOB_EXPORT_TO_CSV              = 'entity_export_to_csv';
     const JOB_EXPORT_TEMPLATE_TO_CSV     = 'entity_export_template_to_csv';
     const JOB_IMPORT_FROM_CSV            = 'entity_import_from_csv';
