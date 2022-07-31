@@ -18,7 +18,7 @@ class PhoneProviderPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $tagName = 'oro_address.phone_provider';
         $providers = [];
@@ -34,11 +34,12 @@ class PhoneProviderPass implements CompilerPassInterface
             }
         }
         if ($providers) {
-            $providers = $this->inverseSortByPriorityAndFlatten($providers);
+            ksort($providers);
+            $providers = array_merge(...array_values($providers));
         }
 
         $map = [];
-        foreach ($providers as list($id, $class)) {
+        foreach ($providers as [$id, $class]) {
             $map[$class][] = $id;
         }
 
