@@ -4,9 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
 /**
  * Provides abstract description for pager functionality for datagrids based on ORM data source.
- *
- * Class AbstractPager
- * @package Oro\Bundle\DataGridBundle\Extension\Pager
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
@@ -17,7 +14,6 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
     protected $nbResults = 0;
     protected $cursor = 1;
     protected $currentMaxLink = 1;
-    protected $maxRecordLimit = false;
     protected $maxPageLinks = 10;
 
     // used by iterator interface
