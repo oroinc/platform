@@ -185,8 +185,6 @@ oro:
             user_first_name:     First name of logged in user
             user_last_name:      Last name of logged in user
             user_full_name:      Full name of logged in user
-            app_short_name:      Short name of application #@deprecated since 1.4 Provider\SystemVariablesProvider
-            app_full_name:       Full name of application  #@deprecated since 1.4 Provider\SystemVariablesProvider
             app_url:             Application URL
             current_datetime:    Current date & time
             current_date:        Current date

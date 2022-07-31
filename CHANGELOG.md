@@ -10,7 +10,8 @@ The current file describes significant changes in the code that may affect the u
 ### Removed
 
 #### UIBundle
-* `oroui/js/app/views/input-widget/checkbox`was removed; use pure CSS checkbox customization instead.
+* `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
+* The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
 
 ## 5.1.0-alpha.1 (2022-05-31)
 [Show detailed list of changes](incompatibilities-5-1-alpha.md)

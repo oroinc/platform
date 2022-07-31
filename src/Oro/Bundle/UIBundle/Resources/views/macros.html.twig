@@ -32,10 +32,6 @@
     {%- set tooltip = tooltip_raw -%}
     {%- if tooltip_translatable is not same as(false) -%}
         {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({})) %}
-        {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
-        {% if tooltip == tooltip_raw %}
-            {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({}), "tooltips") %}
-        {% endif %}
     {%- endif -%}
     {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
