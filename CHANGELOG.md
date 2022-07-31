@@ -9,6 +9,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### DataGridBundle
+* The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead. 
+* The deprecated `source / acl_resource` datagrid option was removed. Use the `acl_resource` option instead.
+
 #### UIBundle
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
