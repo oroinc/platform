@@ -6,8 +6,9 @@
 <li>
     <a href="#" data-url="{{ path(audit_path, {entity:entity_class, id:id}) }}"
         title="{{ 'oro.dataaudit.change_history.title'|trans({'%item%': title}) }}"
-        {{ UI.renderWidgetDataAttributes({
+        {{ UI.renderWidgetAttributes({
             'type': 'dialog',
+            'createOnEvent' : 'click',
             'options': {
                 'dialogOptions': {
                     'allowMaximize': true,
