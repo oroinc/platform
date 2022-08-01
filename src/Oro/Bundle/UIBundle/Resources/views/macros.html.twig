@@ -32,10 +32,6 @@
     {%- set tooltip = tooltip_raw -%}
     {%- if tooltip_translatable is not same as(false) -%}
         {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({})) %}
-        {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
-        {% if tooltip == tooltip_raw %}
-            {% set tooltip = tooltip_raw|trans(tooltip_parameters|default({}), "tooltips") %}
-        {% endif %}
     {%- endif -%}
     {%- if tooltip is not empty -%}
         {% set details_anchor = details_anchor|default(null) %}
@@ -628,7 +624,6 @@
         'path': '#'
     } %}
 
-
     {% if (parameters.dataId is defined) %}
         {% set data = linkParams.data|merge({'id': parameters.dataId}) %}
         {% set linkParams = linkParams|merge({ 'data': data }) %}
@@ -864,20 +859,6 @@
     {% endif %}
     {{ UIMacro.renderPageComponentAttributes(pageComponent) }}
 {% endmacro %}
-{#
-    @deprecated
-    Please use renderWidgetAttributes() with createOnEvent option specified instead
-#}
-{% macro renderWidgetDataAttributes(options) %}
-    {% import _self as UIMacro %}
-
-    {% if (options.createOnEvent is not defined) %}
-        {% set options = options|merge({
-            'createOnEvent' : options.event|default('click')
-        }) %}
-    {% endif %}
-    {{ UIMacro.renderWidgetAttributes(options) }}
-{% endmacro %}
 
 {% macro renderAttributes(options, prefix) %}
     {% for name, value in options %}
@@ -1104,7 +1085,6 @@
 
     {{ UIMacro.buttonType(parameters) }}
 {% endmacro %}
-
 
 {#
     Button macros with custom button type
@@ -1552,6 +1532,7 @@
         <span class="{{ classNames }}" aria-hidden="true"></span>
     {% endif %}
 {% endmacro %}
+
 {#
     Render sortable list for configuration options
     Parameters:

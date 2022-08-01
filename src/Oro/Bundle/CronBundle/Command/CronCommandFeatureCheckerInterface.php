@@ -10,7 +10,7 @@ namespace Oro\Bundle\CronBundle\Command;
  * * a common logic for all CRON commands
  * * implement a feature related logic for specific CRON commands
  * * discard a common logic for some CRON commands if needed
- * * extends logic of the {@see \Oro\Bundle\CronBundle\Command\CronCommandInterface::isActive} method
+ * * extends logic of the {@see \Oro\Bundle\CronBundle\Command\CronCommandActivationInterface::isActive} method
  *   without a need to extend a CRON command
  */
 interface CronCommandFeatureCheckerInterface

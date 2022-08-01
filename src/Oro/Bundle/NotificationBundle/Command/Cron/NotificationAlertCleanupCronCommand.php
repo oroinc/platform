@@ -4,7 +4,7 @@ namespace Oro\Bundle\NotificationBundle\Command\Cron;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,20 +14,19 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 /**
  * Deletes resolved notification alerts that is older than 30 days.
  */
-class NotificationAlertCleanupCronCommand extends Command implements CronCommandInterface
+class NotificationAlertCleanupCronCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     public const DEFAULT_OUTDATED_ALERT_INTERVAL =  '30 days';
 
     /** @var string */
     protected static $defaultName = 'oro:cron:notification:alerts:cleanup';
 
-    private ManagerRegistry $registry;
+    private ManagerRegistry $doctrine;
 
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $doctrine)
     {
         parent::__construct();
-
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
     }
 
     protected function configure(): void
@@ -46,18 +45,10 @@ class NotificationAlertCleanupCronCommand extends Command implements CronCommand
     /**
      * {@inheritDoc}
      */
-    public function isActive(): bool
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var EntityRepository $entityRepository */
-        $entityRepository = $this->registry->getRepository(NotificationAlert::class);
+        $entityRepository = $this->doctrine->getRepository(NotificationAlert::class);
 
         $outdatedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
         $outdatedInterval->sub(\DateInterval::createFromDateString(self::DEFAULT_OUTDATED_ALERT_INTERVAL));

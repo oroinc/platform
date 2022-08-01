@@ -38,9 +38,7 @@ class ConsumptionExtensionCompilerPassTest extends \PHPUnit\Framework\TestCase
                 ['addTopicName', [Topics::EXPORT]],
                 ['addTopicName', [Topics::POST_EXPORT]],
                 ['addTopicName', [Topics::SEND_IMPORT_NOTIFICATION]],
-                ['addTopicName', [Topics::SAVE_IMPORT_EXPORT_RESULT]],
-                ['addTopicName', [Topics::PRE_HTTP_IMPORT]],
-                ['addTopicName', [Topics::HTTP_IMPORT]]
+                ['addTopicName', [Topics::SAVE_IMPORT_EXPORT_RESULT]]
             ],
             $extensionDef->getMethodCalls()
         );

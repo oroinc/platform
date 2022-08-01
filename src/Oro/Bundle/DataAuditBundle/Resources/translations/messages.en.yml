@@ -71,7 +71,9 @@ oro:
             field:
                 items:
                     auditable: Auditable
-                    propagate: Append audit log to the related entity
+                    propagate:
+                        label: Append audit log to the related entity
+                        tooltip: Use the option to enable reverse side audit for the relations.
 
         condition_builder:
             criteria:

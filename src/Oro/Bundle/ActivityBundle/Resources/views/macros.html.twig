@@ -67,10 +67,11 @@
     <a href="#" role="button" title="{{ 'oro.activity.contexts.placeholder'|trans|e('html_attr') }}"
        class="dropdown-item"
        data-url="<%- routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': relatedActivityClass }) %>"
-        {{ UI.renderWidgetDataAttributes({
+        {{ UI.renderWidgetAttributes({
             'type' : 'dialog',
             'multiple' : true,
             'refresh-widget-alias': 'activity-list-widget',
+            'createOnEvent' : 'click',
             'options' : {
                 'alias': 'activity-context-dialog',
                 'dialogOptions' : {

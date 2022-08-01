@@ -5,7 +5,8 @@ namespace Oro\Bundle\IntegrationBundle\Command;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
@@ -21,7 +22,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * Schedules synchronization for integrations.
  */
-class SyncCommand extends Command implements CronCommandInterface
+class SyncCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandActivationInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:cron:integration:sync';
@@ -44,12 +47,18 @@ class SyncCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '*/5 * * * *';
     }
 
-    public function isActive()
+    /**
+     * {@inheritDoc}
+     */
+    public function isActive(): bool
     {
         /** @var ChannelRepository $integrationRepository */
         $integrationRepository = $this->entityManager->getRepository(Integration::class);

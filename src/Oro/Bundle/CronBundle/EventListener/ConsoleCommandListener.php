@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CronBundle\EventListener;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\FeatureToggleBundle\EventListener\ConsoleCommandListener as BaseListener;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 
@@ -16,7 +16,7 @@ class ConsoleCommandListener extends BaseListener
      */
     public function onConsoleCommand(ConsoleCommandEvent $event): void
     {
-        if ($event->getCommand() instanceof CronCommandInterface) {
+        if ($event->getCommand() instanceof CronCommandScheduleDefinitionInterface) {
             return;
         }
 

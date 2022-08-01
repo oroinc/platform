@@ -47,10 +47,11 @@
             <a href="#" title="{{ 'oro.activity.contexts.placeholder'|trans|e('html_attr') }}"
                class="dropdown-item"
                data-url="<%- routing.generate('oro_activity_context', {'id': relatedActivityId, 'activity': '{{ entityClass|replace({'\\': '_'}) }}' }) %>"
-                    {{ UI.renderWidgetDataAttributes({
+                    {{ UI.renderWidgetAttributes({
                     'type' : 'dialog',
                     'multiple' : true,
                     'refresh-widget-alias': 'activity-list-widget',
+                    'createOnEvent' : 'click',
                     'options' : {
                         'alias': 'activity-context-dialog',
                         'dialogOptions' : {
@@ -76,10 +77,11 @@
             <a href="#" title="{{ 'oro.email.reply'|trans }}"
                class="dropdown-item"
                data-url="<%- routing.generate('oro_email_email_reply', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-               {{ UI.renderWidgetDataAttributes({
+               {{ UI.renderWidgetAttributes({
                 'type': 'dialog',
                 'multiple': true,
                 'refresh-widget-alias': 'activity-list-widget',
+                'createOnEvent' : 'click',
                 'options': {
                     'alias': 'email-dialog',
                     'dialogOptions': {
@@ -103,10 +105,11 @@
         <a href="#" title="{{ 'oro.email.reply_all'|trans|e('html_attr') }}"
            class="dropdown-item"
            data-url="<%- routing.generate('oro_email_email_reply_all', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-                {{ UI.renderWidgetDataAttributes({
+                {{ UI.renderWidgetAttributes({
                     'type': 'dialog',
                     'multiple': true,
                     'refresh-widget-alias': 'activity-list-widget',
+                    'createOnEvent' : 'click',
                     'options': {
                         'alias': 'email-dialog',
                         'dialogOptions': {
@@ -130,10 +133,11 @@
             <a href="#" title="{{ 'oro.email.forward'|trans }}"
                class="dropdown-item"
                data-url="<%- routing.generate('oro_email_email_forward', {'id': relatedActivityId, 'entityClass': targetEntityData.class, 'entityId': targetEntityData.id}) %>"
-               {{ UI.renderWidgetDataAttributes({
+               {{ UI.renderWidgetAttributes({
                 'type': 'dialog',
                 'multiple': true,
                 'refresh-widget-alias': 'activity-list-widget',
+                'createOnEvent' : 'click',
                 'options': {
                     'alias': 'forward-dialog',
                     'dialogOptions': {

@@ -125,10 +125,7 @@ class PreImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     public function testImportProcessShouldReturnSubscribedTopics()
     {
-        $expectedSubscribedTopics = [
-            Topics::PRE_IMPORT,
-            Topics::PRE_HTTP_IMPORT
-        ];
+        $expectedSubscribedTopics = [Topics::PRE_IMPORT];
         $this->assertEquals($expectedSubscribedTopics, PreImportMessageProcessor::getSubscribedTopics());
     }
 

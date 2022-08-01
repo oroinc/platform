@@ -2,75 +2,63 @@
 
 namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\ResultIterator;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\AST\FromClause;
+use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
 use Doctrine\ORM\Query\AST\OrderByClause;
 use Doctrine\ORM\Query\AST\OrderByItem;
 use Doctrine\ORM\Query\AST\PathExpression;
+use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
+use Doctrine\ORM\Query\AST\SelectClause;
+use Doctrine\ORM\Query\AST\SelectExpression;
+use Doctrine\ORM\Query\AST\SelectStatement;
+use Doctrine\ORM\Query\ParserResult;
 use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\ReduceOrderByWalker;
-use Oro\Bundle\TestFrameworkBundle\Tests\Unit\ORM\Query\ResultIterator\SqlWalkerHelperTrait;
 
 class ReduceOrderByWalkerTest extends \PHPUnit\Framework\TestCase
 {
-    use SqlWalkerHelperTrait;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
     /** @var ReduceOrderByWalker */
     private $reduceOrderByWalker;
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
-
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
-
-        $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->any())
-            ->method('getEntityManager')
-            ->willReturn($em);
+        $rootMetadata = new ClassMetadata('Entity\Root');
+        $rootMetadata->setIdentifier(['e']);
 
         $this->reduceOrderByWalker = new ReduceOrderByWalker(
-            $query,
-            null,
-            $this->getQueryComponents()
+            $this->createMock(AbstractQuery::class),
+            $this->createMock(ParserResult::class),
+            ['e' => ['map' => null, 'metadata' => $rootMetadata]]
         );
     }
 
-    public function testWalkSelectStatementShouldRemoveUnnecessaryOrderBy()
+    private function getAst(): SelectStatement
     {
-        $ast = $this->getDefaultAST();
-        $ast->orderByClause = new OrderByClause(
-            [
-                new OrderByItem(
-                    new PathExpression(
-                        PathExpression::TYPE_STATE_FIELD,
-                        'email',
-                        'email'
-                    )
-                ),
-                new OrderByItem(
-                    new PathExpression(
-                        PathExpression::TYPE_STATE_FIELD,
-                        'o',
-                        'o'
-                    )
-                ),
-            ]
+        return new SelectStatement(
+            new SelectClause([new SelectExpression('e', 'id', null)], false),
+            new FromClause([
+                new IdentificationVariableDeclaration(new RangeVariableDeclaration('Test', 'e'), null, [])
+            ])
         );
+    }
+
+    public function testWalkSelectStatementShouldRemoveUnnecessaryOrderBy(): void
+    {
+        $ast = $this->getAst();
+        $ast->orderByClause = new OrderByClause([
+            new OrderByItem(new PathExpression(PathExpression::TYPE_STATE_FIELD, 'email', 'email')),
+            new OrderByItem(new PathExpression(PathExpression::TYPE_STATE_FIELD, 'e', 'e')),
+        ]);
 
         $this->reduceOrderByWalker->walkSelectStatement($ast);
+
         $this->assertCount(1, $ast->orderByClause->orderByItems);
     }
 
-    public function testWalkShouldSkipIfThereIsNoOrderBy()
+    public function testWalkShouldSkipIfThereIsNoOrderBy(): void
     {
-        $ast = $this->getDefaultAST();
+        $ast = $this->getAst();
 
         $this->reduceOrderByWalker->walkSelectStatement($ast);
 

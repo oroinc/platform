@@ -3,14 +3,14 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\IntegrationBundle\Command;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper;
 use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Symfony\Component\Console\Command\Command;
@@ -21,7 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Deletes old integration status records.
  */
-class CleanupCommand extends Command implements CronCommandInterface
+class CleanupCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandActivationInterface
 {
     public const BATCH_SIZE = 100;
     public const FAILED_STATUSES_INTERVAL = '1 month';
@@ -30,23 +32,28 @@ class CleanupCommand extends Command implements CronCommandInterface
     /** @var string */
     protected static $defaultName = 'oro:cron:integration:cleanup';
 
-    private ManagerRegistry $registry;
+    private ManagerRegistry $doctrine;
     private NativeQueryExecutorHelper $nativeQueryExecutorHelper;
 
-    public function __construct(ManagerRegistry $registry, NativeQueryExecutorHelper $nativeQueryExecutorHelper)
+    public function __construct(ManagerRegistry $doctrine, NativeQueryExecutorHelper $nativeQueryExecutorHelper)
     {
         parent::__construct();
-
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->nativeQueryExecutorHelper = $nativeQueryExecutorHelper;
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '0 1 * * *';
     }
 
-    public function isActive()
+    /**
+     * {@inheritDoc}
+     */
+    public function isActive(): bool
     {
         $completedInterval = new \DateTime('now', new \DateTimeZone('UTC'));
         $completedInterval->sub(\DateInterval::createFromDateString(self::DEFAULT_COMPLETED_STATUSES_INTERVAL));
@@ -55,8 +62,7 @@ class CleanupCommand extends Command implements CronCommandInterface
         $failedInterval->sub(\DateInterval::createFromDateString(self::FAILED_STATUSES_INTERVAL));
 
         $qb = $this->getOldIntegrationStatusesQueryBuilder($completedInterval, $failedInterval)
-            ->select('COUNT(status.id)')
-        ;
+            ->select('COUNT(status.id)');
 
         $count = $qb->getQuery()->getSingleScalarResult();
 
@@ -150,9 +156,7 @@ HELP
 
     protected function processDeletion(array $ids, string $className): void
     {
-        /** @var EntityManager $em */
-        $em = $this->registry->getManagerForClass($className);
-        $em->getRepository($className)
+        $this->doctrine->getRepository($className)
             ->createQueryBuilder('entity')
             ->delete($className, 'entity')
             ->where('entity.id IN (:ids)')
@@ -165,10 +169,7 @@ HELP
         \DateTime $completedInterval,
         \DateTime $failedInterval
     ): QueryBuilder {
-        /** @var EntityManager $em */
-        $em = $this->registry->getManagerForClass(Status::class);
-
-        $queryBuilder = $em->getRepository(Status::class)
+        $queryBuilder = $this->doctrine->getRepository(Status::class)
             ->createQueryBuilder('status');
 
         $expr = $queryBuilder->expr();
@@ -204,10 +205,9 @@ HELP
      */
     protected function prepareExcludes(): array
     {
-        /** @var EntityManager $em */
-        $em = $this->registry->getManagerForClass(Status::class);
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Status::class);
 
-        /** @var Connection $connection */
         $connection = $em->getConnection();
 
         $tableName = $this->nativeQueryExecutorHelper->getTableName(Status::class);

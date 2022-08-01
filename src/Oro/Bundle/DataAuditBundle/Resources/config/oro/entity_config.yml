@@ -74,7 +74,7 @@ entity_config:
                                 Yes:        true
                             placeholder:    false
                             block:          other
-                            label:          oro.dataaudit.entity_config.field.items.propagate
+                            label:          oro.dataaudit.entity_config.field.items.propagate.label
                             tooltip:        oro.dataaudit.entity_config.field.items.propagate.tooltip
                     immutable:
                         options:

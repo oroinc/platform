@@ -16,11 +16,8 @@ class WidgetProviderPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /** @var string */
-    private $serviceId;
-
-    /** @var string */
-    private $tagName;
+    private string $serviceId;
+    private string $tagName;
 
     public function __construct(string $serviceId, string $tagName)
     {
@@ -31,15 +28,17 @@ class WidgetProviderPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $providers = [];
         $taggedServices = $container->findTaggedServiceIds($this->tagName);
         foreach ($taggedServices as $id => $tags) {
             $providers[$this->getPriorityAttribute($tags[0])][] = new Reference($id);
         }
-
-        $providers = $this->inverseSortByPriorityAndFlatten($providers);
+        if ($providers) {
+            ksort($providers);
+            $providers = array_merge(...array_values($providers));
+        }
 
         $container->getDefinition($this->serviceId)
             ->setArgument(0, new IteratorArgument($providers));

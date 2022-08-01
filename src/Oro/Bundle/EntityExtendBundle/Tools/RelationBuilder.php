@@ -13,8 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
  */
 class RelationBuilder
 {
-    /** @var ConfigManager */
-    protected $configManager;
+    private ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
     {
@@ -168,37 +167,6 @@ class RelationBuilder
     }
 
     /**
-     * @param string $targetEntityName
-     * @param string $sourceEntityName
-     * @param string $relationName
-     * @param string $relationKey
-     * @deprecated since 2.0. This method is not used anywhere and will be removed
-     */
-    public function addManyToOneRelationTargetSide(
-        $targetEntityName,
-        $sourceEntityName,
-        $relationName,
-        $relationKey
-    ) {
-        $extendConfig = $this->configManager->getProvider('extend')->getConfig($targetEntityName);
-
-        // add relation to config
-        $relations = $extendConfig->get('relation', false, []);
-
-        $targetFieldId = new FieldConfigId('extend', $sourceEntityName, $relationName, RelationType::MANY_TO_ONE);
-
-        $relations[$relationKey] = [
-            'field_id'        => false,
-            'owner'           => false,
-            'target_entity'   => $sourceEntityName,
-            'target_field_id' => $targetFieldId
-        ];
-        $extendConfig->set('relation', $relations);
-
-        $this->configManager->persist($extendConfig);
-    }
-
-    /**
      * @param string $className
      * @param array  $options
      */
@@ -222,7 +190,7 @@ class RelationBuilder
      * @param array  $options
      * @param string $fieldName
      */
-    protected function updateConfigs($className, $options, $fieldName = null)
+    private function updateConfigs($className, $options, $fieldName = null)
     {
         foreach ($options as $scope => $scopeValues) {
             $config     = $this->configManager->getProvider($scope)->getConfig($className, $fieldName);

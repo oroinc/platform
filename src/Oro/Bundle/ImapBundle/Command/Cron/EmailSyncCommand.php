@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ImapBundle\Command\Cron;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizerInterface;
 use Oro\Bundle\EmailBundle\Sync\Model\SynchronizationProcessorSettings;
 use Oro\Component\Log\OutputLogger;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Synchronizes emails via IMAP.
  */
-class EmailSyncCommand extends Command implements CronCommandInterface
+class EmailSyncCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     /** The maximum number of email origins which can be synchronized */
     public const MAX_TASKS = -1;
@@ -43,14 +43,12 @@ class EmailSyncCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';
-    }
-
-    public function isActive()
-    {
-        return true;
     }
 
     /**
