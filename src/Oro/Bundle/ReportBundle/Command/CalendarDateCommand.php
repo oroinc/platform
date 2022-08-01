@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ReportBundle\Command;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\ReportBundle\Entity\Manager\CalendarDateManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Generates calendar date records.
  */
-class CalendarDateCommand extends Command implements CronCommandInterface
+class CalendarDateCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     private const STATUS_SUCCESS = 0;
 
@@ -27,14 +27,12 @@ class CalendarDateCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '01 00 * * *';
-    }
-
-    public function isActive()
-    {
-        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

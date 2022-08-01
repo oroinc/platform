@@ -11,7 +11,8 @@ use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Job\BatchStatus;
 use Oro\Bundle\BatchBundle\Job\DoctrineJobRepository;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -20,7 +21,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Deletes old batch job records.
  */
-class CleanupCommand extends Command implements CronCommandInterface
+class CleanupCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandActivationInterface
 {
     public const FLUSH_BATCH_SIZE = 100;
 
@@ -38,15 +41,18 @@ class CleanupCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '0 1 * * *';
     }
 
     /**
-     * @return bool
+     * {@inheritDoc}
      */
-    public function isActive()
+    public function isActive(): bool
     {
         $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $date->sub(\DateInterval::createFromDateString($this->batchCleanupInterval));

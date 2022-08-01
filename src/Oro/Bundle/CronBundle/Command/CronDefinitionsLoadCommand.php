@@ -35,8 +35,9 @@ class CronDefinitionsLoadCommand extends Command
 The <info>%command.name%</info> command updates cron commands definitions stored in the database.
 
 The previously loaded command definitions are removed from the database, and all command definitions
-from <info>oro:cron</info> namespace that implement <info>\Oro\Bundle\CronBundle\Command\CronCommandInterface</info>
-are saved to the database. 
+from <info>oro:cron</info> namespace that implement
+<info>Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface</info>
+are saved to the database.
 
   <info>php %command.full_name%</info>
 
@@ -78,7 +79,7 @@ HELP
 
     private function createSchedule(
         OutputInterface $output,
-        CronCommandInterface $command,
+        CronCommandScheduleDefinitionInterface $command,
         string $name,
         array $arguments = []
     ): Schedule {
@@ -95,9 +96,9 @@ HELP
 
     private function checkCommand(OutputInterface $output, Command $command): bool
     {
-        if (!$command instanceof CronCommandInterface) {
+        if (!$command instanceof CronCommandScheduleDefinitionInterface) {
             $output->writeln(
-                '<info>Skipping, the command does not implement CronCommandInterface</info>'
+                '<info>Skipping, the command does not implement CronCommandScheduleDefinitionInterface</info>'
             );
 
             return false;

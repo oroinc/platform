@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace Oro\Bundle\ReminderBundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandActivationInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
 use Oro\Bundle\ReminderBundle\Model\ReminderSenderInterface;
@@ -15,28 +16,35 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Sends reminders that are due now.
  */
-class SendRemindersCommand extends Command implements CronCommandInterface
+class SendRemindersCommand extends Command implements
+    CronCommandScheduleDefinitionInterface,
+    CronCommandActivationInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:cron:send-reminders';
 
-    private ManagerRegistry $registry;
+    private ManagerRegistry $doctrine;
     private ReminderSenderInterface $sender;
 
-    public function __construct(ManagerRegistry $registry, ReminderSenderInterface $sender)
+    public function __construct(ManagerRegistry $doctrine, ReminderSenderInterface $sender)
     {
-        $this->registry = $registry;
-        $this->sender = $sender;
-
         parent::__construct();
+        $this->doctrine = $doctrine;
+        $this->sender = $sender;
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';
     }
 
-    public function isActive()
+    /**
+     * {@inheritDoc}
+     */
+    public function isActive(): bool
     {
         $count = $this->getReminderRepository()->countRemindersToSend();
 
@@ -66,7 +74,6 @@ HELP
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $reminders = $this->getReminderRepository()->findRemindersToSend();
-
         if (!$reminders) {
             $output->writeln('<info>No reminders to sent</info>');
             return 0;
@@ -76,10 +83,9 @@ HELP
             sprintf('<comment>Reminders to send:</comment> %d', count($reminders))
         );
 
-        $em = $this->registry->getManager();
+        $em = $this->doctrine->getManager();
+        $em->beginTransaction();
         try {
-            $em->beginTransaction();
-
             $sentCount = $this->sendReminders($output, $reminders);
 
             $output->writeln(sprintf('<info>Reminders sent:</info> %d', $sentCount));
@@ -94,29 +100,21 @@ HELP
         return 0;
     }
 
-    /**
-     * Send reminders
-     *
-     * @param OutputInterface $output
-     * @param Reminder[]      $reminders
-     * @return int Count of sent reminders
-     */
-    protected function sendReminders(OutputInterface $output, array $reminders): int
+    private function sendReminders(OutputInterface $output, array $reminders): int
     {
-        $result = 0;
-
         foreach ($reminders as $reminder) {
             $this->sender->push($reminder);
         }
-
         $this->sender->send();
 
+        $result = 0;
+        /** @var Reminder $reminder */
         foreach ($reminders as $reminder) {
-            if (Reminder::STATE_SENT == $reminder->getState()) {
-                $result += 1;
+            if (Reminder::STATE_SENT === $reminder->getState()) {
+                $result++;
             }
 
-            if (Reminder::STATE_FAIL == $reminder->getState()) {
+            if (Reminder::STATE_FAIL === $reminder->getState()) {
                 $exception = $reminder->getFailureException();
                 $output->writeln(sprintf('<error>Failed to send reminder with id=%d</error>', $reminder->getId()));
                 $output->writeln(sprintf('<info>%s</info>: %s', $exception['class'], $exception['message']));
@@ -126,8 +124,8 @@ HELP
         return $result;
     }
 
-    protected function getReminderRepository(): ReminderRepository
+    private function getReminderRepository(): ReminderRepository
     {
-        return $this->registry->getRepository('OroReminderBundle:Reminder');
+        return $this->doctrine->getRepository(Reminder::class);
     }
 }

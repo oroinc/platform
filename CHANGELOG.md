@@ -9,6 +9,11 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### CronBundle
+* `Oro\Bundle\CronBundle\Command\CronCommandInterface` has been removed.
+  Use `Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface`
+  and `Oro\Bundle\CronBundle\Command\CronCommandActivationInterface` instead.
+
 #### DataGridBundle
 * The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead. 
 * The deprecated `source / acl_resource` datagrid option was removed. Use the `acl_resource` option instead.

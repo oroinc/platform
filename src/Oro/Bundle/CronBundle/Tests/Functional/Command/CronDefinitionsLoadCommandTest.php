@@ -44,7 +44,7 @@ class CronDefinitionsLoadCommandTest extends WebTestCase
 
         self::assertStringContainsString(
             'Processing command "oro:cron:definitions:load": '.
-            'Skipping, the command does not implement CronCommandInterface',
+            'Skipping, the command does not implement CronCommandScheduleDefinitionInterface',
             $result
         );
     }
