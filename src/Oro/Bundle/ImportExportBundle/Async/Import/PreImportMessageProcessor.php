@@ -128,9 +128,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public static function getSubscribedTopics()
     {
-        // Topic PRE_HTTP_IMPORT subscribed only for possibility to process already existing messages in message queue
-        // This is possible after the upgrade to the new application version
-        return [Topics::PRE_IMPORT, Topics::PRE_HTTP_IMPORT];
+        return [Topics::PRE_IMPORT];
     }
 
     /**
