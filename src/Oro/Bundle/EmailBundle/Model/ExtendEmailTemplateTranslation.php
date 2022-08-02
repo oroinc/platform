@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Model;
 
 /**
- * Extend class which allow to make EmailTemplateLocalization entity extandable
+ * This class is required to make EmailTemplateTranslation entity extendable.
  */
 class ExtendEmailTemplateTranslation
 {

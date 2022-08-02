@@ -7,7 +7,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class EmailTemplateLocalizationTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateTranslationTest extends \PHPUnit\Framework\TestCase
 {
     use EntityTestCaseTrait;
 
