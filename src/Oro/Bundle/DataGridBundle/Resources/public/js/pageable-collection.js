@@ -572,6 +572,11 @@ define([
             this.trigger('updateState', this, this.state);
         },
 
+        patchInitialState(statePatch) {
+            this.initialState = _.extend({}, this.initialState, statePatch);
+            this.trigger('patchInitialState', this, this.initialState);
+        },
+
         /**
          * @inheritdoc
          */

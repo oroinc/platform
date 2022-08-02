@@ -1173,12 +1173,17 @@
         isForm - flag what scroll block mut contain the form
         contentAttributes - additional attributes for block content
         useSubBlockDivider - indicates if 'row-fluid-divider' css class should be added to a row when there are more than one subblocks
+        options
+            [
+                'initSectionInstantly' - boolean, if is true -- aditional attribute added to the section element,
+                    in order to ignore delayed initialization
+            ]
 #}
-{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider, headerLinkContent = '') %}
+{% macro scrollBlock(blockId, title, subblocks, isForm, contentAttributes, useSubBlockDivider, headerLinkContent = '', options = {}) %}
     {% import _self as UIMacro %}
 
     {% set cols = subblocks|length %}
-    <div class="responsive-section">
+    <div class="responsive-section"{% if options.initSectionInstantly is defined and options.initSectionInstantly %} data-init-section-instantly{% endif %}>
         <h4 class="scrollspy-title">{{ title }}{% if headerLinkContent is defined %}{{ headerLinkContent }}{% endif %}</h4>
         <div id="{{ blockId }}" class="scrollspy-nav-target"></div>
         <div class="section-content">
@@ -1262,7 +1267,17 @@
         {% endif %}
         <div data-spy="scroll" data-target="#{{ dataTarget }}" data-offset="1" class="scrollspy container-fluid scrollable-container{% if isForm %} form-container{% endif %}">
             {% for scrollBlock in dataBlocks %}
-                {{ UIMacro.scrollBlock("scroll-" ~ loop.index, scrollBlock.title, scrollBlock.subblocks, isForm, scrollBlock.content_attr is defined ? scrollBlock.content_attr : null, scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true, scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null) }}
+                {{ UIMacro.scrollBlock(
+                    "scroll-" ~ loop.index,
+                    scrollBlock.title,
+                    scrollBlock.subblocks,
+                    isForm,
+                    scrollBlock.content_attr is defined ? scrollBlock.content_attr : null,
+                    scrollBlock.useSubBlockDivider is defined ? scrollBlock.useSubBlockDivider : true,
+                    scrollBlock.headerLinkContent is defined ? scrollBlock.headerLinkContent : null,
+                    scrollBlock.options is defined ? scrollBlock.options : {}
+                ) }}
+
             {% endfor %}
             {% if data.hiddenData is defined or isForm %}
                 <div class="hide" data-skip-input-widgets data-layout="separate">

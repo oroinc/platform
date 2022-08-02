@@ -21,18 +21,19 @@ define(function(require) {
          * @inheritdoc
          */
         initialize: function(options) {
-            const self = this;
             // TODO: uncomment when scrol to section will be fixed
             // var index = this.$(window.location.hash).parents('.responsive-section').index();
             //
             // index = index !== -1 ? index : 0;
             const index = 0;
 
-            this.$('.responsive-section').not(':nth-child(' + (index + 1) + ')').each(function(index, el) {
-                self.subview('form-section-loading-' + index, new FormSectionLoadingView({
-                    el: $(el)
-                }));
-            });
+            this.$('.responsive-section')
+                .not(':nth-child(' + (index + 1) + '),[data-init-section-instantly]')
+                .each((index, el) => {
+                    this.subview('form-section-loading-' + index, new FormSectionLoadingView({
+                        el: $(el)
+                    }));
+                });
 
             FormLoadingView.__super__.initialize.call(this, options);
         },

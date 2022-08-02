@@ -1012,9 +1012,7 @@ define(function(require) {
                 });
             });
 
-            this.listenTo(mediator, 'datagrid:changeColumnParam:' + this.name, function(columnName, option, value) {
-                this.changeColumnParam(columnName, option, value);
-            });
+            this.listenTo(mediator, `datagrid:changeColumnParam:${this.name}`, this.changeColumnParam);
 
             this.listenTo(mediator, 'datagrid:doRefresh:' + this.name, function() {
                 if (!this.refreshAction) {
@@ -1046,8 +1044,8 @@ define(function(require) {
          * @param value
          */
         changeColumnParam: function(columnName, option, value) {
-            this.columns.each(function(column) {
-                if (column.get('name') === columnName && option in column) {
+            this.columns.each(column => {
+                if (column.get('name') === columnName) {
                     column.set(option, value);
                 }
             });
