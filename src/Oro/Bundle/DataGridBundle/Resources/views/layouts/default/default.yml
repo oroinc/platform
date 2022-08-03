@@ -1,0 +1,4 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: '@OroDataGrid/layouts/default/default.html.twig'

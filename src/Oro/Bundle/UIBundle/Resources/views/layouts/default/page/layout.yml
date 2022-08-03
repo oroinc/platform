@@ -1,0 +1,87 @@
+layout:
+    actions:
+        - '@setBlockTheme':
+            themes: '@OroUI/layouts/default/page/layout.html.twig'
+        - '@addTree':
+            items:
+                head:
+                    blockType: head
+                title:
+                    blockType: title
+                    options:
+                        defaultValue: '=data["title_provider"].getTitle(context["route_name"], params)'
+                        value: '=defaultValue'
+                        params: []
+                meta_charset:
+                    blockType: meta
+                    options:
+                        charset: 'utf-8'
+                meta_viewport:
+                    blockType: meta
+                    options:
+                        name: viewport
+                        content: 'width=device-width, initial-scale=1'
+                theme_icon:
+                    blockType: external_resource
+                    options:
+                        visible: '=data["theme"].getIcon(context["theme"])!=null'
+                        href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
+                        rel: shortcut icon
+                styles:
+                    blockType: style
+                    options:
+                        src: '=data["theme"].getStylesOutput(context["theme"])'
+                print_styles:
+                    blockType: style
+                    options:
+                        src: '=data["theme"].getStylesOutput(context["theme"], "print_styles")'
+                        media: 'print'
+                body:
+                    blockType: body
+                wrapper:
+                      blockType: container
+                page_container:
+                    blockType: container
+                page_main:
+                    blockType: container
+                page_main_content:
+                    blockType: container
+                page_main_header:
+                    blockType: container
+                page_sidebar:
+                    blockType: container
+                page_content:
+                    blockType: container
+                layout_js:
+                    blockType: container
+                layout_js_modules_config:
+                    blockType: js_modules_config
+                    options:
+                        publicPath: '="build/" ~ context["theme"] ~ "/"'
+                layout_js_build_scripts:
+                    blockType: js_build
+                    options:
+                        src: '="build/" ~ context["theme"] ~ "/app.js"'
+                skip_to_content:
+                    blockType: container
+            tree:
+                root:
+                    head:
+                        title: ~
+                        meta_charset: ~
+                        meta_viewport: ~
+                        theme_icon: ~
+                        styles: ~
+                        print_styles: ~
+                    body:
+                        wrapper:
+                            skip_to_content: ~
+                            page_container:
+                                page_main:
+                                    page_main_content:
+                                        page_main_header: ~
+                                        page_sidebar: ~
+                                        page_content: ~
+                        layout_js:
+                            layout_js_modules_config: ~
+                            layout_js_build_scripts: ~

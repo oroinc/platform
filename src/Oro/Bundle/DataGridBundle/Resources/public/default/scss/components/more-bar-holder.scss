@@ -1,0 +1,41 @@
+/* @theme: default; */
+
+.more-bar-holder {
+    position: relative;
+
+    display: inline-block;
+
+    .dropdown-toggle {
+        display: inline-flex;
+        align-items: center;
+
+        padding: $more-bar-holder-toggle-offset;
+        height: $more-bar-holder-toggle-size;
+
+        font-size: $more-bar-holder-toggle-size;
+        line-height: 0;
+        text-decoration: none;
+
+        color: inherit;
+
+        // Hide bootstrap arrow
+        &::before {
+            // Override bootstrap styles
+            // stylelint-disable-next-line declaration-no-important
+            content: none !important;
+        }
+
+        .action-cell & {
+            margin: 0;
+        }
+    }
+
+    .dropdown {
+        display: inline-block;
+    }
+
+    .dropdown-menu__placeholder + .dropdown-toggle,
+    .dropdown-toggle:hover {
+        text-decoration: none;
+    }
+}

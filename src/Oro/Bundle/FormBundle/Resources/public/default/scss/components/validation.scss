@@ -6,6 +6,9 @@
 .validation-warning {
     @extend .notification;
 
+    display: block;
+    color: $validation-failed-color;
+
     &--lite {
         @extend .notification--lite;
     }

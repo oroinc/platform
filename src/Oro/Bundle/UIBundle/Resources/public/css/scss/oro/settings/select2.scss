@@ -300,9 +300,11 @@ $select2-drop-highlighted-font-style: italic !default;
 
 $select2-drop-auto-width: auto !default;
 
-$select2-drop-mask-position: absolute !default;
-$select2-drop-mask-left: 0 !default;
+$select2-drop-mask-position: fixed !default;
 $select2-drop-mask-top: 0 !default;
+$select2-drop-mask-bottom: 0 !default;
+$select2-drop-mask-right: 0 !default;
+$select2-drop-mask-left: 0 !default;
 $select2-drop-mask-z-index: 9998 !default;
 
 $select2-tree-autocomplete-choice-item-color: $body-color !default;

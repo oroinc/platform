@@ -24,12 +24,13 @@ dynamic-imports:
         - oroworkflow/js/app/views/workflow-form-widget-view
         - oroworkflow/transition-dialog-widget
 map:
-    "*":
+    '*':
         jsplumb: oroworkflow/js/extend/jsplumb
     oroworkflow/js/extend/jsplumb:
-        jsplumb: "@oroinc/jsplumb/dist/js/jsPlumb-1.7.10"
+        jsplumb: '@oroinc/jsplumb/dist/js/jsPlumb-1.7.10'
 shim:
-    "@oroinc/jsplumb/dist/js/jsPlumb-1.7.10":
+    '@oroinc/jsplumb/dist/js/jsPlumb-1.7.10':
         imports:
-            - additionalCode: "var define = false;"
-              wrapper: window
+            -
+                additionalCode: var define = false;
+                wrapper: window

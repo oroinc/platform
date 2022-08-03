@@ -1,0 +1,21 @@
+/* @theme: default; */
+
+.form-row {
+    &__label {
+        margin-bottom: $form-row-label-offset-x;
+    }
+
+    &__content {
+        margin-bottom: $form-row-content-offset-x;
+    }
+
+    &--offset {
+        &-s {
+            margin-bottom: $offset-y-s;
+        }
+
+        &-none {
+            margin-bottom: 0;
+        }
+    }
+}

@@ -1,5 +1,0 @@
-styles:
-    inputs:
-        - 'bundles/orofilter/blank/scss/variables/ui-timepicker-list-config.scss'
-
-        - 'bundles/orofilter/blank/scss/styles.scss'

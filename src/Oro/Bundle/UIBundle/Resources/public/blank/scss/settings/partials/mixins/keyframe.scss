@@ -1,7 +1,0 @@
-/* @theme: blank; */
-
-@mixin keyframe($animation-name) {
-    @keyframes #{$animation-name} {
-        @content;
-    }
-}
