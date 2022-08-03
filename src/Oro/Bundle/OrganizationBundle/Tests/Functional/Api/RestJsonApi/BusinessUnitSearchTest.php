@@ -9,6 +9,8 @@ class BusinessUnitSearchTest extends RestJsonApiTestCase
 {
     protected function setUp(): void
     {
+        self::markTestSkipped('Must be fixed on BAP-21572');
+
         parent::setUp();
         $this->loadFixtures([LoadBusinessUnit::class]);
     }

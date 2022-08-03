@@ -2195,12 +2195,13 @@ TEXT;
     /**
      * Show specified filter for grid
      *
+     * @Given /^(?:|I) show filter "(?P<filter>(?:[^"]|\\")*)" in grid$/
      * @Given /^(?:|I) show filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>[^"]+)" grid$/
      *
      * @param string $filter
      * @param string $gridName
      */
-    public function iShowFilterInGrid($filter, $gridName)
+    public function iShowFilterInGrid(string $filter, string $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 

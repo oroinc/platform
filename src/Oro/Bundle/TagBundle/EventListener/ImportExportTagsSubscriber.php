@@ -162,7 +162,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface, ServiceSub
             return;
         }
 
-        $event->setResultField(
+        $event->setResultFieldValue(
             TagImportManager::TAGS_FIELD,
             $this->getTagImportManager()->normalizeTags($this->getTagImportManager()->getTags($event->getObject()))
         );
