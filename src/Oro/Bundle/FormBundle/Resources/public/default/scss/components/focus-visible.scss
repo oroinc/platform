@@ -1,0 +1,14 @@
+/* @theme: default; */
+
+@if $focus-visible-style {
+    .focus-visible:focus {
+        box-shadow: $focus-visible-style;
+
+        &[data-skip-focus-decoration],
+        [data-skip-focus-decoration-inner-elements] &,
+        &:disabled,
+        &.disabled {
+            box-shadow: none;
+        }
+    }
+}

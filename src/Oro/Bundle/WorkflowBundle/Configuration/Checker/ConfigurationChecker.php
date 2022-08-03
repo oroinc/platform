@@ -7,6 +7,9 @@ use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\ContextAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+/**
+ * Validates that a workflow configuration is clean.
+ */
 class ConfigurationChecker
 {
     use ContextAccessorAwareTrait;
@@ -49,10 +52,8 @@ class ConfigurationChecker
         $paths = [
             new PropertyPath('preactions'),
             new PropertyPath('preconditions'),
-            new PropertyPath('pre_conditions'),
             new PropertyPath('conditions'),
             new PropertyPath('actions'),
-            new PropertyPath('post_actions')
         ];
 
         return $this->isConfigurationClean(

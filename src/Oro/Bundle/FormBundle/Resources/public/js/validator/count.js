@@ -24,6 +24,16 @@ define(function(require) {
     }
 
     /**
+     * Return only selected options count.
+     *
+     * @param {jQuery} $fields
+     * @returns {Number}
+     */
+    function getSelectedCount($fields) {
+        return $fields.find('option:selected').length;
+    }
+
+    /**
      * Replace collection child key in child name with '[]',
      * Example:
      *      form[additional][field1] > form[additional][]
@@ -68,8 +78,12 @@ define(function(require) {
         // Example: collectionName = 'form[additional]'
         const collectionName = $(element).data('collectionName');
         if (!collectionName) {
-            // use old logic if data-collection-name not found
-            return getCheckboxCount(validator.findByName(element.name));
+            const $fields = validator.findByName(element.name);
+            if (element.type === 'select-multiple' || element.type === 'select-one') {
+                return getSelectedCount($fields);
+            } else {
+                return getCheckboxCount($fields);
+            }
         }
 
         const $fields = findByCollectionName(collectionName, validator);

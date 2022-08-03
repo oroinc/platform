@@ -1,0 +1,19 @@
+styles:
+    inputs:
+        - 'bundles/oroui/default/scss/settings/global-settings.scss'
+        - 'bundles/oroui/default/scss/settings/font-awesome/font-awesome.scss'
+    output: 'css/styles.css'
+
+stylebook_styles:
+    inputs:
+        - 'bundles/oroui/default/scss/settings/global-settings.scss'
+        - 'bundles/oroui/default/scss/settings/font-awesome/font-awesome.scss'
+
+print_styles:
+    inputs:
+        - 'bundles/oroui/default/scss/settings/global-settings.scss'
+        - 'bundles/oroui/default/scss/settings/font-awesome/font-awesome.scss'
+    output: 'css/styles-print.css'
+    auto_rtl_inputs:
+        - 'bundles/oro*/**'
+

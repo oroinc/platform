@@ -1,0 +1,24 @@
+aliases:
+    moment$: moment/moment
+    moment-timezone$: moment-timezone/builds/moment-timezone-with-data
+    numeral$: numeral/numeral
+app-modules:
+    - orolocale/js/app/modules/locale-module
+configs:
+    orolocale/js/locale-settings: {}
+dynamic-imports:
+    commons:
+        - orolocale/js/formatter/datetime
+map:
+    '*':
+        moment: orolocale/js/moment-l10n
+        moment-timezone: orolocale/js/extend/moment-timezone
+        numeral: orolocale/js/numeral-l10n
+    moment-timezone:
+        moment: moment
+    orolocale/js/extend/moment-timezone:
+        moment-timezone: moment-timezone
+    orolocale/js/moment-l10n:
+        moment: moment
+    orolocale/js/numeral-l10n:
+        numeral: numeral

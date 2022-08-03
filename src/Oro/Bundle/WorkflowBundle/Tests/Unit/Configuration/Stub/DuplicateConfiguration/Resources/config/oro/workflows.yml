@@ -25,5 +25,3 @@ workflows:
                     '@true': ~
                 actions:
                     - '@custom_action2': ~
-                post_actions:
-                    - '@custom_action': ~

@@ -1,0 +1,8 @@
+/* @theme: default; */
+
+[data-blank-content] {
+    &::after {
+        content: attr(data-blank-content);
+        color: $datagrid-blank-content-color;
+    }
+}

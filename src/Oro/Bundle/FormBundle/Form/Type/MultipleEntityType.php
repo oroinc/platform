@@ -11,13 +11,13 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
+/**
+ * The form type to select several entities from a list.
+ */
 class MultipleEntityType extends AbstractType
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private DoctrineHelper $doctrineHelper;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -68,7 +68,6 @@ class MultipleEntityType extends AbstractType
                 'initial_elements'           => null,
                 'selector_window_title'      => null,
                 'extra_config'               => null,
-                'grid_url'                   => null, // deprecated
                 'selection_url'              => null,
                 'selection_route'            => null,
                 'selection_route_parameters' => [],
@@ -82,31 +81,15 @@ class MultipleEntityType extends AbstractType
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $this->setOptionToView($view, $options, 'extra_config');
-        $this->setOptionToView($view, $options, 'grid_url'); // deprecated
         $this->setOptionToView($view, $options, 'selection_url');
         $this->setOptionToView($view, $options, 'selection_route');
         $this->setOptionToView($view, $options, 'selection_route_parameters');
         $this->setOptionToView($view, $options, 'initial_elements');
         $this->setOptionToView($view, $options, 'selector_window_title');
         $this->setOptionToView($view, $options, 'default_element');
-
-        if (empty($options['add_acl_resource'])) {
-            $options['allow_action'] = true;
-        } else {
-            $options['allow_action'] = $this->authorizationChecker->isGranted($options['add_acl_resource']);
-        }
-
-        $this->setOptionToView($view, $options, 'allow_action');
-    }
-
-    /**
-     * @param FormView $view
-     * @param array    $options
-     * @param string   $option
-     */
-    protected function setOptionToView(FormView $view, array $options, $option)
-    {
-        $view->vars[$option] = isset($options[$option]) ? $options[$option] : null;
+        $view->vars['allow_action'] =
+            empty($options['add_acl_resource'])
+            || $this->authorizationChecker->isGranted($options['add_acl_resource']);
     }
 
     /**
@@ -123,5 +106,10 @@ class MultipleEntityType extends AbstractType
     public function getBlockPrefix()
     {
         return 'oro_multiple_entity';
+    }
+
+    private function setOptionToView(FormView $view, array $options, string $option): void
+    {
+        $view->vars[$option] = $options[$option] ?? null;
     }
 }

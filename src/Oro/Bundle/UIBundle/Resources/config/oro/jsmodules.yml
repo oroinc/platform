@@ -12,7 +12,7 @@ aliases:
     bootstrap-scrollspy$: '@oroinc/bootstrap/js/dist/scrollspy'
     bootstrap-tab$: '@oroinc/bootstrap/js/dist/tab'
     bootstrap-tooltip$: '@oroinc/bootstrap/js/dist/tooltip'
-    bootstrap-typeahead$: 'oroui/lib/bootstrap/bootstrap-typeahead'
+    bootstrap-typeahead$: oroui/lib/bootstrap/bootstrap-typeahead
     bootstrap-util$: '@oroinc/bootstrap/js/dist/util'
     chaplin$: oroui/lib/chaplin
     controllers/page-controller$: oroui/js/app/controllers/page-controller
@@ -36,10 +36,10 @@ aliases:
     jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
     jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
     jquery.numeric$: jquery-numeric/jquery.numeric
-    jquery.select2$: "@oroinc/select2/select2"
+    jquery.select2$: '@oroinc/select2/select2'
     jquery.simplecolorpicker$: oroui/lib/simplecolorpicker/jquery.simplecolorpicker
     jquery.timepicker$: timepicker/jquery.timepicker
-    jquery.uniform$: "@oroinc/jquery.uniform/src/js/jquery.uniform"
+    jquery.uniform$: '@oroinc/jquery.uniform/src/js/jquery.uniform'
     module-config$: oroui/js/app/services/module-config
     oro/block-widget$: oroui/js/widget/block-widget
     oro/buttons-widget$: oroui/js/widget/buttons-widget
@@ -48,9 +48,9 @@ aliases:
     overlayScrollbars$: overlayscrollbars/js/OverlayScrollbars
     popper$: popper.js/dist/umd/popper
     scriptjs$: scriptjs/dist/script
+    slick$: slick-carousel/slick/slick
     styled-scroll-bar$: oroui/js/app/plugins/styled-scroll-bar
     underscore$: underscore/underscore
-    slick$: slick-carousel/slick/slick
 app-modules:
     - oroui/js/app/modules/ajax-error-module
     - oroui/js/app/modules/color-util
@@ -58,8 +58,8 @@ app-modules:
     - oroui/js/app/modules/css-variable-module
     - oroui/js/app/modules/focus-visible
     - oroui/js/app/modules/ignore-tabbable
-    - oroui/js/app/modules/init-layout
     - oroui/js/app/modules/init-image-preview
+    - oroui/js/app/modules/init-layout
     - oroui/js/app/modules/input-widgets
     - oroui/js/app/modules/jstree-actions-module
     - oroui/js/app/modules/layout-module
@@ -156,7 +156,7 @@ entry:
         - oroui/js/app
         - oroui/js/app/services/app-ready-load-modules
 map:
-    "*":
+    '*':
         alert.js: bootstrap-alert
         backbone: oroui/js/extend/backbone
         bootstrap: oroui/js/extend/bootstrap

@@ -1,0 +1,102 @@
+/* @theme: default; */
+
+.grid-header-cell {
+    .table & {
+        &-massAction {
+            padding: $datagrid-header-cell-mass-action-offset-inner;
+        }
+    }
+
+    .table-bordered & {
+        border-width: $datagrid-header-cell-border-width;
+    }
+
+    &.sortable {
+        .sortable-icon {
+            position: relative;
+
+            display: none;
+            height: $datagrid-header-cell-link-font-size;
+
+            &::before {
+                position: absolute;
+                top: $datagrid-header-cell-link-font-size * .5;
+                left: $datagrid-header-cell-sortable-icon-left;
+
+                content: '';
+
+                border-right: $datagrid-header-cell-sortable-icon-size solid transparent;
+                border-left: $datagrid-header-cell-sortable-icon-size solid transparent;
+            }
+        }
+    }
+
+    &.ascending {
+        .sortable-icon {
+            display: inline-block;
+
+            &::before {
+                border-top: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
+            }
+        }
+    }
+
+    &.descending {
+        .sortable-icon {
+            display: inline-block;
+
+            &::before {
+                border-bottom: $datagrid-header-cell-sortable-icon-size solid $datagrid-header-cell-sortable-icon-color;
+            }
+        }
+    }
+
+    &.action-column {
+        width: $datagrid-header-cell-action-column-width;
+        padding: $datagrid-header-cell-action-column-offset-inner;
+
+        text-align: $datagrid-header-cell-action-column-text-align;
+
+        &:empty,
+        &--disabled {
+            &::before {
+                height: 10px;
+
+                display: inline-block;
+                vertical-align: middle;
+
+                font-size: $base-font-size--m;
+                line-height: 0;
+
+                color: $datagrid-header-cell-action-column-disabled-color;
+
+                content: '...';
+            }
+        }
+    }
+
+    &__link {
+        font-size: $datagrid-header-cell-link-font-size;
+        line-height: $datagrid-header-cell-link-line-height;
+        font-weight: $datagrid-header-cell-link-font-weight;
+        color: $datagrid-header-cell-link-color;
+        position: $datagrid-header-cell-link-position;
+
+        &:hover,
+        &:focus,
+        &:active {
+            color: $datagrid-header-cell-link-hover-color;
+            text-decoration: $datagrid-header-cell-link-hover-text-decoration;
+        }
+    }
+}
+
+@include breakpoint('tablet') {
+    .with-floating-header {
+        .grid-header-cell {
+            .caret {
+                margin-top: $offset-y-s;
+            }
+        }
+    }
+}

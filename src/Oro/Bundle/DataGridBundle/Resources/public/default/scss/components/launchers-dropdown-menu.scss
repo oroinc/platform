@@ -1,0 +1,17 @@
+/* @theme: default; */
+
+.launchers-dropdown-menu {
+    /* stylelint-disable declaration-no-important */
+    // Override bootstrap styles
+    min-width: 0 !important;
+    // Override bootstrap styles;
+    margin: 0 !important;
+    // Override bootstrap styles;
+    padding: 0 !important;
+
+    &.show {
+        // Override bootstrap styles;
+        margin: 0 !important;
+    }
+    /* stylelint-enable declaration-no-important */
+}

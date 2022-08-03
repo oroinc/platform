@@ -78,7 +78,6 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
             'add_acl_resource',
             'class',
             'default_element',
-            'grid_url',
             'initial_elements',
             'selector_window_title',
             'extra_config',
@@ -137,16 +136,6 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
                 false
             ],
             [
-                ['grid_url' => '/test'],
-                'grid_url',
-                '/test'
-            ],
-            [
-                [],
-                'grid_url',
-                null
-            ],
-            [
                 ['initial_elements' => []],
                 'initial_elements',
                 []
@@ -175,11 +164,6 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
                 [],
                 'default_element',
                 null
-            ],
-            [
-                ['grid_url' => 'testUrl'],
-                'grid_url',
-                'testUrl',
             ],
             [
                 ['selection_url' => 'testUrlSelection'],

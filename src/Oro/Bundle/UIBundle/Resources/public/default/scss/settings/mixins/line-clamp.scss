@@ -1,0 +1,11 @@
+/* @theme: default; */
+
+// Truncates text at a specific number of lines.
+@mixin line-clamp($line-clamp-count: 2) {
+    overflow: hidden;
+    // stylelint-disable-next-line value-no-vendor-prefix
+    display: -webkit-box;
+    -webkit-line-clamp: $line-clamp-count;
+    // stylelint-disable-next-line property-no-vendor-prefix
+    -webkit-box-orient: vertical;
+}

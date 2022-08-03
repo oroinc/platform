@@ -1,0 +1,58 @@
+/* @theme: default; */
+
+// mixin for Slick slider dots navigation
+@mixin slick-dots(
+    $slick-dots-class:                    '.slick-dots',
+    $slick-dots-bottom-pos:               $offset-y,
+    $slick-dots-item-offset:              0 $offset-x-s,
+    $slick-dots-button-size:              10px,
+    $slick-dots-button-bg:                get-color('additional', 'light'),
+    $slick-dots-button-border:            1px solid get-color('additional', 'middle'),
+    $slick-dots-button-box-shadow:        null,
+    $slick-dots-button-border-radius:     50%,
+    $slick-dots-button-active-border:     1px solid get-color('ui', 'focus'),
+    $slick-dots-button-active-bg:         get-color('ui', 'focus'),
+    $slick-dots-button-active-box-shadow: 0 0 7px get-color('ui', 'focus')
+) {
+    #{$slick-dots-class} {
+        position: absolute;
+        bottom: $slick-dots-bottom-pos;
+
+        width: 100%;
+        margin: 0 auto;
+        padding: 0;
+
+        text-align: center;
+        vertical-align: bottom;
+
+        li {
+            display: inline-block;
+
+            margin: $slick-dots-item-offset;
+
+            &.slick-active {
+                button {
+                    background: $slick-dots-button-active-bg;
+                    border: $slick-dots-button-active-border;
+                    box-shadow: $slick-dots-button-active-box-shadow;
+                }
+            }
+        }
+
+        button {
+            width: $slick-dots-button-size;
+            height: $slick-dots-button-size;
+            padding: 0;
+
+            font-size: 0;
+
+            background: $slick-dots-button-bg;
+            border: $slick-dots-button-border;
+            box-shadow: $slick-dots-button-box-shadow;
+
+            border-radius: $slick-dots-button-border-radius;
+
+            cursor: pointer;
+        }
+    }
+}

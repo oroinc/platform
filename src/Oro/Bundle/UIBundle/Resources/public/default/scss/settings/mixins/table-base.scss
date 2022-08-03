@@ -1,0 +1,27 @@
+/* @theme: default; */
+
+@mixin table-base(
+    $table-width:         $table-width,
+    $table-text-align:    $table-text-align,
+    $table-margin-bottom: $table-margin-bottom,
+    $head-padding:        $table-head-padding,
+    $row-padding:         $table-row-padding
+) {
+    width: $table-width;
+    margin-bottom: $table-margin-bottom;
+
+    border-spacing: 0;
+    border-collapse: collapse;
+
+    &__td {
+        padding: $row-padding;
+
+        text-align: $table-text-align;
+    }
+
+    &__th {
+        padding: $head-padding;
+
+        text-align: $table-text-align;
+    }
+}

@@ -2,10 +2,22 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Added 
+
+#### ImportExportBundle
+* Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
+  to mark certain field as skipped during denormalization process to avoid possible type conflicts.
+
 ### Changed
 
 #### PlatformBundle
 * As the 'composer/composer' package is no longer used, the `Oro\Bundle\PlatformBundle\Provider\PackageProvider` class based services now provide the packages info in pure arrays instead of the array of the `Composer\Package\PackageInterface` interface based objects. The returned array structure is as follows: `['package_name' => ['pretty_version' => '1.0.0', 'license' => ['MIT']]]`..
+
+#### OrganizationBundle
+* Changed the `cascade` Doctrine option of the `\Oro\Bundle\OrganizationBundle\Entity\Ownership\BusinessUnitAwareTrait::$owner`
+  association: it is not cascade-persisted anymore.
 
 ### Removed
 
@@ -21,6 +33,14 @@ The current file describes significant changes in the code that may affect the u
 #### UIBundle
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
+
+#### WorkflowBundle
+* The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
+* The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
+
+#### ImportExportBundle
+* Removed `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use 
+  `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultFieldValue` instead.
 
 ## 5.1.0-alpha.1 (2022-05-31)
 [Show detailed list of changes](incompatibilities-5-1-alpha.md)

@@ -347,8 +347,10 @@
         &-undermask,
         &-mask {
             position: $select2-drop-mask-position;
-            left: $select2-drop-mask-left;
             top: $select2-drop-mask-top;
+            right: $select2-drop-mask-left;
+            bottom: $select2-drop-mask-left;
+            left: $select2-drop-mask-left;
             z-index: $select2-drop-mask-z-index;
         }
 

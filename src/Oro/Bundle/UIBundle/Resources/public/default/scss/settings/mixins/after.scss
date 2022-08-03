@@ -1,0 +1,9 @@
+/* @theme: default; */
+
+@mixin after() {
+    content: '';
+
+    position: absolute;
+
+    display: block;
+}

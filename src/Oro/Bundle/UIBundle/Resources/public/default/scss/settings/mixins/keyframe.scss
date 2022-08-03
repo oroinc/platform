@@ -1,0 +1,7 @@
+/* @theme: default; */
+
+@mixin keyframe($animation-name) {
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}

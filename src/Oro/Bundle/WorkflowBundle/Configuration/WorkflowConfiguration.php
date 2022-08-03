@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
- * Defines the configuration parameters recognized by WorkflowBundle.
+ * Defines the configuration of workflows.
  */
 class WorkflowConfiguration extends AbstractConfiguration implements ConfigurationInterface
 {
@@ -569,7 +569,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('pre_conditions')->end() // deprecated, use `preconditions` instead
                     ->arrayNode('conditions')
                         ->prototype('variable')
                         ->end()
@@ -578,15 +577,6 @@ class WorkflowConfiguration extends AbstractConfiguration implements Configurati
                         ->prototype('variable')
                         ->end()
                     ->end()
-                    ->arrayNode('post_actions')->end() // deprecated, use `actions` instead
-                ->end()
-                ->beforeNormalization()
-                    ->always(function ($config) {
-                        return $this->mergeConfigs([
-                            'preconditions' => 'pre_conditions',
-                            'actions' => 'post_actions',
-                        ], $config);
-                    })
                 ->end()
             ->end();
 
