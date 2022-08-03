@@ -7,11 +7,14 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Configuration\EntityExtendConfigurationProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
+use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ScalarFieldDenormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Serializer\Normalizer\Stub\DenormalizationStub;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
@@ -20,11 +23,11 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FieldHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldHelper;
+    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
 
-    /** @var ConfigurableEntityNormalizer */
-    private $normalizer;
+    private ConfigurableEntityNormalizer $normalizer;
+
+    private EventDispatcher|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
     protected function setUp(): void
     {
@@ -41,8 +44,12 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['hasConfig', 'getConfigValue', 'getEntityFields', 'getObjectValue'])
             ->getMock();
 
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+
         $this->normalizer = new ConfigurableEntityNormalizer($this->fieldHelper);
         $this->normalizer->setScalarFieldDenormalizer(new ScalarFieldDenormalizer());
+
+        $this->normalizer->setDispatcher($this->eventDispatcher);
     }
 
     /**
@@ -69,7 +76,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ['test', 'stdClass', false, false],
             [[], '', false, false],
             [[], 'stdClass', false, false],
-            [[], 'stdClass', true, true]
+            [[], 'stdClass', true, true],
         ];
     }
 
@@ -105,11 +112,13 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
     public function testSetSerializerException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage(\sprintf(
-            'Serializer must implement "%s" and "%s"',
-            ContextAwareNormalizerInterface::class,
-            ContextAwareDenormalizerInterface::class
-        ));
+        $this->expectExceptionMessage(
+            \sprintf(
+                'Serializer must implement "%s" and "%s"',
+                ContextAwareNormalizerInterface::class,
+                ContextAwareDenormalizerInterface::class
+            )
+        );
 
         $serializer = $this->createMock(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
@@ -137,7 +146,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $fieldsValueMap = [
             $entityName => $fields,
-            'DateTime' => []
+            'DateTime' => [],
         ];
 
         $this->fieldHelper->expects(self::atLeastOnce())
@@ -192,6 +201,11 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         }
         $this->normalizer->setSerializer($serializer);
 
+        $this->eventDispatcher
+            ->expects(self::any())
+            ->method('hasListeners')
+            ->willReturn(false);
+
         self::assertEquals($result, $this->normalizer->normalize($object, $format, $context));
     }
 
@@ -200,12 +214,12 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
      */
     public function normalizeDataProvider(): array
     {
-        $object = (object) [
+        $object = (object)[
             'fieldString' => 'string',
             'excluded' => 'excluded',
             'id' => 'id',
             'nonId' => 'nonId',
-            'objectNoIds' => new \DateTime()
+            'objectNoIds' => new \DateTime(),
         ];
         $object->relatedObjectWithId = clone $object;
 
@@ -215,71 +229,71 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                 [],
                 [
                     [
-                        'name' => 'fieldString'
-                    ]
+                        'name' => 'fieldString',
+                    ],
                 ],
                 [
                     'fieldString' => [
-                        'excluded' => false
-                    ]
+                        'excluded' => false,
+                    ],
                 ],
                 [
-                    'fieldString' => 'string'
-                ]
+                    'fieldString' => 'string',
+                ],
             ],
             'simple_with_excluded' => [
                 $object,
                 [],
                 [
                     [
-                        'name' => 'fieldString'
+                        'name' => 'fieldString',
                     ],
                     [
-                        'name' => 'id'
-                    ]
+                        'name' => 'id',
+                    ],
                 ],
                 [
                     'fieldString' => [
-                        'excluded' => true
+                        'excluded' => true,
                     ],
                     'id' => [
-                        'excluded' => false
-                    ]
+                        'excluded' => false,
+                    ],
                 ],
                 [
-                    'id' => 'id'
-                ]
+                    'id' => 'id',
+                ],
             ],
             'with_identity' => [
                 $object,
                 [
-                    'mode' => ConfigurableEntityNormalizer::SHORT_MODE
+                    'mode' => ConfigurableEntityNormalizer::SHORT_MODE,
                 ],
                 [
                     [
-                        'name' => 'fieldString'
+                        'name' => 'fieldString',
                     ],
                     [
-                        'name' => 'nonId'
+                        'name' => 'nonId',
                     ],
                     [
-                        'name' => 'id'
-                    ]
+                        'name' => 'id',
+                    ],
                 ],
                 [
                     'fieldString' => [
-                        'excluded' => false
+                        'excluded' => false,
                     ],
                     'nonId' => [
                         'identity' => false,
                     ],
                     'id' => [
                         'identity' => true,
-                    ]
+                    ],
                 ],
                 [
-                    'id' => 'id'
-                ]
+                    'id' => 'id',
+                ],
             ],
             'with_object_full_non_identity' => [
                 $object,
@@ -293,7 +307,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-one',
                         'fieldContext' => [
                             'fieldName' => 'relatedObjectWithId',
-                            'mode' => ConfigurableEntityNormalizer::FULL_MODE
+                            'mode' => ConfigurableEntityNormalizer::FULL_MODE,
                         ],
                     ],
                     [
@@ -304,29 +318,29 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-one',
                         'fieldContext' => [
                             'fieldName' => 'objectNoIds',
-                            'mode' => ConfigurableEntityNormalizer::FULL_MODE
+                            'mode' => ConfigurableEntityNormalizer::FULL_MODE,
                         ],
                     ],
                     [
-                        'name' => 'id'
-                    ]
+                        'name' => 'id',
+                    ],
                 ],
                 [
                     'relatedObjectWithId' => [
-                        'full' => true
+                        'full' => true,
                     ],
                     'objectNoIds' => [
-                        'full' => true
+                        'full' => true,
                     ],
                     'id' => [
                         'identity' => true,
-                    ]
+                    ],
                 ],
                 [
                     'id' => 'id',
                     'relatedObjectWithId' => 'obj1',
-                    'objectNoIds' => 'obj2'
-                ]
+                    'objectNoIds' => 'obj2',
+                ],
             ],
             'object_relation_short_with_non_identity' => [
                 $object,
@@ -337,7 +351,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'normalizedValue' => 'obj1',
                         'fieldContext' => [
                             'fieldName' => 'relatedObjectWithId',
-                            'mode' => ConfigurableEntityNormalizer::SHORT_MODE
+                            'mode' => ConfigurableEntityNormalizer::SHORT_MODE,
                         ],
                         'related_entity_type' => 'stdClass',
                         'related_entity_name' => 'stdClass',
@@ -348,15 +362,15 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'normalizedValue' => 'obj2',
                         'fieldContext' => [
                             'fieldName' => 'objectNoIds',
-                            'mode' => ConfigurableEntityNormalizer::SHORT_MODE
+                            'mode' => ConfigurableEntityNormalizer::SHORT_MODE,
                         ],
                         'related_entity_type' => 'DateTime',
                         'related_entity_name' => 'DateTime',
                         'relation_type' => 'ref-one',
                     ],
                     [
-                        'name' => 'id'
-                    ]
+                        'name' => 'id',
+                    ],
                 ],
                 [
                     'relatedObjectWithId' => [
@@ -365,12 +379,12 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                     ],
                     'id' => [
                         'identity' => true,
-                    ]
+                    ],
                 ],
                 [
                     'id' => 'id',
-                    'relatedObjectWithId' => 'obj1'
-                ]
+                    'relatedObjectWithId' => 'obj1',
+                ],
             ],
         ];
     }
@@ -411,6 +425,14 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityFields')
             ->willReturn($fields);
 
+        $this->eventDispatcher
+            ->expects(self::any())
+            ->method('dispatch')
+            ->withConsecutive(
+                [new DenormalizeEntityEvent(new $class(), $data), Events::BEFORE_DENORMALIZE_ENTITY],
+                [new DenormalizeEntityEvent($expected, $data), Events::AFTER_DENORMALIZE_ENTITY]
+            );
+
         self::assertEquals($expected, $this->normalizer->denormalize($data, $class, null, $context));
     }
 
@@ -433,20 +455,20 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                     'created' => new \DateTime('2011-11-11'),
                     'birthday' => new \DateTime('2011-11-11'),
                     'time' => new \DateTime('2011-11-11 12:12:12'),
-                    'obj' => (object) ['key' => 'val'],
+                    'obj' => (object)['key' => 'val'],
                     'obj2' => [],
                     'collection' => [1, 2],
-                    'unknown' => 'not_included'
+                    'unknown' => 'not_included',
                 ],
                 DenormalizationStub::class,
                 [
                     [
                         'name' => 'id',
-                        'type' => 'integer'
+                        'type' => 'integer',
                     ],
                     [
                         'name' => 'name',
-                        'type' => 'string'
+                        'type' => 'string',
                     ],
                     [
                         'name' => 'created',
@@ -454,7 +476,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => null,
                         'type' => 'datetime',
                         'denormalizedValue' => 'dDateTime',
-                        'expectedEntityClass' => 'DateTime'
+                        'expectedEntityClass' => 'DateTime',
                     ],
                     [
                         'name' => 'birthday',
@@ -462,7 +484,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => null,
                         'type' => 'date',
                         'denormalizedValue' => 'dDate',
-                        'expectedEntityClass' => 'DateTime'
+                        'expectedEntityClass' => 'DateTime',
                     ],
                     [
                         'name' => 'time',
@@ -470,7 +492,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => null,
                         'type' => 'time',
                         'denormalizedValue' => 'dTime',
-                        'expectedEntityClass' => 'DateTime'
+                        'expectedEntityClass' => 'DateTime',
                     ],
                     [
                         'name' => 'obj',
@@ -478,7 +500,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-one',
                         'denormalizedValue' => 'dObj',
                         'expectedEntityClass' => 'stdClass',
-                        'type' => 'object'
+                        'type' => 'object',
                     ],
                     [
                         'name' => 'obj2',
@@ -486,7 +508,7 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-one',
                         'denormalizedValue' => 'dObj',
                         'expectedEntityClass' => 'stdClass',
-                        'type' => 'object'
+                        'type' => 'object',
                     ],
                     [
                         'name' => 'collection',
@@ -494,11 +516,11 @@ class ConfigurableEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                         'relation_type' => 'ref-many',
                         'denormalizedValue' => 'dCollection',
                         'expectedEntityClass' => 'ArrayCollection<stdClass>',
-                        'type' => 'object'
+                        'type' => 'object',
                     ],
                 ],
-                $expected
-            ]
+                $expected,
+            ],
         ];
     }
 }
