@@ -34,6 +34,10 @@ The current file describes significant changes in the code that may affect the u
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
 
+#### WorkflowBundle
+* The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
+* The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
+
 #### ImportExportBundle
 * Removed `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use 
   `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultFieldValue` instead.

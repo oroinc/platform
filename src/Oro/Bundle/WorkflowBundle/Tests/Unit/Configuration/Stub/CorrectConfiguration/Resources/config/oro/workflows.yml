@@ -154,10 +154,6 @@ workflows:
                         message: "Fail upper level"
                 actions:
                     - '@custom_action2': ~
-                pre_conditions:
-                    '@condition1': ~
-                post_actions:
-                    - '@custom_action': ~
     second_workflow:
         entity: Second\Entity
         start_step: second_step

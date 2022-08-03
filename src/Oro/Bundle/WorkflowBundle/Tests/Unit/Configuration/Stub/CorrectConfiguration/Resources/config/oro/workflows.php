@@ -249,7 +249,6 @@ return [
                 ],
                 'preconditions' => [
                     '@true' => null,
-                    '@condition1' => null,
                 ],
                 'conditions' => [
                     '@and' => [
@@ -268,7 +267,6 @@ return [
                 ],
                 'actions' => [
                     ['@custom_action2' => null],
-                    ['@custom_action' => null],
                 ]
             ]
         ],

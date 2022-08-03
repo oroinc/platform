@@ -50,7 +50,6 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
                     'exclude_definitions'   => [],
                     'actions_configuration' => ['key' => 'value'],
                     'preconditions' => ['test'],
-                    'pre_conditions' => ['test2'],
                 ],
                 'expected' => [
                     'name' => 'my_definition',
@@ -60,7 +59,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit\Framework\TestCase
                     'order' => 10,
                     'exclude_definitions'   => [],
                     'actions_configuration' => ['key' => 'value'],
-                    'preconditions' => ['test', 'test2'],
+                    'preconditions' => ['test'],
                 ],
             ],
         ];
