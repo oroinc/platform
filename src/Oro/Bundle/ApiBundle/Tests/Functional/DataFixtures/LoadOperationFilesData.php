@@ -33,6 +33,7 @@ class LoadOperationFilesData extends AbstractFixture implements ContainerAwareIn
         $operationIds = [
             $this->getReference('user_operation1')->getId(),
             $this->getReference('user_operation2')->getId(),
+            $this->getReference('user_operation3')->getId(),
             $this->getReference('subordinate_bu_user_operation')->getId()
         ];
 
