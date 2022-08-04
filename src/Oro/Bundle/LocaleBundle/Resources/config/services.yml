@@ -89,9 +89,8 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_locale.cache.provider.tree_fallback_strategy'
-        calls:
-            - [setEntityClass, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
         tags:
+            - { name: oro_translation.extension.translation_strategy, priority: 10 }
             - { name: kernel.cache_warmer }
 
     # Calendar

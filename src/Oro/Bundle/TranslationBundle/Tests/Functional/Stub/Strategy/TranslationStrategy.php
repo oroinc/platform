@@ -6,17 +6,10 @@ use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 
 class TranslationStrategy implements TranslationStrategyInterface
 {
-    /** @var string */
-    protected $name;
+    private string $name;
+    private array $locales;
 
-    /** @var array */
-    protected $locales;
-
-    /**
-     * @param string $name
-     * @param array $locales
-     */
-    public function __construct($name, array $locales)
+    public function __construct(string $name, array $locales)
     {
         $this->name = $name;
         $this->locales = $locales;
