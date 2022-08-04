@@ -685,6 +685,14 @@ class Configuration implements ConfigurationInterface
                         ->min(60) // 1 minute
                         ->defaultValue(3600) // 1 hour
                     ->end()
+                    ->integerNode('operation_timeout')
+                        ->info(
+                            'The maximum number of seconds after which an operation will be removed'
+                            . ' regardless of status.'
+                        )
+                        ->min(60)
+                        ->defaultValue(3600) // 1 hour
+                    ->end()
                 ->end()
             ->end()
             ->integerNode('chunk_size')
