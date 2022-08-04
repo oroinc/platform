@@ -170,3 +170,6 @@ oro_form:
                         - src
                         - controls
                 aside: ~
+twig:
+    paths:
+        '%kernel.project_dir%/vendor/oro/platform/src/Oro/Bundle/FormBundle/Resources/public': 'OroFormBundlePublic'
