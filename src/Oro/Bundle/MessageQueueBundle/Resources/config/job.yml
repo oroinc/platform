@@ -82,16 +82,6 @@ services:
             - '@oro_message_queue.status_calculator.collection_calculator'
             - '@oro_message_queue.status_calculator.query_calculator'
 
-    oro_message_queue.job.calculate_root_job_status_processor:
-        class: 'Oro\Component\MessageQueue\Job\CalculateRootJobStatusProcessor'
-        arguments:
-            - '@oro_message_queue.job.root_job_status_calculator'
-            - '@doctrine'
-            - 'Oro\Bundle\MessageQueueBundle\Entity\Job'
-            - '@logger'
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-
     oro_message_queue.job.dependent_job_processor:
         class: 'Oro\Component\MessageQueue\Job\DependentJobMessageProcessor'
         arguments:
