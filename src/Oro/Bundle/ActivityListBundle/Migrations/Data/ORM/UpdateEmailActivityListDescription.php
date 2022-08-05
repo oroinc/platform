@@ -5,10 +5,14 @@ namespace Oro\Bundle\ActivityListBundle\Migrations\Data\ORM;
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Updates descriptions for Email related activity list records.
+ */
 class UpdateEmailActivityListDescription extends AbstractFixture implements ContainerAwareInterface
 {
     const BATCH_SIZE = 500;
@@ -38,7 +42,7 @@ class UpdateEmailActivityListDescription extends AbstractFixture implements Cont
     public function updateEmailActivityDescription(ObjectManager $manager)
     {
         /** @var QueryBuilder $activityListBuilder */
-        $activityListBuilder = $manager->getRepository('OroActivityListBundle:ActivityList')->createQueryBuilder('e');
+        $activityListBuilder = $manager->getRepository(ActivityList::class)->createQueryBuilder('e');
 
         $iterator = new BufferedIdentityQueryResultIterator($activityListBuilder);
         $iterator->setBufferSize(self::BATCH_SIZE);

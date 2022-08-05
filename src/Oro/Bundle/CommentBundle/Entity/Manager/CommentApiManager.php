@@ -77,7 +77,7 @@ class CommentApiManager extends ApiEntityManager
         $this->aclHelper = $aclHelper;
         $this->configManager = $configManager;
 
-        parent::__construct(Comment::ENTITY_NAME, $this->em);
+        parent::__construct(Comment::class, $this->em);
 
         $this->setEventDispatcher($eventDispatcher);
     }

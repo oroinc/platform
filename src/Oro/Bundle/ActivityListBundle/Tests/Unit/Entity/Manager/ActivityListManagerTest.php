@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
@@ -43,9 +42,6 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
     private $activityListIdProvider;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $commentManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject */
@@ -68,7 +64,6 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->provider = $this->createMock(ActivityListChainProvider::class);
         $this->activityListIdProvider = $this->createMock(ActivityListIdProvider::class);
-        $this->em = $this->createMock(EntityManager::class);
         $this->commentManager = $this->createMock(CommentApiManager::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->workflowHelper = $this->createMock(WorkflowDataHelper::class);
@@ -95,7 +90,7 @@ class ActivityListManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->doctrineHelper->expects($this->once())
             ->method('getEntityRepository')
-            ->with('OroActivityListBundle:ActivityList');
+            ->with(ActivityList::class);
         $this->activityListManager->getRepository();
     }
 

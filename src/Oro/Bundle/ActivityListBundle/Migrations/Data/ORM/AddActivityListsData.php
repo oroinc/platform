@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActivityListBundle\Migrations\Data\ORM;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
@@ -83,7 +84,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
     {
         $qb  = $this->container
             ->get('doctrine')
-            ->getRepository('OroActivityListBundle:ActivityList')
+            ->getRepository(ActivityList::class)
             ->createQueryBuilder('activityList');
 
         $activityList = $qb->select('activityList.id')

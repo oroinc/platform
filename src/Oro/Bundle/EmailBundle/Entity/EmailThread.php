@@ -17,8 +17,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  */
 class EmailThread
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailThread';
-
     /**
      * @var integer
      *

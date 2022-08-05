@@ -56,15 +56,10 @@ class AutoResponseTemplateType extends AbstractType
         $builder
             ->add('entityName', HiddenType::class, [
                 'attr' => [
-                    'data-default-value' => Email::ENTITY_CLASS,
+                    'data-default-value' => Email::class,
                 ],
                 'constraints' => [
-                    new Assert\Choice([
-                        'choices' => [
-                            '',
-                            Email::ENTITY_CLASS,
-                        ],
-                    ]),
+                    new Assert\Choice(['choices' => ['', Email::class]]),
                 ],
             ])
             ->add('type', ChoiceType::class, [
@@ -98,7 +93,7 @@ class AutoResponseTemplateType extends AbstractType
                 $emailTemplate = new EmailTemplate();
                 $signature = $this->htmlTagHelper->sanitize($this->configManager->get('oro_email.signature', ''));
                 $emailTemplate->setContent($signature);
-                $emailTemplate->setEntityName(Email::ENTITY_CLASS);
+                $emailTemplate->setEntityName(Email::class);
                 $event->setData($emailTemplate);
             }
         });
@@ -157,7 +152,7 @@ class AutoResponseTemplateType extends AbstractType
             ->select('COUNT(et.id)')
             ->where('et.name = :name AND et.entityName = :entityName')
             ->setParameter('name', $name)
-            ->setParameter('entityName', Email::ENTITY_CLASS)
+            ->setParameter('entityName', Email::class)
             ->getQuery()
             ->getSingleScalarResult();
     }

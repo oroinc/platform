@@ -157,7 +157,7 @@ class EmailActivityManager
             $contexts = $this->emailActivityListProvider->getTargetEntities($email);
             if (count($contexts) > 0) {
                 // from email to thread emails
-                $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+                $relatedEmails = $this->em->getRepository(Email::class)->findByThread($thread);
                 foreach ($relatedEmails as $relatedEmail) {
                     if ($email->getId() !== $relatedEmail->getId()) {
                         $this->changeContexts($relatedEmail, $contexts);
