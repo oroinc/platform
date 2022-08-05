@@ -211,7 +211,7 @@
 
     {{ emailMacros.renderEmailAddressLink(
         label|oro_html_strip_tags|default(emailMacros.email_address_text(emailAddress)),
-        emailAddress.owner.class,
+        oro_class_name(emailAddress.owner),
         emailAddress.owner.id) }}
 {%- endmacro -%}
 
@@ -238,7 +238,7 @@
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
     {% set label = label|oro_html_strip_tags|default(emailAddressName|default('N/A')) %}
-    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% set route = oro_entity_route(oro_class_name(emailAddress.owner)) %}
     {% if route is not null %}
         <a href="{{ path(route, {id: emailAddress.owner.id}) }}" dir="ltr">
             {{ label }}</a>

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -17,10 +18,10 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class EmailNotificationManager
 {
-    protected ManagerRegistry $doctrine;
-    protected HtmlTagHelper $htmlTagHelper;
-    protected UrlGeneratorInterface $urlGenerator;
-    protected ConfigManager $configManager;
+    private ManagerRegistry $doctrine;
+    private HtmlTagHelper $htmlTagHelper;
+    private UrlGeneratorInterface $urlGenerator;
+    private ConfigManager $configManager;
     private AclHelper $aclHelper;
 
     public function __construct(
@@ -47,8 +48,7 @@ class EmailNotificationManager
      */
     public function getEmails(User $user, Organization $organization, $maxEmailsDisplay, $folderId)
     {
-        $emails = $this->doctrine->getManagerForClass(Email::class)
-            ->getRepository(Email::class)
+        $emails = $this->doctrine->getRepository(Email::class)
             ->getNewEmails($user, $organization, $maxEmailsDisplay, $folderId, $this->aclHelper);
 
         $emailsData = [];
@@ -89,32 +89,26 @@ class EmailNotificationManager
      */
     public function getCountNewEmails(User $user, Organization $organization, $folderId = null)
     {
-        return $this->doctrine->getManagerForClass(Email::class)
-            ->getRepository(Email::class)
+        return $this->doctrine->getRepository(Email::class)
             ->getCountNewEmails($user, $organization, $folderId, $this->aclHelper);
     }
 
-    /**
-     * @param Email $email
-     *
-     * @return bool|string
-     */
-    protected function getFromNameLink(Email $email)
+    private function getFromNameLink(Email $email): ?string
     {
-        $path = false;
-        if ($email->getFromEmailAddress() && $email->getFromEmailAddress()->getOwner()) {
-            $className = $email->getFromEmailAddress()->getOwner()->getClass();
-            $routeName = $this->configManager->getEntityMetadata($className)->getRoute('view', false);
-            try {
-                $path = $this->urlGenerator->generate(
-                    $routeName,
-                    ['id' => $email->getFromEmailAddress()->getOwner()->getId()]
-                );
-            } catch (RouteNotFoundException $e) {
-                return false;
-            }
+        if (!$email->getFromEmailAddress()) {
+            return null;
         }
 
-        return $path;
+        $owner = $email->getFromEmailAddress()->getOwner();
+        if (null === $owner) {
+            return null;
+        }
+
+        $routeName = $this->configManager->getEntityMetadata(ClassUtils::getClass($owner))->getRoute('view', false);
+        try {
+            return $this->urlGenerator->generate($routeName, ['id' => $owner->getId()]);
+        } catch (RouteNotFoundException $e) {
+            return null;
+        }
     }
 }
