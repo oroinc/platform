@@ -532,6 +532,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *
@@ -587,6 +588,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *
