@@ -130,7 +130,7 @@ define(function(require) {
                 _.map(
                     value.toString().split(this.arraySeparator),
                     function(number) {
-                        return parseInt(number);
+                        return parseFloat(number);
                     }
                 ),
                 function(number) {

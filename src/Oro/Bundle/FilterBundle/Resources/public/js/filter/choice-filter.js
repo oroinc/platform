@@ -29,7 +29,7 @@ define(function(require) {
          * @property {Object}
          */
         criteriaValueSelectors: {
-            value: 'input[name="value"]',
+            value: 'input[name="value"]:not(input[type="hidden"])',
             type: 'input[type="hidden"]:last'
         },
 
