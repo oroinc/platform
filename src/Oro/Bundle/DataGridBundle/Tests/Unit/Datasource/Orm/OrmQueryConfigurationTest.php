@@ -12,10 +12,10 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 class OrmQueryConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DatagridConfiguration */
-    protected $config;
+    private $config;
 
     /** @var OrmQueryConfiguration */
-    protected $query;
+    private $query;
 
     protected function setUp(): void
     {

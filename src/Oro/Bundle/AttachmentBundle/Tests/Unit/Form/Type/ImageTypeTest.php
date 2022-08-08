@@ -8,7 +8,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 class ImageTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ImageType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {

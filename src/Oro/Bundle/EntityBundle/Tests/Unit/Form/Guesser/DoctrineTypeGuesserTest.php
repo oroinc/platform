@@ -8,21 +8,20 @@ use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Form\Guesser\DoctrineTypeGuesser;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Component\Testing\ReflectionUtil;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
 
 class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DoctrineTypeGuesser */
-    private $guesser;
-
-    /** @var MockObject|ManagerRegistry */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $managerRegistry;
 
-    /** @var MockObject|ConfigProvider */
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $entityConfigProvider;
+
+    /** @var DoctrineTypeGuesser */
+    private $guesser;
 
     protected function setUp(): void
     {
@@ -146,11 +145,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @param string $class
-     * @param mixed $metadata
-     */
-    private function setEntityMetadata($class, $metadata)
+    private function setEntityMetadata(string $class, ?ClassMetadata $metadata): void
     {
         $entityManager = $this->createMock(EntityManager::class);
         $entityManager->expects($this->any())
@@ -164,13 +159,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityManager);
     }
 
-    /**
-     * @param TypeGuess $guess
-     * @param string $type
-     * @param array $options
-     * @param $confidence
-     */
-    private function assertGuess($guess, $type, array $options, $confidence)
+    private function assertGuess(TypeGuess $guess, string $type, array $options, int $confidence): void
     {
         $this->assertInstanceOf(TypeGuess::class, $guess);
         $this->assertEquals($type, $guess->getType());
@@ -178,10 +167,7 @@ class DoctrineTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($confidence, $guess->getConfidence());
     }
 
-    /**
-     * @param TypeGuess $guess
-     */
-    private function assertDefaultGuess($guess)
+    private function assertDefaultGuess(TypeGuess $guess): void
     {
         $this->assertGuess($guess, TextType::class, [], TypeGuess::LOW_CONFIDENCE);
     }

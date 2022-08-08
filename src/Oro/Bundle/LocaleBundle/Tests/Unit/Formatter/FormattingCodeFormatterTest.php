@@ -12,17 +12,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class FormattingCodeFormatterTest extends TestCase
 {
     /** @var LanguageCodeFormatter */
-    protected $formatter;
+    private $formatter;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    protected $translator;
+    private $translator;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|LocaleSettings */
-    protected $localeSettings;
+    private $localeSettings;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);
@@ -34,12 +31,9 @@ class FormattingCodeFormatterTest extends TestCase
     }
 
     /**
-     * @param string $value
-     * @param string $expected
-     *
      * @dataProvider formatLanguageCodeProvider
      */
-    public function testFormatLanguageCode($value, $expected)
+    public function testFormatLanguageCode(string $value, string $expected)
     {
         $this->translator->expects($value ? $this->never() : $this->once())
             ->method('trans')

@@ -8,10 +8,8 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroPercentTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var string
-     */
-    protected $locale;
+    /** @var string */
+    private $locale;
 
     protected function setUp(): void
     {

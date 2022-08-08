@@ -11,10 +11,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class AuditEntityMapperTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AuditEntityMapper
-     */
-    protected $mapper;
+    /** @var AuditEntityMapper */
+    private $mapper;
 
     protected function setUp(): void
     {

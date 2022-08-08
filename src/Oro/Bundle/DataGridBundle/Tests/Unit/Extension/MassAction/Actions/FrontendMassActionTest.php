@@ -10,11 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 class FrontendMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var FrontendMassAction */
-    protected $action;
+    private $action;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->action = new FrontendMassAction();

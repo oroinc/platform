@@ -11,10 +11,8 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class EntityTreeSelectTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var EntityTreeSelectType
-     */
-    protected $formType;
+    /** @var EntityTreeSelectType */
+    private $formType;
 
     protected function setUp(): void
     {

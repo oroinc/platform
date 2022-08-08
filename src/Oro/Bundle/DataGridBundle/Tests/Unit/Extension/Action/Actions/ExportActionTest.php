@@ -2,17 +2,15 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Action\Actions;
 
+use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ExportAction;
 
 class ExportActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExportAction */
-    protected $action;
+    private $action;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->action = new ExportAction();
@@ -42,7 +40,7 @@ class ExportActionTest extends \PHPUnit\Framework\TestCase
 
     public function testSetOptionsWithoutExportProcessor()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('There is no option "exportProcessor" for action "test_name"');
 
         $this->assertSame(

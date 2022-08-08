@@ -8,7 +8,7 @@ use Oro\Bundle\LocaleBundle\ImportExport\Normalizer\LocalizationCodeFormatter;
 class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LocalizationCodeFormatter */
-    protected $formatter;
+    private $formatter;
 
     protected function setUp(): void
     {
@@ -16,12 +16,9 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $localization
-     * @param string $expected
-     *
      * @dataProvider nameDataProvider
      */
-    public function testFormatName($localization, $expected)
+    public function testFormatName(mixed $localization, string $expected)
     {
         $this->assertEquals($expected, $this->formatter->formatName($localization));
     }
@@ -39,12 +36,9 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $localization
-     * @param string $expected
-     *
      * @dataProvider keyDataProvider
      */
-    public function testFormatKey($localization, $expected)
+    public function testFormatKey(mixed $localization, ?string $expected)
     {
         $this->assertEquals($expected, $this->formatter->formatKey($localization));
     }

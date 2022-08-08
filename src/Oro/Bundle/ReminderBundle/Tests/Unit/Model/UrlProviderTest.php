@@ -9,20 +9,14 @@ use Symfony\Component\Routing\RouterInterface;
 
 class UrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var UrlProvider
-     */
-    protected $urlProvider;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $configManager;
+    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $router;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $router;
+    /** @var UrlProvider */
+    private $urlProvider;
 
     protected function setUp(): void
     {

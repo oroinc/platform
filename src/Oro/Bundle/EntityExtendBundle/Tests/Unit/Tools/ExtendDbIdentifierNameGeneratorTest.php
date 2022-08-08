@@ -7,7 +7,7 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    private $nameGenerator;
 
     protected function setUp(): void
     {
@@ -17,14 +17,14 @@ class ExtendDbIdentifierNameGeneratorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider generateEnumTableNameProvider
      */
-    public function testGenerateEnumTableName($enumCode, $allowHash, $expected)
+    public function testGenerateEnumTableName(string $enumCode, bool $allowHash, string $expected)
     {
         $tableName = $this->nameGenerator->generateEnumTableName($enumCode, $allowHash);
         $this->assertEquals($expected, $tableName);
         $this->assertLessThanOrEqual($this->nameGenerator->getMaxIdentifierSize(), strlen($tableName));
     }
 
-    public function generateEnumTableNameProvider()
+    public function generateEnumTableNameProvider(): array
     {
         $prefix = ExtendDbIdentifierNameGenerator::ENUM_TABLE_PREFIX;
 

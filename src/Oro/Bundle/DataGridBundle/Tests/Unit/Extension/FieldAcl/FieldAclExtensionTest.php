@@ -11,16 +11,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class FieldAclExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    protected $configManager;
+    private $configManager;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipQueryHelper */
-    protected $ownershipQueryHelper;
+    private $ownershipQueryHelper;
 
     /** @var FieldAclExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {

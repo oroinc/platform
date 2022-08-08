@@ -6,14 +6,9 @@ use Oro\Bundle\ImportExportBundle\MimeType\CsvMimeTypeGuesser;
 
 class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var CsvMimeTypeGuesser
-     */
-    protected $guesser;
+    /** @var CsvMimeTypeGuesser */
+    private $guesser;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->guesser = new CsvMimeTypeGuesser();
@@ -21,20 +16,16 @@ class CsvMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider filesDataProvider
-     *
-     * @param string $path
-     * @param string|null $expectedMimeType
      */
-    public function testGuess($path, $expectedMimeType)
+    public function testGuess(string $path, ?string $expectedMimeType)
     {
         $this->assertEquals($expectedMimeType, $this->guesser->guessMimeType($path));
     }
 
     /**
-     * @return array
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function filesDataProvider()
+    public function filesDataProvider(): array
     {
         $validCsv = realpath(__DIR__ . '/Fixtures/valid.csv');
         $brokenCsv = realpath(__DIR__ . '/Fixtures/broken.csv');

@@ -6,14 +6,9 @@ use Oro\Bundle\FormBundle\Form\Type\CollectionType;
 
 class PhoneCollectionTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PhoneCollectionType
-     */
-    protected $type;
+    /** @var PhoneCollectionType */
+    private $type;
 
-    /**
-     * Setup test env
-     */
     protected function setUp(): void
     {
         $this->type = new PhoneCollectionType();

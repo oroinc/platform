@@ -9,14 +9,9 @@ use Symfony\Component\Intl\Locales;
 
 class LocaleTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var LocaleType
-     */
-    protected $formType;
+    /** @var LocaleType */
+    private $formType;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

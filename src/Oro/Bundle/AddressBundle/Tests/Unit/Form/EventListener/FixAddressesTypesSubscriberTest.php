@@ -12,14 +12,22 @@ use Symfony\Component\Form\FormInterface;
 
 class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FixAddressesTypesSubscriber
-     */
-    protected $subscriber;
+    /** @var FixAddressesTypesSubscriber */
+    private $subscriber;
 
     protected function setUp(): void
     {
         $this->subscriber = new FixAddressesTypesSubscriber('owner.addresses');
+    }
+
+    private function createAddress(AddressType $type = null): TypedAddress
+    {
+        $address = new TypedAddress();
+        if (null !== $type) {
+            $address->addType($type);
+        }
+
+        return $address;
     }
 
     public function testGetSubscribedEvents()
@@ -35,7 +43,11 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testPostSubmit(array $allAddresses, $formAddressKey, array $expectedAddressesData)
     {
-        $owner = new TypedAddressOwner($allAddresses);
+        $owner = new TypedAddressOwner();
+        foreach ($allAddresses as $address) {
+            $address->setOwner($owner);
+            $owner->getAddresses()->add($address);
+        }
         $event = new FormEvent($this->createMock(FormInterface::class), $allAddresses[$formAddressKey]);
 
         $this->subscriber->postSubmit($event);
@@ -54,9 +66,9 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
         return [
             'unset_primary_and_remove_type' => [
                 'allAddresses' => [
-                    'foo' => $this->createAddress()->addType($billing),
-                    'bar' => $this->createAddress()->addType($billing),
-                    'baz' => $this->createAddress()->addType($shipping),
+                    'foo' => $this->createAddress($billing),
+                    'bar' => $this->createAddress($billing),
+                    'baz' => $this->createAddress($shipping),
                 ],
                 'formAddressKey' => 'foo',
                 'expectedAddressesData' => [
@@ -68,8 +80,8 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
             'nothing_to_do' => [
                 'allAddresses' => [
                     'foo' => $this->createAddress(),
-                    'bar' => $this->createAddress()->addType($billing),
-                    'baz' => $this->createAddress()->addType($shipping),
+                    'bar' => $this->createAddress($billing),
+                    'baz' => $this->createAddress($shipping),
                 ],
                 'formAddressKey' => 'foo',
                 'expectedAddressesData' => [
@@ -79,13 +91,5 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
         ];
-    }
-
-    /**
-     * @return TypedAddress
-     */
-    protected function createAddress()
-    {
-        return new TypedAddress();
     }
 }

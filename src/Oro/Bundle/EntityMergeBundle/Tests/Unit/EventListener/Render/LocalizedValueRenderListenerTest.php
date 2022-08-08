@@ -14,40 +14,26 @@ use Oro\Bundle\LocaleBundle\Model\FirstNameInterface;
 
 class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LocalizedValueRenderListener
-     */
-    protected $target;
+    /** @var AddressFormatter|\PHPUnit\Framework\MockObject\MockObject */
+    private $addressFormatter;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $addressFormatter;
+    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $dateTimeFormatter;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $dateTimeFormatter;
+    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityNameResolver;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityNameResolver;
+    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
+    private $numberFormatter;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $numberFormatter;
+    /** @var ValueRenderEvent|\PHPUnit\Framework\MockObject\MockObject */
+    private $event;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $event;
+    /** @var MetadataInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $metadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $metadata;
+    /** @var LocalizedValueRenderListener */
+    private $target;
 
     protected function setUp(): void
     {
@@ -66,7 +52,7 @@ class LocalizedValueRenderListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function expectEventCalls($originalValue, $localizedValue = null)
+    private function expectEventCalls(mixed $originalValue, mixed $localizedValue = null): void
     {
         $this->event->expects($this->any())
             ->method('getOriginalValue')

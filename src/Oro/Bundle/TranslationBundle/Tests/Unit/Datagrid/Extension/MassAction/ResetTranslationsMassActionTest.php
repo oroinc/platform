@@ -10,7 +10,7 @@ use Oro\Component\Config\Common\ConfigObject;
 class ResetTranslationsMassActionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ResetTranslationsMassAction */
-    protected $action;
+    private $action;
 
     protected function setUp(): void
     {

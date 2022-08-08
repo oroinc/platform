@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\ExpressionVisitor;
 use Doctrine\Common\Collections\Expr\Value;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
@@ -18,33 +19,21 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
     private const ENTITY_CLASS = 'Test\Entity';
     private const ENTITY_ALIAS = 'test_entity';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AbstractSearchMappingProvider */
-    private $searchMappingProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SearchFieldResolver */
-    private $searchFieldResolver;
-
     /** @var SearchQueryFilter */
     private $filter;
 
     protected function setUp(): void
     {
-        $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
-        $this->searchFieldResolver = $this->createMock(SearchFieldResolver::class);
-
         $fieldMappings = ['field1' => 'field_1'];
-        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
-        $searchFieldResolverFactory->expects(self::any())
-            ->method('createFieldResolver')
-            ->with(self::ENTITY_CLASS, $fieldMappings)
-            ->willReturn($this->searchFieldResolver);
 
-        $this->searchMappingProvider->expects(self::any())
+        $searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
+        $searchMappingProvider->expects(self::any())
             ->method('getEntityConfig')
             ->with(self::ENTITY_CLASS)
             ->willReturn(['alias' => self::ENTITY_ALIAS]);
 
-        $this->searchFieldResolver->expects(self::any())
+        $searchFieldResolver = $this->createMock(SearchFieldResolver::class);
+        $searchFieldResolver->expects(self::any())
             ->method('resolveFieldName')
             ->willReturnCallback(function ($fieldName) use ($fieldMappings) {
                 if (isset($fieldMappings[$fieldName])) {
@@ -53,12 +42,18 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
 
                 return $fieldName;
             });
-        $this->searchFieldResolver->expects(self::any())
+        $searchFieldResolver->expects(self::any())
             ->method('resolveFieldType')
             ->willReturn('text');
 
+        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
+        $searchFieldResolverFactory->expects(self::any())
+            ->method('createFieldResolver')
+            ->with(self::ENTITY_CLASS, $fieldMappings)
+            ->willReturn($searchFieldResolver);
+
         $this->filter = new SearchQueryFilter(DataType::STRING);
-        $this->filter->setSearchMappingProvider($this->searchMappingProvider);
+        $this->filter->setSearchMappingProvider($searchMappingProvider);
         $this->filter->setSearchFieldResolverFactory($searchFieldResolverFactory);
         $this->filter->setEntityClass(self::ENTITY_CLASS);
         $this->filter->setFieldMappings($fieldMappings);
@@ -97,7 +92,7 @@ class SearchQueryFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testInvalidFilter()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('Not allowed operator.');
 
         $criteria = new Criteria();

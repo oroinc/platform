@@ -19,13 +19,13 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SearchEntityFilterTypeTest extends FormIntegrationTestCase
 {
     /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityNameResolver;
+    private $entityNameResolver;
 
     /** @var LocalizationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationHelper;
+    private $localizationHelper;
 
     /** @var SearchEntityFilterType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {

@@ -7,20 +7,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CurrentRouteContentProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Request
-     */
-    protected $request;
+    /** @var Request */
+    private $request;
 
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
+    /** @var RequestStack */
+    private $requestStack;
 
-    /**
-     * @var CurrentRouteContentProvider
-     */
-    protected $provider;
+    /** @var CurrentRouteContentProvider */
+    private $provider;
 
     protected function setUp(): void
     {

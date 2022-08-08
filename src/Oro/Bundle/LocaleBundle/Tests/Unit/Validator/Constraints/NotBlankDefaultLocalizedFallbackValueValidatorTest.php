@@ -5,20 +5,13 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Validator\Constraints;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Bundle\LocaleBundle\Helper\LocalizationHelper;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\NotBlankDefaultLocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Validator\Constraints\NotBlankDefaultLocalizedFallbackValueValidator;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotBlankDefaultLocalizedFallbackValueValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * @var LocalizationHelper|MockObject
-     */
-    protected $localizationHelper;
-
     protected function createValidator()
     {
         return new NotBlankDefaultLocalizedFallbackValueValidator();
@@ -26,10 +19,8 @@ class NotBlankDefaultLocalizedFallbackValueValidatorTest extends ConstraintValid
 
     /**
      * @dataProvider validLocalizationDataProvider
-     *
-     * @param string|int $defaultTitleValue
      */
-    public function testValidDefaultLocalizedValue($defaultTitleValue)
+    public function testValidDefaultLocalizedValue(string|int $defaultTitleValue)
     {
         $defaultValue = new LocalizedFallbackValue();
         $defaultValue->setString($defaultTitleValue);
@@ -51,10 +42,8 @@ class NotBlankDefaultLocalizedFallbackValueValidatorTest extends ConstraintValid
 
     /**
      * @dataProvider notValidLocalizationDataProvider
-     *
-     * @param string|int $defaultTitleValue
      */
-    public function testNotValidDefaultLocalizedValue($defaultTitleValue)
+    public function testNotValidDefaultLocalizedValue(?string $defaultTitleValue)
     {
         $defaultValue = new LocalizedFallbackValue();
         $defaultValue->setString($defaultTitleValue);
