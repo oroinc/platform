@@ -24,6 +24,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### FilterBundle
+
+* The `day-value-helper` was removed, use `date-value-helper` instead.
+
 #### CronBundle
 * `Oro\Bundle\CronBundle\Command\CronCommandInterface` has been removed.
   Use `Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface`
