@@ -44,6 +44,9 @@ define(function(require) {
                 'click .dropdown-level-1': this.onMenuOpen,
                 'transitionend .accordion': function() {
                     mediator.trigger('layout:reposition');
+                },
+                'mainMenuUpdated'() {
+                    this.scrollingOverlay.setScrollingContent(this.element.find('.nav-multilevel'));
                 }
             });
 
