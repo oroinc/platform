@@ -22,6 +22,7 @@ class CleanupAsyncOperationCompilerPass implements CompilerPassInterface
 
         $container->getDefinition(CleanupAsyncOperationsCommand::class)
             ->replaceArgument(0, $asyncOperationConfig['lifetime'])
-            ->replaceArgument(1, $asyncOperationConfig['cleanup_process_timeout']);
+            ->replaceArgument(1, $asyncOperationConfig['cleanup_process_timeout'])
+            ->addMethodCall('setOperationTimeout', [$asyncOperationConfig['operation_timeout']]);
     }
 }
