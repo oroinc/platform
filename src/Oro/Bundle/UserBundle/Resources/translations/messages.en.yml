@@ -427,13 +427,13 @@ oro:
                 password_special_chars:
                     label: Require a special character
                     tooltip: >
-                        Special chars: {{ specialChars }} and space
+                        If enabled, then the password must contain special characters: {{ specialChars }} and space.
                 send_password_in_invitation_email:
                     label: 'Send plain text password in invitation emails'
                     tooltip: 'This option defines whether or not the password is sent in a plain text in the invitation email. Always keep it disabled in production.'
                 case_insensitive_email_addresses_enabled:
                     label: 'Case-Insensitive Email Addresses'
-                    tooltip: 'If this option is enabled, the letter case will be ignored when comparing email addresses. For example, john.doe@example.com and John.Doe@example.com will be considered equal.'
+                    tooltip: 'Enable the option to ignore the letter case when comparing email addresses. In this case, john.doe@example.com and John.Doe@example.com are considered equal.'
         mass_actions:
             enable_users:
                 success_message: '%count% user(s) were enabled'

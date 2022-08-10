@@ -123,12 +123,12 @@ oro:
                 description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.
             webp_quality:
                 label: WebP resize quality (%)
-                tooltip: Modification of the value may cause temporary storefront slow-down until all product images are resized.
+                tooltip: Determines the percentage of the .webp image resize quality (30%-100%). The higher the value, the better the image quality. Modification of the value may cause temporary storefront slow-down until all product images are resized.
             png_quality: PNG resize quality (%)
             png_preserve_quality: Preserve quality
             png_minimize_file_size: Minimize file size
             jpeg_quality: JPEG resize quality (%)
-            quality_tooltip: Modification of the value may cause temporary storefront slow-down until all product images are resized.
+            quality_tooltip: Determines the percentage of image resize quality (30%-100%). The higher the value, the better the image quality. Modification of the value may cause temporary storefront slow-down until all product images are resized.
             thumb_width.label:   Thumbnail width
             thumb_height.label:  Thumbnail height
             attachment.label:    Upload Settings

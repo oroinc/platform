@@ -8,13 +8,13 @@ oro.imap:
         fields:
             enable_google_imap:
                 label: Enable
-                tooltip: 'Please make sure that Gmail API is enabled in the <a href="https://console.developers.google.com/apis/api/gmail/overview/" target="_blank">Google Developers Console</a>.'
+                tooltip: 'To activate OAuth 2.0, make sure that Gmail API is enabled in the <a href="https://console.developers.google.com/apis/api/gmail/overview/" target="_blank">Google Developers Console</a>.'
                 error.label: Error during Authorization
                 success.label: Authorization was successfull
                 warning.label: If you disable this option, all users' mailboxes configured with Gmail OAuth 2.0, will become unavailable for synchronization.
             enable_microsoft_imap:
                 label: Enable Emails Sync
-                tooltip: Allows to enable and configure emails synchronization with Microsoft 365 for users. Please make sure that fields under the Azure Active Directory Application Settings are filled.
+                tooltip: Select the option to enable and configure emails synchronization with Microsoft 365 for users. Make sure to fill out the Azure Active Directory Application settings.
                 error.label: Error during Authorization
                 success.label: Authorization was successfull
                 warning.label: If you disable this option, all users' mailboxes configured with Microsoft Azure App OAuth 2.0, will become unavailable for synchronization.

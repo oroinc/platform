@@ -144,13 +144,13 @@ oro.locale:
         tooltip:
             languages: "Select the languages that can be used to translate email templates."
             locale: "Locale selection affects the formatting of numbers, addresses, names, and dates."
-            location: " If Format address per country option is disabled, or there is no country-specific formatting, the addresses will be formatted according to the rules of primary location."
-            format_address_by_address_country: "When this option is selected, addresses will be formatted according to the rules of their countries. Otherwise, the primary location formatting will be applied."
+            location: " Select the location whose address formatting should be used if the Format Address Per Country option is disabled, or there is no country-specific formatting."
+            format_address_by_address_country: "Select the option to format addresses following addressing guidelines of the required country. If unselected, primary location formatting is applied."
             language: "Select the system language from the list of the installed translations (see System &rarr; Localization &rarr; Languages)."
-            timezone: "Select the timezone of your location. All dates and times will be displayed in the specified timezone."
+            timezone: "Select the timezone to display all dates and times based on your location. "
             currency: "Select the default currency"
             quarter_start: "Set the date when the first quarter of the year starts."
-            temperature_unit: "Select the temperature unit. This settings will be applied for the weather on the map."
-            wind_speed_unit: "Select the wind speed unit. This settings will be applied for the weather on the map."
+            temperature_unit: "Select the temperature unit to apply to the weather on the map."
+            wind_speed_unit: "Select the wind speed unit to apply for the weather on the map."
 
 oro.scope.localization.label: Localization

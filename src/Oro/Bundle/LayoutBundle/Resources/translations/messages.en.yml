@@ -14,7 +14,7 @@ oro:
                         yes: Yes
                 debug_developer_toolbar:
                     label: Generate layout tree dump for the developer toolbar
-                    tooltip: This option works with debug mode enabled only
+                    tooltip: This option works only with the enabled debug mode.
                     choices:
                         no: No
                         yes: Yes

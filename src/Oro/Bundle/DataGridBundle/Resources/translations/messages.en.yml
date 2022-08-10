@@ -88,6 +88,6 @@ oro:
             fields:
                 default_per_page.label: 'Items per Page by Default'
                 full_screen_layout_enabled.label: 'Lock headers in grids'
-                full_screen_layout_enabled.tooltip: 'This parameter controls whether grid headers are locked on the page during scrolling'
+                full_screen_layout_enabled.tooltip: 'Enable this option to lock grid headers on the page when scrolling.'
                 row_link_enabled.label: 'Row link navigation'
-                row_link_enabled.tooltip: 'This option adds the ability for the row in the grid to behave like a native link'
+                row_link_enabled.tooltip: 'Enable this option to make rows in the grid behave like native links.'

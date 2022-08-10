@@ -42,9 +42,9 @@ oro:
 
             tooltip:
                 attachment_sync:
-                    enable: Enable loading attachments on email sync.
-                    max_size: Maximum sync attachment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
-                    preview_limit: Limit to show preview for attachments (thumbnail for images and a big file icon for other files). Set to 0 to see a list with file names only.
+                    enable: Select the option to enable attachments loading while synchronizing emails.
+                    max_size: Max sync attachment size in Mb. Attachments that exceed the defined size cannot be downloaded. Set to 0 to remove limitations.
+                    preview_limit: A limit to show preview for attachments (a thumbnail for images and a big file icon for other files). Set to 0 to see a list with file names only.
 
         variable.not.found:                     N/A
 
@@ -125,7 +125,7 @@ oro:
             attachment:
                 max_size:
                     label: Maximum Attachment Size, Mb
-                    tooltip: Maximum attachment size, Mb. Attachments with exceeding size will not be uploaded. To unlimit size set to 0.
+                    tooltip: Max allowed attachment size to upload in Mb. Attachments that exceed the size limit are not uploaded. Set to 0 to remove limitations.
 
             attachment_sync:
                 enable:
@@ -137,7 +137,7 @@ oro:
 
             sanitize_html:
                 label: Enable HTML purifier
-                tooltip: Disabling HTML purifier will allow users to paste any HTML code into template or email body editor without tag stripping.
+                tooltip: Disable HTML Purifier to enable users to paste any HTML code into a template or an email body editor without tag stripping.
 
         emailtemplate:
             entity_label:        Email Template

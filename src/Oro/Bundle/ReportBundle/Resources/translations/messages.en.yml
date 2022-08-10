@@ -120,7 +120,7 @@ oro:
                 report_settings.title: Reports settings
             fields:
                 display_sql_query.label: Display SQL in Reports and Segments
-                display_sql_query.tooltip: Displays SQL query of a report or segment on its view page
+                display_sql_query.tooltip: Select this option to display the SQL query of a report or a segment on its view page.
         filter:
             grouping.label: Grouping
             skip_empty_periods.label: Skip Empty Periods
