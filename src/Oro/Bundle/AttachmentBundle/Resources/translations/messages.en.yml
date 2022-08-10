@@ -155,7 +155,7 @@ oro:
 
             original_file_names_enabled:
                 label: Enable Original File Names
-                tooltip: When enabled, the original file names will be appended to the system-generated hash values.
+                tooltip: Enable the option to append the original image file name to the system-generated hash value. All non-alphanumeric characters (e.g., ":),~") are replaced with "-" (dash).
 
             notice:
                 storage_check_space: >
