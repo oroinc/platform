@@ -77,3 +77,7 @@ search:
                 name:                   label
                 target_type:            text
                 target_fields:          [label]
+            -
+                name:                   role
+                target_type:            text
+                target_fields:          [role]

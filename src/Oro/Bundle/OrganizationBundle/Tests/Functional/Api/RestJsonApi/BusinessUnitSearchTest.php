@@ -3,6 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 
 class BusinessUnitSearchTest extends RestJsonApiTestCase
@@ -13,6 +14,10 @@ class BusinessUnitSearchTest extends RestJsonApiTestCase
 
         parent::setUp();
         $this->loadFixtures([LoadBusinessUnit::class]);
+        // do the reindex because by some unknown reasons the search index is empty
+        // after upgrade from old application version
+        $indexer = self::getContainer()->get('oro_search.search.engine.indexer');
+        $indexer->reindex(BusinessUnit::class);
     }
 
     public function testSearchBusinessUnits(): void
