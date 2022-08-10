@@ -1048,6 +1048,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener
         arguments:
             - '@doctrine'
+            - '@oro_api.batch.async.operation_manager'
         tags:
             - { name: kernel.event_listener, event: oro_message_queue.before_save_job, method: onBeforeSaveJob }
 
