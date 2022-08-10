@@ -612,3 +612,15 @@ services:
             - '%oro_user.login_sources%'
         tags:
             - { name: monolog.logger, channel: security }
+
+    oro_user.acl.voter.anonymous_role:
+        class: Oro\Bundle\UserBundle\Acl\Voter\AnonymousRoleVoter
+        tags:
+            - { name: security.voter }
+
+    oro_user.acl.search.role_acl_helper_condition:
+        class: Oro\Bundle\UserBundle\Acl\Search\RoleSearchAclHelperCondition
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+        tags:
+            - { name: oro_security.acl_helper.condition }
