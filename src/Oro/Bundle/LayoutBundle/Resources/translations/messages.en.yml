@@ -21,7 +21,7 @@ oro:
         feature:
             development_settings:
                 label: Development Settings
-                description: Development Settings is enabled only in dev environment
+                description: Enables development settings (such as layouts tree and block debug) in the system configuration. This option is available in the dev environment only.
 
         profiler:
             title: Layout

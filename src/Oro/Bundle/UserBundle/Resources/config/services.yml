@@ -115,6 +115,11 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
+    oro_user.access_rule.anonymous_role:
+        class: Oro\Bundle\UserBundle\Acl\AccessRule\AnonymousRoleAccessRule
+        tags:
+            - { name: oro_security.access_rule, entityClass: Oro\Bundle\UserBundle\Entity\Role }
+
     oro_user.role_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\RoleManager
         arguments:

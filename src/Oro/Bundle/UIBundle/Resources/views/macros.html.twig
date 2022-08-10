@@ -1465,7 +1465,7 @@
     {% import _self as UIMacro %}
 
     {% if entity %}
-        {% if route and is_granted(permission|default('VIEW'), entity) %}
+        {% if route and is_granted(permission|default('VIEW'), entity) and feature_resource_enabled(route, 'routes') %}
             {{ UIMacro.renderUrl(path(route, {'id': entity.id}), label) }}
         {% else %}
             {{ label|escape }}

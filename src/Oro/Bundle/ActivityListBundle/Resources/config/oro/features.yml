@@ -1,0 +1,24 @@
+features:
+    activity_lists:
+        label: oro.activitylist.feature.label
+        description: oro.activitylist.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_activity_list_widget_activities
+            - oro_activitylist_segment_activitycondition
+            - oro_activity_list_api_get_list
+            - oro_activity_list_api_get_item
+            - oro_api_get_activitylist_activity_list_item
+            - oro_api_get_activitylist_activity_list_option
+        entities:
+            - Oro\Bundle\ActivityListBundle\Entity\ActivityList
+            - Oro\Bundle\ActivityListBundle\Entity\ActivityOwner
+        placeholder_items:
+            - view_oro_activity_list
+            - update_oro_activity_list
+            - activity_condition
+        configuration:
+            - oro_activity_list.sorting_field
+            - oro_activity_list.sorting_direction
+            - oro_activity_list.per_page
+            - oro_activity_list.grouping

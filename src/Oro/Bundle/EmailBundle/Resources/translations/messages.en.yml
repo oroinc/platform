@@ -26,8 +26,8 @@ oro:
             no_subject: "no subject"
 
         feature:
-            label: User Emails
-            description: Enables user emails
+            label: Email Settings
+            description: Enables the user email management settings, including the configuration of personal and system mailboxes, email threads, and email attachment settings.
 
         form:
             choose_template:                     Choose a Template
@@ -193,7 +193,10 @@ oro:
 
             # errors
             failed_to_compile: This email template can't be used
-
+            feature:
+                manage:
+                    label: Email Template Management
+                    description: Enables creating and managing personalized email templates.
         emailtemplatetranslation:
             entity_label: 'Email Template Translations'
             entity_plural_label: 'Email Template Translations'

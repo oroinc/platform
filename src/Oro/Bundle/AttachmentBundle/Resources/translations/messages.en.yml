@@ -100,21 +100,22 @@ oro:
             file_size.label:     File Size (MB)
             feature:
                 attachment_processors_allowed:
-                    label: Enable Image Optimization
+                    title: Enable Image Optimization
                     tooltip: While additional image optimization may reduce the final image size it requires extra processing time and may increase the load on the system when uploading, importing or resizing many images at the same time.
-                    description: Disable or enable image optimization feature
+                    label: Image Optimization Setting
+                    description: Enables the system to optimize the images, reducing the final image size.
                 attachment_processors:
-                    label: Attachment processors settings
-                    description: Attachment settings feature allow you to change the image quality from configuration
+                    label: Image Resize Quality Settings
+                    description: Enables the system configuration settings that change the size and quality of the uploading .jpeg and .png images.
                 attachment_processing:
-                    label: Attachment processing
-                    description: Allows to enable or disable post processing
+                    label: Image Processing Settings
+                    description: Enables a set of the image processing settings that control whether to optimize or not the size of the uploading images in the storage.
                 webp:
-                    label: WebP Format Support
-                    description: Allows to enable generation of images in the WebP format
+                    label: WebP Image Format Settings
+                    description: Enables converting images into the WebP format and controlling the quality of the resized WebP images.
                 original_file_names_enabled:
-                    label: Enable Original File Names
-                    description: When enabled, the original file names will be appended to the system-generated hash values.
+                    label: Attachment Original File Names
+                    description: Enables appending original file names to the system-generated hash values. All non-alphanumeric characters (e.g., ":),~") are replaced with "-" (dash).
             attachment_processors_settings:
                 label: Image Processing
                 description: Modification of the default value may cause temporary storefront slow-down until all product images are resized. The changes on the product listing page will not be applied immediately and will require manual start of the search re-index. Make sure that the harddrive has at least 50% space available as the resized images will be stored alongside the existing ones.

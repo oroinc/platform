@@ -103,6 +103,11 @@ oro:
             content: "Warning: Removing the integration will delete all related data"
             success: Integration and all related data were deleted
 
+        feature:
+            manage:
+                label: Integration Management
+                description: Enables creating and managing payment, shipping, and other integrations with third-party applications.
+
         form:
             no_available_integrations: No integrations available
 

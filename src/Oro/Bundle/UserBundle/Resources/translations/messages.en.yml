@@ -42,6 +42,10 @@ resetting:
 
 oro:
     user:
+        feature:
+            manage:
+                label: Back-Office User Management
+                description: Enables creating back-office users and adjusting their configuration settings.
         form:
             access_settings.label: Business Units
             signature.label: Email Signature
@@ -189,6 +193,10 @@ oro:
         roles:
             label:                   Roles
             description:             The roles assigned to the user.
+            feature:
+                manage:
+                    label: Back-Office User Role and Permission Management
+                    description: Enables creating and managing roles and permissions for the back-office users.
         datagrid:
             user:
                 columns:
@@ -258,6 +266,11 @@ oro:
             owner.label: Owner
             organization.label:  Organization
             has_group.label:     Has group
+            feature:
+                manage:
+                    label: Back-Office User Group Management
+                    description: Enables creating and managing user groups that help consolidate back-office users into certain field-specific groups.
+
         #
         # Oro/Bundle/UserBundle/Entity/Role
         #
@@ -317,7 +330,10 @@ oro:
             context:
                 label: Context
                 description: Additional user info was tracked during loging.
-
+            feature:
+                manage:
+                    label: Back-Office User Login Attempts
+                    description: Enables access to view successful and unsuccessful login attempts of back-office users.
         invite:
             label: Send an Email Invitation
         privileges:

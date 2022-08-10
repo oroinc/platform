@@ -52,6 +52,7 @@ services:
         arguments:
             - '@oro_entity.entity_class_name_provider'
             - '@oro_dataaudit.audit_config_provider'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_dataaudit.datagrid.author_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider'

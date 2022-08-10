@@ -41,6 +41,11 @@ oro.locale:
         navigation:
             view: 'Localization "%name%"'
 
+        feature:
+            manage:
+                label: Localization Management
+                description: Enables creating and managing localizations that help adapt the website content and system elements to the user-specific location.
+
         form:
             placeholder:
                 select_parent_localization: 'Please select parent localization...'

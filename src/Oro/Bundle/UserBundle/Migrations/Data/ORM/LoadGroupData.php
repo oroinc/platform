@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\Group;
 class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getDependencies(): array
     {
@@ -32,11 +32,11 @@ class LoadGroupData extends AbstractFixture implements DependentFixtureInterface
         $manager->flush();
     }
 
-    private function createGroup(string $name, ?BusinessUnit $owner): Group
+    private function createGroup(string $name, ?BusinessUnit $businessUnit): Group
     {
-        $group= new Group($name);
-        if (null !== $owner) {
-            $group->setOwner($owner);
+        $group = new Group($name);
+        if (null !== $businessUnit) {
+            $group->setOwner($businessUnit);
         }
 
         return $group;

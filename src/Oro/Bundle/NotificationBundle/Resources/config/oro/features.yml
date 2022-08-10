@@ -1,0 +1,53 @@
+features:
+    email_notification_rules:
+        label: oro.notification.emailnotification.feature.label
+        description: oro.notification.emailnotification.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_notification_emailnotification_index
+            - oro_notification_emailnotification_update
+            - oro_notification_emailnotification_create
+            - oro_api_delete_emailnotication
+        configuration:
+            - oro_notification.email_notification_sender_email
+            - oro_notification.email_notification_sender_name
+        entities:
+            - Oro\Bundle\NotificationBundle\Entity\EmailNotification
+        api_resources:
+            - Oro\Bundle\NotificationBundle\Entity\EmailNotification
+        navigation_items:
+            - application_menu.system_tab.emails.oro_notification_emailnotification_list
+
+    email_mass_notifications:
+        label: oro.notification.massnotification.feature.label
+        description: oro.notification.massnotification.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_notification_massnotification_index
+            - oro_notification_massnotification_view
+            - oro_notification_massnotification_info
+        configuration:
+            - oro_notification.mass_notification_recipients
+            - oro_notification.mass_notification_template
+        entities:
+            - Oro\Bundle\NotificationBundle\Entity\MassNotification
+        api_resources:
+            - Oro\Bundle\NotificationBundle\Entity\MassNotification
+        navigation_items:
+            - application_menu.system_tab.emails.oro_notification_massnotification_list
+
+    notification_alerts:
+        label: oro.notification.notificationalert.feature.label
+        description: oro.notification.notificationalert.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_notification_notificationalert_index
+        commands:
+            - oro:notification:alerts:list
+            - oro:notification:alerts:cleanup
+        entities:
+            - Oro\Bundle\NotificationBundle\Entity\NotificationAlert
+        api_resources:
+            - Oro\Bundle\NotificationBundle\Entity\NotificationAlert
+        navigation_items:
+            - application_menu.system_tab.oro_notification_notificationalerts_list

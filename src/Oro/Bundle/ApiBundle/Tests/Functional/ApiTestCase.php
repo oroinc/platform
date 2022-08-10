@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -154,27 +153,21 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function findEntityId(string $entityClass): mixed
     {
-        /** @var EntityManager|null $em */
+        /** @var EntityManagerInterface|null $em */
         $em = self::getContainer()->get('doctrine')->getManagerForClass($entityClass);
         if (null === $em) {
             return null;
         }
 
-        $ids = $em->getRepository($entityClass)->createQueryBuilder('e')
-            ->select(
-                implode(
-                    ',',
-                    array_map(
-                        function ($fieldName) {
-                            return 'e.' . $fieldName;
-                        },
-                        $em->getClassMetadata($entityClass)->getIdentifierFieldNames()
-                    )
-                )
-            )
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getArrayResult();
+        $qb = $em->getRepository($entityClass)->createQueryBuilder('e')
+            ->select(implode(',', array_map(
+                function ($fieldName) {
+                    return 'e.' . $fieldName;
+                },
+                $em->getClassMetadata($entityClass)->getIdentifierFieldNames()
+            )))
+            ->setMaxResults(1);
+        $ids = self::getContainer()->get('oro_security.acl_helper')->apply($qb)->getArrayResult();
         if (empty($ids)) {
             return null;
         }

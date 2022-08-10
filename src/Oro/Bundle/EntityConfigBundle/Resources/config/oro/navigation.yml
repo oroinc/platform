@@ -12,6 +12,8 @@ navigation:
                 extras:
                     routes:      ['oro_entityconfig*', 'oro_entityextend*']
                     description: 'oro.entity_config.menu.entity_management.description'
+                position: -255
+
             attributes_list:
                 label: 'oro.entity_config.menu.attributes_list.label'
                 uri: '#'

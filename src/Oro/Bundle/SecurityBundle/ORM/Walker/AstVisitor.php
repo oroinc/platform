@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
+use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Query\AST;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
@@ -12,17 +13,15 @@ use Oro\Bundle\SecurityBundle\AccessRule\Visitor;
 
 /**
  * Converts access rule expressions to DBAL AST conditions.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class AstVisitor extends Visitor
 {
-    /** @var EntityManagerInterface */
-    private $em;
+    private const LIKE = 'LIKE';
 
-    /** @var string */
-    private $alias;
-
-    /** @var QueryComponentCollection */
-    private $queryComponents;
+    private EntityManagerInterface $em;
+    private string $alias;
+    private QueryComponentCollection $queryComponents;
 
     public function __construct(
         EntityManagerInterface $em,
@@ -37,31 +36,27 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkComparison(Expr\Comparison $comparison): AST\ConditionalPrimary
+    public function walkComparison(Expr\Comparison $comparison): mixed
     {
-        $leftExpression = new AST\ArithmeticExpression();
-        $leftExpression->simpleArithmeticExpression = $comparison->getLeftOperand()->visit($this);
-
         $operator = $comparison->getOperator();
-
         switch ($operator) {
             case Expr\Comparison::IN:
-                $resultExpression = new AST\InExpression($leftExpression);
+                $resultExpression = new AST\InExpression($this->walkOperand($comparison->getLeftOperand()));
                 $resultExpression->literals = $comparison->getRightOperand()->visit($this);
                 break;
             case Expr\Comparison::NIN:
-                $resultExpression = new AST\InExpression($leftExpression);
+                $resultExpression = new AST\InExpression($this->walkOperand($comparison->getLeftOperand()));
                 $resultExpression->not = true;
                 $resultExpression->literals = $comparison->getRightOperand()->visit($this);
                 break;
+            case Expr\Comparison::CONTAINS:
+                $resultExpression = $this->walkContainsComparison($comparison);
+                break;
             default:
-                $rightExpression = new AST\ArithmeticExpression();
-                $rightExpression->simpleArithmeticExpression = $comparison->getRightOperand()->visit($this);
-
                 $resultExpression = new AST\ComparisonExpression(
-                    $leftExpression,
+                    $this->walkOperand($comparison->getLeftOperand()),
                     $comparison->getOperator(),
-                    $rightExpression
+                    $this->walkOperand($comparison->getRightOperand())
                 );
         }
 
@@ -74,7 +69,7 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkValue(Expr\Value $value)
+    public function walkValue(Expr\Value $value): mixed
     {
         // unfortunately we have to use literals
         // because it is not possible to add query parameters in a query walker;
@@ -95,7 +90,7 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkCompositeExpression(Expr\CompositeExpression $expr)
+    public function walkCompositeExpression(Expr\CompositeExpression $expr): mixed
     {
         $factors = [];
         foreach ($expr->getExpressionList() as $expression) {
@@ -123,7 +118,7 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkAccessDenied(Expr\AccessDenied $accessDenied): AST\ConditionalPrimary
+    public function walkAccessDenied(Expr\AccessDenied $accessDenied): mixed
     {
         $leftExpression = new AST\ArithmeticExpression();
         $leftExpression->simpleArithmeticExpression = new AST\Literal(AST\Literal::NUMERIC, 1);
@@ -142,13 +137,12 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkAssociation(Expr\Association $association)
+    public function walkAssociation(Expr\Association $association): mixed
     {
         $alias = $this->alias;
         $associationName = $association->getAssociationName();
 
-        /** @var ClassMetadataInfo $sourceMetadata */
-        $sourceMetadata = $this->queryComponents->get($alias)->getMetadata();
+        $sourceMetadata = $this->getMetadata($alias);
         if (empty($sourceMetadata->associationMappings[$associationName])) {
             throw new \RuntimeException(\sprintf(
                 'Parameter of Association expression should be the name of existing association'
@@ -171,14 +165,14 @@ class AstVisitor extends Visitor
         $targetMetadata = $this->em->getClassMetadata($targetEntityClass);
 
         $queryComponentRelation = $associationMapping;
-        if (!$associationMapping['isOwningSide']) {
+        if ($associationMapping['isOwningSide']) {
+            $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $targetEntityAlias);
+            $rightPathExpression = new Expr\Path($associationName, $alias);
+        } else {
             $mappedBy = $associationMapping['mappedBy'];
             $queryComponentRelation = $targetMetadata->associationMappings[$mappedBy];
             $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $alias);
             $rightPathExpression = new Expr\Path($mappedBy, $targetEntityAlias);
-        } else {
-            $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $targetEntityAlias);
-            $rightPathExpression = new Expr\Path($associationName, $alias);
         }
 
         $this->queryComponents->add(
@@ -205,13 +199,12 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkPath(Expr\Path $path): AST\PathExpression
+    public function walkPath(Expr\Path $path): mixed
     {
         $alias = $path->getAlias() ?: $this->alias;
         $field = $path->getField();
 
-        /** @var ClassMetadata $metadata */
-        $metadata = $this->queryComponents->get($alias)->getMetadata();
+        $metadata = $this->getMetadata($alias);
         if ($metadata->isSingleValuedAssociation($field)) {
             $type = AST\PathExpression::TYPE_SINGLE_VALUED_ASSOCIATION;
         } elseif ($metadata->isCollectionValuedAssociation($field)) {
@@ -233,7 +226,7 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkSubquery(Expr\Subquery $subquery): AST\Subselect
+    public function walkSubquery(Expr\Subquery $subquery): mixed
     {
         $from = $subquery->getFrom();
         $alias = $subquery->getAlias();
@@ -266,7 +259,7 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkExists(Expr\Exists $existsExpr): AST\ConditionalPrimary
+    public function walkExists(Expr\Exists $existsExpr): mixed
     {
         $exist = new AST\ExistsExpression($existsExpr->getExpression()->visit($this));
         $exist->not = $existsExpr->isNot();
@@ -280,7 +273,7 @@ class AstVisitor extends Visitor
     /**
      * {@inheritdoc}
      */
-    public function walkNullComparison(Expr\NullComparison $comparison): AST\ConditionalPrimary
+    public function walkNullComparison(Expr\NullComparison $comparison): mixed
     {
         $expression = new AST\NullComparisonExpression($comparison->getExpression()->visit($this));
         $expression->not = $comparison->isNot();
@@ -291,12 +284,106 @@ class AstVisitor extends Visitor
         return $primaryConditional;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return AST\Literal
-     */
-    protected function getValueLiteral($value): AST\Literal
+    private function walkOperand(Expr\ExpressionInterface $operand): AST\ArithmeticExpression
+    {
+        $expression = new AST\ArithmeticExpression();
+        $expression->simpleArithmeticExpression = $operand->visit($this);
+
+        return $expression;
+    }
+
+    private function walkContainsComparison(Expr\Comparison $comparison): AST\Node
+    {
+        $leftOperand = $comparison->getLeftOperand();
+        if (!$leftOperand instanceof Expr\Path) {
+            throw new \RuntimeException('The left operand for CONTAINS comparison must be a path.');
+        }
+        $rightOperand = $comparison->getRightOperand();
+        if (!$rightOperand instanceof Expr\Value) {
+            throw new \RuntimeException('The left operand for CONTAINS comparison must be a value.');
+        }
+
+        $fieldType = $this->getMetadata($leftOperand->getAlias() ?: $this->alias)
+            ->getTypeOfField($leftOperand->getField());
+
+        if (Types::JSON === $fieldType) {
+            return $this->walkJsonArrayContainsComparison($leftOperand, $rightOperand);
+        }
+
+        if (!\is_string($rightOperand->getValue())) {
+            throw new \RuntimeException('The right operand for string CONTAINS comparison must be a string.');
+        }
+
+        return new AST\ComparisonExpression(
+            $this->walkOperand($leftOperand),
+            self::LIKE,
+            $this->getValueLiteral('%' . $rightOperand->getValue() . '%')
+        );
+    }
+
+    private function walkJsonArrayContainsComparison(
+        Expr\Path $leftOperand,
+        Expr\Value $rightOperand
+    ): AST\Node {
+        $value = $rightOperand->getValue();
+        if (\is_array($value) && count($value) === 1) {
+            $value = reset($value);
+        }
+
+        $isPostgres = $this->em->getConnection()->getDatabasePlatform() instanceof PostgreSQL94Platform;
+
+        if (\is_string($value)) {
+            if ($isPostgres) {
+                return $this->getPostgreSqlJsonbContainsExpression($leftOperand, $value);
+            }
+
+            return new AST\ComparisonExpression(
+                $this->walkOperand($leftOperand),
+                self::LIKE,
+                $this->getValueLiteral('%"' . $value . '"%')
+            );
+        }
+
+        if (\is_array($value) && !empty($value)) {
+            $field = $this->walkOperand($leftOperand);
+            $expressions = [];
+            foreach ($value as $val) {
+                $expression = new AST\ConditionalPrimary();
+                $expression->simpleConditionalExpression = $isPostgres
+                    ? $this->getPostgreSqlJsonbContainsExpression($field, $val)
+                    : new AST\ComparisonExpression(
+                        $field,
+                        self::LIKE,
+                        $this->getValueLiteral('%"' . $val . '"%')
+                    );
+                $expressions[] = $expression;
+            }
+
+            return new AST\ParenthesisExpression(new AST\ConditionalExpression($expressions));
+        }
+
+        throw new \RuntimeException(
+            'The right operand for JSON array CONTAINS comparison must be a string or not empty array.'
+        );
+    }
+
+    private function getPostgreSqlJsonbContainsExpression(
+        Expr\Path|AST\ArithmeticExpression $leftOperand,
+        mixed $value
+    ) : AST\Node {
+        if (!\is_array($value)) {
+            $value = [$value];
+        }
+
+        return new AST\ComparisonExpression(
+            $this->walkOperand($leftOperand),
+            '@>',
+            // Here used Numeric type to avoid the parameter escaping with quotes
+            new Ast\Literal(Ast\Literal::NUMERIC, sprintf("'%s'::jsonb", json_encode($value, JSON_THROW_ON_ERROR)))
+        );
+    }
+
+    private function getValueLiteral(mixed $value): AST\Literal
     {
         if (\is_numeric($value)) {
             $type = AST\Literal::NUMERIC;
@@ -308,5 +395,10 @@ class AstVisitor extends Visitor
         }
 
         return new AST\Literal($type, $value);
+    }
+
+    private function getMetadata(string $alias): ClassMetadataInfo
+    {
+        return $this->queryComponents->get($alias)->getMetadata();
     }
 }

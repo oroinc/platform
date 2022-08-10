@@ -1,0 +1,9 @@
+features:
+    system_information:
+        label: oro.platform.feature.system_info.label
+        description: oro.platform.feature.system_info.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_platform_system_info
+        navigation_items:
+            - application_menu.system_tab.oro_platform_system_info

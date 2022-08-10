@@ -69,7 +69,7 @@ system_configuration:
             type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
             page_reload: true
             options:
-                label: oro.attachment.config.feature.attachment_processors_allowed.label
+                label: oro.attachment.config.feature.attachment_processors_allowed.title
                 tooltip: oro.attachment.config.feature.attachment_processors_allowed.tooltip
                 resettable: true
 

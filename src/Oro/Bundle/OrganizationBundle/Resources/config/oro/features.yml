@@ -1,0 +1,25 @@
+features:
+    manage_business_units:
+        label: oro.organization.businessunit.feature.manage.label
+        description: oro.organization.businessunit.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_business_unit_create
+            - oro_business_unit_view
+            - oro_business_unit_search
+            - oro_business_unit_update
+            - oro_business_unit_index
+            - oro_business_unit_widget_info
+            - oro_business_unit_widget_users
+            - oro_api_get_businessunits
+            - oro_api_post_businessunit
+            - oro_api_put_businessunit
+            - oro_api_get_businessunit
+            - oro_api_delete_businessunit
+            - oro_api_options_businessunits
+        entities:
+            - Oro\Bundle\OrganizationBundle\Entity\BusinessUnit
+        api_resources:
+            - [Oro\Bundle\OrganizationBundle\Entity\BusinessUnit, [create, update, delete, delete_list]]
+        navigation_items:
+            - application_menu.system_tab.users_management.oro_business_unit_list

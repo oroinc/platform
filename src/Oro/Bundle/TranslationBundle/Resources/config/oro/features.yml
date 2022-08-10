@@ -1,0 +1,48 @@
+features:
+    manage_languages:
+        label: oro.translation.language.feature.manage.label
+        description: oro.translation.language.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_translation_language_index
+        operations:
+            - oro_translation_language_add
+            - oro_translation_language_disable
+            - oro_translation_language_enable
+            - oro_translation_language_import
+            - oro_translation_language_export
+            - oro_translation_language_load_base
+            - oro_translation_language_install
+            - oro_translation_language_update
+        entities:
+            - Oro\Bundle\TranslationBundle\Entity\Language
+        api_resources:
+            - Oro\Bundle\TranslationBundle\Entity\Language
+        navigation_items:
+            - application_menu.system_tab.localization.languages
+
+    manage_translations:
+        label: oro.translation.translation.feature.manage.label
+        description: oro.translation.translation.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_translation_translation_index
+            - oro_translation_mass_reset
+            - oro_api_get_translations
+            - oro_api_patch_translation
+        operations:
+            - oro_translation_translation_reset
+        commands:
+            - oro:translation:update
+            - oro:translation:rebuild-cache
+            - oro:translation:load
+            - oro:translation:dump
+            - oro:translation:dump-files
+        entities:
+            - Oro\Bundle\TranslationBundle\Entity\Translation
+            - Oro\Bundle\TranslationBundle\Entity\TranslationKey
+        api_resources:
+            - Oro\Bundle\TranslationBundle\Entity\Translation
+            - Oro\Bundle\TranslationBundle\Entity\TranslationKey
+        navigation_items:
+            - application_menu.system_tab.localization.translations

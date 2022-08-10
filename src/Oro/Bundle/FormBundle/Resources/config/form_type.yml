@@ -280,6 +280,7 @@ services:
         class: Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType
         arguments:
             - '@security.authorization_checker'
+            - '@oro_featuretoggle.checker.feature_checker'
             - '@oro_entity_config.config_manager'
             - '@doctrine.orm.entity_manager'
             - '@oro_form.autocomplete.search_registry'

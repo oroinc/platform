@@ -11,6 +11,10 @@ oro:
             entity_filter: "Entity filter"
         controller:
             tag.saved.message: "Tag saved"
+        feature:
+            manage:
+                label: Tag Management
+                description: Enables creating and managing descriptive keywords (tags) to organize the data extracted from various sources into logical categories and subcategories.
         form:
             choose_tag: "Choose a tag"
             choose_taxonomy: "Choose a taxonomy"
@@ -101,6 +105,10 @@ oro:
             my_taxonomies: My taxonomies
         controller:
             saved.message: "Taxonomy has been saved"
+        feature:
+            manage:
+                label: Taxonomy Management
+                description: Enables creating taxonomies that help color code and classify the tags.
         form:
             choose_taxonomy: "Choose a taxonomy"
             choose_or_create_taxonomy: "Select an existing taxonomy or create a new one"

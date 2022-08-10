@@ -4,18 +4,19 @@ namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * The fort type for Group entity.
+ * The form type for Group entity.
  */
 class GroupType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -32,7 +33,7 @@ class GroupType extends AbstractType
                 'appendUsers',
                 EntityIdentifierType::class,
                 [
-                    'class'    => 'OroUserBundle:User',
+                    'class'    => User::class,
                     'required' => false,
                     'mapped'   => false,
                     'multiple' => true,
@@ -42,7 +43,7 @@ class GroupType extends AbstractType
                 'removeUsers',
                 EntityIdentifierType::class,
                 [
-                    'class'    => 'OroUserBundle:User',
+                    'class'    => User::class,
                     'required' => false,
                     'mapped'   => false,
                     'multiple' => true,
@@ -51,7 +52,7 @@ class GroupType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -64,7 +65,7 @@ class GroupType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName()
     {
@@ -72,7 +73,7 @@ class GroupType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getBlockPrefix()
     {
