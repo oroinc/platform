@@ -148,6 +148,8 @@ oro:
             more: 'View More'
             less: 'View Less'
         breadcrumb.aria_label: Breadcrumbs
+        simplified_preview:
+            message: Current content view is simplified, please check the edit page to see the actual result.
 
     htmlpurifier:
         formatted_error: '- {{ message }} (near {{ place }}...)'

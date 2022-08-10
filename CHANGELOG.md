@@ -23,6 +23,9 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### UIBundle
+* Added renderCollapsibleWysiwygContentPreview TWIG macro to UIBundle for rendering WYSIWYG content in backoffice.
+
 #### AttachmentBundle
 * Added `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` property to store external file URL.
 * Added `Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider` (`oro_attachment.provider.external_url_provider`) that
