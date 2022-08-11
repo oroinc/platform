@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
@@ -12,9 +13,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     private function processConfiguration(array $config): array
     {
-        $processor = new Processor();
-
-        return $processor->processConfiguration(new ThemeConfiguration(), [$config]);
+        return (new Processor())->processConfiguration(new ThemeConfiguration(), [$config]);
     }
 
     public function testProcessEmptyConfiguration(): void
@@ -131,7 +130,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessImagesDimensionWithoutHeight(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The child config "height" under "themes.test_theme.config.images.dimensions.test_dimension1"'
             . ' must be configured.'
@@ -154,7 +153,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessImagesDimensionWithoutWidth(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The child config "width" under "themes.test_theme.config.images.dimensions.test_dimension1"'
             . ' must be configured.'
@@ -236,7 +235,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessPageTemplateWithEmptyRoute(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The path "themes.test_theme.config.page_templates.templates.0.route_name" cannot contain an empty value,'
             . ' but got "".'
@@ -259,7 +258,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessPageTemplateWithEmptyKey(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The path "themes.test_theme.config.page_templates.templates.0.key" cannot contain an empty value,'
             . ' but got "".'
@@ -282,7 +281,7 @@ class ThemeConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessPageTemplateWithEmptyLabel(): void
     {
-        $this->expectException(\Symfony\Component\Config\Definition\Exception\InvalidConfigurationException::class);
+        $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
             'The path "themes.test_theme.config.page_templates.templates.0.label" cannot contain an empty value,'
             . ' but got "".'

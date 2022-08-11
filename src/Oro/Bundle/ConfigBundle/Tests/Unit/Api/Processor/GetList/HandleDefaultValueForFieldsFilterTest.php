@@ -9,7 +9,7 @@ use Oro\Bundle\ConfigBundle\Api\Processor\GetList\HandleDefaultValueForFieldsFil
 class HandleDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
 {
     /** @var HandleDefaultValueForFieldsFilter */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {

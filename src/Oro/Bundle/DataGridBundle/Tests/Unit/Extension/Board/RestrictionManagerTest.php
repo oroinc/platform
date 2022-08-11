@@ -12,25 +12,17 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 
 class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $userAgentProvider;
+    /** @var UserAgentProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $userAgentProvider;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $workflowRegistry;
+    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $workflowRegistry;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityClassResolver;
+    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityClassResolver;
 
-    /**
-     * @var RestrictionManager
-     */
-    protected $manager;
+    /** @var RestrictionManager */
+    private $manager;
 
     protected function setUp(): void
     {

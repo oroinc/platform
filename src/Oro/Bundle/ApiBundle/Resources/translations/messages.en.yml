@@ -56,3 +56,8 @@ oro:
             fields:
                 web_api:
                     label: Enable API
+
+        feature:
+            web_api:
+                label: Back-Office API
+                description: Enables the back-office API feature for the application.

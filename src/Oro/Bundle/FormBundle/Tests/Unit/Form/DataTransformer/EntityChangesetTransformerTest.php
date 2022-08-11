@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityChangesetTransformer;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 {
@@ -65,7 +66,7 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformException()
     {
-        $this->expectException(\Symfony\Component\Form\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "string" given');
 
         $this->transformer->reverseTransform('test');

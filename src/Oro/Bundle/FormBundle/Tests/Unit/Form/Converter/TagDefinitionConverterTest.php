@@ -6,10 +6,8 @@ use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
 
 class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var TagDefinitionConverter
-     */
-    protected $converter;
+    /** @var TagDefinitionConverter */
+    private $converter;
 
     protected function setUp(): void
     {
@@ -17,12 +15,9 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $allowedElements
-     * @param array $expected
-     *
      * @dataProvider elementsDataProvider
      */
-    public function testGetElements($allowedElements, $expected)
+    public function testGetElements(string $allowedElements, array $expected)
     {
         $this->assertEquals(
             $expected,
@@ -50,12 +45,9 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param string $allowedElements
-     * @param string $expected
-     *
      * @dataProvider attributesDataProvider
      */
-    public function testGetAttributes($allowedElements, $expected)
+    public function testGetAttributes(string $allowedElements, array $expected)
     {
         $this->assertEquals(
             $expected,

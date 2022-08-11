@@ -92,7 +92,7 @@ class ActivityListManager
      */
     public function getRepository()
     {
-        return $this->doctrineHelper->getEntityRepository(ActivityList::ENTITY_NAME);
+        return $this->doctrineHelper->getEntityRepository(ActivityList::class);
     }
 
     /**
@@ -450,7 +450,7 @@ class ActivityListManager
 
         if (is_null($activityClass)) {
             $associationName = $this->getActivityListAssociationName($targetClass);
-            $entityClass = ActivityList::ENTITY_NAME;
+            $entityClass = ActivityList::class;
         } else {
             $associationName = $this->getActivityAssociationName($targetClass);
             $entityClass = $activityClass;
@@ -464,7 +464,7 @@ class ActivityListManager
             $targetField = current(array_keys($association['relationToTargetKeyColumns']));
 
             $dbConnection = $this->doctrineHelper
-                ->getEntityManager(ActivityList::ENTITY_NAME)
+                ->getEntityManager(ActivityList::class)
                 ->getConnection();
 
             // to avoid of duplication activity lists and activities items we need to clear these relations

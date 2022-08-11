@@ -26,6 +26,7 @@ class OroApiBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(new Compiler\ProcessorBagCompilerPass());
+        $container->addCompilerPass(new Compiler\ResourceCheckerRegistryPass());
         $container->addCompilerPass(new Compiler\RequestTypeDependedTaggedServiceCompilerPass(
             'oro_api.filter_names_registry',
             'oro.api.filter_names'

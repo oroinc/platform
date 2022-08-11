@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Acl\Search;
 
-use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SearchBundle\Query\Criteria\ExpressionBuilder;
@@ -12,7 +11,7 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
 use Oro\Bundle\SecurityBundle\Search\SearchAclHelperConditionInterface;
 
 /**
- * Search ACL helper condition builder for the EmailUser entity that checks access to the public and private emails.
+ * Applies restrictions for the public and private user emails.
  */
 class SearchAclHelperCondition implements SearchAclHelperConditionInterface
 {
@@ -36,12 +35,17 @@ class SearchAclHelperCondition implements SearchAclHelperConditionInterface
      */
     public function addRestriction(Query $query, string $alias, ?Expression $orExpression): ?Expression
     {
-        $expr = new ExpressionBuilder();
-        $condition  = $this->ownershipDataBuilder->getAclConditionData(EmailUser::class);
-        $publicExpression = $this->getExpressionByCondition($condition, $expr, 0);
-
-        $condition  = $this->ownershipDataBuilder->getAclConditionData(EmailUser::class, 'VIEW_PRIVATE');
-        $privateExpression = $this->getExpressionByCondition($condition, $expr, 1);
+        $expressionBuilder = new ExpressionBuilder();
+        $publicExpression = $this->getExpressionByCondition(
+            $this->ownershipDataBuilder->getAclConditionData(EmailUser::class),
+            $expressionBuilder,
+            0
+        );
+        $privateExpression = $this->getExpressionByCondition(
+            $this->ownershipDataBuilder->getAclConditionData(EmailUser::class, 'VIEW_PRIVATE'),
+            $expressionBuilder,
+            1
+        );
 
         // no access - do not modify the given expression and do not add alias to the list of available aliases
         if (null === $publicExpression && null === $privateExpression) {
@@ -49,21 +53,19 @@ class SearchAclHelperCondition implements SearchAclHelperConditionInterface
         }
 
         $query->from(array_merge($query->getFrom(), [$alias]));
-        $expressions = [];
 
+        $expressions = [];
         if ($orExpression) {
             $expressions[] = $orExpression;
         }
-
         if (null !== $publicExpression) {
             $expressions[] = $publicExpression;
         }
-
         if (null !== $privateExpression) {
             $expressions[] = $privateExpression;
         }
 
-        return new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
+        return $expressionBuilder->orX(...$expressions);
     }
 
     /**
@@ -101,7 +103,7 @@ class SearchAclHelperCondition implements SearchAclHelperConditionInterface
         if (\is_array($owners)) {
             return $expressionBuilder->andX(
                 $expressionBuilder->eq('integer.email_user_private', $privateValue),
-                \count($owners) === 1
+                count($owners) === 1
                     ? $expressionBuilder->eq('integer.oro_email_owner', reset($owners))
                     : $expressionBuilder->in('integer.oro_email_owner', $owners)
             );

@@ -10,7 +10,6 @@ use Oro\Component\MessageQueue\Client\DriverFactoryInterface;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\Testing\ReflectionUtil;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
@@ -21,13 +20,8 @@ class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
         $config = $this->createMock(Config::class);
         $driver = $this->createMock(DriverInterface::class);
 
-        /** @var MockObject|DriverFactoryInterface */
         $driverFactory = $this->createMock(DriverFactoryInterface::class);
-
-        /** @var MockObject|TokenStorageInterface */
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
-
-        /** @var MockObject|TokenSerializerInterface */
         $tokenSerializer = $this->createMock(TokenSerializerInterface::class);
 
         /** @var SecurityAwareDriverFactory */

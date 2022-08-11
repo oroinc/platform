@@ -3,11 +3,11 @@ services:
         public: true
 
     Oro\Bundle\UserBundle\Controller\ConfigurationController:
-        calls:
-            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        arguments:
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: 'oro_config.user' }
+            - { name: container.service_subscriber, id: oro_config.user, key: Oro\Bundle\ConfigBundle\Config\ConfigManager }
 
     Oro\Bundle\UserBundle\Controller\SecurityController:
         calls:

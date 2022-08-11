@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\UnitOfWork;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
 use Oro\Bundle\ApiBundle\Batch\EventListener\JobListener;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -17,23 +16,19 @@ use Oro\Component\Testing\ReflectionUtil;
  */
 class JobListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityManager */
+    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $em;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UnitOfWork */
-    private $uow;
+    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $asyncOperationManager;
 
     /** @var JobListener */
     private $listener;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
-        $this->uow = $this->createMock(UnitOfWork::class);
-
-        $this->em->expects(self::any())
-            ->method('getUnitOfWork')
-            ->willReturn($this->uow);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->asyncOperationManager = $this->createMock(AsyncOperationManager::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -41,7 +36,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->with(AsyncOperation::class)
             ->willReturn($this->em);
 
-        $this->listener = new JobListener($doctrine);
+        $this->listener = new JobListener($doctrine, $this->asyncOperationManager);
     }
 
     public function testForNotRootJob()
@@ -52,6 +47,8 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects(self::never())
             ->method('find');
+        $this->asyncOperationManager->expects(self::never())
+            ->method('updateOperation');
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
@@ -62,6 +59,8 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects(self::never())
             ->method('find');
+        $this->asyncOperationManager->expects(self::never())
+            ->method('updateOperation');
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
@@ -73,6 +72,8 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects(self::never())
             ->method('find');
+        $this->asyncOperationManager->expects(self::never())
+            ->method('updateOperation');
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
@@ -87,6 +88,8 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn(null);
+        $this->asyncOperationManager->expects(self::never())
+            ->method('updateOperation');
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
@@ -108,8 +111,14 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->uow->expects(self::never())
-            ->method('recomputeSingleEntityChangeSet');
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame([], $callback());
+
+                return false;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
@@ -132,22 +141,25 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             (new \DateTime('now', new \DateTimeZone('UTC')))->sub(new \DateInterval('PT10M'))
         );
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'progress' => 0.1
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(0.1, $operation->getProgress()); // 10%
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateZeroProgress()
@@ -169,22 +181,25 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         );
         $operation->setProgress(0.5);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'progress' => 0
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(0, $operation->getProgress());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateInvalidProgress()
@@ -210,12 +225,16 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->uow->expects(self::never())
-            ->method('recomputeSingleEntityChangeSet');
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame([], $callback());
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(0.5, $operation->getProgress());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateProgressWhenCreatedAtIsNotSet()
@@ -231,22 +250,25 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         $operation->setProgress(0.5);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'progress' => 0.1
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(0.1, $operation->getProgress());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateJobId()
@@ -260,22 +282,25 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         $operation->setProgress(0);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'jobId' => 123
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(123, $operation->getJobId());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateStatusToSuccess()
@@ -297,35 +322,35 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         $operation->setProgress(0.1);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'status'    => AsyncOperation::STATUS_SUCCESS,
+                        'progress'  => 1,
+                        'summary'   => [
+                            'aggregateTime' => 25,
+                            'readCount'     => 3,
+                            'writeCount'    => 0,
+                            'errorCount'    => 0,
+                            'createCount'   => 0,
+                            'updateCount'   => 0
+                        ],
+                        'hasErrors' => false
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_SUCCESS, $operation->getStatus());
-        self::assertSame(1, $operation->getProgress());
-        self::assertEquals(
-            [
-                'aggregateTime' => 25,
-                'readCount'     => 3,
-                'writeCount'    => 0,
-                'errorCount'    => 0,
-                'createCount'   => 0,
-                'updateCount'   => 0
-            ],
-            $operation->getSummary()
-        );
-        self::assertFalse($operation->isHasErrors());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateStatusToSuccessAndWithExistingSummary()
@@ -355,35 +380,35 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             'updateCount'   => 6
         ]);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'status'    => AsyncOperation::STATUS_SUCCESS,
+                        'progress'  => 1,
+                        'summary'   => [
+                            'aggregateTime' => 30,
+                            'readCount'     => 7,
+                            'writeCount'    => 3,
+                            'errorCount'    => 2,
+                            'createCount'   => 1,
+                            'updateCount'   => 6
+                        ],
+                        'hasErrors' => true
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_SUCCESS, $operation->getStatus());
-        self::assertSame(1, $operation->getProgress());
-        self::assertEquals(
-            [
-                'aggregateTime' => 30,
-                'readCount'     => 7,
-                'writeCount'    => 3,
-                'errorCount'    => 2,
-                'createCount'   => 1,
-                'updateCount'   => 6
-            ],
-            $operation->getSummary()
-        );
-        self::assertTrue($operation->isHasErrors());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateStatusToFailed()
@@ -415,35 +440,35 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         $operation->setProgress(0.1);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'progress'  => 0.5,
+                        'status'    => AsyncOperation::STATUS_FAILED,
+                        'summary'   => [
+                            'aggregateTime' => 0,
+                            'readCount'     => 2,
+                            'writeCount'    => 1,
+                            'errorCount'    => 1,
+                            'createCount'   => 1,
+                            'updateCount'   => 0
+                        ],
+                        'hasErrors' => true
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_FAILED, $operation->getStatus());
-        self::assertSame(0.5, $operation->getProgress());
-        self::assertEquals(
-            [
-                'aggregateTime' => 0,
-                'readCount'     => 2,
-                'writeCount'    => 1,
-                'errorCount'    => 1,
-                'createCount'   => 1,
-                'updateCount'   => 0
-            ],
-            $operation->getSummary()
-        );
-        self::assertTrue($operation->isHasErrors());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateStatusToStale()
@@ -463,35 +488,35 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         $operation->setProgress(0.1);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'progress'  => 0.5,
+                        'status'    => AsyncOperation::STATUS_FAILED,
+                        'summary'   => [
+                            'aggregateTime' => 0,
+                            'readCount'     => 2,
+                            'writeCount'    => 0,
+                            'errorCount'    => 0,
+                            'createCount'   => 0,
+                            'updateCount'   => 0,
+                        ],
+                        'hasErrors' => true
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_FAILED, $operation->getStatus());
-        self::assertSame(0.5, $operation->getProgress());
-        self::assertEquals(
-            [
-                'aggregateTime' => 0,
-                'readCount'     => 2,
-                'writeCount'    => 0,
-                'errorCount'    => 0,
-                'createCount'   => 0,
-                'updateCount'   => 0
-            ],
-            $operation->getSummary()
-        );
-        self::assertTrue($operation->isHasErrors());
     }
 
     public function testForRootJobLinkedToAsyncOperationUpdateStatusToCancelled()
@@ -507,23 +532,26 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $operation->setStatus(AsyncOperation::STATUS_RUNNING);
         $operation->setProgress(0.1);
 
-        $classMetadata = $this->createMock(ClassMetadata::class);
         $this->em->expects(self::once())
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with(AsyncOperation::class)
-            ->willReturn($classMetadata);
-        $this->uow->expects(self::once())
-            ->method('recomputeSingleEntityChangeSet')
-            ->with(self::identicalTo($classMetadata), self::identicalTo($operation));
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame(
+                    [
+                        'progress' => 0.5,
+                        'status'   => AsyncOperation::STATUS_CANCELLED
+                    ],
+                    $callback()
+                );
+
+                return true;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_CANCELLED, $operation->getStatus());
-        self::assertSame(0.5, $operation->getProgress());
     }
 
     public function testForRootJobLinkedToAsyncOperationWhenJobStatusChangedToFailedRedelivered()
@@ -543,12 +571,16 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->uow->expects(self::never())
-            ->method('recomputeSingleEntityChangeSet');
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame([], $callback());
+
+                return false;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_RUNNING, $operation->getStatus());
     }
 
     public function testForRootJobLinkedToAsyncOperationWhenJobStatusChangedToNew()
@@ -568,11 +600,15 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with(AsyncOperation::class, 1)
             ->willReturn($operation);
-        $this->uow->expects(self::never())
-            ->method('recomputeSingleEntityChangeSet');
+        $this->asyncOperationManager->expects(self::once())
+            ->method('updateOperation')
+            ->with(1)
+            ->willReturnCallback(function ($operationId, $callback) {
+                self::assertSame([], $callback());
+
+                return false;
+            });
 
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
-
-        self::assertSame(AsyncOperation::STATUS_RUNNING, $operation->getStatus());
     }
 }

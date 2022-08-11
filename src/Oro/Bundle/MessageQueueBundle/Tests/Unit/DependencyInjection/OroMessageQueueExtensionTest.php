@@ -470,7 +470,6 @@ class OroMessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             'oro_message_queue.status_calculator.collection_calculator',
             'oro_message_queue.status_calculator.query_calculator',
             'oro_message_queue.status_calculator.status_calculator_resolver',
-            'oro_message_queue.job.calculate_root_job_status_processor',
             'oro_message_queue.job.dependent_job_processor',
             'oro_message_queue.job.dependent_job_service',
             'oro_message_queue.job.grid.root_job_action_configuration',

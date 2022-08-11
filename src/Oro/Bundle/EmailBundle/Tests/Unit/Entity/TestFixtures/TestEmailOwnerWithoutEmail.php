@@ -28,11 +28,6 @@ class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
         }
     }
 
-    public function getClass()
-    {
-        return self::class;
-    }
-
     public function getEmailFields()
     {
         return null;

@@ -17,11 +17,11 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class SearchPercentFilterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SearchPercentFilter */
-    protected $filter;
-
     /** @var FilterDatasourceAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datasource;
+    private $datasource;
+
+    /** @var SearchPercentFilter */
+    private $filter;
 
     protected function setUp(): void
     {

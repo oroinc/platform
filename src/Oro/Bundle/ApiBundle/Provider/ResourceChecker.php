@@ -12,11 +12,16 @@ class ResourceChecker implements ResourceCheckerInterface
 {
     private FeatureChecker $featureChecker;
     private ResourceCheckerConfigProvider $configProvider;
+    private string $resourceType;
 
-    public function __construct(FeatureChecker $featureChecker, ResourceCheckerConfigProvider $configProvider)
-    {
+    public function __construct(
+        FeatureChecker $featureChecker,
+        ResourceCheckerConfigProvider $configProvider,
+        string $resourceType
+    ) {
         $this->featureChecker = $featureChecker;
         $this->configProvider = $configProvider;
+        $this->resourceType = $resourceType;
     }
 
     /**
@@ -28,7 +33,7 @@ class ResourceChecker implements ResourceCheckerInterface
         string $version,
         RequestType $requestType
     ): bool {
-        if (!$this->featureChecker->isResourceEnabled($entityClass, 'api_resources')) {
+        if (!$this->featureChecker->isResourceEnabled($entityClass, $this->resourceType)) {
             return false;
         }
 

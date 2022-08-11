@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -13,14 +12,13 @@ use Oro\Bundle\EmailBundle\Manager\EmailNotificationManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
-use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
@@ -30,143 +28,70 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
+    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $urlGenerator;
+
     /** @var EmailNotificationManager */
     private $emailNotificationManager;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EmailRepository::class);
+        $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
 
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Email::class)
             ->willReturn($this->repository);
-        $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(Email::class)
-            ->willReturn($em);
 
-        $htmlTagProvider = $this->createMock(HtmlTagProvider::class);
-
-        $htmlTagHelper = new HtmlTagHelper($htmlTagProvider, '');
-        $htmlTagHelper->setTranslator($this->createMock(TranslatorInterface::class));
-
-        $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator->expects($this->any())
-            ->method('generate')
-            ->willReturn('oro_email_email_reply');
+        $htmlTagHelper = $this->createMock(HtmlTagHelper::class);
+        $htmlTagHelper->expects(self::any())
+            ->method('purify')
+            ->willReturnCallback(function (string $string) {
+                return $string . ' (purified)';
+            });
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('getEntityMetadata')
-            ->willReturn(new EntityMetadata(\stdClass::class));
+            ->willReturnCallback(function (string $class) {
+                return new EntityMetadata($class);
+            });
 
         $this->emailNotificationManager = new EmailNotificationManager(
             $doctrine,
             $htmlTagHelper,
-            $urlGenerator,
+            $this->urlGenerator,
             $configManager,
             $this->createMock(AclHelper::class)
         );
     }
 
-    /**
-     * @dataProvider getEmails
-     */
-    public function testGetEmails(User $user, array $emails, array $expectedResult)
-    {
-        $organization = $this->createMock(Organization::class);
-        $this->repository->expects($this->once())
-            ->method('getNewEmails')
-            ->willReturn($emails);
-        $maxEmailsDisplay = 1;
-        $emails = $this->emailNotificationManager->getEmails($user, $organization, $maxEmailsDisplay, null);
-
-        $this->assertEquals($expectedResult, $emails);
-    }
-
-    public function getEmails(): array
-    {
-        $user = $this->createMock(User::class);
-
-        $emails = [
-            $this->prepareEmailUser(
-                [
-                    'getId'          => 1,
-                    'getSubject'     => 'subject',
-                    'getFromName'    => 'fromName',
-                    'getBodyContent' => 'bodyContent',
-                ],
-                $user,
-                false
-            ),
-            $this->prepareEmailUser(
-                [
-                    'getId'          => 2,
-                    'getSubject'     => 'subject_1',
-                    'getBodyContent' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer',
-                    'getFromName'    => 'fromName_1',
-                ],
-                $user,
-                true
-            )
-        ];
-
-        $expectedResult = [
-            [
-                'replyRoute' => 'oro_email_email_reply',
-                'replyAllRoute' => 'oro_email_email_reply',
-                'forwardRoute' => 'oro_email_email_reply',
-                'id' => 1,
-                'seen' => 0,
-                'subject' => 'subject',
-                'bodyContent' => 'bodyContent',
-                'fromName' => 'fromName',
-                'linkFromName' => 'oro_email_email_reply',
-            ],
-            [
-                'replyRoute' => 'oro_email_email_reply',
-                'replyAllRoute' => 'oro_email_email_reply',
-                'forwardRoute' => 'oro_email_email_reply',
-                'id' => 2,
-                'seen' => 1,
-                'subject' => 'subject_1',
-                'bodyContent' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer',
-                'fromName' => 'fromName_1',
-                'linkFromName' => 'oro_email_email_reply',
-            ]
-        ];
-
-        return [[$user, $emails, $expectedResult]];
-    }
-
-    public function testGetCountNewEmails()
-    {
-        $this->repository->expects($this->once())
-            ->method('getCountNewEmails')
-            ->willReturn(1);
-        $user = $this->createMock(User::class);
-        $organization = $this->createMock(Organization::class);
-        $count = $this->emailNotificationManager->getCountNewEmails($user, $organization, null);
-        $this->assertEquals(1, $count);
-    }
-
-    private function prepareEmailUser(array $values, EmailOwnerInterface $user, bool $seen): EmailUser
-    {
+    private function getEmailUser(
+        int $id,
+        string $subject,
+        string $fromName,
+        string $bodyContent,
+        bool $hasFromEmailAddress,
+        ?EmailOwnerInterface $fromEmailAddressOwner,
+        bool $seen
+    ): EmailUser {
         $emailBody = new EmailBody();
-        $emailBody->setTextBody($values['getBodyContent']);
+        $emailBody->setTextBody($bodyContent);
 
         $email = new Email();
-        ReflectionUtil::setId($email, $values['getId']);
-        $email->setSubject($values['getSubject']);
-        $email->setFromName($values['getFromName']);
+        ReflectionUtil::setId($email, $id);
+        $email->setSubject($subject);
+        $email->setFromName($fromName);
 
-        $emailAddress = new EmailAddress();
-        $emailAddress->setOwner($user);
-
-        $email->setFromEmailAddress($emailAddress);
+        if ($hasFromEmailAddress) {
+            $emailAddress = new EmailAddress();
+            if (null !== $fromEmailAddressOwner) {
+                $emailAddress->setOwner($fromEmailAddressOwner);
+            }
+            $email->setFromEmailAddress($emailAddress);
+        }
         $email->setEmailBody($emailBody);
 
         $emailUser = new EmailUser();
@@ -174,5 +99,173 @@ class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
         $emailUser->setSeen($seen);
 
         return $emailUser;
+    }
+
+    public function testGetEmails(): void
+    {
+        $user = new User();
+
+        $this->repository->expects(self::once())
+            ->method('getNewEmails')
+            ->willReturn([
+                $this->getEmailUser(1, 'subject', 'fromName', 'bodyContent', true, $user, false),
+                $this->getEmailUser(2, 'subject_1', 'fromName_1', 'bodyContent_1', true, $user, true)
+            ]);
+
+        $this->urlGenerator->expects(self::any())
+            ->method('generate')
+            ->willReturnArgument(0);
+
+        $emails = $this->emailNotificationManager->getEmails($user, $this->createMock(Organization::class), 1, null);
+
+        self::assertSame(
+            [
+                [
+                    'replyRoute'    => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply_all',
+                    'forwardRoute'  => 'oro_email_email_forward',
+                    'id'            => 1,
+                    'seen'          => false,
+                    'subject'       => 'subject (purified)',
+                    'bodyContent'   => 'bodyContent (purified)',
+                    'fromName'      => 'fromName (purified)',
+                    'linkFromName'  => 'oro_user_view'
+                ],
+                [
+                    'replyRoute'    => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply_all',
+                    'forwardRoute'  => 'oro_email_email_forward',
+                    'id'            => 2,
+                    'seen'          => true,
+                    'subject'       => 'subject_1 (purified)',
+                    'bodyContent'   => 'bodyContent_1 (purified)',
+                    'fromName'      => 'fromName_1 (purified)',
+                    'linkFromName'  => 'oro_user_view'
+                ]
+            ],
+            $emails
+        );
+    }
+
+    public function testGetEmailsWhenNoFromEmailAddress(): void
+    {
+        $user = new User();
+
+        $this->repository->expects(self::once())
+            ->method('getNewEmails')
+            ->willReturn([
+                $this->getEmailUser(1, 'subject', 'fromName', 'bodyContent', false, null, false)
+            ]);
+
+        $this->urlGenerator->expects(self::any())
+            ->method('generate')
+            ->willReturnArgument(0);
+
+        $emails = $this->emailNotificationManager->getEmails($user, $this->createMock(Organization::class), 1, null);
+
+        self::assertSame(
+            [
+                [
+                    'replyRoute'    => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply_all',
+                    'forwardRoute'  => 'oro_email_email_forward',
+                    'id'            => 1,
+                    'seen'          => false,
+                    'subject'       => 'subject (purified)',
+                    'bodyContent'   => 'bodyContent (purified)',
+                    'fromName'      => 'fromName (purified)',
+                    'linkFromName'  => null
+                ]
+            ],
+            $emails
+        );
+    }
+
+    public function testGetEmailsWhenNoFromEmailAddressOwner(): void
+    {
+        $user = new User();
+
+        $this->repository->expects(self::once())
+            ->method('getNewEmails')
+            ->willReturn([
+                $this->getEmailUser(1, 'subject', 'fromName', 'bodyContent', true, null, false)
+            ]);
+
+        $this->urlGenerator->expects(self::any())
+            ->method('generate')
+            ->willReturnArgument(0);
+
+        $emails = $this->emailNotificationManager->getEmails($user, $this->createMock(Organization::class), 1, null);
+
+        self::assertSame(
+            [
+                [
+                    'replyRoute'    => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply_all',
+                    'forwardRoute'  => 'oro_email_email_forward',
+                    'id'            => 1,
+                    'seen'          => false,
+                    'subject'       => 'subject (purified)',
+                    'bodyContent'   => 'bodyContent (purified)',
+                    'fromName'      => 'fromName (purified)',
+                    'linkFromName'  => null
+                ]
+            ],
+            $emails
+        );
+    }
+
+    public function testGetEmailsWhenViewRouteNotFound(): void
+    {
+        $user = new User();
+
+        $this->repository->expects(self::once())
+            ->method('getNewEmails')
+            ->willReturn([
+                $this->getEmailUser(1, 'subject', 'fromName', 'bodyContent', true, $user, false)
+            ]);
+
+        $this->urlGenerator->expects(self::any())
+            ->method('generate')
+            ->willReturnCallback(function (string $name) {
+                if ('oro_user_view' === $name) {
+                    throw new RouteNotFoundException('no route');
+                }
+
+                return $name;
+            });
+
+        $emails = $this->emailNotificationManager->getEmails($user, $this->createMock(Organization::class), 1, null);
+
+        self::assertSame(
+            [
+                [
+                    'replyRoute'    => 'oro_email_email_reply',
+                    'replyAllRoute' => 'oro_email_email_reply_all',
+                    'forwardRoute'  => 'oro_email_email_forward',
+                    'id'            => 1,
+                    'seen'          => false,
+                    'subject'       => 'subject (purified)',
+                    'bodyContent'   => 'bodyContent (purified)',
+                    'fromName'      => 'fromName (purified)',
+                    'linkFromName'  => null
+                ]
+            ],
+            $emails
+        );
+    }
+
+    public function testGetCountNewEmails(): void
+    {
+        $this->repository->expects(self::once())
+            ->method('getCountNewEmails')
+            ->willReturn(1);
+
+        $count = $this->emailNotificationManager->getCountNewEmails(
+            $this->createMock(User::class),
+            $this->createMock(Organization::class)
+        );
+
+        self::assertEquals(1, $count);
     }
 }

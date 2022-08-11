@@ -90,8 +90,11 @@ HELP
         foreach ($configs as $featureName => $config) {
             $result[$featureName] = $this->getConfig($config, $verbose);
         }
+        if ($verbose) {
+            $result = $this->configurationExtension->completeConfiguration($result);
+        }
 
-        return $this->configurationExtension->completeConfiguration($result);
+        return $result;
     }
 
     private function getConfig(array $config, bool $verbose): array

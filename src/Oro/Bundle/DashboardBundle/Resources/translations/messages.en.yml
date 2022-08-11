@@ -20,6 +20,10 @@ oro:
         organization.label:  Organization
         options.label:       Options
 
+        feature:
+            label: Dashboards
+            description: Enables creating and managing dashboards.
+
         start_dashboard: Clone from
         start_dashboard.empty_value: Blank Dashboard
 

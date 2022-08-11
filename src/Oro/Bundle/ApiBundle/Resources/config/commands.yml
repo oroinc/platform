@@ -60,6 +60,7 @@ services:
         arguments:
             - ~ # operation lifetime. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
             - ~ # cleanup process timeout. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
+            - ~ # operation timeout. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\CleanupAsyncOperationCompilerPass
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.delete_handler_registry'
         tags:

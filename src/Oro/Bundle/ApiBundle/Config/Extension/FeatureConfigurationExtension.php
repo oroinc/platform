@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config\Extension;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerConfigProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationExtensionInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ProcessConfigurationExtensionInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -14,17 +15,21 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FeatureConfigurationExtension implements ConfigurationExtensionInterface, ProcessConfigurationExtensionInterface
 {
-    private const API_RESOURCES = 'api_resources';
-
     private ActionProcessorBagInterface $actionProcessorBag;
     private ResourceCheckerConfigProvider $configProvider;
+    private string $resourceType;
+    private string $resourceDescription;
 
     public function __construct(
         ActionProcessorBagInterface $actionProcessorBag,
-        ResourceCheckerConfigProvider $configProvider
+        ResourceCheckerConfigProvider $configProvider,
+        string $resourceType,
+        string $resourceDescription
     ) {
         $this->actionProcessorBag = $actionProcessorBag;
         $this->configProvider = $configProvider;
+        $this->resourceType = $resourceType;
+        $this->resourceDescription = $resourceDescription;
     }
 
     /**
@@ -33,8 +38,8 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
     public function extendConfigurationTree(NodeBuilder $node): void
     {
         $node
-            ->arrayNode(self::API_RESOURCES)
-                ->info('A list of entity FQCNs that are available as API resources.')
+            ->arrayNode($this->resourceType)
+                ->info($this->resourceDescription)
                 ->example([
                     'Acme\AppBundle\Entity\Customer',
                     ['Acme\AppBundle\Entity\User', ['create', 'update', 'delete', 'delete_list']]
@@ -71,8 +76,8 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
         foreach ($configuration as $feature => $featureConfig) {
             $apiResources = $this->configProvider->getApiResources($feature);
             if ($apiResources) {
-                $configuration[$feature][self::API_RESOURCES] = array_merge(
-                    $featureConfig[self::API_RESOURCES] ?? [],
+                $configuration[$feature][$this->resourceType] = array_merge(
+                    $featureConfig[$this->resourceType] ?? [],
                     $apiResources
                 );
             }
@@ -91,12 +96,12 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
 
     private function loadFeatureConfiguration(string $feature, array $featureConfig): array
     {
-        if (empty($featureConfig[self::API_RESOURCES])) {
+        if (empty($featureConfig[$this->resourceType])) {
             return $featureConfig;
         }
 
         $actionDependedApiResourceKeys = [];
-        foreach ($featureConfig[self::API_RESOURCES] as $key => $apiResource) {
+        foreach ($featureConfig[$this->resourceType] as $key => $apiResource) {
             if (\is_array($apiResource)) {
                 $actionDependedApiResourceKeys[] = $key;
             }
@@ -106,11 +111,16 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface, 
         }
 
         foreach ($actionDependedApiResourceKeys as $key) {
-            [$entityClass, $actions] = $featureConfig[self::API_RESOURCES][$key];
-            unset($featureConfig[self::API_RESOURCES][$key]);
+            [$entityClass, $actions] = $featureConfig[$this->resourceType][$key];
+            unset($featureConfig[$this->resourceType][$key]);
+            if (\in_array(ApiAction::UPDATE, $actions, true)) {
+                $actions[] = ApiAction::UPDATE_RELATIONSHIP;
+                $actions[] = ApiAction::ADD_RELATIONSHIP;
+                $actions[] = ApiAction::DELETE_RELATIONSHIP;
+            }
             $this->configProvider->addApiResource($feature, $entityClass, $actions);
         }
-        $featureConfig[self::API_RESOURCES] = array_values($featureConfig[self::API_RESOURCES]);
+        $featureConfig[$this->resourceType] = array_values($featureConfig[$this->resourceType]);
 
         return $featureConfig;
     }

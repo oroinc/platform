@@ -28,6 +28,11 @@ class CmsArticle
     public $text;
 
     /**
+     * @ORM\Column(type="json")
+     */
+    public $types;
+
+    /**
      * @ORM\ManyToOne(targetEntity="CmsUser", inversedBy="articles")
      * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
      */

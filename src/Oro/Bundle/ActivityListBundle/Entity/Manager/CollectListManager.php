@@ -44,7 +44,7 @@ class CollectListManager
         }
 
         foreach ($deletedEntities as $entity) {
-            $entityManager->getRepository(ActivityList::ENTITY_NAME)
+            $entityManager->getRepository(ActivityList::class)
                 ->deleteActivityListsByRelatedActivityData($entity['class'], $entity['id']);
         }
     }
@@ -55,7 +55,7 @@ class CollectListManager
             return false;
         }
 
-        $metaData = $entityManager->getClassMetadata(ActivityList::ENTITY_CLASS);
+        $metaData = $entityManager->getClassMetadata(ActivityList::class);
         foreach ($updatedEntities as $entity) {
             $activityList = $this->chainProvider->getUpdatedActivityList($entity, $entityManager);
             if ($activityList) {

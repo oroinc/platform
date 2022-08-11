@@ -15,8 +15,6 @@ use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
  */
 class EmailAttachment implements FileExtensionInterface
 {
-    const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailAttachment';
-
     /**
      * @var integer
      *

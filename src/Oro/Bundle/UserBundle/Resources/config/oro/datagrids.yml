@@ -233,7 +233,6 @@ datagrids:
         acl_resource: oro_user_role_view
         source:
             type: orm
-            skip_acl_apply: true
             query:
                 select:
                     - r
@@ -242,9 +241,6 @@ datagrids:
                     - r.label
                 from:
                     - { table: 'Oro\Bundle\UserBundle\Entity\Role', alias: r }
-                where:
-                    and:
-                        - r.role <> 'Oro\Bundle\UserBundle\Entity\User::ROLE_ANONYMOUS'
         columns:
             label:
                 label: oro.user.role.label.label

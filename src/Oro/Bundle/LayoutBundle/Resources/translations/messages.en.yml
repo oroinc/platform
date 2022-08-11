@@ -14,14 +14,14 @@ oro:
                         yes: Yes
                 debug_developer_toolbar:
                     label: Generate layout tree dump for the developer toolbar
-                    tooltip: This option works with debug mode enabled only
+                    tooltip: This option works only with the enabled debug mode.
                     choices:
                         no: No
                         yes: Yes
         feature:
             development_settings:
                 label: Development Settings
-                description: Development Settings is enabled only in dev environment
+                description: Enables development settings (such as layouts tree and block debug) in the system configuration. This option is available in the dev environment only.
 
         profiler:
             title: Layout

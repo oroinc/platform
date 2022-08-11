@@ -45,8 +45,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUser
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
-
     /**
      * @var integer
      *

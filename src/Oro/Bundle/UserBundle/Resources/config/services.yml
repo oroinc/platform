@@ -115,6 +115,11 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
+    oro_user.access_rule.anonymous_role:
+        class: Oro\Bundle\UserBundle\Acl\AccessRule\AnonymousRoleAccessRule
+        tags:
+            - { name: oro_security.access_rule, entityClass: Oro\Bundle\UserBundle\Entity\Role }
+
     oro_user.role_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\RoleManager
         arguments:
@@ -612,3 +617,15 @@ services:
             - '%oro_user.login_sources%'
         tags:
             - { name: monolog.logger, channel: security }
+
+    oro_user.acl.voter.anonymous_role:
+        class: Oro\Bundle\UserBundle\Acl\Voter\AnonymousRoleVoter
+        tags:
+            - { name: security.voter }
+
+    oro_user.acl.search.role_acl_helper_condition:
+        class: Oro\Bundle\UserBundle\Acl\Search\RoleSearchAclHelperCondition
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+        tags:
+            - { name: oro_security.acl_helper.condition }

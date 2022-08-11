@@ -21,4 +21,4 @@ Feature: Plural translations management
   Scenario: I check that plural translations are displayed without errors in case when there are not all plural forms translated
     Given I go to System/User Management/Roles
     When I click on Administrator in grid
-    Then I should see "9 записей (множ. число 2 форма)"
+    Then I should see "10 записей (множ. число 2 форма)"

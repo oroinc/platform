@@ -225,6 +225,8 @@ services:
             - '@doctrine'
             - '@oro_translation.provider.translation_domain'
             - '@oro_translation.dynamic_translation_cache'
+            - '@oro_message_queue.client.message_producer'
+            - !abstract '$jsTranslationDomains defined in Oro\Bundle\TranslationBundle\DependencyInjection\OroTranslationExtension'
 
     oro_translation.provider.translation_domain:
         class: Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider
@@ -317,6 +319,7 @@ services:
            - '@oro_translation.manager.translation'
            - '@translator'
            - '@oro_security.acl_helper'
+           - '@oro_message_queue.client.message_producer'
 
     oro_translation.migration.demo_data_fixtures_listener.js_translation_dump:
         class: Oro\Bundle\TranslationBundle\EventListener\JsTranslationDumpDemoDataListener
@@ -326,6 +329,11 @@ services:
             - '@oro_distribution.handler.application_status'
         tags:
             - { name: kernel.event_listener, event: oro_migration.data_fixtures.post_load, method: onPostLoad, priority: -100 }
+
+    oro_translation.async.message_filter.dump_js_translations:
+        class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageFilter
+        tags:
+            - { name: oro_message_queue.message_filter, topic: oro.translation.dump_js_translations }
 
     oro_translation.async.dump_js_translations_processor:
         class: Oro\Bundle\TranslationBundle\Async\DumpJsTranslationsMessageProcessor

@@ -16,15 +16,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenStorage;
+
     /** @var BuildTemplateFormSubscriber */
     private $listener;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /**
-     * SetUp test environment
-     */
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

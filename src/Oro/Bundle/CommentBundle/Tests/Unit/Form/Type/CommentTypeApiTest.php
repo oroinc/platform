@@ -67,7 +67,7 @@ class CommentTypeApiTest extends \PHPUnit\Framework\TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'data_class'      => Comment::ENTITY_NAME,
+                'data_class'      => Comment::class,
                 'csrf_token_id'   => 'comment',
                 'csrf_protection' => false,
             ]);

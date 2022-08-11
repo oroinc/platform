@@ -4,35 +4,43 @@ namespace Oro\Bundle\FeatureToggleBundle\Tests\Unit\Checker;
 
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureDecisionManagerInterface;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureResourceDecisionManagerInterface;
 use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 
 class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
     /** @var FeatureDecisionManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $featureDecisionManager;
+
+    /** @var FeatureResourceDecisionManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $featureResourceDecisionManager;
+
+    /** @var ConfigurationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
 
     /** @var FeatureChecker */
     private $featureChecker;
 
     protected function setUp(): void
     {
-        $this->configManager = $this->createMock(ConfigurationManager::class);
         $this->featureDecisionManager = $this->createMock(FeatureDecisionManagerInterface::class);
+        $this->featureResourceDecisionManager = $this->createMock(FeatureResourceDecisionManagerInterface::class);
+        $this->configManager = $this->createMock(ConfigurationManager::class);
 
         $this->featureChecker = new FeatureChecker(
-            $this->configManager,
-            $this->featureDecisionManager
+            $this->featureDecisionManager,
+            $this->featureResourceDecisionManager,
+            $this->configManager
         );
     }
 
-    public function testIsFeatureEnabled(): void
+    /**
+     * @dataProvider checkDataProvider
+     */
+    public function testIsFeatureEnabled(bool $expected): void
     {
         $feature = 'feature1';
         $scopeIdentifier = 1;
-        $expected = true;
 
         $this->featureDecisionManager->expects(self::once())
             ->method('decide')
@@ -43,26 +51,18 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @dataProvider isResourceEnabledDataProvider
+     * @dataProvider checkDataProvider
      */
-    public function testIsResourceEnabled(array $features, bool $expected): void
+    public function testIsResourceEnabled(bool $expected): void
     {
         $resource = 'oro_login';
         $resourceType = 'route';
         $scopeIdentifier = 1;
 
-        $decideResultMap = [];
-        foreach ($features as $featureName => $featureEnabled) {
-            $decideResultMap[] = [$featureName, $scopeIdentifier, $featureEnabled];
-        }
-
-        $this->configManager->expects(self::once())
-            ->method('getFeaturesByResource')
-            ->with($resourceType, $resource)
-            ->willReturn(array_keys($features));
-        $this->featureDecisionManager->expects(self::atLeastOnce())
+        $this->featureResourceDecisionManager->expects(self::once())
             ->method('decide')
-            ->willReturnMap($decideResultMap);
+            ->with($resource, $resourceType, $scopeIdentifier)
+            ->willReturn($expected);
 
         $this->assertSame(
             $expected,
@@ -70,13 +70,11 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function isResourceEnabledDataProvider(): array
+    public function checkDataProvider(): array
     {
         return [
-            [['feature1' => false, 'feature2' => false], false],
-            [['feature1' => false, 'feature2' => true], false],
-            [['feature1' => true, 'feature2' => false], false],
-            [['feature1' => true, 'feature2' => true], true],
+            [false],
+            [true],
         ];
     }
 
@@ -90,15 +88,17 @@ class FeatureCheckerTest extends \PHPUnit\Framework\TestCase
         array $expectedResources
     ): void {
         $decideMap = [];
-        foreach ($featuresState as $feature => $state) {
-            $decideMap[] = [$feature, null, $state];
+        foreach ($resources as $resource => $features) {
+            foreach ($features as $feature) {
+                $decideMap[] = [$resource, $resourceType, null, $featuresState[$feature]];
+            }
         }
 
         $this->configManager->expects(self::any())
             ->method('getResourcesByType')
             ->with($resourceType)
             ->willReturn($resources);
-        $this->featureDecisionManager->expects(self::any())
+        $this->featureResourceDecisionManager->expects(self::any())
             ->method('decide')
             ->willReturnMap($decideMap);
 

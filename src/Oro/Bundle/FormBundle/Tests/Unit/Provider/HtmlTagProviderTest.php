@@ -11,19 +11,13 @@ use Symfony\Component\Yaml\Yaml;
 class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HtmlTagProvider */
-    protected $htmlTagProvider;
+    private $htmlTagProvider;
 
-    /** @var array */
-    private $purifierConfig;
-
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
-        $this->purifierConfig = Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/purifier_config.yml'));
-
-        $this->htmlTagProvider = new HtmlTagProvider($this->purifierConfig);
+        $this->htmlTagProvider = new HtmlTagProvider(
+            Yaml::parse(file_get_contents(__DIR__ . '/Fixtures/purifier_config.yml'))
+        );
     }
 
     public function testGetScopes()
@@ -41,11 +35,8 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider allowedElementsDataProvider
-     *
-     * @param string $scope
-     * @param array $expectedResult
      */
-    public function testGetAllowedElements($scope, array $expectedResult): void
+    public function testGetAllowedElements(string $scope, array $expectedResult): void
     {
         $allowedElements = $this->htmlTagProvider->getAllowedElements($scope);
         $this->assertEquals($expectedResult, $allowedElements);
@@ -53,11 +44,8 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider allowedTagsDataProvider
-     *
-     * @param string $scope
-     * @param string $expectedResult
      */
-    public function testGetAllowedTags($scope, $expectedResult): void
+    public function testGetAllowedTags(string $scope, string $expectedResult): void
     {
         $allowedTags = $this->htmlTagProvider->getAllowedTags($scope);
         $this->assertEquals($expectedResult, $allowedTags);
@@ -65,11 +53,8 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider iframeRegexpDataProvider
-     *
-     * @param string $scope
-     * @param string $expectedResult
      */
-    public function testGetIframeRegexp($scope, $expectedResult): void
+    public function testGetIframeRegexp(string $scope, string $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->htmlTagProvider->getIframeRegexp($scope));
     }
@@ -85,11 +70,8 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider uriSchemesDataProvider
-     *
-     * @param string $scope
-     * @param array $expectedResult
      */
-    public function testGetUriSchemes($scope, array $expectedResult): void
+    public function testGetUriSchemes(string $scope, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->htmlTagProvider->getUriSchemes($scope));
     }

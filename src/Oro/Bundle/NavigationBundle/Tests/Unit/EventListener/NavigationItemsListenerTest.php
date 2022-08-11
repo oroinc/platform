@@ -11,7 +11,7 @@ use Oro\Bundle\NavigationBundle\EventListener\NavigationItemsListener;
 class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var NavigationItemsListener */
-    protected $navigationListener;
+    private $navigationListener;
 
     protected function setUp(): void
     {
@@ -227,13 +227,7 @@ class NavigationItemsListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @param MenuItem $item
-     * @param array $children
-     *
-     * @return MenuItem
-     */
-    protected function addChildren(MenuItem $item, array $children)
+    private function addChildren(MenuItem $item, array $children): MenuItem
     {
         foreach ($children as $child) {
             $item->addChild($child);

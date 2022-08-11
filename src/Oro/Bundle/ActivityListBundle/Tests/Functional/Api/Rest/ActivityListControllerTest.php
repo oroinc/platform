@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActivityListBundle\Tests\Functional\Api\Rest;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -11,9 +12,7 @@ class ActivityListControllerTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
-        $this->loadFixtures([
-            'Oro\Bundle\ActivityListBundle\Tests\Functional\DataFixtures\LoadActivityData'
-        ]);
+        $this->loadFixtures([LoadActivityData::class]);
     }
 
     public function testGetList()
@@ -39,12 +38,12 @@ class ActivityListControllerTest extends WebTestCase
         $activity = $this->getReference('test_activity_1');
         $activityId       = $activity->getId();
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $activityListId = $em->getRepository(ActivityList::ENTITY_NAME)
+        $activityListId = $em->getRepository(ActivityList::class)
             ->createQueryBuilder('list')
             ->select('list.id')
             ->where('list.relatedActivityClass = :relatedActivityClass')
             ->andWhere('list.relatedActivityId = :relatedActivityId')
-            ->setParameter('relatedActivityClass', 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity')
+            ->setParameter('relatedActivityClass', TestActivity::class)
             ->setParameter('relatedActivityId', $activityId)
             ->getQuery()
             ->getSingleScalarResult();

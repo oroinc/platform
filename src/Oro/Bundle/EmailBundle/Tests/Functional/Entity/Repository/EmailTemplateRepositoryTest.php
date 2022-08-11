@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Entity\Repository;
 
+use Doctrine\ORM\NoResultException;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Model\EmailTemplateCriteria;
@@ -331,7 +332,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
 
     public function testFindOneLocalizedWhenNoResult(): void
     {
-        $this->expectException(\Doctrine\ORM\NoResultException::class);
+        $this->expectException(NoResultException::class);
 
         $this->loadFixtures([LoadLocalizedEmailTemplateData::class]);
 

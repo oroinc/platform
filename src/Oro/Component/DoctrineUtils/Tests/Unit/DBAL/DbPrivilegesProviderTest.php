@@ -3,7 +3,6 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\DBAL;
 
 use Oro\Component\DoctrineUtils\DBAL\DbPrivilegesProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -66,8 +65,10 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEqualsCanonicalizing(['CREATE', 'INSERT', 'SELECT', 'TEMPORARY', 'TRIGGER'], $privileges);
     }
 
-    private function assertPgSqlPrivilegesFetch(string $dbName, \PDO $pdo): void
-    {
+    private function assertPgSqlPrivilegesFetch(
+        string $dbName,
+        \PDO|\PHPUnit\Framework\MockObject\MockObject $pdo
+    ): void {
         $stmt = $this->createMock(\PDOStatement::class);
         $stmt->expects($this->exactly(2))
             ->method('bindValue')
@@ -125,11 +126,7 @@ class DbPrivilegesProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['ALL PRIVILEGES', 'USAGE'], $privileges);
     }
 
-    /**
-     * @param string[] $grants
-     * @return MockObject|\PDO
-     */
-    private function createPDOMockWithMySQLGrants(array $grants = []): MockObject
+    private function createPDOMockWithMySQLGrants(array $grants = []): \PDO|\PHPUnit\Framework\MockObject\MockObject
     {
         $pdo = $this->createMock(\PDO::class);
         $stmt = $this->createMock(\PDOStatement::class);

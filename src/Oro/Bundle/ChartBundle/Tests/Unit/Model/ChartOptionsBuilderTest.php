@@ -6,10 +6,8 @@ use Oro\Bundle\ChartBundle\Model\ChartOptionsBuilder;
 
 class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ChartOptionsBuilder
-     */
-    protected $builder;
+    /** @var ChartOptionsBuilder */
+    private $builder;
 
     protected function setUp(): void
     {

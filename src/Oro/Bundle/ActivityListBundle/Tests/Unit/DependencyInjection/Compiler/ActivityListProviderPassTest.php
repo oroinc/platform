@@ -6,6 +6,7 @@ use Oro\Bundle\ActivityListBundle\DependencyInjection\Compiler\ActivityListProvi
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -41,7 +42,7 @@ class ActivityListProviderPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessWithoutNameAttribute(): void
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The attribute "class" is required for "oro_activity_list.provider" tag. Service: "provider_1".'
         );

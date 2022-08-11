@@ -11,11 +11,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var StripTagsExtension */
-    protected $formExtension;
-
     /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $htmlTagHelper;
+    private $htmlTagHelper;
+
+    /** @var StripTagsExtension */
+    private $formExtension;
 
     protected function setUp(): void
     {

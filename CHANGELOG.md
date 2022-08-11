@@ -4,11 +4,14 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
-### Added 
+### Added
 
 #### ImportExportBundle
 * Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
   to mark certain field as skipped during denormalization process to avoid possible type conflicts.
+
+## 5.1.0-alpha.2 (2022-08-01)
+[Show detailed list of changes](incompatibilities-5-1-alpha-2.md)
 
 ### Changed
 

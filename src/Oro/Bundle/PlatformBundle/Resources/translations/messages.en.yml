@@ -23,3 +23,8 @@ oro:
         deployment_variable:
             label: Label
             value: Value
+
+        feature:
+            system_info:
+                label: System Information
+                description: Enables access to view system information such as the current application version, licenses, installed packages.

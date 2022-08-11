@@ -9,14 +9,9 @@ use Symfony\Component\Intl\Countries;
 
 class CountryTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var CountryType
-     */
-    protected $formType;
+    /** @var CountryType */
+    private $formType;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         parent::setUp();

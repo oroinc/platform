@@ -25,6 +25,7 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandSchedu
 
     private int $operationLifetime;
     private int $cleanupProcessTimeout;
+    private int $operationTimeout;
 
     private DoctrineHelper $doctrineHelper;
     private EntityDeleteHandlerRegistry $deleteHandlerRegistry;
@@ -32,11 +33,13 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandSchedu
     public function __construct(
         int $operationLifetime,
         int $cleanupProcessLifetime,
+        int $operationTimeout,
         DoctrineHelper $doctrineHelper,
         EntityDeleteHandlerRegistry $deleteHandlerRegistry
     ) {
         $this->operationLifetime = $operationLifetime;
         $this->cleanupProcessTimeout = $cleanupProcessLifetime;
+        $this->operationTimeout = $operationTimeout;
         $this->doctrineHelper = $doctrineHelper;
         $this->deleteHandlerRegistry = $deleteHandlerRegistry;
 
@@ -86,7 +89,9 @@ HELP
             new \DateTime('now', new \DateTimeZone('UTC')),
             new \DateInterval(sprintf('P%dD', $this->operationLifetime))
         );
-        $iterator = new BufferedIdentityQueryResultIterator($this->getOutdatedAsyncOperationsQueryBuilder($minDate));
+
+        $builder = $this->getOutdatedAsyncOperationsQueryBuilder($minDate, $this->operationTimeout);
+        $iterator = new BufferedIdentityQueryResultIterator($builder);
 
         if ($input->getOption('dry-run')) {
             $output->writeln(sprintf(
@@ -126,11 +131,15 @@ HELP
         return 0;
     }
 
-    private function getOutdatedAsyncOperationsQueryBuilder(\DateTime $minDate): QueryBuilder
+    private function getOutdatedAsyncOperationsQueryBuilder(\DateTime $minDate, int $operationTimeout): QueryBuilder
     {
         return $this->doctrineHelper
             ->createQueryBuilder(AsyncOperation::class, 'o')
             ->where('o.updatedAt <= :datetime')
-            ->setParameter('datetime', $minDate);
+            ->orWhere('o.elapsedTime >= :operation_timeout')
+            ->setParameters([
+                'datetime' => $minDate,
+                'operation_timeout' => $operationTimeout
+            ]);
     }
 }

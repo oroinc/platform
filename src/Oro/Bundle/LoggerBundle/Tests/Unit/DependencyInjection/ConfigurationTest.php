@@ -9,16 +9,11 @@ use Symfony\Component\Config\Definition\Processor;
 class ConfigurationTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Configuration */
-    protected $configuration;
+    private $configuration;
 
     protected function setUp(): void
     {
         $this->configuration = new Configuration();
-    }
-
-    protected function tearDown(): void
-    {
-        unset($this->configuration);
     }
 
     public function testGetConfigTreeBuilder()

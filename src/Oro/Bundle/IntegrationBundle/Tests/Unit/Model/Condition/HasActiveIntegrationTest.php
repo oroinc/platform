@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Condition;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository;
 use Oro\Bundle\IntegrationBundle\Model\Condition\HasActiveIntegration;
+use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
 
 class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
 {
@@ -26,7 +27,7 @@ class HasActiveIntegrationTest extends \PHPUnit\Framework\TestCase
      */
     public function testInitializeException(array $options)
     {
-        $this->expectException(\Oro\Component\ConfigExpression\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->condition->initialize($options);
     }
 

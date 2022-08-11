@@ -92,7 +92,7 @@ class ReplaceStrategy implements StrategyInterface
     {
         $entityClass = ClassUtils::getRealClass($entity);
         $queryBuilder = $this->doctrineHelper
-            ->getEntityRepository(ActivityList::ENTITY_NAME)
+            ->getEntityRepository(ActivityList::class)
             ->getActivityListQueryBuilderByActivityClass($entityClass, $entity->getId(), $activityClass);
 
         return $queryBuilder->getQuery()->getResult();

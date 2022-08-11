@@ -52,9 +52,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ActivityList extends ExtendActivityList implements DatesAwareInterface, UpdatedByAwareInterface
 {
-    const ENTITY_NAME  = 'OroActivityListBundle:ActivityList';
-    const ENTITY_CLASS = 'Oro\Bundle\ActivityListBundle\Entity\ActivityList';
-
     const VERB_CREATE = 'create';
     const VERB_UPDATE = 'update';
 

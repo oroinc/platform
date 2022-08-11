@@ -2,14 +2,18 @@
 
 namespace Oro\Bundle\TranslationBundle\Datagrid\Extension\MassAction;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
+use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -17,20 +21,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
 {
-    private const FLUSH_BATCH_SIZE = 100;
+    private const FLUSH_BATCH_SIZE = 500;
 
     private TranslationManager $translationManager;
     private TranslatorInterface $translator;
     private AclHelper $aclHelper;
+    private MessageProducerInterface $producer;
 
     public function __construct(
         TranslationManager $translationManager,
         TranslatorInterface $translator,
-        AclHelper $aclHelper
+        AclHelper $aclHelper,
+        MessageProducerInterface $producer
     ) {
         $this->translationManager = $translationManager;
         $this->translator = $translator;
         $this->aclHelper = $aclHelper;
+        $this->producer = $producer;
     }
 
     /**
@@ -43,23 +50,42 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
             throw new \InvalidArgumentException(sprintf(
                 'Expected "%s", "%s" given',
                 OrmDatasource::class,
-                get_class($datasource)
+                \get_class($datasource)
             ));
         }
 
         $qb = clone $datasource->getQueryBuilder();
         $qb->addSelect('translation.scope as translation_scope');
-        $this->removeEmptyValues($qb);
+        $valuesParameter = $qb->getParameter('values');
+        if (null !== $valuesParameter) {
+            $valuesParameter->setValue(array_filter($valuesParameter->getValue()));
+        }
         $this->aclHelper->apply($qb, 'TRANSLATE');
-        $results = $qb->getQuery()->iterate(null, Query::HYDRATE_SCALAR);
+        $translations = $qb->getQuery()->iterate(null, Query::HYDRATE_SCALAR);
 
         // if huge amount data must be deleted
         set_time_limit(0);
 
-        $iteration = 0;
-        foreach ($results as $result) {
-            $translationData = reset($result);
-            if ($translationData === false) {
+        $totalCount = $this->resetTranslations($translations, $qb->getEntityManager());
+
+        return new MassActionResponse(
+            $totalCount > 0,
+            $this->translator->trans('oro.translation.action.reset.success'),
+            ['count' => $totalCount]
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function resetTranslations(\Traversable $translations, EntityManagerInterface $em): int
+    {
+        $hasJsTranslations = false;
+        $totalCount = 0;
+        $updateCount = 0;
+        foreach ($translations as $item) {
+            $translationData = reset($item);
+            if (false === $translationData) {
                 continue;
             }
 
@@ -71,32 +97,35 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
                     $translationData['domain'],
                     $translationData['translation_scope']
                 );
+                $updateCount++;
             }
-            $iteration++;
+            $totalCount++;
 
-            if ($iteration % self::FLUSH_BATCH_SIZE === 0) {
-                $this->translationManager->flush();
+            if ($updateCount > 0 && ($updateCount % self::FLUSH_BATCH_SIZE) === 0) {
+                if ($this->flushTranslations($em)) {
+                    $hasJsTranslations = true;
+                }
+                $updateCount = 0;
             }
         }
-
-        if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-            $this->translationManager->flush();
+        if ($updateCount > 0 && $this->flushTranslations($em)) {
+            $hasJsTranslations = true;
         }
 
-        return new MassActionResponse(
-            $iteration > 0,
-            $this->translator->trans('oro.translation.action.reset.success'),
-            ['count' => $iteration]
-        );
+        if ($hasJsTranslations) {
+            $this->producer->send(DumpJsTranslationsTopic::getName(), []);
+        }
+
+        return $totalCount;
     }
 
-    private function removeEmptyValues(QueryBuilder $qb): void
+    private function flushTranslations(EntityManagerInterface $em): bool
     {
-        $valuesParameter = $qb->getParameter('values');
-        if (null === $valuesParameter) {
-            return;
-        }
+        $hasJsTranslations = $this->translationManager->flushWithoutDumpJsTranslations();
 
-        $valuesParameter->setValue(array_filter($valuesParameter->getValue()));
+        $em->clear(Translation::class);
+        $em->clear(TranslationKey::class);
+
+        return $hasJsTranslations;
     }
 }

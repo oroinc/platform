@@ -3,18 +3,19 @@
 namespace Oro\Bundle\NoteBundle\Form\Handler;
 
 use Doctrine\Persistence\ObjectManager;
-use Oro\Bundle\EntityBundle\Model\EntityIdSoap;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\NoteBundle\Entity\Note;
-use Oro\Bundle\NoteBundle\Entity\NoteSoap;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * Handles REST API requests for Note entity.
+ */
 class NoteApiHandler
 {
     use RequestHandlerTrait;
@@ -69,10 +70,8 @@ class NoteApiHandler
 
     protected function processRequest(Request $request)
     {
-        /** @var NoteSoap $note */
         $note = $request->request->get('note');
 
-        /** @var EntityIdSoap $association */
         $association = $note['entityId'];
         if ($association && $association['id']) {
             /** @var ConfigProvider $noteProvider */
@@ -82,9 +81,8 @@ class NoteApiHandler
             $extendProvider = $this->configManager->getProvider('extend');
 
             $fieldName    = ExtendHelper::buildAssociationName($association['entity']);
-            if ($noteProvider->hasConfig(Note::ENTITY_NAME, $fieldName)
-                && $extendProvider->getConfig(Note::ENTITY_NAME, $fieldName)
-                    ->is('state', ExtendScope::STATE_ACTIVE)
+            if ($noteProvider->hasConfig(Note::class, $fieldName)
+                && $extendProvider->getConfig(Note::class, $fieldName)->is('state', ExtendScope::STATE_ACTIVE)
             ) {
                 $note[$fieldName] = $association['id'];
                 unset($note['entityId']);

@@ -292,7 +292,8 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
                     'validators' => [
                         'other choice' =>
                             '{0} other choice 0 (PT-BR)|{1} other choice 1 (PT-BR)|]1,Inf] other choice inf (PT-BR)',
-                    ]
+                    ],
+                    'jsmessages' => []
                 ]
             ],
         ];
@@ -321,15 +322,17 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
             ],
             'fr' => [
                 'jsmessages' => [
-                    'foo'     => 'foo (FR) (dynamic)',
                     'bar'     => 'bar (FR) (dynamic)',
                     'another' => 'another (FR) (dynamic)'
+                ],
+                'another'    => [
+                    'val1' => 'val1 (FR) (dynamic)'
                 ]
             ]
         ]));
         $translator->rebuildCache();
 
-        $result = $translator->getTranslations(['jsmessages', 'messages'], $locale);
+        $result = $translator->getTranslations(['jsmessages', 'messages', 'another'], $locale);
 
         self::assertEquals($expected, $result);
     }
@@ -346,10 +349,13 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
                     'jsmessages' => [
                         'foobarfoo' => 'foobarfoo (PT-PT)',
                         'foobar'    => 'foobar (ES)',
-                        'foo'       => 'foo (FR) (dynamic)',
+                        'foo'       => 'foo (FR)',
                         'bar'       => 'bar (FR) (dynamic)',
-                        'baz'       => 'baz (EN)',
+                        'baz'       => 'baz (EN) (dynamic)',
                         'another'   => 'another (FR) (dynamic)'
+                    ],
+                    'another'    => [
+                        'val1' => 'val1 (FR) (dynamic)'
                     ]
                 ]
             ],
@@ -362,10 +368,13 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
                     'jsmessages' => [
                         'foobarfoo' => 'foobarfoo (PT-PT)',
                         'foobar'    => 'foobar (ES)',
-                        'foo'       => 'foo (FR) (dynamic)',
+                        'foo'       => 'foo (FR)',
                         'bar'       => 'bar (FR) (dynamic)',
-                        'baz'       => 'baz (EN)',
+                        'baz'       => 'baz (EN) (dynamic)',
                         'another'   => 'another (FR) (dynamic)'
+                    ],
+                    'another'    => [
+                        'val1' => 'val1 (FR) (dynamic)'
                     ]
                 ]
             ],
@@ -382,7 +391,8 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
                         'bar'       => 'bar (EN)',
                         'baz'       => 'baz (EN) (dynamic)',
                         'another'   => 'another (EN) (dynamic)'
-                    ]
+                    ],
+                    'another'    => []
                 ]
             ],
             [
@@ -395,7 +405,8 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
                         'foobarfoo' => 'foobarfoo (PT-PT)',
                         'foo'       => 'foo (PT-PT)',
                         'foobar'    => 'foobar (ES)',
-                    ]
+                    ],
+                    'another'    => []
                 ]
             ],
         ];

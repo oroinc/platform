@@ -44,7 +44,7 @@ class UniteStrategy implements StrategyInterface
                 $entityClass = ClassUtils::getRealClass($masterEntity);
                 $activityClass = $fieldMetadata->get('type');
                 $queryBuilder = $this->doctrineHelper
-                    ->getEntityRepository(ActivityList::ENTITY_NAME)
+                    ->getEntityRepository(ActivityList::class)
                     ->getActivityListQueryBuilderByActivityClass($entityClass, $sourceEntity->getId(), $activityClass);
 
                 $activityListItems = $queryBuilder->getQuery()->getResult();

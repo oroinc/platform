@@ -10,7 +10,7 @@ use Oro\Component\DoctrineUtils\ORM\QueryHintResolver;
 class HintExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var HintExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {

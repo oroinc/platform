@@ -7,10 +7,8 @@ use Oro\Bundle\CurrencyBundle\Form\DataTransformer\PriceTransformer;
 
 class PriceTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PriceTransformer
-     */
-    protected $transformer;
+    /** @var PriceTransformer */
+    private $transformer;
 
     protected function setUp(): void
     {
@@ -25,11 +23,8 @@ class PriceTransformerTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider reverseTransformDataProvider
-     *
-     * @param Price|null $data
-     * @param Price|null $expected
      */
-    public function testReverseTransform($data, $expected)
+    public function testReverseTransform(Price|string|null $data, ?Price $expected)
     {
         $this->assertSame($expected, $this->transformer->reverseTransform($data));
     }
@@ -39,6 +34,7 @@ class PriceTransformerTest extends \PHPUnit\Framework\TestCase
         $zeroPrice = Price::create(0, 'USD');
         $price = Price::create(100, 'USD');
         $lessZeroPrice = Price::create('-1', 'USD');
+
         return [
             'zero price' => [
                 'input' => $zeroPrice,

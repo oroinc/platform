@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class SearchEnumFilterTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var SearchEnumFilterType */
-    protected $type;
+    private $type;
 
     protected function setUp(): void
     {

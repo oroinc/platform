@@ -132,10 +132,10 @@ class EmailVoter implements VoterInterface, ServiceSubscriberInterface
      */
     protected function convertToSupportedObject($object, $objectClass)
     {
-        if ($objectClass === EmailBody::CLASS_NAME) {
+        if (EmailBody::class === $objectClass) {
             $object = $object->getEmail();
         }
-        if ($objectClass === EmailAttachment::CLASS_NAME) {
+        if (EmailAttachment::class === $objectClass) {
             $object = $object->getEmailBody()->getEmail();
         }
 

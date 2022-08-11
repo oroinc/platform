@@ -35,7 +35,6 @@ class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyOrderByWhenNoAdded()
     {
-        /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject $datasource */
         $datasource = $this->createMock(OrmDatasource::class);
         $sortKey = 'someKey';
         $direction = 'DESC';
@@ -61,7 +60,6 @@ class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyOrderBy()
     {
-        /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject $datasource */
         $datasource = $this->createMock(OrmDatasource::class);
         $sortKey = 'someKey';
         $direction = 'DESC';

@@ -459,15 +459,13 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             ->method('supports')
             ->willReturn(true);
 
-        $this->searchProvider->expects(self::exactly(6))
+        $this->searchProvider->expects(self::exactly(4))
             ->method('getData')
             ->willReturnOnConsecutiveCalls(
                 ['Third group'],
                 ['Fourth group'],
                 ['title some field', 'tooltip some field'],
                 ['title some other field'],
-                ['Another branch first group'],
-                ['Another branch second group']
             );
 
         $result = $provider->getJsTree();
@@ -484,17 +482,6 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
                     'title some field',
                     'tooltip some field',
                     'title some other field',
-                ]
-            ],
-            [
-                'id' => 'another_branch_first',
-                'text' => 'Another branch first group',
-                'icon' => 'fa-file',
-                'parent' => 'second_group',
-                'priority' => 0,
-                'search_by' => [
-                    'Another branch first group',
-                    'Another branch second group',
                 ]
             ],
             [

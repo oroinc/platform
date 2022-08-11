@@ -137,7 +137,6 @@ oro:
 
             show_step_in_grid.label: 'Workflow step in grid'
 
-
         event:
             notification:
                 workflow_transition: Workflow transition
@@ -354,3 +353,12 @@ oro:
             exclusive_record_groups.tooltip: "Only one workflow can be started for a related entity within a same exclusive record group"
             choose_workflow: 'Choose a workflow...'
             choose_transition: 'Choose a transition...'
+
+        feature:
+            manage:
+                label: Workflow Management
+                description: Enables creating and managing workflows with logical steps and transitions to standardize and optimize business processes.
+            process:
+                manage:
+                    label: Process Management
+                    description: Enables access to view and deactivate predefined processes in the Oro application.

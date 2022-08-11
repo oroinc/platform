@@ -12,24 +12,21 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 class LazyResultTest extends \PHPUnit\Framework\TestCase
 {
     /** @var array */
-    protected $elements = [];
+    private $elements = [];
 
     /** @var int */
-    protected $count = 42;
+    private $count = 42;
 
     /** @var array */
-    protected $aggregatedData = [
+    private $aggregatedData = [
         'test_name' => [
             'field' => 'test_field_name',
             'function' => Query::AGGREGATE_FUNCTION_COUNT
         ]
     ];
 
-    /** @var Query */
-    protected $query;
-
     /** @var LazyResult */
-    protected $result;
+    private $result;
 
     protected function setUp(): void
     {
@@ -54,10 +51,8 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
             )
         ];
 
-        $this->query = new Query();
-
         $this->result = new LazyResult(
-            $this->query,
+            new Query(),
             $this->getCallbackFunction($this->elements),
             $this->getCallbackFunction($this->count),
             $this->getCallbackFunction($this->aggregatedData)
@@ -208,11 +203,7 @@ class LazyResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($this->elements, $items);
     }
 
-    /**
-     * @param mixed $value
-     * @return \Closure
-     */
-    protected function getCallbackFunction($value)
+    private function getCallbackFunction(mixed $value): \Closure
     {
         return function () use ($value) {
             return $value;

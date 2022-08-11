@@ -54,7 +54,6 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);
         $this->tokenStorage = $this->createMock(TokenStorage::class);
         $this->serviceLink = $this->createMock(ServiceLink::class);
-        $this->entityOwnerAccessorLink = $this->createMock(ServiceLink::class);
         $this->em = $this->createMock(EntityManager::class);
 
         $this->emailActivityManager = new EmailActivityManager(
@@ -104,7 +103,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->em->expects($this->exactly($methods['entityManager.getRepository']['amountCall']))
             ->method('getRepository')
-            ->with(Email::ENTITY_CLASS)
+            ->with(Email::class)
             ->willReturn($repository);
 
         $this->emailActivityListProvider->expects($this->exactly($methods['getTargetEntities']['amountCall']))
