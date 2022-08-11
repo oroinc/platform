@@ -10,6 +10,7 @@ oro:
             invalid_organization_field: 'Organization or First Name and Last Name should not be blank.'
             invalid_country_region: 'Region {{ region }} does not belong to country {{ country }}'
             invalid_region_text: 'Custom region can be used only for countries without predefined regions.'
+            invalid_customer_and_address_organization: 'Customer and its address belongs to different organizations.'
             owner_changed: 'Address owner cannot be changed once set.'
             contains_primary: 'One of the addresses must be set as primary.'
             emails:
