@@ -15,6 +15,13 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### DataGridBundle
+* The `iconHideText` option for `action-launcher` and `dropdown-select-choice-launcher` views was removed, use the `launcherMode` option instead.
+  The `launcherMode` option can have three different values:
+    - `icon-text` - shows datagrid actions with icons and text labels;
+    - `icon-only` - shows datagrid actions as icons;
+    - `text-only`- shows datagrid actions as text labels;
+
 #### PlatformBundle
 * As the 'composer/composer' package is no longer used, the `Oro\Bundle\PlatformBundle\Provider\PackageProvider` class based services now provide the packages info in pure arrays instead of the array of the `Composer\Package\PackageInterface` interface based objects. The returned array structure is as follows: `['package_name' => ['pretty_version' => '1.0.0', 'license' => ['MIT']]]`..
 

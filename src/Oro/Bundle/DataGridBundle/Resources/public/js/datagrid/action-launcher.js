@@ -9,7 +9,7 @@ define(function(require, exports, module) {
     let config = require('module-config').default(module.id);
 
     config = _.extend({
-        iconHideText: true
+        launcherMode: 'icon-only'
     }, config);
 
     /**
@@ -56,10 +56,6 @@ define(function(require, exports, module) {
 
         /** @property {String} */
         iconClassName: undefined,
-
-        /** @property {Boolean} */
-        /** @deprecated use launcherMode */
-        iconHideText: config.iconHideText,
 
         /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
         launcherMode: '',
@@ -120,7 +116,6 @@ define(function(require, exports, module) {
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
          * @param {String} [options.icon]
-         * @param {Boolean} [options.iconHideText]
          * @param {String} [options.launcherMode]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
@@ -136,21 +131,10 @@ define(function(require, exports, module) {
             this.setOptions(options);
 
             if (!this.launcherMode) {
-                this.launcherMode = this._convertToLauncherMode();
+                this.launcherMode = this.icon ? config.launcherMode : 'text-only';
             }
 
             ActionLauncher.__super__.initialize.call(this, options);
-        },
-
-        /**
-         * @return {String}
-         */
-        _convertToLauncherMode: function() {
-            if (this.icon) {
-                return this.iconHideText ? 'icon-only' : 'icon-text';
-            } else {
-                return 'text-only';
-            }
         },
 
         /**
@@ -173,7 +157,7 @@ define(function(require, exports, module) {
 
             _.extend(
                 this,
-                _.pick(options, 'iconHideText', 'runAction', 'onClickReturnValue', 'links'),
+                _.pick(options, 'runAction', 'onClickReturnValue', 'links'),
                 _.pick(truthy, value => value !== void 0)
             );
 
