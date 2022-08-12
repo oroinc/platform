@@ -31,14 +31,6 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
-#### UIBundle
-
-The `modalHandler` method for `error` helper was removed, use `showError` method instead.
-
-#### FilterBundle
-
-* The `day-value-helper` was removed, use `date-value-helper` instead.
-
 #### CronBundle
 * `Oro\Bundle\CronBundle\Command\CronCommandInterface` has been removed.
   Use `Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface`
@@ -48,9 +40,16 @@ The `modalHandler` method for `error` helper was removed, use `showError` method
 * The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead. 
 * The deprecated `source / acl_resource` datagrid option was removed. Use the `acl_resource` option instead.
 
+#### EntityBundle
+* JS util `EntityFieldsUtil` was removed, use `EntityStructureDataProvider` instead.
+
+#### FilterBundle
+* The `day-value-helper` was removed, use `date-value-helper` instead.
+
 #### UIBundle
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
+* The `modalHandler` method for `error` helper was removed, use `showError` method instead.
 
 #### WorkflowBundle
 * The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
