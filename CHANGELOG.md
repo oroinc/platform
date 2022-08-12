@@ -24,6 +24,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### UIBundle
+
+The `modalHandler` method for `error` helper was removed, use `showError` method instead.
+
 #### FilterBundle
 
 * The `day-value-helper` was removed, use `date-value-helper` instead.
