@@ -867,6 +867,90 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
+    public function testOwnerFieldWithAdditionalDescription()
+    {
+        $entityClass = TestEntity::class;
+        $targetAction = 'get_list';
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'owner'        => null
+            ]
+        ];
+
+        $this->ownershipConfigProvider->addEntityConfig(
+            $entityClass,
+            ['owner_field_name' => 'owner']
+        );
+
+        $this->resourceDocParser->expects(self::exactly(2))
+            ->method('getFieldDocumentation')
+            ->willReturnMap([
+                [$entityClass, 'owner', $targetAction, 'action field description. {@inheritdoc}'],
+                [$entityClass, 'owner', null, null]
+            ]);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'owner'        => [
+                        'description' => 'action field description. ' . self::OWNER_DESCRIPTION
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testOrganizationFieldWithAdditionalDescription()
+    {
+        $entityClass = TestEntity::class;
+        $targetAction = 'get_list';
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'organization' => null
+            ]
+        ];
+
+        $this->ownershipConfigProvider->addEntityConfig(
+            $entityClass,
+            ['organization_field_name' => 'organization']
+        );
+
+        $this->resourceDocParser->expects(self::exactly(2))
+            ->method('getFieldDocumentation')
+            ->willReturnMap([
+                [$entityClass, 'organization', $targetAction, 'action field description. {@inheritdoc}'],
+                [$entityClass, 'organization', null, null]
+            ]);
+
+        $this->context->setClassName($entityClass);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'fields'                 => [
+                    'organization' => [
+                        'description' => 'action field description. ' . self::ORGANIZATION_DESCRIPTION
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
     public function testEnumFields()
     {
         $config = [
