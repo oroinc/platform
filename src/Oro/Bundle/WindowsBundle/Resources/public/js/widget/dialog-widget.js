@@ -212,7 +212,7 @@ define(function(require, exports, module) {
         },
 
         removeMessageContainer: function() {
-            if (this.$messengerContainer.length) {
+            if (this.$messengerContainer && this.$messengerContainer.length) {
                 if (this.options.triggerEventOnMessagesRemoved) {
                     this.$messengerContainer.trigger('remove');
                 }
