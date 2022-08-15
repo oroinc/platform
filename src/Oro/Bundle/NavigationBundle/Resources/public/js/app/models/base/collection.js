@@ -15,9 +15,9 @@ define(function(require) {
             BaseNavigationItemCollection.__super__.constructor.apply(this, args);
         },
 
-        getCurrentModel: function() {
-            return this.find(function(model) {
-                return mediator.execute('compareUrl', model.get('url'));
+        getCurrentModel() {
+            return this.find(model => {
+                return model.get('url') !== null && mediator.execute('compareUrl', model.get('url'));
             });
         }
     });
