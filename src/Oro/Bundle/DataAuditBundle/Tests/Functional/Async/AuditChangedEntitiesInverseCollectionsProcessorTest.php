@@ -11,7 +11,6 @@ use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\DataFixtures\LoadTestAuditDataWithOneToManyData;
 use Oro\Bundle\DataAuditBundle\Tests\Functional\Environment\Entity\TestAuditDataOwner;
-use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -173,7 +172,6 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
             $fields = $audit->getFields();
             $this->assertCount(1, $fields);
 
-            /** @var AuditField $field */
             $field = $audit->getField('ownerManyToOne');
             $changedDiffs = $field->getCollectionDiffs()['changed'];
             $this->assertCount(1, $changedDiffs);

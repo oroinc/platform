@@ -8,12 +8,9 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class LocalizedFallbackValueRepositoryTest extends WebTestCase
 {
-    use EntityTrait;
-
     private EntityManager $entityManager;
     private LocalizedFallbackValueRepository $repository;
 

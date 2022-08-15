@@ -100,33 +100,37 @@ class DoctrineHelper implements ResetInterface
     /**
      * Extracts the identifier values of the given entity.
      *
-     * @param object $entity An entity object
-     *
-     * @return array
+     * @throws Exception\NotManageableEntityException if an entity is not manageable and it doesn't have getId() method
      */
-    public function getEntityIdentifier($entity)
+    public function getEntityIdentifier(object $entity): array
     {
-        // check if we can use getId method to fast get the identifier
+        $entityClass = $this->getClass($entity);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null !== $manager) {
+            return $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
+        }
+
         if (method_exists($entity, 'getId')) {
-            // This code doesn't support composite keys. See BAP-8835
             return ['id' => $entity->getId()];
         }
 
-        return $this
-            ->getEntityMetadata($entity)
-            ->getIdentifierValues($entity);
+        throw new Exception\NotManageableEntityException($entityClass);
     }
 
     /**
-     * Check whether an entity is new
+     * Check whether the given entity is new entity object.
      *
-     * @param object $entity An entity object
-     *
-     * @return bool
+     * @throws Exception\NotManageableEntityException if an entity is not manageable
      */
-    public function isNewEntity($entity)
+    public function isNewEntity(object $entity): bool
     {
-        $identifierValues = $this->getEntityMetadata($entity)->getIdentifierValues($entity);
+        $entityClass = $this->getClass($entity);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (null === $manager) {
+            throw new Exception\NotManageableEntityException($entityClass);
+        }
+
+        $identifierValues = $manager->getClassMetadata($entityClass)->getIdentifierValues($entity);
 
         return count($identifierValues) === 0;
     }
@@ -134,26 +138,19 @@ class DoctrineHelper implements ResetInterface
     /**
      * Extracts the single identifier value of the given entity.
      *
-     * @param object $entity         An entity object
-     * @param bool   $throwException Whether to throw exception in case the entity has several identifier fields
-     *
-     * @return mixed|null
-     *
-     * @throws Exception\InvalidEntityException
+     * @throws Exception\InvalidEntityException if the entity has several identifier fields and $throwException is TRUE
      */
-    public function getSingleEntityIdentifier($entity, $throwException = true)
+    public function getSingleEntityIdentifier(object $entity, bool $throwException = true): mixed
     {
         $entityIdentifier = $this->getEntityIdentifier($entity);
 
         $result = null;
         if (count($entityIdentifier) > 1) {
             if ($throwException) {
-                throw new Exception\InvalidEntityException(
-                    sprintf(
-                        'Can\'t get single identifier for "%s" entity.',
-                        $this->getEntityClass($entity)
-                    )
-                );
+                throw new Exception\InvalidEntityException(sprintf(
+                    'Can\'t get single identifier for "%s" entity.',
+                    $this->getEntityClass($entity)
+                ));
             }
         } else {
             $result = $entityIdentifier ? reset($entityIdentifier) : null;

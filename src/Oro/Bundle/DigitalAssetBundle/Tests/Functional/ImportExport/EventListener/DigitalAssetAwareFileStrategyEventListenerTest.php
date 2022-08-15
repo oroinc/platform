@@ -14,7 +14,7 @@ use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 /**
@@ -22,8 +22,6 @@ use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
  */
 class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 {
-    use EntityTrait;
-
     /** @var FileStrategyEventListener */
     private $fileStrategyListener;
 
@@ -49,6 +47,14 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->persistListener = $this->getContainer()->get(
             'oro_digital_asset.import_export.event_listener.digital_asset_aware_file_strategy_persist_event_listener'
         );
+    }
+
+    private function createUser(int $id): User
+    {
+        $user = new User();
+        ReflectionUtil::setId($user, $id);
+
+        return $user;
     }
 
     public function testWhenNoFileFields(): void
@@ -84,7 +90,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
@@ -121,7 +127,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
@@ -157,7 +163,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $fieldName = 'avatar';
         $digitalAsset = $this->getReference('user_2_avatar_digital_asset');
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $sourceFileUuid = $digitalAsset->getSourceFile()->getUuid();
 
         $file = new File();
@@ -209,7 +215,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $user2 = $this->getReference('user2');
         $sourceFileUuid = $user2->getAvatar()->getUuid();
         $digitalAsset = $user2->getAvatar()->getDigitalAsset();
@@ -249,7 +255,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
@@ -289,7 +295,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $user->setAvatar($file);
@@ -329,7 +335,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
 
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $fileWithInvalidDigitalAsset = $this->getReference('file_with_invalid_digital_asset');
         $fileUuid = $fileWithInvalidDigitalAsset->getUuid();
 
@@ -374,7 +380,7 @@ class DigitalAssetAwareFileStrategyEventListenerTest extends WebTestCase
         $this->toggleDam(true);
 
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $url = 'http://example.org/sample/url/filename.jpg';
         $externalFile = new ExternalFile($url, 'filename', 100, 'image/jpeg');

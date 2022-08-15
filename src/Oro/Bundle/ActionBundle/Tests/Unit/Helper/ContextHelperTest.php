@@ -401,6 +401,6 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         }
         ksort($array);
 
-        return md5(json_encode($array, JSON_NUMERIC_CHECK));
+        return md5(json_encode($array, JSON_NUMERIC_CHECK | JSON_THROW_ON_ERROR));
     }
 }

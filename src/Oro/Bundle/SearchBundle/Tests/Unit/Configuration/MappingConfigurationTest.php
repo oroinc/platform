@@ -3,13 +3,13 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\SearchBundle\Configuration\MappingConfiguration;
-use Oro\Component\Testing\Unit\LoadTestCaseDataTrait;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\Yaml\Yaml;
 
 class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
 {
-    use LoadTestCaseDataTrait;
-
     /**
      * @dataProvider processConfigurationDataProvider
      */
@@ -25,6 +25,13 @@ class MappingConfigurationTest extends \PHPUnit\Framework\TestCase
 
     public function processConfigurationDataProvider(): array
     {
-        return $this->getTestCaseData(__DIR__ . DIRECTORY_SEPARATOR . 'mapping_configuration');
+        $cases = [];
+        $finder = (new Finder())->files()->in(__DIR__ . '/mapping_configuration')->name('*.yml');
+        /** @var SplFileInfo $file */
+        foreach ($finder as $file) {
+            $cases[$file->getRelativePathname()] = Yaml::parse($file->getContents());
+        }
+
+        return $cases;
     }
 }
