@@ -135,19 +135,6 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedClass, $this->doctrineHelper->getEntityClass($class));
     }
 
-    public function testGetEntityIdentifierWithGetIdMethod()
-    {
-        $identifiers = ['id' => self::TEST_IDENTIFIER];
-        $entity = new TestEntity($identifiers['id']);
-        $this->registry->expects($this->never())
-            ->method('getManagerForClass');
-
-        $this->assertEquals(
-            $identifiers,
-            $this->doctrineHelper->getEntityIdentifier($entity)
-        );
-    }
-
     /**
      * @dataProvider testIsNewEntityDataProvider
      */
@@ -237,7 +224,22 @@ class DoctrineHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdentifierNotManageableEntity()
+    public function testGetEntityIdentifierForNotManageableEntityWithGetIdMethod()
+    {
+        $identifiers = ['id' => self::TEST_IDENTIFIER];
+        $entity = new TestEntity($identifiers['id']);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(TestEntity::class)
+            ->willReturn(null);
+
+        $this->assertEquals(
+            $identifiers,
+            $this->doctrineHelper->getEntityIdentifier($entity)
+        );
+    }
+
+    public function testGetEntityIdentifierForNotManageableEntityWithoutGetIdMethod()
     {
         $entity = $this->createMock(\stdClass::class);
 

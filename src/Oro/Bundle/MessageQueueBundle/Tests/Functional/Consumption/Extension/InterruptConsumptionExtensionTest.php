@@ -3,7 +3,6 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 
 use Oro\Bundle\MessageQueueBundle\Test\Async\ChangeConfigProcessor;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension\TestLogger;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
@@ -11,14 +10,13 @@ use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtens
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class InterruptConsumptionExtensionTest extends WebTestCase
 {
     private MessageProducerInterface $messageProducer;
-
     private QueueConsumer $consumer;
-
     private TestLogger $logger;
 
     protected function setUp(): void

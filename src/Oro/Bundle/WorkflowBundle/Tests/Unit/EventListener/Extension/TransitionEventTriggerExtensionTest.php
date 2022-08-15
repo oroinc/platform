@@ -43,6 +43,11 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             ->method('getEntityRepositoryForClass')
             ->with(TransitionEventTrigger::class)
             ->willReturn($this->repository);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityIdentifier')
+            ->willReturnCallback(function ($entity) {
+                return ['id' => $entity->getId()];
+            });
 
         $this->extension = new TransitionEventTriggerExtension(
             $this->doctrineHelper,
@@ -226,7 +231,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 
         $this->handler->expects($this->once())
             ->method('process')
-            ->with($expectedTrigger, TransitionTriggerMessage::create($expectedTrigger, null))
+            ->with($expectedTrigger, TransitionTriggerMessage::create($expectedTrigger, ['id' => self::ENTITY_ID]))
             ->willReturn(true);
 
         $this->callPreFunctionByEventName(EventTriggerInterface::EVENT_CREATE, $entity);
@@ -292,7 +297,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
             TransitionTriggerProcessor::EVENT_TOPIC_NAME,
             [
                 TransitionTriggerMessage::TRANSITION_TRIGGER => $expectedTrigger->getId(),
-                TransitionTriggerMessage::MAIN_ENTITY => null
+                TransitionTriggerMessage::MAIN_ENTITY => ['id' => self::ENTITY_ID]
             ]
         );
     }

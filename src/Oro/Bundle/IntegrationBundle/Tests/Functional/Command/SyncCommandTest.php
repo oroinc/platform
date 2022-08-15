@@ -4,7 +4,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\IntegrationBundle\Async\Topics;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
@@ -14,19 +13,23 @@ use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessagePriority;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 /**
  * @dbIsolationPerTest
  */
 class SyncCommandTest extends WebTestCase
 {
-    use MessageQueueExtension, EntityTrait;
+    use MessageQueueExtension;
 
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadChannelData::class]);
+    }
+
+    private function getJobRepository(): JobRepository
+    {
+        return self::getContainer()->get('doctrine')->getRepository(Job::class);
     }
 
     public function testShouldOutputHelpForTheCommand()
@@ -125,16 +128,14 @@ class SyncCommandTest extends WebTestCase
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
+        $entity = new Job();
+        $entity->setName('oro_integration:sync_integration:' . $integration->getId());
+        $entity->setOwnerId('owner-id-1');
+        $entity->setCreatedAt(new \DateTime('now', new \DateTimeZone('UTC')));
+        $entity->setUnique(true);
+        $entity->setStatus(Job::STATUS_RUNNING);
+
         $jobHandler = $this->getContainer()->get('oro_message_queue.job.manager');
-        $data = [
-            'name' => 'oro_integration:sync_integration:'.$integration->getId(),
-            'owner_id' => 'owner-id-1',
-            'created_at' => new \DateTime('now', new \DateTimeZone('UTC')),
-            'unique' => true,
-            'status' => Job::STATUS_RUNNING
-        ];
-        /** @var Job $entity */
-        $entity = $this->getEntity(Job::class, $data);
         $jobHandler->saveJob($entity);
 
         $this->assertNull($this->getJobRepository()->findRootJobByJobNameAndStatuses(
@@ -162,15 +163,5 @@ class SyncCommandTest extends WebTestCase
             'oro_integration:sync_integration:'.$integration->getId(),
             [Job::STATUS_STALE]
         ));
-    }
-
-    /**
-     * @return JobRepository|EntityRepository
-     */
-    private function getJobRepository(): JobRepository
-    {
-        $doctrineHelper = self::getContainer()->get('oro_entity.doctrine_helper');
-
-        return $doctrineHelper->getEntityRepository(Job::class);
     }
 }

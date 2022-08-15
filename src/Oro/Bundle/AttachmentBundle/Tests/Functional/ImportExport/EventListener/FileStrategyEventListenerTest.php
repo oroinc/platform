@@ -11,23 +11,17 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithAvatars;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
 /**
  * @dbIsolationPerTest
- *
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FileStrategyEventListenerTest extends WebTestCase
 {
-    use EntityTrait;
-
     private FileStrategyEventListener $listener;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
@@ -36,6 +30,14 @@ class FileStrategyEventListenerTest extends WebTestCase
         $this->loadFixtures([LoadUsersWithAvatars::class]);
 
         $this->listener = self::getContainer()->get('oro_attachment.import_export.event_listener.file_strategy');
+    }
+
+    private function createUser(int $id): User
+    {
+        $user = new User();
+        ReflectionUtil::setId($user, $id);
+
+        return $user;
     }
 
     public function testWhenNoFileFields(): void
@@ -94,7 +96,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $fieldName = 'avatar';
         $context = $this->getContext([$fieldName => []]);
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $event = $this->getEvent($context, $user);
 
         $this->listener->onProcessBefore($event);
@@ -111,7 +113,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $fieldName = 'avatar';
         $context = $this->getContext([$fieldName => []]);
         $existingUser = $this->getReference('user2');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $event = $this->getEvent($context, $user);
 
         $entityConfigManager = self::getContainer()->get('oro_entity_config.config_manager');
@@ -137,7 +139,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $existingUser = $this->getReference('user2');
         /** @var File $existingUserAvatar */
         $existingUserAvatar = $existingUser->getAvatar();
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $event = $this->getEvent($context, $user);
 
         $this->listener->onProcessBefore($event);
@@ -157,7 +159,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user2');
         $existingFileUuid = $existingUser->getAvatar()->getUuid();
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $file->setUuid($existingFileUuid);
@@ -190,7 +192,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $existingFileOriginalFilename = $existingFile->getOriginalFilename();
 
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $file->setUuid($existingFileUuid);
@@ -231,7 +233,7 @@ class FileStrategyEventListenerTest extends WebTestCase
     {
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
@@ -277,7 +279,7 @@ class FileStrategyEventListenerTest extends WebTestCase
     {
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user2');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $oldFilename = $existingUser->getAvatar()->getFilename();
         $oldOriginalFilename = $existingUser->getAvatar()->getOriginalFilename();
@@ -327,7 +329,7 @@ class FileStrategyEventListenerTest extends WebTestCase
     {
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $user->setAvatar($file);
@@ -357,7 +359,7 @@ class FileStrategyEventListenerTest extends WebTestCase
     {
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $symfonyFile = new SymfonyFile('invalid/path', false);
@@ -399,7 +401,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $context = $this->getContext([$fieldName => []]);
 
         $existingUser = $this->getReference('user2');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $user->setAvatar($file);
 
         $event = $this->getEvent($context, $user);
@@ -435,7 +437,7 @@ class FileStrategyEventListenerTest extends WebTestCase
     {
         $fieldName = 'avatar';
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $symfonyFile = new SymfonyFile(
@@ -471,7 +473,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $fieldName = 'avatar';
         $existingFileUuid = $this->getReference('user3')->getAvatar()->getUuid();
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $file->setUuid($existingFileUuid);
@@ -504,7 +506,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $fieldName = 'avatar';
         $existingFileUuid = $this->getReference('user3')->getAvatar()->getUuid();
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
 
         $file = new File();
         $file->setUuid($existingFileUuid);
@@ -543,7 +545,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $file->setFile($externalFile);
 
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $user->setAvatar($file);
 
         $event = $this->getEvent($context, $user);
@@ -568,7 +570,7 @@ class FileStrategyEventListenerTest extends WebTestCase
         $context = $this->getContext([$fieldName => []]);
 
         $existingUser = $this->getReference('user1');
-        $user = $this->getEntity(User::class, ['id' => $existingUser->getId()]);
+        $user = $this->createUser($existingUser->getId());
         $user->setAvatar($file);
 
         $event = $this->getEvent($context, $user);

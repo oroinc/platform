@@ -2,15 +2,16 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\Datagrid\FilteredEntityReader;
 
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SearchBundle\Datagrid\FilteredEntityReader\SearchSourceFilteredEntityIdentityReader;
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\DataFixtures\LoadSearchItemData;
 use Oro\Bundle\SearchBundle\Tests\Functional\Controller\SearchBundleWebTestCase;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Tests\Unit\Stub\OrganizationStub;
 
 /**
  * @dbIsolationPerTest
@@ -95,7 +96,7 @@ class SearchSourceFilteredEntityIdentityReaderTest extends SearchBundleWebTestCa
         // Create token with fake organization which Id is another than organization which used in fixtures.
         $user = new User();
         $organizationId = $this->getReference('organization')->getId();
-        $organization = new OrganizationStub();
+        $organization = new Organization();
         $organization->setId(++$organizationId);
         $token = new OrganizationToken($organization, []);
         $token->setUser($user);
@@ -118,18 +119,16 @@ class SearchSourceFilteredEntityIdentityReaderTest extends SearchBundleWebTestCa
             ->setToken($token);
     }
 
-    private function getDatagrid($options)
+    private function getDatagrid(array $options): DatagridInterface
     {
         $name = $options['filteredResultsGrid'];
         $queryString = $options['filteredResultsGridParams'] ?? null;
         parse_str($queryString, $parameters);
+
         return $this->getDatagridManager()->getDatagrid($name, [ParameterBag::MINIFIED_PARAMETERS => $parameters]);
     }
 
-    /**
-     * @return Manager
-     */
-    private function getDatagridManager()
+    private function getDatagridManager(): Manager
     {
         return $this->client->getContainer()->get('oro_datagrid.datagrid.manager');
     }

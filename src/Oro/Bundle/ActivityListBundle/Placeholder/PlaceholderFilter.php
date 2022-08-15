@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActivityListBundle\Placeholder;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -20,9 +20,6 @@ class PlaceholderFilter
     /** @var ActivityListChainProvider */
     protected $activityListProvider;
 
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -34,14 +31,12 @@ class PlaceholderFilter
 
     public function __construct(
         ActivityListChainProvider $activityListChainProvider,
-        ManagerRegistry $doctrine,
         DoctrineHelper $doctrineHelper,
         ConfigManager $configManager
     ) {
         $this->activityListProvider = $activityListChainProvider;
-        $this->doctrine             = $doctrine;
-        $this->doctrineHelper       = $doctrineHelper;
-        $this->configManager        = $configManager;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -145,7 +140,8 @@ class PlaceholderFilter
      */
     protected function isActivityListEmpty($targetEntityClass, $targetEntityId)
     {
-        $repo = $this->doctrine->getRepository(ActivityList::class);
+        /** @var ActivityListRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepositoryForClass(ActivityList::class);
 
         return 0 === $repo->getRecordsCountForTargetClassAndId($targetEntityClass, $targetEntityId);
     }
