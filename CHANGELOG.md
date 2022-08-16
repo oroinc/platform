@@ -50,6 +50,7 @@ The current file describes significant changes in the code that may affect the u
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
 * The `modalHandler` method for `error` helper was removed, use `showError` method instead.
+* The deprecated method `tools.loadModuleAndReplace()` from `'oroui/js/tools'` module, use `loadModules.fromObjectProp` from `'oroui/js/app/services/load-modules'` instead.
 
 #### WorkflowBundle
 * The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.

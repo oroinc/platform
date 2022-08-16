@@ -4,6 +4,7 @@ define(function(require) {
     const $ = require('jquery');
     const tools = require('oroui/js/tools');
     const error = require('oroui/js/error');
+    const loadModules = require('oroui/js/app/services/load-modules');
 
     const appearanceBuilder = {
         /**
@@ -52,9 +53,8 @@ define(function(require) {
                 if (!appearance.plugin) {
                     return;
                 }
-                return tools.loadModuleAndReplace(appearance, 'plugin').then(function() {
-                    return appearance.plugin.processMetadata(appearance, gridConfiguration);
-                });
+                return loadModules.fromObjectProp(appearance, 'plugin')
+                    .then(() => appearance.plugin.processMetadata(appearance, gridConfiguration));
             });
         }
     };

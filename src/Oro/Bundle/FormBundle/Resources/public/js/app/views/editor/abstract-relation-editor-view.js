@@ -31,7 +31,7 @@ define(function(require) {
      */
     const SelectEditorView = require('./select-editor-view');
     const _ = require('underscore');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     require('jquery.select2');
 
     const AbstractRelationEditorView = SelectEditorView.extend(/** @lends AbstractRelationEditorView.prototype */{
@@ -121,7 +121,7 @@ define(function(require) {
             if (!apiSpec.class) {
                 apiSpec.class = AbstractRelationEditorView.DEFAULT_ACCESSOR_CLASS;
             }
-            return tools.loadModuleAndReplace(apiSpec, 'class').then(function() {
+            return loadModules.fromObjectProp(apiSpec, 'class').then(() => {
                 if (!apiSpec.clientCache) {
                     apiSpec.clientCache = {
                         enable: true
