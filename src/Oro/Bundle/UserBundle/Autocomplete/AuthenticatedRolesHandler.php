@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Autocomplete;
 
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
-use Oro\Bundle\UserBundle\Entity\User;
 
+/**
+ * The autocomplete handler to search roles.
+ * This class can be removed after the support of access rules for search will be implemented (BAP-17347).
+ */
 class AuthenticatedRolesHandler extends SearchHandler
 {
     /**
@@ -13,13 +15,11 @@ class AuthenticatedRolesHandler extends SearchHandler
      */
     protected function findById($query)
     {
-        $entityIds = explode(',', $query);
+        $queryBuilder = $this->entityRepository->createQueryBuilder('r')
+            ->andWhere('r.id IN (:entityIds)')
+            ->setParameter('entityIds', explode(',', $query));
 
-        $queryBuilder = $this->getBasicQueryBuilder();
-        $queryBuilder->andWhere($queryBuilder->expr()->in('r.id', ':entityIds'))
-            ->setParameter('entityIds', $entityIds);
-
-        return $queryBuilder->getQuery()->getResult();
+        return $this->aclHelper->apply($queryBuilder)->getResult();
     }
 
     /**
@@ -27,40 +27,15 @@ class AuthenticatedRolesHandler extends SearchHandler
      */
     protected function searchEntities($search, $firstResult, $maxResults)
     {
-        $queryBuilder = $this->getBasicQueryBuilder();
-        if ($search) {
-            $this->addSearchCriteria($queryBuilder, $search);
-        }
-        $queryBuilder
+        $queryBuilder = $this->entityRepository->createQueryBuilder('r')
             ->setFirstResult($firstResult)
             ->setMaxResults($maxResults);
+        if ($search) {
+            $queryBuilder
+                ->andWhere('r.label LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
 
-        return $queryBuilder->getQuery()->getResult();
-    }
-
-    /**
-     * Returns query builder for roles.
-     *
-     * @return QueryBuilder
-     */
-    protected function getBasicQueryBuilder()
-    {
-        $queryBuilder = $this->entityRepository->createQueryBuilder('r');
-        $queryBuilder->andWhere('r.role != :anonymous')
-            ->setParameter('anonymous', User::ROLE_ANONYMOUS);
-
-        return $queryBuilder;
-    }
-
-    /**
-     * Adds search criteria to query builder.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $search
-     */
-    protected function addSearchCriteria(QueryBuilder $queryBuilder, $search)
-    {
-        $queryBuilder->andWhere($queryBuilder->expr()->like('r.label', ':search'))
-            ->setParameter('search', '%' . $search . '%');
+        return $this->aclHelper->apply($queryBuilder)->getResult();
     }
 }

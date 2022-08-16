@@ -53,6 +53,7 @@ class OroMainContext extends MinkContext implements
 {
     const SKIP_WAIT_PATTERN = '/'.
         '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" flash message and I close it$|'.
         '^(?:|I )should see ".+" error message$|'.
         '^(?:|I )should see Schema updated flash message$'.
     '/';
@@ -1352,6 +1353,28 @@ JS;
     }
 
     /**
+     * Example: And I should see exactly the following menu:
+     *   | System/ User Management/ Users |
+     *   | System/ User Management/ Roles |
+     *
+     * @Then /^(?:|I )should see exactly the following menu:$/
+     */
+    public function iShouldSeeExactlyFollowingMenu(TableNode $table): void
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $paths = $table->getColumn(0);
+        foreach ($paths as $path) {
+            self::assertTrue($mainMenu->hasLink($path), sprintf('Cannot find the menu "%s"', $path));
+        }
+        foreach ($mainMenu->walkAllMenuItems() as $path) {
+            if (!\in_array($path, $paths, true)) {
+                self::fail(sprintf('Not expected to see the menu "%s"', $path));
+            }
+        }
+    }
+
+    /**
      * Assert current page
      * Example: Then I should be on Search Result page
      * Example: Then I should be on Default Calendar View page
@@ -2535,12 +2558,12 @@ JS;
             $page = $this->getPage();
 
             $button = $page->findLink($item);
-            if (!$button) {
+            if (null === $button || !$button->isVisible()) {
                 $button = $page->findButton($item);
             }
 
-            self::assertNull(
-                $button,
+            self::assertTrue(
+                null === $button || !$button->isVisible(),
                 "Button with name $item still present on page (link selector, actually)"
             );
         }

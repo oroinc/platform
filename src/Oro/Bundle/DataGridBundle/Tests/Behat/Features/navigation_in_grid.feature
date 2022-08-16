@@ -9,7 +9,7 @@ Feature: Navigation in grid
       | Buyer1          |
       | Buyer5          |
       | Sales Rep       |
-    And there are 14 records in grid
+    And there are 15 records in grid
     When I select 10 from per page list dropdown
     Then I should see following records in grid:
       | Account Manager   |

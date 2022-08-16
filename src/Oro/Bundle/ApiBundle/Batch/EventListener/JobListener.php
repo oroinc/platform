@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Batch\EventListener;
 
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
@@ -23,10 +24,12 @@ class JobListener
     private const UPDATE_COUNT   = 'updateCount';
 
     private ManagerRegistry $doctrine;
+    private AsyncOperationManager $asyncOperationManager;
 
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, AsyncOperationManager $asyncOperationManager)
     {
         $this->doctrine = $doctrine;
+        $this->asyncOperationManager = $asyncOperationManager;
     }
 
     public function onBeforeSaveJob(BeforeSaveJobEvent $event): void
@@ -42,14 +45,16 @@ class JobListener
             return;
         }
 
-        $em = $this->doctrine->getManagerForClass(AsyncOperation::class);
-        $operation = $em->find(AsyncOperation::class, $data[self::OPERATION_ID]);
-        if (null !== $operation && $this->updateOperation($operation, $job)) {
-            $uow = $em->getUnitOfWork();
-            $uow->clearEntityChangeSet(spl_object_hash($operation));
-            $uow->recomputeSingleEntityChangeSet($em->getClassMetadata(AsyncOperation::class), $operation);
-            $uow->commit($operation);
+        $operationId = $data[self::OPERATION_ID];
+        $operation = $this->doctrine->getManagerForClass(AsyncOperation::class)
+            ->find(AsyncOperation::class, $operationId);
+        if (null === $operation) {
+            return;
         }
+
+        $this->asyncOperationManager->updateOperation($operationId, function () use ($operation, $job) {
+            return $this->updateOperation($operation, $job);
+        });
     }
 
     private function isRootJobUpdate(Job $job): bool
@@ -57,35 +62,32 @@ class JobListener
         return $job->isRoot() && null !== $job->getId();
     }
 
-    private function updateOperation(AsyncOperation $operation, Job $job): bool
+    private function updateOperation(AsyncOperation $operation, Job $job): array
     {
-        $hasChanges = false;
+        $data = [];
         $jobId = $job->getId();
         if ($operation->getJobId() !== $jobId) {
-            $hasChanges = true;
-            $operation->setJobId($jobId);
+            $data['jobId'] = $jobId;
         }
         $progress = $job->getJobProgress();
-        if ($progress >= 0 && $operation->getProgress() !== $progress) {
-            $hasChanges = true;
-            $operation->setProgress($progress);
+        if (null !== $progress && $progress >= 0 && $operation->getProgress() !== $progress) {
+            $data['progress'] = $progress;
         }
         $status = $this->getOperationStatus($job->getStatus());
         if ($status && $operation->getStatus() !== $status) {
-            $hasChanges = true;
-            $operation->setStatus($status);
+            $data['status'] = $status;
             if (AsyncOperation::STATUS_SUCCESS === $status) {
-                $operation->setProgress(1);
+                $data['progress'] = 1;
                 $summary = $this->getTotalSummary($job, $operation);
-                $operation->setSummary($summary);
-                $operation->setHasErrors(($summary[self::ERROR_COUNT] ?? 0) > 0);
+                $data['summary'] = $summary;
+                $data['hasErrors'] = ($summary[self::ERROR_COUNT] ?? 0) > 0;
             } elseif (AsyncOperation::STATUS_FAILED === $status) {
-                $operation->setSummary($this->getTotalSummary($job, $operation));
-                $operation->setHasErrors(true);
+                $data['summary'] = $this->getTotalSummary($job, $operation);
+                $data['hasErrors'] = true;
             }
         }
 
-        return $hasChanges;
+        return $data;
     }
 
     private function getOperationStatus(string $jobStatus): ?string

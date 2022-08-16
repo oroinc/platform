@@ -1,0 +1,15 @@
+features:
+    manage_embedded_forms:
+        label: oro.embeddedform.feature.manage.label
+        description: oro.embeddedform.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_embedded_form_list
+            - oro_embedded_form_create
+            - oro_embedded_form_delete
+            - oro_embedded_form_default_data
+            - oro_embedded_form_update
+            - oro_embedded_form_view
+            - oro_embedded_form_info
+        navigation_items:
+            - application_menu.system_tab.integrations_submenu.embedded_forms

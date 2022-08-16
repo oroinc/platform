@@ -54,6 +54,9 @@ oro:
         activity_owners.label: Activity Owners
         merge.items.label: 'Item|Items'
 
+        feature:
+            label: Activity List Widget
+            description: Enables the Activity section block with the related activities (calls, tasks, emails, calendar events, notes) on the entity view page and the Activity List widget settings in the system configuration.
     entity_merge:
         merge_modes:
             activity_unite: Append

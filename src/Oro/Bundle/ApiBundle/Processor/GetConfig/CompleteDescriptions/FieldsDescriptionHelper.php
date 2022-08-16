@@ -66,11 +66,13 @@ class FieldsDescriptionHelper
         string $targetAction,
         string $fieldPrefix = null
     ): void {
+        $entityConfig = $this->getEntityConfig($entityClass);
         $identifierFieldName = $this->getIdentifierFieldName($definition);
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($isInherit || !$field->hasDescription()) {
                 $description = $this->getDescriptionOfField(
+                    $entityConfig,
                     $field,
                     $requestType,
                     $entityClass,
@@ -91,7 +93,7 @@ class FieldsDescriptionHelper
                         $description,
                         $fieldName === $identifierFieldName
                             ? IdentifierDescriptionHelper::ID_DESCRIPTION
-                            : $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
+                            : $this->getFieldDescription($entityClass, $entityConfig, $field, $fieldName, $fieldPrefix)
                     ));
                 }
             }
@@ -101,7 +103,7 @@ class FieldsDescriptionHelper
                 if (InheritDocUtil::hasDescriptionInheritDoc($description)) {
                     $description = InheritDocUtil::replaceDescriptionInheritDoc(
                         $description,
-                        $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix)
+                        $this->getFieldDescription($entityClass, $entityConfig, $field, $fieldName, $fieldPrefix)
                     );
                 }
                 $field->setDescription($this->descriptionProcessor->process($description, $requestType));
@@ -132,7 +134,6 @@ class FieldsDescriptionHelper
         );
         $this->setDescriptionForCreatedAtField($definition, $targetAction);
         $this->setDescriptionForUpdatedAtField($definition, $targetAction);
-        $this->setDescriptionsForOwnershipFields($definition, $entityClass);
         if (\is_a($entityClass, AbstractEnumValue::class, true)) {
             $this->setDescriptionsForEnumFields($definition);
         }
@@ -178,46 +179,6 @@ class FieldsDescriptionHelper
         FieldDescriptionUtil::updateReadOnlyFieldDescription($definition, 'updatedAt', $targetAction);
     }
 
-    private function setDescriptionsForOwnershipFields(EntityDefinitionConfig $definition, string $entityClass): void
-    {
-        if (!$this->ownershipConfigProvider->hasConfig($entityClass)) {
-            // ownership fields are available only for configurable entities
-            return;
-        }
-
-        $entityConfig = $this->ownershipConfigProvider->getConfig($entityClass);
-        $this->updateOwnershipFieldDescription(
-            $definition,
-            $entityConfig,
-            'owner_field_name',
-            self::OWNER_DESCRIPTION
-        );
-        $this->updateOwnershipFieldDescription(
-            $definition,
-            $entityConfig,
-            'organization_field_name',
-            self::ORGANIZATION_DESCRIPTION
-        );
-    }
-
-    private function updateOwnershipFieldDescription(
-        EntityDefinitionConfig $definition,
-        ConfigInterface $entityConfig,
-        string $configKey,
-        string $description
-    ): void {
-        $propertyPath = $entityConfig->get($configKey);
-        if ($propertyPath) {
-            $field = $definition->findField($propertyPath, true);
-            if (null !== $field) {
-                $existingDescription = $field->getDescription();
-                if (!$existingDescription) {
-                    $field->setDescription($description);
-                }
-            }
-        }
-    }
-
     private function setDescriptionsForEnumFields(EntityDefinitionConfig $definition): void
     {
         FieldDescriptionUtil::updateFieldDescription(
@@ -241,6 +202,7 @@ class FieldsDescriptionHelper
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function getDescriptionOfField(
+        ?ConfigInterface $entityConfig,
         EntityDefinitionFieldConfig $field,
         RequestType $requestType,
         string $entityClass,
@@ -255,7 +217,13 @@ class FieldsDescriptionHelper
             if (InheritDocUtil::hasInheritDoc($description)) {
                 $fieldDescription = $fieldDescriptionReplacement;
                 if (!$fieldDescription) {
-                    $fieldDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                    $fieldDescription = $this->getFieldDescription(
+                        $entityClass,
+                        $entityConfig,
+                        $field,
+                        $fieldName,
+                        $fieldPrefix
+                    );
                 }
                 $commonDescription = $field->getDescription()
                     ?: $resourceDocParser->getFieldDocumentation($entityClass, $fieldName);
@@ -274,12 +242,24 @@ class FieldsDescriptionHelper
                 if (InheritDocUtil::hasInheritDoc($description)) {
                     $fieldDescription = $fieldDescriptionReplacement;
                     if (!$fieldDescription) {
-                        $fieldDescription = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                        $fieldDescription = $this->getFieldDescription(
+                            $entityClass,
+                            $entityConfig,
+                            $field,
+                            $fieldName,
+                            $fieldPrefix
+                        );
                     }
                     $description = InheritDocUtil::replaceInheritDoc($description, $fieldDescription);
                 }
             } else {
-                $description = $this->getFieldDescription($entityClass, $field, $fieldName, $fieldPrefix);
+                $description = $this->getFieldDescription(
+                    $entityClass,
+                    $entityConfig,
+                    $field,
+                    $fieldName,
+                    $fieldPrefix
+                );
                 if ($description && $fieldDescriptionReplacement) {
                     $description = $fieldDescriptionReplacement;
                 }
@@ -291,6 +271,7 @@ class FieldsDescriptionHelper
 
     private function getFieldDescription(
         string $entityClass,
+        ?ConfigInterface $entityConfig,
         EntityDefinitionFieldConfig $field,
         string $fieldName,
         ?string $fieldPrefix
@@ -298,6 +279,13 @@ class FieldsDescriptionHelper
         $propertyPath = $field->getPropertyPath($fieldName);
         if ($fieldPrefix) {
             $propertyPath = $fieldPrefix . $propertyPath;
+        } elseif (null !== $entityConfig) {
+            if ($entityConfig->get('owner_field_name') === $propertyPath) {
+                return self::OWNER_DESCRIPTION;
+            }
+            if ($entityConfig->get('organization_field_name') === $propertyPath) {
+                return self::ORGANIZATION_DESCRIPTION;
+            }
         }
 
         return $this->entityDescriptionProvider->getFieldDocumentation($entityClass, $propertyPath);
@@ -306,5 +294,12 @@ class FieldsDescriptionHelper
     private function trans(Label $label): ?string
     {
         return $label->trans($this->translator) ?: null;
+    }
+
+    private function getEntityConfig(string $entityClass): ?ConfigInterface
+    {
+        return $this->ownershipConfigProvider->hasConfig($entityClass)
+            ? $this->ownershipConfigProvider->getConfig($entityClass)
+            : null;
     }
 }

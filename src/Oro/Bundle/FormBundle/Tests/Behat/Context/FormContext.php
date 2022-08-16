@@ -23,6 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -527,6 +528,46 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         self::assertTrue($element->isIsset(), sprintf('Element "%s" not found', $elementName));
 
         $element->check();
+    }
+
+    /**
+     * @Given /^(?:|I )uncheck "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field$/
+     */
+    public function uncheckElementForField(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        $field->uncheckField($elementName);
+    }
+
+    /**
+     * @Given /^(?:|I )check "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field$/
+     */
+    public function checkElementForField(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        $field->checkField($elementName);
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field should be unchecked$/
+     */
+    public function elementForFieldShouldBeUnchecked(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasUncheckedField($elementName));
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field should be checked$/
+     */
+    public function elementForFieldShouldBeChecked(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasCheckedField($elementName));
     }
 
     //@codingStandardsIgnoreStart

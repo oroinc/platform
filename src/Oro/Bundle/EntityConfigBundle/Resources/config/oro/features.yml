@@ -1,0 +1,17 @@
+features:
+    entity_management:
+        label: oro.entity_config.feature.entity_management.label
+        description: oro.entity_config.feature.entity_management.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_entityconfig_index
+            - oro_entityconfig_view
+            - oro_entityconfig_update
+            - oro_entityconfig_fields
+            - oro_entityconfig_field_update
+            - oro_entityconfig_field_search
+            - oro_entityconfig_widget_info
+            - oro_entityconfig_widget_unique_keys
+            - oro_entityconfig_widget_entity_fields
+        navigation_items:
+            - application_menu.system_tab.entities_list.entity_management

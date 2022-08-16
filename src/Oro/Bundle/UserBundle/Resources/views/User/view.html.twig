@@ -52,10 +52,12 @@
 {% block pageHeader %}
     {% set breadcrumbs = {
         'entity':      entity,
-        'indexPath':   path('oro_user_index'),
         'indexLabel':  'oro.user.entity_plural_label'|trans,
         'entityTitle': fullname,
     } %}
+    {% if (feature_resource_enabled('oro_user_index', 'routes')) %}
+        {% set breadcrumbs = breadcrumbs|merge({'indexPath':  path('oro_user_index')}) %}
+    {% endif %}
 
     {{ parent() }}
 {% endblock pageHeader %}

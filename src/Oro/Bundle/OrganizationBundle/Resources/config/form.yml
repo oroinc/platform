@@ -100,7 +100,6 @@ services:
     oro_organization.form.type.organizations_select:
         class: Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType
         arguments:
-            - '@doctrine.orm.entity_manager'
             - '@oro_organization.business_unit_manager'
             - '@oro_security.token_accessor'
         tags:

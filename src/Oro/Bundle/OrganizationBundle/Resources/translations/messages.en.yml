@@ -86,6 +86,10 @@ oro:
             extend_description:
                 label:            Description
                 description:      Short description of the business unit record
+            feature:
+                manage:
+                    label: Business Unit Management
+                    description: Enables creating and managing business units.
 
         controller:
             message:

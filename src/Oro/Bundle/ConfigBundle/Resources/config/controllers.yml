@@ -3,8 +3,8 @@ services:
         public: true
 
     Oro\Bundle\ConfigBundle\Controller\ConfigurationController:
-        calls:
-            - ['setContainer', ['@Psr\Container\ContainerInterface']]
+        arguments:
+            - '@Psr\Container\ContainerInterface'
         tags:
             - { name: container.service_subscriber }
             - { name: container.service_subscriber, id: oro_config.global, key: Oro\Bundle\ConfigBundle\Config\ConfigManager }

@@ -1,0 +1,30 @@
+features:
+    dashboards:
+        label: oro.dashboard.feature.label
+        description: oro.dashboard.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_dashboard_index
+            - oro_dashboard_view
+            - oro_dashboard_configure
+            - oro_dashboard_update
+            - oro_dashboard_create
+            - oro_dashboard_widget
+            - oro_api_put_dashboard_widget
+            - oro_api_delete_dashboard_widget
+            - oro_api_put_dashboard_widget_positions
+            - oro_api_post_dashboard_widget_add_widget
+            - oro_api_delete_dashboard
+            - oro_dashboard_itemized_widget
+            - oro_dashboard_itemized_data_widget
+            - oro_dashboard_quick_launchpad
+            - oro_dashboard_grid
+        entities:
+            - Oro\Bundle\DashboardBundle\Entity\Dashboard
+            - Oro\Bundle\DashboardBundle\Entity\ActiveDashboard
+            - Oro\Bundle\DashboardBundle\Entity\Widget
+            - Oro\Bundle\DashboardBundle\Entity\WidgetState
+        dashboard_widgets:
+            - quick_launchpad
+        navigation_items:
+            - application_menu.dashboard_tab.oro_dashboard_index

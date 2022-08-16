@@ -74,6 +74,15 @@ define(function(require) {
             ScrollingOverlayView.__super__.initialize.call(this, options);
         },
 
+        setScrollingContent($scrollingContents) {
+            if (this.$scrollingContent) {
+                this.$scrollingContent.off(this.eventNamespace());
+            }
+
+            this.$scrollingContent = $($scrollingContents);
+            this.render();
+        },
+
         /**
          * @inheritdoc
          */

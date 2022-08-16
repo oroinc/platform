@@ -52,6 +52,7 @@ class AclHelper
      * @param string $permission
      *
      * @return Query
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function apply(Query $query, $permission = 'VIEW')
     {
@@ -89,13 +90,12 @@ class AclHelper
             }
         }
 
+        $query->from($allowedAliases);
+
         $orExpression = null;
         if (count($ownerExpressions) !== 0) {
             $orExpression = new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions);
         }
-
-        $query->from($allowedAliases);
-
         // Add the expression from the ACL helper condition providers.
         // This helps to add custom search ACL restrictions.
         foreach ($expressionProtectedClasses as $protectedClassData) {
@@ -108,8 +108,9 @@ class AclHelper
                 $orExpression
             );
         }
-
-        $query->getCriteria()->andWhere($orExpression);
+        if (null !== $orExpression) {
+            $query->getCriteria()->andWhere($orExpression);
+        }
 
         $this->addOrganizationLimits($query, $expr);
 

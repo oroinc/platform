@@ -419,7 +419,7 @@ services:
             - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.shortcuts, method: onNavigationConfigure }
-            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
+            - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure, priority: -200 }
 
     oro_navigation.config_extension.feature:
         class: Oro\Bundle\NavigationBundle\Configuration\FeatureConfigurationExtension

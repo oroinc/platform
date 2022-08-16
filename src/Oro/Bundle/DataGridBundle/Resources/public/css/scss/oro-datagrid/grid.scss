@@ -204,6 +204,12 @@
     text-align: left;
 }
 
+.string-cell {
+    ul.unstyled {
+        margin-bottom: 0;
+    }
+}
+
 .boolean-cell {
     input {
         &[type='checkbox'],

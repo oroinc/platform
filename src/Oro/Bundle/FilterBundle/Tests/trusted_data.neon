@@ -82,6 +82,11 @@ trusted_data:
                 fieldExpr: true
             createSubQueryBuilder:
                 filter: true
+        Oro\Bundle\FilterBundle\Filter\JsonArrayChoiceFilter:
+            getExpression:
+                fieldName: true
+            getExpressionForPostgreSql:
+                fieldName: true
     safe_static_methods:
         Oro\Bundle\FilterBundle\Filter\FilterOrmQueryUtil:
             getSelectFieldFromGroupBy: true

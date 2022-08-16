@@ -1,0 +1,13 @@
+features:
+    manage_jobs:
+        label: oro.messagequeue.feature.manage_jobs.label
+        description: oro.messagequeue.feature.manage_jobs.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_message_queue_root_jobs
+            - oro_message_queue_child_jobs
+            - oro_api_message_queue_job_interrupt_root_job
+        entities:
+            - Oro\Bundle\MessageQueueBundle\Entity\Job
+        navigation_items:
+            - application_menu.system_tab.oro_message_queue_job

@@ -5,31 +5,28 @@ namespace Oro\Bundle\DataAuditBundle\Datagrid;
 use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
+/**
+ * Provides human-readable EntityType column value and EntityTypes filter list for audit data grid.
+ */
 class EntityTypeProvider
 {
-    /** @var EntityClassNameProviderInterface */
-    protected $entityClassNameProvider;
-
-    /** @var AuditConfigProvider */
-    protected $configProvider;
+    private EntityClassNameProviderInterface $entityClassNameProvider;
+    private AuditConfigProvider $configProvider;
+    private FeatureChecker $featureChecker;
 
     public function __construct(
         EntityClassNameProviderInterface $entityClassNameProvider,
-        AuditConfigProvider $configProvider
+        AuditConfigProvider $configProvider,
+        FeatureChecker $featureChecker
     ) {
         $this->entityClassNameProvider = $entityClassNameProvider;
         $this->configProvider = $configProvider;
+        $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * @param string $gridName
-     * @param string $keyName
-     * @param array  $node
-     *
-     * @return callable
-     */
-    public function getEntityType($gridName, $keyName, $node)
+    public function getEntityType(): callable|\Closure
     {
         return function (ResultRecord $record) {
             return $this->entityClassNameProvider->getEntityClassName(
@@ -41,11 +38,15 @@ class EntityTypeProvider
     /**
      * @return array [entity class => entity type, ...]
      */
-    public function getEntityTypes()
+    public function getEntityTypes(): array
     {
         $result = [];
         $classNames = $this->configProvider->getAllAuditableEntities();
         foreach ($classNames as $className) {
+            if (!$this->featureChecker->isResourceEnabled($className, 'entities')) {
+                continue;
+            }
+
             $label = $this->entityClassNameProvider->getEntityClassName($className);
             if ($label) {
                 $result[$label] = $className;

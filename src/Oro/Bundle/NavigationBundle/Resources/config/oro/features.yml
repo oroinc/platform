@@ -1,0 +1,37 @@
+features:
+    navigation_menu:
+        label: oro.navigation.menu.feature.label
+        description: oro.navigation.menu.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_navigation_global_menu_index
+            - oro_navigation_global_menu_view
+            - oro_navigation_global_menu_create
+            - oro_navigation_global_menu_update
+            - oro_navigation_global_menu_move
+            - oro_navigation_global_menu_ajax_reset
+            - oro_navigation_global_menu_ajax_create
+            - oro_navigation_global_menu_ajax_delete
+            - oro_navigation_global_menu_ajax_show
+            - oro_navigation_global_menu_ajax_hide
+            - oro_navigation_global_menu_ajax_move
+            - oro_navigation_user_menu_index
+            - oro_navigation_user_menu_view
+            - oro_navigation_user_menu_create
+            - oro_navigation_user_menu_update
+            - oro_navigation_user_menu_move
+            - oro_navigation_user_menu_ajax_reset
+            - oro_navigation_user_menu_ajax_create
+            - oro_navigation_user_menu_ajax_delete
+            - oro_navigation_user_menu_ajax_show
+            - oro_navigation_user_menu_ajax_hide
+            - oro_navigation_user_menu_ajax_move
+        commands:
+            - oro:navigation:menu:reset
+        entities:
+            - Oro\Bundle\NavigationBundle\Entity\MenuUpdate
+        navigation_items:
+            - application_menu.system_tab.menu_list_default
+        placeholder_items:
+            - oro_edit_menus_button
+            - oro_edit_menus_link

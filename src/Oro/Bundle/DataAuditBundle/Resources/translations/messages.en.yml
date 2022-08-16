@@ -118,3 +118,8 @@ oro:
             user.label: Audit user
             additional_fields.label: Additional fields
             type.label: Audit type
+
+        feature:
+            manage:
+                label: Data Audit
+                description: Enables the system to set entities as auditable to monitor the history of their changes.
