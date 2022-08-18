@@ -5,32 +5,26 @@ namespace Oro\Bundle\AssetBundle;
 use Symfony\Component\Process\Process;
 
 /**
- * Run command using NodeJs engine
+ * Creating assets command process using js engine path.
  */
-class NodeProcessFactory
+class AssetCommandProcessFactory
 {
-    /**
-     * @var string
-     */
-    private $jsEngine;
-
-    public function __construct(string $jsEnginePath)
+    public function __construct(private string $jsEnginePath)
     {
-        $this->jsEngine = $jsEnginePath;
     }
 
     /**
-     * @param array         $command The command line to run
-     * @param string         $cwd The working directory or null to use the working dir of the current PHP process
+     * @param array $command The command line to run
+     * @param string $cwd The working directory or null to use the working dir of the current PHP process
      * @param int|float|null $timeout The timeout in seconds or null to disable
      * @return Process
      */
     public function create(array $command, string $cwd, $timeout = null): Process
     {
-        if (!$this->jsEngine) {
-            throw new \RuntimeException('JS engine not found');
+        if (!$this->jsEnginePath) {
+            throw new \RuntimeException('Js engine path is not found');
         }
-        $process = new Process(array_merge([$this->jsEngine], $command), $cwd);
+        $process = new Process(array_merge([$this->jsEnginePath], $command), $cwd);
         $process->setTimeout($timeout);
 
         // some workaround when this command is launched from web
