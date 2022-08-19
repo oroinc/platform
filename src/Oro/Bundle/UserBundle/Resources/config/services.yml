@@ -164,25 +164,17 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_user.impersonation_success, method: onImpersonationSuccess }
 
-    oro_user.autocomplete.user.search_acl_handler.abstract:
-        abstract: true
+    oro_user.autocomplete.user.search_acl_handler:
         class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_attachment.provider.picture_sources'
-            - 'Oro\Bundle\UserBundle\Entity\User'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
             - '@oro_entity.routing_helper'
-            - "@?security.acl.voter.basic_permissions"
-        calls:
-            - [ setEntityNameResolver,  ['@oro_entity.entity_name_resolver']]
-
-    oro_user.autocomplete.user.search_acl_handler:
-        parent: oro_user.autocomplete.user.search_acl_handler.abstract
-        calls:
-            - [ setProperties, [["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]] ]
+            - '@oro_entity.entity_name_resolver'
+            - '@security.acl.voter.basic_permissions'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: acl_users }
         lazy: true
