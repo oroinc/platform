@@ -594,3 +594,8 @@ services:
             - '@Oro\Bundle\DistributionBundle\Handler\ApplicationState'
         tags:
             - { name: oro_entity_extend.warmer }
+
+    oro_entity_config.tools.attribute_options_validator:
+        class: Oro\Bundle\EntityConfigBundle\Tools\AttributeValidator
+        arguments:
+            - "@doctrine"
