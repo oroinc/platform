@@ -566,16 +566,20 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ['id' => 'opt2', 'label' => 'Option 2', 'priority' => 2, 'is_default' => false],
             ['id' => 'opt5', 'label' => 'Option 5', 'priority' => 3, 'is_default' => false],
             ['id' => '', 'label' => 'Option 4', 'priority' => 4, 'is_default' => true],
+            ['id' => '0025', 'label' => '0.025', 'priority' => 5, 'is_default' => false],
+            ['id' => '025', 'label' => '0.25', 'priority' => 6, 'is_default' => false],
         ];
 
         $value1 = new TestEnumValue('opt1', 'Option 1', 1, true);
         $value2 = new TestEnumValue('opt2', 'Option 2 old', 4, true);
         $value3 = new TestEnumValue('opt3', 'Option 3', 3, false);
         $value5 = new TestEnumValue('opt5', 'Option 5', 2, false);
+        $value6 = new TestEnumValue('025', '0.25', 5, false);
+        $value7 = new TestEnumValue('0025', '0.025', 6, false);
 
         $newValue = new TestEnumValue('opt4', 'Option 4', 4, true);
 
-        $values = [$value1, $value2, $value3, $value5];
+        $values = [$value1, $value2, $value3, $value5, $value6, $value7];
 
         $em = $this->createMock(EntityManager::class);
         $em->expects(self::once())
@@ -621,6 +625,12 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $expectedNewValue = new TestEnumValue('opt4', 'Option 4', 4, true);
         $expectedNewValue->setLocale($locale);
         self::assertEquals($expectedNewValue, $newValue);
+        $expectedValue6 = new TestEnumValue('025', '0.25', 6, false);
+        $expectedValue6->setLocale($locale);
+        self::assertEquals($expectedValue6, $value6);
+        $expectedValue7 = new TestEnumValue('0025', '0.025', 5, false);
+        $expectedValue7->setLocale($locale);
+        self::assertEquals($expectedValue7, $value7);
     }
 
     public function testApplyEnumOptionsOptionsInDifferentCase(): void

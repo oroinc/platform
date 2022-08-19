@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\AssetBundle\Command;
 
+use Oro\Bundle\AssetBundle\AssetCommandProcessFactory;
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
-use Oro\Bundle\AssetBundle\NodeProcessFactory;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,11 +37,9 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_VERBOSE => 'minimal',
     ];
 
-    protected const BUILD_DIR = '.';
-
     protected static $defaultName = 'oro:assets:build';
 
-    private NodeProcessFactory $nodeProcessFactory;
+    private AssetCommandProcessFactory $nodeProcessFactory;
     private AssetConfigCache $cache;
 
     private string $npmPath;
@@ -63,12 +61,12 @@ class OroAssetsBuildCommand extends Command
      * @param bool               $disableBabel
      */
     public function __construct(
-        NodeProcessFactory $nodeProcessFactory,
-        AssetConfigCache $cache,
-        string $npmPath,
+        AssetCommandProcessFactory $nodeProcessFactory,
+        AssetConfigCache           $cache,
+        string                     $npmPath,
         $buildTimeout,
         $npmInstallTimeout,
-        bool $disableBabel
+        bool                       $disableBabel
     ) {
         $this->nodeProcessFactory = $nodeProcessFactory;
         $this->cache = $cache;
@@ -264,13 +262,12 @@ HELP
      */
     protected function buildCommand(InputInterface $input, OutputInterface $output): array
     {
+        $command= ['run', 'webpack', '--'];
+
         if ($input->getOption('hot')) {
-            $command[] = self::BUILD_DIR . '/node_modules/.bin/webpack-dev-server.js';
             $command[] = '--hot';
 
             $this->mapSslOptions($input, $command);
-        } else {
-            $command[] = self::BUILD_DIR.'/node_modules/webpack/bin/webpack.js';
         }
 
         if (true === $input->getOption('no-debug') || 'prod' === $input->getOption('env')) {

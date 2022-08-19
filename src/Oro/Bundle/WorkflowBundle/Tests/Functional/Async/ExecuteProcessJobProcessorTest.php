@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Async;
 
-use Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension\TestLogger;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -10,18 +9,14 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessDefinitio
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Psr\Log\Test\TestLogger;
 
 class ExecuteProcessJobProcessorTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-        $this->loadFixtures([
-            LoadProcessDefinitions::class,
-        ]);
+        $this->loadFixtures([LoadProcessDefinitions::class]);
     }
 
     public function testProcessJobWithEntityManagerCleanup(): void

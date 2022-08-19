@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Placeholder;
 
-use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityBundle\Tests\Unit\Stub\TestTarget;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
@@ -21,8 +20,8 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $activityListProvider;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
+    /** @var ActivityListRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
@@ -33,36 +32,41 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->activityListProvider = $this->createMock(ActivityListChainProvider::class);
-        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->repository = $this->createMock(ActivityListRepository::class);
 
         $this->activityListProvider->expects($this->any())
             ->method('getTargetEntityClasses')
             ->willReturn([TestTarget::class]);
 
-        $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
-            ->onlyMethods(['isNewEntity', 'isManageableEntity'])
-            ->setConstructorArgs([$this->doctrine])
-            ->getMock();
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($entity) {
+                return is_object($entity) ? get_class($entity) : $entity;
+            });
         $doctrineHelper->expects($this->any())
             ->method('isNewEntity')
             ->willReturnCallback(function ($entity) {
-                if (method_exists($entity, 'getId')) {
-                    return !(bool)$entity->getId();
-                }
-
-                throw new \RuntimeException('Something wrong');
+                return null === $entity->getId();
+            });
+        $doctrineHelper->expects($this->any())
+            ->method('getSingleEntityIdentifier')
+            ->willReturnCallback(function ($entity) {
+                return $entity->getId();
             });
         $doctrineHelper->expects($this->any())
             ->method('isManageableEntity')
             ->willReturnCallback(function ($entity) {
                 return !$entity instanceof TestNonManagedTarget;
             });
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityRepositoryForClass')
+            ->willReturn($this->repository);
 
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->filter = new PlaceholderFilter(
             $this->activityListProvider,
-            $this->doctrine,
             $doctrineHelper,
             $this->configManager
         );
@@ -198,11 +202,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicableOnEmptyActivityList()
     {
-        $repo = $this->createMock(ActivityListRepository::class);
-        $this->doctrine->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repo);
-        $repo->expects($this->any())
+        $this->repository->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
             ->with(TestNonActiveTarget::class, 123)
             ->willReturn(0);
@@ -241,11 +241,7 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testIsApplicable()
     {
-        $repo = $this->createMock(ActivityListRepository::class);
-        $this->doctrine->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repo);
-        $repo->expects($this->any())
+        $this->repository->expects($this->any())
             ->method('getRecordsCountForTargetClassAndId')
             ->with(TestNonActiveTarget::class, 123)
             ->willReturn(10);

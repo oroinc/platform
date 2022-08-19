@@ -5,7 +5,6 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Consumption\Extension;
 use Oro\Bundle\MessageQueueBundle\Test\Async\RedeliveryAwareMessageProcessor;
 use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\SampleNormalizableBodyTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Model\StdModel;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension\TestLogger;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
@@ -14,12 +13,12 @@ use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RedeliveryMessageExtensionTest extends WebTestCase
 {
     private MessageProducerInterface $messageProducer;
-
     private QueueConsumer $consumer;
 
     protected function setUp(): void
