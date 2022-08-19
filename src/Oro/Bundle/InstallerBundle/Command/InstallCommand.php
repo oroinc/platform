@@ -237,7 +237,7 @@ HELP
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
-        $exitCode = $this->checkRequirements($commandExecutor);
+        $exitCode = $this->checkRequirements($commandExecutor, $skipAssets);
         if ($exitCode > 0) {
             return $exitCode;
         }
@@ -350,7 +350,12 @@ HELP
 
     protected function checkRequirements(CommandExecutor $commandExecutor): int
     {
-        $commandExecutor->runCommand('oro:check-requirements', ['--ignore-errors' => true, '--verbose' => 2]);
+        $skipAssets = func_num_args() === 2 && func_get_arg(1);
+        $params = ['--ignore-errors' => true, '--verbose' => 2];
+        if ($skipAssets) {
+            $params['--skip-assets'] = true;
+        }
+        $commandExecutor->runCommand('oro:check-requirements', $params);
 
         return $commandExecutor->getLastCommandExitCode();
     }
