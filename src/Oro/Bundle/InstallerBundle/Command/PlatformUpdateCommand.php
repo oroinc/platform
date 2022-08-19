@@ -113,7 +113,8 @@ HELP
 
         $this->checkSuggestedMemory($output);
 
-        $exitCode = $this->checkRequirements($commandExecutor);
+        $skipAssets = $input->getOption('skip-assets');
+        $exitCode = $this->checkRequirements($commandExecutor, $skipAssets);
         if ($exitCode > 0) {
             return $exitCode;
         }
@@ -132,7 +133,7 @@ HELP
                 $this->loadDataStep($commandExecutor, $output);
                 $eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
-                $this->finalStep($commandExecutor, $output, $input, $input->getOption('skip-assets'));
+                $this->finalStep($commandExecutor, $output, $input, $skipAssets);
             } catch (\Exception $exception) {
                 return $commandExecutor->getLastCommandExitCode();
             }
@@ -210,7 +211,12 @@ HELP
 
     protected function checkRequirements(CommandExecutor $commandExecutor): int
     {
-        $commandExecutor->runCommand('oro:check-requirements', ['--ignore-errors' => true, '--verbose' => 1]);
+        $skipAssets = func_num_args() === 2 && func_get_arg(1);
+        $params = ['--ignore-errors' => true, '--verbose' => 1];
+        if ($skipAssets) {
+            $params['--skip-assets'] = true;
+        }
+        $commandExecutor->runCommand('oro:check-requirements', $params);
 
         return $commandExecutor->getLastCommandExitCode();
     }

@@ -53,6 +53,7 @@ class OroMainContext extends MinkContext implements
 {
     const SKIP_WAIT_PATTERN = '/'.
         '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" flash message and I close it$|'.
         '^(?:|I )should see ".+" error message$|'.
         '^(?:|I )should see Schema updated flash message$'.
     '/';

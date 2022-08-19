@@ -82,11 +82,34 @@ class CheckRequirementsCommandTest extends WebTestCase
         $this->assertContains('imagewebp() should be available', $messages, $errorMessage);
     }
 
-    private function executeCommand(array $args = []): string
+    public function testSkipAssetsOption()
+    {
+        $this->bootKernel();
+        $output = $this->executeCommand([], ['--skip-assets']);
+        $messages = $this->parseMessages($output, 'OK');
+
+        $errorMessage = 'Command Output: '.$output;
+
+        $this->assertNotContains('NodeJS is installed', $messages, $errorMessage);
+        $this->assertNotContains('NPM is installed', $messages, $errorMessage);
+    }
+
+    public function testSkipAssetsOptionNotProvided()
+    {
+        $this->bootKernel();
+        $output = $this->executeCommand();
+        $messages = $this->parseMessages($output, 'OK');
+
+        $errorMessage = 'Command Output: '.$output;
+        $this->assertContains('NPM is installed', $messages, $errorMessage);
+        $this->assertContains('NPM is installed', $messages, $errorMessage);
+    }
+
+    private function executeCommand(array $args = [], array $options = []): string
     {
         $finder = new PhpExecutableFinder();
         $phpBinary = $finder->find();
-        $command = [$phpBinary, ...$args, 'bin/console', 'oro:check-requirements', '-etest', '-vvv'];
+        $command = [$phpBinary, ...$args, 'bin/console', 'oro:check-requirements', '-etest', '-vvv', ...$options];
 
         $process = new Process($command);
         $process->run();

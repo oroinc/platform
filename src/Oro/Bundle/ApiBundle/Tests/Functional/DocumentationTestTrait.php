@@ -169,10 +169,10 @@ trait DocumentationTestTrait
         ?string $association
     ): array {
         $missingDocs = [];
-        if (empty($definition['description'])) {
+        if ($this->isEmptyDescription($definition, 'description')) {
             $missingDocs[] = 'Empty description';
         }
-        if (empty($definition['documentation'])) {
+        if ($this->isEmptyDescription($definition, 'documentation')) {
             $missingDocs[] = 'Empty documentation';
         } elseif (isset(self::$defaultDocumentation[$action])
             && in_array($definition['documentation'], (array)self::$defaultDocumentation[$action], true)
@@ -198,7 +198,7 @@ trait DocumentationTestTrait
             }
             foreach ($definition['parameters'] as $name => $item) {
                 if (!$this->isSkippedField($entityClass, $name) && !$this->isTestField($entityClass, $name)) {
-                    if (empty($item['description'])) {
+                    if ($this->isEmptyDescription($item, 'description')) {
                         $missingDocs[] = sprintf('Input Field: %s. Empty description.', $name);
                     } elseif (ApiAction::UPDATE === $action && $idFieldName && $name === $idFieldName) {
                         $description = $item['description'];
@@ -226,14 +226,14 @@ trait DocumentationTestTrait
         }
         if (!empty($definition['filters'])) {
             foreach ($definition['filters'] as $name => $item) {
-                if (empty($item['description'])) {
+                if ($this->isEmptyDescription($item, 'description')) {
                     $missingDocs[] = sprintf('Filter: %s. Empty description.', $name);
                 }
             }
         }
         if (!$association && !empty($definition['response'])) {
             foreach ($definition['response'] as $name => $item) {
-                if (empty($item['description'])
+                if ($this->isEmptyDescription($item, 'description')
                     && !$this->isSkippedField($entityClass, $name)
                     && !$this->isTestField($entityClass, $name)
                 ) {
@@ -363,5 +363,17 @@ trait DocumentationTestTrait
             empty($resourceData['response']),
             sprintf('The "response" section for %s should be empty', $resource)
         );
+    }
+
+    private function isEmptyDescription(array $definition, string $name): bool
+    {
+        if (empty($definition[$name])) {
+            return true;
+        }
+
+        $description = $definition[$name];
+        $description = trim(strtr($description, ['<p>' => '', '</p>' => '']));
+
+        return empty($description);
     }
 }
