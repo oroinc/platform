@@ -221,6 +221,7 @@ define(function(require) {
             let data;
             let options;
             const $form = $(event.target);
+            const queue = [];
 
             if ($form.is('[data-prevent-submit]')) {
                 event.preventDefault();
@@ -229,6 +230,8 @@ define(function(require) {
             if (event.isDefaultPrevented()) {
                 return;
             }
+
+            mediator.trigger('before:submitPage', queue);
 
             if ($form.data('nohash') && !$form.data('sent')) {
                 $form.data('sent', true);
@@ -248,23 +251,27 @@ define(function(require) {
                 return;
             }
 
-            this.beforeSerializeHook($form);
+            Promise.all(queue).then(() => {
+                this.beforeSerializeHook($form);
 
-            if (url && method.toUpperCase() === 'GET') {
-                data = $form.serialize();
-                if (data) {
-                    url += (url.indexOf('?') === -1 ? '?' : '&') + data;
-                }
-                mediator.execute('redirectTo', {url: url});
-                $form.removeData('sent');
-            } else {
-                options = formToAjaxOptions($form, {
-                    complete: function() {
-                        $form.removeData('sent');
+                if (url && method.toUpperCase() === 'GET') {
+                    data = $form.serialize();
+                    if (data) {
+                        url += (url.indexOf('?') === -1 ? '?' : '&') + data;
                     }
-                });
-                mediator.execute('submitPage', options);
-            }
+                    mediator.execute('redirectTo', {url: url});
+                    $form.removeData('sent');
+                } else {
+                    options = formToAjaxOptions($form, {
+                        complete: function() {
+                            $form.removeData('sent');
+                        }
+                    });
+                    mediator.execute('submitPage', options);
+                }
+            }).catch(() => {
+                $form.removeData('sent');
+            });
         },
 
         onRefreshClick: function() {
