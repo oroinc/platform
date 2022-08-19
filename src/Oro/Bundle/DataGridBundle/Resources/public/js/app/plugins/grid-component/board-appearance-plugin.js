@@ -6,7 +6,7 @@ define(function(require) {
     const Backbone = require('backbone');
     const BasePlugin = require('oroui/js/app/plugins/base/plugin');
     const collectionTools = require('oroui/js/tools/collection-tools');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
     const BoardDataCollection = require('../../models/board-data-collection');
 
     /**
@@ -280,16 +280,13 @@ define(function(require) {
             });
 
             return $.when(
-                tools.loadModuleAndReplace(options, 'board_view'),
-                tools.loadModuleAndReplace(options, 'card_view'),
-                tools.loadModuleAndReplace(options, 'column_header_view'),
-                tools.loadModuleAndReplace(options, 'column_view'),
-                $.when(...options.columns.map(function(column) {
-                    return tools.loadModuleAndReplace(column.transition, 'class');
-                })),
-                $.when(...options.columns.map(function(column) {
-                    return tools.loadModuleAndReplace(column.transition.save_api_accessor, 'class');
-                }))
+                loadModules.fromObjectProp(options, 'board_view'),
+                loadModules.fromObjectProp(options, 'card_view'),
+                loadModules.fromObjectProp(options, 'column_header_view'),
+                loadModules.fromObjectProp(options, 'column_view'),
+                $.when(...options.columns.map(column => loadModules.fromObjectProp(column.transition, 'class'))),
+                $.when(...options.columns
+                    .map(column => loadModules.fromObjectProp(column.transition.save_api_accessor, 'class')))
             );
         }
     });
