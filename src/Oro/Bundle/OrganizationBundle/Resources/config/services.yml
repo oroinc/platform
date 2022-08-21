@@ -129,13 +129,12 @@ services:
         class: Oro\Bundle\OrganizationBundle\Autocomplete\OrganizationSearchHandler
         arguments:
             - 'Oro\Bundle\OrganizationBundle\Entity\Organization'
-            - ["id", "name"]
-            - ["name"]
+            - ['id', 'name']
+            - ['name']
             - '@doctrine'
             - '@oro_security.token_accessor'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: user_organizations }
-        lazy: true
 
     oro_organization.provider.phone.business_unit:
         class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitPhoneProvider
@@ -164,7 +163,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units, acl_resource: oro_business_unit_view }
 
@@ -174,7 +173,7 @@ services:
         arguments:
             - '@translator'
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_business_units, acl_resource: oro_business_unit_view }
 
@@ -208,7 +207,7 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: owner_validator }
 
-    oro_organization.provider.busines_unit_acl:
+    oro_organization.provider.business_unit_acl:
         class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
         arguments:
             - '@security.authorization_checker'
@@ -221,11 +220,10 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
-            - ["name"]
+            - ['name']
             - '@doctrine'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_owner_search_handler }
-        lazy: true
 
     oro_organization.autocomplete.parent_business_unit_search_handler:
         class: Oro\Bundle\OrganizationBundle\Autocomplete\ParentBusinessUnitSearchHandler
@@ -234,7 +232,6 @@ services:
             - [setOwnerTreeProvider, ['@oro_security.ownership_tree_provider']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: parent-business-units }
-        lazy: true
 
     oro_organization.listener.choice_tree_filter_load_data_listener:
         class: Oro\Bundle\OrganizationBundle\EventListener\ChoiceTreeFilterLoadDataListener
@@ -250,7 +247,6 @@ services:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units_tree_search_handler }
-        lazy: true
 
     oro_organization.scope_criteria_provider.organization:
         class: Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider

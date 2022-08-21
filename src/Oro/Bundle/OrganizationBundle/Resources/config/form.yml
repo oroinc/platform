@@ -140,7 +140,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\OrganizationBundle\Entity\Organization'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: organization, acl_resource: oro_organization_view }
 

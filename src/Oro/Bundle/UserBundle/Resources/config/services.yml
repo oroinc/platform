@@ -177,7 +177,6 @@ services:
             - '@security.acl.voter.basic_permissions'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: acl_users }
-        lazy: true
 
     oro_user.autocomplete.user.search_handler:
         class: Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
@@ -185,7 +184,7 @@ services:
         arguments:
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
 
@@ -195,7 +194,7 @@ services:
         arguments:
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
@@ -208,7 +207,7 @@ services:
             - '@translator'
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
             - [setSearchUserCriteria, ['@oro_user.autocomplete.search_user_criteria']]
@@ -235,7 +234,7 @@ services:
             - '@oro_security.token_accessor'
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
 
@@ -244,7 +243,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\UserBundle\Entity\Role'
-            - ["label"]
+            - ['label']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
 
@@ -253,7 +252,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\UserBundle\Entity\Role'
-            - ["label"]
+            - ['label']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_roles, acl_resource: oro_user_role_view }
 
@@ -262,7 +261,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\UserBundle\Entity\Role'
-            - ["label"]
+            - ['label']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles_authenticated, acl_resource: oro_user_role_view }
 

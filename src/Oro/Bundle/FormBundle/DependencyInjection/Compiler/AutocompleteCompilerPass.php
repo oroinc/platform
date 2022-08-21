@@ -15,7 +15,10 @@ class AutocompleteCompilerPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    public function process(ContainerBuilder $container)
+    /**
+     * {@inheritDoc}
+     */
+    public function process(ContainerBuilder $container): void
     {
         $handlers = [];
         $aclResources = [];

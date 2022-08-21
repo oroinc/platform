@@ -252,7 +252,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\TagBundle\Entity\Taxonomy'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: taxonomy, acl_resource: oro_taxonomy_view }
 
