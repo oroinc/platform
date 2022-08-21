@@ -3,13 +3,13 @@
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
+use Oro\Bundle\MessageQueueBundle\Security\SecurityTokenProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\QueueInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 /**
@@ -17,13 +17,13 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DriverInterface */
+    /** @var DriverInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $driver;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface */
-    private $tokenStorage;
+    /** @var SecurityTokenProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $tokenProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TokenSerializerInterface */
+    /** @var TokenSerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenSerializer;
 
     /** @var SecurityAwareDriver */
@@ -32,13 +32,13 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->driver = $this->createMock(DriverInterface::class);
-        $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $this->tokenProvider = $this->createMock(SecurityTokenProviderInterface::class);
         $this->tokenSerializer = $this->createMock(TokenSerializerInterface::class);
 
         $this->securityAwareDriver = new SecurityAwareDriver(
             $this->driver,
             ['security_agnostic_topic'],
-            $this->tokenStorage,
+            $this->tokenProvider,
             $this->tokenSerializer
         );
     }
@@ -49,7 +49,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         $message->setProperty(Config::PARAMETER_TOPIC_NAME, 'security_agnostic_topic');
         $queue = $this->createMock(QueueInterface::class);
 
-        $this->tokenStorage->expects(self::never())
+        $this->tokenProvider->expects(self::never())
             ->method('getToken');
         $this->tokenSerializer->expects(self::never())
             ->method('serialize');
@@ -73,7 +73,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         $token = $this->createMock(TokenInterface::class);
         $serializedToken = 'serialized';
 
-        $this->tokenStorage->expects(self::once())
+        $this->tokenProvider->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         $this->tokenSerializer->expects(self::once())
@@ -101,7 +101,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
 
         $message->setProperty(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN, $serializedToken);
 
-        $this->tokenStorage->expects(self::never())
+        $this->tokenProvider->expects(self::never())
             ->method('getToken');
         $this->tokenSerializer->expects(self::never())
             ->method('serialize');
@@ -118,12 +118,12 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendShouldNotAddSecurityTokenToMessageIfNoTokenInTokenStorage()
+    public function testSendShouldNotAddSecurityTokenToMessageIfNoToken()
     {
         $message = new Message();
         $queue = $this->createMock(QueueInterface::class);
 
-        $this->tokenStorage->expects(self::once())
+        $this->tokenProvider->expects(self::once())
             ->method('getToken')
             ->willReturn(null);
         $this->tokenSerializer->expects(self::never())
@@ -144,7 +144,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         $queue = $this->createMock(QueueInterface::class);
         $token = $this->createMock(TokenInterface::class);
 
-        $this->tokenStorage->expects(self::once())
+        $this->tokenProvider->expects(self::once())
             ->method('getToken')
             ->willReturn($token);
         $this->tokenSerializer->expects(self::once())
@@ -170,7 +170,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
 
         $message->setProperty(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN, $token);
 
-        $this->tokenStorage->expects(self::never())
+        $this->tokenProvider->expects(self::never())
             ->method('getToken');
         $this->tokenSerializer->expects(self::once())
             ->method('serialize')
@@ -197,7 +197,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
 
         $message->setProperty(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN, $token);
 
-        $this->tokenStorage->expects(self::never())
+        $this->tokenProvider->expects(self::never())
             ->method('getToken');
         $this->tokenSerializer->expects(self::once())
             ->method('serialize')
@@ -220,7 +220,7 @@ class SecurityAwareDriverTest extends \PHPUnit\Framework\TestCase
         $message->setProperty(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN, 'serialized');
         $queue = $this->createMock(QueueInterface::class);
 
-        $this->tokenStorage->expects(self::never())
+        $this->tokenProvider->expects(self::never())
             ->method('getToken');
         $this->tokenSerializer->expects(self::never())
             ->method('serialize');

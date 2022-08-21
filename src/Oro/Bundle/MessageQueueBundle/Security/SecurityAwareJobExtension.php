@@ -14,14 +14,9 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 class SecurityAwareJobExtension extends AbstractExtension
 {
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var TokenSerializerInterface */
-    private $tokenSerializer;
-
-    /** @var JobManagerInterface */
-    private $jobManager;
+    private TokenStorageInterface $tokenStorage;
+    private TokenSerializerInterface $tokenSerializer;
+    private JobManagerInterface $jobManager;
 
     public function __construct(
         TokenStorageInterface $tokenStorage,
@@ -34,9 +29,9 @@ class SecurityAwareJobExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function onPreRunUnique(Job $job)
+    public function onPreRunUnique(Job $job): void
     {
         $token = $this->tokenStorage->getToken();
         if (!$token instanceof TokenInterface) {
@@ -47,7 +42,7 @@ class SecurityAwareJobExtension extends AbstractExtension
             $job = $job->getRootJob();
         }
         $jobProperties = $job->getProperties();
-        if (array_key_exists(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN, $jobProperties)) {
+        if (\array_key_exists(SecurityAwareDriver::PARAMETER_SECURITY_TOKEN, $jobProperties)) {
             return;
         }
 

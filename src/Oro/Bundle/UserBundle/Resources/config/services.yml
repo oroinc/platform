@@ -333,11 +333,11 @@ services:
     oro_user.event_listener.owner_user_grid_listener:
         class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
-            - "@?security.acl.voter.basic_permissions"
+            - '@security.acl.voter.basic_permissions'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.owner-users-select-grid, method: onBuildBefore }
 
