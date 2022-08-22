@@ -78,16 +78,15 @@ services:
         class: Oro\Bundle\LocaleBundle\Autocomplete\ParentLocalizationSearchHandler
         arguments:
             - 'Oro\Bundle\LocaleBundle\Entity\Localization'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_localization_parent, acl_resource: oro_locale_localization_view }
 
     oro_locale.form.autocomplete.localization.search_handler:
-        public: false
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\LocaleBundle\Entity\Localization'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: oro_localization, acl_resource: oro_locale_localization_view }
 

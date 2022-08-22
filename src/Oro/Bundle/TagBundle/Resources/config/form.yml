@@ -52,7 +52,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\TagBundle\Entity\Tag'
-            - ["name"]
+            - ['name']
             - '@oro_security.token_accessor'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }

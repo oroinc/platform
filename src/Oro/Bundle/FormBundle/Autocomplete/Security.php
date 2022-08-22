@@ -9,11 +9,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class Security
 {
-    /** @var string[] [autocomplete search handler id => acl resource, ...] */
-    private $autocompleteAclResources;
-
-    /** @var AuthorizationCheckerInterface */
-    private $authorizationChecker;
+    /** @var string[] [autocomplete search handler name => acl resource, ...] */
+    private array $autocompleteAclResources;
+    private AuthorizationCheckerInterface $authorizationChecker;
 
     public function __construct(array $autocompleteAclResources, AuthorizationCheckerInterface $authorizationChecker)
     {
