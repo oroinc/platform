@@ -27,7 +27,7 @@ class ExtendReflectionErrorHandler
     public static function dataCollector(string $className): bool
     {
         // store traces only for entities
-        if (str_contains($className, '\Entity\\')) {
+        if (false !== strpos($className, '\Entity\\')) {
             self::$traces[$className] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         }
 
