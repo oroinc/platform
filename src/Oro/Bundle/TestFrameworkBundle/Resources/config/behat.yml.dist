@@ -20,6 +20,14 @@ default: &default
                 640_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
+                mobile_session:
+                    oroSelenium2:
+                        wd_host: 'http://localhost:4444/wd/hub'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    mobileEmulation:
+                                        deviceName: "iPhone 12 Pro"
         FriendsOfBehat\SymfonyExtension:
             kernel:
                 environment: 'prod'
@@ -132,3 +140,21 @@ chromedriver:
                                         - "--window-size=640,1100"
                                         - "--no-pings"
                                         - "--disable-renderer-backgrounding"
+
+                mobile_session:
+                    oroSelenium2:
+                        wd_host: 'http://localhost:9515'
+                        capabilities:
+                            extra_capabilities:
+                                chromeOptions:
+                                    args:
+                                        - "--no-proxy-server"
+                                        - "--no-sandbox"
+                                        - "--dns-prefetch-disable"
+                                        - "--no-first-run"
+                                        - "--disable-gpu"
+                                        - "--headless"
+                                        - "--no-pings"
+                                        - "--disable-renderer-backgrounding"
+                                    mobileEmulation:
+                                        deviceName: "iPhone 12 Pro"

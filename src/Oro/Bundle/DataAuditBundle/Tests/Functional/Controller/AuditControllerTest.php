@@ -25,30 +25,26 @@ class AuditControllerTest extends WebTestCase
         self::assertStringContainsString('ca205501-a584-4e16-bb19-0226cbb9e1c8', $crawler->html());
     }
 
-    public function testAuditHistory()
+    /**
+     * @dataProvider idsDataProvider
+     */
+    public function testAuditHistory($entityId)
     {
         $crawler = $this->client->request(
             'GET',
-            $this->getUrl('oro_dataaudit_history', ['entity' => \stdClass::class, 'id' => 999999]),
+            $this->getUrl('oro_dataaudit_history', ['entity' => \stdClass::class, 'id' => $entityId]),
             ['_widgetContainer' => 'dialog']
         );
 
         $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        self::assertStringContainsString('999999', $crawler->html());
+        self::assertStringContainsString($entityId, $crawler->html());
     }
 
-    public function testAuditHistoryStringId()
+    public function idsDataProvider(): array
     {
-        $crawler = $this->client->request(
-            'GET',
-            $this->getUrl(
-                'oro_dataaudit_history',
-                ['entity' => \stdClass::class, 'id' => 'ca205501-a584-4e16-bb19-0226cbb9e1c8']
-            ),
-            ['_widgetContainer' => 'dialog']
-        );
-
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
-        self::assertStringContainsString('ca205501-a584-4e16-bb19-0226cbb9e1c8', $crawler->html());
+        return [
+            'integer' => [999999],
+            'string' => ['ca205501-a584-4e16-bb19-0226cbb9e1c8']
+        ];
     }
 }
