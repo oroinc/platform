@@ -96,7 +96,8 @@ define(function(require) {
                 autoRender: true,
                 model: cell.model,
                 fieldName: cell.column.get('name'),
-                metadata: cell.column.get('metadata')
+                metadata: cell.column.get('metadata'),
+                cell
             });
             if (this.formState) {
                 this.updateModel(cell.model, this.oldState);

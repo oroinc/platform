@@ -30,5 +30,7 @@ oro_behat_extension:
         - Oro\Bundle\FilterBundle\Tests\Behat\Context\FilterContext
         - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
         - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
+        - Oro\Bundle\ImportExportBundle\Tests\Behat\Context\ImportExportContext
       paths:
         - '@OroSegmentBundle/Tests/Behat/Features'

@@ -26,12 +26,37 @@ oro_behat_extension:
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
       options:
         mapping:
-          Enable SMTP: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][useSmtp]'
-          SMTP Host: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][smtpHost]'
-          SMTP Port: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][smtpPort]'
-          Encryption: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][smtpEncryption]'
-          User: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][user]'
-          Password: 'oro_user_emailsettings[imapAccountType][userEmailOrigin][password]'
+          Enable SMTP:
+            type: 'css'
+            locator: '[name$="[useSmtp]"]'
+          SMTP Host:
+            type: 'css'
+            locator: '[name$="[smtpHost]"]'
+          SMTP Port:
+            type: 'css'
+            locator: '[name$="[smtpPort]"]'
+          Encryption:
+            type: 'css'
+            locator: '[name$="[smtpEncryption]"]'
+          Password:
+            type: 'css'
+            locator: '[name$="[password]"]'
+          Enable IMAP:
+            type: 'css'
+            locator: '[name$="[useImap]"]'
+          IMAP Host:
+            type: 'css'
+            locator: '[name$="[imapHost]"]'
+          IMAP Port:
+            type: 'css'
+            locator: '[name$="[imapPort]"]'
+          IMAP Encryption:
+            type: 'css'
+            locator: '[name$="[imapEncryption]"]'
+          User:
+            type: 'css'
+            locator: '[name$="[user]"]'
+
     Add Autoresponse Rule Form:
       selector: "form[id^='oro_email_autoresponserule']"
       class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form

@@ -603,13 +603,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $element->focus();
             $options = $element->getSearchResults();
             $optionsValue = [];
-            /** @var Element $element */
-            foreach ($options as $element) {
-                $optionsValue[] = $element->getText();
+            /** @var Element $option */
+            foreach ($options as $option) {
+                $optionsValue[] = $option->getText();
             }
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $optionsValue);
             }
+            $element->close();
         } elseif ($element instanceof Select) {
             /** @var NodeElement[] $options */
             $options = $element->findAll('css', 'option');
