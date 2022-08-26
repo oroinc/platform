@@ -263,7 +263,7 @@ class EnumSynchronizer
     protected function getEnumOptionKey($id, array $options)
     {
         foreach ($options as $optKey => $opt) {
-            if ($id == $opt['id']) {
+            if ((string) $id === (string) $opt['id']) {
                 return $optKey;
             }
         }
@@ -332,6 +332,7 @@ class EnumSynchronizer
     protected function processValues(array $values, array $options, EntityManager $em, EnumValueRepository $enumRepo)
     {
         $this->fillOptionIds($values, $options);
+        $this->processSwappedOptions($options);
 
         /** @var AbstractEnumValue[] $changes */
         $changes = [];
@@ -423,6 +424,52 @@ class EnumSynchronizer
                 $ids[] = $option['id'];
             }
         }
+    }
+
+    /**
+     * Detects and restores outdated labels of swapped options.
+     *
+     * before:
+     *  $options = [
+     *    ['id' => '025',  'label' => '0.025'],
+     *    ['id' => '0025', 'label' => '0.25'],
+     * ];
+     *
+     * after:
+     *  $options = [
+     *    ['id' => '025',  'label' => '0.25'],
+     *    ['id' => '0025', 'label' => '0.025'],
+     * ];
+     */
+    protected function processSwappedOptions(array &$options): void
+    {
+        foreach ($options as $i => $option) {
+            if ($swapSettings = $this->getSwappedOptionSettings($option, $options)) {
+                [$swapPos, $swapLabel] = $swapSettings;
+
+                $options[$swapPos]['label'] = $option['label'];
+                $options[$i]['label'] = $swapLabel;
+            }
+        }
+    }
+
+    private function getSwappedOptionSettings(array $option, array $optionsList): ?array
+    {
+        $id = $option['id'];
+        $label = $option['label'];
+        $actualId = $this->generateEnumValueId($label, []);
+
+        // Option id doesn't equal id generated from option label
+        // It's a sign that option may be outdated
+        if ($id && $id !== $actualId) {
+            foreach ($optionsList as $i => $elem) {
+                // Cross-check option id and element id with ids generated from labels
+                if ($elem['id'] === $actualId && $id === $this->generateEnumValueId($elem['label'], [])) {
+                    return [$i, $elem['label']];
+                }
+            }
+        }
+        return null;
     }
 
     /**
