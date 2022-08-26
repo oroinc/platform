@@ -25,7 +25,7 @@ oro_behat_extension:
     OroTagBundle:
       contexts:
         - Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext
-        - OroDataGridBundle::GridContext
-        - OroFormBundle::FormContext
+        - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
+        - Oro\Bundle\FormBundle\Tests\Behat\Context\FormContext
       paths:
         - '@OroTagBundle/Tests/Behat/Features'
