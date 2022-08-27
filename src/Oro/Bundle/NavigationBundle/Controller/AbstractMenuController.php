@@ -4,7 +4,7 @@ namespace Oro\Bundle\NavigationBundle\Controller;
 
 use Doctrine\ORM\EntityManager;
 use Knp\Menu\ItemInterface;
-use Oro\Bundle\FormBundle\Model\UpdateHandler;
+use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\NavigationBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\NavigationBundle\Entity\MenuUpdateInterface;
 use Oro\Bundle\NavigationBundle\Event\MenuUpdateChangeEvent;
@@ -15,6 +15,7 @@ use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Provider\BuilderChainProvider;
 use Oro\Bundle\NavigationBundle\Provider\MenuUpdateProvider;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\ScopeBundle\Helper\ContextRequestHelper;
 use Oro\Bundle\ScopeBundle\Manager\ContextNormalizer;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
@@ -51,27 +52,17 @@ abstract class AbstractMenuController extends AbstractController
         return $this->get(MenuUpdateManager::class);
     }
 
-    /**
-     * @return String
-     */
-    protected function getScopeType()
+    protected function getScopeType(): string
     {
         return $this->getMenuUpdateManager()->getScopeType();
     }
 
-    /**
-     * @return string
-     */
-    protected function getEntityClass()
+    protected function getEntityClass(): string
     {
         return $this->getMenuUpdateManager()->getEntityClass();
     }
 
-    /**
-     * @param array $context
-     * @return array
-     */
-    protected function index(array $context = [])
+    protected function index(array $context = []): array
     {
         $this->checkAcl($context);
 
@@ -84,12 +75,7 @@ abstract class AbstractMenuController extends AbstractController
         );
     }
 
-    /**
-     * @param string $menuName
-     * @param array  $context
-     * @return array
-     */
-    protected function view($menuName, array $context = [])
+    protected function view(string $menuName, array $context = []): array
     {
         $this->checkAcl($context);
         $denormalizedContext = $this->denormalizeContext($context);
@@ -105,13 +91,7 @@ abstract class AbstractMenuController extends AbstractController
         );
     }
 
-    /**
-     * @param string $menuName
-     * @param string $parentKey
-     * @param array  $context
-     * @return array|RedirectResponse
-     */
-    protected function create($menuName, $parentKey, array $context = [])
+    protected function create(string $menuName, ?string $parentKey, array $context = []): array|RedirectResponse
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
@@ -130,13 +110,7 @@ abstract class AbstractMenuController extends AbstractController
         return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
-    /**
-     * @param string $menuName
-     * @param string $key
-     * @param array  $context
-     * @return array|RedirectResponse
-     */
-    protected function update($menuName, $key, array $context = [])
+    protected function update(string $menuName, string $key, array $context = []): array|RedirectResponse
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
@@ -153,13 +127,7 @@ abstract class AbstractMenuController extends AbstractController
         return $this->handleUpdate($menuUpdate, $context, $menu);
     }
 
-    /**
-     * @param Request $request
-     * @param string  $menuName
-     * @param array   $context
-     * @return Response|RedirectResponse
-     */
-    protected function move(Request $request, $menuName, array $context = [])
+    protected function move(Request $request, string $menuName, array $context = []): Response|RedirectResponse
     {
         $this->checkAcl($context);
         $context = $this->denormalizeContext($context);
@@ -226,26 +194,18 @@ abstract class AbstractMenuController extends AbstractController
         return $this->renderMoveDialog($responseData, $form);
     }
 
-    /**
-     * @param array         $params
-     * @param FormInterface $form
-     * @return Response
-     */
-    protected function renderMoveDialog(array $params, FormInterface $form)
+    protected function renderMoveDialog(array $params, FormInterface $form): Response
     {
         $params = array_merge($params, ['form' => $form->createView()]);
 
         return $this->render('@OroNavigation/menuUpdate/dialog/move.html.twig', $params);
     }
 
-    /**
-     * @param MenuUpdateInterface $menuUpdate
-     * @param array               $context
-     * @param ItemInterface       $menu
-     * @return array|RedirectResponse
-     */
-    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context, ItemInterface $menu)
-    {
+    protected function handleUpdate(
+        MenuUpdateInterface $menuUpdate,
+        array $context,
+        ItemInterface $menu
+    ): array|RedirectResponse {
         $menuItem = null;
         if (!$menuUpdate->isCustom()) {
             $menuItem = MenuUpdateUtils::findMenuItem($menu, $menuUpdate->getKey());
@@ -253,13 +213,13 @@ abstract class AbstractMenuController extends AbstractController
 
         $form = $this->createForm(MenuUpdateType::class, $menuUpdate, ['menu_item' => $menuItem]);
 
-        $response = $this->get(UpdateHandler::class)->update(
+        $response = $this->get(UpdateHandlerFacade::class)->update(
             $menuUpdate,
             $form,
             $this->getSavedSuccessMessage()
         );
 
-        if (is_array($response)) {
+        if (\is_array($response)) {
             $response['context'] = $this->normalizeContext($context);
             $response['menuName'] = $menu->getName();
             $response['tree'] = $this->createMenuTree($menu);
@@ -273,29 +233,22 @@ abstract class AbstractMenuController extends AbstractController
     }
 
     /**
-     * @param array $context
      * @return string[]
      */
-    protected function normalizeContext(array $context)
+    protected function normalizeContext(array $context): array
     {
         return $this->get(ContextNormalizer::class)->normalizeContext($context);
     }
 
     /**
-     * @param array $context
      * @return object[]
      */
-    protected function denormalizeContext(array $context)
+    protected function denormalizeContext(array $context): array
     {
         return $this->get(ContextNormalizer::class)->denormalizeContext($this->getScopeType(), $context);
     }
 
-    /**
-     * @param string $menuName
-     * @param array  $context
-     * @return ItemInterface
-     */
-    protected function getMenu($menuName, array $context)
+    protected function getMenu(string $menuName, array $context): ItemInterface
     {
         $options = [
             MenuUpdateProvider::SCOPE_CONTEXT_OPTION => $context,
@@ -315,20 +268,12 @@ abstract class AbstractMenuController extends AbstractController
         return $menu;
     }
 
-    /**
-     * @param $menu
-     * @return array
-     */
-    protected function createMenuTree($menu)
+    protected function createMenuTree($menu): array
     {
         return $this->get(MenuUpdateTreeHandler::class)->createTree($menu);
     }
 
-    /**
-     * @param string $menuName
-     * @param array  $context
-     */
-    protected function dispatchMenuUpdateChangeEvent($menuName, array $context)
+    protected function dispatchMenuUpdateChangeEvent(string $menuName, array $context): void
     {
         $this->get(EventDispatcherInterface::class)->dispatch(
             new MenuUpdateChangeEvent($menuName, $context),
@@ -336,10 +281,7 @@ abstract class AbstractMenuController extends AbstractController
         );
     }
 
-    /**
-     * @return null|\Oro\Bundle\OrganizationBundle\Entity\Organization
-     */
-    protected function getCurrentOrganization()
+    protected function getCurrentOrganization():? Organization
     {
         if (null === $token = $this->container->get('security.token_storage')->getToken()) {
             return null;
@@ -350,25 +292,17 @@ abstract class AbstractMenuController extends AbstractController
             : null;
     }
 
-    /**
-     * @param Request $request
-     * @param array   $allowedKeys
-     * @return array
-     */
-    protected function getContextFromRequest(Request $request, array $allowedKeys = [])
+    protected function getContextFromRequest(Request $request, array $allowedKeys = []): array
     {
         return $this->get(ContextRequestHelper::class)->getFromRequest($request, $allowedKeys);
     }
 
-    /**
-     * @return string
-     */
-    protected function getSavedSuccessMessage()
+    protected function getSavedSuccessMessage(): string
     {
         return $this->renderView('@OroNavigation/menuUpdate/savedSuccessMessage.html.twig');
     }
 
-    protected function updateDependentMenuUpdateUrls(MenuUpdateInterface $menuUpdate)
+    protected function updateDependentMenuUpdateUrls(MenuUpdateInterface $menuUpdate): void
     {
         $repo = $this->getMenuUpdateManager()->getRepository();
         $eventDispatcher = $this->get(EventDispatcherInterface::class);
@@ -383,7 +317,7 @@ abstract class AbstractMenuController extends AbstractController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedServices()
     {
@@ -394,13 +328,13 @@ abstract class AbstractMenuController extends AbstractController
                 MenuUpdateTreeHandler::class,
                 ValidatorInterface::class,
                 TranslatorInterface::class,
-                UpdateHandler::class,
                 ContextNormalizer::class,
                 ConfigurationProvider::class,
                 BuilderChainProvider::class,
                 EventDispatcherInterface::class,
                 ContextRequestHelper::class,
                 MenuUpdateManager::class,
+                UpdateHandlerFacade::class
             ]
         );
     }

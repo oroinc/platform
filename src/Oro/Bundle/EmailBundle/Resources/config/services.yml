@@ -1105,9 +1105,6 @@ services:
             - { name: container.service_subscriber, id: oro_email.mailbox.process_storage }
             - { name: container.service_subscriber, id: oro_workflow.process.process_handler }
 
-    Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler:
-        alias: oro_email.autocomplete.mailbox_user_search_handler
-
     oro_email.autocomplete.mailbox_user_search_handler:
         class: Oro\Bundle\EmailBundle\Autocomplete\MailboxUserSearchHandler
         public: true

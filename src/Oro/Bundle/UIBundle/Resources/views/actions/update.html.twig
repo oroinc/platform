@@ -67,7 +67,7 @@
                 {% if form.vars.method != 'GET' %}
                     {% set inputAction  = form.vars.default_input_action is defined
                         ? form.vars.default_input_action
-                        : constant('Oro\\Bundle\\UIBundle\\Route\\Router::ACTION_SAVE_CLOSE')
+                        : ''
                     %}
                     <input
                             type="hidden"
