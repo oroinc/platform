@@ -7,6 +7,7 @@ use Oro\Bundle\MigrationBundle\Locator\FixturePathLocatorInterface;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -186,12 +187,30 @@ HELP
 
     protected function executeFixtures(OutputInterface $output, array $fixtures, string $fixturesType): void
     {
+        $cursor = new Cursor($output);
         $this->dataFixturesExecutor->setLogger(
-            function ($message) use ($output) {
-                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
+            function ($message) use ($output, $cursor) {
+                $output->write(\sprintf('  <comment>></comment> <info>%s</info>', $message));
+                // Saves the cursor position to make it possible to return to the end of previous line in the progress
+                // callback to append the progress info.
+                $cursor->savePosition();
+                $output->writeln('');
             }
         );
-        $this->dataFixturesExecutor->execute($fixtures, $fixturesType);
+
+        $progressCallback = static function (int $memoryBytes, float $durationMilli) use ($output, $cursor) {
+            // Returns cursor to the end of the previous line so the progress info will be appended after it.
+            $cursor->restorePosition();
+            $cursor->moveUp();
+
+            $output->writeln(\sprintf(
+                ' <comment>%.2F MiB - %d ms</comment>',
+                $memoryBytes / 1024 / 1024,
+                $durationMilli
+            ));
+        };
+
+        $this->dataFixturesExecutor->execute($fixtures, $fixturesType, $progressCallback);
     }
 
     protected function getTypeOfFixtures(InputInterface $input): string

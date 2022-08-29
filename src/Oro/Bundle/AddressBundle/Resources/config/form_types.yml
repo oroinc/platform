@@ -76,6 +76,4 @@ services:
     oro_address.form.handler.address:
         class: Oro\Bundle\AddressBundle\Form\Handler\AddressHandler
         arguments:
-            - '@oro_address.form.address'
-            - '@request_stack'
             - '@doctrine.orm.entity_manager'

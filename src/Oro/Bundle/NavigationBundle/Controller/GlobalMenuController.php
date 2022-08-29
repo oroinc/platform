@@ -95,8 +95,11 @@ class GlobalMenuController extends AbstractMenuController
     /**
      * {@inheritDoc}
      */
-    protected function handleUpdate(MenuUpdateInterface $menuUpdate, array $context, ItemInterface $menu)
-    {
+    protected function handleUpdate(
+        MenuUpdateInterface $menuUpdate,
+        array $context,
+        ItemInterface $menu
+    ): array|RedirectResponse {
         $response = parent::handleUpdate($menuUpdate, $context, $menu);
 
         // On save RedirectResponse is returned, during rendering response is an array.

@@ -20,8 +20,10 @@ interface DataFixturesExecutorInterface
      *
      * @param FixtureInterface[] $fixtures     The list of data fixtures to execute
      * @param string             $fixturesType The type of data fixtures
+     * @param ?callable $progressCallback Callback that can be used to track execution progress. The callback should
+     * expect to receive two arguments - memory consumption (int, bytes) and duration (int|float, milliseconds).
      */
-    public function execute(array $fixtures, $fixturesType);
+    public function execute(array $fixtures, string $fixturesType, ?callable $progressCallback): void;
 
     /**
      * Sets a logger callback for logging messages when executing data fixtures.

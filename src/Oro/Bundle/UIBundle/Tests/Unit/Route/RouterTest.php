@@ -48,140 +48,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router = new Router($requestStack, $this->urlGenerator, $this->authorizationChecker);
     }
 
-    public function testSaveAndStayRedirectAfterSave()
-    {
-        $testUrl = 'test\\url\\index.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->willReturn(Router::ACTION_SAVE_AND_STAY);
-
-        $this->urlGenerator->expects($this->once())
-            ->method('generate')
-            ->willReturn($testUrl);
-
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
-
-        $redirect = $this->router->redirectAfterSave(
-            [
-                'route'      => 'test_route',
-                'parameters' => ['id' => 1],
-            ],
-            []
-        );
-
-        $this->assertEquals($testUrl, $redirect->getTargetUrl());
-    }
-
-    public function testSaveAndStayWithAccessGrantedRedirectAfterSave()
-    {
-        $testUrl = 'test\\url\\index.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->willReturn(Router::ACTION_SAVE_AND_STAY);
-
-        $this->urlGenerator->expects($this->once())
-            ->method('generate')
-            ->willReturn($testUrl);
-
-        $entity = new \stdClass();
-
-        $this->authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with('EDIT', $this->identicalTo($entity))
-            ->willReturn(true);
-
-        $redirect = $this->router->redirectAfterSave(
-            [
-                'route'      => 'test_route',
-                'parameters' => ['id' => 1],
-            ],
-            [],
-            $entity
-        );
-
-        $this->assertEquals($testUrl, $redirect->getTargetUrl());
-    }
-
-    public function testSaveAndStayWithAccessDeniedRedirectAfterSave()
-    {
-        $testUrl1 = 'test\\url\\index1.html';
-        $testUrl2 = 'test\\url\\index2.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->willReturn(Router::ACTION_SAVE_AND_STAY);
-
-        $this->urlGenerator->expects($this->once())
-            ->method('generate')
-            ->willReturnCallback(function ($name) use (&$testUrl1, &$testUrl2) {
-                if ($name === 'test_route1') {
-                    return $testUrl1;
-                }
-                if ($name === 'test_route2') {
-                    return $testUrl2;
-                }
-
-                return '';
-            });
-
-        $entity = new \stdClass();
-
-        $this->authorizationChecker->expects($this->once())
-            ->method('isGranted')
-            ->with('EDIT', $this->identicalTo($entity))
-            ->willReturn(false);
-
-        $redirect = $this->router->redirectAfterSave(
-            [
-                'route'      => 'test_route1',
-                'parameters' => ['id' => 1],
-            ],
-            [
-                'route'      => 'test_route2',
-                'parameters' => ['id' => 1],
-            ],
-            $entity
-        );
-
-        $this->assertEquals($testUrl2, $redirect->getTargetUrl());
-    }
-
-    public function testSaveAndCloseRedirectAfterSave()
-    {
-        $testUrl = 'save_and_close.html';
-
-        $this->request->expects($this->once())
-            ->method('get')
-            ->willReturn(Router::ACTION_SAVE_CLOSE);
-
-        $this->urlGenerator->expects($this->once())
-            ->method('generate')
-            ->willReturn($testUrl);
-
-        $this->authorizationChecker->expects($this->never())
-            ->method('isGranted');
-
-        $redirect = $this->router->redirectAfterSave(
-            [],
-            [
-                'route'      => 'test_route',
-                'parameters' => ['id' => 1],
-            ]
-        );
-
-        $this->assertEquals($testUrl, $redirect->getTargetUrl());
-    }
-
-    public function testWrongParametersRedirectAfterSave()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->router->redirectAfterSave([], []);
-    }
-
-    public function testRedirectWillBeToTheSamePageIfInputActionIsEmpty()
+    public function testRedirectWillBeToTheSamePageIfInputActionIsEmpty(): void
     {
         $expectedUrl = '/example/view/1';
         $this->request->expects($this->once())
@@ -192,7 +59,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($response->getTargetUrl(), $expectedUrl);
     }
 
-    public function testRedirectFailsWhenInputActionNotString()
+    public function testRedirectFailsWhenInputActionNotString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Request parameter "input_action" must be string, array is given.');
@@ -205,7 +72,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    public function testRedirectFailsWhenRouteIsEmpty()
+    public function testRedirectFailsWhenRouteIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -221,7 +88,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    public function testRedirectFailsWhenRouteIsNotString()
+    public function testRedirectFailsWhenRouteIsNotString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -237,7 +104,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
         $this->router->redirect([]);
     }
 
-    public function testRedirectFailsWhenRouteParamsIsNotArray()
+    public function testRedirectFailsWhenRouteParamsIsNotArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -256,7 +123,7 @@ class RouterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider redirectDataProvider
      */
-    public function testRedirectWorks(array $expected, array $data)
+    public function testRedirectWorks(array $expected, array $data): void
     {
         $this->request->expects($this->any())
             ->method('get')

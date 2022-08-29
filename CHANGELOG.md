@@ -46,6 +46,9 @@ The current file describes significant changes in the code that may affect the u
 #### FilterBundle
 * The `day-value-helper` was removed, use `date-value-helper` instead.
 
+#### FormBundle
+* `Oro\Bundle\FormBundle\Model\UpdateHandler` has been removed. Use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` instead.
+
 #### UIBundle
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
