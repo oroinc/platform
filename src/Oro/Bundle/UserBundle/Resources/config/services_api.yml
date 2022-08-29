@@ -25,3 +25,13 @@ services:
         class: Oro\Bundle\UserBundle\Api\Processor\DisableUserByDefault
         tags:
             - { name: oro.api.processor, action: customize_form_data, event: pre_validate, parentAction: create, class: Oro\Bundle\UserBundle\Entity\User }
+
+    oro_user.api.user.set_case_sensitivity_for_email_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetCaseSensitivityForFilter
+        arguments:
+            - '@oro_config.manager'
+            - 'email'
+            - 'oro_user.case_insensitive_email_addresses_enabled'
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_input, class: Oro\Bundle\UserBundle\Entity\User, priority: -120 }
+            - { name: oro.api.processor, action: get_list, group: normalize_input, class: Oro\Bundle\UserBundle\Entity\User, priority: -120 }
