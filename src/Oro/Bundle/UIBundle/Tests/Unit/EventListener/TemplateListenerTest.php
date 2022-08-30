@@ -270,6 +270,29 @@ class TemplateListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testProcessContainerForCustomWidgetContainer(): void
+    {
+        $expectedTemplate = '@TestBundle/Default/widget/Calendar/test.html.twig';
+
+        $this->request->query->set('_widgetContainer', 'Calendar');
+        $this->request->attributes->set('_template', '@TestBundle/Default/widget/test.html.twig');
+
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects(self::atLeastOnce())
+            ->method('exists')
+            ->willReturnMap([
+                ['@TestBundle/Default/Calendar/widget/test.html.twig', false],
+                [$expectedTemplate, true],
+            ]);
+        $this->twig->expects(self::atLeastOnce())
+            ->method('getLoader')
+            ->willReturn($loader);
+
+        $this->listener->onKernelView($this->event);
+
+        self::assertEquals($expectedTemplate, (string) $this->request->attributes->get('_template'));
+    }
+
     private function templateWithContainer(?string $container = null): TemplateReference
     {
         return new TemplateReference(
