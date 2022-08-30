@@ -12,8 +12,7 @@ use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
  */
 class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterface
 {
-    /** @var ConfigManager */
-    private $configManager;
+    private ConfigManager $configManager;
 
     public function __construct(ConfigManager $configManager)
     {
@@ -50,6 +49,14 @@ class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterfac
 
     private function isSchemaUpdateRequired(ConfigInterface $config): bool
     {
+        //Extend Custom New entity do NOT require update
+        if ($config->is('is_extend')
+            && $config->is('owner', ExtendScope::OWNER_CUSTOM)
+            && $config->is('state', ExtendScope::STATE_NEW)
+        ) {
+            return false;
+        }
+
         return
             $config->is('is_extend')
             && !$config->is('state', ExtendScope::STATE_ACTIVE)
