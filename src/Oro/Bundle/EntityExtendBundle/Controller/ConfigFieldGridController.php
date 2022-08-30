@@ -104,9 +104,11 @@ class ConfigFieldGridController extends AbstractController
     public function removeAction(FieldConfigModel $field)
     {
         $this->ensureFieldConfigModelIsCustom($field);
-        $successMessage = $this->getTranslator()->trans('oro.entity_extend.controller.config_field.message.deleted');
 
-        return $this->getRemoveRestoreConfigFieldHandler()->handleRemove($field, $successMessage);
+        return $this->getRemoveRestoreConfigFieldHandler()->handleRemove(
+            $field,
+            $this->getTranslator()->trans('oro.entity_extend.controller.config_field.message.deleted')
+        );
     }
 
     /**
@@ -153,7 +155,7 @@ class ConfigFieldGridController extends AbstractController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedServices(): array
     {
