@@ -156,10 +156,21 @@ class TemplateListener implements ServiceSubscriberInterface
         $parts = $this->parseTemplateReference($templateReference);
         if ($parts) {
             $templateName = $parts['path'] . $container . '/' . $parts['name'];
-
             if ($this->getTwig()->getLoader()->exists($templateName)) {
                 $templateReference->set('name', $templateName);
                 return true;
+            }
+
+            if ($parts['widget']) {
+                /**
+                 * Checks if legacy template file is exists
+                 */
+                $templateName = $parts['path'] . $parts['widget'] . '/'. $container . '/' . $parts['template'];
+                if ($this->getTwig()->getLoader()->exists($templateName)) {
+                    $templateReference->set('name', $templateName);
+
+                    return true;
+                }
             }
         }
 
@@ -173,9 +184,14 @@ class TemplateListener implements ServiceSubscriberInterface
             return null;
         }
 
-        $pattern = '/^(?<path>@?(?<bundle>[^\/:]+)[\/:]{1}(?<controller>[^\/:]+)[\/:]{1})(?<name>.+)$/';
+        $pattern = '/^(?<path>@?(?<bundle>[^\/:]+)[\/:]{1}(?<controller>[^\/:]+)[\/:]{1})'
+            . '((?<widget>.*)[\/:]{1})?(?<template>.*)$/';
 
-        return \preg_match($pattern, $parameters['name'], $parts) ? $parts : null;
+        $parts = \preg_match($pattern, $parameters['name'], $parts) ? $parts : null;
+        if ($parts) {
+            $parts['name'] = $parts['widget'] ? $parts['widget'] . '/' . $parts['template'] : $parts['template'];
+        }
+        return $parts;
     }
 
     private function getTwig(): Environment
