@@ -72,7 +72,7 @@ class EmailUser
      * @var OrganizationInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $organization;
 
