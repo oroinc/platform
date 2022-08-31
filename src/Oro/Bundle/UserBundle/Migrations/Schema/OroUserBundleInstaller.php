@@ -38,6 +38,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_5\SetOwnerForEmailTemplates as Em
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_7\OroUserBundle as UserOrganization;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_9\OroUserBundle as ExtendTitle;
 use Oro\Bundle\UserBundle\Migrations\Schema\v2_0\OroUserBundle as OroUserBundle20;
+use Oro\Bundle\UserBundle\Migrations\Schema\v2_9\SetOwnerForEmailOrganizationOnDeleteCascade;
 
 /**
  * ORO installer for UserBundle
@@ -66,7 +67,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v2_8';
+        return 'v2_9';
     }
 
     /**
@@ -154,6 +155,7 @@ class OroUserBundleInstaller implements
 
         AddAuthStatusColumn::addAuthStatusFieldAndValues($schema, $queries, $this->extendExtension);
         OroUserBundle20::addEmailUserIndexes($schema);
+        SetOwnerForEmailOrganizationOnDeleteCascade::updateOrganizationConstraint($schema);
 
         $this->addRelationsToScope($schema);
     }
