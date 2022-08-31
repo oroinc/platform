@@ -12,6 +12,8 @@ use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtensi
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor;
 use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 {
@@ -24,6 +26,7 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
+        $this->clearMessages();
 
         $this->loadFixtures([
             LoadStuckRootJobData::class,
@@ -70,5 +73,17 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
     private function getEntityManager(): EntityManager
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
+    }
+
+    private function clearMessages(): void
+    {
+        $connection = self::getContainer()->get(
+            'oro_message_queue.transport.dbal.connection',
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+
+        if ($connection instanceof DbalConnection) {
+            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
+        }
     }
 }
