@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class FormatterProvider
 {
-    const FORMAT_TYPE = 'format_type';
+    public const FORMAT_TYPE = 'formatType';
 
     /** @var array [{formatter_alias} => {formatter_service_id}] */
     protected $formatterIds = [];

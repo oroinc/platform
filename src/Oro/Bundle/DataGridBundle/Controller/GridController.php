@@ -7,8 +7,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\RequestParameterBagFactory;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
-use Oro\Bundle\DataGridBundle\Extension\Export\Configuration;
-use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -143,27 +141,20 @@ class GridController extends AbstractController
     {
         $format = $request->query->get('format');
         $formatType = $request->query->get('format_type', 'excel');
-        $gridParameters = $this->get(RequestParameterBagFactory::class)->fetchParameters($gridName);
-        $parameters = [
-            'gridName' => $gridName,
-            'gridParameters' => $gridParameters,
-            FormatterProvider::FORMAT_TYPE => $formatType,
-        ];
+        $gridParameters = $this->container->get(RequestParameterBagFactory::class)->fetchParameters($gridName);
 
-        $gridConfiguration = $this->get(Manager::class)->getConfigurationForGrid($gridName);
-        $exportOptions = $gridConfiguration->offsetGetByPath(ExportExtension::EXPORT_OPTION_PATH);
-        if (isset($exportOptions[$format][Configuration::OPTION_PAGE_SIZE])) {
-            $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
-        }
-
-        $this->get(MessageProducerInterface::class)->send(
-            DatagridPreExportTopic::getName(),
-            [
-                'format' => $format,
-                'parameters' => $parameters,
-                'notificationTemplate' => 'datagrid_export_result',
-            ]
-        );
+        $this->container->get(MessageProducerInterface::class)
+            ->send(
+                DatagridPreExportTopic::getName(),
+                [
+                    'outputFormat' => $format,
+                    'contextParameters' => [
+                        'gridName' => $gridName,
+                        'gridParameters' => $gridParameters,
+                        FormatterProvider::FORMAT_TYPE => $formatType,
+                    ],
+                ]
+            );
 
         return new JsonResponse([
             'successful' => true,

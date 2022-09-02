@@ -16,32 +16,6 @@ class GridControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
-    public function testShouldSendExportMessageWithPageSizeParameter(): void
-    {
-        $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
-            'gridName' => 'items-grid-with-export-page-size',
-            'format' => 'csv',
-            'items-grid' => [],
-        ]));
-
-        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
-
-        $this->assertNotEmpty($result);
-        $this->assertCount(1, $result);
-        $this->assertTrue($result['successful']);
-
-        self::assertMessageSent(DatagridPreExportTopic::getName(), [
-            'format' => 'csv',
-            'parameters' => [
-                'gridName' => 'items-grid-with-export-page-size',
-                'gridParameters' => [],
-                FormatterProvider::FORMAT_TYPE => 'excel',
-                'pageSize' => 499
-            ],
-            'notificationTemplate' => 'datagrid_export_result'
-        ]);
-    }
-
     public function testShouldSendExportMessage(): void
     {
         $this->client->request('GET', $this->getUrl('oro_datagrid_export_action', [
@@ -66,9 +40,8 @@ class GridControllerTest extends WebTestCase
         $this->assertTrue($result['successful']);
 
         self::assertMessageSent(DatagridPreExportTopic::getName(), [
-            'format' => 'csv',
-            'notificationTemplate' => 'datagrid_export_result',
-            'parameters' => [
+            'outputFormat' => 'csv',
+            'contextParameters' => [
                 'gridName' => 'audit-grid',
                 'gridParameters' => [
                     '_pager' => [

@@ -172,3 +172,13 @@ services:
             - '%oro_platform.xdebug_warning_command_list%'
         tags:
             - { name: kernel.event_listener, event: console.command, method: onCommandExecute}
+
+    oro_platform.repository.materialized_view_entity:
+        alias: Oro\Bundle\PlatformBundle\Entity\Repository\MaterializedViewEntityRepository
+
+    Oro\Bundle\PlatformBundle\Entity\Repository\MaterializedViewEntityRepository:
+        parent: oro_entity.abstract_repository
+        arguments:
+            - 'Oro\Bundle\PlatformBundle\Entity\MaterializedView'
+        tags:
+            - { name: doctrine.repository_service }

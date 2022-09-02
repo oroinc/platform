@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityBundle\DependencyInjection\Compiler;
 
 use Doctrine\ORM\Query;
+use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorTrait;
 use Oro\Component\DoctrineUtils\ORM\Walker\OutputAstWalkerInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\OutputResultModifierInterface;
 use Oro\Component\DoctrineUtils\ORM\Walker\SqlWalker;
@@ -14,6 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class SqlWalkerPass implements CompilerPassInterface
 {
+    use PriorityTaggedLocatorTrait;
+
     public const TAG_NAME = 'oro_entity.sql_walker';
 
     /**
@@ -26,14 +29,14 @@ class SqlWalkerPass implements CompilerPassInterface
             'setDefaultQueryHint',
             [
                 Query::HINT_CUSTOM_OUTPUT_WALKER,
-                SqlWalker::class
+                SqlWalker::class,
             ]
         );
 
         $astWalkers = [];
         $outputModifiers = [];
-        foreach ($container->findTaggedServiceIds(self::TAG_NAME) as $id => $attributes) {
-            $walkerDefinition = $container->getDefinition($id);
+        foreach ($this->findAndSortTaggedServices(self::TAG_NAME, '', $container, false) as $reference) {
+            $walkerDefinition = $container->getDefinition((string) $reference);
             $walkerDefinition->setAbstract(true);
             $walkerDefinition->setPublic(false);
             $className = $walkerDefinition->getClass();
@@ -48,14 +51,14 @@ class SqlWalkerPass implements CompilerPassInterface
             'setDefaultQueryHint',
             [
                 OutputAstWalkerInterface::HINT_AST_WALKERS,
-                $astWalkers
+                $astWalkers,
             ]
         );
         $doctrineConfiguration->addMethodCall(
             'setDefaultQueryHint',
             [
                 OutputResultModifierInterface::HINT_RESULT_MODIFIERS,
-                $outputModifiers
+                $outputModifiers,
             ]
         );
     }

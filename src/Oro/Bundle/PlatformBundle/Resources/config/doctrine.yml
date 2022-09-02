@@ -22,3 +22,34 @@ services:
         parent: oro.data.cache.without_memory_cache
         tags:
             - { name: 'cache.pool', namespace: 'doctrine_query_config' }
+
+    oro_platform.dbal.schema.materialized_view.manager:
+        class: Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedViewSchemaManager
+        arguments:
+            - '@=service("doctrine").getConnection()'
+
+    oro_platform.sql_walker.use_materialized_view:
+        class: Oro\Component\DoctrineUtils\ORM\Walker\MaterializedViewOutputResultModifier
+        abstract: true
+        tags:
+            - { name: oro_entity.sql_walker, priority: -255 }
+
+    oro_platform.materialized_view.factory.by_query:
+        class: Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory
+
+    oro_platform.materialized_view.manager:
+        class: Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager
+        arguments:
+            - '@doctrine'
+            - '@oro_platform.materialized_view.factory.by_query'
+            - '@oro_platform.dbal.schema.materialized_view.manager'
+        calls:
+            - [setLogger, ['@logger']]
+
+    oro_platform.materialized_view.remover:
+        class: Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRemover
+        arguments:
+            - '@doctrine'
+            - '@oro_platform.materialized_view.manager'
+        calls:
+            - [setLogger, ['@logger']]

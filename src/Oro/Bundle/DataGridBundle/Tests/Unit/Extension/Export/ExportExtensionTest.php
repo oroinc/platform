@@ -2,14 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Export;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -209,61 +203,5 @@ class ExportExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             $config->offsetGetByPath(ExportExtension::EXPORT_OPTION_PATH)
         );
-    }
-
-
-    public function testShouldThrowExceptionIfIdsExistAndDatasourceIsNotInstanceOfOrmDatasource(): void
-    {
-        $datasource = $this->createMock(DatasourceInterface::class);
-
-        $this->expectException(UnexpectedTypeException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Expected argument of type "%s", "%s" given',
-            OrmDatasource::class,
-            get_class($datasource)
-        ));
-
-        $this->extension->setParameters(new ParameterBag(['_export' => ['ids' => [1, 2]]]));
-        $this->extension->visitDatasource(DatagridConfiguration::create([]), $datasource);
-    }
-
-    public function testShouldAddWhereToQueryBuilder(): void
-    {
-        $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects(self::once())
-            ->method('getSingleIdentifierFieldName')
-            ->willReturn('id');
-
-        $em = $this->createMock(EntityManager::class);
-        $em->expects(self::once())
-            ->method('getClassMetadata')
-            ->with('Test')
-            ->willReturn($metadata);
-
-        $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects(self::once())
-            ->method('getRootAliases')
-            ->willReturn(['o']);
-        $qb->expects(self::once())
-            ->method('getEntityManager')
-            ->willReturn($em);
-        $qb->expects(self::once())
-            ->method('getRootEntities')
-            ->willReturn(['Test']);
-        $qb->expects(self::once())
-            ->method('andWhere')
-            ->with('o.id IN (:exportIds)')
-            ->willReturn($qb);
-        $qb->expects(self::once())
-            ->method('setParameter')
-            ->with('exportIds', [1, 2]);
-
-        $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects(self::once())
-            ->method('getQueryBuilder')
-            ->willReturn($qb);
-
-        $this->extension->setParameters(new ParameterBag(['_export' => ['ids' => [1, 2]]]));
-        $this->extension->visitDatasource(DatagridConfiguration::create([]), $datasource);
     }
 }
