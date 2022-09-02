@@ -5,10 +5,14 @@ namespace Oro\Bundle\DataGridBundle\Extension\Export;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
+/**
+ * Configuration class for the datagrid export configuration.
+ */
 class Configuration implements ConfigurationInterface
 {
-    const XLSX_MAX_EXPORT_RECORDS = 10000;
-    const OPTION_PAGE_SIZE = 'page_size';
+    public const XLSX_MAX_EXPORT_RECORDS = 10000;
+    public const OPTION_PAGE_SIZE = 'page_size';
+    public const OPTION_EXPORT_BY_PAGES = 'export_by_pages';
 
     /**
      * {@inheritDoc}
@@ -43,6 +47,8 @@ class Configuration implements ConfigurationInterface
                     ->integerNode('max_export_records')
                     ->end()
                     ->integerNode(self::OPTION_PAGE_SIZE)
+                    ->end()
+                    ->booleanNode(self::OPTION_EXPORT_BY_PAGES)
                     ->end()
                 ->end()
             ->end();

@@ -131,4 +131,9 @@ class DatagridExportIdFetcher implements ContextAwareInterface
             }
         );
     }
+
+    public function getTotalRecords(): int
+    {
+        return $this->grid->getData()->getTotalRecords();
+    }
 }

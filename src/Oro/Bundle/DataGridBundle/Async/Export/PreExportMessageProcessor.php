@@ -82,12 +82,62 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
     }
 
     /**
+     * {@inheritdoc}
+     *
+     * Adds an extra ability to create delayed jobs divided in batches by page number instead of entity IDs.
+     */
+    protected function getRunUniqueJobCallback($jobUniqueName, array $body)
+    {
+        return function (JobRunner $jobRunner, Job $job) use ($jobUniqueName, $body) {
+            $this->addDependentJob($job->getRootJob(), $body);
+
+            if (!empty($body['parameters']['exportByPages'])) {
+                $totalPages = (int) ceil($this->exportIdFetcher->getTotalRecords() / $this->getPageOrBatchSize($body));
+                $batches = array_map(static fn (int $page) => ['exactPage' => $page], range(1, $totalPages));
+            } else {
+                $exportingEntityIds = $this->getExportingEntityIds($body);
+                $batches = $this->splitByPageSizeOrBatchSize($exportingEntityIds, $body);
+            }
+
+            if (empty($batches)) {
+                $jobRunner->createDelayed(
+                    sprintf('%s.chunk.%s', $jobUniqueName, 1),
+                    $this->getDelayedJobCallback($body)
+                );
+            }
+
+            foreach ($batches as $key => $batchData) {
+                $jobRunner->createDelayed(
+                    sprintf('%s.chunk.%s', $jobUniqueName, ++$key),
+                    $this->getDelayedJobCallback($body, $batchData)
+                );
+            }
+
+            return true;
+        };
+    }
+
+    protected function splitByPageSizeOrBatchSize(array $ids, array $body): array
+    {
+        return array_chunk($ids, $this->getPageOrBatchSize($body));
+    }
+
+    protected function getPageOrBatchSize(array $messageBody): int
+    {
+        return $messageBody['parameters']['pageSize'] ?? $this->getBatchSize();
+    }
+
+    /**
      * {@inheritDoc}
      */
-    protected function getDelayedJobCallback(array $body, array $ids = [])
+    protected function getDelayedJobCallback(array $body, array $batchData = [])
     {
-        if (!empty($ids)) {
-            $body['parameters']['gridParameters']['_export']['ids'] = $ids;
+        if (!empty($batchData)) {
+            if (!empty($body['parameters']['exportByPages'])) {
+                $body['parameters']['exactPage'] = $batchData['exactPage'];
+            } else {
+                $body['parameters']['gridParameters']['_export']['ids'] = $batchData;
+            }
         }
 
         return function (JobRunner $jobRunner, Job $child) use ($body) {
@@ -108,7 +158,7 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
     {
         $body = JSON::decode($message->getBody());
         $body = array_replace_recursive([
-            'batchSize' => $this->batchSize,
+            'batchSize' => $this->getPageOrBatchSize($body),
             'exportType' => ProcessorRegistry::TYPE_EXPORT,
         ], $body);
 
