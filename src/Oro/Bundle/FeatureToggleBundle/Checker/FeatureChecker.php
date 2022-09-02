@@ -10,14 +10,17 @@ use Oro\Bundle\FeatureToggleBundle\Configuration\ConfigurationManager;
 class FeatureChecker
 {
     private FeatureDecisionManagerInterface $featureDecisionManager;
+    private FeatureResourceDecisionManagerInterface $featureResourceDecisionManager;
     private ConfigurationManager $configManager;
 
     public function __construct(
-        ConfigurationManager $configManager,
-        FeatureDecisionManagerInterface $featureDecisionManager
+        FeatureDecisionManagerInterface $featureDecisionManager,
+        FeatureResourceDecisionManagerInterface $featureResourceDecisionManager,
+        ConfigurationManager $configManager
     ) {
-        $this->configManager = $configManager;
+        $this->featureResourceDecisionManager = $featureResourceDecisionManager;
         $this->featureDecisionManager = $featureDecisionManager;
+        $this->configManager = $configManager;
     }
 
     public function isFeatureEnabled(string $feature, object|int|null $scopeIdentifier = null): bool
@@ -30,14 +33,7 @@ class FeatureChecker
         string $resourceType,
         object|int|null $scopeIdentifier = null
     ): bool {
-        $features = $this->configManager->getFeaturesByResource($resourceType, $resource);
-        foreach ($features as $feature) {
-            if (!$this->isFeatureEnabled($feature, $scopeIdentifier)) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->featureResourceDecisionManager->decide($resource, $resourceType, $scopeIdentifier);
     }
 
     public function getDisabledResourcesByType(string $resourceType): array
@@ -45,14 +41,7 @@ class FeatureChecker
         $disabledResources = [];
         $resources = $this->configManager->getResourcesByType($resourceType);
         foreach ($resources as $resource => $features) {
-            $isResourceEnabled = false;
-            foreach ($features as $feature) {
-                if ($this->isFeatureEnabled($feature)) {
-                    $isResourceEnabled = true;
-                    break;
-                }
-            }
-            if (!$isResourceEnabled) {
+            if (!$this->isResourceEnabled($resource, $resourceType)) {
                 $disabledResources[] = $resource;
             }
         }

@@ -8,13 +8,13 @@ oro.imap:
         fields:
             enable_google_imap:
                 label: Enable
-                tooltip: 'Please make sure that Gmail API is enabled in the <a href="https://console.developers.google.com/apis/api/gmail/overview/" target="_blank">Google Developers Console</a>.'
+                tooltip: 'To activate OAuth 2.0, make sure that Gmail API is enabled in the <a href="https://console.developers.google.com/apis/api/gmail/overview/" target="_blank">Google Developers Console</a>.'
                 error.label: Error during Authorization
                 success.label: Authorization was successfull
                 warning.label: If you disable this option, all users' mailboxes configured with Gmail OAuth 2.0, will become unavailable for synchronization.
             enable_microsoft_imap:
                 label: Enable Emails Sync
-                tooltip: Allows to enable and configure emails synchronization with Microsoft 365 for users. Please make sure that fields under the Azure Active Directory Application Settings are filled.
+                tooltip: Select the option to enable and configure emails synchronization with Microsoft 365 for users. Make sure to fill out the Azure Active Directory Application settings.
                 error.label: Error during Authorization
                 success.label: Authorization was successfull
                 warning.label: If you disable this option, all users' mailboxes configured with Microsoft Azure App OAuth 2.0, will become unavailable for synchronization.
@@ -42,10 +42,12 @@ oro.imap:
         user.label: User
         password.label: Password
         connect: Connect
+        reconnect: Reconnect
         connect_and_retrieve_folders: Check connection/Retrieve folders
         tooltip: If the value has changed, a new mailbox will be registered and all data from the currently configured mailbox will be lost.
         reset_email.label: Connected Account
         disconnect.label: Disconnect
+        reconnect_description: Email synchronization has been disabled. Please click Reconnect to enable the sync.
     oauth:
         manager:
             token.error: Invalid Token Response

@@ -8,10 +8,8 @@ use Oro\Bundle\ChartBundle\Model\Data\Transformer\PieChartDataTransformer;
 
 class PieChartDataTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var PieChartDataTransformer
-     */
-    protected $transformer;
+    /** @var PieChartDataTransformer */
+    private $transformer;
 
     protected function setUp(): void
     {

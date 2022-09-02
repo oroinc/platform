@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller;
 
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\OrganizationBundle\Provider\ScopeOrganizationCriteriaProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\ScopeUserCriteriaProvider;
@@ -107,7 +108,7 @@ class UserMenuController extends AbstractMenuController
     /**
      * {@inheritDoc}
      */
-    protected function getMenu($menuName, array $context)
+    protected function getMenu(string $menuName, array $context): ItemInterface
     {
         if (array_key_exists(ScopeUserCriteriaProvider::USER, $context)) {
             /** @var User $user */

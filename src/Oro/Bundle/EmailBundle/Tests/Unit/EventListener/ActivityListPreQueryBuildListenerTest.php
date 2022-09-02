@@ -11,11 +11,11 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ActivityListPreQueryBuildListener */
-    private $listener;
-
     /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
     private $doctrineHelper;
+
+    /** @var ActivityListPreQueryBuildListener */
+    private $listener;
 
     protected function setUp(): void
     {
@@ -37,7 +37,7 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPrepareIdsForEmailThreadWithoutThreadsEvent()
     {
-        $targetClass = Email::ENTITY_CLASS;
+        $targetClass = Email::class;
         $targetId = 1;
 
         $email = $this->createMock(Email::class);
@@ -54,7 +54,7 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testPrepareIdsForEmailThreadWithThreadsEvent()
     {
-        $targetClass = Email::ENTITY_CLASS;
+        $targetClass = Email::class;
         $targetId = 1;
         $expectedResult = [2, 3];
 

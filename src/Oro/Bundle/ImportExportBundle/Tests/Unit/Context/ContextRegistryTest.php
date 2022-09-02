@@ -7,12 +7,11 @@ use Oro\Bundle\BatchBundle\Entity\JobInstance;
 use Oro\Bundle\BatchBundle\Entity\StepExecution;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 use Oro\Bundle\ImportExportBundle\Context\StepExecutionProxyContext;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class ContextRegistryTest extends \PHPUnit\Framework\TestCase
 {
     /** @var ContextRegistry */
-    protected $registry;
+    private $registry;
 
     protected function setUp(): void
     {
@@ -37,11 +36,7 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
         static::assertNotSame($barContext, $barContext2);
     }
 
-    /**
-     * @param string $alias
-     * @return MockObject|StepExecution
-     */
-    protected function createStepExecution($alias = null)
+    private function createStepExecution(string $alias = null): StepExecution
     {
         $stepExecution = $this->createMock(StepExecution::class);
 

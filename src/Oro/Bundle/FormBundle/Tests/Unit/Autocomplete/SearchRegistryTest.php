@@ -36,7 +36,7 @@ class SearchRegistryTest extends \PHPUnit\Framework\TestCase
     public function testGetSearchHandlerFails()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Search handler "testNotExists" is not registered');
+        $this->expectExceptionMessage('Search handler "testNotExists" is not registered.');
 
         $this->searchRegistry->getSearchHandler('testNotExists');
     }

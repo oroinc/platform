@@ -10,24 +10,16 @@ use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class ResultTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var array
-     */
-    protected $items = [];
+    /** @var array */
+    private $items = [];
 
-    /**
-     * @var Result
-     */
-    protected $result;
+    /** @var Result */
+    private $result;
 
-    /**
-     * @var Result
-     */
-    protected $result1;
+    /** @var Result */
+    private $result1;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected static $aggregatedData = [
         'test_name' => [
             'field' => 'test_field_name',
@@ -109,7 +101,7 @@ class ResultTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('OroTestBundle:product', $from[1]);
 
         $whereExpression = $query->getCriteria()->getWhereExpression();
-        $this->assertInstanceOf('Doctrine\\Common\\Collections\\Expr\\Comparison', $whereExpression);
+        $this->assertInstanceOf(\Doctrine\Common\Collections\Expr\Comparison::class, $whereExpression);
         $this->assertEquals('text.name', $whereExpression->getField());
         $this->assertEquals(Comparison::CONTAINS, $whereExpression->getOperator());
         $this->assertEquals('test string', $whereExpression->getValue()->getValue());

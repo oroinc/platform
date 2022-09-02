@@ -9,10 +9,8 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
 
 class AddressTypeFixtureTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddressTypeFixture
-     */
-    protected $fixture;
+    /** @var AddressTypeFixture */
+    private $fixture;
 
     protected function setUp(): void
     {

@@ -1,0 +1,76 @@
+/* @theme: default; */
+
+.grid-body-cell {
+    position: relative;
+
+    .table & {
+        padding: $datagrid-body-cell-offset;
+
+        vertical-align: $datagrid-body-cell-vertical-align;
+    }
+
+    .table-sm & {
+        padding: $datagrid-body-cell-sm-offset;
+    }
+
+    .table-bordered & {
+        border-width: $datagrid-body-cell-border-width;
+    }
+
+    &.select-row-cell {
+        padding-left: $datagrid-body-select-row-cell-offset-start;
+    }
+
+    &.action-cell {
+        width: $datagrid-body-cell-action-cell-width;
+        padding-right: $datagrid-body-cell-action-offset;
+
+        text-align: $datagrid-body-cell-action-cell-text-align;
+    }
+
+    &.dropdown-action-cell {
+        padding-right: $datagrid-body-cell-dropdown-action-offset;
+    }
+
+    &-poNumber,
+    &-identifier,
+    &-email,
+    &-zip {
+        /* rtl:ignore */
+        direction: ltr;
+    }
+
+    .cell-link {
+        display: flex;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        user-select: all;
+
+        .cell-link-inner {
+            width: 100%;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        ~ * {
+            position: relative;
+            // Make elements invisible for events due to pass event to .cell-link
+            pointer-events: none;
+
+            $focusable-selectors: get-focusable-selectors();
+            // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
+            #{$focusable-selectors} {
+                pointer-events: auto;
+            }
+        }
+
+        $focusable-selectors-after-link: get-focusable-selectors($whole-list: false, $part-before: '~ ');
+        // The elements (~ a, ~ input, ~ .dropdown-menu, etc) behave as usual
+        #{$focusable-selectors-after-link} {
+            pointer-events: auto;
+        }
+    }
+}

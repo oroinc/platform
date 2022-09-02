@@ -1,0 +1,104 @@
+services:
+    oro_tag.api.tag_entities_association_handler:
+        class: Oro\Bundle\TagBundle\Api\Form\Handler\TagEntitiesAssociationHandler
+        arguments:
+            - '@oro_tag.tag.manager'
+
+    oro_tag.api.tags_association_handler:
+        class: Oro\Bundle\TagBundle\Api\Form\Handler\TagsAssociationHandler
+        arguments:
+            - '@oro_tag.tag.manager'
+
+    oro_tag.api.add_acceptable_entity_classes_to_tag_entities_association:
+        class: Oro\Bundle\TagBundle\Api\Processor\AddAcceptableEntityClassesToTagEntitiesAssociation
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+            - '@oro_api.resources_provider'
+        tags:
+            - { name: oro.api.processor, action: get_metadata, class: Oro\Bundle\TagBundle\Entity\Tag, priority: -90 }
+
+    oro_tag.api.compute_tag_entities:
+        class: Oro\Bundle\TagBundle\Api\Processor\ComputeTagEntities
+        arguments:
+            - '@oro_api.customize_loaded_data.multi_target_association_data_loader'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true, class: Oro\Bundle\TagBundle\Entity\Tag }
+
+    oro_tag.api.load_tag_entities_association:
+        class: Oro\Bundle\TagBundle\Api\Processor\LoadTagEntitiesAssociation
+        arguments:
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: load_data, association: entities, parentClass: Oro\Bundle\TagBundle\Entity\Tag }
+            - { name: oro.api.processor, action: get_relationship, group: load_data, association: entities, parentClass: Oro\Bundle\TagBundle\Entity\Tag }
+
+    oro_tag.api.handle_tag_entities_association:
+        class: Oro\Bundle\TagBundle\Api\Processor\HandleTagEntitiesAssociation
+        arguments:
+            - '@oro_tag.api.tag_entities_association_handler'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_flush_data, parentAction: create|update, class: Oro\Bundle\TagBundle\Entity\Tag }
+
+    oro_tag.api.handle_tag_entities_relationship:
+        class: Oro\Bundle\TagBundle\Api\Processor\HandleTagEntitiesRelationship
+        arguments:
+            - '@oro_tag.api.tag_entities_association_handler'
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, parentClass: Oro\Bundle\TagBundle\Entity\Tag, association: entities, priority: -150 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, parentClass: Oro\Bundle\TagBundle\Entity\Tag, association: entities, priority: -150 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, parentClass: Oro\Bundle\TagBundle\Entity\Tag, association: entities, priority: -150 }
+
+    oro_tag.api.add_tags_association:
+        class: Oro\Bundle\TagBundle\Api\Processor\AddTagsAssociation
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', priority: -10 }
+
+    oro_tag.api.add_activity_association_descriptions:
+        class: Oro\Bundle\TagBundle\Api\Processor\AddTagsAssociationDescriptions
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.complete_descriptions.resource_doc_parser_provider'
+            - '@oro_api.entity_name_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -208 }
+
+    oro_tag.api.compute_tags:
+        class: Oro\Bundle\TagBundle\Api\Processor\ComputeTags
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_serializer'
+            - '@oro_security.acl_helper'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true }
+
+    oro_tag.api.update_tags_association_query:
+        class: Oro\Bundle\TagBundle\Api\Processor\AddParentEntityIdToTagsSubresourceQuery
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -140 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -140 }
+
+    oro_tag.api.handle_tags_association:
+        class: Oro\Bundle\TagBundle\Api\Processor\HandleTagsAssociation
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+            - '@oro_tag.api.tags_association_handler'
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_flush_data, parentAction: create|update }
+
+    oro_tag.api.handle_tags_relationship:
+        class: Oro\Bundle\TagBundle\Api\Processor\HandleTagsRelationship
+        arguments:
+            - '@oro_tag.helper.taggable_helper'
+            - '@oro_tag.api.tags_association_handler'
+        tags:
+            - { name: oro.api.processor, action: add_relationship, group: transform_data, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -150 }
+            - { name: oro.api.processor, action: delete_relationship, group: transform_data, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -150 }
+            - { name: oro.api.processor, action: update_relationship, group: transform_data, class: Oro\Bundle\TagBundle\Entity\Tag, association: tags, priority: -150 }

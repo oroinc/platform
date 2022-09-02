@@ -142,36 +142,18 @@ class DatagridConfiguration extends ConfigObject
 
     /**
      * Get value of "acl_resource" option from datagrid configuration.
-     *
-     * @return string|null
      */
-    public function getAclResource()
+    public function getAclResource(): ?string
     {
-        if ($this->offsetExistByPath(self::ACL_RESOURCE_PATH)) {
-            $result = $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
-        } else {
-            // @deprecated Since 1.9. Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath('[source][acl_resource]', false);
-        }
-
-        return $result;
+        return $this->offsetGetByPath(self::ACL_RESOURCE_PATH);
     }
 
     /**
      * Check if ACL apply to source query of datagrid should be skipped
-     *
-     * @return bool
      */
-    public function isDatasourceSkipAclApply()
+    public function isDatasourceSkipAclApply(): bool
     {
-        if ($this->offsetExistByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH)) {
-            $result = $this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH);
-        } else {
-            // @deprecated Since 1.9. Support backward compatibility until 1.11 to get this option from deprecated path.
-            $result = $this->offsetGetByPath('[options][skip_acl_check]', false);
-        }
-
-        return (bool)$result;
+        return (bool)$this->offsetGetByPath(self::DATASOURCE_SKIP_ACL_APPLY_PATH);
     }
 
     /**

@@ -23,6 +23,7 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class FormContext extends OroFeatureContext implements OroPageObjectAware
 {
@@ -234,7 +235,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
                 self::assertEquals(
                     $value,
                     $error,
-                    "Failed asserting that $label has error $value"
+                    "Failed asserting that $label has error $value. Actual value: $error"
                 );
             }
         });
@@ -529,9 +530,50 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         $element->check();
     }
 
+    /**
+     * @Given /^(?:|I )uncheck "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field$/
+     */
+    public function uncheckElementForField(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        $field->uncheckField($elementName);
+    }
+
+    /**
+     * @Given /^(?:|I )check "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field$/
+     */
+    public function checkElementForField(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        $field->checkField($elementName);
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field should be unchecked$/
+     */
+    public function elementForFieldShouldBeUnchecked(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasUncheckedField($elementName));
+    }
+
+    /**
+     * @Then /^the "(?P<elementName>[^"]*)" element for "(?P<fieldName>[^"]*)" field should be checked$/
+     */
+    public function elementForFieldShouldBeChecked(string $elementName, string $fieldName): void
+    {
+        $field = $this->createOroForm()->findField($fieldName);
+        self::assertTrue($field->isIsset(), sprintf('Field "%s" not found', $fieldName));
+        self::assertTrue($field->hasCheckedField($elementName));
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select:$/
+     * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *
@@ -561,13 +603,14 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
             $element->focus();
             $options = $element->getSearchResults();
             $optionsValue = [];
-            /** @var Element $element */
-            foreach ($options as $element) {
-                $optionsValue[] = $element->getText();
+            /** @var Element $option */
+            foreach ($options as $option) {
+                $optionsValue[] = $option->getText();
             }
             foreach ($optionLabels as $optionLabel) {
                 static::assertContains($optionLabel, $optionsValue);
             }
+            $element->close();
         } elseif ($element instanceof Select) {
             /** @var NodeElement[] $options */
             $options = $element->findAll('css', 'option');
@@ -587,6 +630,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
     //@codingStandardsIgnoreStart
     /**
      * @Then /^(?:|I )should not see the following options for "(?P<field>[^"]*)" select:$/
+     * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)":$/
      * @Then /^(?:|I )should not see the following options for "(?P<label>[^"]*)" select in form "(?P<formName>(?:[^"]|\\")*)" pre-filled with "(?P<value>(?:[^"]|\\")*)":$/
      *

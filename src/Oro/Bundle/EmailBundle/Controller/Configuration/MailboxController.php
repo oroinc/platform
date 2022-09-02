@@ -13,6 +13,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -29,8 +30,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MailboxController extends AbstractController
 {
-    const ACTIVE_GROUP    = 'platform';
-    const ACTIVE_SUBGROUP = 'email_configuration';
+    private const ACTIVE_GROUP = 'platform';
+    private const ACTIVE_SUBGROUP = 'email_configuration';
 
     /**
      * @Route(
@@ -42,33 +43,20 @@ class MailboxController extends AbstractController
      *      class="OroEmailBundle:Mailbox"
      * )
      * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
-     *
-     * @param Mailbox $mailbox
-     * @param Request $request
-     *
-     * @return array
      */
-    public function updateAction(Mailbox $mailbox, Request $request)
+    public function updateAction(Mailbox $mailbox, Request $request): array|RedirectResponse
     {
         return $this->update($mailbox, $request);
     }
 
     /**
      * Prepares and handles data of Mailbox update/create form.
-     *
-     * @param Mailbox $mailbox
-     * @param Request $request
-     *
-     * @return array
      */
-    private function update(Mailbox $mailbox, Request $request)
+    private function update(Mailbox $mailbox, Request $request): array|RedirectResponse
     {
         $provider = $this->get(SystemConfigurationFormProvider::class);
-
         [$activeGroup, $activeSubGroup] = $provider->chooseActiveGroups(self::ACTIVE_GROUP, self::ACTIVE_SUBGROUP);
-
         $jsTree = $provider->getJsTree();
-
         $handler = $this->get(MailboxHandler::class);
 
         if ($handler->process($mailbox)) {
@@ -80,14 +68,10 @@ class MailboxController extends AbstractController
                 )
             );
 
-            return $this->get(Router::class)->redirectAfterSave(
-                [
-                    'route' => 'oro_email_mailbox_update',
-                    'parameters' => ['id' => $mailbox->getId()]
-                ],
-                $this->getRedirectData($request),
-                $mailbox
-            );
+            return $this->get(Router::class)->redirect([
+                'route' => 'oro_email_mailbox_update',
+                'id'    => $mailbox->getId()
+            ]);
         }
 
         return [
@@ -102,12 +86,8 @@ class MailboxController extends AbstractController
     /**
      * @Route("/mailbox/create", name="oro_email_mailbox_create")
      * @Template("@OroEmail/Configuration/Mailbox/update.html.twig")
-     *
-     * @param Request      $request
-     *
-     * @return array
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request): array|RedirectResponse
     {
         return $this->update(new Mailbox(), $request);
     }
@@ -118,12 +98,8 @@ class MailboxController extends AbstractController
      *      "mailbox",
      *      class="OroEmailBundle:Mailbox"
      * )
-     *
-     * @param Mailbox $mailbox
-     *
-     * @return Response
      */
-    public function deleteAction(Mailbox $mailbox)
+    public function deleteAction(Mailbox $mailbox): Response
     {
         $mailboxManager = $this->getDoctrine()->getManagerForClass('OroEmailBundle:Mailbox');
         $mailboxManager->remove($mailbox);
@@ -139,28 +115,19 @@ class MailboxController extends AbstractController
      *      "/mailbox/users/search/{organizationId}",
      *      name="oro_email_mailbox_users_search"
      * )
-     *
-     * @param Request $request
-     * @param int     $organizationId
-     *
-     * @return JsonResponse
      */
-    public function searchUsersAction(Request $request, $organizationId)
+    public function searchUsersAction(Request $request, int $organizationId): JsonResponse
     {
         $autocompleteRequest = new AutocompleteRequest($request);
-        $validator           = $this->get(ValidatorInterface::class);
-        $isXmlHttpRequest    = $request->isXmlHttpRequest();
-        $code                = 200;
-        $result              = [
+        $result = [
             'results' => [],
             'hasMore' => false,
             'errors'  => []
         ];
 
-        if ($violations = $validator->validate($autocompleteRequest)) {
-            foreach ($violations as $violation) {
-                $result['errors'][] = $violation->getMessage();
-            }
+        $violations = $this->get(ValidatorInterface::class)->validate($autocompleteRequest);
+        foreach ($violations as $violation) {
+            $result['errors'][] = $violation->getMessage();
         }
 
         if (!$this->get(Security::class)->isAutocompleteGranted($autocompleteRequest->getName())) {
@@ -168,11 +135,11 @@ class MailboxController extends AbstractController
         }
 
         if (!empty($result['errors'])) {
-            if ($isXmlHttpRequest) {
-                return new JsonResponse($result, $code);
+            if ($request->isXmlHttpRequest()) {
+                return new JsonResponse($result);
             }
 
-            throw new HttpException($code, implode(', ', $result['errors']));
+            throw new HttpException(Response::HTTP_OK, implode(', ', $result['errors']));
         }
 
         $searchHandler = $this->get(MailboxUserSearchHandler::class);
@@ -188,12 +155,7 @@ class MailboxController extends AbstractController
         );
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return array
-     */
-    protected function getRedirectData(Request $request)
+    protected function getRedirectData(Request $request): array
     {
         return $request->query->get(
             'redirectData',
@@ -208,9 +170,9 @@ class MailboxController extends AbstractController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public static function getSubscribedServices()
+    public static function getSubscribedServices(): array
     {
         return array_merge(
             parent::getSubscribedServices(),

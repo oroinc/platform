@@ -15,7 +15,6 @@ use Doctrine\ORM\Mapping\EntityListenerResolver;
 use Oro\Bundle\EntityBundle\ORM\OroClassMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Async\OrmMetadataFactoryClearer;
 use Oro\Component\Testing\ReflectionUtil;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Doctrine\ContainerAwareEventManager;
 use Symfony\Component\DependencyInjection\Container;
@@ -25,7 +24,7 @@ use Symfony\Component\DependencyInjection\Container;
  */
 class OrmMetadataFactoryClearerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|Container */
+    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     /** @var OrmMetadataFactoryClearer */

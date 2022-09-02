@@ -33,11 +33,6 @@ class TestEmailOwner implements EmailOwnerInterface
         }
     }
 
-    public function getClass()
-    {
-        return self::class;
-    }
-
     public function getEmailFields()
     {
         return $this->emailFields;

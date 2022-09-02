@@ -1,0 +1,50 @@
+Oro\Bundle\EmailBundle\Entity\Mailbox:
+    test_mailbox:
+        email: test@test.com
+        label: test system mailbox
+        origin: '@test_origin'
+        organization: '@organization'
+
+Oro\Bundle\ImapBundle\Entity\UserEmailOrigin:
+    test_origin:
+        isActive: true
+        mailboxName: useremailorigin
+        organization: '@organization'
+        mailbox: '@test_mailbox'
+        imapHost: 127.0.0.1
+        imapPort: 1000
+        imapEncryption: ssl
+        user: test@test.com
+        password: test
+
+Oro\Bundle\EmailBundle\Entity\EmailFolder:
+    inbox_folder:
+        name: Inbox
+        fullName: Inbox
+        type: inbox
+        syncEnabled: true
+        origin: '@test_origin'
+    send_folder:
+        name: Sent
+        fullName: Sent
+        type: sent
+        syncEnabled: true
+        origin: '@test_origin'
+    another1_folder:
+        name: Another1
+        fullName: Another1
+        type: other
+        syncEnabled: true
+        origin: '@test_origin'
+    another2_folder:
+        name: Another2
+        fullName: Another2
+        type: other
+        syncEnabled: true
+        origin: '@test_origin'
+    another3_folder:
+        name: Another3
+        fullName: Another3
+        type: other
+        syncEnabled: true
+        origin: '@test_origin'

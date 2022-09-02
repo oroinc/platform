@@ -51,9 +51,6 @@ class AccessRuleWalkerTest extends OrmTestCase
             new AnnotationReader(),
             'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
         ));
-        $this->em->getConfiguration()->setEntityNamespaces([
-            'Test' => 'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS'
-        ]);
 
         $this->rule = new DynamicAccessRule();
         $container = $this->createMock(ContainerInterface::class);
@@ -72,13 +69,29 @@ class AccessRuleWalkerTest extends OrmTestCase
         );
     }
 
+    private function prepareQuery(Query $dqlQuery, array $contextOptions = []): void
+    {
+        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
+        foreach ($contextOptions as $optionName => $optionValue) {
+            $context->setOption($optionName, $optionValue);
+        }
+        $dqlQuery->setHint(AccessRuleWalker::CONTEXT, $context);
+        $dqlQuery->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
+    }
+
+    private function assertResultQueryEquals(string $expectedQuery, Query $dqlQuery, array $contextOptions = []): void
+    {
+        $this->prepareQuery($dqlQuery, $contextOptions);
+        $this->assertEquals($expectedQuery, $dqlQuery->getSQL());
+    }
+
     public function testWalkerWithEmptyRules()
     {
         $this->rule->setRule(function (Criteria $criteria) {
             return;
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -90,10 +103,10 @@ class AccessRuleWalkerTest extends OrmTestCase
     public function testWalkerWithSimpleComparisonExpression()
     {
         $this->rule->setRule(function (Criteria $criteria) {
-            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -107,10 +120,10 @@ class AccessRuleWalkerTest extends OrmTestCase
     public function testWalkerQueryWithWhereAndWithSimpleComparisonExpression()
     {
         $this->rule->setRule(function (Criteria $criteria) {
-            $criteria->orExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+            $criteria->orExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->setParameter('country', 'US')
@@ -126,12 +139,12 @@ class AccessRuleWalkerTest extends OrmTestCase
     public function testWalkerQueryWithWhereAndWithCompositeExpression()
     {
         $this->rule->setRule(function (Criteria $criteria) {
-            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
             $criteria->orExpression(new Comparison(new Path('user'), Comparison::EQ, 20));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->setParameter('country', 'US')
@@ -148,11 +161,11 @@ class AccessRuleWalkerTest extends OrmTestCase
     public function testWalkerQueryWithWhereAndWithOrCompositeExpression()
     {
         $this->rule->setRule(function (Criteria $criteria) {
-            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+            $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
             $criteria->orExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->setParameter('country', 'US')
@@ -172,7 +185,7 @@ class AccessRuleWalkerTest extends OrmTestCase
                 new CompositeExpression(
                     CompositeExpression::TYPE_OR,
                     [
-                        new Comparison(new Path('user'), Comparison::NIN, [1,2,3,4,5]),
+                        new Comparison(new Path('user'), Comparison::NIN, [1, 2, 3, 4, 5]),
                         new Comparison(new Path('user'), Comparison::GTE, 20)
                     ]
                 )
@@ -180,7 +193,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->where('address.country = :country')
             ->orWhere('address.zip = :zip')
@@ -214,7 +227,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join('user.address', 'address', 'WITH', 'address.id > 0')
             ->getQuery();
@@ -239,7 +252,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join('user.address', 'address', 'WITH', 'address.id > 0')
             ->getQuery();
@@ -263,14 +276,9 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
-            ->join(
-                'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-                'address',
-                'WITH',
-                'address.user = user.id AND address = 1'
-            )
+            ->join(CmsAddress::class, 'address', 'WITH', 'address.user = user.id AND address = 1')
             ->getQuery();
 
         $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
@@ -292,14 +300,9 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
-            ->join(
-                'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-                'address',
-                'WITH',
-                'address.user = user.id AND address = 1'
-            )
+            ->join(CmsAddress::class, 'address', 'WITH', 'address.user = user.id AND address = 1')
             ->getQuery();
 
         $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
@@ -321,14 +324,9 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
-            ->join(
-                'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-                'address',
-                'WITH',
-                'address.user = user.id AND address = 1'
-            )
+            ->join(CmsAddress::class, 'address', 'WITH', 'address.user = user.id AND address = 1')
             ->getQuery();
 
         $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
@@ -350,7 +348,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $qb = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u');
+        $qb = $this->em->getRepository(CmsUser::class)->createQueryBuilder('u');
         $query = $qb->select('u.id')
             ->where(
                 $qb->expr()->in(
@@ -384,7 +382,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $qb = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u');
+        $qb = $this->em->getRepository(CmsUser::class)->createQueryBuilder('u');
         $query = $qb->select('u.id')
             ->where('u.id > 0')
             ->andWhere(
@@ -423,7 +421,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         $context->setOption(AclHelper::CHECK_RELATIONS, false);
         $originalContext = clone $context;
 
-        $qb = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u');
+        $qb = $this->em->getRepository(CmsUser::class)->createQueryBuilder('u');
         $query = $qb->select('u.id')
             ->join('u.address', 'a')
             ->where(
@@ -471,7 +469,7 @@ class AccessRuleWalkerTest extends OrmTestCase
                     new Comparison(new Path('name', 'users'), Comparison::EQ, 'test')
                 );
 
-                $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
                 $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
                 $criteria->orExpression(
                     new Exists(
@@ -490,7 +488,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('article')
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('article')
             ->select('article.id')
             ->getQuery();
 
@@ -516,7 +514,7 @@ class AccessRuleWalkerTest extends OrmTestCase
                     new Comparison(new Path('name', 'users'), Comparison::EQ, 'test')
                 );
 
-                $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1,2,3,4,5]));
+                $criteria->andExpression(new Comparison(new Path('user'), Comparison::IN, [1, 2, 3, 4, 5]));
                 $criteria->orExpression(
                     new Exists(
                         new Subquery(
@@ -534,7 +532,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('article')
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('article')
             ->select('article.id')
             ->getQuery();
 
@@ -556,7 +554,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->orExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -572,7 +570,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('user'), Comparison::LT, 5));
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -597,7 +595,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         });
 
         $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')->getQuery();
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
         $query->getSQL();
@@ -617,7 +615,7 @@ class AccessRuleWalkerTest extends OrmTestCase
         });
 
         $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('u')->getQuery();
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('u')->getQuery();
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
         $query->setHint(AccessRuleWalker::CONTEXT, $context);
         $query->getSQL();
@@ -635,7 +633,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsAddress')->createQueryBuilder('address')
+        $query = $this->em->getRepository(CmsAddress::class)->createQueryBuilder('address')
             ->select('address.id')
             ->getQuery();
 
@@ -659,7 +657,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
             ->join('user.address', 'address', 'WITH', 'address.id > 0')
             ->getQuery();
@@ -686,14 +684,9 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id, address.country')
-            ->join(
-                'Oro\Bundle\SecurityBundle\Tests\Unit\Fixtures\Models\CMS\CmsAddress',
-                'address',
-                'WITH',
-                'address.user = user.id AND address = 1'
-            )
+            ->join(CmsAddress::class, 'address', 'WITH', 'address.user = user.id AND address = 1')
             ->getQuery();
 
         $expectedQuery = 'SELECT c0_.id AS id_0, c1_.country AS country_1'
@@ -719,7 +712,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $qb = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('a');
+        $qb = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('a');
         $query = $qb->select('a.id')
             ->where($qb->expr()->in('a.user', 'SELECT users.id FROM ' . CmsUser::class . ' users'))
             ->getQuery();
@@ -745,7 +738,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
         });
 
-        $qb = $this->em->getRepository('Test:CmsArticle')->createQueryBuilder('article');
+        $qb = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('article');
         $query = $qb->select('article.id')
             ->join(
                 'article.user',
@@ -786,7 +779,7 @@ class AccessRuleWalkerTest extends OrmTestCase
             }
         });
 
-        $query = $this->em->getRepository('Test:CmsUser')->createQueryBuilder('user')
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('user')
             ->select('user.id')
             ->getQuery();
 
@@ -798,15 +791,180 @@ class AccessRuleWalkerTest extends OrmTestCase
         $this->assertResultQueryEquals($expectedQuery, $query);
     }
 
-    private function assertResultQueryEquals(string $expectedQuery, Query $dqlQuery, array $contextOptions = []): void
+    public function testWalkerWithContainsExpressionForStringField()
     {
-        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
-        foreach ($contextOptions as $optionName => $optionValue) {
-            $context->setOption($optionName, $optionValue);
-        }
-        $dqlQuery->setHint(AccessRuleWalker::CONTEXT, $context);
-        $dqlQuery->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('topic'), Comparison::CONTAINS, 'test'));
+        });
 
-        $this->assertEquals($expectedQuery, $dqlQuery->getSQL());
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0 FROM cms_articles c0_ WHERE c0_.topic LIKE \'%test%\'';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithContainsExpressionForStringFieldForNotStringValue()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The right operand for string CONTAINS comparison must be a string.');
+
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('topic'), Comparison::CONTAINS, null));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->getQuery();
+
+        $this->prepareQuery($query);
+        $query->getSQL();
+    }
+
+    public function testWalkerWithContainsExpressionForJsonArrayField()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, 'val'));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_articles c0_'
+            . ' WHERE c0_.types LIKE \'%"val"%\'';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithContainsExpressionWithOneValueInArrayForJsonArrayField()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, 'val'));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_articles c0_'
+            . ' WHERE c0_.types LIKE \'%"val"%\'';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithContainsExpressionWithSeveralValuesForJsonArrayField()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, ['val1', 'val2']));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_articles c0_'
+            . ' WHERE (c0_.types LIKE \'%"val1"%\' OR c0_.types LIKE \'%"val2"%\')';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithContainsExpressionWithSeveralValuesForJsonArrayFieldAndWhereNotEmpty()
+    {
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, ['val1', 'val2']));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id > 0')
+            ->getQuery();
+
+        $expectedQuery = 'SELECT c0_.id AS id_0'
+            . ' FROM cms_articles c0_'
+            . ' WHERE c0_.id > 0 AND (c0_.types LIKE \'%"val1"%\' OR c0_.types LIKE \'%"val2"%\')';
+
+        $this->assertResultQueryEquals($expectedQuery, $query);
+    }
+
+    public function testWalkerWithContainsExpressionWithNoValuesInArrayForJsonArrayField()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The right operand for JSON array CONTAINS comparison must be a string or not empty array.'
+        );
+
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, []));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id > 0')
+            ->getQuery();
+
+        $this->prepareQuery($query);
+        $query->getSQL();
+    }
+
+    public function testWalkerWithContainsExpressionWithNotStringAndNotArrayValueForJsonArrayField()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            'The right operand for JSON array CONTAINS comparison must be a string or not empty array.'
+        );
+
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, null));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id > 0')
+            ->getQuery();
+
+        $this->prepareQuery($query);
+        $query->getSQL();
+    }
+
+    public function testWalkerWithContainsExpressionForJsonArrayFieldWhenLeftOperandIsNotPath()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The left operand for CONTAINS comparison must be a path.');
+
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison('val', Comparison::CONTAINS, new Path('types')));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id > 0')
+            ->getQuery();
+
+        $this->prepareQuery($query);
+        $query->getSQL();
+    }
+
+    public function testWalkerWithContainsExpressionForJsonArrayFieldWhenRightOperandIsNotValue()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The left operand for CONTAINS comparison must be a value.');
+
+        $this->rule->setRule(function (Criteria $criteria) {
+            $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, new Path('types')));
+        });
+
+        $query = $this->em->getRepository(CmsArticle::class)->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.id > 0')
+            ->getQuery();
+
+        $this->prepareQuery($query);
+        $query->getSQL();
     }
 }

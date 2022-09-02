@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\EventListener;
 
+use Knp\Menu\ItemInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -43,17 +44,14 @@ class NavigationListener
 
     public function onNavigationConfigure(ConfigureMenuEvent $event)
     {
-        $children = [];
         $entitiesMenuItem = MenuUpdateUtils::findMenuItem($event->getMenu(), 'entities_list');
         if ($entitiesMenuItem !== null) {
+            $children = [];
             /** @var ConfigProvider $entityConfigProvider */
             $entityConfigProvider = $this->configManager->getProvider('entity');
-
             /** @var ConfigProvider $entityExtendProvider */
             $entityExtendProvider = $this->configManager->getProvider('extend');
-
             $extendConfigs = $entityExtendProvider->getConfigs();
-
             foreach ($extendConfigs as $extendConfig) {
                 if ($this->checkAvailability($extendConfig)) {
                     $config = $entityConfigProvider->getConfig($extendConfig->getId()->getClassname());
@@ -73,16 +71,14 @@ class NavigationListener
                             ],
                             'extras'          => [
                                 'safe_label'  => true,
-                                'routes'      => array('oro_entity_*')
+                                'routes'      => ['oro_entity_*']
                             ],
                         ]
                     ];
                 }
             }
-
-            sort($children);
-            foreach ($children as $child) {
-                $entitiesMenuItem->addChild($child['label'], $child['options']);
+            if ($children) {
+                $this->addChildren($entitiesMenuItem, $children);
             }
         }
     }
@@ -96,10 +92,21 @@ class NavigationListener
     {
         return
             $extendConfig->is('is_extend')
-            && $extendConfig->get('owner') == ExtendScope::OWNER_CUSTOM
-            && $extendConfig->in(
-                'state',
-                [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]
-            );
+            && $extendConfig->get('owner') === ExtendScope::OWNER_CUSTOM
+            && $extendConfig->in('state', [ExtendScope::STATE_ACTIVE, ExtendScope::STATE_UPDATE]);
+    }
+
+    private function addChildren(ItemInterface $entitiesMenuItem, array $children): void
+    {
+        sort($children);
+        foreach ($children as $child) {
+            $entitiesMenuItem->addChild($child['label'], $child['options']);
+        }
+        if ($entitiesMenuItem->getExtra('no_children_in_config')
+            && !$entitiesMenuItem->getExtra('isAllowed')
+            && $entitiesMenuItem->getDisplayChildren()
+        ) {
+            $entitiesMenuItem->setExtra('isAllowed', true);
+        }
     }
 }

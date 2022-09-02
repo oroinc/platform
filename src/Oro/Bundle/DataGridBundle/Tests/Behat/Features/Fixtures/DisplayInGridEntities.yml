@@ -15,7 +15,7 @@ Oro\Bundle\TagBundle\Entity\Tag:
 Oro\Bundle\TagBundle\Entity\Taxonomy:
   taxonomy_entity:
     name: 'New Taxonomy'
-    backgroundColor: 'l7'
+    backgroundColor: '#ff0000'
     owner: '@admin'
     organization: '@organization'
 

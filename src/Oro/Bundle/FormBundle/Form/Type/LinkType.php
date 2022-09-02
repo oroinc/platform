@@ -8,6 +8,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for a link.
+ */
 class LinkType extends AbstractType
 {
     /**
@@ -15,21 +18,12 @@ class LinkType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        // @todo remove 'isPath', 'class' options after BAP-4696 implementation
         $resolver
-            ->setRequired(['route', 'acl', 'title'])
-            ->setDefined([
-                'routeParameters',
-                'isPath',
-                'class'
-            ])
-            ->setDefaults([
-                'routeParameters' => [],
-                'isPath'          => false,
-                'class'           => ''
-            ])
+            ->setRequired(['route', 'title'])
+            ->setDefined(['acl', 'routeParameters'])
+            ->setDefaults(['acl' => null, 'routeParameters' => []])
             ->setAllowedTypes('route', 'string')
-            ->setAllowedTypes('acl', 'string')
+            ->setAllowedTypes('acl', ['string', 'null'])
             ->setAllowedTypes('title', 'string');
     }
 
@@ -38,13 +32,10 @@ class LinkType extends AbstractType
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['route']           = $options['route'];
-        $view->vars['acl']             = $options['acl'];
-        $view->vars['title']           = $options['title'];
+        $view->vars['title'] = $options['title'];
+        $view->vars['route'] = $options['route'];
         $view->vars['routeParameters'] = $options['routeParameters'];
-        // @todo remove 'isPath', 'class' options after BAP-4696 implementation
-        $view->vars['isPath']          = $options['isPath'];
-        $view->vars['class']           = $options['class'];
+        $view->vars['acl'] = $options['acl'];
     }
 
     /**

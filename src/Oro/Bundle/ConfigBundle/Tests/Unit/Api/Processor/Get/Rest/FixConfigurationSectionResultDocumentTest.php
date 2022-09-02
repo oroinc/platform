@@ -8,7 +8,7 @@ use Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\FixConfigurationSectionResult
 class FixConfigurationSectionResultDocumentTest extends GetProcessorTestCase
 {
     /** @var FixConfigurationSectionResultDocument */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {

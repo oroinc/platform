@@ -113,8 +113,8 @@ class QueueConsumer
         $logger->info('Start consuming');
 
         while (true) {
-            try {
-                foreach ($this->boundMessageProcessors as $queueName => $messageProcessorName) {
+            foreach ($this->boundMessageProcessors as $queueName => $messageProcessorName) {
+                try {
                     $logger->debug(sprintf('Switch to a queue %s', $queueName));
 
                     $context = new Context($session);
@@ -124,31 +124,35 @@ class QueueConsumer
                     $context->setMessageProcessorName($messageProcessorName);
 
                     $this->doConsume($extension, $context);
-                }
-            } catch (ConsumptionInterruptedException $e) {
-                $logger->warning(sprintf('Consuming interrupted, reason: %s', $e->getMessage()));
+                } catch (ConsumptionInterruptedException $e) {
+                    $logger->warning(\sprintf(
+                        'Consuming interrupted. Queue: "%s", reason: "%s"',
+                        $queueName,
+                        $e->getMessage()
+                    ));
 
-                $extension->onInterrupted($context);
-                $session->close();
-
-                return;
-            } catch (RejectMessageExceptionInterface $exception) {
-                $context->setException($exception);
-                $context->getMessageConsumer()->reject($context->getMessage());
-                $session->close();
-                throw $exception;
-            } catch (\Exception $exception) {
-                $context->setExecutionInterrupted(true);
-                $context->setException($exception);
-
-                try {
-                    $this->onInterruptionByException($extension, $context);
-                    $session->close();
-                } catch (\Exception $e) {
-                    // for some reason finally does not work here on php5.5
+                    $extension->onInterrupted($context);
                     $session->close();
 
-                    throw $e;
+                    return;
+                } catch (RejectMessageExceptionInterface $exception) {
+                    $context->setException($exception);
+                    $context->getMessageConsumer()->reject($context->getMessage());
+                    $session->close();
+                    throw $exception;
+                } catch (\Exception $exception) {
+                    $context->setExecutionInterrupted(true);
+                    $context->setException($exception);
+
+                    try {
+                        $this->onInterruptionByException($extension, $context);
+                        $session->close();
+                    } catch (\Exception $e) {
+                        // for some reason finally does not work here on php5.5
+                        $session->close();
+
+                        throw $e;
+                    }
                 }
             }
         }

@@ -15,24 +15,15 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  * as a process that sent the message.
  * Also the "security_agnostic_processors" option can be used to disable changing the security context
  * for some processors.
- * For details see "Resources/doc/security_context.md".
+ * For details see {@link https://doc.oroinc.com/master/backend/mq/security-context/}.
  */
 class SecurityAwareConsumptionExtension extends AbstractExtension
 {
     /** @var array [processor name => TRUE, ...] */
-    private $securityAgnosticProcessors;
+    private array $securityAgnosticProcessors;
+    private TokenStorageInterface $tokenStorage;
+    private TokenSerializerInterface  $tokenSerializer;
 
-    /** @var TokenStorageInterface */
-    private $tokenStorage;
-
-    /** @var TokenSerializerInterface */
-    private $tokenSerializer;
-
-    /**
-     * @param string[]                 $securityAgnosticProcessors
-     * @param TokenStorageInterface    $tokenStorage
-     * @param TokenSerializerInterface $tokenSerializer
-     */
     public function __construct(
         array $securityAgnosticProcessors,
         TokenStorageInterface $tokenStorage,
@@ -44,9 +35,9 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function onPreReceived(Context $context)
+    public function onPreReceived(Context $context): void
     {
         if (isset($this->securityAgnosticProcessors[$context->getMessageProcessorName()])) {
             return;
@@ -60,19 +51,17 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
             if (null === $token) {
                 $exception = new InvalidSecurityTokenException();
                 $context->getLogger()->error($exception->getMessage());
-
                 throw $exception;
-            } else {
-                $context->getLogger()->debug('Set security token');
-                $this->tokenStorage->setToken($token);
             }
+            $context->getLogger()->debug('Set security token');
+            $this->tokenStorage->setToken($token);
         }
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function onPostReceived(Context $context)
+    public function onPostReceived(Context $context): void
     {
         // reset the security context after processing of each message
         $this->tokenStorage->setToken(null);

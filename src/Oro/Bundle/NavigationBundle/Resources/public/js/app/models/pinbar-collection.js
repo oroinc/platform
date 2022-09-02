@@ -12,9 +12,10 @@ define(function(require) {
             PinbarCollection.__super__.constructor.apply(this, args);
         },
 
-        getCurrentModel: function() {
-            return this.find(function(model) {
-                return mediator.execute('compareNormalizedUrl', model.get('url'), {ignoreGetParameters: ['restore']});
+        getCurrentModel() {
+            return this.find(model => {
+                return model.get('url') !== null &&
+                    mediator.execute('compareNormalizedUrl', model.get('url'), {ignoreGetParameters: ['restore']});
             });
         }
     });

@@ -5,12 +5,14 @@ namespace Oro\Bundle\TranslationBundle\Manager;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
  * Provides functionality to manage translations that are stored in the database.
@@ -22,6 +24,9 @@ class TranslationManager
     private ManagerRegistry $doctrine;
     private TranslationDomainProvider $domainProvider;
     private DynamicTranslationCache $dynamicTranslationCache;
+    private MessageProducerInterface $producer;
+    /** @var string[] */
+    private array $jsTranslationDomains;
 
     /** @var Language[] */
     private array $languages = [];
@@ -35,11 +40,15 @@ class TranslationManager
     public function __construct(
         ManagerRegistry $doctrine,
         TranslationDomainProvider $domainProvider,
-        DynamicTranslationCache $dynamicTranslationCache
+        DynamicTranslationCache $dynamicTranslationCache,
+        MessageProducerInterface $producer,
+        array $jsTranslationDomains
     ) {
         $this->doctrine = $doctrine;
         $this->domainProvider = $domainProvider;
         $this->dynamicTranslationCache = $dynamicTranslationCache;
+        $this->producer = $producer;
+        $this->jsTranslationDomains = $jsTranslationDomains;
     }
 
     /**
@@ -143,13 +152,32 @@ class TranslationManager
     }
 
     /**
-     * Flushes all changes.
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * Flushes all changes and dumps JS translations if they are changed.
      */
     public function flush(bool $force = false): void
     {
         $em = $this->getEntityManager(Translation::class);
+        [$locales, $domains] = $this->prepareData($em);
+        $this->flushData($em, $force, $locales);
+        if ($this->hasJsTranslations($domains)) {
+            $this->producer->send(DumpJsTranslationsTopic::getName(), []);
+        }
+    }
 
+    /**
+     * Flushes all changes without dumping JS translations.
+     */
+    public function flushWithoutDumpJsTranslations(bool $force = false): bool
+    {
+        $em = $this->getEntityManager(Translation::class);
+        [$locales, $domains] = $this->prepareData($em);
+        $this->flushData($em, $force, $locales);
+
+        return $this->hasJsTranslations($domains);
+    }
+
+    private function prepareData(EntityManager $em): array
+    {
         foreach ($this->translationKeys as $translationKey) {
             $em->persist($translationKey);
         }
@@ -163,6 +191,7 @@ class TranslationManager
         }
 
         $locales = [];
+        $domains = [];
         foreach ($this->translations as $key => $translation) {
             if (null !== $translation->getValue()) {
                 $em->persist($translation);
@@ -175,8 +204,19 @@ class TranslationManager
             if (!isset($locales[$locale])) {
                 $locales[$locale] = true;
             }
+            $domain = $translation->getTranslationKey()->getDomain();
+            if (!isset($domains[$domain])) {
+                $domains[$domain] = true;
+            }
         }
+        $locales = array_keys($locales);
+        $domains = array_keys($domains);
 
+        return [$locales, $domains];
+    }
+
+    private function flushData(EntityManager $em, bool $force, array $locales): void
+    {
         if ($force) {
             $em->flush();
         } else {
@@ -189,9 +229,8 @@ class TranslationManager
                 $em->flush($entities);
             }
         }
-
         $this->clear();
-        $this->clearDynamicTranslationCache(array_keys($locales));
+        $this->clearDynamicTranslationCache($locales);
     }
 
     public function clear(): void
@@ -242,5 +281,18 @@ class TranslationManager
         if ($locales) {
             $this->dynamicTranslationCache->delete($locales);
         }
+    }
+
+    private function hasJsTranslations(array $domains): bool
+    {
+        if ($domains && $this->jsTranslationDomains) {
+            foreach ($domains as $domain) {
+                if (\in_array($domain, $this->jsTranslationDomains, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

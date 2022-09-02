@@ -219,6 +219,13 @@
                 <div class="control-group">
                     <div class="controls">
                         {{ form_widget(form.check) }}
+                        {% if form.vars.value.isSyncEnabled() == false %}
+                            <div class="controls messages">
+                                <div class="alert alert-error" role="alert">
+                                    {{ 'oro.imap.configuration.reconnect_description'|trans }}
+                                </div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endif %}

@@ -10,19 +10,17 @@ Feature: Application search
     Given I login as administrator
     And I click "Search"
     And type "Common" in "search"
-    And I should see 3 search suggestions
+    And I should see 2 search suggestions
     When I click "Search Submit"
     Then I should be on Search Result page
     And I should see following search entity types:
       | Type            | N | isSelected |
-      | All             | 3 | yes        |
+      | All             | 2 | yes        |
       | Business Units  | 1 |            |
-      | Organizations   | 1 |            |
       | Reports         | 1 |            |
-    And number of records should be 3
+    And number of records should be 2
     And I should see following search results:
       | Title                | Type          |
-      | Common Organization  | Organization  |
       | Common Report        | Report        |
       | Common Business Unit | Business Unit |
 
@@ -50,9 +48,8 @@ Feature: Application search
     When I click "Search Submit"
     Then I should see following search entity types:
       | Type            | N | isSelected |
-      | All             | 3 |            |
+      | All             | 2 |            |
       | Business Units  | 1 | yes        |
-      | Organizations   | 1 |            |
       | Reports         | 1 |            |
     And number of records should be 1
     And I should see following search results:

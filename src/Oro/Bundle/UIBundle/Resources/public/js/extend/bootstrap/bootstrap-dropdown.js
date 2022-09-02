@@ -59,6 +59,7 @@ define(function(require, exports, module) {
             original.toggle.call(this);
             this.syncAriaExpanded();
 
+            // Prevent to show the keyboard on mobile devices if the first element is input
             if (Dropdown._isShowing) {
                 let focusTabbable = null;
 

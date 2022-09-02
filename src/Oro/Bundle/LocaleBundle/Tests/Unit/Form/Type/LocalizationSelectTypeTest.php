@@ -8,14 +8,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class LocalizationSelectTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LocalizationSelectType
-     */
-    protected $type;
+    /** @var LocalizationSelectType */
+    private $type;
 
-    /**
-     * {@inheritDoc}
-     */
     protected function setUp(): void
     {
         $this->type = new LocalizationSelectType();

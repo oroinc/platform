@@ -7,13 +7,25 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class DenormalizeEntityEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $object = new User();
         $data = ['a' => 'b'];
 
         $event = new DenormalizeEntityEvent($object, $data);
-        $this->assertSame($object, $event->getObject());
-        $this->assertSame($data, $event->getData());
+        self::assertSame($object, $event->getObject());
+        self::assertSame($data, $event->getData());
+    }
+
+    public function testMarkAsSkipped(): void
+    {
+        $object = new \stdClass();
+        $event = new DenormalizeEntityEvent($object, []);
+
+        $event->markAsSkipped('sampleField');
+        self::assertTrue($event->isFieldSkipped('sampleField'));
+
+        $event->markAsSkipped('sampleField', false);
+        self::assertFalse($event->isFieldSkipped('sampleField'));
     }
 }

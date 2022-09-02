@@ -3,7 +3,6 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-    const loadModules = require('oroui/js/app/services/load-modules');
     const tools = {};
     const iOS = /(iPad|iPhone)/.test(navigator.userAgent);
     const iPadOS = !!(navigator.userAgent.match(/Mac/) && navigator.maxTouchPoints && navigator.maxTouchPoints > 2);
@@ -262,48 +261,6 @@ define(function(require) {
          */
         isIOS: function() {
             return iOS || iPadOS;
-        },
-
-        /**
-         * Loads dynamic list of modules and execute callback function with passed modules
-         *
-         * @deprecated use 'oroui/js/app/services/load-modules'
-         * @param {Object.<string, string>|Array.<string>|string} modules
-         *  - Object: where keys are formal module names and values are actual
-         *  - Array: module names,
-         *  - string: single module name
-         * @param {function(Object)=} callback
-         * @param {Object=} context
-         * @return {Promise}
-         */
-        loadModules: loadModules,
-
-        /**
-         * Loads single module and returns promise
-         *
-         * @deprecated use 'oroui/js/app/services/load-modules'
-         * @param {string} module name
-         * @return {Promise}
-         */
-        loadModule: loadModules,
-
-        /**
-         * Loads single module and replaces the property
-         *
-         * @param {Object} container where to replace property
-         * @param {string} moduleProperty name to replace module ref to concrete realization
-         * @return {JQueryPromise}
-         */
-        loadModuleAndReplace: function(container, moduleProperty) {
-            if (typeof container[moduleProperty] !== 'string') {
-                const deferred = $.Deferred();
-                deferred.resolve(container[moduleProperty]);
-                return deferred.promise();
-            }
-            return loadModules(container[moduleProperty]).then(function(realization) {
-                container[moduleProperty] = realization;
-                return realization;
-            });
         },
 
         /**

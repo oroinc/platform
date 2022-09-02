@@ -1,0 +1,20 @@
+/* @theme: default; */
+
+.buttons-equal {
+    display: flex;
+
+    padding-top: $offset-y;
+
+    &--no-offset {
+        padding-top: 0;
+    }
+
+    > .btn,
+    > .btn-group {
+        flex-basis: 50%;
+
+        &:first-child {
+            margin-right: $offset-x-m;
+        }
+    }
+}

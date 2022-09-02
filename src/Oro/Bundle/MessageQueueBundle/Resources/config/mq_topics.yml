@@ -4,4 +4,3 @@ services:
             - { name: oro_message_queue.topic }
 
     Oro\Component\MessageQueue\Job\Topic\RootJobStoppedTopic: ~
-    Oro\Component\MessageQueue\Job\Topic\CalculateRootJobStatusTopic: ~

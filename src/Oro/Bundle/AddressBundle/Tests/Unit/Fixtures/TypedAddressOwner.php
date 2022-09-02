@@ -7,19 +7,11 @@ use Doctrine\Common\Collections\Collection;
 
 class TypedAddressOwner
 {
-    /** @var Collection */
-    protected $addresses;
+    private Collection $addresses;
 
-    /**
-     * @param TypedAddress[] $addresses
-     */
-    public function __construct(array $addresses)
+    public function __construct()
     {
         $this->addresses = new ArrayCollection();
-        foreach ($addresses as $address) {
-            $address->setOwner($this);
-            $this->addresses->add($address);
-        }
     }
 
     /**

@@ -8,18 +8,14 @@ use Oro\Bundle\NavigationBundle\Entity\MenuUpdate;
 use Oro\Bundle\NavigationBundle\Entity\Repository\MenuUpdateRepository;
 use Oro\Bundle\NavigationBundle\Manager\MenuUpdateManager;
 use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
-use Oro\Bundle\NavigationBundle\Tests\Unit\Entity\Stub\MenuUpdateStub;
 use Oro\Bundle\NavigationBundle\Utils\MenuUpdateUtils;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Manager\ScopeManager;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UIBundle\Model\TreeItem;
-use Oro\Component\Testing\Unit\EntityTrait;
 
 class MenuUpdateManagerTest extends WebTestCase
 {
-    use EntityTrait;
-
     private const MENU_NAME = 'application_menu';
 
     /** @var EntityRepository */
@@ -65,7 +61,7 @@ class MenuUpdateManagerTest extends WebTestCase
     {
         $menu = $this->getMenu();
         $item = MenuUpdateUtils::findMenuItem($menu, 'oro_organization_list');
-        $update = new MenuUpdateStub();
+        $update = new MenuUpdate();
         $update->setKey('oro_organization_list')
             ->setParentKey('dashboard_tab');
 
@@ -95,18 +91,15 @@ class MenuUpdateManagerTest extends WebTestCase
         $this->manager->showMenuItem($this->getMenu(), MenuUpdateData::MENU_UPDATE_2_1, $scope);
 
         /** @var MenuUpdate[] $result */
-        $result = $this->repository
-            ->findBy(
-                [
-                    'menu' => self::MENU_NAME,
-                    'key' => [
-                        MenuUpdateData::MENU_UPDATE_2,
-                        MenuUpdateData::MENU_UPDATE_2_1,
-                        MenuUpdateData::MENU_UPDATE_2_1_1
-                    ],
-                    'scope' => $scope,
-                ]
-            );
+        $result = $this->repository->findBy([
+            'menu'  => self::MENU_NAME,
+            'key'   => [
+                MenuUpdateData::MENU_UPDATE_2,
+                MenuUpdateData::MENU_UPDATE_2_1,
+                MenuUpdateData::MENU_UPDATE_2_1_1
+            ],
+            'scope' => $scope,
+        ]);
 
         foreach ($result as $entity) {
             $this->assertTrue($entity->isActive());
@@ -119,14 +112,11 @@ class MenuUpdateManagerTest extends WebTestCase
         $this->manager->hideMenuItem($this->getMenu(), MenuUpdateData::MENU_UPDATE_1, $scope);
 
         /** @var MenuUpdate[] $result */
-        $result = $this->repository
-            ->findBy(
-                [
-                    'menu' => self::MENU_NAME,
-                    'key' => [MenuUpdateData::MENU_UPDATE_1, MenuUpdateData::MENU_UPDATE_1_1],
-                    'scope' => $scope
-                ]
-            );
+        $result = $this->repository->findBy([
+            'menu'  => self::MENU_NAME,
+            'key'   => [MenuUpdateData::MENU_UPDATE_1, MenuUpdateData::MENU_UPDATE_1_1],
+            'scope' => $scope
+        ]);
 
         foreach ($result as $entity) {
             $this->assertFalse($entity->isActive());
@@ -187,13 +177,7 @@ class MenuUpdateManagerTest extends WebTestCase
         $this->manager->deleteMenuUpdates($scope, self::MENU_NAME);
 
         /** @var MenuUpdate[] $result */
-        $result = $this->repository
-            ->findBy(
-                [
-                    'menu' => self::MENU_NAME,
-                    'scope' => $scope
-                ]
-            );
+        $result = $this->repository->findBy(['menu' => self::MENU_NAME, 'scope' => $scope]);
 
         $this->assertCount(0, $result);
     }

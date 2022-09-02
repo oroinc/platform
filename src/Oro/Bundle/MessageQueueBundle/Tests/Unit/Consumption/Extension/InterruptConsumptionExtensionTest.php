@@ -16,7 +16,7 @@ class InterruptConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
     private $filePath;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|CacheState */
-    protected $cacheState;
+    private $cacheState;
 
     protected function setUp(): void
     {

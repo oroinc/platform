@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ScopeBundle\Tests\Functional;
 
 use Oro\Bundle\ScopeBundle\Entity\Scope;
-use Oro\Bundle\ScopeBundle\Tests\Unit\Stub\StubScope;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -15,12 +14,10 @@ class AbstractScopeProviderTestCase extends WebTestCase
         $this->client->useHashNavigation(true);
     }
 
-    /**
-     * @param string $scopeProviderCriteriaField
-     * @param array $scopeTypes
-     */
-    protected static function assertProviderRegisteredWithScopeTypes($scopeProviderCriteriaField, array $scopeTypes)
-    {
+    protected static function assertProviderRegisteredWithScopeTypes(
+        string $scopeProviderCriteriaField,
+        array $scopeTypes
+    ): void {
         $scopeManager = self::getContainer()->get('oro_scope.scope_manager');
 
         foreach ($scopeTypes as $scopeType) {
@@ -36,17 +33,10 @@ class AbstractScopeProviderTestCase extends WebTestCase
         }
     }
 
-    /**
-     * @param string $field
-     * @param mixed $value
-     * @return Scope
-     */
-    private static function createScope($field, $value)
+    private static function createScope(string $field, mixed $value): Scope
     {
-        $scope = new StubScope();
-
-        $propertyAccessor = new PropertyAccessor();
-        $propertyAccessor->setValue($scope, $field, $value);
+        $scope = new Scope();
+        (new PropertyAccessor())->setValue($scope, $field, $value);
 
         return $scope;
     }

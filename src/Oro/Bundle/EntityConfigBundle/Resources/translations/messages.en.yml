@@ -110,6 +110,11 @@ oro:
             new_field.label:     New Field
             records_count.label: 'Number of records: %count%'
 
+        feature:
+            entity_management:
+                label: Entity Management
+                description: Enables creating and managing entities and entity fields.
+
         form:
             default_group_label: General
             name.label: Name

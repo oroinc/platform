@@ -8,6 +8,9 @@ oro:
             favorite.label: Favorites
             mostviewed.label: Most Viewed
             menu_list_default.label: Menus
+            feature:
+                label: Back-Office Menu
+                description: Enables managing the back-office menus of the Oro application, such as the main menu, personal menu of the logged-in user, shortcuts and calendar menus.
         messages:
             no_items: You have no items yet
         shortcuts:

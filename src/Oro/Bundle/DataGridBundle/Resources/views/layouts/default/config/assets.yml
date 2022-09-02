@@ -1,0 +1,23 @@
+styles:
+    inputs:
+        - 'bundles/orodatagrid/default/scss/variables/no-data-config.scss'
+        - 'bundles/orodatagrid/default/scss/variables/datagrid-table-config.scss'
+        - 'bundles/orodatagrid/default/scss/variables/datagrid-header-cell-config.scss'
+        - 'bundles/orodatagrid/default/scss/variables/datagrid-body-cell-config.scss'
+        - 'bundles/orodatagrid/default/scss/variables/more-bar-holder-config.scss'
+        - 'bundles/orodatagrid/default/scss/variables/data-blank-content-config.scss'
+
+        - 'bundles/orodatagrid/default/scss/components/data-blank-content.scss'
+        - 'bundles/orodatagrid/default/scss/components/no-data.scss'
+        - 'bundles/orodatagrid/default/scss/components/oro-datagrid.scss'
+        - 'bundles/orodatagrid/default/scss/components/datagrid-table.scss'
+        - 'bundles/orodatagrid/default/scss/components/datagrid-header-cell.scss'
+        - 'bundles/orodatagrid/default/scss/components/datagrid-body-cell.scss'
+        - 'bundles/orodatagrid/default/scss/components/datagrid-row.scss'
+        - 'bundles/orodatagrid/default/scss/components/launcher-list.scss'
+        - 'bundles/orodatagrid/default/scss/components/launchers-dropdown-menu.scss'
+        - 'bundles/orodatagrid/default/scss/components/more-bar-holder.scss'
+
+print_styles:
+    inputs:
+        - 'bundles/orodatagrid/default/scss/components/print/datagrid-header-cell.scss'

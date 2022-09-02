@@ -1,16 +1,50 @@
 /* @theme: default; */
 
 .textarea {
+    min-height: $textarea-min-height;
+    resize: vertical;
+
+    @include base-ui-element(
+        $use-base-style-for-textarea,
+        $textarea-padding,
+        $textarea-font-size,
+        $textarea-font-family,
+        $textarea-line-height,
+        $textarea-border,
+        $textarea-border-radius,
+        $textarea-background-color,
+        $textarea-color
+    );
+
     @include placeholder {
         color: $textarea-placeholder-color;
     }
 
-    &--size-m {
-        padding: $textarea-padding--m;
+    @include element-state('hover') {
+        border-color: $textarea-border-color-hover-state;
     }
 
-    &--size-s {
-        padding: $textarea-padding--s;
+    @include element-state('focus') {
+        border-color: $textarea-border-color-focus-state;
+        box-shadow: $textarea-box-shadow-focus-state;
+    }
+
+    &.focus-visible {
+        border-color: $textarea-border-color-focus-state;
+    }
+
+    @include element-state('error') {
+        border-color: $textarea-border-color-error-state;
+    }
+
+    @include element-state('disabled') {
+        background: $textarea-border-color-disabled-background;
+
+        @include base-disabled-style();
+
+        @include element-state('hover') {
+            border-color: $textarea-border-color-disabled-hover-border-color;
+        }
     }
 
     @include element-state('error') {
@@ -21,5 +55,13 @@
         background: $textarea-background-color-disabled-state;
         box-shadow: none;
         border: $textarea-border;
+    }
+
+    &--size-m {
+        padding: $textarea-padding--m;
+    }
+
+    &--size-s {
+        padding: $textarea-padding--s;
     }
 }

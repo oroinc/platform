@@ -20,6 +20,7 @@ use Twig\TwigFunction;
  *   - oro_class_name
  *   - oro_url_class_name
  *   - oro_class_alias
+ *   - oro_alias_class_name
  *   - oro_action_params
  *   - oro_entity_fallback_value
  *
@@ -44,6 +45,7 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction('oro_class_name', [$this, 'getClassName']),
             new TwigFunction('oro_url_class_name', [$this, 'getUrlClassName']),
             new TwigFunction('oro_class_alias', [$this, 'getClassAlias']),
+            new TwigFunction('oro_alias_class_name', [$this, 'getAliasClassName']),
             new TwigFunction('oro_action_params', [$this, 'getActionParams']),
             new TwigFunction('oro_entity_fallback_value', [$this, 'getFallbackValue']),
             new TwigFunction('oro_entity_fallback_type', [$this, 'getFallbackType']),
@@ -114,6 +116,14 @@ class EntityExtension extends AbstractExtension implements ServiceSubscriberInte
         return $isPlural
             ? $this->getEntityAliasResolver()->getPluralAlias($className)
             : $this->getEntityAliasResolver()->getAlias($className);
+    }
+
+    /**
+     * Get class name of specified class alias
+     */
+    public function getAliasClassName(string $alias): ?string
+    {
+        return $this->getEntityAliasResolver()->getClassByAlias($alias);
     }
 
     /**

@@ -13,15 +13,11 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class IterableResultFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AclHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $aclHelper;
+    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $aclHelper;
 
-    /**
-     * @var IterableResultFactory
-     */
-    protected $iterableResultFactory;
+    /** @var IterableResultFactory */
+    private $iterableResultFactory;
 
     protected function setUp(): void
     {

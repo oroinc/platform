@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
@@ -25,8 +26,12 @@ trait EntityTypeConsistencyTestTrait
         $entities = $this->getEntities();
         foreach ($entities as $entity) {
             [$entityClass] = $entity;
-            $entityType = $this->getEntityType($entityClass);
-            if ($this->isSkippedEntity($entityClass, $entityType)) {
+            $entityType = ValueNormalizerUtil::tryConvertToEntityType(
+                $this->getValueNormalizer(),
+                $entityClass,
+                $this->getRequestType()
+            );
+            if (!$entityType || $this->isSkippedEntity($entityClass, $entityType)) {
                 continue;
             }
 

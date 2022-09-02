@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\NavigationBundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 use Oro\Bundle\NavigationBundle\Entity\Repository\HistoryItemRepository;
 use Symfony\Component\Console\Command\Command;
@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Clears old navigation history.
  */
-class ClearNavigationHistoryCommand extends Command implements CronCommandInterface
+class ClearNavigationHistoryCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:navigation:history:clear';
@@ -31,15 +31,13 @@ class ClearNavigationHistoryCommand extends Command implements CronCommandInterf
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         // 00:05 every day
         return '5 0 * * *';
-    }
-
-    public function isActive()
-    {
-        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

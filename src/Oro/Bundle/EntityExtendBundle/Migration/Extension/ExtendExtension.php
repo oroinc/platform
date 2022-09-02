@@ -37,9 +37,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
     protected ExtendOptionsManager $extendOptionsManager;
     protected EntityMetadataHelper $entityMetadataHelper;
     protected PropertyConfigBag $propertyConfigBag;
-
-    /** @var ExtendDbIdentifierNameGenerator */
-    protected $nameGenerator;
+    protected ExtendDbIdentifierNameGenerator $nameGenerator;
 
     public function __construct(
         ExtendOptionsManager $extendOptionsManager,
@@ -445,8 +443,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      * @param string       $targetAssociationName The name of a relation field on the inverse side
      * @param string       $titleColumnName       A column name is used to show owning side entity
      * @param array        $options               Entity config options. [scope => [name => value, ...], ...]
-     *
-     * @deprecated since 2.1, cause oneToMany relation has to be bidirectional always
      */
     public function addOneToManyInverseRelation(
         Schema $schema,
@@ -461,7 +457,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
-        $selfTable     = $this->getTable($selfTableName, $schema);
+        $selfTable     = $this->getTable($table, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
@@ -647,7 +643,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
-        $selfTable     = $this->getTable($selfTableName, $schema);
+        $selfTable     = $this->getTable($table, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);
@@ -801,7 +797,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
         $this->ensureExtendFieldSet($options);
 
         $selfTableName = $this->getTableName($table);
-        $selfTable     = $this->getTable($selfTableName, $schema);
+        $selfTable     = $this->getTable($table, $schema);
         $selfClassName = $this->getEntityClassByTableName($selfTableName);
 
         $targetTableName = $this->getTableName($targetTable);

@@ -17,7 +17,7 @@ class FileTest extends RestJsonApiTestCase
     private static $blankFileContent = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
     . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
 
-    private string $externalFileAllowedUrlsRegExp = '';
+    private string $externalFileAllowedUrlsRegExp;
 
     protected function setUp(): void
     {
@@ -33,13 +33,33 @@ class FileTest extends RestJsonApiTestCase
             $this->setExternalFileAllowedUrlsRegExp($this->externalFileAllowedUrlsRegExp);
         }
         $this->externalFileAllowedUrlsRegExp = '';
-        $this->toggleIsStoredExternally(false);
+        $this->setIsStoredExternally(false);
     }
 
-    /**
-     * @return string The file entity id
-     */
-    public function testPost(): string
+    private function getExternalFileAllowedUrlsRegExp(): string
+    {
+        return (string)self::getConfigManager()->get('oro_attachment.external_file_allowed_urls_regexp');
+    }
+
+    private function setExternalFileAllowedUrlsRegExp(string $value): void
+    {
+        $configManager = self::getConfigManager();
+        $configManager->set('oro_attachment.external_file_allowed_urls_regexp', $value);
+        $configManager->flush();
+    }
+
+    private function setIsStoredExternally(bool $isStoredExternally): void
+    {
+        $entityConfigManager = self::getContainer()->get('oro_entity_config.config_manager');
+        $avatarFieldConfig = $entityConfigManager->getFieldConfig('attachment', User::class, 'avatar');
+        if ($avatarFieldConfig->get('is_stored_externally') !== $isStoredExternally) {
+            $avatarFieldConfig->set('is_stored_externally', $isStoredExternally);
+            $entityConfigManager->persist($avatarFieldConfig);
+            $entityConfigManager->flush();
+        }
+    }
+
+    public function testCreate(): int
     {
         $data = [
             'data' => [
@@ -83,21 +103,19 @@ class FileTest extends RestJsonApiTestCase
     }
 
     /**
-     * @depends testPost
-     *
-     * @param string $fileId
+     * @depends testCreate
      */
-    public function testGet(string $fileId): void
+    public function testGet(int $fileId): void
     {
         $response = $this->get(
-            ['entity' => 'files', 'id' => $fileId]
+            ['entity' => 'files', 'id' => (string)$fileId]
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => 'files',
-                    'id'            => $fileId,
+                    'id'            => (string)$fileId,
                     'attributes'    => [
                         'mimeType'         => 'image/png',
                         'originalFilename' => 'blank.png',
@@ -119,7 +137,7 @@ class FileTest extends RestJsonApiTestCase
         );
     }
 
-    public function testPostExternalUrlNoExternalFilesAllowed(): void
+    public function testTryToCreateWithExternalUrlNoExternalFilesAllowed(): void
     {
         $this->setExternalFileAllowedUrlsRegExp('');
 
@@ -141,23 +159,25 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
+                'title'  => 'external file url constraint',
                 'detail' => 'No external files and images are allowed.'
                     . ' Allowed URLs RegExp can be configured on the following page:'
-                    . ' System -> Configuration -> General Setup -> Upload Settings.'
+                    . ' System -> Configuration -> General Setup -> Upload Settings.',
+                'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
             $response,
         );
     }
 
-    public function testPostNotFoundExternalUrl(): void
+    public function testTryToCreateWithNotFoundExternalUrl(): void
     {
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $url = 'http://example.org/missing.png';
         $data = [
             'data' => [
-                'type' => 'files',
-                'attributes' => [
+                'type'          => 'files',
+                'attributes'    => [
                     'externalUrl' => $url,
                 ],
                 'relationships' => [
@@ -176,13 +196,15 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
+                'title'  => 'external file url constraint',
                 'detail' => 'The specified URL is not accessible. Reason: "Not Found"',
+                'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
             $response,
         );
     }
 
-    public function testPostExternalUrlNotMatchedAllowedRegex(): void
+    public function testTryToCreateWithExternalUrlNotMatchedAllowedRegex(): void
     {
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/valid\.domain');
 
@@ -204,15 +226,17 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'detail' => 'The provided URL does not match the URLs allowed in the system configuration.'
+                'title'  => 'external file url constraint',
+                'detail' => 'The provided URL does not match the URLs allowed in the system configuration.',
+                'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
             $response,
         );
     }
 
-    public function testPostExternalUrlWithNotValidMimeType(): void
+    public function testTryToCreateWithExternalUrlWithNotValidMimeType(): void
     {
-        $this->toggleIsStoredExternally(true);
+        $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http://example\.org');
 
         $data = [
@@ -233,37 +257,28 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
+                'title'  => 'external file mime type constraint',
                 'detail' => 'The MIME type of the file is invalid ("text/plain").'
-                    . ' Allowed MIME types are "image/gif", "image/jpeg", "image/png", "image/webp".'
+                    . ' Allowed MIME types are "image/gif", "image/jpeg", "image/png", "image/webp".',
+                'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
             $response,
         );
-
-        $this->toggleIsStoredExternally(false);
     }
 
-    private function toggleIsStoredExternally(bool $isStoredExternally): void
+    public function testTryToCreateWithExternalUrlReturnsErrorWhenBothContentAndExternalUrl(): void
     {
-        $entityConfigManager = $this->getContainer()->get('oro_entity_config.config_manager');
-        $avatarFieldConfig = $entityConfigManager->getFieldConfig('attachment', User::class, 'avatar');
-        $avatarFieldConfig->set('is_stored_externally', $isStoredExternally);
-        $entityConfigManager->persist($avatarFieldConfig);
-        $entityConfigManager->flush();
-    }
-
-    public function testPostExternalUrlReturnsErrorWhenBothContentAndExternalUrl(): void
-    {
-        $this->toggleIsStoredExternally(true);
+        $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $data = [
             'data' => [
-                'type' => 'files',
-                'attributes' => [
-                    'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                    'content' => 'sample data',
+                'type'          => 'files',
+                'attributes'    => [
+                    'externalUrl'      => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                    'content'          => 'sample data',
                     'originalFilename' => 'image-a.png',
-                    'parentFieldName' => 'avatar',
+                    'parentFieldName'  => 'avatar',
                 ],
                 'relationships' => [
                     'parent' => [
@@ -276,20 +291,16 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
+                'title'  => 'form constraint',
                 'detail' => 'Either "externalUrl" or "content" must be specified, but not both'
             ],
             $response,
         );
-
-        $this->toggleIsStoredExternally(false);
     }
 
-    /**
-     * @return string The file entity id
-     */
-    public function testPostExternalUrl(): string
+    public function testCreateWithExternalUrl(): int
     {
-        $this->toggleIsStoredExternally(true);
+        $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $data = [
@@ -321,8 +332,6 @@ class FileTest extends RestJsonApiTestCase
         $entity = $this->getEntityManager()->find(File::class, $fileId);
         self::assertNotNull($entity);
 
-        $this->toggleIsStoredExternally(false);
-
         // clear entity manager to not affect dependent tests
         $this->getEntityManager()->clear();
 
@@ -330,21 +339,19 @@ class FileTest extends RestJsonApiTestCase
     }
 
     /**
-     * @depends testPostExternalUrl
-     *
-     * @param string $fileId
+     * @depends testCreateWithExternalUrl
      */
-    public function testGetExternalUrl(string $fileId): void
+    public function testGetExternalUrl(int $fileId): void
     {
         $response = $this->get(
-            ['entity' => 'files', 'id' => $fileId]
+            ['entity' => 'files', 'id' => (string)$fileId]
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => 'files',
-                    'id'            => $fileId,
+                    'id'            => (string)$fileId,
                     'attributes'    => [
                         'mimeType'         => 'image/png',
                         'originalFilename' => 'image-a.png',
@@ -367,33 +374,30 @@ class FileTest extends RestJsonApiTestCase
     }
 
     /**
-     * @depends testPostExternalUrl
-     *
-     * @param string $fileId
-     * @return string The file entity id
+     * @depends testCreateWithExternalUrl
      */
-    public function testPatchExternalUrl(string $fileId): string
+    public function testUpdateExternalUrl(int $fileId): int
     {
-        $this->toggleIsStoredExternally(true);
+        $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'id'            => $fileId,
-                'attributes'    => [
+                'type'       => 'files',
+                'id'         => (string)$fileId,
+                'attributes' => [
                     'externalUrl'     => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
                     'parentFieldName' => 'avatar',
                 ]
             ]
         ];
-        $response = $this->patch(['entity' => 'files', 'id' => $fileId], $data);
+        $response = $this->patch(['entity' => 'files', 'id' => (string)$fileId], $data);
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => 'files',
-                    'id'            => $fileId,
+                    'id'            => (string)$fileId,
                     'attributes'    => [
                         'mimeType'         => 'image/png',
                         'originalFilename' => 'image-b.png',
@@ -413,28 +417,24 @@ class FileTest extends RestJsonApiTestCase
             ],
             $response
         );
-
-        $this->toggleIsStoredExternally(false);
 
         return $fileId;
     }
 
     /**
-     * @depends testPatchExternalUrl
-     *
-     * @param string $fileId
+     * @depends testUpdateExternalUrl
      */
-    public function testGetExternalUrlAfterPatch(string $fileId): void
+    public function testGetExternalUrlAfterPatch(int $fileId): void
     {
         $response = $this->get(
-            ['entity' => 'files', 'id' => $fileId]
+            ['entity' => 'files', 'id' => (string)$fileId]
         );
 
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'          => 'files',
-                    'id'            => $fileId,
+                    'id'            => (string)$fileId,
                     'attributes'    => [
                         'mimeType'         => 'image/png',
                         'originalFilename' => 'image-b.png',
@@ -457,14 +457,12 @@ class FileTest extends RestJsonApiTestCase
     }
 
     /**
-     * @depends testPostExternalUrl
-     *
-     * @param string $fileId
+     * @depends testCreateWithExternalUrl
      */
-    public function testDeleteExternalUrl(string $fileId): void
+    public function testDeleteExternalUrl(int $fileId): void
     {
         $response = $this->delete(
-            ['entity' => 'files', 'id' => $fileId]
+            ['entity' => 'files', 'id' => (string)$fileId]
         );
 
         self::assertResponseStatusCodeEquals($response, Response::HTTP_NO_CONTENT);
@@ -472,17 +470,5 @@ class FileTest extends RestJsonApiTestCase
         // Checks that the File entity was deleted.
         $entity = $this->getEntityManager()->find(File::class, $fileId);
         self::assertNull($entity);
-    }
-
-    private function getExternalFileAllowedUrlsRegExp(): bool
-    {
-        return (string)self::getConfigManager()->get('oro_attachment.external_file_allowed_urls_regexp');
-    }
-
-    private function setExternalFileAllowedUrlsRegExp(string $value): void
-    {
-        $configManager = self::getConfigManager();
-        $configManager->set('oro_attachment.external_file_allowed_urls_regexp', $value);
-        $configManager->flush();
     }
 }

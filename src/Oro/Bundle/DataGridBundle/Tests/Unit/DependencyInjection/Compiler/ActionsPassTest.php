@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\DependencyInjection\Compiler\ActionsPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -56,7 +57,7 @@ class ActionsPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessSharedAction(): void
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The service "action1" should not be shared.');
 
         $this->container->register('action1')

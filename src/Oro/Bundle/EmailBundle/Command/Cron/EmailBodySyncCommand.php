@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Command\Cron;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Oro\Component\Log\OutputLogger;
 use Symfony\Component\Console\Command\Command;
@@ -16,7 +16,7 @@ use Symfony\Component\Lock\Store\SemaphoreStore;
 /**
  * Synchronizes email bodies.
  */
-class EmailBodySyncCommand extends Command implements CronCommandInterface
+class EmailBodySyncCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     /** Number of emails in batch */
     public const BATCH_SIZE = 25;
@@ -35,17 +35,12 @@ class EmailBodySyncCommand extends Command implements CronCommandInterface
         $this->synchronizer = $synchronizer;
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '*/30 * * * *';
-    }
-
-    /**
-     * @return bool
-     */
-    public function isActive()
-    {
-        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

@@ -42,10 +42,7 @@ features:
             - 'oro_api_get_emailorigin'
             - 'oro_api_options_emailorigins'
             - 'oro_api_get_email_activity_relations_by_filters'
-            - 'oro_api_options_email_activity_relations'
-            - 'oro_api_options_email_search_relations'
             - 'oro_api_get_activity_email_suggestions'
-            - 'oro_api_options_activity_email_suggestions'
             - 'oro_email_mailbox_update'
             - 'oro_email_mailbox_create'
             - 'oro_email_mailbox_delete'
@@ -75,3 +72,26 @@ features:
             - 'oro:cron:email-body-sync'
         cron_jobs:
             - 'oro:cron:email-body-sync'
+
+    manage_email_templates:
+        label: oro.email.emailtemplate.feature.manage.label
+        description: oro.email.emailtemplate.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_email_emailtemplate_index
+            - oro_email_emailtemplate_update
+            - oro_email_emailtemplate_create
+            - oro_email_emailtemplate_clone
+            - oro_email_emailtemplate_preview
+            - oro_api_delete_emailtemplate
+            - oro_api_get_emailtemplates
+            - oro_api_get_emailtemplate_variables
+            - oro_api_get_emailtemplate_compiled
+        commands:
+            - oro:email:template:import
+            - oro:email:template:export
+        entities:
+            - Oro\Bundle\EmailBundle\Entity\EmailTemplate
+            - Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation
+        navigation_items:
+            - application_menu.system_tab.emails.oro_email_emailtemplate_list

@@ -57,7 +57,7 @@ define(function(require) {
         _inputData: function($root) {
             const data = {};
             const inputs = $root.find('> input[data-name]')
-                .add($root.find('> label > span > input[data-name]:checked'));
+                .add($root.find('> label > input[data-name]:checked'));
 
             inputs.each(function() {
                 const $input = $(this);

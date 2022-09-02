@@ -34,7 +34,8 @@ define(function(require) {
         // showMonthAfterYear: false, // True if the year select precedes month, false for month then year
         // yearSuffix: "" // Additional text to append to the year in the month headers
         gotoCurrent: true, // True if today link goes back to current selection instead
-        applyTodayDateSelection: true // Select the date on Today button click
+        applyTodayDateSelection: true, // Select the date on Today button click
+        blurInputOnTodaySelection: true // Blur input when select today action
     };
     $.datepicker.setDefaults($.datepicker.regional[locale]);
 
@@ -58,7 +59,7 @@ define(function(require) {
             if (this._get(inst, 'applyTodayDateSelection')) {
                 // select current day and close dropdown
                 this._selectDate(id);
-                inst.input.blur();
+                this._get(inst, 'blurInputOnTodaySelection') && inst.input.blur();
             }
         };
 

@@ -4,40 +4,30 @@ namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Data;
 
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class EntityDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityMetadata;
+    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityMetadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldMetadata;
+    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldMetadata;
 
-    /**
-     * @var string
-     */
-    protected $fieldName;
+    /** @var string */
+    private $fieldName;
 
-    /**
-     * @var EntityData
-     */
-    protected $entityData;
+    /** @var EntityData */
+    private $entityData;
 
-    /**
-     * @var array
-     */
-    protected $entities = [];
+    /** @var array */
+    private $entities = [];
 
-    /**
-     * @var array
-     */
-    protected $entityFieldsMetadata = [];
+    /** @var array */
+    private $entityFieldsMetadata = [];
 
     protected function setUp(): void
     {
@@ -71,6 +61,14 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $this->entityData->getField($this->fieldName)->setSourceEntity($this->entities[0]);
     }
 
+    private function createTestEntity(int $id): \stdClass
+    {
+        $result = new \stdClass();
+        $result->id = $id;
+
+        return $result;
+    }
+
     public function testGetMetadata()
     {
         $this->assertEquals($this->entityMetadata, $this->entityData->getMetadata());
@@ -96,7 +94,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
 
         $this->entityData->addEntity($barEntity);
 
-        $expectedCount += 1;
+        $expectedCount++;
         $expectedEntities = array_merge($expectedEntities, [$barEntity]);
 
         $this->assertCount($expectedCount, $this->entityData->getEntities());
@@ -117,7 +115,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityByOffsetFails()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         $this->expectExceptionMessage('"undefined" is illegal offset for getting entity.');
 
         $this->entityData->getEntityByOffset('undefined');
@@ -149,7 +147,7 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldFails()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Field "unknown" not exist.');
 
         $this->entityData->getField('unknown');
@@ -160,12 +158,5 @@ class EntityDataTest extends \PHPUnit\Framework\TestCase
         $fields = $this->entityData->getFields();
         $this->assertCount(1, $fields);
         $this->assertInstanceOf(FieldData::class, $fields[$this->fieldName]);
-    }
-
-    protected function createTestEntity($id)
-    {
-        $result = new \stdClass();
-        $result->id = $id;
-        return $result;
     }
 }

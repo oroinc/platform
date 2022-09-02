@@ -1,9 +1,0 @@
-/* @theme: blank; */
-
-// Mixin for add styles to block with background and paddings
-@mixin block-substrate($offset-inner, $bg, $border-radius: null) {
-    padding: $offset-inner;
-
-    background: $bg;
-    border-radius: $border-radius;
-}

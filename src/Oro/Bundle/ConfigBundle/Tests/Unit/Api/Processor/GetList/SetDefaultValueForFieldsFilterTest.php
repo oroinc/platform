@@ -20,11 +20,11 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class SetDefaultValueForFieldsFilterTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $valueNormalizer;
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
+    private $valueNormalizer;
 
     /** @var SetDefaultValueForFieldsFilter */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {

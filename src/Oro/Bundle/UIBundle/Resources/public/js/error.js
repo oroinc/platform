@@ -4,18 +4,14 @@ define(function(require, exports, module) {
     const routing = require('routing');
     const mediator = require('oroui/js/mediator');
     const tools = require('oroui/js/tools');
-    const Modal = require('oroui/js/modal');
     const _ = require('underscore');
     const config = require('module-config').default(module.id);
 
     const defaults = _.defaults(config, {
-        headerServerError: _.__('Server error'),
-        headerUserError: _.__('User input error'),
         message: _.__('oro.ui.error.performing'),
         loginRoute: 'oro_user_security_login'
     });
 
-    const ERROR_USER_INPUT = 'user_input_error';
     const console = window.console;
 
     const errorHandler = {
@@ -129,27 +125,6 @@ define(function(require, exports, module) {
          */
         showFlashError: function(message) {
             mediator.execute('showFlashMessage', 'error', message);
-        },
-
-        /**
-         * @param {Error} xhr
-         * @deprecated
-         */
-        modalHandler: function(xhr) {
-            let message = defaults.message;
-            if (tools.debug) {
-                message += '<br><b>Debug:</b>' + xhr.responseText;
-            }
-
-            const responseObject = xhr.responseJSON || {};
-            const errorType = responseObject.type;
-
-            const modal = new Modal({
-                title: errorType === ERROR_USER_INPUT ? defaults.headerUserError : defaults.headerServerError,
-                content: responseObject.message || message,
-                cancelText: false
-            });
-            modal.open();
         },
 
         /**

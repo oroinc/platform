@@ -71,7 +71,9 @@ oro:
             field:
                 items:
                     auditable: Auditable
-                    propagate: Append audit log to the related entity
+                    propagate:
+                        label: Append audit log to the related entity
+                        tooltip: Use the option to enable reverse side audit for the relations.
 
         condition_builder:
             criteria:
@@ -116,3 +118,8 @@ oro:
             user.label: Audit user
             additional_fields.label: Additional fields
             type.label: Audit type
+
+        feature:
+            manage:
+                label: Data Audit
+                description: Enables the system to set entities as auditable to monitor the history of their changes.

@@ -70,7 +70,11 @@
             {{ value|nl2br }}
         {% endset %}
     {% elseif type == 'html' %}
-        {{ value|oro_html_sanitize|default('N/A'|trans) }}
+        {{ UI.renderCollapsibleHtml(
+            value|oro_html_sanitize|default('N/A'|trans)|raw,
+            entity,
+            item.label
+        ) }}
     {% elseif type == 'boolean' and value is not null %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}

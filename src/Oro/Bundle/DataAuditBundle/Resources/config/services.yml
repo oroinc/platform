@@ -52,6 +52,7 @@ services:
         arguments:
             - '@oro_entity.entity_class_name_provider'
             - '@oro_dataaudit.audit_config_provider'
+            - '@oro_featuretoggle.checker.feature_checker'
 
     oro_dataaudit.datagrid.author_provider:
         class: 'Oro\Bundle\DataAuditBundle\Datagrid\AuthorProvider'
@@ -220,6 +221,8 @@ services:
         arguments:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.job.runner'
+        calls:
+            - ['setLogger', ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

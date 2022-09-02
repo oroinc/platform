@@ -115,6 +115,11 @@ services:
         tags:
             - { name: gos_web_socket.topic }
 
+    oro_user.access_rule.anonymous_role:
+        class: Oro\Bundle\UserBundle\Acl\AccessRule\AnonymousRoleAccessRule
+        tags:
+            - { name: oro_security.access_rule, entityClass: Oro\Bundle\UserBundle\Entity\Role }
+
     oro_user.role_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\RoleManager
         arguments:
@@ -159,28 +164,19 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_user.impersonation_success, method: onImpersonationSuccess }
 
-    oro_user.autocomplete.user.search_acl_handler.abstract:
-        abstract: true
+    oro_user.autocomplete.user.search_acl_handler:
         class: Oro\Bundle\UserBundle\Autocomplete\UserAclHandler
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_attachment.provider.picture_sources'
-            - 'Oro\Bundle\UserBundle\Entity\User'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
             - '@oro_entity.routing_helper'
-            - "@?security.acl.voter.basic_permissions"
-        calls:
-            - [ setEntityNameResolver,  ['@oro_entity.entity_name_resolver']]
-
-    oro_user.autocomplete.user.search_acl_handler:
-        parent: oro_user.autocomplete.user.search_acl_handler.abstract
-        calls:
-            - [ setProperties, [["id", "username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]] ]
+            - '@oro_entity.entity_name_resolver'
+            - '@security.acl.voter.basic_permissions'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: acl_users }
-        lazy: true
 
     oro_user.autocomplete.user.search_handler:
         class: Oro\Bundle\UserBundle\Autocomplete\UserSearchHandler
@@ -188,7 +184,7 @@ services:
         arguments:
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users, acl_resource: oro_user_user_view }
 
@@ -198,7 +194,7 @@ services:
         arguments:
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
@@ -211,7 +207,7 @@ services:
             - '@translator'
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         calls:
             - [setTokenAccessor, ['@oro_security.token_accessor']]
             - [setSearchUserCriteria, ['@oro_user.autocomplete.search_user_criteria']]
@@ -238,7 +234,7 @@ services:
             - '@oro_security.token_accessor'
             - '@oro_attachment.provider.picture_sources'
             - 'Oro\Bundle\UserBundle\Entity\User'
-            - ["username", "namePrefix", "firstName", "middleName", "lastName", "nameSuffix", "email"]
+            - ['username', 'namePrefix', 'firstName', 'middleName', 'lastName', 'nameSuffix', 'email']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: users_without_current, acl_resource: oro_user_user_view }
 
@@ -247,7 +243,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\UserBundle\Entity\Role'
-            - ["label"]
+            - ['label']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles, acl_resource: oro_user_role_view }
 
@@ -256,7 +252,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\UserBundle\Entity\Role'
-            - ["label"]
+            - ['label']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: widget_owner_roles, acl_resource: oro_user_role_view }
 
@@ -265,7 +261,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\UserBundle\Entity\Role'
-            - ["label"]
+            - ['label']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: roles_authenticated, acl_resource: oro_user_role_view }
 
@@ -336,11 +332,11 @@ services:
     oro_user.event_listener.owner_user_grid_listener:
         class: Oro\Bundle\UserBundle\EventListener\OwnerUserGridListener
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@oro_security.ownership_tree_provider'
-            - "@?security.acl.voter.basic_permissions"
+            - '@security.acl.voter.basic_permissions'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.owner-users-select-grid, method: onBuildBefore }
 
@@ -612,3 +608,15 @@ services:
             - '%oro_user.login_sources%'
         tags:
             - { name: monolog.logger, channel: security }
+
+    oro_user.acl.voter.anonymous_role:
+        class: Oro\Bundle\UserBundle\Acl\Voter\AnonymousRoleVoter
+        tags:
+            - { name: security.voter }
+
+    oro_user.acl.search.role_acl_helper_condition:
+        class: Oro\Bundle\UserBundle\Acl\Search\RoleSearchAclHelperCondition
+        arguments:
+            - '@oro_security.orm.ownership_sql_walker_builder'
+        tags:
+            - { name: oro_security.acl_helper.condition }

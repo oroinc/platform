@@ -3,6 +3,8 @@
 namespace Oro\Bundle\DataAuditBundle\Service;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -23,34 +25,19 @@ use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
  */
 class EntityChangesToAuditEntryConverter
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var AuditEntityMapper */
-    private $auditEntityMapper;
-
-    /** @var AuditConfigProvider */
-    private $configProvider;
-
-    /** @var EntityNameProvider */
-    private $entityNameProvider;
-
-    /** @var SetNewAuditVersionService */
-    private $setNewAuditVersionService;
-
-    /** @var AuditRecordValidator */
-    private $auditRecordValidator;
-
-    /** @var ChangeSetToAuditFieldsConverterInterface */
-    private $changeSetToAuditFieldsConverter;
+    private ManagerRegistry $doctrine;
+    private AuditEntityMapper $auditEntityMapper;
+    private AuditConfigProvider $configProvider;
+    private EntityNameProvider $entityNameProvider;
+    private SetNewAuditVersionService $setNewAuditVersionService;
+    private AuditRecordValidator $auditRecordValidator;
+    private ChangeSetToAuditFieldsConverterInterface $changeSetToAuditFieldsConverter;
 
     /**
      * Local cache of entities metadata.
      * To avoid performance impact of getting entities metadata in "convert" method.
-     *
-     * @var array
      */
-    private $entityMetadataCache = [];
+    private array $entityMetadataCache = [];
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -318,9 +305,13 @@ class EntityChangesToAuditEntryConverter
 
                 $auditEntityManager->persist($auditEntry);
                 $auditEntityManager->flush($auditEntry);
-            } catch (UniqueConstraintViolationException $e) {
-                // We should stop the process when the same audit entry appears in DB during the save.
-                throw new WrongDataAuditEntryStateException($auditEntry);
+            } catch (\Throwable $e) {
+                if ($this->isRetryableException($e)) {
+                    // We should stop the process when the same audit entry appears in DB during the save.
+                    throw new WrongDataAuditEntryStateException($auditEntry);
+                } else {
+                    throw $e;
+                }
             }
 
             $this->setNewAuditVersionService->setVersion($auditEntry);
@@ -354,5 +345,12 @@ class EntityChangesToAuditEntryConverter
         }
 
         return $this->entityMetadataCache[$entityClass];
+    }
+
+    private function isRetryableException(\Throwable $exception): bool
+    {
+        return $exception instanceof RetryableException
+            || $exception instanceof UniqueConstraintViolationException
+            || $exception instanceof ForeignKeyConstraintViolationException;
     }
 }

@@ -3,12 +3,15 @@
 namespace Oro\Bundle\DataAuditBundle\Async;
 
 use Oro\Bundle\DataAuditBundle\Async\Topic\AuditChangedEntitiesInverseCollectionsChunkTopic;
+use Oro\Bundle\DataAuditBundle\Exception\WrongDataAuditEntryStateException;
 use Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter;
 use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * Processed chunks of collection.
@@ -16,8 +19,9 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAuditProcessor implements
     TopicSubscriberInterface
 {
-    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
+    use LoggerAwareTrait;
 
+    private EntityChangesToAuditEntryConverter $entityChangesToAuditEntryConverter;
     private JobRunner $jobRunner;
 
     public function __construct(
@@ -30,7 +34,11 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
 
     public function process(MessageInterface $message, SessionInterface $session): string
     {
-        return $this->runDelayed($message->getBody()) ? self::ACK : self::REJECT;
+        try {
+            return $this->runDelayed($message->getBody()) ? self::ACK : self::REJECT;
+        } catch (JobRedeliveryException $e) {
+            return self::REQUEUE;
+        }
     }
 
     /**
@@ -73,7 +81,28 @@ class AuditChangedEntitiesInverseCollectionsChunkProcessor extends AbstractAudit
                     }
                 }
 
-                $this->convert($body, $map);
+                try {
+                    $this->convert($body, $map);
+                } catch (WrongDataAuditEntryStateException $e) {
+                    $this->logger?->warning(
+                        'Unexpected retryable database exception occurred during Audit Changed Entities build.',
+                        [
+                            'topic' => AuditChangedEntitiesInverseCollectionsChunkTopic::getName(),
+                            'exception' => $e
+                        ]
+                    );
+
+                    throw JobRedeliveryException::create();
+                } catch (\Throwable $e) {
+                    $this->logger?->error(
+                        'Unexpected exception occurred during Audit Changed Entities build.',
+                        [
+                            'topic' => AuditChangedEntitiesInverseCollectionsChunkTopic::getName(),
+                            'exception' => $e
+                        ]
+                    );
+                    return false;
+                }
 
                 return true;
             }

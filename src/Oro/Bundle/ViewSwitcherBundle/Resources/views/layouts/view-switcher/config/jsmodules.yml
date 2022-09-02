@@ -27,7 +27,7 @@ entry:
         - oroui/js/app
         - oroui/js/app/services/app-ready-load-modules
 map:
-    "*":
+    '*':
         backbone: oroui/js/extend/backbone
         chaplin: oroui/js/extend/chaplin
         jquery: oroui/js/extend/jquery

@@ -1,0 +1,21 @@
+features:
+    reports:
+        label: oro.report.feature.label
+        description: oro.report.feature.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_report_index
+            - oro_report_view
+            - oro_report_view_grid
+            - oro_report_create
+            - oro_report_update
+            - oro_report_clone
+            - oro_api_delete_report
+            - oro_reportcrm_index
+        configuration:
+            - oro_report.display_sql_query
+        entities:
+            - Oro\Bundle\ReportBundle\Entity\Report
+            - Oro\Bundle\ReportBundle\Entity\ReportType
+        navigation_items:
+            - application_menu.reports_tab.manage_reports

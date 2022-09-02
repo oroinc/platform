@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Composer\Question\StrictConfirmationQuestion;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
@@ -23,6 +22,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -78,6 +78,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('formatting-code', null, InputOption::VALUE_OPTIONAL, 'Localization formatting code')
             ->addOption('skip-assets', null, InputOption::VALUE_NONE, 'Skip install/build of frontend assets')
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink the assets instead of copying them')
+            ->addOption(
+                'relative-symlink',
+                null,
+                InputOption::VALUE_NONE,
+                'Symlink the assets using relative path instead of absolute'
+            )
             ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
@@ -134,6 +140,11 @@ The <info>--symlink</info> option tells the asset installer to create symlinks
 instead of copying the assets (it may be useful during development):
 
   <info>php %command.full_name% --symlink</info>
+  
+If the <info>--relative-symlink</info> option is provided, the command creates symlinks using relative paths instead
+of absolute:
+
+  <info>php %command.full_name% --relative-symlink</info>
 
 The <info>--skip-download-translations</info> and <info>--skip-translations</info> options can be used
 to skip the step of downloading translations (already downloaded translations
@@ -179,6 +190,7 @@ HELP
             ->addUsage('--language=en --formatting-code=en_US')
             ->addUsage('--skip-assets')
             ->addUsage('--symlink')
+            ->addUsage('--relative-symlink')
             ->addUsage('--skip-download-translations')
             ->addUsage('--skip-translations')
             ->addUsage('--drop-database')
@@ -553,7 +565,7 @@ HELP
             'Load sample data (y/n)',
             null,
             [
-                'class' => StrictConfirmationQuestion::class,
+                'class' => ConfirmationQuestion::class,
                 'constructorArgs' => [false]
             ]
         );
@@ -793,6 +805,10 @@ HELP
 
         if ($input->hasOption('symlink') && $input->getOption('symlink')) {
             $command[] = '--symlink';
+        }
+
+        if ($input->hasOption('relative-symlink') && $input->getOption('relative-symlink')) {
+            $command[] = '--relative-symlink';
         }
 
         if ($input->getOption('env')) {

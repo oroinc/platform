@@ -11,21 +11,25 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
 class MainMenu extends Element
 {
     /** @var Element */
-    protected $dropDown;
+    private $dropDown;
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     protected function init()
     {
         $this->dropDown = $this;
     }
 
-    /**
-     * @param string $path
-     * @return NodeElement
-     */
-    public function openAndClick($path)
+    protected function getDropDown(NodeElement $link): Element
+    {
+        return $this->elementFactory->wrapElement(
+            'MainMenuDropdown',
+            $link->getParent()->find('css', '.dropdown-menu')
+        );
+    }
+
+    public function openAndClick(string $path): NodeElement
     {
         $this->dropDown = $this;
         $items = explode('/', $path);
@@ -49,7 +53,7 @@ class MainMenu extends Element
     }
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function hasLink($path)
     {
@@ -80,11 +84,7 @@ class MainMenu extends Element
         return true;
     }
 
-    /**
-     * @param string $item
-     * @return NodeElement
-     */
-    public function selectSideSubmenu(string $item)
+    public function selectSideSubmenu(string $item): NodeElement
     {
         $link = $this->findVisibleLink($item);
         if (!$link->find('xpath', './span')->hasClass('title-level-1')) {
@@ -101,24 +101,45 @@ class MainMenu extends Element
         return $link;
     }
 
-    /**
-     * @param string $path
-     */
-    private function moveByMenuTree($path)
+    public function walkAllMenuItems(): \Generator
+    {
+        $topLevelItems = $this->findAll('css', 'span.title-level-1');
+        foreach ($topLevelItems as $topLevelItem) {
+            $topLevelPrefix = $this->selectSideSubmenu($topLevelItem->getText())->getText() . '/ ';
+            $currentLevel = 1;
+            $currentLevelPrefix = '';
+            $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
+            foreach ($menuOverlay->findAll('css', 'ul.menu-level-1 > li span.title') as $menuTitle) {
+                $menuLevel = $this->getMenuLevel($menuTitle);
+                if ($menuLevel < $currentLevel) {
+                    $lastDelimPos = mb_strrpos($currentLevelPrefix, '/ ', -3);
+                    $currentLevelPrefix = false !== $lastDelimPos
+                        ? mb_substr($currentLevelPrefix, 0, $lastDelimPos + 2)
+                        : '';
+                }
+                $currentLevel = $menuLevel;
+                if ($menuTitle->getParent()->hasClass('unclickable')) {
+                    $currentLevelPrefix .= $menuTitle->getText() . '/ ';
+                    continue;
+                }
+
+                yield $topLevelPrefix . $currentLevelPrefix . $menuTitle->getText();
+            }
+        }
+    }
+
+    private function moveByMenuTree(string $path): void
     {
         $items = explode('/', $path);
         array_pop($items);
         while ($item = array_shift($items)) {
             $link = $this->findVisibleLink($item);
             $link->mouseOver();
-            $this->getDropDown($link);
+            $this->dropDown = $this->getDropDown($link);
         }
     }
 
-    /**
-     * @param string $path
-     */
-    private function clickByMenuTree($path)
+    private function clickByMenuTree(string $path): void
     {
         $items = explode('/', $path);
         array_pop($items);
@@ -130,11 +151,7 @@ class MainMenu extends Element
         }
     }
 
-    /**
-     * @param string $path
-     * @return NodeElement
-     */
-    private function walkSideMenu(string $path)
+    private function walkSideMenu(string $path): NodeElement
     {
         $items = explode('/', $path);
         $link = $this->selectSideSubmenu(array_shift($items));
@@ -145,13 +162,9 @@ class MainMenu extends Element
 
         $currentItem = trim(array_shift($items));
         $currentLevel = 1;
-
         $menuOverlay = $this->elementFactory->createElement('SideMenuOverlay');
-
-        /** @var NodeElement $menuTitle */
         foreach ($menuOverlay->findAll('css', 'ul.menu-level-1 > li span.title') as $menuTitle) {
             $menuLevel = $this->getMenuLevel($menuTitle);
-
             if ($menuLevel <= $currentLevel) {
                 break; // it's needed to check only nested menu items
             }
@@ -159,7 +172,6 @@ class MainMenu extends Element
             if ($menuLevel !== $currentLevel + 1) {
                 continue; // it's needed to check only direct children
             }
-
             if (!$menuTitle->has(
                 'xpath',
                 sprintf('ancestor::li[contains(normalize-space(@data-original-text),"%s")]', $currentItem)
@@ -178,11 +190,7 @@ class MainMenu extends Element
         throw new \LogicException(sprintf('Menu "%s" was not found on the page', $path));
     }
 
-    /**
-     * @param NodeElement $menuTitle
-     * @return int
-     */
-    private function getMenuLevel(NodeElement $menuTitle)
+    private function getMenuLevel(NodeElement $menuTitle): int
     {
         $class = $menuTitle->getAttribute('class');
 
@@ -194,11 +202,7 @@ class MainMenu extends Element
         return (int)$matches[1];
     }
 
-    /**
-     * @param string $title
-     * @return NodeElement
-     */
-    protected function findVisibleLink($title)
+    private function findVisibleLink(string $title): NodeElement
     {
         $title = trim($title);
 
@@ -216,16 +220,5 @@ class MainMenu extends Element
         self::assertNotNull($link, sprintf('Menu item "%s" not found', $title));
 
         return $link;
-    }
-
-    /**
-     * @param NodeElement $link
-     */
-    protected function getDropDown($link)
-    {
-        $this->dropDown = $this->elementFactory->wrapElement(
-            'MainMenuDropdown',
-            $link->getParent()->find('css', '.dropdown-menu')
-        );
     }
 }

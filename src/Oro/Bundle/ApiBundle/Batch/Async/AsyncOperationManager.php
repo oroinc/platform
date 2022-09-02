@@ -168,8 +168,13 @@ class AsyncOperationManager
         });
     }
 
-    private function updateOperation(int $operationId, callable $callback): bool
+    public function updateOperation(int $operationId, callable $callback): bool
     {
+        $data = $callback();
+        if (!$data) {
+            return false;
+        }
+
         $em = $this->getEntityManager();
         $metadata = $em->getClassMetadata(AsyncOperation::class);
         $qb = $em
@@ -177,7 +182,6 @@ class AsyncOperationManager
             ->update(AsyncOperation::class, 'o')
             ->where('o.id = :id')
             ->setParameter('id', $operationId);
-        $data = $callback();
         foreach ($data as $fieldName => $value) {
             $qb
                 ->set('o.' . $fieldName, ':' . $fieldName)

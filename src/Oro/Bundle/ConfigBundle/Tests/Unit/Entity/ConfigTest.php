@@ -8,10 +8,8 @@ use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 
 class ConfigTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Config
-     */
-    protected $object;
+    /** @var Config */
+    private $object;
 
     protected function setUp(): void
     {

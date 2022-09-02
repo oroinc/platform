@@ -39,10 +39,8 @@ class CleanConfigurationHandlerTest extends \PHPUnit\Framework\TestCase
                 'test_transition' => [
                     'preactions' => ['config'],
                     'preconditions' => ['config'],
-                    'pre_conditions' => ['config'],
                     'conditions' => ['config'],
                     'actions' => ['config'],
-                    'post_actions' => ['config'],
                     'other_node_name' => 'other_node_config'
                 ]
             ],

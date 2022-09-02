@@ -53,6 +53,7 @@ class OroMainContext extends MinkContext implements
 {
     const SKIP_WAIT_PATTERN = '/'.
         '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" flash message and I close it$|'.
         '^(?:|I )should see ".+" error message$|'.
         '^(?:|I )should see Schema updated flash message$'.
     '/';
@@ -1287,7 +1288,9 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
-        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        $modalWindow = $this->spin(function () {
+            return $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        }, 5);
         self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         try {
             $button = $this->fixStepArgument($button);
@@ -1347,6 +1350,28 @@ JS;
         /** @var MainMenu $mainMenu */
         $mainMenu = $this->createElement('MainMenu');
         $mainMenu->selectSideSubmenu($submenu);
+    }
+
+    /**
+     * Example: And I should see exactly the following menu:
+     *   | System/ User Management/ Users |
+     *   | System/ User Management/ Roles |
+     *
+     * @Then /^(?:|I )should see exactly the following menu:$/
+     */
+    public function iShouldSeeExactlyFollowingMenu(TableNode $table): void
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $paths = $table->getColumn(0);
+        foreach ($paths as $path) {
+            self::assertTrue($mainMenu->hasLink($path), sprintf('Cannot find the menu "%s"', $path));
+        }
+        foreach ($mainMenu->walkAllMenuItems() as $path) {
+            if (!\in_array($path, $paths, true)) {
+                self::fail(sprintf('Not expected to see the menu "%s"', $path));
+            }
+        }
     }
 
     /**
@@ -2533,12 +2558,12 @@ JS;
             $page = $this->getPage();
 
             $button = $page->findLink($item);
-            if (!$button) {
+            if (null === $button || !$button->isVisible()) {
                 $button = $page->findButton($item);
             }
 
-            self::assertNull(
-                $button,
+            self::assertTrue(
+                null === $button || !$button->isVisible(),
                 "Button with name $item still present on page (link selector, actually)"
             );
         }

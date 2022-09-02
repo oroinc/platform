@@ -28,6 +28,8 @@ class OroTranslationExtension extends Extension
 
         $container->getDefinition('oro_translation.js_generator')
             ->setArgument('$domains', $config['js_translation']['domains']);
+        $container->getDefinition('oro_translation.manager.translation')
+            ->setArgument('$jsTranslationDomains', $config['js_translation']['domains']);
         $container->getDefinition('oro_translation.twig.translation.extension')
             ->setArgument('$isDebugJsTranslations', $config['js_translation']['debug']);
 

@@ -18,13 +18,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class AutoResponseTemplateChoiceType extends AbstractType
 {
-    const NAME = 'oro_email_autoresponse_template_choice';
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    private TokenAccessorInterface $tokenAccessor;
+    private TranslatorInterface $translator;
 
     public function __construct(TokenAccessorInterface $tokenAccessor, TranslatorInterface $translator)
     {
@@ -38,10 +33,10 @@ class AutoResponseTemplateChoiceType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'selectedEntity' => Email::ENTITY_CLASS,
+            'selectedEntity' => Email::class,
             'query_builder' => function (EmailTemplateRepository $repository) {
                 return $repository->getEntityTemplatesQueryBuilder(
-                    Email::ENTITY_CLASS,
+                    Email::class,
                     $this->tokenAccessor->getOrganization(),
                     true,
                     false
@@ -59,9 +54,9 @@ class AutoResponseTemplateChoiceType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        /* @var $choice ChoiceView */
+        /* @var ChoiceView $choice */
         foreach ($view->vars['choices'] as $choice) {
-            /* @var $template EmailTemplate */
+            /* @var EmailTemplate $template */
             $template = $choice->data;
             if (!$template->isVisible()) {
                 $choice->label = $this->translator->trans('oro.form.custom_value');
@@ -90,6 +85,6 @@ class AutoResponseTemplateChoiceType extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return static::NAME;
+        return 'oro_email_autoresponse_template_choice';
     }
 }

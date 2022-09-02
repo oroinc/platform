@@ -1,0 +1,22 @@
+features:
+    manage_localizations:
+        label: oro.locale.localization.feature.manage.label
+        description: oro.locale.localization.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_locale_localization_view
+            - oro_locale_localization_index
+            - oro_locale_localization_create
+            - oro_locale_localization_update
+        commands:
+            - oro:localization:localized-fallback-values:cleanup-unused
+            - oro:localization:dump
+            - oro:localization:update
+        entities:
+            - Oro\Bundle\LocaleBundle\Entity\Localization
+            - Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
+        api_resources:
+            - Oro\Bundle\LocaleBundle\Entity\Localization
+            - Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
+        navigation_items:
+            - application_menu.system_tab.localization.localizations

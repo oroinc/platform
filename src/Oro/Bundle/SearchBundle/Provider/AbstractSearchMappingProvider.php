@@ -4,6 +4,9 @@ namespace Oro\Bundle\SearchBundle\Provider;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
+/**
+ * The base class for search mapping providers.
+ */
 abstract class AbstractSearchMappingProvider
 {
     /**
@@ -14,9 +17,7 @@ abstract class AbstractSearchMappingProvider
     /**
      * Get array with entity aliases
      *
-     * @return array
-     *  key - entity class name
-     *  value - entity search alias
+     * @return array [entity class => entity search alias, ...]
      */
     public function getEntitiesListAliases()
     {
@@ -24,7 +25,7 @@ abstract class AbstractSearchMappingProvider
 
         $mappingConfig = $this->getMappingConfig();
         foreach ($mappingConfig as $class => $mappingEntity) {
-            $entities[$class] = isset($mappingEntity['alias']) ? $mappingEntity['alias'] : '';
+            $entities[$class] = $mappingEntity['alias'] ?? '';
         }
 
         return $entities;
@@ -35,7 +36,7 @@ abstract class AbstractSearchMappingProvider
      *
      * @param string[] $classNames The list of entity FQCN
      *
-     * @return array [entity class name => entity search alias, ...]
+     * @return array [entity class => entity search alias, ...]
      *
      * @throws \InvalidArgumentException if some of requested entities is not registered in the search index
      *                                   or has no the search alias
@@ -87,14 +88,14 @@ abstract class AbstractSearchMappingProvider
      *
      * @param string $alias
      *
-     * @return null|string
+     * @return string|null
      */
     public function getEntityClass($alias)
     {
         $mappingConfig = $this->getMappingConfig();
 
         foreach ($mappingConfig as $className => $config) {
-            if ($config['alias'] == $alias) {
+            if ($config['alias'] === $alias) {
                 return $className;
             }
         }
@@ -129,7 +130,7 @@ abstract class AbstractSearchMappingProvider
     {
         $mappingConfig = $this->getMappingConfig();
 
-        return array_key_exists($className, $mappingConfig);
+        return \array_key_exists($className, $mappingConfig);
     }
 
     /**
@@ -143,9 +144,10 @@ abstract class AbstractSearchMappingProvider
     {
         $mappingConfig = $this->getMappingConfig();
 
-        return array_key_exists($className, $mappingConfig)
-        && isset($mappingConfig[$className]['fields'])
-        && !empty($mappingConfig[$className]['fields']);
+        return
+            \array_key_exists($className, $mappingConfig)
+            && isset($mappingConfig[$className]['fields'])
+            && !empty($mappingConfig[$className]['fields']);
     }
 
     /**
@@ -168,19 +170,12 @@ abstract class AbstractSearchMappingProvider
     }
 
     /**
-     * Get mapping config for entity
-     *
-     * @param string $entity
-     *
-     * @return array
+     * Gets mapping configuration for the given entity.
      */
-    public function getEntityConfig($entity)
+    public function getEntityConfig(string $className): array
     {
         $mappingConfig = $this->getMappingConfig();
-        if (isset($mappingConfig[(string)$entity])) {
-            return $mappingConfig[(string)$entity];
-        }
 
-        return [];
+        return $mappingConfig[$className] ?? [];
     }
 }

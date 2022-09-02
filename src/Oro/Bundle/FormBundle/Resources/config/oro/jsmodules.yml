@@ -75,7 +75,7 @@ dynamic-imports:
         - oroform/js/app/views/default-field-value-view
         - oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view
 map:
-    "*":
+    '*':
         jquery.validate: oroform/js/extend/validate
     oroform/js/extend/validate:
         jquery.validate: jquery.validate

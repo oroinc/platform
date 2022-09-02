@@ -263,7 +263,7 @@ class EnumSynchronizer
     protected function getEnumOptionKey($id, array $options)
     {
         foreach ($options as $optKey => $opt) {
-            if ($id == $opt['id']) {
+            if ((string) $id === (string) $opt['id']) {
                 return $optKey;
             }
         }

@@ -9,20 +9,14 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 
 class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MergeModesListener
-     */
-    protected $listener;
+    /** @var EntityMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityMetadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityMetadata;
+    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldMetadata;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldMetadata;
+    /** @var MergeModesListener */
+    private $listener;
 
     protected function setUp(): void
     {

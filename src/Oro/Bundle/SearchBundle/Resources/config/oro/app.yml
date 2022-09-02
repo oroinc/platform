@@ -35,6 +35,9 @@ fos_rest:
 
 oro_api:
     filters:
+        simpleSearch:
+            class: Oro\Bundle\SearchBundle\Api\Filter\SimpleSearchFilter
+            supported_operators: ['=']
         searchQuery:
             factory: ['@oro_search.api.filter_factory.search_query', 'createFilter']
             supported_operators: ['=']

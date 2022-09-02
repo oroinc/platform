@@ -89,9 +89,8 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_locale.cache.provider.tree_fallback_strategy'
-        calls:
-            - [setEntityClass, ['Oro\Bundle\LocaleBundle\Entity\Localization']]
         tags:
+            - { name: oro_translation.extension.translation_strategy, priority: 10 }
             - { name: kernel.cache_warmer }
 
     # Calendar
@@ -373,7 +372,6 @@ services:
     oro_locale.twig.date_time_organization:
         class: Oro\Bundle\LocaleBundle\Twig\DateTimeOrganizationExtension
         parent: oro_locale.twig.date_time
-        deprecated: The "%service_id%" service is deprecated since 1.11, will be removed after 1.13.
         tags:
             - { name: twig.extension }
 

@@ -11,18 +11,13 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 /**
- * Denies access to entities that does not belong to the current organization.
+ * Denies access to entities that do not belong to the current organization.
  */
 class OrganizationAwareAccessRule implements AccessRuleInterface
 {
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var string */
-    private $organizationFieldName;
-
-    /** @var bool */
-    private $isOrganizationOptional = false;
+    private TokenAccessorInterface $tokenAccessor;
+    private string $organizationFieldName;
+    private bool $isOrganizationOptional = false;
 
     public function __construct(
         TokenAccessorInterface $tokenAccessor,
@@ -38,7 +33,7 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isApplicable(Criteria $criteria): bool
     {
@@ -46,7 +41,7 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(Criteria $criteria): void
     {

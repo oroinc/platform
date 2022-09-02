@@ -8,7 +8,7 @@ define(function(require, exports, module) {
     let config = require('module-config').default(module.id);
 
     config = _.extend({
-        iconHideText: true
+        launcherMode: 'icon-only'
     }, config);
 
     /**
@@ -46,10 +46,6 @@ define(function(require, exports, module) {
          * @property {boolean}
          */
         allowDefaultAriaLabel: false,
-
-        /** @property {Boolean} */
-        /** @deprecated use launcherMode */
-        iconHideText: config.iconHideText,
 
         /** @property {String}: 'icon-text' | 'icon-only' | 'text-only' */
         launcherMode: '',
@@ -113,21 +109,6 @@ define(function(require, exports, module) {
         },
 
         /**
-         * @return {String}
-         */
-        _convertToLauncherMode: function() {
-            let str = '';
-
-            if (this.icon) {
-                str = this.iconHideText ? 'icon-only' : 'icon-text';
-            } else {
-                str = 'text-only';
-            }
-
-            return str;
-        },
-
-        /**
          * @inheritdoc
          */
         dispose: function() {
@@ -174,7 +155,10 @@ define(function(require, exports, module) {
                 ariaLabel = this.getDefaultAriaLabel(label);
             }
 
-            this.launcherMode = this.launcherMode || this._convertToLauncherMode();
+            if (!this.launcherMode) {
+                this.launcherMode = this.icon ? config.launcherMode : 'text-only';
+            }
+
             return {
                 label: label,
                 icon: this.selectedItem.icon,

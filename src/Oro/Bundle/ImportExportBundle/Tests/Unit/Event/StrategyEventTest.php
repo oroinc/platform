@@ -8,20 +8,14 @@ use Oro\Bundle\ImportExportBundle\Strategy\StrategyInterface;
 
 class StrategyEventTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var StrategyInterface;
-     */
-    protected $strategy;
+    /** @var StrategyInterface */
+    private $strategy;
 
-    /**
-     * @var \stdClass
-     */
-    protected $entity;
+    /** @var \stdClass */
+    private $entity;
 
-    /**
-     * @var StrategyEvent
-     */
-    protected $event;
+    /** @var StrategyEvent */
+    private $event;
 
     protected function setUp(): void
     {

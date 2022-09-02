@@ -6,6 +6,7 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
@@ -103,18 +104,17 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
         }
 
         if ($permissions[self::RULE_GROUP]) {
-            $arr = [
-                'label'     => 'oro.user.groups.label',
-                'class'     => 'OroUserBundle:Group',
-                'choice_label' => 'name',
-                'multiple'  => true,
-                'expanded'  => true,
-                'required'  => false,
-                'attr'      => $attr,
-                'disabled'  => $isMyProfile,
+            $formFields[] = ['groups', EntityType::class, [
+                'label'                => 'oro.user.groups.label',
+                'class'                => Group::class,
+                'choice_label'         => 'name',
+                'multiple'             => true,
+                'expanded'             => true,
+                'required'             => false,
+                'attr'                 => $attr,
+                'disabled'             => $isMyProfile,
                 'translatable_options' => false
-            ];
-            $formFields[] = ['groups', EntityType::class, $arr];
+            ]];
         }
         if ($permissions[self::RULE_BUSINESS_UNIT] && $permissions[self::RULE_ORGANIZATION]) {
             $formFields[] = ['organizations', OrganizationsSelectType::class];
@@ -138,7 +138,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
     public function addEntityFieldsDataProvider(): array
     {
         return [
-            'own profile with all permission' => [
+            'own profile with all permission'                  => [
                 'permissions' => [
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => true,
@@ -147,7 +147,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isMyProfile' => true
             ],
-            'other profile with all permission' => [
+            'other profile with all permission'                => [
                 'permissions' => [
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
@@ -156,7 +156,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isMyProfile' => false
             ],
-            'own profile without permission for role' => [
+            'own profile without permission for role'          => [
                 'permissions' => [
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => true,
@@ -165,7 +165,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isMyProfile' => true
             ],
-            'own profile without permission for group' => [
+            'own profile without permission for group'         => [
                 'permissions' => [
                     self::RULE_ROLE          => true,
                     self::RULE_GROUP         => false,
@@ -183,7 +183,7 @@ class UserTypeTest extends \PHPUnit\Framework\TestCase
                 ],
                 'isMyProfile' => true
             ],
-            'own profile without all permission' => [
+            'own profile without all permission'               => [
                 'permissions' => [
                     self::RULE_ROLE          => false,
                     self::RULE_GROUP         => false,

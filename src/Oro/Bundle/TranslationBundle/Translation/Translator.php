@@ -115,19 +115,18 @@ class Translator extends BaseTranslator
         }
         $fallbackCatalogues = array_reverse($fallbackCatalogues);
 
-        $domains = array_flip($domains);
         $translations = [];
         foreach ($fallbackCatalogues as $fallbackCatalogue) {
             $localeTranslations = $fallbackCatalogue->all();
-            // if there are domains -> filter only their translations
-            if ($domains) {
-                $localeTranslations = array_intersect_key($localeTranslations, $domains);
-            }
-            foreach ($localeTranslations as $domain => $domainTranslations) {
+            foreach ($domains as $domain) {
+                $domainTranslations = $localeTranslations[$domain] ?? [];
                 $translations[$domain] = empty($translations[$domain])
                     ? $domainTranslations
                     : array_merge($translations[$domain], $domainTranslations);
-                $dynamicTranslations = $this->dynamicTranslationProvider->getTranslations($domain, $locale);
+                $dynamicTranslations = $this->dynamicTranslationProvider->getTranslations(
+                    $domain,
+                    $fallbackCatalogue->getLocale()
+                );
                 if ($dynamicTranslations) {
                     $translations[$domain] = array_replace($translations[$domain], $dynamicTranslations);
                 }
@@ -203,7 +202,7 @@ class Translator extends BaseTranslator
         $result = false;
         $catalogue = $this->getCatalogue($locale);
         while (null !== $catalogue) {
-            if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $locale)
+            if ($this->dynamicTranslationProvider->hasTranslation($id, $domain, $catalogue->getLocale())
                 || $catalogue->defines($id, $domain)
             ) {
                 $result = true;

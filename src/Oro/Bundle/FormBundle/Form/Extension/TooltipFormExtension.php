@@ -10,24 +10,24 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Adds support of tooltips for form fields.
+ */
 class TooltipFormExtension extends AbstractTypeExtension
 {
     use FormExtendedTypeTrait;
 
-    const DEFAULT_TRANSLATE_DOMAIN = 'messages';
-    const TOOLTIPS_TRANSLATE_DOMAIN = 'tooltips';
-
     /**
      * @var array
      */
-    protected $optionalParameters = array(
+    protected $optionalParameters = [
         'tooltip',
         'tooltip_details_enabled',
         'tooltip_details_anchor',
         'tooltip_details_link',
         'tooltip_placement',
         'tooltip_parameters'
-    );
+    ];
 
     /** @var ConfigProvider */
     protected $entityConfigProvider;
@@ -72,16 +72,13 @@ class TooltipFormExtension extends AbstractTypeExtension
     protected function updateTooltip(FormInterface $field, FormView $view)
     {
         $parentOptions = $field->getParent()->getConfig()->getOptions();
-        $parentClassName = isset($parentOptions['data_class']) ? $parentOptions['data_class'] : null;
+        $parentClassName = $parentOptions['data_class'] ?? null;
         if (!isset($view->vars['tooltip']) &&
             $parentClassName &&
             $this->entityConfigProvider->hasConfig($parentClassName, $field->getName())
         ) {
             $tooltip = $this->entityConfigProvider->getConfig($parentClassName, $field->getName())->get('description');
-            //@deprecated 1.9.0:1.11.0 tooltips.*.yml will be removed. Use Resources/translations/messages.*.yml instead
-            if ($this->translator->hasTrans($tooltip, self::DEFAULT_TRANSLATE_DOMAIN) ||
-                $this->translator->hasTrans($tooltip, self::TOOLTIPS_TRANSLATE_DOMAIN)
-            ) {
+            if ($this->translator->hasTrans($tooltip)) {
                 $view->vars['tooltip'] = $tooltip;
             }
         }

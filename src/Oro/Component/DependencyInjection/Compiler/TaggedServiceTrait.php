@@ -11,29 +11,16 @@ trait TaggedServiceTrait
 {
     /**
      * Gets a value of the specific tag attribute.
-     *
-     * @param array  $attributes
-     * @param string $attributeName
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
      */
-    private function getAttribute(array $attributes, string $attributeName, $defaultValue = null)
+    private function getAttribute(array $attributes, string $attributeName, mixed $defaultValue = null): mixed
     {
-        return array_key_exists($attributeName, $attributes)
+        return \array_key_exists($attributeName, $attributes)
             ? $attributes[$attributeName]
             : $defaultValue;
     }
 
     /**
      * Gets a value of the specific mandatory tag attribute.
-     *
-     * @param array  $attributes
-     * @param string $attributeName
-     * @param string $serviceId
-     * @param string $tagName
-     *
-     * @return mixed
      *
      * @throws InvalidArgumentException is the requested attribute does not exist
      */
@@ -42,8 +29,8 @@ trait TaggedServiceTrait
         string $attributeName,
         string $serviceId,
         string $tagName
-    ) {
-        if (!array_key_exists($attributeName, $attributes)) {
+    ): mixed {
+        if (!\array_key_exists($attributeName, $attributes)) {
             throw new InvalidArgumentException(sprintf(
                 'The attribute "%s" is required for "%s" tag. Service: "%s".',
                 $attributeName,
@@ -77,27 +64,6 @@ trait TaggedServiceTrait
     {
         if ($services) {
             krsort($services);
-            $services = array_merge(...array_values($services));
-        }
-
-        return $services;
-    }
-
-    /**
-     * Sorts tagged services by the priority using ksort() function
-     * (the higher the priority number, the later the service is added to the result list)
-     * and returns flatten array of sorted services.
-     *
-     * @param array $services [priority => item, ...]
-     *
-     * @return array [item, ...]
-     *
-     * @deprecated use {@see sortByPriorityAndFlatten} for new tags
-     */
-    private function inverseSortByPriorityAndFlatten(array $services): array
-    {
-        if ($services) {
-            ksort($services);
             $services = array_merge(...array_values($services));
         }
 

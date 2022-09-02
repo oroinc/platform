@@ -1,0 +1,48 @@
+features:
+    manage_workflows:
+        label: oro.workflow.feature.manage.label
+        description: oro.workflow.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_workflow_definition_index
+            - oro_workflow_definition_create
+            - oro_workflow_definition_update
+            - oro_workflow_definition_configure
+            - oro_workflow_definition_view
+            - oro_workflow_definition_activate_from_widget
+        commands:
+            - oro:workflow:definitions:load
+            - oro:debug:workflow:definitions
+            - oro:workflow:translations:dump
+        entities:
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAclIdentity
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowRestrictionIdentity
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowStep
+            - Oro\Bundle\WorkflowBundle\Entity\WorkflowTransitionRecord
+            - Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger
+            - Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger
+        navigation_items:
+            - application_menu.system_tab.workflow_definition_list
+        operations:
+            - clone_workflow
+            - oro_workflow_definition_configure
+
+    manage_processes:
+        label: oro.workflow.feature.process.manage.label
+        description: oro.workflow.feature.process.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_process_definition_index
+            - oro_process_definition_view
+        commands:
+            - oro:process:configuration:load
+        entities:
+            - Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition
+            - Oro\Bundle\WorkflowBundle\Entity\ProcessJob
+            - Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger
+        navigation_items:
+            - application_menu.system_tab.process_definition_list

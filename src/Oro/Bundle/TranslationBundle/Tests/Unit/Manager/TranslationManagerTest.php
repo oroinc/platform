@@ -4,6 +4,7 @@ namespace Oro\Bundle\TranslationBundle\Tests\Unit\Manager;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Oro\Bundle\TranslationBundle\Async\Topic\DumpJsTranslationsTopic;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationKeyRepository;
@@ -13,6 +14,7 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Bundle\TranslationBundle\Manager\TranslationManager;
 use Oro\Bundle\TranslationBundle\Provider\TranslationDomainProvider;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationCache;
+use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
 
 /**
@@ -25,6 +27,9 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
 
     /** @var DynamicTranslationCache|\PHPUnit\Framework\MockObject\MockObject */
     private $dynamicTranslationCache;
+
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $producer;
 
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
@@ -45,6 +50,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
     {
         $this->domainProvider = $this->createMock(TranslationDomainProvider::class);
         $this->dynamicTranslationCache = $this->createMock(DynamicTranslationCache::class);
+        $this->producer = $this->createMock(MessageProducerInterface::class);
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->translationKeyRepository = $this->createMock(TranslationKeyRepository::class);
         $this->translationRepository = $this->createMock(TranslationRepository::class);
@@ -66,7 +72,9 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->translationManager = new TranslationManager(
             $doctrine,
             $this->domainProvider,
-            $this->dynamicTranslationCache
+            $this->dynamicTranslationCache,
+            $this->producer,
+            ['validators', 'jsmessages']
         );
     }
 
@@ -197,6 +205,42 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         $this->dynamicTranslationCache->expects($this->once())
             ->method('delete')
             ->with(['locale']);
+        $this->producer->expects($this->never())
+            ->method('send');
+
+        $this->translationManager->flush();
+    }
+
+    public function testFlushWhenJsTranslationsChanged()
+    {
+        $translationKey = (new TranslationKey())->setKey('key')->setDomain('jsmessages');
+
+        $this->translationKeyRepository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturn($translationKey);
+
+        $this->languageRepository->expects($this->any())
+            ->method('findOneBy')
+            ->willReturn((new Language())->setCode('locale'));
+
+        $translation = $this->translationManager->saveTranslation('key', 'value', 'locale', 'jsmessages');
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('persist')
+            ->withConsecutive(
+                [$this->identicalTo($translationKey)],
+                [$this->identicalTo($translation)]
+            );
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->with([$translationKey, $translation]);
+
+        $this->dynamicTranslationCache->expects($this->once())
+            ->method('delete')
+            ->with(['locale']);
+        $this->producer->expects($this->once())
+            ->method('send')
+            ->with(DumpJsTranslationsTopic::getName(), []);
 
         $this->translationManager->flush();
     }

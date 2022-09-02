@@ -6,10 +6,8 @@ use Oro\Bundle\AddressBundle\Entity\AddressType;
 
 class AddressTypeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var AddressType
-     */
-    protected $type;
+    /** @var AddressType */
+    private $type;
 
     protected function setUp(): void
     {

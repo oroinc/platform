@@ -9,8 +9,7 @@ use Psr\Container\ContainerInterface;
  */
 class SearchRegistry
 {
-    /** @var ContainerInterface */
-    private $searchHandlers;
+    private ContainerInterface $searchHandlers;
 
     public function __construct(ContainerInterface $searchHandlers)
     {
@@ -23,7 +22,7 @@ class SearchRegistry
     public function getSearchHandler(string $name): SearchHandlerInterface
     {
         if (!$this->searchHandlers->has($name)) {
-            throw new \RuntimeException(sprintf('Search handler "%s" is not registered', $name));
+            throw new \RuntimeException(sprintf('Search handler "%s" is not registered.', $name));
         }
 
         return $this->searchHandlers->get($name);

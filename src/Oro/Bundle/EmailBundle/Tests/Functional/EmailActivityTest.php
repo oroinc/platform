@@ -34,7 +34,7 @@ class EmailActivityTest extends WebTestCase
         $em->flush($email);
 
         /** @var ActivityList $activityList */
-        $activityList = $em->getRepository(ActivityList::ENTITY_NAME)
+        $activityList = $em->getRepository(ActivityList::class)
             ->findOneBy(['relatedActivityClass' => Email::class, 'relatedActivityId' => $email->getId()]);
 
         $this->assertEquals($originalSentAt, $activityList->getUpdatedAt());

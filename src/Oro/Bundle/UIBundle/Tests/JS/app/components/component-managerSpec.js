@@ -72,7 +72,7 @@ define(function(require) {
                 pageComponentModule: 'oroui/js/app/components/jquery-widget-component',
                 pageComponentOptions: {
                     printPage: '',
-                    widgetModule: 'orofrontend/blank/js/widgets/print-page-widget'
+                    widgetModule: 'orofrontend/default/js/widgets/print-page-widget'
                 }
             });
         });

@@ -8,20 +8,14 @@ use Symfony\Component\DependencyInjection\Container;
 
 class OptionalListenerManagerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var OptionalListenerManager
-     */
-    protected $manager;
+    /** @var array */
+    private $testListeners;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $container;
+    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
+    private $container;
 
-    /**
-     * @var array
-     */
-    protected $testListeners;
+    /** @var OptionalListenerManager */
+    private $manager;
 
     protected function setUp(): void
     {

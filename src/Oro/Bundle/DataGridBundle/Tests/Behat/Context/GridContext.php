@@ -395,6 +395,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * Example: I should see not empty grid
+     *
+     * @Given /^I should see not empty grid "(?P<gridName>[^"]+)"$/
+     * @Given /^I should see not empty grid$/
+     */
+    public function gridShouldNotBeEmpty($number, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        self::assertGreaterThan(0, $this->getGridPaginator($grid)->getTotalRecordsCount());
+    }
+
+
+    /**
      * Example: Then number of pages should be 3
      * Example: Then number of pages should be 15
      *

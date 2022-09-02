@@ -345,12 +345,12 @@
         <div class="grid-container steps-list">
             <input name="oro_workflow_definition_form[steps]" type="hidden" value=''>
             <input name="oro_workflow_definition_form[transitions]" type="hidden" value=''>
-            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
                         <th class="label-column"><span>{{ "Step"|trans }}</span></th>
                         <th><span>{{ "Transitions"|trans }}</span></th>
-                        <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">{{ "Position"|trans }}</span></th>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}">{{ "Position"|trans }}</span></th>
                         <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
                     </tr>
                 </thead>
@@ -365,14 +365,14 @@
             <%- label %>
             <% } else { %>
             <a href="#" class="edit-step" title="{{ 'Update this step'|trans}}"><%- label %></a>
-            <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans({}, "tooltips") }}">({{ "Final"|trans }})</strong><% } %>
+            <% if (is_final) { %>&nbsp;<strong title="{{ "oro.workflow.workflowdefinition.step.is_final.tooltip"|trans }}">({{ "Final"|trans }})</strong><% } %>
                 <% if (name && !_is_clone && typeof translateLinks !== 'undefined' && translateLinks.label) { %>
                     {{ workflowMacros.renderGoToTranslationsIconByLink('<%- translateLinks.label %>') }}
                 <% } %>
             <% } %>
         </td>
         <td class="step-transitions"></td>
-        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}"><%- order %></span></td>
+        <td><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans }}"><%- order %></span></td>
         <td class="step-actions">
             <div class="btn-group pull-right">
                 <a href="#" class="btn btn-icon btn-lighter add-step-transition action" title="{{ 'Add transition to this step'|trans}}"><i class="fa-plus-circle hide-text"></i></a>
@@ -433,7 +433,7 @@
 
     <script type="text/template" id="attribute-form-option-list-template">
         <div class="grid-container form-options-list">
-            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
                         <th><span>{{ "Entity field"|trans }}</span></th>
@@ -480,10 +480,10 @@
 
     <script type="text/template" id="transition-list-template">
         <div class="grid-container transition-list">
-            <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
                     <tr>
-                        <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}">{{ "Transition name"|trans }}</span></th>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans }}">{{ "Transition name"|trans }}</span></th>
                         <th><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}">{{ "To step"|trans }}</span></th>
                         <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
                     </tr>
@@ -503,7 +503,7 @@
 
     <script type="text/template" id="transition-row-template">
         <td class="transition-name">
-            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}"><%- label %></span>
+            <span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans }}"><%- label %></span>
         </td>
         <td><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans }}"><%- stepToLabel %></span></td>
         <td class="transition-actions">

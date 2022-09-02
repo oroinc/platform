@@ -11,17 +11,9 @@ use Oro\Bundle\TranslationBundle\Provider\LanguageProvider;
  */
 class DefaultTranslationStrategy implements TranslationStrategyInterface
 {
-    const NAME = 'default';
-
-    /** @var LanguageProvider */
-    protected $languageProvider;
-
+    private LanguageProvider $languageProvider;
     private ApplicationState $applicationState;
 
-    /**
-     * @param LanguageProvider $languageProvider
-     * @param ApplicationState $applicationState
-     */
     public function __construct(LanguageProvider $languageProvider, ApplicationState $applicationState)
     {
         $this->languageProvider = $languageProvider;
@@ -29,7 +21,7 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isApplicable()
     {
@@ -37,22 +29,23 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getName()
     {
-        return self::NAME;
+        return 'default';
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getLocaleFallbacks()
     {
         // default strategy has only one fallback to default locale
         if ($this->applicationState->isInstalled()) {
             $locales = [];
-            foreach ($this->languageProvider->getAvailableLanguageCodes() as $code) {
+            $codes = $this->languageProvider->getAvailableLanguageCodes();
+            foreach ($codes as $code) {
                 $locales[Configuration::DEFAULT_LOCALE][$code] = [];
             }
         } else {

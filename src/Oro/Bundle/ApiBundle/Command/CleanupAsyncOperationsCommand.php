@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Exception\DeleteAsyncOperationException;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Console\Command\Command;
@@ -18,13 +18,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Deletes all obsolete asynchronous operations.
  */
-class CleanupAsyncOperationsCommand extends Command implements CronCommandInterface
+class CleanupAsyncOperationsCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     /** @var string */
     protected static $defaultName = 'oro:cron:api:async_operations:cleanup';
 
     private int $operationLifetime;
     private int $cleanupProcessTimeout;
+    private int $operationTimeout;
 
     private DoctrineHelper $doctrineHelper;
     private EntityDeleteHandlerRegistry $deleteHandlerRegistry;
@@ -32,25 +33,25 @@ class CleanupAsyncOperationsCommand extends Command implements CronCommandInterf
     public function __construct(
         int $operationLifetime,
         int $cleanupProcessLifetime,
+        int $operationTimeout,
         DoctrineHelper $doctrineHelper,
         EntityDeleteHandlerRegistry $deleteHandlerRegistry
     ) {
         $this->operationLifetime = $operationLifetime;
         $this->cleanupProcessTimeout = $cleanupProcessLifetime;
+        $this->operationTimeout = $operationTimeout;
         $this->doctrineHelper = $doctrineHelper;
         $this->deleteHandlerRegistry = $deleteHandlerRegistry;
 
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '0 1 * * *';
-    }
-
-    public function isActive()
-    {
-        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -88,7 +89,9 @@ HELP
             new \DateTime('now', new \DateTimeZone('UTC')),
             new \DateInterval(sprintf('P%dD', $this->operationLifetime))
         );
-        $iterator = new BufferedIdentityQueryResultIterator($this->getOutdatedAsyncOperationsQueryBuilder($minDate));
+
+        $builder = $this->getOutdatedAsyncOperationsQueryBuilder($minDate, $this->operationTimeout);
+        $iterator = new BufferedIdentityQueryResultIterator($builder);
 
         if ($input->getOption('dry-run')) {
             $output->writeln(sprintf(
@@ -128,11 +131,15 @@ HELP
         return 0;
     }
 
-    private function getOutdatedAsyncOperationsQueryBuilder(\DateTime $minDate): QueryBuilder
+    private function getOutdatedAsyncOperationsQueryBuilder(\DateTime $minDate, int $operationTimeout): QueryBuilder
     {
         return $this->doctrineHelper
             ->createQueryBuilder(AsyncOperation::class, 'o')
             ->where('o.updatedAt <= :datetime')
-            ->setParameter('datetime', $minDate);
+            ->orWhere('o.elapsedTime >= :operation_timeout')
+            ->setParameters([
+                'datetime' => $minDate,
+                'operation_timeout' => $operationTimeout
+            ]);
     }
 }

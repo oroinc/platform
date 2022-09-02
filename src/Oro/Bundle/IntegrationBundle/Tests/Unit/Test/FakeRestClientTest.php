@@ -15,7 +15,7 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
     private const FAKE_RESOURCE = '/foo';
 
     /** @var FakeRestClient */
-    protected $client;
+    private $client;
 
     protected function setUp(): void
     {

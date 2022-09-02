@@ -14,8 +14,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetDefaultOrdering implements ProcessorInterface
 {
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    public const OPERATION_NAME = 'set_default_ordering';
+
+    private DoctrineHelper $doctrineHelper;
 
     public function __construct(DoctrineHelper $doctrineHelper)
     {
@@ -23,38 +24,45 @@ class SetDefaultOrdering implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var Context $context */
 
-        $criteria = $context->getCriteria();
-        if (null === $criteria || $criteria->getOrderings()) {
-            // the criteria object does not exist or ordering is already set
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the access validation was already performed
             return;
         }
 
-        $idFieldNames = [];
-        $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
-        if ($entityClass) {
-            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        } else {
-            $config = $context->getConfig();
-            if (null !== $config && $config->isSortingEnabled()) {
-                $fieldNames = $config->getIdentifierFieldNames();
-                foreach ($fieldNames as $fieldName) {
-                    $idFieldNames[] = $config->getField($fieldName)->getPropertyPath($fieldName);
+        $criteria = $context->getCriteria();
+        if (null !== $criteria && !$criteria->getOrderings()) {
+            $idFieldNames = [];
+            $entityClass = $context->getManageableEntityClass($this->doctrineHelper);
+            if ($entityClass) {
+                $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+            } else {
+                $config = $context->getConfig();
+                if (null !== $config && $config->isSortingEnabled()) {
+                    $fieldNames = $config->getIdentifierFieldNames();
+                    foreach ($fieldNames as $fieldName) {
+                        $idFieldNames[] = $config->getField($fieldName)->getPropertyPath($fieldName);
+                    }
                 }
             }
-        }
-
-        if ($idFieldNames) {
-            $ordering = [];
-            foreach ($idFieldNames as $propertyPath) {
-                $ordering[$propertyPath] = Criteria::ASC;
+            if ($idFieldNames) {
+                $this->setOrderBy($criteria, $idFieldNames);
             }
-            $criteria->orderBy($ordering);
         }
+        $context->setProcessed(self::OPERATION_NAME);
+    }
+
+    private function setOrderBy(Criteria $criteria, array $idFieldNames): void
+    {
+        $ordering = [];
+        foreach ($idFieldNames as $propertyPath) {
+            $ordering[$propertyPath] = Criteria::ASC;
+        }
+        $criteria->orderBy($ordering);
     }
 }

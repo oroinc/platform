@@ -12,7 +12,7 @@ class YamlPersisterTest extends \PHPUnit\Framework\TestCase
     use TempDirExtension;
 
     /** @var string */
-    protected $temporaryDir;
+    private $temporaryDir;
 
     protected function setUp(): void
     {
@@ -24,7 +24,7 @@ class YamlPersisterTest extends \PHPUnit\Framework\TestCase
         $persister = new YamlPersister(__DIR__ . DIRECTORY_SEPARATOR . 'fixtures', 'base');
         $parameters = $persister->parse();
 
-        \copy(
+        copy(
             __DIR__ . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'parameters_dump.yml',
             $this->temporaryDir . DIRECTORY_SEPARATOR . 'parameters_dump.yml'
         );

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
 class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +13,6 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
     public function testApply(array $map, array $things, array $expected)
     {
         $substitution = new ArraySubstitution();
-
         $substitution->setMap($map);
 
         $substitution->apply($things);
@@ -20,10 +20,7 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $things);
     }
 
-    /**
-     * @return array
-     */
-    public function applyProvider()
+    public function applyProvider(): array
     {
         return [
             'simple' => [
@@ -119,15 +116,14 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
 
     public function testMaxDepthException()
     {
-        $substitutor = new ArraySubstitution(true, 2);
-
-        $substitutor->setMap([
+        $substitution = new ArraySubstitution(true, 2);
+        $substitution->setMap([
             'a' => 'c',
             'c' => 'b',
             'b' => 'e'
         ]);
 
-        $this->expectException(\Oro\Bundle\ActionBundle\Exception\CircularReferenceException::class);
+        $this->expectException(CircularReferenceException::class);
 
         $things = [
             'a' => ['a body'],
@@ -136,7 +132,7 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
             'e' => ['e body']
         ];
 
-        $substitutor->apply($things);
+        $substitution->apply($things);
     }
 
     /**
@@ -154,10 +150,7 @@ class ArraySubstitutionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $applyTo);
     }
 
-    /**
-     * @return array
-     */
-    public function clearUnboundProvider()
+    public function clearUnboundProvider(): array
     {
         return [
             'simple' => [

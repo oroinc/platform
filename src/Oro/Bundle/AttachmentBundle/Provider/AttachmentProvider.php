@@ -71,10 +71,7 @@ class AttachmentProvider
      */
     private function getAttachmentByEntity($entity)
     {
-        $accessor   = PropertyAccess::createPropertyAccessor();
-        $attachment = $accessor->getValue($entity, 'attachment');
-
-        return $attachment;
+        return (PropertyAccess::createPropertyAccessor())->getValue($entity, 'attachment');
     }
 
     /**
@@ -99,22 +96,14 @@ class AttachmentProvider
                 $thumbnail = $thumbnailPictureSources['src'];
                 $thumbnailSources = $thumbnailPictureSources['sources'];
             }
+
+            $attachmentPictureSources = $this->pictureSourcesProvider->getFilteredPictureSources($attachment);
             $result = [
                 'attachmentURL' => [
-                    'url' => $this->attachmentManager
+                    'url' => $attachmentPictureSources['src'],
+                    'sources' => $attachmentPictureSources['sources'],
+                    'downloadUrl' => $this->attachmentManager
                         ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
-                    'sources' => $this->attachmentManager->isWebpEnabledIfSupported() ? [
-                        [
-                            'srcset' => $this->attachmentManager
-                                ->getFilteredImageUrl(
-                                    $attachment,
-                                    'original',
-                                    'webp'
-                                ),
-                            'type' => 'image/webp',
-                        ]
-                    ]
-                    : [],
                 ],
                 'attachmentSize' => BytesFormatter::format($attachment->getFileSize()),
                 'attachmentFileName' => $attachment->getOriginalFilename() ?: $attachment->getFilename(),

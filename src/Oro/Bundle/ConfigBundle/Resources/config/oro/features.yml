@@ -1,0 +1,9 @@
+features:
+    system_configuration:
+        label: oro.config.feature.system_configuration.label
+        description: oro.config.feature.system_configuration.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_config_configuration_system
+        navigation_items:
+            - application_menu.system_tab.system_configuration

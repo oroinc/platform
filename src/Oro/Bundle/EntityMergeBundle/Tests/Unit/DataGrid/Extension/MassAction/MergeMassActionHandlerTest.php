@@ -10,6 +10,7 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
 use Oro\Bundle\EntityMergeBundle\DataGrid\Extension\MassAction\MergeMassActionHandler;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
 
 class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
@@ -108,7 +109,7 @@ class MergeMassActionHandlerTest extends \PHPUnit\Framework\TestCase
 
     public function testHandleMustThrowInvalidArgumentExceptionIfEntityNameIsEmpty()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Entity name is missing.');
 
         $this->optionsArray['entity_name'] = '';

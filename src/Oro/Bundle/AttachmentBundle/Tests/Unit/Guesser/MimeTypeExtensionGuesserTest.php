@@ -7,25 +7,19 @@ use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
 class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MimeTypeExtensionGuesser */
-    protected $guesser;
+    private $guesser;
 
     protected function setUp(): void
     {
         $this->guesser = new MimeTypeExtensionGuesser();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function testIsGuesserSupported(): void
     {
         $this->assertTrue($this->guesser->isGuesserSupported());
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function guessMimeType(): void
+    public function testGuessMimeType(): void
     {
         $this->assertNull($this->guesser->guessMimeType(realpath(__DIR__ . '/../Fixtures/testFile/test.msg')));
     }

@@ -6,10 +6,8 @@ use Oro\Bundle\ThemeBundle\Model\Theme;
 
 class ThemeTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Theme
-     */
-    protected $theme;
+    /** @var Theme */
+    private $theme;
 
     protected function setUp(): void
     {

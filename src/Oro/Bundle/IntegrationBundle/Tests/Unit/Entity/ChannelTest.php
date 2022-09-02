@@ -17,7 +17,7 @@ class ChannelTest extends \PHPUnit\Framework\TestCase
     use EntityTestCaseTrait;
 
     /** @var Channel */
-    protected $entity;
+    private $entity;
 
     protected function setUp(): void
     {

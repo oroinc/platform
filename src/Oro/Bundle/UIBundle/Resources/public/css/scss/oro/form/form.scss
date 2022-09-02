@@ -415,9 +415,7 @@ select[multiple] {
         }
 
         &.control-group-checkbox {
-            &:not(:last-of-type) {
-                margin-top: -$content-padding-small;
-            }
+            margin-top: -$content-padding-small;
         }
     }
 

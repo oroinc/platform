@@ -73,7 +73,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
 
     public function testSerialize(): void
     {
-        self::assertSame([null, null, $this->entity->getUuid(), null, null], $this->entity->__serialize());
+        self::assertSame([null, null, $this->entity->getUuid(), null, null, null], $this->entity->__serialize());
 
         $file = $this->getEntity(
             File::class,
@@ -83,10 +83,11 @@ class FileTest extends \PHPUnit\Framework\TestCase
                 'uuid' => 'test-uuid',
                 'externalUrl' => 'http://example.org/image.png',
                 'originalFilename' => 'original-filename.png',
+                'mimeType' => 'image/png',
             ]
         );
         self::assertEquals(
-            [1, 'sample_filename', 'test-uuid', 'http://example.org/image.png', 'original-filename.png'],
+            [1, 'sample_filename', 'test-uuid', 'http://example.org/image.png', 'original-filename.png', 'image/png'],
             $file->__serialize()
         );
     }
@@ -98,7 +99,8 @@ class FileTest extends \PHPUnit\Framework\TestCase
             'sample_filename',
             'test-uuid',
             'http://example.org/image.png',
-            'original-filename.png'
+            'original-filename.png',
+            'image/png'
         ]);
         $data = serialize($this->entity);
         /** @var File $entity */
@@ -108,6 +110,7 @@ class FileTest extends \PHPUnit\Framework\TestCase
         self::assertSame('test-uuid', $entity->getUuid());
         self::assertEquals('http://example.org/image.png', $entity->getExternalUrl());
         self::assertEquals('original-filename.png', $entity->getOriginalFilename());
+        self::assertEquals('image/png', $entity->getMimeType());
     }
 
     public function testClone(): void

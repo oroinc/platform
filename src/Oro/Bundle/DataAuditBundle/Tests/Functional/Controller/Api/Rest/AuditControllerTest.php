@@ -42,9 +42,6 @@ class AuditControllerTest extends WebTestCase
 
         $user = $this->findAdmin();
 
-        // guard
-        $this->assertEquals('admin', $user->getUsername());
-
         $audit = new Audit();
         $audit->setAction('anAction');
         $audit->setObjectName('aName');
@@ -81,7 +78,7 @@ class AuditControllerTest extends WebTestCase
         $this->assertEquals(123, $actualAudit['objectId']);
         $this->assertEquals('aClass', $actualAudit['objectClass']);
         $this->assertEquals('aName', $actualAudit['objectName']);
-        $this->assertEquals('admin', $actualAudit['username']);
+        $this->assertEquals($user->getId(), $actualAudit['user']);
         $this->assertEquals('anAction', $actualAudit['action']);
     }
 
@@ -90,9 +87,6 @@ class AuditControllerTest extends WebTestCase
         $em = $this->getEntityManager();
 
         $user = $this->findAdmin();
-
-        // guard
-        $this->assertEquals('admin', $user->getUsername());
 
         $audit = new Audit();
         $audit->setAction('anAction');
@@ -131,7 +125,7 @@ class AuditControllerTest extends WebTestCase
         $this->assertEquals(123, $actualAudit['objectId']);
         $this->assertEquals('aClass', $actualAudit['objectClass']);
         $this->assertEquals('aName', $actualAudit['objectName']);
-        $this->assertEquals('admin', $actualAudit['username']);
+        $this->assertEquals($user->getId(), $actualAudit['user']);
         $this->assertEquals('anAction', $actualAudit['action']);
     }
 
@@ -140,9 +134,6 @@ class AuditControllerTest extends WebTestCase
         $em = $this->getEntityManager();
 
         $user = $this->findAdmin();
-
-        // guard
-        $this->assertEquals('admin', $user->getUsername());
 
         $audit = new Audit();
         $audit->setObjectName('aName');

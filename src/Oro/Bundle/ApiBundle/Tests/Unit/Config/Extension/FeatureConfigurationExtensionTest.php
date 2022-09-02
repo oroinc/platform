@@ -24,9 +24,23 @@ class FeatureConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
         $actionProcessorBag = $this->createMock(ActionProcessorBagInterface::class);
         $actionProcessorBag->expects(self::any())
             ->method('getActions')
-            ->willReturn(['get', 'create', 'update', 'delete', 'delete_list']);
+            ->willReturn([
+                'get',
+                'create',
+                'update',
+                'delete',
+                'delete_list',
+                'update_relationship',
+                'add_relationship',
+                'delete_relationship'
+            ]);
 
-        $this->extension = new FeatureConfigurationExtension($actionProcessorBag, $this->configProvider);
+        $this->extension = new FeatureConfigurationExtension(
+            $actionProcessorBag,
+            $this->configProvider,
+            'api_resources',
+            'A list of entity FQCNs that are available as API resources.'
+        );
     }
 
     private function processConfiguration(array $configs): array
@@ -86,7 +100,9 @@ class FeatureConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 ['resource2', ['create', 'another']],
-                'The "another" is unknown API action. Known actions: "get, create, update, delete, delete_list".'
+                'The "another" is unknown API action. Known actions: '
+                . '"get, create, update, delete, delete_list, '
+                . 'update_relationship, add_relationship, delete_relationship".'
             ],
         ];
     }
@@ -121,7 +137,11 @@ class FeatureConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->expects(self::exactly(3))
             ->method('addApiResource')
             ->withConsecutive(
-                ['feature1', 'resource2', ['create', 'update']],
+                [
+                    'feature1',
+                    'resource2',
+                    ['create', 'update', 'update_relationship', 'add_relationship', 'delete_relationship']
+                ],
                 ['feature1', 'resource2', ['delete']],
                 ['feature2', 'resource2', ['delete', 'delete_list']],
             );

@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
+use Oro\Bundle\DataGridBundle\Exception\RuntimeException;
 use Oro\Bundle\DataGridBundle\Extension\Acceptor;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\MassActionInterface;
@@ -22,16 +23,16 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
 {
     /** @var MassActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $actionFactory;
+    private $actionFactory;
 
     /** @var MassActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    protected $actionMetadataFactory;
+    private $actionMetadataFactory;
 
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $authorizationChecker;
+    private $authorizationChecker;
 
     /** @var MassActionExtension */
-    protected $extension;
+    private $extension;
 
     protected function setUp(): void
     {
@@ -212,7 +213,7 @@ class MassActionExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testVisitMetadataWithMassActionsAndNotValidHTTPMethods()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
             'Action parameter "allowedRequestTypes" contains wrong HTTP method.'
             . ' Given "POST, DELETE, WRONG", allowed: "GET, POST, DELETE, PUT, PATCH".'

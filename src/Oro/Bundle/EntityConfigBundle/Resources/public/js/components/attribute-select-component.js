@@ -86,7 +86,7 @@ define(function(require) {
                         const oldText = $(option).text();
                         const moveFrom = _.__('oro.attribute.move_from');
                         const groupName = selectedOptions[id] ? selectedOptions[id] : _.__('oro.attribute.noname');
-                        const newText = oldText + '(' + moveFrom + ' ' + groupName + ')';
+                        const newText = oldText + ' (' + moveFrom + ' ' + groupName + ')';
                         $(option).text(newText);
                         this.oldOptionLabels[id] = oldText;
                     }

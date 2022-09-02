@@ -16,19 +16,16 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
     private const WORKFLOW_RELATED_CLASSES_KEY = 'all_workflow_related';
 
     /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
+    private $cache;
 
     /** @var WorkflowDefinitionRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $definitionRepository;
-
-    /** @var WorkflowAwareCache */
-    protected $workflowAwareCache;
+    private $definitionRepository;
 
     /** @var \stdClass */
     private $entity;
+
+    /** @var WorkflowAwareCache */
+    private $workflowAwareCache;
 
     protected function setUp(): void
     {
@@ -36,14 +33,16 @@ class WorkflowAwareCacheInvalidationTest extends \PHPUnit\Framework\TestCase
         $this->entity = new \stdClass();
         $this->definitionRepository = $this->createMock(WorkflowDefinitionRepository::class);
 
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())->method('getEntityClass')->willReturn(get_class($this->entity));
-        $this->doctrineHelper->expects($this->any())
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturn(get_class($this->entity));
+        $doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with(WorkflowDefinition::class)
             ->willReturn($this->definitionRepository);
 
-        $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $this->doctrineHelper);
+        $this->workflowAwareCache = new WorkflowAwareCache($this->cache, $doctrineHelper);
     }
 
     public function testInvalidationOfActiveWorkflowRelatedEntityClassesList()

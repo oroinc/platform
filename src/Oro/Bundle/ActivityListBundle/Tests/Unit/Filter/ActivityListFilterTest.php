@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilter;
 use Oro\Bundle\ActivityListBundle\Filter\ActivityListFilterHelper;
@@ -157,7 +158,7 @@ class ActivityListFilterTest extends \PHPUnit\Framework\TestCase
             ->willReturn($classMetadata);
         $this->em->expects($this->once())
             ->method('getRepository')
-            ->with('OroActivityListBundle:ActivityList')
+            ->with(ActivityList::class)
             ->willReturn($activityListRepository);
 
         $this->activityAssociationHelper->expects($this->once())

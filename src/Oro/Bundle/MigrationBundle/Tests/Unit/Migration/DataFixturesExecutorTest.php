@@ -1,29 +1,26 @@
 <?php
+declare(strict_types=1);
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 
+use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var DataFixturesExecutor */
-    private $dataFixturesExecutor;
+    private EntityManager|MockObject $em;
+    private Connection|MockObject$connection;
+    private EventDispatcherInterface|MockObject $eventDispatcher;
+    private DataFixturesExecutor $dataFixturesExecutor;
 
     protected function setUp(): void
     {
@@ -31,14 +28,10 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
         $this->connection = $this->createMock(Connection::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->em->expects(self::any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
+        $this->em->method('getConnection')->willReturn($this->connection);
 
         $eventManager = $this->createMock(EventManager::class);
-        $this->em->expects(self::any())
-            ->method('getEventManager')
-            ->willReturn($eventManager);
+        $this->em->method('getEventManager')->willReturn($eventManager);
 
         $this->dataFixturesExecutor = new DataFixturesExecutor($this->em, $this->eventDispatcher);
     }
@@ -170,5 +163,28 @@ class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
             ],
             $logMessages
         );
+    }
+
+    /** @covers ::execute() */
+    public function testExecuteWithProgressCallback(): void
+    {
+        $fixtures = [
+            new class implements FixtureInterface {
+                public function load(ObjectManager $manager): void
+                {
+                }
+            }
+        ];
+        $resultMemory = null;
+        $resultDuration = null;
+        $callback = static function (int $memoryBytes, float $durationMilli) use (&$resultMemory, &$resultDuration) {
+            $resultMemory = $memoryBytes;
+            $resultDuration = $durationMilli;
+        };
+
+        $this->dataFixturesExecutor->execute($fixtures, 'test', $callback);
+
+        static::assertIsNumeric($resultMemory);
+        static::assertIsNumeric($resultDuration);
     }
 }

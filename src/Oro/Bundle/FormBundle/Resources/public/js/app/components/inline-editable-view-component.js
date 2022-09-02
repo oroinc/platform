@@ -10,7 +10,7 @@ define(function(require) {
     const InlineEditorWrapperView = require('../views/inline-editable-wrapper-view');
     const frontendTypeMap = require('../../tools/frontend-type-map');
     const overlayTool = require('oroui/js/tools/overlay');
-    const tools = require('oroui/js/tools');
+    const loadModules = require('oroui/js/app/services/load-modules');
 
     /**
      * Allows to connect inline editors on view pages.
@@ -149,7 +149,7 @@ define(function(require) {
                     waitors.push(this.classes.editor.processMetadata(this.metadata));
                 }
                 this.wrapper.on('start-editing', this.enterEditMode, this);
-                waitors.push(tools.loadModuleAndReplace(this.inlineEditingOptions.save_api_accessor, 'class').then(
+                waitors.push(loadModules.fromObjectProp(this.inlineEditingOptions.save_api_accessor, 'class').then(
                     () => {
                         const ConcreteApiAccessor = this.inlineEditingOptions.save_api_accessor['class'];
                         this.saveApiAccessor = new ConcreteApiAccessor(

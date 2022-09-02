@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\PlatformBundle\Provider;
 
-use Composer\Package\PackageInterface;
-use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
+use Composer\InstalledVersions;
 
 /**
  * Provides information about packages.
@@ -17,25 +16,22 @@ class PackageProvider
     const PACKAGE_CRM = 'crm';
     const PACKAGE_COMMERCE = 'commerce';
 
-    /** @var LocalRepositoryFactory */
-    protected $localRepositoryFactory;
+    protected array $oroPackages = [];
 
-    /** @var array */
-    protected $oroPackages = [];
+    protected array $thirdPartyPackages = [];
 
-    /** @var array */
-    protected $thirdPartyPackages = [];
+    private ?string $installedJsonfile;
 
-    public function __construct(LocalRepositoryFactory $localRepositoryFactory)
+    public function __construct(?string $installedJsonfile = null)
     {
-        $this->localRepositoryFactory = $localRepositoryFactory;
+        $this->installedJsonfile = $installedJsonfile;
     }
 
     /**
      * @param bool $additional
-     * @return PackageInterface[]
+     * @return array ['package_name' => ['pretty_version' => '1.0.0', 'license' => ['MIT']]]
      */
-    public function getOroPackages($additional = true)
+    public function getOroPackages(bool $additional = true): array
     {
         $this->initPackages();
 
@@ -56,34 +52,73 @@ class PackageProvider
     }
 
     /**
-     * @return PackageInterface[]
+     * @return array ['package_name' => ['pretty_version' => '1.0.0', 'license' => ['MIT']]]
      */
-    public function getThirdPartyPackages()
+    public function getThirdPartyPackages(): array
     {
         $this->initPackages();
 
         return $this->thirdPartyPackages;
     }
 
-    protected function initPackages()
+    protected function getInstalledPackages(): array
     {
-        $packages = $this->localRepositoryFactory->getLocalRepository()->getCanonicalPackages();
+        $packages = [];
+        foreach (InstalledVersions::getAllRawData() as $installed) {
+            $rootPackageName = isset($installed['root']) ? $installed['root']['name'] : null;
+            foreach ($installed['versions'] as $packageName => $packageData) {
+                if (isset($packageData['reference'])
+                    && $packageName !== $rootPackageName
+                    && !isset($packages[$packageName])
+                ) {
+                    $packages[$packageName]['pretty_version'] = $packageData['pretty_version'];
+                }
+            }
+        }
 
-        foreach ($packages as $package) {
-            if ($this->isOroPackage($package)) {
-                $this->oroPackages[$package->getName()] = $package;
+        return $packages;
+    }
+
+    private function initPackages(): void
+    {
+        if (!empty($this->oroPackages) && !empty($this->thirdPartyPackages)) {
+            return;
+        }
+
+        $packages = $this->getInstalledPackages();
+        $licenses = $this->retrieveLicenses();
+
+        foreach ($packages as $packageName => $packageData) {
+            $packageData['license'] = $licenses[$packageName] ?? [];
+            if ($this->isOroPackage($packageName)) {
+                $this->oroPackages[$packageName] = $packageData;
             } else {
-                $this->thirdPartyPackages[$package->getName()] = $package;
+                $this->thirdPartyPackages[$packageName] = $packageData;
             }
         }
     }
 
-    /**
-     * @param PackageInterface $package
-     * @return bool
-     */
-    protected function isOroPackage(PackageInterface $package)
+    private function retrieveLicenses(): array
     {
-        return str_starts_with($package->getName(), self::ORO_NAMESPACE . self::NAMESPACE_DELIMITER);
+        if (null === $this->installedJsonfile) {
+            return [];
+        }
+
+        if (!\file_exists($this->installedJsonfile)) {
+            throw new \RuntimeException(sprintf('File "%s" does not exists.', $this->installedJsonfile));
+        }
+
+        $data = json_decode(file_get_contents($this->installedJsonfile), true);
+        $licenses = [];
+        foreach ($data['packages'] as $packageData) {
+            $licenses[$packageData['name']] = $packageData['license'] ?? [];
+        }
+
+        return $licenses;
+    }
+
+    private function isOroPackage(string $packageName): bool
+    {
+        return str_starts_with($packageName, self::ORO_NAMESPACE . self::NAMESPACE_DELIMITER);
     }
 }

@@ -271,14 +271,6 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
     /**
      * {@inheritdoc}
      */
-    public function getClass()
-    {
-        return __CLASS__;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getEmailFields()
     {
         return ['email'];
