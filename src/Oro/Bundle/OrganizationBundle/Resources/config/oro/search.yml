@@ -17,6 +17,10 @@ search:
         alias:                          oro_business_unit
         search_template:                '@OroOrganization/Search/businessUnitResult.html.twig'
         title_fields:                   [name]
+        route:
+            name:                       oro_business_unit_view
+            parameters:
+                id:                     id
         fields:
             -
                 name:                   id

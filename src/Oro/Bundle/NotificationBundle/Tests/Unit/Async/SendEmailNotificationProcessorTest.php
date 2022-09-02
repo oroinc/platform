@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email as SymfonyEmail;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
 {
@@ -128,5 +129,49 @@ class SendEmailNotificationProcessorTest extends \PHPUnit\Framework\TestCase
             MessageProcessorInterface::REJECT,
             $this->processor->process($message, $this->createMock(SessionInterface::class))
         );
+    }
+
+    /**
+     * @dataProvider processLogsErrorWhenMessageExceptionProvider
+     * @return void
+     */
+    public function testProcessLogsErrorWhenMessageException(
+        array $messageBody,
+        \Exception $exception,
+        string $errorMessage
+    ): void {
+        $this->loggerMock->expects(self::once())
+            ->method('error')
+            ->with($errorMessage, ['exception' => $exception]);
+
+        $message = new Message();
+        $message->setBody($messageBody);
+
+        self::assertEquals(
+            MessageProcessorInterface::REJECT,
+            $this->processor->process($message, $this->createMock(SessionInterface::class))
+        );
+    }
+
+    public function processLogsErrorWhenMessageExceptionProvider(): array
+    {
+        $rfcComplianceException = new RfcComplianceException(
+            'Email "test@gmail.com." does not comply with addr-spec of RFC 2822.'
+        );
+
+        return [
+            $rfcComplianceException->getMessage() => [
+                'messageBody' => [
+                    'from' => '"From Name" <from@example.com>',
+                    'toEmail' => 'test@gmail.com.',
+                    'subject' => 'sample subject',
+                    'body' => 'sample body',
+                    'contentType' => 'text/plain',
+                ],
+                'exception' => $rfcComplianceException,
+                'errorMessage' => 'Failed to send an email notification to test@gmail.com.: '.
+                    $rfcComplianceException->getMessage(),
+            ]
+        ];
     }
 }

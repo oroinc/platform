@@ -577,6 +577,10 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             case preg_match('/\<absolutePath\("(?P<path>(?:[^"]|\\")+)"\)\>/i', $value, $matches):
                 $value = $this->getAbsolutePath($matches['path']);
                 break;
+
+            case preg_match('/\<eol\("(?P<value>(?:[^"]|\\")+)"\)\>/i', $value, $matches):
+                $value = str_replace('\r\n', PHP_EOL, $matches['value']);
+                break;
         }
 
         return $value;

@@ -7,6 +7,8 @@
 {% import '@OroUI/macros.html.twig' as UI %}
 
 {% set showImage = true %}
+{% set iconType = 'user' %}
+{% set image = entity ? entity.avatar : null %}
 
 {% set recordUrl = indexer_item.recordUrl %}
 

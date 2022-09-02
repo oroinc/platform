@@ -4,7 +4,27 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Added 
+
+#### ImportExportBundle
+* Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
+  to mark certain field as skipped during denormalization process to avoid possible type conflicts.
+
+### Removed
+
+#### ImportExportBundle
+* Deprecated `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use 
+  `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultFieldValue` instead.
+* Deprecated `\Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer::dispatchDenormalizeEvent`, use
+  `\Oro\Bundle\ImportExportBundle\Serializer\Normalizer\ConfigurableEntityNormalizer::dispatchDenormalize` instead.
+
+## 5.1.0-alpha.1 (2022-05-31)
+[Show detailed list of changes](incompatibilities-5-1-alpha.md)
+
 ### Added
+
+#### UIBundle
+* Added renderCollapsibleWysiwygContentPreview TWIG macro to UIBundle for rendering WYSIWYG content in backoffice.
 
 #### AttachmentBundle
 * Added `Oro\Bundle\AttachmentBundle\Entity\File::$externalUrl` property to store external file URL.

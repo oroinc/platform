@@ -20,6 +20,12 @@ class OroAssetsInstallCommand extends AbstractCommand
     {
         $this
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink instead of copying')
+            ->addOption(
+                'relative-symlink',
+                null,
+                InputOption::VALUE_NONE,
+                'Symlink using relative path instead of absolute'
+            )
             ->setDescription('Installs and builds application assets.')
             ->setHelp(
                 <<<HELP
@@ -32,12 +38,17 @@ If the <info>--symlink</info> option is provided this command will create symlin
 of copying the files (it may be especially useful during development):
 
   <info>php %command.full_name% --symlink</info>
+  
+If the <info>--relative-symlink</info> option is provided, the command creates symlinks using relative paths instead
+of absolute:
+
+  <info>php %command.full_name% --relative-symlink</info>
 
 You may run individual steps if necessary as follows:
 
   <info>php {$_SERVER['PHP_SELF']} fos:js-routing:dump</info>
   <info>php {$_SERVER['PHP_SELF']} oro:localization:dump</info>
-  <info>php {$_SERVER['PHP_SELF']} assets:install [--symlink]</info>
+  <info>php {$_SERVER['PHP_SELF']} assets:install [--symlink][--relative-symlink]</info>
   <info>php {$_SERVER['PHP_SELF']} oro:assets:build --npm-install</info>
 
 HELP
@@ -54,6 +65,11 @@ HELP
         $assetsOptions = [];
         if ($input->hasOption('symlink') && $input->getOption('symlink')) {
             $assetsOptions['--symlink'] = true;
+        }
+
+        if ($input->hasOption('relative-symlink') && $input->getOption('relative-symlink')) {
+            $assetsOptions['--symlink'] = true;
+            $assetsOptions['--relative'] = true;
         }
 
         $commandExecutor = $this->getCommandExecutor($input, $output);

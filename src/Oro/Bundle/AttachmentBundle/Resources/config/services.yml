@@ -1,5 +1,5 @@
 parameters:
-    oro_attachment.liip_imagine.unsupported_mime_types: ['image/svg+xml']
+    oro_attachment.liip_imagine.unsupported_mime_types: ['image/svg+xml', 'image/svg']
 
 services:
     Liip\ImagineBundle\Imagine\Filter\FilterConfiguration:
@@ -360,6 +360,8 @@ services:
         class: Oro\Bundle\AttachmentBundle\Provider\FileNameProvider
         arguments:
             - '@liip_imagine.filter.configuration'
+        calls:
+            - [setFilenameExtensionHelper, ['@oro_attachment.tools.file_name_extension_helper']]
 
     oro_attachment.provider.file_name.webp_aware:
         class: Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider
@@ -704,6 +706,8 @@ services:
             - '@liip_imagine.cache.manager'
             - '@liip_imagine.filter.configuration'
             - '@oro_attachment.provider.resized_image'
+        calls:
+            - [setFilenameExtensionHelper, ['@oro_attachment.tools.file_name_extension_helper']]
 
     Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider:
         alias: oro_attachment.provider.picture_sources
@@ -719,12 +723,16 @@ services:
         arguments:
             - '@.inner'
             - '@oro_attachment.manager'
+        calls:
+            - [setUnsupportedMimeTypes, ['%oro_attachment.liip_imagine.unsupported_mime_types%']]
 
     oro_attachment.imagine.provider.url:
         class: Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider
         arguments:
             - '@router'
             - '@liip_imagine.filter.configuration'
+        calls:
+            - [setFilenameExtensionHelper, ['@oro_attachment.tools.file_name_extension_helper']]
 
     oro_attachment.imagine.provider.url.webp_aware:
         class: Oro\Bundle\AttachmentBundle\Imagine\Provider\WebpAwareImagineUrlProvider
@@ -780,5 +788,11 @@ services:
         decoration_priority: -50
         arguments:
             - '@.inner'
+            - '@oro_attachment.tools.file_name_extension_helper'
         tags:
             - { name: oro_featuretogle.feature, feature: attachment_original_filenames }
+
+    oro_attachment.tools.file_name_extension_helper:
+        class: Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper
+        arguments:
+            - '%oro_attachment.liip_imagine.unsupported_mime_types%'

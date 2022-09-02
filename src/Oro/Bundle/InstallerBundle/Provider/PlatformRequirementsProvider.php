@@ -35,6 +35,8 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
 
     public const REQUIRED_NODEJS_VERSION  = '>=16 <17';
 
+    public static bool $checkJSBuildRequirements = true;
+
     protected Connection $connection;
     protected string $projectDirectory;
     protected array $imageProcessorConfig;
@@ -118,9 +120,11 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addIntlExtRequirement($collection);
         $this->addZipExtRequirement($collection);
         $this->addMbstringExtRequirement($collection);
-        $this->addNodeJsInstalledRequirement($collection, $nodeJsExecutable);
-        $this->addNodeJsVersionRequirement($collection, $nodeJsExecutable);
-        $this->addNpmInstalledRequirement($collection, $nodeJsExecutableFinder->findNpm());
+        if (self::$checkJSBuildRequirements) {
+            $this->addNodeJsInstalledRequirement($collection, $nodeJsExecutable);
+            $this->addNodeJsVersionRequirement($collection, $nodeJsExecutable);
+            $this->addNpmInstalledRequirement($collection, $nodeJsExecutableFinder->findNpm());
+        }
         $this->addConfiguredConnectionRequirement($collection);
 
         $this->addImageProcessorsRequirement($collection, ProcessorHelper::JPEGOPTIM);

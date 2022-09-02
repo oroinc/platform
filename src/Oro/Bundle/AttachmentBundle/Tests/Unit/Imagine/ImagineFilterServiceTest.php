@@ -8,6 +8,7 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 
 class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,6 +26,7 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
         $this->cacheManager = $this->createMock(CacheManager::class);
         $filterConfiguration = $this->createMock(FilterConfiguration::class);
         $this->resizedImageProvider = $this->createMock(ResizedImageProviderInterface::class);
+        $filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);
 
         $filterConfiguration
             ->expects(self::any())
@@ -44,6 +46,7 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
             $filterConfiguration,
             $this->resizedImageProvider
         );
+        $this->imagineFilterService->setFilenameExtensionHelper($filenameExtensionHelper);
     }
 
     /**
@@ -119,6 +122,12 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
                 'path' => '/sample/image.png',
                 'targetPath' => '/sample/image.png.webp',
                 'filter' => 'jpeg_filter',
+                'format' => 'webp',
+            ],
+            'extension is not added for unsupported mime type' => [
+                'path' => '/sample/image.svg',
+                'targetPath' => '/sample/image.svg',
+                'filter' => 'webp_filter',
                 'format' => 'webp',
             ],
         ];

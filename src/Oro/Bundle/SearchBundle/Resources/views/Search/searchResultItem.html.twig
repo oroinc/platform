@@ -5,11 +5,13 @@
                 {% if recordUrl is defined -%}
                 <a href="{{ recordUrl }}" {% if recordUrlCssClass is defined %}class="{{ recordUrlCssClass }}"{% endif %}>
                 {%- endif -%}
+                {%- if showImage|default(false) -%}
                     {% include '@OroAttachment/Twig/picture.html.twig' with {
-                        sources: showImage|default(null) and image|default(null) ? oro_filtered_picture_sources(image, 'avatar_med') : asset('bundles/oroui/img/info-' ~ iconType|default('user') ~ '.png'),
+                        sources: image|default(null) ? oro_filtered_picture_sources(image, 'avatar_med') : asset('bundles/oroui/img/info-' ~ iconType|default('noimage') ~ '.png'),
                         filter: 'avatar_med',
                         img_attrs: { alt: title }
                     } %}
+                {%- endif -%}
                 {%- if recordUrl is defined -%}
                 </a>
                 {%- endif %}

@@ -7,13 +7,23 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class NormalizeEntityEventTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEvent()
+    public function testEvent(): void
     {
         $object = new User();
         $result = ['username' => 'user'];
         $event = new NormalizeEntityEvent($object, $result);
 
-        $this->assertSame($object, $event->getObject());
-        $this->assertEquals($result, $event->getResult());
+        self::assertSame($object, $event->getObject());
+        self::assertEquals($result, $event->getResult());
+    }
+
+    public function testSetResultFieldValue(): void
+    {
+        $object = new User();
+        $result = ['username' => 'user'];
+        $event = new NormalizeEntityEvent($object, $result);
+
+        $event->setResultFieldValue('sampleField', 'sampleValue');
+        self::assertEquals('sampleValue', $event->getResult()['sampleField']);
     }
 }

@@ -40,6 +40,11 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $symfonyEmail = $this->createEmailMessage($message->getBody());
+
+        if (!$symfonyEmail) {
+            return self::REJECT;
+        }
+
         $sentCount = $this->sendEmailMessage($symfonyEmail);
 
         if (!$sentCount) {
@@ -49,22 +54,27 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
         return self::ACK;
     }
 
-    private function createEmailMessage(array $messageBody): SymfonyEmail
+    private function createEmailMessage(array $messageBody): ?SymfonyEmail
     {
-        $symfonyEmail = (new SymfonyEmail())
-            ->from($messageBody['from'])
-            ->to($messageBody['toEmail'])
-            ->subject($messageBody['subject']);
+        try {
+            $symfonyEmail = (new SymfonyEmail())
+                ->from($messageBody['from'])
+                ->to($messageBody['toEmail'])
+                ->subject($messageBody['subject']);
 
-        if ($messageBody['contentType'] === 'text/html') {
-            $symfonyEmail->html($messageBody['body']);
+            if ($messageBody['contentType'] === 'text/html') {
+                $symfonyEmail->html($messageBody['body']);
 
-            $this->embeddedImagesInSymfonyEmailHandler->handleEmbeddedImages($symfonyEmail);
-        } else {
-            $symfonyEmail->text($messageBody['body']);
+                $this->embeddedImagesInSymfonyEmailHandler->handleEmbeddedImages($symfonyEmail);
+            } else {
+                $symfonyEmail->text($messageBody['body']);
+            }
+
+            return $symfonyEmail;
+        } catch (\InvalidArgumentException $exception) {
+            $this->logException($exception, [$messageBody['toEmail']]);
+            return null;
         }
-
-        return $symfonyEmail;
     }
 
     private function sendEmailMessage(SymfonyEmail $symfonyEmail): int
@@ -78,16 +88,21 @@ class SendEmailNotificationProcessor implements MessageProcessorInterface, Logge
                 static fn (SymfonyAddress $address) => $address->getAddress(),
                 Envelope::create($symfonyEmail)->getRecipients()
             );
-            $this->logger->error(
-                sprintf(
-                    'Failed to send an email notification to %s: %s',
-                    implode(', ', $recipients),
-                    $exception->getMessage()
-                ),
-                ['exception' => $exception]
-            );
+            $this->logException($exception, $recipients);
         }
 
         return $sentCount;
+    }
+
+    private function logException(\Exception $exception, array $recipients): void
+    {
+        $this->logger->error(
+            sprintf(
+                'Failed to send an email notification to %s: %s',
+                implode(', ', $recipients),
+                $exception->getMessage()
+            ),
+            ['exception' => $exception]
+        );
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider;
+use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 
 /**
@@ -28,10 +29,12 @@ class OriginalFileNameProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->innerProvider = $this->createMock(FileNameProviderInterface::class);
         $this->featureChecker = $this->createMock(FeatureChecker::class);
+        $filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);
 
         $this->provider = new OriginalFileNameProvider($this->innerProvider);
         $this->provider->setFeatureChecker($this->featureChecker);
         $this->provider->addFeature(self::FEATURE_NAME);
+        $this->provider->setFilenameExtensionHelper($filenameExtensionHelper);
     }
 
     public function testGetFileNameEmptyOriginalFilename(): void
@@ -160,6 +163,29 @@ class OriginalFileNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testGetFilteredImageNameUnsupportedMimeType(): void
+    {
+        $fileName = 'original-filename_#123-картинка))).svg';
+
+        $file = new File();
+        $file->setFilename($fileName);
+        $file->setOriginalFilename($fileName);
+        $file->setMimeType('image/svg');
+
+        $this->featureChecker->expects(self::once())
+            ->method('isFeatureEnabled')
+            ->with(self::FEATURE_NAME)
+            ->willReturn(true);
+
+        $this->innerProvider->expects(self::never())
+            ->method(self::anything());
+
+        self::assertEquals(
+            'original-filename_-123-картинка.svg',
+            $this->provider->getFilteredImageName($file, self::FILTER, self::FORMAT)
+        );
+    }
+
     /**
      * @dataProvider getExtensionDataProvider
      */
@@ -243,6 +269,29 @@ class OriginalFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             'original-filename_-123-картинка.jpeg.' . self::FORMAT,
+            $this->provider->getResizedImageName($file, self::WIDTH, self::HEIGHT, self::FORMAT)
+        );
+    }
+
+    public function testGetResizedImageNameUnsupportedMimeType(): void
+    {
+        $fileName = 'original-filename_#123-картинка))).svg';
+
+        $file = new File();
+        $file->setFilename($fileName);
+        $file->setOriginalFilename($fileName);
+        $file->setMimeType('image/svg');
+
+        $this->featureChecker->expects(self::once())
+            ->method('isFeatureEnabled')
+            ->with(self::FEATURE_NAME)
+            ->willReturn(true);
+
+        $this->innerProvider->expects(self::never())
+            ->method(self::anything());
+
+        self::assertEquals(
+            'original-filename_-123-картинка.svg',
             $this->provider->getResizedImageName($file, self::WIDTH, self::HEIGHT, self::FORMAT)
         );
     }

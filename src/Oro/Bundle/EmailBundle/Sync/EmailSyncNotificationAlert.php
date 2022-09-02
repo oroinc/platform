@@ -18,6 +18,7 @@ class EmailSyncNotificationAlert implements NotificationAlertInterface
     public const OPERATION_IMPORT_BODY = 'import body';
 
     public const ALERT_TYPE_AUTH = 'auth';
+    public const ALERT_TYPE_REFRESH_TOKEN = 'refresh token';
     public const ALERT_TYPE_SWITCH_FOLDER = 'switch folder';
     public const ALERT_TYPE_SYNC = 'sync';
 
@@ -125,6 +126,19 @@ class EmailSyncNotificationAlert implements NotificationAlertInterface
         $this->emailOriginId = $emailOriginId;
     }
 
+    /**
+     * Creates a notification alert object that represents a failure during authentication.
+     */
+    public static function createForRefreshTokenFail(?string $message = null): EmailSyncNotificationAlert
+    {
+        $item = new EmailSyncNotificationAlert();
+        $item->alertType = self::ALERT_TYPE_REFRESH_TOKEN;
+        $item->operation = self::OPERATION_IMPORT;
+        $item->id = UUIDGenerator::v4();
+        $item->message = $message;
+
+        return $item;
+    }
 
     /**
      * Creates a notification alert object that represents a failure during authentication.

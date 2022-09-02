@@ -33,3 +33,9 @@ services:
             - '@oro_entity_config.configuration_handler'
         tags:
             - { name: console.command }
+
+    Oro\Bundle\EntityConfigBundle\Command\ValidateAttributeCommand:
+        arguments:
+            - '@oro_entity_config.tools.attribute_options_validator'
+        tags:
+            - { name: console.command }

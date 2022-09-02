@@ -41,4 +41,14 @@ class EmailOriginTest extends \PHPUnit\Framework\TestCase
         $entity->setActive(false);
         $this->assertFalse($entity->isActive());
     }
+
+    public function testIsSyncEnabled(): void
+    {
+        $entity = new TestEmailOrigin();
+        self::assertTrue($entity->isSyncEnabled());
+        $entity->setIsSyncEnabled(false);
+        self::assertFalse($entity->isSyncEnabled());
+        $entity->setIsSyncEnabled(true);
+        self::assertTrue($entity->isSyncEnabled());
+    }
 }

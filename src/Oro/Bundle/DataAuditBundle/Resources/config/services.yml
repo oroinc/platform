@@ -225,6 +225,8 @@ services:
         arguments:
             - '@oro_dataaudit.converter.entity_changes_to_audit_entry'
             - '@oro_message_queue.job.runner'
+        calls:
+            - ['setLogger', ['@logger']]
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 

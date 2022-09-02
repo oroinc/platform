@@ -2,7 +2,10 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Behat\Context;
 
+use Behat\Gherkin\Node\TableNode;
 use Behat\Mink\Element\NodeElement;
+use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageObjectAware;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 use Psr\Http\Message\ResponseInterface;
@@ -21,6 +24,9 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
 
     /** @var string[] */
     private $rememberedFilenames = [];
+
+    /** @var array[] [file name => [[path, ...], media cache manager], ...] */
+    private array $rememberedImagePaths = [];
 
     public function getResizeAttachmentUrl($entity, string $attachmentField): string
     {
@@ -79,29 +85,31 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
      */
     public function assertImageIsLoaded(string $imgElementName): void
     {
-        $imgElement = $this->elementFactory->createElement($imgElementName);
-        $imgElementXpath = $imgElement->getXpath();
-        $imageIsLoadedScript = <<<JS
-        (function () {
-            var image = document.evaluate(
-                '$imgElementXpath',
-                document,
-                null,
-                XPathResult.FIRST_ORDERED_NODE_TYPE,
-                null
-                ).singleNodeValue;
-            
-            if (!image) {
-                return false;
-            }
-            
-            return image.complete && typeof image.naturalWidth !== "undefined" && image.naturalWidth !== 0;
-        })();
+        $result = $this->spin(function () use ($imgElementName) {
+            $imgElement = $this->elementFactory->createElement($imgElementName);
+            $imgElementXpath = $imgElement->getXpath();
+            $imageIsLoadedScript = <<<JS
+                (function () {
+                    var image = document.evaluate(
+                        '$imgElementXpath',
+                        document,
+                        null,
+                        XPathResult.FIRST_ORDERED_NODE_TYPE,
+                        null
+                        ).singleNodeValue;
+                    
+                    if (!image) {
+                        return false;
+                    }
+                    
+                    return image.complete && typeof image.naturalWidth !== "undefined" && image.naturalWidth !== 0;
+                })();
 JS;
 
-        $result = $this->getDriver()->evaluateScript($imageIsLoadedScript);
+            return $this->getDriver()->evaluateScript($imageIsLoadedScript);
+        }, 5);
 
-        $this->assertTrue($result, sprintf('Image %s is not loaded', $imgElementName));
+        self::assertTrue($result, sprintf('Image %s is not loaded', $imgElementName));
     }
 
     /**
@@ -125,7 +133,7 @@ JS;
         $rememberedCount = $this->filesCount[$extension] ?? 0;
 
         if ($operator === 'less') {
-            $this->assertEquals(
+            self::assertEquals(
                 $rememberedCount - $currentCount,
                 $count,
                 sprintf(
@@ -138,7 +146,7 @@ JS;
         }
 
         if ($operator === 'more') {
-            $this->assertEquals(
+            self::assertEquals(
                 $count,
                 $currentCount - $rememberedCount,
                 sprintf(
@@ -189,8 +197,8 @@ JS;
     {
         $name = $this->fixStepArgument($name);
 
-        $this->assertArrayHasKey($name, $this->rememberedFilenames);
-        $this->assertEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
+        self::assertArrayHasKey($name, $this->rememberedFilenames);
+        self::assertEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
     }
 
     /**
@@ -202,8 +210,8 @@ JS;
     {
         $name = $this->fixStepArgument($name);
 
-        $this->assertArrayHasKey($name, $this->rememberedFilenames);
-        $this->assertNotEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
+        self::assertArrayHasKey($name, $this->rememberedFilenames);
+        self::assertNotEquals($this->rememberedFilenames[$name], $this->getFileFilename($name));
     }
 
     /**
@@ -228,7 +236,7 @@ JS;
         $image = $this->fixStepArgument($image);
         $filename = $this->getImageFilename($image);
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->rememberedFilenames[$image],
             $filename,
             sprintf(
@@ -248,7 +256,7 @@ JS;
         $image = $this->fixStepArgument($image);
         $filename = $this->getImageFilename($image);
 
-        $this->assertNotEquals(
+        self::assertNotEquals(
             $this->rememberedFilenames[$image],
             $filename,
             sprintf(
@@ -261,7 +269,7 @@ JS;
     private function getImageFilename(string $imageName): string
     {
         $image = $this->createElement($imageName);
-        $this->assertTrue($image->isValid(), sprintf('Image %s was not found', $imageName));
+        self::assertTrue($image->isValid(), sprintf('Image %s was not found', $imageName));
 
         preg_match(
             '/\/media\/cache\/attachment\/.+\/(?P<filename>.+)$/',
@@ -359,5 +367,116 @@ JS;
         self::assertTrue($picture->isVisible(), 'Picture is not visible');
 
         return $picture;
+    }
+
+    private function getImageFiles(string $imageName): array
+    {
+        $fileRepository = $this->getAppContainer()
+            ->get('doctrine')
+            ->getManagerForClass(File::class)->getRepository(File::class);
+
+        /** @var File[] $files */
+        $files = $fileRepository->findBy(
+            ['originalFilename' => $imageName],
+            ['id' => 'DESC']
+        );
+        self::assertNotEmpty($files, sprintf('File for image %s not found', $imageName));
+
+        return $files;
+    }
+
+    /**
+     * @Then /^(?:|I )expect image files created and remember paths:$/
+     * Example: Then expect image files created and remember paths:
+     *      | image.jpg |
+     *      | name.png  |
+     */
+    public function assertImageFilesCreated(TableNode $table): void
+    {
+        $this->assertImageFilesCreatedAndRemembered($table);
+    }
+
+    /**
+     * @Then /^(?:|I )expect paths don't exist for images:$/
+     * Example: Then expect paths don't exist for images:
+     *      | image.jpg |
+     *      | name.png  |
+     */
+    public function assertPathsDontExist(TableNode $table): void
+    {
+        $imagePaths = $this->rememberedImagePaths;
+        $this->rememberedImagePaths = [];
+
+        $rows = $table->getRows();
+        foreach ($rows as $row) {
+            $imageName = $row[0];
+
+            self::assertArrayHasKey(
+                $imageName,
+                $imagePaths,
+                sprintf('File paths was not remembered for image %s', $imageName)
+            );
+
+            /** @var GaufretteFileManager $mediaCacheManager */
+            [$paths, $mediaCacheManager] = $imagePaths[$imageName];
+            foreach ($paths as $path) {
+                self::assertFalse(
+                    $mediaCacheManager->hasFile($path),
+                    sprintf('Failed assert that file %s does not exist', $path)
+                );
+            }
+        }
+    }
+
+    /**
+     * @Then /^(?:|I )expect public image files created:$/
+     * Example: Then expect public image files created:
+     *      | image.jpg |
+     *      | name.png  |
+     */
+    public function assertPublicImageFilesCreated(TableNode $table): void
+    {
+        /** @var GaufretteFileManager $mediaCacheManager */
+        $mediaCacheManager = $this->getAppContainer()->get('oro_attachment.manager.public_mediacache');
+
+        $this->assertImageFilesCreatedAndRemembered($table, $mediaCacheManager);
+    }
+
+    public function assertImageFilesCreatedAndRemembered(
+        TableNode $table,
+        GaufretteFileManager $mediaCacheManager = null
+    ): void {
+        $this->rememberedImagePaths = [];
+
+        $rows = $table->getRows();
+        foreach ($rows as $row) {
+            $imageName = $row[0];
+
+            $existingPaths = [];
+            $files = $this->getImageFiles($imageName);
+            foreach ($files as $file) {
+                $paths = $this->getAppContainer()
+                    ->get('oro_attachment.behat.provider.image_file_names')
+                    ->getFileNames($file);
+                self::assertNotEmpty($paths, sprintf('File paths for image %s not found', $imageName));
+
+                $mediaCacheManager = $mediaCacheManager ?? $this->getAppContainer()
+                        ->get('oro_attachment.behat.media_cache_manager_registry')
+                        ->getManagerForFile($file);
+
+                foreach ($paths as $path) {
+                    if ($mediaCacheManager->hasFile($path)) {
+                        $existingPaths[] = $path;
+                    }
+                }
+            }
+
+            self::assertNotEmpty(
+                $existingPaths,
+                sprintf('At least one image file should be created for image %s', $imageName)
+            );
+
+            $this->rememberedImagePaths[$imageName] = [$existingPaths, $mediaCacheManager];
+        }
     }
 }

@@ -96,7 +96,8 @@ define(function(require) {
                 autoRender: true,
                 model: cell.model,
                 fieldName: cell.column.get('name'),
-                metadata: cell.column.get('metadata')
+                metadata: cell.column.get('metadata'),
+                cell
             });
             if (this.formState) {
                 this.updateModel(cell.model, this.oldState);
@@ -210,7 +211,7 @@ define(function(require) {
                 return false;
             }
 
-            const cell = this.options.cell;
+            const {cell, plugin} = this.options;
             let serverUpdateData = this.getServerUpdateData();
             this.applyDivisor(serverUpdateData, false);
             this.formState = this.view.getFormState();
@@ -221,7 +222,7 @@ define(function(require) {
 
             this.updateModel(cell.model, modelUpdateData);
             this.errorHolderView.render();
-            this.options.plugin.main.trigger('content:update');
+            plugin.main.trigger('content:update');
             if (this.options.save_api_accessor.initialOptions.field_name) {
                 const keys = _.keys(serverUpdateData);
                 if (keys.length > 1) {
@@ -244,7 +245,8 @@ define(function(require) {
             }
             savePromise.done(this.onSaveSuccess.bind(this))
                 .fail(this.onSaveError.bind(this))
-                .always(function() {
+                .always(() => {
+                    plugin.main.trigger('content:update');
                     cell.$el.removeClass('loading');
                 });
             return savePromise;

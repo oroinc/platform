@@ -96,6 +96,11 @@ define(function(require, exports, module) {
                 minWidth: tools.isMobile() ? 320 : 604,
                 minHeight: 150
             });
+
+            if (!dialogOptions.position) {
+                dialogOptions.position = this.getPositionProps();
+            }
+
             if (tools.isMobile()) {
                 options.incrementalPosition = false;
             }
@@ -550,12 +555,7 @@ define(function(require, exports, module) {
             } else if (this.options.incrementalPosition) {
                 dialogManager.updateIncrementalPosition(this);
             } else {
-                this.setPosition({
-                    my: 'center center',
-                    at: this.defaultPos,
-                    of: this.getLimitToContainer(),
-                    collision: 'fit'
-                });
+                this.setPosition(this.getPositionProps());
             }
 
             this._fixScrollableHeight();
@@ -587,7 +587,9 @@ define(function(require, exports, module) {
             const dialog = this.widget.closest('.ui-dialog');
 
             const initialDialogPosition = dialog.css('position');
-            const initialScrollTop = $(window).scrollTop();
+            const scrollableContainer = tools.isMobile() ? $('html, body') : this.widget;
+            const widgetScrollTop = scrollableContainer.scrollTop();
+
             if (tools.isIOS() && initialDialogPosition === 'fixed') {
                 // Manipulating with position to fix iOS bug,
                 // when orientation is changed
@@ -611,8 +613,9 @@ define(function(require, exports, module) {
                 dialog.css({
                     position: initialDialogPosition
                 });
-                $('html, body').scrollTop(initialScrollTop);
             }
+
+            scrollableContainer.scrollTop(widgetScrollTop);
         },
 
         leftAndWidthAdjustments: function(dialog) {
@@ -754,6 +757,15 @@ define(function(require, exports, module) {
 
         widgetIsResizable: function() {
             return this.options.dialogOptions.resizable;
+        },
+
+        getPositionProps() {
+            return {
+                my: 'center center',
+                at: this.defaultPos,
+                of: this.getLimitToContainer(),
+                collision: 'fit'
+            };
         }
     });
 
