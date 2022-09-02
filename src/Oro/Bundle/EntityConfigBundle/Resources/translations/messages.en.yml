@@ -78,7 +78,6 @@ oro:
             plural_label:      Entities
             information.label: Entity Information
             unique.label:      Unique Keys
-            information_message: Current content view is simplified, please check the edit page to see the actual result
 
         entity_config:
             entity_name.label: Name

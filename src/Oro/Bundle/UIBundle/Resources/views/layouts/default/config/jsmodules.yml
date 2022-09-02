@@ -12,6 +12,7 @@ aliases:
     bootstrap-tooltip$: '@oroinc/bootstrap/js/dist/tooltip'
     bootstrap-typeahead$: oroui/lib/bootstrap/bootstrap-typeahead
     bootstrap-util$: '@oroinc/bootstrap/js/dist/util'
+    bootstrap-collapse$: '@oroinc/bootstrap/js/dist/collapse'
     chaplin$: oroui/lib/chaplin
     controllers/page-controller$: oroui/js/app/controllers/page-controller
     cryptojs/core$: crypto-js/core

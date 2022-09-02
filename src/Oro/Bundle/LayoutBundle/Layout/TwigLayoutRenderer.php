@@ -13,12 +13,11 @@ use Twig\Environment;
  * Layout renderer that uses Twig for rendering.
  * @see \Oro\Component\Layout\Layouts
  */
-class TwigLayoutRenderer extends LayoutRenderer
+class TwigLayoutRenderer extends LayoutRenderer implements TwigEnvironmentAwareLayoutRendererInterface
 {
-    /**
-     * @var PlaceholderRenderer
-     */
-    private $placeholderRenderer;
+    private PlaceholderRenderer $placeholderRenderer;
+
+    private Environment $environment;
 
     public function __construct(
         TwigRendererInterface $innerRenderer,
@@ -26,9 +25,22 @@ class TwigLayoutRenderer extends LayoutRenderer
         Environment $environment,
         PlaceholderRenderer $placeholderRenderer
     ) {
-        $innerRenderer->setEnvironment($environment);
-        $this->placeholderRenderer = $placeholderRenderer;
         parent::__construct($innerRenderer, $formRendererEngine);
+
+        $this->placeholderRenderer = $placeholderRenderer;
+        $this->setEnvironment($environment);
+    }
+
+    public function getEnvironment(): Environment
+    {
+        return $this->environment;
+    }
+
+    public function setEnvironment(Environment $environment): void
+    {
+        $this->environment = $environment;
+
+        $this->innerRenderer->setEnvironment($this->environment);
     }
 
     /**

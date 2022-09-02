@@ -90,36 +90,11 @@
     {% endif %}
 
     {% if type == 'wysiwyg' %}
-        {% if item.value is not null %}
-            <div class="alert alert-info alert--compact" role="alert">
-                <span class="fa-info alert-icon" aria-hidden="true"></span>
-                {{ 'oro.entity_config.entity.information_message'|trans }}
-            </div>
-        {% endif %}
-        {% import _self as entityConfigMacros %}
-        {% set toRenderValue = value is defined and value|length
-            ? entityConfigMacros.renderWysiwygContentPreview(value)
-            : 'N/A'|trans
-        %}
-        {{ UI.renderCollapsibleHtml(
-            toRenderValue|raw,
-            entity,
-            item.label,
-            'More',
-            'Less'
-        ) }}
+        {{ UI.renderCollapsibleWysiwygContentPreview(value) }}
     {% elseif type != 'html' %}
         {{ value|default('N/A'|trans) }}
     {% endif %}
 {% endmacro %}
-
-{%- macro renderWysiwygContentPreview(content) -%}
-    {% apply spaceless %}
-        {% if content is defined and content|length %}
-            <div data-page-component-view="oroentityconfig/js/views/wysiwyg-content-preview">{{ content|render_content|oro_html_sanitize }}</div>
-        {% endif %}
-    {% endapply %}
-{%- endmacro -%}
 
 {% macro renderField(value) %}
     {% import '@OroUI/macros.html.twig' as ui %}
