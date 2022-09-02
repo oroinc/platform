@@ -1,0 +1,2 @@
+parameters:
+    oro_datagrid.export.size_of_batch: 3

@@ -1,3 +1,6 @@
+parameters:
+    oro_datagrid.export.size_of_batch: 5000
+
 services:
     oro_datagrid.datagrid.manager:
         class: Oro\Bundle\DataGridBundle\Datagrid\Manager
@@ -296,24 +299,29 @@ services:
             - '@router.default'
 
     oro_datagrid.async.pre_export:
-        class: Oro\Bundle\DataGridBundle\Async\Export\PreExportMessageProcessor
-        parent: oro_importexport.async.pre_export_abstract
+        class: Oro\Bundle\DataGridBundle\Async\Export\DatagridPreExportMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_datagrid.async.executor.pre_export'
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_security.token_accessor'
         tags:
-            - { name: 'oro_message_queue.client.message_processor' }
-        calls:
-            - [setExportHandler, ['@oro_datagrid.handler.export']]
-            - [setExportIdFetcher, ['@oro_datagrid.importexport.export_id_fetcher']]
+            - { name: oro_message_queue.client.message_processor }
 
     oro_datagrid.async.export:
-        class: Oro\Bundle\DataGridBundle\Async\Export\ExportMessageProcessor
-        parent: oro_importexport.async.export_abstract
-        tags:
-            - { name: 'oro_message_queue.client.message_processor' }
+        class: Oro\Bundle\DataGridBundle\Async\Export\DatagridExportMessageProcessor
+        arguments:
+            - '@oro_message_queue.job.runner'
+            - '@oro_datagrid.handler.export'
+            - '@oro_datagrid.importexport.processor.export'
+            - '@oro_datagrid.importexport.materialized_view_reader'
+            - '@oro_importexport.writer.writer_chain'
+            - '@oro_importexport.file.file_manager'
         calls:
-            - [setExportHandler, ['@oro_datagrid.handler.export']]
-            - [setExportConnector, ['@oro_datagrid.importexport.export_connector']]
-            - [setExportProcessor, ['@oro_datagrid.importexport.processor.export']]
-            - [setWriterChain, ['@oro_importexport.writer.writer_chain']]
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: oro_message_queue.client.message_processor }
+            - { name: monolog.logger, channel: oro_importexport }
 
     oro_datagrid.layout_context_configurator.data:
         class: Oro\Bundle\DataGridBundle\Layout\Extension\DatagridConfigContextConfigurator
@@ -366,3 +374,27 @@ services:
     Oro\Bundle\DataGridBundle\EntityConfig\EntityEntityConfiguration:
         tags:
             - oro_entity_config.validation.entity_config
+
+    oro_datagrid.materialized_view.factory.by_datagrid:
+        class: Oro\Bundle\DataGridBundle\MaterializedView\MaterializedViewByDatagridFactory
+        arguments:
+            - '@oro_platform.materialized_view.manager'
+
+    oro_datagrid.async.executor.pre_export:
+        class: Oro\Bundle\DataGridBundle\Async\Export\Executor\DatagridPreExportExecutor
+        arguments:
+            - !tagged_iterator 'oro_datagrid.async.executor.pre_export'
+
+    oro_datagrid.async.executor.pre_export.orm:
+        class: Oro\Bundle\DataGridBundle\Async\Export\Executor\DatagridPreExportOrmExecutor
+        arguments:
+            - '@oro_message_queue.client.message_producer'
+            - '@oro_platform.materialized_view.manager'
+            - '@oro_datagrid.materialized_view.factory.by_datagrid'
+            - '@oro_message_queue.job.dependent_job_service'
+            - '@oro_security.token_accessor'
+        calls:
+            - [setLogger, ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: oro_importexport }
+            - { name: oro_datagrid.async.executor.pre_export }

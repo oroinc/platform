@@ -42,12 +42,23 @@ class TabContext extends OroFeatureContext implements
      *              | Second Tab |
      *
      * @Then /^(?:|I )should see following tabs:$/
+     * @Then /^(?:|I )should see following tabs in "(?P<element>(?:[^"]|\\")*)" element:$/
      */
-    public function iShouldSeeFollowingTabs(TableNode $table)
+    public function iShouldSeeFollowingTabs(TableNode $table, ?string $element = null)
     {
+        if ($element) {
+            $element = $this->createElement($element);
+            self::assertTrue($element->isValid());
+        }
+
         $expectedValues = $table->getColumn(0);
         foreach ($expectedValues as $expectedValue) {
-            $linkElement = $this->elementFactory->findElementContainsByXPath('Tab Link', $expectedValue, false);
+            $linkElement = $this->elementFactory->findElementContainsByXPath(
+                'Tab Link',
+                $expectedValue,
+                false,
+                $element
+            );
             self::assertTrue($linkElement->isValid(), "Link with '$expectedValue' text not found in tab");
         }
     }

@@ -31,7 +31,6 @@ To change the resulting SQL, use OutputResultModifierInterface (it has access to
 ```yaml
 oro_entity.sql_walker.union:
     class: Oro\Component\DoctrineUtils\ORM\Walker\UnionOutputResultModifier
-    public: false
     abstract: true
     tags:
         - { name: oro_entity.sql_walker }

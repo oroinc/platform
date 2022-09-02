@@ -22,7 +22,7 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_2';
     }
 
     /**
@@ -40,6 +40,7 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     {
         /** Tables generation **/
         $this->oroSessionTable($schema, $queries);
+        $this->createMaterializedViewTable($schema, $queries);
     }
 
     /**
@@ -83,5 +84,16 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
         $table->addColumn('sess_time', Types::INTEGER, []);
         $table->addColumn('sess_lifetime', Types::INTEGER, []);
         $table->setPrimaryKey(['id']);
+    }
+
+    private function createMaterializedViewTable(Schema $schema, QueryBag $queries): void
+    {
+        $table = $schema->createTable('oro_materialized_view');
+        $table->addColumn('name', Types::STRING, ['length' => 63]);
+        $table->setPrimaryKey(['name']);
+
+        $table->addColumn('with_data', Types::BOOLEAN, ['default' => false]);
+        $table->addColumn('created_at', Types::DATETIME_MUTABLE, []);
+        $table->addColumn('updated_at', Types::DATETIME_MUTABLE, []);
     }
 }

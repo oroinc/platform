@@ -2,8 +2,10 @@
 
 namespace Oro\Component\DoctrineUtils\ORM;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\SQLParserUtils;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\Query\ParserResult;
 use Doctrine\ORM\Query\QueryException;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
@@ -181,5 +183,32 @@ class QueryUtil
         }
         $resultSetMappingProperty->setAccessible(true);
         $resultSetMappingProperty->setValue($query, null);
+    }
+
+    /**
+     * Removes parameters from ORM query.
+     * Removes parameter mappings from {@see ParserResult} if any.
+     */
+    public static function resetParameters(Query $query, ParserResult $parserResult = null): void
+    {
+        // Removes parameters and parameter mappings.
+        $query->setParameters(new ArrayCollection());
+
+        if ($parserResult === null) {
+            /** @var Query\ParserResult $parserResult */
+            $parserResult = \Closure::bind(static fn (Query $query) => $query->parserResult, null, $query)($query);
+        }
+
+        if ($parserResult !== null) {
+            $clearMappings = \Closure::bind(
+                static function (Query\ParserResult $parserResult) {
+                    $parserResult->_parameterMappings = [];
+                },
+                null,
+                $parserResult
+            );
+
+            $clearMappings($parserResult);
+        }
     }
 }

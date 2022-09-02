@@ -85,9 +85,7 @@ class DatagridDataConverter implements DataConverterInterface, ContextAwareInter
     }
 
     /**
-     * Returns columns from either:
-     * 1) datagrid columns stored in context;
-     * 2) columns from datagrid configuration;
+     * Returns columns from the datagrid configuration.
      * Caches grid columns in gridColumns property until the new context is set.
      *
      * @return array

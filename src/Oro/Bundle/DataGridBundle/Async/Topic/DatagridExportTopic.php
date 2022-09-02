@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\DataGridBundle\Async\Topic;
 
-use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
+use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
+use Oro\Component\MessageQueue\Topic\AbstractTopic;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Allows to export datagrid.
+ * Defines MQ topic that should export a batch of rows during the datagrid data export.
  */
-class DatagridExportTopic extends DatagridPreExportTopic
+class DatagridExportTopic extends AbstractTopic
 {
     public static function getName(): string
     {
@@ -17,37 +18,72 @@ class DatagridExportTopic extends DatagridPreExportTopic
 
     public static function getDescription(): string
     {
-        return 'Exports data from datagrid';
+        return 'Exports a batch of rows during the datagrid data export.';
     }
 
     public function configureMessageBody(OptionsResolver $resolver): void
     {
-        parent::configureMessageBody($resolver);
-
         $resolver
-            ->setDefined([
-                'jobId',
-                'exportType',
-                'batchSize',
-                'entity',
-                'jobName',
-                'outputFormat',
-            ])
-            ->setRequired([
-                'jobId',
-                'entity',
-                'jobName',
-                'outputFormat',
-            ])
-            ->setDefaults([
-                'exportType' => ProcessorRegistry::TYPE_EXPORT,
-                'batchSize' => null,
-            ])
+            ->setDefined(
+                [
+                    'jobId',
+                    'outputFormat',
+                    'writerBatchSize',
+                    'contextParameters',
+                ]
+            )
+            ->setRequired(
+                [
+                    'jobId',
+                    'outputFormat',
+                    'contextParameters',
+                ]
+            )
+            ->setDefaults(
+                [
+                    'writerBatchSize' => 100,
+                    'contextParameters' => \Closure::fromCallable([$this, 'configureContextParameters']),
+                ]
+            )
             ->addAllowedTypes('jobId', 'int')
-            ->addAllowedTypes('exportType', 'string')
-            ->addAllowedTypes('batchSize', ['int', 'null'])
-            ->addAllowedTypes('entity', 'string')
-            ->addAllowedTypes('jobName', 'string')
-            ->addAllowedTypes('outputFormat', 'string');
+            ->addAllowedTypes('outputFormat', 'string')
+            ->addAllowedTypes('writerBatchSize', 'int')
+            ->addAllowedTypes('contextParameters', 'array')
+            ->setInfo('writerBatchSize', 'Number of rows to collect before sending them to the export writer.');
+    }
+
+    private function configureContextParameters(OptionsResolver $parametersResolver): void
+    {
+        $parametersResolver
+            ->setDefined(
+                [
+                    'gridName',
+                    'gridParameters',
+                    FormatterProvider::FORMAT_TYPE,
+                    'materializedViewName',
+                    'rowsOffset',
+                    'rowsLimit',
+                ]
+            )
+            ->setRequired(
+                [
+                    'gridName',
+                    'materializedViewName',
+                    'rowsOffset',
+                    'rowsLimit',
+                ]
+            )
+            ->setDefaults(
+                [
+                    'gridParameters' => [],
+                    FormatterProvider::FORMAT_TYPE => 'excel',
+                ]
+            )
+            ->setAllowedTypes('gridName', 'string')
+            ->setAllowedTypes('gridParameters', 'array')
+            ->setAllowedTypes(FormatterProvider::FORMAT_TYPE, 'string')
+            ->setAllowedTypes('materializedViewName', 'string')
+            ->setAllowedTypes('rowsOffset', 'int')
+            ->setAllowedTypes('rowsLimit', 'int');
     }
 }

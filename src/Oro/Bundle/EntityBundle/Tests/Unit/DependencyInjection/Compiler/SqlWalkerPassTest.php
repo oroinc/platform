@@ -12,47 +12,60 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class SqlWalkerPassTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var SqlWalkerPass */
-    private $compiler;
+    private SqlWalkerPass $compiler;
 
     protected function setUp(): void
     {
         $this->compiler = new SqlWalkerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $configDefinition = new Definition();
         $container->setDefinition('doctrine.orm.configuration', $configDefinition);
 
-        $container->register('service1', Stub\AstWalkerStub::class)
+        $astWalkerWithLowerPriority = get_class($this->createMock(OutputAstWalkerInterface::class));
+        $container->register('service1', $astWalkerWithLowerPriority)
+            ->addTag('oro_entity.sql_walker', ['priority' => -42]);
+
+        $astWalker = Stub\AstWalkerStub::class;
+        $container->register('service2', $astWalker)
             ->addTag('oro_entity.sql_walker');
-        $container->register('service2', Stub\OutputResultModifierStub::class)
+
+        $outputResultModifier = Stub\OutputResultModifierStub::class;
+        $container->register('service3', $outputResultModifier)
             ->addTag('oro_entity.sql_walker');
+
+        $outputResultModifierWithHigherPriority = get_class($this->createMock(OutputResultModifierInterface::class));
+        $container->register('service4', $outputResultModifierWithHigherPriority)
+            ->addTag('oro_entity.sql_walker', ['priority' => 42]);
 
         $this->compiler->process($container);
 
         $methodCalls = $configDefinition->getMethodCalls();
-        $this->assertCount(3, $methodCalls);
-        $this->assertContains(
+        self::assertCount(3, $methodCalls);
+        self::assertContains(
             [
                 'setDefaultQueryHint',
-                [Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class]
+                [Query::HINT_CUSTOM_OUTPUT_WALKER, SqlWalker::class],
             ],
             $methodCalls
         );
-        $this->assertContains(
+        self::assertContains(
             [
                 'setDefaultQueryHint',
-                [OutputAstWalkerInterface::HINT_AST_WALKERS, [Stub\AstWalkerStub::class]]
+                [OutputAstWalkerInterface::HINT_AST_WALKERS, [$astWalker, $astWalkerWithLowerPriority]],
             ],
             $methodCalls
         );
-        $this->assertContains(
+        self::assertContains(
             [
                 'setDefaultQueryHint',
-                [OutputResultModifierInterface::HINT_RESULT_MODIFIERS, [Stub\OutputResultModifierStub::class]]
+                [
+                    OutputResultModifierInterface::HINT_RESULT_MODIFIERS,
+                    [$outputResultModifierWithHigherPriority, $outputResultModifier],
+                ],
             ],
             $methodCalls
         );

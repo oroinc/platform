@@ -19,14 +19,15 @@ trait PriorityTaggedLocatorTrait
     private function findAndSortTaggedServices(
         string $tagName,
         string $nameAttribute,
-        ContainerBuilder $container
+        ContainerBuilder $container,
+        bool $throwOnAbstract = true
     ): array {
         $items = [];
-        $taggedServices = $container->findTaggedServiceIds($tagName, true);
+        $taggedServices = $container->findTaggedServiceIds($tagName, $throwOnAbstract);
         foreach ($taggedServices as $id => $tags) {
             foreach ($tags as $attributes) {
                 $items[$this->getPriorityAttribute($attributes)][] = [
-                    $this->getRequiredAttribute($attributes, $nameAttribute, $id, $tagName),
+                    $nameAttribute ? $this->getRequiredAttribute($attributes, $nameAttribute, $id, $tagName) : $id,
                     $id
                 ];
             }

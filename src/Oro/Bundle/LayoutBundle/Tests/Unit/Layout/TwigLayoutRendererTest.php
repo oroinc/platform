@@ -10,17 +10,25 @@ use Twig\Environment;
 
 class TwigLayoutRendererTest extends \PHPUnit\Framework\TestCase
 {
-    public function testEnvironmentSet()
+    public function testEnvironmentSet(): void
     {
         $innerRenderer = $this->createMock(TwigRendererInterface::class);
-        $environment = $this->createMock(Environment::class);
         $formRenderer = $this->createMock(FormRendererEngineInterface::class);
         $placeholderRenderer = $this->createMock(PlaceholderRenderer::class);
 
-        $innerRenderer->expects($this->once())
-            ->method('setEnvironment')
-            ->with($this->identicalTo($environment));
+        $environment = $this->createMock(Environment::class);
+        $newEnvironment = clone $environment;
 
-        new TwigLayoutRenderer($innerRenderer, $formRenderer, $environment, $placeholderRenderer);
+        $innerRenderer
+            ->expects(self::exactly(2))
+            ->method('setEnvironment')
+            ->withConsecutive([self::identicalTo($environment)], [self::identicalTo($newEnvironment)]);
+
+        $renderer = new TwigLayoutRenderer($innerRenderer, $formRenderer, $environment, $placeholderRenderer);
+
+        self::assertSame($environment, $renderer->getEnvironment());
+
+        $renderer->setEnvironment($newEnvironment);
+        self::assertSame($newEnvironment, $renderer->getEnvironment());
     }
 }

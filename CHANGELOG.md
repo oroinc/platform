@@ -6,9 +6,19 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### UIBundle
+* Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
+  rendering WYSIWYG content in backoffice.
+
 #### ImportExportBundle
 * Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
   to mark certain field as skipped during denormalization process to avoid possible type conflicts.
+
+### Removed
+
+#### EntityConfigBundle
+* Removed `renderWysiwygContentPreview` TWIG macro from EntityConfigBundle, use `renderWysiwygContentPreview` or
+  `renderCollapsibleWysiwygContentPreview` from UIBundle instead.
 
 ## 5.1.0-alpha.2 (2022-08-01)
 [Show detailed list of changes](incompatibilities-5-1-alpha-2.md)
@@ -37,7 +47,7 @@ The current file describes significant changes in the code that may affect the u
   and `Oro\Bundle\CronBundle\Command\CronCommandActivationInterface` instead.
 
 #### DataGridBundle
-* The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead. 
+* The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead.
 * The deprecated `source / acl_resource` datagrid option was removed. Use the `acl_resource` option instead.
 
 #### EntityBundle
@@ -60,7 +70,7 @@ The current file describes significant changes in the code that may affect the u
 * The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
 
 #### ImportExportBundle
-* Removed `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use 
+* Removed `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use
   `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultFieldValue` instead.
 
 ## 5.1.0-alpha.1 (2022-05-31)

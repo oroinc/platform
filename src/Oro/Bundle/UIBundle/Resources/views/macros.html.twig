@@ -229,19 +229,23 @@
     Render collapsible html block
     Parameters:
         data  - rendered data
-        entity - the entitty instance on wich Field ACL should be checked
+        entity - the entity instance on wich Field ACL should be checked
         fieldName - the name of field on wich Field ACL should be checked
 #}
-{% macro renderCollapsibleHtml(data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
-    {% if is_granted('VIEW', entity, fieldName) and data is not empty %}
+{% macro renderCollapsibleHtml(data, entity = null, fieldName = null, moreText = 'Show more', lessText = 'Show less') %}
+    {% if data is not empty and (entity is empty or fieldName is empty or is_granted('VIEW', entity, fieldName)) %}
         {% set collapseView = {
-            storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
-            uid: '[' ~ fieldName ~ '][' ~ entity.id ~ ']',
             animationSpeed: 0,
             closeClass: 'overflows',
             checkOverflow: true,
             open: false
         } %}
+        {%- if entity is not empty and fieldName is not empty -%}
+            {%- set collapseView = collapseView|merge({
+                storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
+                uid: '[' ~ fieldName ~ '][' ~ entity.id|default(0) ~ ']'
+            }) -%}
+        {%- endif -%}
         <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
             <div class="control-label" data-collapse-container>
                 {{ data|raw }}
@@ -1618,4 +1622,31 @@
     <span class="badge badge-pill badge-{{ badgeClass }} status-{{ badgeClass }}">
         <i class="icon-status-{{ badgeClass }} {{ iconClass }}" aria-hidden="true"></i>{{ label }}
     </span>
+{% endmacro %}
+
+{%- macro renderWysiwygContentPreview(content) -%}
+    {%- apply spaceless -%}
+        {% if content is not empty %}
+            <div data-page-component-view="oroentityconfig/js/views/wysiwyg-content-preview">{{ content|render_content|oro_html_sanitize }}</div>
+        {% endif %}
+    {%- endapply -%}
+{%- endmacro -%}
+
+{% macro renderCollapsibleWysiwygContentPreview(content, entity = null, fieldName = null, previewMessage = 'oro.ui.simplified_preview.message', moreText = 'oro.ui.collapse.more', lessText = 'oro.ui.collapse.less', noDataMessage = 'oro.ui.empty') %}
+    {%- if entity is empty or fieldName is empty or is_granted('VIEW', entity, fieldName) -%}
+        {%- import _self as UIMacro -%}
+        {%- if content|trim is not empty -%}
+            {%- if previewMessage is not empty -%}
+                <div class="alert alert-info alert--compact" role="alert">
+                    <span class="fa-info alert-icon" aria-hidden="true"></span>
+                    {{ previewMessage|trans }}
+                </div>
+            {%- endif -%}
+            <div class="cms-content">
+                {{- UIMacro.renderCollapsibleHtml(UIMacro.renderWysiwygContentPreview(content), entity, fieldName, moreText, lessText) -}}
+            </div>
+        {%- elseif noDataMessage is not empty -%}
+            <div class="no-data">{{ noDataMessage|trans }}</div>
+        {%- endif %}
+    {%- endif -%}
 {% endmacro %}
