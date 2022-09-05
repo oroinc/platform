@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
+use Behat\Behat\Tester\ServiceContainer\TesterExtension;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
@@ -24,6 +25,7 @@ use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -111,6 +113,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('cli_controllers.yml');
         $loader->load('kernel_services.yml');
 
+        $this->loadSkipOnFailureStepTester($container);
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts'] ?? []);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers'] ?? []);
 
@@ -154,6 +157,16 @@ class OroTestFrameworkExtension implements TestworkExtension
         foreach ($container->findTaggedServiceIds(ContextExtension::INITIALIZER_TAG) as $serviceId => $tags) {
             $definition->addMethodCall('registerContextInitializer', [new Reference($serviceId)]);
         }
+    }
+
+    private function loadSkipOnFailureStepTester(ContainerBuilder $container): void
+    {
+        $definition = new Definition(SkipOnFailureStepTester::class, [
+            new Reference(TesterExtension::STEP_TESTER_ID),
+            new Reference('oro_test.storage.failed_features'),
+        ]);
+        $definition->addTag(TesterExtension::STEP_TESTER_WRAPPER_TAG);
+        $container->setDefinition(TesterExtension::STEP_TESTER_WRAPPER_TAG . '.skip_on_failure', $definition);
     }
 
     private function transferApplicationParameters(ContainerBuilder $container): void
