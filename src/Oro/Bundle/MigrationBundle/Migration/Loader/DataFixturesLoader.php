@@ -13,15 +13,13 @@ use Oro\Bundle\MigrationBundle\Migration\Sorter\DataFixturesSorter;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Provides list of data fixtures to perform
  */
 class DataFixturesLoader extends ContainerAwareLoader
 {
-    /** @var EntityManager */
-    protected $em;
-
     /** @var DataFixture[] */
     protected $loadedFixtures;
 
@@ -31,11 +29,12 @@ class DataFixturesLoader extends ContainerAwareLoader
     /**
      * Constructor.
      */
-    public function __construct(EntityManager $em, ContainerInterface $container)
-    {
+    public function __construct(
+        protected EntityManager $em,
+        protected KernelInterface $kernel,
+        ContainerInterface $container
+    ) {
         parent::__construct($container);
-
-        $this->em = $em;
     }
 
     /**
@@ -78,7 +77,6 @@ class DataFixturesLoader extends ContainerAwareLoader
             $this->ref = new \ReflectionProperty('Doctrine\Common\DataFixtures\Loader', 'fixtures');
             $this->ref->setAccessible(true);
         }
-
         return $this->ref->getValue($this);
     }
 

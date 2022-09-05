@@ -64,6 +64,9 @@ abstract class OroKernel extends Kernel
         foreach ($this->bundles as $name => $bundle) {
             $bundles[$name] = get_class($bundle);
         }
+        if (class_exists('AppKernel')) {
+            $bundles['app.kernel'] = \AppKernel::class;
+        }
         CumulativeResourceManager::getInstance()
             ->setBundles($bundles)
             ->setAppRootDir($this->getProjectDir());

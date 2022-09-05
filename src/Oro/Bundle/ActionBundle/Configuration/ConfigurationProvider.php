@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -18,23 +18,17 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
 {
     private const CONFIG_FILE = 'Resources/config/oro/actions.yml';
 
-    /** @var Container */
-    private $container;
-
-    /** @var string[] */
-    private $bundles;
+    private Container $container;
 
     /**
-     * @param string    $cacheFile
-     * @param bool      $debug
+     * @param string $cacheFile
+     * @param bool $debug
      * @param Container $container
-     * @param string[]  $bundles
      */
-    public function __construct(string $cacheFile, bool $debug, Container $container, array $bundles)
+    public function __construct(string $cacheFile, bool $debug, Container $container)
     {
         parent::__construct($cacheFile, $debug);
         $this->container = $container;
-        $this->bundles = $bundles;
     }
 
     /**
@@ -52,8 +46,9 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
     {
         $mergedConfig = [];
         $rawConfigs = $this->getRawConfigs($resourcesContainer);
+        $bundles = $this->getBundles();
         foreach ($rawConfigs as $sectionName => $configs) {
-            $merger = new ConfigurationMerger($this->bundles);
+            $merger = new ConfigurationMerger($bundles);
             $mergedConfig[$sectionName] = $merger->mergeConfiguration(
                 $this->container->getParameterBag()->resolveValue($configs)
             );
@@ -71,6 +66,11 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
         );
     }
 
+    protected function getBundles(): array
+    {
+        return CumulativeResourceManager::getInstance()->getBundles();
+    }
+
     /**
      * @param ResourcesContainerInterface $resourcesContainer
      *
@@ -79,10 +79,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider implements Configurat
     private function getRawConfigs(ResourcesContainerInterface $resourcesContainer): array
     {
         $result = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_action',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_action', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             foreach ($resource->data as $sectionName => $config) {

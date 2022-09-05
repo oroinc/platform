@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
 use Oro\Component\Config\CumulativeResource;
 use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
+use Oro\Component\Config\Loader\FolderYamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Testing\TempDirExtension;
 
@@ -600,10 +601,14 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $pathDefault = '/Resources/config/oro/api.yml';
         $pathFirst = '/Resources/config/oro/api_first.yml';
         $pathSecond = '/Resources/config/oro/api_second.yml';
-
         $expectedResourcesDefault = new CumulativeResource(
             'oro_api',
-            new CumulativeResourceLoaderCollection([new YamlCumulativeFileLoader($pathDefault)])
+            new CumulativeResourceLoaderCollection(
+                [
+                    new YamlCumulativeFileLoader($pathDefault),
+                    new FolderYamlCumulativeFileLoader('../config/oro/api')
+                ]
+            )
         );
         $expectedResourcesDefault->addFound(
             get_class($bundle1),
@@ -620,7 +625,12 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
         $expectedResourcesFirst = new CumulativeResource(
             'oro_api',
-            new CumulativeResourceLoaderCollection([new YamlCumulativeFileLoader($pathFirst)])
+            new CumulativeResourceLoaderCollection(
+                [
+                    new YamlCumulativeFileLoader($pathFirst),
+                    new FolderYamlCumulativeFileLoader('../config/oro/api_first')
+                ]
+            )
         );
         $expectedResourcesFirst->addFound(
             get_class($bundle1),
@@ -629,7 +639,12 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
 
         $expectedResourcesSecond = new CumulativeResource(
             'oro_api',
-            new CumulativeResourceLoaderCollection([new YamlCumulativeFileLoader($pathSecond)])
+            new CumulativeResourceLoaderCollection(
+                [
+                    new YamlCumulativeFileLoader($pathSecond),
+                    new FolderYamlCumulativeFileLoader('../config/oro/api_second')
+                ]
+            )
         );
         $expectedResourcesSecond->addFound(
             get_class($bundle1),

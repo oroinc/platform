@@ -203,9 +203,10 @@ class DashboardController extends AbstractController
 
     /**
      * @Route(
-     *      "/widget/{widget}/{bundle}/{name}",
+     *      "/widget/{widget}/{name}/{bundle}",
      *      name="oro_dashboard_widget",
-     *      requirements={"widget"="[\w\-]+", "bundle"="\w+", "name"="[\w\-]+"}
+     *      requirements={"widget"="[\w\-]+", "bundle"="^$|\w+", "name"="[\w\-]+"},
+     *      defaults={"bundle"= ""}
      * )
      *
      * @param string $widget
@@ -215,8 +216,12 @@ class DashboardController extends AbstractController
      */
     public function widgetAction($widget, $bundle, $name)
     {
+        $view = !empty($bundle)
+            ? sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name)
+            : sprintf('Dashboard/%s.html.twig', $name);
+
         return $this->render(
-            sprintf('@%s/Dashboard/%s.html.twig', $bundle, $name),
+            $view,
             $this->get(WidgetConfigs::class)->getWidgetAttributesForTwig($widget)
         );
     }

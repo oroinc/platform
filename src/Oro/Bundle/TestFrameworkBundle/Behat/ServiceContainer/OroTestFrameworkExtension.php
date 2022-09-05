@@ -42,6 +42,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private const SUITE_AWARE_TAG = 'suite_aware';
     private const HEALTH_CHECKER_TAG = 'behat_health_checker';
     private const HEALTH_CHECKER_AWARE_TAG = 'health_checker_aware';
+    private const REFERENCE_REPOSITORY_INITIALIZER = 'oro_behat.reference_repository_initializer';
     private const CONFIG_PATH = '/Tests/Behat/behat.yml';
     private const ELEMENTS_CONFIG_ROOT = 'elements';
     private const PAGES_CONFIG_ROOT = 'pages';
@@ -264,8 +265,6 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     private function processBundleBehatConfigurations(ContainerBuilder $container): void
     {
-        /** @var KernelInterface $kernel */
-        $kernel = $container->get(SymfonyExtension::KERNEL_ID);
         $processor = new Processor();
         $configuration = new BehatBundleConfiguration($container);
         $suites = [$container->getParameter('suite.configurations')];
@@ -273,8 +272,8 @@ class OroTestFrameworkExtension implements TestworkExtension
         $elements = [];
         $requiredOptionalListeners = [];
 
-        foreach ($kernel->getBundles() as $bundle) {
-            $configFile = str_replace('/', DIRECTORY_SEPARATOR, $bundle->getPath() . self::CONFIG_PATH);
+        foreach ($this->getConfigPathsPrefixes($container) as $pathPrefix) {
+            $configFile = str_replace('/', DIRECTORY_SEPARATOR, $pathPrefix . self::CONFIG_PATH);
             if (!is_file($configFile)) {
                 continue;
             }
@@ -301,6 +300,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $loader = new YamlFileLoader($container, new FileLocator(rtrim($resource->path, 'services.yml')));
             $loader->load('services.yml');
         }
+        $this->loadAppBehatServices($container);
 
         $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
         $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
@@ -308,6 +308,36 @@ class OroTestFrameworkExtension implements TestworkExtension
             ->addMethodCall('setRequiredListeners', [array_unique($requiredOptionalListeners)]);
         $suites = array_merge($suites, $container->getParameter('suite.configurations'));
         $container->setParameter('suite.configurations', $suites);
+    }
+
+    private function getConfigPathsPrefixes(ContainerBuilder $container): array
+    {
+        /** @var KernelInterface $kernel */
+        $kernel = $container->get(SymfonyExtension::KERNEL_ID);
+        $configPrefixes = [];
+
+        foreach ($kernel->getBundles() as $bundle) {
+            $configPrefixes[] = $bundle->getPath();
+        }
+        $configPrefixes[] = $kernel->getProjectDir() . '/src';
+
+        return $configPrefixes;
+    }
+
+    private function loadAppBehatServices(ContainerBuilder $container): void
+    {
+        /** @var KernelInterface $kernel */
+        $kernel = $container->get(SymfonyExtension::KERNEL_ID);
+
+        $servicesFile = str_replace(
+            '/',
+            DIRECTORY_SEPARATOR,
+            $kernel->getProjectDir() . '/config/oro/behat_services.yml'
+        );
+        if (\is_file($servicesFile)) {
+            $loader = new YamlFileLoader($container, new FileLocator($kernel->getProjectDir() . '/config/oro'));
+            $loader->load('behat_services.yml');
+        }
     }
 
     private function appendConfiguration(array &$baseConfig, array $config): void
@@ -323,31 +353,11 @@ class OroTestFrameworkExtension implements TestworkExtension
 
     private function processReferenceRepositoryInitializers(ContainerBuilder $container): void
     {
-        $kernel = $container->get(SymfonyExtension::KERNEL_ID);
         $doctrineIsolator = $container->getDefinition('oro_behat_extension.isolation.doctrine_isolator');
 
-        /** @var BundleInterface $bundle */
-        foreach ($kernel->getBundles() as $bundle) {
-            $namespace = sprintf('%s\Tests\Behat\ReferenceRepositoryInitializer', $bundle->getNamespace());
-
-            if (!class_exists($namespace)) {
-                continue;
-            }
-
-            try {
-                $initializer = new $namespace;
-            } catch (\Throwable $e) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Error while creating "%s" initializer. Initializer should not have any dependencies',
-                        $namespace
-                    ),
-                    0,
-                    $e
-                );
-            }
-
-            $doctrineIsolator->addMethodCall('addInitializer', [$initializer]);
+        $referenceRepositoryInitializers = $container->findTaggedServiceIds(self::REFERENCE_REPOSITORY_INITIALIZER);
+        foreach ($referenceRepositoryInitializers as $serviceId => $tags) {
+            $doctrineIsolator->addMethodCall('addInitializer', [new Reference($serviceId)]);
         }
     }
 

@@ -76,7 +76,9 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
     {
         return [
             '#Resources/views/layouts/' . self::RESOURCES_FOLDER_PATTERN . '/theme\.yml$#',
-            '#Resources/views/layouts/' . self::RESOURCES_FOLDER_PATTERN . '/config/[^/]+\.yml$#'
+            '#Resources/views/layouts/' . self::RESOURCES_FOLDER_PATTERN . '/config/[^/]+\.yml$#',
+            '#templates/layouts/' . self::RESOURCES_FOLDER_PATTERN . '/theme\.yml$#',
+            '#templates/layouts/' . self::RESOURCES_FOLDER_PATTERN . '/config/[^/]+\.yml$#'
         ];
     }
 }

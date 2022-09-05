@@ -53,23 +53,28 @@ class LayoutUpdatesCacheWarmer implements CacheWarmerInterface
     private function loadLayoutUpdates(): void
     {
         foreach ($this->kernel->getBundles() as $bundle) {
-            $finder = new Finder();
-            $layoutsDir = $bundle->getPath() . '/Resources/views/layouts';
-            if (!is_dir($layoutsDir)) {
-                continue;
-            }
+            $this->loadLayoutsUpdatesFromDir($bundle->getPath() . '/Resources/views/layouts');
+        }
+        $this->loadLayoutsUpdatesFromDir($this->kernel->getProjectDir() . '/templates/layouts');
+    }
 
-            $finder
-                ->in($layoutsDir)
-                ->exclude('config')
-                ->files()
-                ->name('*.yml')
-                ->notName('theme.yml');
+    private function loadLayoutsUpdatesFromDir(string $layoutsDir): void
+    {
+        if (!is_dir($layoutsDir)) {
+            return;
+        }
 
-            foreach ($finder as $file) {
-                $layoutUpdatePath = $file->getRealPath();
-                $this->layoutUpdateLoader->load($layoutUpdatePath);
-            }
+        $finder = new Finder();
+        $finder
+            ->in($layoutsDir)
+            ->exclude('config')
+            ->files()
+            ->name('*.yml')
+            ->notName('theme.yml');
+
+        foreach ($finder as $file) {
+            $layoutUpdatePath = $file->getRealPath();
+            $this->layoutUpdateLoader->load($layoutUpdatePath);
         }
     }
 

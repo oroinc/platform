@@ -3,9 +3,8 @@
 namespace Oro\Bundle\UserBundle\Configuration;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainerInterface;
 
 /**
@@ -30,10 +29,7 @@ class PrivilegeCategoryConfigurationProvider extends PhpArrayConfigProvider
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_acl_categories',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_acl_categories', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (isset($resource->data[PrivilegeCategoryConfiguration::ROOT_NODE])) {

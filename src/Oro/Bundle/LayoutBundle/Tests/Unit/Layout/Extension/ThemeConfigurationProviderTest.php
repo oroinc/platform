@@ -4,6 +4,7 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider;
+use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestAppRoot\SrcStubFolder\AppKernelStub;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle\TestBundle;
 use Oro\Bundle\LayoutBundle\Tests\Unit\Stubs\Bundles\TestBundle2\TestBundle2;
 use Oro\Component\Config\CumulativeResourceManager;
@@ -25,7 +26,8 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
             ->clear()
             ->setBundles([
                 $bundle1->getName() => get_class($bundle1),
-                $bundle2->getName() => get_class($bundle2)
+                $bundle2->getName() => get_class($bundle2),
+                'app.kernel' => AppKernelStub::class
             ]);
 
         $this->configurationProvider = new ThemeConfigurationProvider(
@@ -40,7 +42,7 @@ class ThemeConfigurationProviderTest extends \PHPUnit\Framework\TestCase
     {
         $result = $this->configurationProvider->getThemeNames();
         sort($result);
-        $this->assertEquals(['base', 'oro-black'], $result);
+        $this->assertEquals(['base', 'oro-app-root-based', 'oro-black'], $result);
     }
 
     public function testGetThemeDefinitionForUnknownTheme()

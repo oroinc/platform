@@ -15,6 +15,9 @@ use Oro\Component\Config\ResourcesContainerInterface;
  */
 class WidgetDefinitionProvider extends PhpArrayConfigProvider
 {
+    private const RELATIVE_PATH = 'Resources/public/sidebar_widgets/{folder}/widget.yml';
+    private const APP_RELATIVE_PATH = '../public/sidebar_widgets/{folder}/widget.yml';
+
     /**
      * Gets definitions for all sidebar widgets that should be shown at the given placement.
      *
@@ -43,11 +46,10 @@ class WidgetDefinitionProvider extends PhpArrayConfigProvider
         $config = [];
         $configLoader = new CumulativeConfigLoader(
             'oro_sidebar',
-            new FolderingCumulativeFileLoader(
-                '{folder}',
-                '\w+',
-                new YamlCumulativeFileLoader('Resources/public/sidebar_widgets/{folder}/widget.yml')
-            )
+            [
+                $this->getFolderYmlCumulativeFileLoader(self::RELATIVE_PATH),
+                $this->getFolderYmlCumulativeFileLoader(self::APP_RELATIVE_PATH),
+            ],
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
@@ -58,6 +60,15 @@ class WidgetDefinitionProvider extends PhpArrayConfigProvider
             'Resources/public/sidebar_widgets/*/widget.yml',
             new WidgetDefinitionConfiguration(),
             [$config]
+        );
+    }
+
+    private function getFolderYmlCumulativeFileLoader(string $relativeFilePath): FolderingCumulativeFileLoader
+    {
+        return new FolderingCumulativeFileLoader(
+            '{folder}',
+            '\w+',
+            new YamlCumulativeFileLoader($relativeFilePath)
         );
     }
 }

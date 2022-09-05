@@ -571,7 +571,6 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/permissions.php'
             - '%kernel.debug%'
-            - '%kernel.bundles%'
 
     oro_security.configuration.provider.configurable_permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\ConfigurablePermissionConfigurationProvider
@@ -580,7 +579,6 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/configurable_permissions.php'
             - '%kernel.debug%'
-            - '%kernel.bundles%'
 
     oro_security.configuration.builder.permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder

@@ -4,16 +4,15 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Symfony\Component\Finder\Finder;
 
+/**
+ * Workflows config resources Finder builder.
+ */
 class WorkflowConfigFinderBuilder
 {
-    /** @var ConfigFinderFactory */
-    private $configFinderFactory;
-
-    /** @var string */
-    private $fileName;
-
-    /** @var string */
-    private $subDirectory;
+    private ConfigFinderFactory $configFinderFactory;
+    private ?string $fileName = null;
+    private ?string $subDirectory = null;
+    private ?string $appSubDirectory = null;
 
     public function __construct(ConfigFinderFactory $configFinderFactory)
     {
@@ -28,12 +27,18 @@ class WorkflowConfigFinderBuilder
         if (null === $this->subDirectory) {
             throw $this->notConfiguredException('subDirectory');
         }
-
         if (null === $this->fileName) {
             throw $this->notConfiguredException('fileName');
         }
+        if (null === $this->appSubDirectory) {
+            throw $this->notConfiguredException('appSubDirectory');
+        }
 
-        return $this->configFinderFactory->create($this->subDirectory, $this->fileName);
+        return $this->configFinderFactory->create(
+            $this->subDirectory,
+            $this->appSubDirectory,
+            $this->fileName
+        );
     }
 
     public function setFileName(string $fileName)
@@ -44,6 +49,11 @@ class WorkflowConfigFinderBuilder
     public function setSubDirectory(string $subDirectory)
     {
         $this->subDirectory = $subDirectory;
+    }
+
+    public function setAppSubDirectory(string $subDirectory): void
+    {
+        $this->appSubDirectory = $subDirectory;
     }
 
     private function notConfiguredException(string $propertyMissed): \BadMethodCallException
