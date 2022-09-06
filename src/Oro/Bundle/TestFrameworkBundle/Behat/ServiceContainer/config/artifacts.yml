@@ -14,6 +14,13 @@ services:
       - '@output.formatter.pretty'
       - '@mink'
 
+  oro_test.artifacts.failed_feature_subscriber:
+    class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\FailedFeaturesSubscriber
+    arguments:
+    - '@oro_test.storage.failed_features'
+    tags:
+    - { name: event_dispatcher.subscriber }
+  
   oro_test.artifacts.progress_artifacts_subscriber:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ProgressArtifactsSubscriber
     arguments:
