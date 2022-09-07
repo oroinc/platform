@@ -8,9 +8,11 @@
     {% set buttonOptions = options.options %}
     {% if not onlyLink|default(false) %}<div class="pull-left btn-group icons-holder">{% endif %}
     {% block link %}
+        {% set classes = 'icons-holder-text operation-button ' ~ params.buttonOptions.class|default('')|trim ~ ' ' ~ aClass|default('')|trim ~ ' ' ~ params.buttonOptions.aCss|default('')|trim  %}
+        {% set classes = classes|split(' ')|array_unique|join(' ') %}
         <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
            href="#"
-           class="icons-holder-text operation-button {{ params.buttonOptions.class|default('') }} {{ aClass|default('') }} {{ params.buttonOptions.aCss|default('') }}"
+           class="{{ classes }}"
            {% if linkTitle is not empty %}
                title="{{ linkTitle }}"
            {% endif %}

@@ -137,7 +137,7 @@ define(function(require) {
          * @param {Object} options
          */
         createFrontField: function(options) {
-            // According for accessibility if input doesn't linked label
+            // According to accessibility if input doesn't linked label
             if ($(`label[for="${options.dateInputAttrs.id}"]`).length) {
                 delete options.dateInputAttrs['aria-label'];
             }
@@ -152,6 +152,10 @@ define(function(require) {
             this.checkEmpty();
             this.$el.after(this.$frontDateField);
             this.$el.attr('data-format', 'backend');
+
+            if (options.dateInputAttrs.id === this.$el.attr('id')) {
+                this.$el.attr('id', `hidden_${this.$el.attr('id')}`);
+            }
         },
 
         /**
