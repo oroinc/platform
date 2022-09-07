@@ -17,6 +17,8 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  *
  * Note: parameters are sorted by priority,
  * the higher the priority, the closer the parameter to the top of the parameter list.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ScopeCriteria implements \IteratorAggregate
 {
@@ -73,6 +75,32 @@ class ScopeCriteria implements \IteratorAggregate
     public function applyWhereWithPriority(QueryBuilder $qb, string $alias, array $ignoreFields = []): void
     {
         $this->doApplyWhere($qb, $alias, $ignoreFields, true);
+    }
+
+    public function applyWhereWithPriorityForScopes(
+        QueryBuilder $qb,
+        string $alias,
+        array $ignoreFields = []
+    ): void {
+        $this->applyWhereWithPriority($qb, $alias, $ignoreFields);
+
+        $orX = $qb->expr()->orX();
+        foreach ($this->parameters as $field => $value) {
+            if (in_array($field, $ignoreFields)) {
+                continue;
+            }
+
+            QueryBuilderUtil::checkIdentifier($alias);
+            QueryBuilderUtil::checkIdentifier($field);
+            $aliasedField = $alias . '.' . $field;
+            $orX->add($qb->expr()->isNotNull($aliasedField));
+        }
+
+        $fieldId = 'id';
+        QueryBuilderUtil::checkIdentifier($fieldId);
+        $groupBy = $alias . '.' . $fieldId;
+
+        $qb->andWhere($orX)->groupBy($groupBy);
     }
 
     /**

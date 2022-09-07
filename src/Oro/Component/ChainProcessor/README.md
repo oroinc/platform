@@ -30,7 +30,7 @@ The following enhancements of the original design pattern are added to make a co
 
 Lets imagine that you need a different types of textual representations of some group of objects, e.g. entities. One of straightforward solution may be using of `__toString()` magic method or some custom `toString($parameters)` method. In some simple cases this solution may be a good approach. But in case if you want to allow external code to change existing representation of your objects or add new types of representations this solution is not seem as a good choice.
 
-The Oro ChainProcessor component can help to solve this task. It is supposed that your application is built using Symfony Framework, but the Oro ChainProcessor component can be easily adapted to other frameworks.
+The Oro ChainProcessor component can help solve this task. It is supposed that your application is built using Symfony Framework, but the Oro ChainProcessor component can be easily adapted to other frameworks.
 
 - Register compiler passes
 

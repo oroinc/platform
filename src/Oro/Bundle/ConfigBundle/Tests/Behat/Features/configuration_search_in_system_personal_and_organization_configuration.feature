@@ -1,4 +1,5 @@
 @regression
+@ticket-BB-19440
 Feature: Configuration Search in System, Personal and Organization configuration
   In order to find the configuration options by their group names, names and descriptions (hints)
   As an Administrator
@@ -25,7 +26,7 @@ Feature: Configuration Search in System, Personal and Organization configuration
   Scenario: Search should show sections which contain found settings
     When I type "url" in "Configuration Quick Search"
     Then I should see "Routing" in the "Configuration Sidebar Content" element
-    And I should not see "Localization" in the "Configuration Sidebar Content" element
+    And I should see "Localization" in the "Configuration Sidebar Content" element
     When I click "Clear Sidebar Search"
     And I expand all on configuration sidebar
     Then I should see "Localization" in the "Configuration Sidebar Content" element

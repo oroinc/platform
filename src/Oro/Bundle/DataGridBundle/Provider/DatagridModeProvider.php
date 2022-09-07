@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Provider;
 
 /**
- * Stores datagrid modes which can help to filter what extensions to load in different modes
+ * Stores datagrid modes which can help filter what extensions to load in different modes
  */
 class DatagridModeProvider
 {

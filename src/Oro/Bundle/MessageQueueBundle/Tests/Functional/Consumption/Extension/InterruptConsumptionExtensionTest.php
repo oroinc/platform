@@ -55,7 +55,9 @@ class InterruptConsumptionExtensionTest extends WebTestCase
             new LoggerExtension($this->logger)
         ]));
 
-        $this->assertInterruptionMessage('Consuming interrupted, reason: The message limit reached.');
+        $this->assertInterruptionMessage(
+            'Consuming interrupted. Queue: "oro.default", reason: "The message limit reached."'
+        );
     }
 
     public function testMessageConsumptionIsInterruptedByConfigCacheChanged()
@@ -69,7 +71,9 @@ class InterruptConsumptionExtensionTest extends WebTestCase
             new LoggerExtension($this->logger)
         ]));
 
-        $this->assertInterruptionMessage('Consuming interrupted, reason: The cache has changed.');
+        $this->assertInterruptionMessage(
+            'Consuming interrupted. Queue: "oro.default", reason: "The cache has changed."'
+        );
     }
 
     private function assertInterruptionMessage(string $expectedMessage): void

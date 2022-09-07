@@ -38,15 +38,31 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
             ->execute();
     }
 
+    private function updateElapsedTimeForTestOperations(array $operationIds, int $operationTimeout = 3600): void
+    {
+        /** @var EntityRepository $repo */
+        $repo = self::getContainer()->get('doctrine')->getRepository(AsyncOperation::class);
+        $repo->createQueryBuilder('operation')
+            ->update(AsyncOperation::class, 'operation')
+            ->set('operation.elapsedTime', ':operationTimeout')
+            ->where('operation.id in (:ids)')
+            ->setParameter('ids', $operationIds)
+            ->setParameter('operationTimeout', $operationTimeout)
+            ->getQuery()
+            ->execute();
+    }
+
     public function testProcessOperationsCleanupWithDryRunOption()
     {
         $outdatedOperationId = $this->getReference('user_operation1')->getId();
         $notOutdatedOperationId = $this->getReference('user_operation2')->getId();
+        $processingTimeElapsedOperationId = $this->getReference('user_operation3')->getId();
 
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('doctrine')->getManagerForClass(AsyncOperation::class);
         $em->clear();
         $this->updateModificationDateForTestOperations([$outdatedOperationId]);
+        $this->updateElapsedTimeForTestOperations([$processingTimeElapsedOperationId]);
 
         self::runCommand(CleanupAsyncOperationsCommand::getDefaultName(), ['--dry-run']);
 
@@ -62,10 +78,21 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         self::assertNotNull($em->find(AsyncOperation::class, $notOutdatedOperationId));
         self::assertTrue($fileManager->hasFile($fileNameProvider->getErrorIndexFileName($notOutdatedOperationId)));
         self::assertTrue($fileManager->hasFile($fileNameProvider->getInfoFileName($notOutdatedOperationId)));
+
+        self::assertNotNull($em->find(AsyncOperation::class, $processingTimeElapsedOperationId));
+        self::assertTrue(
+            $fileManager->hasFile(
+                $fileNameProvider->getErrorIndexFileName($processingTimeElapsedOperationId)
+            )
+        );
+        self::assertTrue($fileManager->hasFile($fileNameProvider->getInfoFileName($processingTimeElapsedOperationId)));
     }
 
     public function testProcessOperationsCleanup()
     {
+        $processingTimeElapsedOperationsIds = [
+            $this->getReference('user_operation3')->getId(),
+        ];
         $outdatedOperationIds = [
             $this->getReference('user_operation1')->getId(),
             $this->getReference('user_operation2')->getId(),
@@ -80,6 +107,7 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         $em = self::getContainer()->get('doctrine')->getManagerForClass(AsyncOperation::class);
         $em->clear();
         $this->updateModificationDateForTestOperations($outdatedOperationIds);
+        $this->updateElapsedTimeForTestOperations($processingTimeElapsedOperationsIds);
 
         self::runCommand(CleanupAsyncOperationsCommand::getDefaultName());
 
@@ -89,6 +117,12 @@ class CleanupAsyncOperationsCommandTest extends WebTestCase
         $fileNameProvider = self::getContainer()->get('oro_api.batch.file_name_provider');
 
         foreach ($outdatedOperationIds as $id) {
+            self::assertTrue(null === $em->find(AsyncOperation::class, $id));
+            self::assertFalse($fileManager->hasFile($fileNameProvider->getErrorIndexFileName($id)));
+            self::assertFalse($fileManager->hasFile($fileNameProvider->getInfoFileName($id)));
+        }
+
+        foreach ($processingTimeElapsedOperationsIds as $id) {
             self::assertTrue(null === $em->find(AsyncOperation::class, $id));
             self::assertFalse($fileManager->hasFile($fileNameProvider->getErrorIndexFileName($id)));
             self::assertFalse($fileManager->hasFile($fileNameProvider->getInfoFileName($id)));

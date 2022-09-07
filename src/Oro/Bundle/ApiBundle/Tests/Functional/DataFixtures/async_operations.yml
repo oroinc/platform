@@ -30,6 +30,22 @@ Oro\Bundle\ApiBundle\Entity\AsyncOperation:
         actionName: 'create'
         owner: '@user'
         organization: '@organization'
+    user_operation3:
+        status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_RUNNING)>'
+        progress: 0.5
+        summary:
+            aggregateTime: 100
+            readCount: 5
+            writeCount: 5
+            errorCount: 0
+            createCount: 1
+            updateCount: 4
+        jobId: 4
+        dataFileName: 'test_file_4.yml'
+        entityClass: '<(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment::class)>'
+        actionName: 'create'
+        owner: '@user'
+        organization: '@organization'
     subordinate_bu_user_operation:
         status: '<(Oro\Bundle\ApiBundle\Entity\AsyncOperation::STATUS_RUNNING)>'
         progress: 0.3333

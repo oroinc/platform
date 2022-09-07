@@ -9,6 +9,8 @@ use Akeneo\Bundle\BatchBundle\Item\ExecutionContext;
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
 use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository as BatchJobRepository;
 use Akeneo\Bundle\BatchBundle\Job\Job;
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -24,7 +26,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * @todo: https://magecore.atlassian.net/browse/BAP-2600 move job results processing outside
+ * Batch job executor for import/export.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
@@ -172,7 +174,7 @@ class JobExecutor
         foreach ($jobExecution->getAllFailureExceptions() as $failureException) {
             // in most cases this occurs in a race condition issue when couple of consumers try to process data
             // in which we have a UNIQUE constraint. workaround is to requeue a message with this job
-            if ($failureException['class'] === UniqueConstraintViolationException::class) {
+            if ($this->isRedeliveryException($failureException['class'])) {
                 $jobResult->setNeedRedelivery(true);
                 return false;
             }
@@ -318,8 +320,6 @@ class JobExecutor
 
     /**
      * Set data to JobResult
-     * TODO: Find a way to work with multiple amount of job and step executions
-     * TODO https://magecore.atlassian.net/browse/BAP-2600
      */
     protected function setJobResultData(JobResult $jobResult, JobInstance $jobInstance)
     {
@@ -444,5 +444,12 @@ class JobExecutor
         }
 
         return $this->contextAggregatorRegistry->getAggregator($aggregatorType);
+    }
+
+    private function isRedeliveryException(string $exceptionClass): bool
+    {
+        return UniqueConstraintViolationException::class === $exceptionClass
+            || ForeignKeyConstraintViolationException::class === $exceptionClass
+            || is_a($exceptionClass, RetryableException::class, true);
     }
 }

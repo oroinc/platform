@@ -602,16 +602,24 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
             ['id' => 'opt2', 'label' => 'Option 2', 'priority' => 2, 'is_default' => false],
             ['id' => 'opt5', 'label' => 'Option 5', 'priority' => 3, 'is_default' => false],
             ['id' => '', 'label' => 'Option 4', 'priority' => 4, 'is_default' => true],
+            ['id' => '0025', 'label' => '0.025', 'priority' => 5, 'is_default' => false],
+            ['id' => '025', 'label' => '0.25', 'priority' => 6, 'is_default' => false],
+            ['id' => '035', 'label' => '0.035', 'priority' => 7, 'is_default' => false],
+            ['id' => '0035', 'label' => '0.35', 'priority' => 8, 'is_default' => false],
         ];
 
         $value1 = new TestEnumValue('opt1', 'Option 1', 1, true);
         $value2 = new TestEnumValue('opt2', 'Option 2 old', 4, true);
         $value3 = new TestEnumValue('opt3', 'Option 3', 3, false);
         $value5 = new TestEnumValue('opt5', 'Option 5', 2, false);
+        $value6 = new TestEnumValue('025', '0.25', 5, false);
+        $value7 = new TestEnumValue('0025', '0.025', 6, false);
+        $value8 = new TestEnumValue('035', '0.35', 8, false);
+        $value9 = new TestEnumValue('0035', '0.035', 7, false);
 
         $newValue = new TestEnumValue('opt4', 'Option 4', 4, true);
 
-        $values = [$value1, $value2, $value3, $value5];
+        $values = [$value1, $value2, $value3, $value5, $value6, $value7, $value8, $value9];
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->once())
@@ -656,7 +664,19 @@ class EnumSynchronizerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedValue5, $value5);
         $expectedNewValue = new TestEnumValue('opt4', 'Option 4', 4, true);
         $expectedNewValue->setLocale($locale);
-        $this->assertEquals($expectedNewValue, $newValue);
+        self::assertEquals($expectedNewValue, $newValue);
+        $expectedValue6 = new TestEnumValue('025', '0.25', 6, false);
+        $expectedValue6->setLocale($locale);
+        self::assertEquals($expectedValue6, $value6);
+        $expectedValue7 = new TestEnumValue('0025', '0.025', 5, false);
+        $expectedValue7->setLocale($locale);
+        self::assertEquals($expectedValue7, $value7);
+        $expectedValue8 = new TestEnumValue('035', '0.35', 7, false);
+        $expectedValue8->setLocale($locale);
+        self::assertEquals($expectedValue8, $value8);
+        $expectedValue9 = new TestEnumValue('0035', '0.035', 8, false);
+        $expectedValue9->setLocale($locale);
+        self::assertEquals($expectedValue9, $value9);
     }
 
     public function testApplyEnumOptionsOptionsInDifferentCase()
