@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
+use Oro\Bundle\InstallerBundle\Provider\PlatformRequirementsProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Requirements\Requirement;
 
@@ -43,11 +45,22 @@ class CheckRequirementsCommand extends Command
     {
         $this
             ->setDescription('Checks that the environment meets the application requirements.')
+            ->addOption(
+                'skip-assets',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not check NodeJS and NPM existence and versions'
+            )
             ->setHelp(
                 <<<'HELP'
 The <info>%command.name%</info> command checks that the environment meets the application requirements.
 
   <info>php %command.full_name%</info>
+
+The <info>--skip-assets</info> option can be used to skip NodeJS and NPM 
+existence and versions check:
+
+  <info>php %command.full_name% --skip-assets</info>
 
 By default this command shows only errors, but you can increase the verbosity
 to see warnings and informational messages as well:
@@ -67,6 +80,14 @@ HELP
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->writeln('Check system requirements');
+
+        if ($input->getOption('skip-assets')) {
+            @trigger_error(
+                'The --skip-assets option of the oro:check-requirements command is deprecated. Will be removed in 5.1',
+                E_USER_DEPRECATED
+            );
+            PlatformRequirementsProvider::$checkJSBuildRequirements = false;
+        }
 
         $collections = $this->getAllCollections();
         $failedCount = 0;

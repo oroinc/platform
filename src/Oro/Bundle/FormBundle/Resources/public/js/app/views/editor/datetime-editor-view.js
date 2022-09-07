@@ -81,19 +81,7 @@ define(function(require) {
         view: DatetimepickerView,
 
         DEFAULT_OPTIONS: {
-            dateInputAttrs: {
-                'placeholder': __('oro.form.choose_date'),
-                'name': 'date',
-                'autocomplete': 'off',
-                'data-validation': JSON.stringify({Date: {}})
-            },
-            datePickerOptions: {
-                altFormat: 'yy-mm-dd',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: '-80:+1',
-                showButtonPanel: true
-            },
+            ...DateEditorView.prototype.DEFAULT_OPTIONS,
             timeInputAttrs: {
                 'placeholder': __('oro.form.choose_time'),
                 'name': 'time',
@@ -101,8 +89,7 @@ define(function(require) {
                 'class': 'input-small timepicker-input',
                 'data-validation': JSON.stringify({Time: {}})
             },
-            timePickerOptions: {
-            }
+            timePickerOptions: {}
         },
 
         events: {

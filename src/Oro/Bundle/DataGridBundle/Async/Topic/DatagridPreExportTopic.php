@@ -37,18 +37,22 @@ class DatagridPreExportTopic extends AbstractTopic
                     $parametersResolver
                         ->setDefined([
                             'gridName',
-                            'parameters',
+                            'gridParameters',
                             FormatterProvider::FORMAT_TYPE,
+                            'pageSize',
+                            'exportByPages',
                         ])
                         ->setRequired([
                             'gridName',
                         ])
                         ->setDefaults([
                             'gridParameters' => [],
-                            FormatterProvider::FORMAT_TYPE => 'excel',
+                            FormatterProvider::FORMAT_TYPE => 'excel'
                         ])
                       ->setAllowedTypes('gridName', 'string')
                       ->setAllowedTypes('gridParameters', 'array')
+                      ->setAllowedTypes('pageSize', 'numeric')
+                      ->setAllowedTypes('exportByPages', 'boolean')
                       ->setAllowedTypes(FormatterProvider::FORMAT_TYPE, 'string');
                 },
                 'notificationTemplate' => null,

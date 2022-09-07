@@ -60,16 +60,13 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
-        $result = $this->dispatchDenormalizeEvent(
-            $data,
-            $this->createObject($type),
-            Events::BEFORE_DENORMALIZE_ENTITY
-        );
+        $event = $this->dispatchDenormalize($data, $this->createObject($type), Events::BEFORE_DENORMALIZE_ENTITY);
+        $result = $event->getObject();
         $fields = $this->fieldHelper->getEntityFields($type, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            if (!\array_key_exists($fieldName, $data)) {
+            if (!\array_key_exists($fieldName, $data) || $event->isFieldSkipped($fieldName)) {
                 continue;
             }
 
@@ -78,7 +75,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             if ($value !== null) {
                 $fieldContext['originalFieldName'] = $fieldContext['fieldName'] ?? $fieldName;
                 $fieldContext['fieldName'] = $fieldName;
-                if ($this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field)) {
+                if ($this->isObjectField($field)) {
                     if ($this->fieldHelper->isMultipleRelation($field)) {
                         $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
                     } elseif ($this->fieldHelper->isSingleRelation($field)) {
@@ -101,7 +98,12 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $this->setObjectValue($result, $fieldName, $value);
         }
 
-        return $this->dispatchDenormalizeEvent($data, $result, Events::AFTER_DENORMALIZE_ENTITY);
+        return $this->dispatchDenormalize($data, $result, Events::AFTER_DENORMALIZE_ENTITY)->getObject();
+    }
+
+    protected function isObjectField(array $field): bool
+    {
+        return $this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field);
     }
 
     /**
@@ -288,12 +290,22 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return false;
     }
 
+    protected function dispatchDenormalize(array $data, object $result, string $eventName): DenormalizeEntityEvent
+    {
+        $event = new DenormalizeEntityEvent($result, $data);
+        $this->dispatcher?->dispatch($event, $eventName);
+
+        return $event;
+    }
+
     /**
      * @param array $data
      * @param object $result
      * @param string $eventName
      *
      * @return object
+     *
+     * @deprecated Will be removed in 5.1, use dispatchDenormalize() instead.
      */
     protected function dispatchDenormalizeEvent($data, $result, $eventName)
     {

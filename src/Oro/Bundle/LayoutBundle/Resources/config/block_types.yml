@@ -62,6 +62,7 @@ services:
                         defaultValue: ~
                         value: {required: true}
                         params: ~
+                        titleIcon: {default: null}
             - [setName, ['page_title']]
         tags:
              - { name: layout.block_type, alias: page_title }

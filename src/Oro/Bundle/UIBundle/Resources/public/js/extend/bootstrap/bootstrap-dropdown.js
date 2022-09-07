@@ -62,6 +62,7 @@ define(function(require, exports, module) {
             if (Dropdown._isShowing) {
                 let focusTabbable = null;
 
+                // Prevent to show the keyboard on mobile devices if the first element is input
                 if (_.isMobile()) {
                     focusTabbable = $(this._menu).find(':tabbable:not("input")').eq(0);
                 }

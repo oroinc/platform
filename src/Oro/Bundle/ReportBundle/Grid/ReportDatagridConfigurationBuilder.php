@@ -4,6 +4,7 @@ namespace Oro\Bundle\ReportBundle\Grid;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\Export\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\Export\ExportExtension;
 use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\JoinIdentifierHelper;
@@ -19,6 +20,13 @@ class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
      * @var DatagridDateGroupingBuilder
      */
     protected $dateGroupingBuilder;
+
+    protected int $exportPageSize = 200;
+
+    public function setExportPageSize(int $exportPageSize): void
+    {
+        $this->exportPageSize = $exportPageSize;
+    }
 
     /**
      * {@inheritdoc}
@@ -49,7 +57,24 @@ class ReportDatagridConfigurationBuilder extends BaseReportConfigurationBuilder
 
     private function enableExportIfApplicable(DatagridConfiguration $config): void
     {
-        $config->offsetSetByPath(ExportExtension::EXPORT_OPTION_PATH, !$this->hasSplittableByIdGroupBy());
+        if ($this->hasSplittableByIdGroupBy()) {
+            $commonOptions = [
+                'page_size' => $this->exportPageSize,
+                'export_by_pages' => true,
+            ];
+            $exportOption = [
+                'csv' => ['label' => 'oro.grid.export.csv'] + $commonOptions,
+                'xlsx' => [
+                        'label' => 'oro.grid.export.xlsx',
+                        'show_max_export_records_dialog' => true,
+                        'max_export_records' => Configuration::XLSX_MAX_EXPORT_RECORDS,
+                    ] + $commonOptions,
+            ];
+        } else {
+            $exportOption = true;
+        }
+
+        $config->offsetSetByPath(ExportExtension::EXPORT_OPTION_PATH, $exportOption);
     }
 
     /**

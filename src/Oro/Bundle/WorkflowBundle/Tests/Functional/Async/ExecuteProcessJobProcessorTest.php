@@ -10,6 +10,8 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessDefinitio
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
+use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ExecuteProcessJobProcessorTest extends WebTestCase
 {
@@ -19,6 +21,7 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
+        $this->clearMessages();
         $this->loadFixtures([
             LoadProcessDefinitions::class,
         ]);
@@ -50,5 +53,17 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
                 var_export($logger->getLogsByLevel('error'), true)
             )
         );
+    }
+
+    private function clearMessages(): void
+    {
+        $connection = self::getContainer()->get(
+            'oro_message_queue.transport.dbal.connection',
+            ContainerInterface::NULL_ON_INVALID_REFERENCE
+        );
+
+        if ($connection instanceof DbalConnection) {
+            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
+        }
     }
 }

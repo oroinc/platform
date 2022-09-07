@@ -53,6 +53,7 @@ class OroMainContext extends MinkContext implements
 {
     const SKIP_WAIT_PATTERN = '/'.
         '^(?:|I )should see ".+" flash message$|'.
+        '^(?:|I )should see ".+" flash message and I close it$|'.
         '^(?:|I )should see ".+" error message$|'.
         '^(?:|I )should see Schema updated flash message$'.
     '/';
@@ -1287,7 +1288,9 @@ class OroMainContext extends MinkContext implements
      */
     public function pressButtonInModalWindow($button)
     {
-        $modalWindow = $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        $modalWindow = $this->spin(function () {
+            return $this->getPage()->findVisible('css', 'div.modal, div[role="dialog"]');
+        }, 5);
         self::assertNotNull($modalWindow, 'There is no visible modal window on page at this moment');
         try {
             $button = $this->fixStepArgument($button);

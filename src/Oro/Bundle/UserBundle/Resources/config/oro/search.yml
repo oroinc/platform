@@ -69,9 +69,15 @@ search:
         title_fields:                   [label]
         search_template:                '@OroUser/Role/Search/result.html.twig'
         route:
-            name:                       oro_user_role_index
+            name:                       oro_user_role_view
+            parameters:
+                id:                     id
         fields:
             -
                 name:                   label
                 target_type:            text
                 target_fields:          [label]
+            -
+                name:                   role
+                target_type:            text
+                target_fields:          [role]

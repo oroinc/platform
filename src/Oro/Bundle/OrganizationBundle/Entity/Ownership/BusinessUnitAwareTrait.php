@@ -4,6 +4,9 @@ namespace Oro\Bundle\OrganizationBundle\Entity\Ownership;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
+/**
+ * Adds Owner field support to entities.
+ */
 trait BusinessUnitAwareTrait
 {
     use OrganizationAwareTrait;

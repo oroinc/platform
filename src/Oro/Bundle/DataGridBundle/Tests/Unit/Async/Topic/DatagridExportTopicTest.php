@@ -7,6 +7,7 @@ use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class DatagridExportTopicTest extends AbstractTopicTestCase
@@ -66,6 +67,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                         'gridName' => $gridName,
                         'gridParameters' => $gridParameters,
                         FormatterProvider::FORMAT_TYPE => $formatType,
+                        'exactPage' => 42,
                     ],
                     'exportType' => ProcessorRegistry::TYPE_EXPORT,
                     'entity' => $entityName,
@@ -81,6 +83,7 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                         'gridName' => $gridName,
                         'gridParameters' => $gridParameters,
                         FormatterProvider::FORMAT_TYPE => $formatType,
+                        'exactPage' => 42,
                     ],
                     'exportType' => ProcessorRegistry::TYPE_EXPORT,
                     'entity' => $entityName,
@@ -108,11 +111,28 @@ class DatagridExportTopicTest extends AbstractTopicTestCase
                     'format' => 'csv',
                     'jobName' => 'foo',
                     'entity' => \stdClass::class,
-                    'outputFormat' => 'bar'
+                    'outputFormat' => 'bar',
                 ],
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required option "parameters\[gridName\]" is missing./',
+            ],
+            '"exactPage" is not numeric' => [
+                'body' => [
+                    'jobId' => 1,
+                    'format' => 'csv',
+                    'jobName' => 'foo',
+                    'entity' => \stdClass::class,
+                    'outputFormat' => 'bar',
+                    'parameters' => [
+                        'gridName' => 'grid-name',
+                        'exactPage' => 'invalid',
+                    ],
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' =>
+                    '/The option "parameters\[exactPage\]" with value "invalid" is expected to be of type "numeric", '
+                    . 'but is of type "string"./',
             ],
         ];
     }

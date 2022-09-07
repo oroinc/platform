@@ -1732,7 +1732,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'async_operation'                     => [
                     'lifetime'                => 30,
-                    'cleanup_process_timeout' => 3600
+                    'cleanup_process_timeout' => 3600,
+                    'operation_timeout' => 3600
                 ],
                 'chunk_size'                          => 100,
                 'chunk_size_per_entity'               => [],
@@ -1800,7 +1801,8 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             [
                 'async_operation'                     => [
                     'lifetime'                => 40,
-                    'cleanup_process_timeout' => 3800
+                    'cleanup_process_timeout' => 3800,
+                    'operation_timeout' => 3600
                 ],
                 'chunk_size'                          => 200,
                 'chunk_size_per_entity'               => [

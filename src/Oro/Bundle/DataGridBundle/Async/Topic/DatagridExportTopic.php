@@ -42,6 +42,11 @@ class DatagridExportTopic extends DatagridPreExportTopic
             ->setDefaults([
                 'exportType' => ProcessorRegistry::TYPE_EXPORT,
                 'batchSize' => null,
+                'parameters' => function (OptionsResolver $parametersResolver) {
+                    $parametersResolver
+                        ->setDefined(['exactPage'])
+                        ->setAllowedTypes('exactPage', 'numeric');
+                },
             ])
             ->addAllowedTypes('jobId', 'int')
             ->addAllowedTypes('exportType', 'string')

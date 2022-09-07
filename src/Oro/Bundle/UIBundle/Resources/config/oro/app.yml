@@ -10,3 +10,6 @@ liip_imagine:
             filters:
                 thumbnail:    { size: [16, 16], mode: outbound }
                 strip:        ~
+twig:
+    paths:
+        '%kernel.project_dir%/vendor/oro/platform/src/Oro/Bundle/UIBundle/Resources/public': 'OroUIBundlePublic'
