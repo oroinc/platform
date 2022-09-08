@@ -404,7 +404,7 @@ define(function(require) {
                 return !$(group).find('> .control-label').length && !$(group).closest('.tab-content, .controls').length;
             });
             const labels = $context.find('.control-label').filter(function(i, label) {
-                return !$(label).closest('.widget-title-container').length;
+                return !$(label).closest('.widget-title-container, .attribute-item__description').length;
             });
 
             labels.css('width', '');
