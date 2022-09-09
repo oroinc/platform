@@ -98,6 +98,9 @@ define(function(require) {
 
             this.$el.width(loaderWidth).css({animation: 'none'}).width('100%');
             this.$el.delay(200).fadeOut(300, () => {
+                if (this.disposed) {
+                    return;
+                }
                 this.$el.css({
                     width: '',
                     animation: ''
