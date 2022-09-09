@@ -48,7 +48,7 @@ class DatagridExportConnector implements
     /**
      * @var integer
      */
-    protected $page;
+    protected $page = 1;
 
     /**
      * @var integer
@@ -94,21 +94,19 @@ class DatagridExportConnector implements
 
         $result  = null;
         $context = $this->getContext();
-        if ($context->getReadCount() < $this->totalCount) {
-            if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
-                $this->page++;
-                $this->sourceData = $this->getGridData()->getData();
-                $this->offset     = 0;
-            }
+        $sourceDataCount = count($this->sourceData);
+        if ($this->offset === $sourceDataCount && $this->hasNextPage()) {
+            $this->sourceData = $this->getGridData()->getData();
+            $this->offset = 0;
+        }
 
-            if ($this->offset < count($this->sourceData)) {
-                $context->incrementReadOffset();
-                $context->incrementReadCount();
-                $result = $this->sourceData[$this->offset];
-                $this->offset++;
-            }
-        } else {
-            // reader can be used again so reset source data
+        if ($this->offset < $sourceDataCount) {
+            $context->incrementReadOffset();
+            $context->incrementReadCount();
+            $result = $this->sourceData[$this->offset];
+            $this->offset++;
+        } elseif (!$this->hasNextPage()) {
+            // Reader can be used again so reset source data.
             $this->close();
         }
 
@@ -160,7 +158,7 @@ class DatagridExportConnector implements
                 throw new LogicException('Reader must be configured with a grid');
             }
 
-            $this->page       = 1;
+            $this->page       = $this->getPage();
             $this->pageSize   = $this->getPageSize();
             $gridData         = $this->getGridData();
             $this->totalCount = $gridData->getTotalRecords();
@@ -174,11 +172,26 @@ class DatagridExportConnector implements
      */
     protected function getPageSize()
     {
-        if ($this->getContext()->hasOption('pageSize')) {
-            return $this->getContext()->getOption('pageSize');
+        return (int) $this->getContext()->getOption('pageSize', self::DEFAULT_PAGE_SIZE);
+    }
+
+    protected function getExactPage(): ?int
+    {
+        return $this->getContext()->getOption('exactPage');
+    }
+
+    protected function getPage(): int
+    {
+        return $this->getExactPage() ?? $this->page;
+    }
+
+    protected function hasNextPage(): bool
+    {
+        if ($this->getExactPage()) {
+            return false;
         }
 
-        return self::DEFAULT_PAGE_SIZE;
+        return $this->getContext()->getReadCount() < $this->totalCount;
     }
 
     /**
@@ -193,8 +206,8 @@ class DatagridExportConnector implements
         }
 
         $pagerParameters = [
-            PagerInterface::PAGE_PARAM     => $this->page,
-            PagerInterface::PER_PAGE_PARAM => $this->pageSize
+            PagerInterface::PAGE_PARAM     => $this->getPage(),
+            PagerInterface::PER_PAGE_PARAM => $this->getPageSize()
         ];
         if (null !== $this->totalCount) {
             $pagerParameters[PagerInterface::ADJUSTED_COUNT] = $this->totalCount;
@@ -209,5 +222,7 @@ class DatagridExportConnector implements
         $this->sourceData = null;
         $this->gridDataSource = null;
         $this->totalCount = null;
+        $this->pageSize = null;
+        $this->page = 1;
     }
 }

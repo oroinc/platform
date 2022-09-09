@@ -156,6 +156,10 @@ class GridController extends AbstractController
             $parameters['pageSize'] = (int)$exportOptions[$format][Configuration::OPTION_PAGE_SIZE];
         }
 
+        if (isset($exportOptions[$format][Configuration::OPTION_EXPORT_BY_PAGES])) {
+            $parameters['exportByPages'] = (bool)$exportOptions[$format][Configuration::OPTION_EXPORT_BY_PAGES];
+        }
+
         $this->get(MessageProducerInterface::class)->send(
             DatagridPreExportTopic::getName(),
             [

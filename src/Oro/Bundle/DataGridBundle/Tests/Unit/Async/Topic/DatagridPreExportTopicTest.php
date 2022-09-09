@@ -6,6 +6,7 @@ use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class DatagridPreExportTopicTest extends AbstractTopicTestCase
@@ -47,6 +48,8 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                             'param1' => 'value1',
                             'param2' => 2,
                         ],
+                        'pageSize' => 4242,
+                        'exportByPages' => true,
                         FormatterProvider::FORMAT_TYPE => 'typeFoo',
                     ],
                     'notificationTemplate' => 'notification-template',
@@ -59,6 +62,8 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                             'param1' => 'value1',
                             'param2' => 2,
                         ],
+                        'pageSize' => 4242,
+                        'exportByPages' => true,
                         FormatterProvider::FORMAT_TYPE => 'typeFoo',
                     ],
                     'notificationTemplate' => 'notification-template',
@@ -69,6 +74,8 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
 
     public function invalidBodyDataProvider(): array
     {
+        $gridName = 'grid-name';
+
         return [
             'empty' => [
                 'body' => [],
@@ -82,6 +89,32 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required option "parameters\[gridName\]" is missing./',
+            ],
+            '"pageSize" is not numeric' => [
+                'body' => [
+                    'format' => 'csv',
+                    'parameters' => [
+                        'gridName' => $gridName,
+                        'pageSize' => 'invalid',
+                    ],
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' =>
+                    '/The option "parameters\[pageSize\]" with value "invalid" is expected to be of type "numeric", '
+                    . 'but is of type "string"./',
+            ],
+            '"exportByPages" is not boolean' => [
+                'body' => [
+                    'format' => 'csv',
+                    'parameters' => [
+                        'gridName' => $gridName,
+                        'exportByPages' => 'invalid',
+                    ],
+                ],
+                'exceptionClass' => InvalidOptionsException::class,
+                'exceptionMessage' =>
+                    '/The option "parameters\[exportByPages\]" with value "invalid" is expected to be of type '
+                    . '"boolean", but is of type "string"./',
             ],
         ];
     }

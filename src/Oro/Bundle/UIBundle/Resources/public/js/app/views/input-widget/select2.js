@@ -155,7 +155,8 @@ define(function(require) {
             const optionsLength = select.find('option').length;
 
             if ((tools.isMobile() || tools.isIOS()) && (isSearchHidden || optionsLength < minimumResultsForSearch)) {
-                selectContainer.find('.select2-search, .select2-focusser').hide();
+                selectContainer.find('.select2-search').hide();
+                selectContainer.find('.select2-focusser').attr('readonly', true);
             }
         }
     });

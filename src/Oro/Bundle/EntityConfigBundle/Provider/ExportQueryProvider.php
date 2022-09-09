@@ -52,26 +52,11 @@ class ExportQueryProvider
 
     private function isExportable(string $entityName, string $fieldName): bool
     {
-        // Excluded fields are not used for export, so there is no need to include them to query.
-        if ($this->getFieldConfig($entityName, $fieldName, 'excluded')) {
-            return false;
-        }
-
-        // To export field with the parameter 'full = false' or 'null' only identifier field is enough,
-        // it is not necessary to join fields in query.
-        if (!$this->getFieldConfig($entityName, $fieldName, 'full')) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function getFieldConfig(string $entityName, string $fieldName, string $code): bool
-    {
+        // In batch export to join an associate field to prevent entity be loaded in lazy mode and detached accidentally
         if ($this->entityConfigManager->hasConfig($entityName, $fieldName)) {
             $config = $this->entityConfigManager->getFieldConfig('importexport', $entityName, $fieldName);
-            if ($config->has($code)) {
-                return $config->get($code);
+            if ($config->has('excluded')) {
+                return !$config->get('excluded');
             }
         }
 

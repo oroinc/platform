@@ -96,6 +96,7 @@ define(function(require) {
             TagsEditorView.__super__.initialize.call(this, options);
             this.listenTo(this.autocompleteApiAccessor, 'cache:clear', this.onCacheClear);
             this.permissions = options.permissions || {};
+            this.cell = options.cell;
         },
 
         getInitialResultItem: function() {
@@ -110,6 +111,9 @@ define(function(require) {
 
         autoSize: function() {
             select2autosizer.applyTo(this.$el, this);
+            if (this.cell) {
+                this.cell.$el.css('height', this.$el.height());
+            }
         },
 
         getSelect2Options: function() {
@@ -329,6 +333,18 @@ define(function(require) {
                 };
             });
             return data;
+        },
+
+        dispose() {
+            if (this.disposed) {
+                return;
+            }
+
+            if (this.cell) {
+                this.cell.$el.css('height', '');
+            }
+
+            TagsEditorView.__super__.dispose.call(this);
         }
     }, {
         DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',

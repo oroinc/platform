@@ -1,0 +1,67 @@
+Oro\Bundle\UserBundle\Entity\Role:
+    observerRole:
+        label: 'Observer'
+        __construct: ['ROLE_OBSERVER']
+
+Oro\Bundle\UserBundle\Entity\User:
+    charlie:
+        firstName: Charlie
+        lastName: Sheen
+        username: charlie
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@managerRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: charlie@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+
+    adam:
+        firstName: Adam
+        lastName: Pilot
+        username: adampilot
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: adam@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+
+    megan:
+        firstName: Megan
+        lastName: Fox
+        username: megan
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@userRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: megan@example.com
+        password: 3X+qGs+/6Ic/iL+5/t6C5C3C0hYEbhYLtZ/nwJDn5QUYArHkBy90HT220LVErWvKyVH7XoId15dv/uF2+pExiQ==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+
+    laura:
+        firstName: Laura
+        lastName: Clark
+        username: laura
+        organization: '@organization'
+        organizations: ['@organization']
+        userRoles: ['@observerRole']
+        owner: '@business_unit'
+        businessUnits: ['@business_unit']
+        email: laura@example.com
+        password: 7HzkZEngxFOPqyVmjsNi7nMeZzrZQPYtjQ6Q+tcB0l2KljQXdCoikRforvxj3NQD8v2wflpazoaZdk8FbrzJhw==
+        salt: eexx2a8mtsg8o4c8k4w08wo04ccsw8
+
+Oro\Bundle\ReportBundle\Entity\Report:
+    report:
+        name: 'Total Users by Roles'
+        createdAt: '<dateTime()>'
+        updatedAt: '<dateTime()>'
+        type: '@report_type_TABLE'
+        entity: 'Oro\Bundle\UserBundle\Entity\User'
+        organization: '@organization'
+        definition: <('{"columns":[{"name":"id","label":"Total Users","func":{"name":"Count","group_type":"aggregates","group_name":"number","return_type":"integer"},"sorting":""},{"name":"userRoles+Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\Role::label","label":"Role","func":"","sorting":""}],"grouping_columns":[{"name":"userRoles+Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\Role::label"}]}')>

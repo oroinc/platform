@@ -50,6 +50,8 @@ class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerIn
         $groupRepository = $em->getRepository('OroUserBundle:Group');
 
         $referenceRepository->set('adminsGroup', $groupRepository->findOneBy(['name' => 'Administrators']));
+        $referenceRepository->set('salesGroup', $groupRepository->findOneBy(['name' => 'Sales']));
+        $referenceRepository->set('marketingGroup', $groupRepository->findOneBy(['name' => 'Marketing']));
 
         $referenceRepository->set(
             'oro_group_all_grid_view_label',

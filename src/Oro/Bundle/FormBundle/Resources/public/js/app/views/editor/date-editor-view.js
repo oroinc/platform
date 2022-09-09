@@ -87,7 +87,8 @@ define(function(require) {
                 changeMonth: true,
                 changeYear: true,
                 yearRange: '-80:+1',
-                showButtonPanel: true
+                showButtonPanel: true,
+                blurInputOnTodaySelection: false
             }
         },
 
@@ -117,6 +118,7 @@ define(function(require) {
             });
             // fix enter behaviour
             const $input = this.$('.hasDatepicker');
+            $input.on(`focusout${this.eventNamespace()}`, () => this._preventFocusout = true);
             $input.bindFirst('keydown' + this.eventNamespace(),
                 this.onGenericEnterKeydown.bind(this));
             // fix esc behaviour
@@ -182,6 +184,9 @@ define(function(require) {
             if (this._isFocused && this._isDateSelection) {
                 delete this._isDateSelection;
                 this.focus();
+            } else if (this._preventFocusout) {
+                delete this._preventFocusout;
+                return;
             } else {
                 DateEditorView.__super__.onFocusout.call(this, e);
             }
