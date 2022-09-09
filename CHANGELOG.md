@@ -35,6 +35,9 @@ The current file describes significant changes in the code that may affect the u
 #### PlatformBundle
 * As the 'composer/composer' package is no longer used, the `Oro\Bundle\PlatformBundle\Provider\PackageProvider` class based services now provide the packages info in pure arrays instead of the array of the `Composer\Package\PackageInterface` interface based objects. The returned array structure is as follows: `['package_name' => ['pretty_version' => '1.0.0', 'license' => ['MIT']]]`..
 
+#### ReminderBundle
+* Reminder template messages are added as JS template macros under `reminderTemplates` namespace. Twig placeholder `oro_reminder_reminder_templates` no longer in use. 
+
 #### OrganizationBundle
 * Changed the `cascade` Doctrine option of the `\Oro\Bundle\OrganizationBundle\Entity\Ownership\BusinessUnitAwareTrait::$owner`
   association: it is not cascade-persisted anymore.

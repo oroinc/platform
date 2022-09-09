@@ -2,9 +2,9 @@
     {% import '@OroUI/macros.html.twig' as UI %}
 
     <div {{ UI.renderPageComponentAttributes({
-        module: 'ororeminder/js/app/components/reminder-show-component',
+        module: 'ororeminder/js/app/components/reminder-messages-publisher',
         options: {
-            reminderData: oro_reminder_get_requested_reminders_data()
+            reminders: oro_reminder_get_requested_reminders_data()
         }
     }) }}></div>
 {% endif %}
