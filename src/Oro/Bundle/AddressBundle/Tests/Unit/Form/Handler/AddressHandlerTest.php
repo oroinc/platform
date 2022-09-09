@@ -7,7 +7,6 @@ use Oro\Bundle\AddressBundle\Entity\Address;
 use Oro\Bundle\AddressBundle\Form\Handler\AddressHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 class AddressHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,13 +32,10 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
         $this->om = $this->createMock(ObjectManager::class);
         $this->address = $this->createMock(Address::class);
 
-        $requestStack = new RequestStack();
-        $requestStack->push($this->request);
-
-        $this->handler = new AddressHandler($this->form, $requestStack, $this->om);
+        $this->handler = new AddressHandler($this->om);
     }
 
-    public function testGoodRequest()
+    public function testGoodRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData');
@@ -58,10 +54,10 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
         $this->om->expects($this->once())
             ->method('flush');
 
-        $this->assertTrue($this->handler->process($this->address));
+        self::assertTrue($this->handler->process($this->address, $this->form, $this->request));
     }
 
-    public function testBadRequest()
+    public function testBadRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData');
@@ -79,10 +75,10 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
         $this->om->expects($this->never())
             ->method('flush');
 
-        $this->assertFalse($this->handler->process($this->address));
+        self::assertFalse($this->handler->process($this->address, $this->form, $this->request));
     }
 
-    public function testNotValidForm()
+    public function testNotValidForm(): void
     {
         $this->form->expects($this->once())
             ->method('setData');
@@ -100,6 +96,6 @@ class AddressHandlerTest extends \PHPUnit\Framework\TestCase
         $this->om->expects($this->never())
             ->method('flush');
 
-        $this->assertFalse($this->handler->process($this->address));
+        self::assertFalse($this->handler->process($this->address, $this->form, $this->request));
     }
 }

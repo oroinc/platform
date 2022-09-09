@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -11,19 +12,13 @@ use Symfony\Component\Yaml\Yaml;
  */
 abstract class AbstractConfigurationProvider
 {
-    /**
-     * @var string
-     */
-    protected $configDirectory = '/Resources/config/';
+    protected string $configDirectory = '/Resources/config/';
+    protected string $appConfigDirectory = '/config/oro/';
 
-    /**
-     * @var array
-     */
-    protected $kernelBundles = [];
-
-    public function __construct(array $kernelBundles)
-    {
-        $this->kernelBundles = $kernelBundles;
+    public function __construct(
+        protected array $kernelBundles,
+        protected KernelInterface $kernel
+    ) {
     }
 
     /**
@@ -72,7 +67,10 @@ abstract class AbstractConfigurationProvider
                 $configDirectories[] = realpath($bundleConfigDirectory);
             }
         }
-
+        $appConfigurationPath = $this->kernel->getProjectDir() . $this->appConfigDirectory;
+        if (is_dir($appConfigurationPath)) {
+            $configDirectories[] = realpath($appConfigurationPath);
+        }
         return $configDirectories;
     }
 

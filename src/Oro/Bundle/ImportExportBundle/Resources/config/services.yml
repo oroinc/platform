@@ -27,7 +27,6 @@ services:
             - '@service_container'
             - []
             - []
-        public: false
 
     oro_importexport.formatter.excel_datetime:
         class: Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter
@@ -58,7 +57,6 @@ services:
             - '@oro_config.global'
             - '@oro_importexport.file.file_manager'
             - '@doctrine'
-        public: false
 
     Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer:
         alias: oro_importexport.async.import_export_result_summarizer

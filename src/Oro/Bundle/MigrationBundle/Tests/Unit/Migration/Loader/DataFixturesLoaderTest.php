@@ -12,6 +12,7 @@ use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPa
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test3Bundle\TestPackageTest3Bundle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Kernel;
 
 class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
 {
@@ -24,10 +25,13 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var DataFixturesLoader */
     private $loader;
 
+    private Kernel $kernel;
+
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->fixtureRepo = $this->createMock(EntityRepository::class);
+        $this->kernel = $this->createMock(Kernel::class);
 
         $em = $this->createMock(EntityManager::class);
         $em->expects($this->any())
@@ -35,7 +39,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
             ->with(DataFixture::class)
             ->willReturn($this->fixtureRepo);
 
-        $this->loader = new DataFixturesLoader($em, $this->container);
+        $this->loader = new DataFixturesLoader($em, $this->kernel, $this->container);
     }
 
     /**

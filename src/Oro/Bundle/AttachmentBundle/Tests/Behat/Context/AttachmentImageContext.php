@@ -85,27 +85,29 @@ class AttachmentImageContext extends AttachmentContext implements OroPageObjectA
      */
     public function assertImageIsLoaded(string $imgElementName): void
     {
-        $imgElement = $this->elementFactory->createElement($imgElementName);
-        $imgElementXpath = $imgElement->getXpath();
-        $imageIsLoadedScript = <<<JS
-        (function () {
-            var image = document.evaluate(
-                '$imgElementXpath',
-                document,
-                null,
-                XPathResult.FIRST_ORDERED_NODE_TYPE,
-                null
-                ).singleNodeValue;
-            
-            if (!image) {
-                return false;
-            }
-            
-            return image.complete && typeof image.naturalWidth !== "undefined" && image.naturalWidth !== 0;
-        })();
+        $result = $this->spin(function () use ($imgElementName) {
+            $imgElement = $this->elementFactory->createElement($imgElementName);
+            $imgElementXpath = $imgElement->getXpath();
+            $imageIsLoadedScript = <<<JS
+                (function () {
+                    var image = document.evaluate(
+                        '$imgElementXpath',
+                        document,
+                        null,
+                        XPathResult.FIRST_ORDERED_NODE_TYPE,
+                        null
+                        ).singleNodeValue;
+                    
+                    if (!image) {
+                        return false;
+                    }
+                    
+                    return image.complete && typeof image.naturalWidth !== "undefined" && image.naturalWidth !== 0;
+                })();
 JS;
 
-        $result = $this->getDriver()->evaluateScript($imageIsLoadedScript);
+            return $this->getDriver()->evaluateScript($imageIsLoadedScript);
+        }, 5);
 
         self::assertTrue($result, sprintf('Image %s is not loaded', $imgElementName));
     }

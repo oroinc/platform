@@ -32,3 +32,22 @@ Feature: Create Report with convert functions
       | First Name | Year | Month | Day | Day Of Year |
       | Patrick    |      |       |     |             |
       | Phil       | 2001 | 2     | 10  | 41          |
+
+  Scenario: Edit report
+    When I go to Reports & Segments / Manage Custom Reports
+    Then I click "Edit" on row "Test Report" in grid
+    And fill "Report Form" with:
+      | Name        | Test Report update |
+    And save and close form
+    Then I should see "Report saved" flash message
+    And should see following grid:
+      | First Name | Year | Month | Day | Day Of Year |
+      | Phil       | 2001 | 2     | 10  | 41          |
+      | Patrick    |      |       |     |             |
+
+  Scenario: Delete report
+    When I go to Reports & Segments / Manage Custom Reports
+    Then I click "delete" on row "Test Report update" in grid
+    And I click "Yes, Delete"
+    Then I should see "Item deleted" flash message
+    And there is no records in grid

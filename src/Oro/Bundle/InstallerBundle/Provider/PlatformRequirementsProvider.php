@@ -122,9 +122,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addPathWritableRequirement($collection, 'var/data');
         $this->addPathWritableRequirement($collection, 'public/js');
 
-        if (is_file($this->projectDirectory . '/config/parameters.yml')) {
-            $this->addPathWritableRequirement($collection, 'config/parameters.yml');
-        }
         if (function_exists('iconv')) {
             $this->addIconvBehaviorRequirement($collection);
         }

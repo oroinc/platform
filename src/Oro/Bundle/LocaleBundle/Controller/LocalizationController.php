@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Controller;
 
-use Oro\Bundle\FormBundle\Model\UpdateHandler;
+use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizationType;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
@@ -27,11 +27,8 @@ class LocalizationController extends AbstractController
      *      class="OroLocaleBundle:Localization",
      *      permission="VIEW"
      * )
-     *
-     * @param Localization $localization
-     * @return array
      */
-    public function viewAction(Localization $localization)
+    public function viewAction(Localization $localization): array
     {
         return [
             'entity' => $localization
@@ -42,10 +39,8 @@ class LocalizationController extends AbstractController
      * @Route("/", name="oro_locale_localization_index")
      * @Template
      * @AclAncestor("oro_locale_localization_view")
-     *
-     * @return array
      */
-    public function indexAction()
+    public function indexAction(): array
     {
         return [
             'entity_class' => Localization::class
@@ -61,10 +56,8 @@ class LocalizationController extends AbstractController
      *     permission="CREATE",
      *     class="OroLocaleBundle:Localization"
      * )
-     *
-     * @return array|RedirectResponse
      */
-    public function createAction()
+    public function createAction(): array|RedirectResponse
     {
         return $this->update(new Localization());
     }
@@ -78,23 +71,15 @@ class LocalizationController extends AbstractController
      *     permission="EDIT",
      *     class="OroLocaleBundle:Localization"
      * )
-     *
-     * @param Localization $localization
-     *
-     * @return array|RedirectResponse
      */
-    public function updateAction(Localization $localization)
+    public function updateAction(Localization $localization): array|RedirectResponse
     {
         return $this->update($localization);
     }
-
-    /**
-     * @param Localization $localization
-     * @return array|RedirectResponse
-     */
-    protected function update(Localization $localization)
+    
+    protected function update(Localization $localization): array|RedirectResponse
     {
-        return $this->get(UpdateHandler::class)->update(
+        return $this->get(UpdateHandlerFacade::class)->update(
             $localization,
             $this->createForm(LocalizationType::class, $localization),
             $this->get(TranslatorInterface::class)->trans('oro.locale.controller.localization.saved.message')
@@ -102,7 +87,7 @@ class LocalizationController extends AbstractController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedServices()
     {
@@ -110,7 +95,7 @@ class LocalizationController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                UpdateHandler::class
+                UpdateHandlerFacade::class
             ]
         );
     }

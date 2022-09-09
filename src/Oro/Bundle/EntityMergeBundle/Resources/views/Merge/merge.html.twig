@@ -7,7 +7,9 @@
     {% import '@OroUI/macros.html.twig' as UI %}
 
     {{ UI.cancelButton(oro_url_add_query(cancelPath)) }}
-    {{ UI.saveAndStayButton('oro.entity_merge.form.merge_button'|trans) }}
+    {{ UI.saveAndStayButton({
+        'label' : 'oro.entity_merge.form.merge_button'|trans
+    }) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

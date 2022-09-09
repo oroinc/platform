@@ -11,20 +11,11 @@ use Psr\Log\LoggerInterface;
 
 class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FileManager|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $fileManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /**
-     * @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /**
-     * @var ExportHandler
-     */
-    private $exportHandler;
+    private ExportHandler $exportHandler;
 
     protected function setUp(): void
     {
@@ -49,9 +40,15 @@ class ExportHandlerTest extends \PHPUnit\Framework\TestCase
 
         $exceptionMsg = 'Failure exception';
         $exception = new \Exception($exceptionMsg);
-        $reader->expects(self::once())
+        $reader
+            ->expects(self::once())
             ->method('read')
             ->willThrowException($exception);
+
+        $this->fileManager
+            ->expects(self::once())
+            ->method('deleteFile')
+            ->with(self::matchesRegularExpression('/\/.+?\/datagrid_.+?\.'.$format.'/'));
 
         $result = $this->exportHandler->handle($reader, $processor, $writer, $contextParameters, $batchSize, $format);
 

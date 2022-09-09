@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm;
 
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
@@ -85,18 +86,7 @@ class OrmDatasource implements DatasourceInterface, BindParametersInterface
      */
     public function getResults()
     {
-        $this->eventDispatcher->dispatch(
-            new OrmResultBeforeQuery($this->datagrid, $this->qb),
-            OrmResultBeforeQuery::NAME
-        );
-
-        $query = $this->qb->getQuery();
-        $this->queryHintResolver->resolveHints($query, $this->queryHints ?? []);
-
-        $this->eventDispatcher->dispatch(
-            new OrmResultBefore($this->datagrid, $query),
-            OrmResultBefore::NAME
-        );
+        $query = $this->getResultsQuery();
 
         $rows = $this->queryExecutor->execute($this->datagrid, $query);
         $records = [];
@@ -108,6 +98,26 @@ class OrmDatasource implements DatasourceInterface, BindParametersInterface
         $this->eventDispatcher->dispatch($event, OrmResultAfter::NAME);
 
         return $event->getRecords();
+    }
+
+    public function getResultsQuery(): Query
+    {
+        $this->eventDispatcher->dispatch(
+            new OrmResultBeforeQuery($this->datagrid, $this->qb),
+            OrmResultBeforeQuery::NAME
+        );
+
+        $query = $this->qb->getQuery();
+        $this->queryHintResolver->resolveHints($query, $this->queryHints ?? []);
+
+        $this->eventDispatcher->dispatch(new OrmResultBefore($this->datagrid, $query), OrmResultBefore::NAME);
+
+        return $query;
+    }
+
+    public function getRootEntityName(): string
+    {
+        return $this->getQueryBuilder()->getRootEntities()[0];
     }
 
     /**

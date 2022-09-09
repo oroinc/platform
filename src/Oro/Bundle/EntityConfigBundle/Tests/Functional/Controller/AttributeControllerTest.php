@@ -272,7 +272,11 @@ class AttributeControllerTest extends AbstractConfigControllerTest
 
         $fieldConfig = $this->getFieldConfigByName('file', 'extend');
 
-        self::assertEquals('Deleted', $fieldConfig->get('state'));
+        /**
+         * Because schema changes has not been applied, the field in state `New` should not change
+         * to be completely deleted.
+         */
+        self::assertEquals('New', $fieldConfig->get('state'));
     }
 
     public function testRequiredProperties(): void

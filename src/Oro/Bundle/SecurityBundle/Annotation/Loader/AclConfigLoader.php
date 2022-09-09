@@ -4,8 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Annotation\Loader;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
 use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationStorage;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainerInterface;
 
 /**
@@ -21,10 +20,7 @@ class AclConfigLoader implements AclAnnotationLoaderInterface
      */
     public function load(AclAnnotationStorage $storage, ResourcesContainerInterface $resourcesContainer): void
     {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_acl_config',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_acl_config', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (isset($resource->data[self::ROOT_NODE]) && \is_array($resource->data[self::ROOT_NODE])) {

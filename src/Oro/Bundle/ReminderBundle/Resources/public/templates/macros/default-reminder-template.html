@@ -1,0 +1,8 @@
+<% let safeSubject = _.escape(subject); %>
+<% if (url) {
+    safeSubject = `<a href="${_.escape(url)}">${safeSubject}</a>`;
+} %>
+<%= _.__('oro.reminder.reminder_template.due_message', {
+    subject: safeSubject,
+    expireAt: _.escape(expireAt)
+}) %>

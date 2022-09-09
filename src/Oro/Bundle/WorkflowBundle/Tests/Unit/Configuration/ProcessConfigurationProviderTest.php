@@ -12,17 +12,17 @@ use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\DuplicateConfigurati
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\EmptyConfiguration\EmptyConfigurationBundle;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration\Stub\IncorrectConfiguration\IncorrectConfigurationBundle;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\HttpKernel\Kernel;
 
 class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ProcessDefinitionListConfiguration */
-    private $definitionConfiguration;
-
-    /** @var ProcessTriggerListConfiguration */
-    private $triggerConfiguration;
+    private ProcessDefinitionListConfiguration $definitionConfiguration;
+    private ProcessTriggerListConfiguration $triggerConfiguration;
+    private Kernel $kernel;
 
     protected function setUp(): void
     {
+        $this->kernel = $this->createMock(Kernel::class);
         $this->definitionConfiguration = new ProcessDefinitionListConfiguration(new ProcessDefinitionConfiguration());
         $this->triggerConfiguration = new ProcessTriggerListConfiguration(new ProcessTriggerConfiguration());
     }
@@ -34,7 +34,8 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
         $configurationProvider->getProcessConfiguration();
     }
@@ -45,7 +46,8 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         self::assertEquals(
@@ -60,7 +62,8 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         $this->assertEquals(
@@ -75,7 +78,8 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         $this->assertEquals(
@@ -98,7 +102,8 @@ class ProcessConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $configurationProvider = new ProcessConfigurationProvider(
             $bundles,
             $this->definitionConfiguration,
-            $this->triggerConfiguration
+            $this->triggerConfiguration,
+            $this->kernel
         );
 
         $expectedConfiguration = $this->getExpectedProcessConfiguration('CorrectConfiguration');

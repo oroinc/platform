@@ -149,6 +149,8 @@ oro:
             less: 'View Less'
         breadcrumb.aria_label: Breadcrumbs
         dropdown_option_aria_label: "More Actions"
+        simplified_preview:
+            message: Current content view is simplified, please check the edit page to see the actual result.
 
     htmlpurifier:
         formatted_error: '- {{ message }} (near {{ place }}...)'

@@ -6,17 +6,37 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### UIBundle
+* Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
+  rendering WYSIWYG content in backoffice.
+
 #### ImportExportBundle
 * Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
   to mark certain field as skipped during denormalization process to avoid possible type conflicts.
+
+### Removed
+
+#### EntityConfigBundle
+* Removed `renderWysiwygContentPreview` TWIG macro from EntityConfigBundle, use `renderWysiwygContentPreview` or
+  `renderCollapsibleWysiwygContentPreview` from UIBundle instead.
 
 ## 5.1.0-alpha.2 (2022-08-01)
 [Show detailed list of changes](incompatibilities-5-1-alpha-2.md)
 
 ### Changed
 
+#### DataGridBundle
+* The `iconHideText` option for `action-launcher` and `dropdown-select-choice-launcher` views was removed, use the `launcherMode` option instead.
+  The `launcherMode` option can have three different values:
+    - `icon-text` - shows datagrid actions with icons and text labels;
+    - `icon-only` - shows datagrid actions as icons;
+    - `text-only`- shows datagrid actions as text labels;
+
 #### PlatformBundle
 * As the 'composer/composer' package is no longer used, the `Oro\Bundle\PlatformBundle\Provider\PackageProvider` class based services now provide the packages info in pure arrays instead of the array of the `Composer\Package\PackageInterface` interface based objects. The returned array structure is as follows: `['package_name' => ['pretty_version' => '1.0.0', 'license' => ['MIT']]]`..
+
+#### ReminderBundle
+* Reminder template messages are added as JS template macros under `reminderTemplates` namespace. Twig placeholder `oro_reminder_reminder_templates` no longer in use. 
 
 #### OrganizationBundle
 * Changed the `cascade` Doctrine option of the `\Oro\Bundle\OrganizationBundle\Entity\Ownership\BusinessUnitAwareTrait::$owner`
@@ -30,19 +50,30 @@ The current file describes significant changes in the code that may affect the u
   and `Oro\Bundle\CronBundle\Command\CronCommandActivationInterface` instead.
 
 #### DataGridBundle
-* The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead. 
+* The deprecated `options / skip_acl_check` datagrid option was removed. Use the `source / skip_acl_apply` option instead.
 * The deprecated `source / acl_resource` datagrid option was removed. Use the `acl_resource` option instead.
+
+#### EntityBundle
+* JS util `EntityFieldsUtil` was removed, use `EntityStructureDataProvider` instead.
+
+#### FilterBundle
+* The `day-value-helper` was removed, use `date-value-helper` instead.
+
+#### FormBundle
+* `Oro\Bundle\FormBundle\Model\UpdateHandler` has been removed. Use `Oro\Bundle\FormBundle\Model\UpdateHandlerFacade` instead.
 
 #### UIBundle
 * `oroui/js/app/views/input-widget/checkbox` was removed; use pure CSS checkbox customization instead.
 * The deprecated `tooltips` translation domain was removed. All translation from this domain were moved to the `messages` domain.
+* The `modalHandler` method for `error` helper was removed, use `showError` method instead.
+* The deprecated method `tools.loadModuleAndReplace()` from `'oroui/js/tools'` module, use `loadModules.fromObjectProp` from `'oroui/js/app/services/load-modules'` instead.
 
 #### WorkflowBundle
 * The deprecated `pre_conditions` option was removed for the configuration of workflow process definitions.
 * The deprecated `pre_conditions` and `post_actions` options were removed for the configuration of workflows.
 
 #### ImportExportBundle
-* Removed `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use 
+* Removed `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultField`, use
   `\Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent::setResultFieldValue` instead.
 
 ## 5.1.0-alpha.1 (2022-05-31)

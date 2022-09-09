@@ -40,15 +40,6 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
     /** @var AclGroupProviderInterface */
     protected $aclGroupProvider;
 
-    /**
-     * @param AuthorizationCheckerInterface      $authorizationChecker
-     * @param TokenStorageInterface              $tokenStorage
-     * @param ObjectIdAccessor                   $objectIdAccessor
-     * @param EntitySecurityMetadataProvider     $entityMetadataProvider
-     * @param OwnershipMetadataProviderInterface $metadataProvider
-     * @param OwnerTreeProviderInterface         $treeProvider
-     * @param AclVoterInterface                  $aclVoter
-     */
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
         TokenStorageInterface $tokenStorage,
@@ -56,7 +47,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
         EntitySecurityMetadataProvider $entityMetadataProvider,
         OwnershipMetadataProviderInterface $metadataProvider,
         OwnerTreeProviderInterface $treeProvider,
-        AclVoterInterface $aclVoter = null
+        AclVoterInterface $aclVoter
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenStorage = $tokenStorage;
@@ -80,10 +71,7 @@ class OwnershipConditionDataBuilder extends AbstractOwnershipConditionDataBuilde
      */
     public function getAclConditionData($entityClassName, $permissions = 'VIEW')
     {
-        if ($this->aclVoter === null
-            || !$this->getUserId()
-            || !$this->entityMetadataProvider->isProtectedEntity($entityClassName)
-        ) {
+        if (!$this->getUserId() || !$this->entityMetadataProvider->isProtectedEntity($entityClassName)) {
             // return full access to the entity
             return [];
         }

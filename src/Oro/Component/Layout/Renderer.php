@@ -13,27 +13,15 @@ use Symfony\Component\Form\FormView;
  */
 class Renderer implements FormRendererInterface
 {
-    const CACHE_KEY_VAR = 'unique_block_prefix';
+    protected const CACHE_KEY_VAR = 'unique_block_prefix';
 
-    /**
-     * @var FormRendererEngineInterface
-     */
-    protected $engine;
+    protected FormRendererEngineInterface $engine;
 
-    /**
-     * @var array
-     */
-    private $blockNameHierarchyMap = [];
+    protected array $blockNameHierarchyMap = [];
 
-    /**
-     * @var array
-     */
-    private $hierarchyLevelMap = [];
+    protected array $hierarchyLevelMap = [];
 
-    /**
-     * @var array
-     */
-    private $variableStack = [];
+    protected array $variableStack = [];
 
     public function __construct(FormRendererEngineInterface $engine)
     {

@@ -76,14 +76,6 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('sample-data', null, InputOption::VALUE_OPTIONAL, 'Load sample data')
             ->addOption('language', null, InputOption::VALUE_OPTIONAL, 'Localization language code')
             ->addOption('formatting-code', null, InputOption::VALUE_OPTIONAL, 'Localization formatting code')
-            ->addOption('skip-assets', null, InputOption::VALUE_NONE, 'Skip install/build of frontend assets')
-            ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlink the assets instead of copying them')
-            ->addOption(
-                'relative-symlink',
-                null,
-                InputOption::VALUE_NONE,
-                'Symlink the assets using relative path instead of absolute'
-            )
             ->addOption('skip-download-translations', null, InputOption::VALUE_NONE, 'Skip downloading translations')
             ->addOption('skip-translations', null, InputOption::VALUE_NONE, 'Skip applying translations')
             ->addOption('drop-database', null, InputOption::VALUE_NONE, 'Delete all existing data')
@@ -131,21 +123,6 @@ by the application:
   <info>php %command.full_name% --language=<language-code> --formatting-code=<formatting-code></info>
   <info>php %command.full_name% --language=en --formatting-code=en_US</info>
 
-The <info>--skip-assets</info> option can be used to skip install and build
-of the frontend assets:
-
-  <info>php %command.full_name% --skip-assets</info>
-
-The <info>--symlink</info> option tells the asset installer to create symlinks
-instead of copying the assets (it may be useful during development):
-
-  <info>php %command.full_name% --symlink</info>
-  
-If the <info>--relative-symlink</info> option is provided, the command creates symlinks using relative paths instead
-of absolute:
-
-  <info>php %command.full_name% --relative-symlink</info>
-
 The <info>--skip-download-translations</info> and <info>--skip-translations</info> options can be used
 to skip the step of downloading translations (already downloaded translations
 will be applied if present), or skip applying the translations completely:
@@ -188,9 +165,6 @@ HELP
             ->addUsage('--sample-data=y')
             ->addUsage('--sample-data=n')
             ->addUsage('--language=en --formatting-code=en_US')
-            ->addUsage('--skip-assets')
-            ->addUsage('--symlink')
-            ->addUsage('--relative-symlink')
             ->addUsage('--skip-download-translations')
             ->addUsage('--skip-translations')
             ->addUsage('--drop-database')
@@ -231,7 +205,6 @@ HELP
             return 3;
         }
 
-        $skipAssets = $input->getOption('skip-assets');
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
         $output->writeln('<info>Installing Oro Application.</info>');
@@ -249,18 +222,10 @@ HELP
 
             $this->eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_BEFORE_DATABASE_PREPARATION);
 
-            if (!$skipAssets) {
-                $this->startBuildAssetsProcess($input);
-            }
-
             $this->loadDataStep($commandExecutor, $output);
             $this->eventDispatcher->dispatch($event, InstallerEvents::INSTALLER_AFTER_DATABASE_PREPARATION);
 
-            $this->finalStep($commandExecutor, $output, $input, $skipAssets);
-
-            if (!$skipAssets) {
-                $buildAssetsProcessExitCode = $this->getBuildAssetsProcessExitCode($output);
-            }
+            $this->finalStep($commandExecutor, $output, $input);
             // cache clear must be done after assets build process finished,
             // otherwise, it could lead to unpredictable errors
             $this->clearCache($commandExecutor, $input);
@@ -585,8 +550,7 @@ HELP
     protected function finalStep(
         CommandExecutor $commandExecutor,
         OutputInterface $output,
-        InputInterface $input,
-        bool $skipAssets
+        InputInterface $input
     ): self {
         $output->writeln('<info>Preparing application.</info>');
 
@@ -596,13 +560,7 @@ HELP
         $this->processInstallerScripts($output, $commandExecutor);
 
         $this->applicationState->setInstalled();
-
-        if (!$skipAssets) {
-            /**
-             * Place this launch of command after the launch of 'assetic-dump' in BAP-16333
-             */
-            $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
-        }
+        $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
         $output->writeln('');
 
         return $this;
@@ -793,63 +751,6 @@ HELP
         return implode(', ', array_keys($alternatives));
     }
 
-    private function startBuildAssetsProcess(InputInterface $input): void
-    {
-        $phpBinaryPath = CommandExecutor::getPhpExecutable();
-
-        $command = [
-            $phpBinaryPath,
-            'bin/console',
-            'oro:assets:install'
-        ];
-
-        if ($input->hasOption('symlink') && $input->getOption('symlink')) {
-            $command[] = '--symlink';
-        }
-
-        if ($input->hasOption('relative-symlink') && $input->getOption('relative-symlink')) {
-            $command[] = '--relative-symlink';
-        }
-
-        if ($input->getOption('env')) {
-            $command[] = sprintf('--env=%s', $input->getOption('env'));
-        }
-
-        if ($input->hasOption('timeout')) {
-            $command[] = sprintf('--timeout=%d', $input->getOption('timeout'));
-        }
-
-        $this->assetsCommandProcess = new Process(
-            $command,
-            realpath($this->getContainer()->getParameter('kernel.project_dir'))
-        );
-        $this->assetsCommandProcess->setTimeout(null);
-        $this->assetsCommandProcess->start();
-    }
-
-    private function getBuildAssetsProcessExitCode(OutputInterface $output): ?int
-    {
-        if (!$this->assetsCommandProcess) {
-            return 0;
-        }
-
-        if (!$this->assetsCommandProcess->isTerminated()) {
-            $this->assetsCommandProcess->wait();
-        }
-
-        if ($this->assetsCommandProcess->isSuccessful()) {
-            $output->writeln('Assets has been installed successfully');
-            $output->writeln($this->assetsCommandProcess->getOutput());
-        } else {
-            $output->writeln($this->assetsCommandProcess->getOutput());
-            $output->writeln('Assets has not been installed! Please run "php bin/console oro:assets:install".');
-            $output->writeln('Error during install assets:');
-            $output->writeln($this->assetsCommandProcess->getErrorOutput());
-        }
-
-        return $this->assetsCommandProcess->getExitCode();
-    }
-
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
@@ -865,7 +766,6 @@ HELP
             'sample-data'       => 'n',
             'organization-name' => 'OroInc',
             'application-url'   => 'http://localhost/',
-            'skip-assets'       => true,
             'skip-translations' => true,
             'timeout'           => '600',
             'language'          => 'en',

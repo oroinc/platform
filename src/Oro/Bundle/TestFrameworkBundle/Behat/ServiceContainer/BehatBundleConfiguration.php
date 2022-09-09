@@ -61,6 +61,10 @@ class BehatBundleConfiguration implements ConfigurationInterface
                                                 return str_replace('@'.$bundleName, $bundlePath, $v);
                                             }
 
+                                            if (!str_starts_with($v, '/')) {
+                                                return $this->kernel->getProjectDir() . DIRECTORY_SEPARATOR . $v;
+                                            }
+
                                             return $v;
                                         }, $val);
                                     }

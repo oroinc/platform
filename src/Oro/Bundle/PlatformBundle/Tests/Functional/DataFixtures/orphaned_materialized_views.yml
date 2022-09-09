@@ -1,0 +1,18 @@
+Oro\Bundle\PlatformBundle\Entity\MaterializedView:
+    materialized_view_0_days_old:
+        name: 'm3685ca0b00624f5aa3b2c6459f3a6c1e'
+        withData: false
+        createdAt: '<dateTimeBetween("today", "today")>'
+        updatedAt: '<dateTimeBetween("today", "today")>'
+
+    materialized_view_2_days_old:
+        name: 'm4d5ec9587bf9416793a43258e93df2ce'
+        withData: false
+        createdAt: '<dateTimeBetween("today -2 days", "today -2 days")>'
+        updatedAt: '<dateTimeBetween("today -2 days", "today -2 days")>'
+
+    materialized_view_7_days_old:
+        name: 'm6a72b1f67b7840a09a8c007d9880f7a3'
+        withData: false
+        createdAt: '<dateTimeBetween("today -7 days", "today -7 days")>'
+        updatedAt: '<dateTimeBetween("today -7 days", "today -7 days")>'

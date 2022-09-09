@@ -1,6 +1,6 @@
 {% block __datagrid_toolbar__datagrid_toolbar_actions_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " actions-panel pull-right",
+        class: attr.class|default('') ~ " actions-panel",
         'data-grid-actions-panel': ''
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
@@ -8,7 +8,7 @@
 
 {% block __datagrid_toolbar__datagrid_toolbar_page_size_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " page-size pull-left",
+        class: attr.class|default('') ~ " page-size",
         'data-grid-pagesize': ''
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
@@ -23,7 +23,7 @@
 
 {% block __datagrid_toolbar__datagrid_toolbar_pagination_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " pagination pull-left",
+        class: attr.class|default('') ~ " pagination",
         'data-grid-pagination': ''
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>

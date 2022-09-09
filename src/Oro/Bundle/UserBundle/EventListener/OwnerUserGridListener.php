@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\UserBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
+use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
@@ -15,88 +17,60 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Owner users select grid. This grid does not use search index or an ACL helper to limit data.
+ * Applies ACL to the datagrid for select owner users.
+ * This datagrid does not use search index or an ACL helper to limit data.
  */
 class OwnerUserGridListener
 {
-    /** @var EntityManager */
-    protected $em;
+    private ManagerRegistry $doctrine;
+    private AuthorizationCheckerInterface $authorizationChecker;
+    private TokenAccessorInterface $tokenAccessor;
+    private AclVoterInterface $aclVoter;
+    private OwnerTreeProvider $treeProvider;
 
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var AclVoterInterface */
-    protected $aclVoter;
-
-    /** @var OwnerTreeProvider */
-    protected $treeProvider;
-
-    /**
-     * @param EntityManager                 $em
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenAccessorInterface        $tokenAccessor
-     * @param OwnerTreeProvider             $treeProvider
-     * @param AclVoterInterface             $aclVoter
-     */
     public function __construct(
-        EntityManager $em,
+        ManagerRegistry $doctrine,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
         OwnerTreeProvider $treeProvider,
-        AclVoterInterface $aclVoter = null
+        AclVoterInterface $aclVoter
     ) {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
         $this->aclVoter = $aclVoter;
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
         $this->treeProvider = $treeProvider;
     }
 
-    public function onBuildBefore(BuildBefore $event)
+    public function onBuildBefore(BuildBefore $event): void
     {
-        $parameters  = $event->getDatagrid()->getParameters();
-        $permission  = $parameters->get('permission');
-        if ($parameters->get('entity')) {
-            $entityClass = str_replace('_', '\\', $parameters->get('entity'));
-        } else {
-            $entityClass = 'Oro\Bundle\UserBundle\Entity\User';
-        }
-
-        $entityId    = $parameters->get('entity_id');
-
-        if ($entityId) {
-            $object = $this->em->getRepository($entityClass)->find((int)$entityId);
-        } else {
-            $object = 'entity:' . $entityClass;
-        }
+        $parameters = $event->getDatagrid()->getParameters();
+        $entity = $parameters->get('entity');
+        $entityClass = $entity
+            ? str_replace('_', '\\', $entity)
+            : User::class;
+        $entityId = $parameters->get('entity_id');
+        $object = $entityId
+            ? $this->doctrine->getRepository($entityClass)->find((int)$entityId)
+            : ObjectIdentityHelper::encodeIdentityString(EntityAclExtension::NAME, $entityClass);
 
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $this->authorizationChecker->isGranted($permission, $object);
-        $accessLevel = $observer->getAccessLevel();
-
-        $config = $event->getConfig();
-        $user = $this->tokenAccessor->getUser();
-        $organization = $this->tokenAccessor->getOrganization();
-
-        $this->applyACL($config, $accessLevel, $user, $organization);
+        $this->authorizationChecker->isGranted($parameters->get('permission'), $object);
+        $this->applyAcl(
+            $event->getConfig(),
+            $observer->getAccessLevel(),
+            $this->tokenAccessor->getUser(),
+            $this->tokenAccessor->getOrganization()
+        );
     }
 
-    /**
-     * Add user limitation
-     *
-     * @param DatagridConfiguration $config
-     * @param string                $accessLevel
-     * @param User                  $user
-     * @param Organization          $organization
-     *
-     * @throws \Exception
-     */
-    protected function applyACL(DatagridConfiguration $config, $accessLevel, User $user, Organization $organization)
-    {
+    protected function applyAcl(
+        DatagridConfiguration $config,
+        int $accessLevel,
+        User $user,
+        Organization $organization
+    ): void {
         $query = $config->getOrmQuery();
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
             $query->addAndWhere('u.id = ' . $user->getId());
@@ -116,9 +90,7 @@ class OwnerUserGridListener
                     $organization->getId()
                 );
             }
-
             $query->addInnerJoin('u.businessUnits', 'bu');
-
             if ($resultBuIds) {
                 $query->addAndWhere('bu.id in (' . implode(', ', $resultBuIds) . ')');
             } else {

@@ -4,13 +4,13 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Security;
 
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory;
+use Oro\Bundle\MessageQueueBundle\Security\SecurityTokenProviderInterface;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverFactoryInterface;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\Testing\ReflectionUtil;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -21,14 +21,14 @@ class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
         $driver = $this->createMock(DriverInterface::class);
 
         $driverFactory = $this->createMock(DriverFactoryInterface::class);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenProvider = $this->createMock(SecurityTokenProviderInterface::class);
         $tokenSerializer = $this->createMock(TokenSerializerInterface::class);
 
         /** @var SecurityAwareDriverFactory */
         $securityAwareDriverFactory = new SecurityAwareDriverFactory(
             $driverFactory,
             ['security_agnostic_topic'],
-            $tokenStorage,
+            $tokenProvider,
             $tokenSerializer
         );
 
@@ -45,7 +45,7 @@ class SecurityAwareDriverFactoryTest extends \PHPUnit\Framework\TestCase
             ['security_agnostic_topic' => true],
             ReflectionUtil::getPropertyValue($result, 'securityAgnosticTopics')
         );
-        self::assertSame($tokenStorage, ReflectionUtil::getPropertyValue($result, 'tokenStorage'));
+        self::assertSame($tokenProvider, ReflectionUtil::getPropertyValue($result, 'tokenProvider'));
         self::assertSame($tokenSerializer, ReflectionUtil::getPropertyValue($result, 'tokenSerializer'));
     }
 }

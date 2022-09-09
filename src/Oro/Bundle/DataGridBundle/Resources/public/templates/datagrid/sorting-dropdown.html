@@ -2,7 +2,7 @@
 <% if (hasSortingOrderButton) { %>
 <span id="<%- labelId %>" class="sorting-label"><%-_.__('oro.datagrid.toolbar_sorting.label') %>:</span>
 <% } else if (inlineSortingLabel) { %>
-<span  id="<%- labelId %>" class="datagrid-tool__label"><%-_.__('oro.datagrid.toolbar_sorting.label') %>:</span>
+<span  id="<%- labelId %>" class="datagrid-tool__label datagrid-tool__label-sorting"><%-_.__('oro.datagrid.toolbar_sorting.label') %>:</span>
 <% } %>
 
 <select class="oro-select2 oro-select2--size-s input-widget" data-skip-input-widgets aria-labelledby="<%- labelId %>">

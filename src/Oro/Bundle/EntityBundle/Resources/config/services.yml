@@ -675,21 +675,18 @@ services:
 
     oro_entity.sql_walker.mysql_use_index:
         class: Oro\Component\DoctrineUtils\ORM\Walker\MySqlUseIndexOutputResultModifier
-        public: false
         abstract: true
         tags:
             - { name: oro_entity.sql_walker }
 
     oro_entity.sql_walker.postgresql_order_by_nulls:
         class: Oro\Component\DoctrineUtils\ORM\Walker\PostgreSqlOrderByNullsOutputResultModifier
-        public: false
         abstract: true
         tags:
             - { name: oro_entity.sql_walker }
 
     oro_entity.sql_walker.union:
         class: Oro\Component\DoctrineUtils\ORM\Walker\UnionOutputResultModifier
-        public: false
         abstract: true
         tags:
             - { name: oro_entity.sql_walker }

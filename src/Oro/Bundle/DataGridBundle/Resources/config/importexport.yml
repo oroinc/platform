@@ -14,12 +14,6 @@ services:
             - '@translator'
             - '@oro_importexport.formatter.formatter_provider'
 
-    oro_datagrid.importexport.export_reader:
-        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportReader
-        arguments:
-            - '@oro_importexport.context_registry'
-            - '@oro_datagrid.importexport.export_connector'
-
     oro_datagrid.importexport.export_filtered_reader:
         class: Oro\Bundle\DataGridBundle\ImportExport\FilteredEntityReader
         arguments:
@@ -35,19 +29,7 @@ services:
             - '@event_dispatcher'
             - '@oro_security.acl_helper'
         tags:
-            - { name: oro_datagrid.filtered_entity_identity_reader}
-
-    oro_datagrid.importexport.export_connector:
-        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportConnector
-        arguments:
-            - '@oro_datagrid.datagrid.manager.link'
-
-    oro_datagrid.importexport.export_id_fetcher:
-        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher
-        arguments:
-            - '@oro_datagrid.datagrid.manager.link'
-            - '@event_dispatcher'
-            - '@oro_datagrid.orm.query_executor'
+            - { name: oro_datagrid.filtered_entity_identity_reader }
 
     oro_datagrid.importexport.datagrid_columns_from_context_provider:
         class: Oro\Bundle\DataGridBundle\ImportExport\DatagridColumnsFromContextProvider
@@ -55,3 +37,10 @@ services:
         arguments:
         - '@oro_datagrid.datagrid.manager'
         - '@oro_datagrid.provider.state.columns'
+
+    oro_datagrid.importexport.materialized_view_reader:
+        class: Oro\Bundle\DataGridBundle\ImportExport\DatagridMaterializedViewReader
+        arguments:
+            - '@oro_datagrid.datagrid.manager'
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }

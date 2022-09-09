@@ -13,7 +13,7 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
     /** @var iterable|CurrentLocalizationExtensionInterface[] */
     private $extensions;
 
-    /** @var Localization|null */
+    /** @var Localization|null|bool */
     private $currentLocalization = false;
 
     /**
@@ -29,18 +29,16 @@ class CurrentLocalizationProvider implements LocalizationProviderInterface
      */
     public function getCurrentLocalization()
     {
-        if (false === $this->currentLocalization) {
-            $this->currentLocalization = null;
-            foreach ($this->extensions as $extension) {
-                $localization = $extension->getCurrentLocalization();
-                if (null !== $localization) {
-                    $this->currentLocalization = $localization;
-                    break;
-                }
-            }
+        if (false !== $this->currentLocalization) {
+            return $this->currentLocalization;
         }
 
-        return $this->currentLocalization;
+        foreach ($this->extensions as $extension) {
+            $localization = $extension->getCurrentLocalization();
+            if (null !== $localization) {
+                return $localization;
+            }
+        }
     }
 
     /**

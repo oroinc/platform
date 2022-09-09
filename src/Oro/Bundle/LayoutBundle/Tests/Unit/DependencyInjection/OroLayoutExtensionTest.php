@@ -59,7 +59,9 @@ class OroLayoutExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(
             [
                 '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/theme\.yml$#',
-                '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/config/[^/]+\.yml$#'
+                '#Resources/views/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/config/[^/]+\.yml$#',
+                '#templates/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/theme\.yml$#',
+                '#templates/layouts/[a-zA-Z][a-zA-Z0-9_\-:]*/config/[^/]+\.yml$#'
             ],
             $container->getDefinition('oro_layout.theme_extension.resource_provider.theme')->getArgument(5)
         );

@@ -62,6 +62,10 @@ HELP
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        if ($this->getContainer()->getParameter('kernel.environment') === 'test') {
+            $output->writeln('Assets build skipped. Assets are not needed for test environment.');
+            return self::SUCCESS;
+        }
         $assetsOptions = [];
         if ($input->hasOption('symlink') && $input->getOption('symlink')) {
             $assetsOptions['--symlink'] = true;

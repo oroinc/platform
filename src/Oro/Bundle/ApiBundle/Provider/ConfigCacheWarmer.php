@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration as Config;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\Loader\FolderYamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -28,6 +29,9 @@ class ConfigCacheWarmer
     public const INCLUSIONS        = 'inclusions';
 
     private const OVERRIDE_CLASS = 'override_class';
+    private const APP_API_CONFIG_PATH = '../config/oro/';
+    private const YAML_EXTENSION = '.yml';
+
 
     /** @var ConfigExtensionRegistry */
     private $configExtensionRegistry;
@@ -284,6 +288,13 @@ class ConfigCacheWarmer
         $configFileLoaders = [new YamlCumulativeFileLoader('Resources/config/oro/' . $fileName)];
         if ('test' === $this->environment) {
             $configFileLoaders[] = new YamlCumulativeFileLoader('Tests/Functional/Environment/' . $fileName);
+        }
+        /** Load api configurations from application */
+        if (str_contains($fileName, self::YAML_EXTENSION)) {
+            $fileNameBody = str_replace(self::YAML_EXTENSION, '', $fileName);
+            $configFileLoaders[] = new FolderYamlCumulativeFileLoader(
+                self::APP_API_CONFIG_PATH . $fileNameBody
+            );
         }
 
         $config = [];

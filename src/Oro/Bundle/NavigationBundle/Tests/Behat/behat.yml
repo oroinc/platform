@@ -20,6 +20,9 @@ oro_behat_extension:
     Main Menu Toggler:
       selector: "#main-menu-toggler"
 
+    Mobile Menu Toggler:
+      selector: "#main-menu-toggle"
+
     PinBarLink:
       selector: '#pinbar div.list-bar .pin-holder a'
 
@@ -106,7 +109,7 @@ oro_behat_extension:
       selector:
         locator: '//ul[contains(@class,"nav-tabs")]/li/a'
         type: xpath
-        
+
     RootItem:
       selector:
         type: xpath

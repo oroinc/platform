@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Suite;
 
 use Behat\Testwork\Suite\Generator\SuiteGenerator;
-use Behat\Testwork\Suite\GenericSuite;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
@@ -44,7 +43,7 @@ class OroSuiteGenerator implements SuiteGenerator
         } catch (\InvalidArgumentException $e) {
             $settings['type'] = self::SUITE_TYPE_GENERIC;
 
-            return new GenericSuite($suiteName, $settings);
+            return new OroGenericSuite($suiteName, $settings, $this->kernel->getProjectDir());
         }
     }
 }

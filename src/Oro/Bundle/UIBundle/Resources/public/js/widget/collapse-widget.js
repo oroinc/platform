@@ -212,6 +212,17 @@ define(function(require) {
         },
 
         _hideSiblings: function(isOpen) {
+            if (this.options.group && isOpen) {
+                this.$el.siblings().each((index, sibling) => {
+                    const widget = $(sibling).data('orouiCollapseWidget');
+                    if (widget && widget.options.group === this.options.group) {
+                        widget._setState(false);
+                    }
+                });
+
+                return;
+            }
+
             if (isOpen) {
                 this.$el.siblings().hide(this.options.animationSpeed);
             } else {

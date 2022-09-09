@@ -89,12 +89,12 @@ define(function(require) {
             const mainConfig = {};
             $.extend(true, mainConfig, this.getDefaultOptions(), options.metadata.inline_editing);
             options.metadata.inline_editing = mainConfig;
-            promises.push(tools.loadModuleAndReplace(mainConfig, 'plugin'));
+            promises.push(loadModules.fromObjectProp(mainConfig, 'plugin'));
             options.metadata.inline_editing.defaultEditorsLoadPromise =
-                tools.loadModuleAndReplace(mainConfig, 'default_editors');
+                loadModules.fromObjectProp(mainConfig, 'default_editors');
             promises.push(options.metadata.inline_editing.defaultEditorsLoadPromise);
-            promises.push(tools.loadModuleAndReplace(mainConfig.cell_editor, 'component'));
-            promises.push(tools.loadModuleAndReplace(mainConfig.save_api_accessor, 'class'));
+            promises.push(loadModules.fromObjectProp(mainConfig.cell_editor, 'component'));
+            promises.push(loadModules.fromObjectProp(mainConfig.save_api_accessor, 'class'));
             return promises;
         },
 
@@ -180,8 +180,7 @@ define(function(require) {
                 }
                 if (columnMeta.inline_editing && columnMeta.inline_editing.save_api_accessor &&
                     columnMeta.inline_editing.save_api_accessor['class']) {
-                    promises.push(tools.loadModuleAndReplace(columnMeta.inline_editing.save_api_accessor,
-                        'class'));
+                    promises.push(loadModules.fromObjectProp(columnMeta.inline_editing.save_api_accessor, 'class'));
                 }
             });
 

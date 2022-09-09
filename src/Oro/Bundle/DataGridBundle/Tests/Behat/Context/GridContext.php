@@ -258,7 +258,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
                 );
 
                 if (!$grid->getRowByNumber($rowNumber)->isVisible()) {
-                    $hiddenRowsCount = $hiddenRowsCount + 1 ;
+                    $hiddenRowsCount = $hiddenRowsCount + 1;
                     $rowNumber = $rowNumber + 1;
                     continue;
                 }
@@ -393,6 +393,19 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $grid = $this->getGrid($gridName);
         self::assertEquals($this->getCount($number), $this->getGridPaginator($grid)->getTotalRecordsCount());
     }
+
+    /**
+     * Example: I should see not empty grid
+     *
+     * @Given /^I should see not empty grid "(?P<gridName>[^"]+)"$/
+     * @Given /^I should see not empty grid$/
+     */
+    public function gridShouldNotBeEmpty($number, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        self::assertGreaterThan(0, $this->getGridPaginator($grid)->getTotalRecordsCount());
+    }
+
 
     /**
      * Example: Then number of pages should be 3
@@ -873,6 +886,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     //@codingStandardsIgnoreStart
+
     /**
      * Set range price value in grid filter
      * Example: When I set range filter "Price" as min value "12.45" and max value "25.66" use "item" unit
@@ -1418,7 +1432,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         string $filterName,
         string $value = '',
         string $filterGridName = 'Grid'
-    ):void {
+    ): void {
         /** @var MultipleChoice $filterItem */
         $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('MultipleChoice', $filterName);
         self::assertFalse($filterItem->isItemChecked($value));
@@ -2418,6 +2432,35 @@ TEXT;
         self::assertTrue(
             $grid->isIsset(),
             sprintf('Grid "%s" was not found on page', $gridName)
+        );
+    }
+
+    /**
+     * Example: I should see "Preview Image" element in grid row containing "PSKU1" for grid "gridName"
+     *
+     * @When /^(?:|I )I should see "(?P<element>[^"]+)" element in grid row containing "(?P<content>[^"]+)"$/
+     * @When /^(?:|I )I should see "(?P<element>[^"]+)" element in grid row containing "(?P<content>[^"]+)"
+     * for "(?P<gridName>[^"]+)"$/
+     */
+    public function iShouldSeeElementInGridRowContainingContent(
+        string $elementName,
+        string $content,
+        string $gridName = null
+    ) {
+        $grid = $this->getGrid($gridName);
+        $rowElement = $grid->getRowByContent($content);
+
+        self::assertNotNull($rowElement, sprintf('There is no row containing "%s"', $content));
+        self::assertTrue($rowElement->isValid(), sprintf('There is no row containing "%s"', $content));
+
+        $element = $rowElement->getElement($elementName);
+        self::assertNotNull(
+            $element,
+            sprintf('There is no row with content "%s" containing element "%s"', $content, $elementName)
+        );
+        self::assertTrue(
+            $element->isValid(),
+            sprintf('There is no row with content "%s" containing element "%s"', $content, $elementName)
         );
     }
 

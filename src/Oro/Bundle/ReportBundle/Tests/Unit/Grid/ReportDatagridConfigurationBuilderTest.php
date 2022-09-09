@@ -21,44 +21,31 @@ use Oro\Bundle\ReportBundle\Grid\ReportDatagridConfigurationBuilder;
 
 class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateGroupingBuilder;
+    private DatagridDateGroupingBuilder|\PHPUnit\Framework\MockObject\MockObject $dateGroupingBuilder;
 
-    /** @var FunctionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $functionProvider;
+    private ConfigManager|\PHPUnit\Framework\MockObject\MockObject $configManager;
 
-    /** @var VirtualFieldProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $virtualFieldProvider;
+    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $doctrine;
 
-    /** @var VirtualRelationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $virtualRelationProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ReportDatagridConfigurationBuilder */
-    private $builder;
+    private ReportDatagridConfigurationBuilder $builder;
 
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->functionProvider = $this->createMock(FunctionProviderInterface::class);
-        $this->virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
-        $this->virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
+        $functionProvider = $this->createMock(FunctionProviderInterface::class);
+        $virtualFieldProvider = $this->createMock(VirtualFieldProviderInterface::class);
+        $virtualRelationProvider = $this->createMock(VirtualRelationProviderInterface::class);
         $this->dateGroupingBuilder = $this->createMock(DatagridDateGroupingBuilder::class);
 
-        $this->virtualFieldProvider->expects($this->any())
+        $virtualFieldProvider->expects(self::any())
             ->method('isVirtualField')
             ->willReturn(false);
 
         $this->builder = new ReportDatagridConfigurationBuilder(
-            $this->functionProvider,
-            $this->virtualFieldProvider,
-            $this->virtualRelationProvider,
+            $functionProvider,
+            $virtualFieldProvider,
+            $virtualRelationProvider,
             new DoctrineHelper($this->doctrine),
             new DatagridGuesser([]),
             $this->createMock(EntityNameResolver::class)
@@ -88,7 +75,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
     {
         $this->mockClassMetadata([]);
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getEntityMetadata')
             ->with(\stdClass::class)
             ->willReturn(null);
@@ -97,31 +84,29 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->setGridName($gridName = 'sample-grid');
         $this->builder->setSource($report);
 
-        $this->dateGroupingBuilder->expects($this->once())
+        $this->dateGroupingBuilder->expects(self::once())
             ->method('applyDateGroupingFilterIfRequired')
-            ->with($this->isInstanceOf(DatagridConfiguration::class), $report);
+            ->with(self::isInstanceOf(DatagridConfiguration::class), $report);
 
-        $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
+        self::assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
     private function mockClassMetadata(array $identifiers)
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $em = $this->createMock(EntityManagerInterface::class);
-        $this->doctrine->expects($this->any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($em);
-        $em->expects($this->any())
+        $em->expects(self::any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
-        $metadata->expects($this->any())
+        $metadata->expects(self::any())
             ->method('getIdentifier')
             ->willReturn($identifiers);
-        $metadata->expects($this->any())
+        $metadata->expects(self::any())
             ->method('getSingleIdentifierFieldName')
             ->willReturn(reset($identifiers));
-
-        return $metadata;
     }
 
     private function getSimpleDefinition(): array
@@ -168,7 +153,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->setGridName($gridName);
         $this->builder->setSource($this->getReportEntity(\stdClass::class, $this->getSimpleDefinition()));
 
-        $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
+        self::assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
     private function mockEntityMetadata(string $viewRoute): void
@@ -176,7 +161,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $entityMetadata = new EntityMetadata(\stdClass::class);
         $entityMetadata->routeView = $viewRoute;
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getEntityMetadata')
             ->with(\stdClass::class)
             ->willReturn($entityMetadata);
@@ -195,7 +180,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->setGridName($gridName);
         $this->builder->setSource($this->getReportEntity(\stdClass::class, $this->getSimpleDefinition()));
 
-        $this->assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
+        self::assertEquals($this->getSimpleConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
     public function invalidIdentifiersDataProvider(): array
@@ -216,7 +201,7 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->builder->setGridName($gridName);
         $this->builder->setSource($this->getReportEntity(\stdClass::class, $this->getSimpleDefinition()));
 
-        $this->assertEquals($this->getExpectedConfiguration($gridName), $this->builder->getConfiguration()->toArray());
+        self::assertEquals($this->getExpectedConfiguration($gridName), $this->builder->getConfiguration()->toArray());
     }
 
     private function getExpectedConfiguration(string $gridName): array
@@ -283,77 +268,13 @@ class ReportDatagridConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @dataProvider groupByDataProvider
-     */
-    public function testGetConfigurationExportOption(array $groupBy, int $associationType, bool $expected): void
-    {
-        $metadata = $this->mockClassMetadata(['sampleId1']);
-        $this->mockEntityMetadata('sample_route');
-
-        $metadata->expects($this->any())
-            ->method('getAssociationNames')
-            ->willReturn(['sampleColumn']);
-        $metadata->expects($this->any())
-            ->method('getAssociationMapping')
-            ->with('sampleColumn')
-            ->willReturn(['type' => $associationType]);
-
-        $gridName = 'sample-grid';
-        $this->builder->setGridName($gridName);
-
-        $definition = [
-            'columns' => [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
-            'grouping_columns' => $groupBy
-        ];
-        $this->builder->setSource($this->getReportEntity(\stdClass::class, $definition));
-        $config = $this->builder->getConfiguration()->toArray();
-        $this->assertEquals($expected, $config['options']['export']);
-    }
-
-    public function groupByDataProvider(): array
-    {
-        return [
-            [
-                [['name' => 'sampleColumn']],
-                ClassMetadata::MANY_TO_MANY,
-                true
-            ],
-            [
-                [['name' => 'sampleColumn']],
-                ClassMetadata::ONE_TO_ONE,
-                true
-            ],
-            [
-                [['name' => 'sampleColumn']],
-                ClassMetadata::ONE_TO_MANY,
-                true
-            ],
-            [
-                [['name' => 'sampleColumn']],
-                ClassMetadata::MANY_TO_ONE,
-                false
-            ],
-            [
-                [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
-                ClassMetadata::MANY_TO_ONE,
-                true
-            ],
-            [
-                [['name' => 'sampleColumn'], ['name' => 'sampleId1']],
-                ClassMetadata::ONE_TO_MANY,
-                true
-            ]
-        ];
-    }
-
     private function getReportEntity(string $entityClass, array $definition): Report
     {
         $report = $this->createMock(Report::class);
-        $report->expects($this->any())
+        $report->expects(self::any())
             ->method('getDefinition')
             ->willReturn(QueryDefinitionUtil::encodeDefinition($definition));
-        $report->expects($this->any())
+        $report->expects(self::any())
             ->method('getEntity')
             ->willReturn($entityClass);
 

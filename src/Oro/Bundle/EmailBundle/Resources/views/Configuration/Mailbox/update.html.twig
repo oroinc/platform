@@ -68,10 +68,13 @@
             'entity_label': 'oro.email.mailbox.entity_label'|trans
         }) %}
         {% set buttons = buttons ~ UI.buttonSeparator() %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+        {% set html = html ~ UI.saveAndStayButton({'route': 'oro_email_mailbox_update', 'params': {'id': '$id'}}) %}
     {% endif %}
 
-    {% set html = html ~ UI.saveAndCloseButton() %}
+    {% set html = html ~ UI.saveAndCloseButton({
+        'route': 'oro_config_configuration_system',
+        'params': {'activeGroup': 'platform', 'activeSubGroup': 'email_configuration'}
+    }) %}
     {% set buttons = buttons ~ UI.dropdownSaveButton({'html': html}) %}
 
     {% set options = {

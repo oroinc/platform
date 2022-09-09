@@ -1,0 +1,7 @@
+services:
+    oro_platform.async.delete_materialized_view:
+        class: Oro\Bundle\PlatformBundle\Async\DeleteMaterializedViewMessageProcessor
+        arguments:
+            - '@oro_platform.materialized_view.manager'
+        tags:
+            - { name: oro_message_queue.client.message_processor }

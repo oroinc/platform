@@ -10,20 +10,6 @@ services:
         tags:
             - { name: twig.extension }
 
-    oro_form.model.update_handler:
-        deprecated: The "%service_id%" service is deprecated since v2.1.0 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade (oro_form.update_handler) instead
-        public: true
-        class: Oro\Bundle\FormBundle\Model\UpdateHandler
-        arguments:
-            - '@request_stack'
-            - '@session'
-            - '@oro_ui.router'
-            - '@oro_entity.doctrine_helper'
-            - '@oro_form.form.handler.default'
-
-    Oro\Bundle\FormBundle\Model\UpdateHandler:
-        alias: oro_form.model.update_handler
-
     oro_form.provider.html_tag_provider:
         class: Oro\Bundle\FormBundle\Provider\HtmlTagProvider
         arguments:

@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowListConfiguration;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowConfigurationImportException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocatorInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Integration test
@@ -26,17 +27,20 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WorkflowListConfiguration */
     private $configuration;
+    private KernelInterface $kernel;
 
     protected function setUp(): void
     {
+        $this->kernel = $this->createMock(KernelInterface::class);
         $this->configuration = new WorkflowListConfiguration(new WorkflowConfiguration());
     }
 
     private function buildProvider(array $bundles): WorkflowConfigurationProvider
     {
-        $finderFactory = new ConfigFinderFactory($bundles);
+        $finderFactory = new ConfigFinderFactory($bundles, $this->kernel);
         $workflowFinderBuilder = new WorkflowConfigFinderBuilder($finderFactory);
         $workflowFinderBuilder->setSubDirectory('/Resources/config/oro/');
+        $workflowFinderBuilder->setAppSubDirectory('/config/oro/workflows/');
         $workflowFinderBuilder->setFileName('workflows.yml');
 
         $fileReader = new YamlFileCachedReader();

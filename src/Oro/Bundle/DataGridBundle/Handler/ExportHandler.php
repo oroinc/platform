@@ -8,7 +8,6 @@ use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutionWarningHandlerInterface;
 use Oro\Bundle\BatchBundle\Step\StepExecutor;
 use Oro\Bundle\DataGridBundle\Exception\InvalidArgumentException;
-use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Context\ContextAwareInterface;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -94,7 +93,7 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         } catch (\Exception $exception) {
             $context->addFailureException($exception);
         } finally {
-            @unlink($filePath);
+            $this->fileManager->deleteFile($filePath);
         }
 
         $readsCount = $context->getReadCount() ?: 0;
@@ -128,27 +127,5 @@ class ExportHandler implements StepExecutionWarningHandlerInterface
         $this->exportFailed = true;
 
         $this->logger->error(sprintf('[DataGridExportHandle] Error message: %s', $reason), ['element' => $element]);
-    }
-
-    /**
-     * @param DatagridExportIdFetcher $idFetcher
-     * @param array $parameters
-     *
-     * @return array
-     */
-    public function getExportingEntityIds(DatagridExportIdFetcher $idFetcher, array $parameters)
-    {
-        $context  = new Context($parameters);
-        $idFetcher->setImportExportContext($context);
-
-        return $idFetcher->getGridDataIds();
-    }
-
-    public function getEntityName(DatagridExportIdFetcher $idFetcher, array $parameters): string
-    {
-        $context  = new Context($parameters);
-        $idFetcher->setImportExportContext($context);
-
-        return $idFetcher->getGridRootEntity();
     }
 }

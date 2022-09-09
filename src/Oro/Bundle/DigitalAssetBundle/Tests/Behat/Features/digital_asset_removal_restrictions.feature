@@ -1,5 +1,6 @@
 @ticket-BB-17850
 @ticket-BB-18073
+@ticket-BAP-21510
 Feature: Digital asset removal restrictions
   In order to have a possibility to manage digital assets
   As an Administrator
@@ -79,3 +80,14 @@ Feature: Digital asset removal restrictions
       | JPG image asset | cat1.jpg  | 76.77 KB  | image/jpeg |
     And I should see following actions for JPG image asset in grid:
       | Delete |
+
+  Scenario: Update digital asset
+    When I click "edit" on row "JPG image asset" in grid
+    And I fill "Digital Asset Form" with:
+      | File  | cat2.jpg                |
+      | Title | JPG image asset updated |
+    When I save and close form
+    Then I should see "Digital Asset has been saved" flash message
+    And I should see following grid:
+      | Title                   | File name | Mime type  |
+      | JPG image asset updated | cat2.jpg  | image/jpeg |

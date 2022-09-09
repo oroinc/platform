@@ -7,9 +7,11 @@ use Oro\Bundle\MigrationBundle\Locator\FixturePathLocatorInterface;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -155,8 +157,25 @@ HELP
                 $this->dataFixturesLoader->loadFromDirectory($path);
             }
         }
+        $this->loadAppFixtures($fixtureRelativePath);
 
         return $this->dataFixturesLoader->getFixtures();
+    }
+
+    protected function loadAppFixtures(string $relativeFixturePath): void
+    {
+        $appFixturesDirectory = $this->kernel->getProjectDir() . '/migrations';
+        if (!is_dir($appFixturesDirectory)) {
+            return;
+        }
+        $finder = (new Finder())->directories()->in($appFixturesDirectory);
+        $relativeFixturePath = str_replace('/Migrations', '', $relativeFixturePath);
+        foreach ($finder as $directory) {
+            $fixtureItemDirectory = $directory . $relativeFixturePath;
+            if (is_dir($fixtureItemDirectory)) {
+                $this->dataFixturesLoader->loadFromDirectory($fixtureItemDirectory);
+            }
+        }
     }
 
     protected function outputFixtures(InputInterface $input, OutputInterface $output, array $fixtures): void
@@ -186,12 +205,30 @@ HELP
 
     protected function executeFixtures(OutputInterface $output, array $fixtures, string $fixturesType): void
     {
+        $cursor = new Cursor($output);
         $this->dataFixturesExecutor->setLogger(
-            function ($message) use ($output) {
-                $output->writeln(sprintf('  <comment>></comment> <info>%s</info>', $message));
+            function ($message) use ($output, $cursor) {
+                $output->write(\sprintf('  <comment>></comment> <info>%s</info>', $message));
+                // Saves the cursor position to make it possible to return to the end of previous line in the progress
+                // callback to append the progress info.
+                $cursor->savePosition();
+                $output->writeln('');
             }
         );
-        $this->dataFixturesExecutor->execute($fixtures, $fixturesType);
+
+        $progressCallback = static function (int $memoryBytes, float $durationMilli) use ($output, $cursor) {
+            // Returns cursor to the end of the previous line so the progress info will be appended after it.
+            $cursor->restorePosition();
+            $cursor->moveUp();
+
+            $output->writeln(\sprintf(
+                ' <comment>%.2F MiB - %d ms</comment>',
+                $memoryBytes / 1024 / 1024,
+                $durationMilli
+            ));
+        };
+
+        $this->dataFixturesExecutor->execute($fixtures, $fixturesType, $progressCallback);
     }
 
     protected function getTypeOfFixtures(InputInterface $input): string

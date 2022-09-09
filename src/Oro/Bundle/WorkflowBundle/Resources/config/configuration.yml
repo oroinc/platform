@@ -1,5 +1,6 @@
 parameters:
     oro_workflow.configuration.default_subdirectory: '/Resources/config/oro/'
+    oro_workflow.configuration.app_default_subdirectory: '/config/oro/workflows/'
     oro_workflow.configuration.default_filename: 'workflows.yml'
 
 services:
@@ -66,6 +67,7 @@ services:
         class: Oro\Bundle\WorkflowBundle\Configuration\ConfigFinderFactory
         arguments:
             - '%kernel.bundles%'
+            - '@kernel'
 
     oro_workflow.configuration.resource_file_locator:
         class: Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileLocator
@@ -79,6 +81,7 @@ services:
         calls:
             - ['setSubDirectory', ['%oro_workflow.configuration.default_subdirectory%']]
             - ['setFileName', ['%oro_workflow.configuration.default_filename%']]
+            - ['setAppSubDirectory', ['%oro_workflow.configuration.app_default_subdirectory%']]
 
     oro_workflow.configuration.reader.yaml:
         class: Oro\Bundle\WorkflowBundle\Configuration\Reader\YamlFileCachedReader
@@ -122,6 +125,7 @@ services:
             - '%kernel.bundles%'
             - '@oro_workflow.configuration.config.process_definition_list'
             - '@oro_workflow.configuration.config.process_trigger_list'
+            - '@kernel'
 
     oro_workflow.configuration.builder.workflow_definition:
         class: Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder
