@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
-use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Component\MessageQueue\Client\Message;
@@ -13,12 +13,12 @@ class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
 {
     use MessageQueueExtension;
 
-    public function testCouldBeConstructedWithRegistryAsFirstArgument()
+    public function testCouldBeConstructedWithRegistryAsFirstArgument(): void
     {
         new GenuineSyncScheduler($this->createMock(MessageProducerInterface::class));
     }
 
-    public function testShouldSendSyncIntegrationMessageWithIntegrationIdOnly()
+    public function testShouldSendSyncIntegrationMessageWithIntegrationIdOnly(): void
     {
         $messageProducer = self::getMessageProducer();
 
@@ -27,7 +27,7 @@ class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
         $scheduler->schedule('theIntegrationId');
 
         self::assertMessageSent(
-            Topics::SYNC_INTEGRATION,
+            SyncIntegrationTopic::getName(),
             new Message(
                 [
                     'integration_id' => 'theIntegrationId',
@@ -40,7 +40,7 @@ class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldAllowPassConnectorNameAndOptions()
+    public function testShouldAllowPassConnectorNameAndOptions(): void
     {
         $messageProducer = self::getMessageProducer();
 
@@ -49,7 +49,7 @@ class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
         $scheduler->schedule('theIntegrationId', 'theConnectorName', ['theOption' => 'theValue']);
 
         self::assertMessageSent(
-            Topics::SYNC_INTEGRATION,
+            SyncIntegrationTopic::getName(),
             new Message(
                 [
                     'integration_id' => 'theIntegrationId',

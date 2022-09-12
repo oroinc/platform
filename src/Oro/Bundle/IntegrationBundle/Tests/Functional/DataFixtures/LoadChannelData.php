@@ -47,14 +47,14 @@ class LoadChannelData extends AbstractFixture implements ContainerAwareInterface
             'type' => 'no_connectors',
             'enabled' => true,
             'connectors' => [],
-            'reference' => 'oro_integration:extended_bar_integration'
+            'reference' => 'oro_integration:no_connectors_integration'
         ],
         [
             'name' => 'Disabled Integration',
             'type' => 'disabled',
             'enabled' => false,
             'connectors' => ['connector1'],
-            'reference' => 'oro_integration:extended_bar_integration'
+            'reference' => 'oro_integration:disabled_integration'
         ]
     ];
 

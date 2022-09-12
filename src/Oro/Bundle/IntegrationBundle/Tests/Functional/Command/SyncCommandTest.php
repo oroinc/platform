@@ -4,7 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Command;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
@@ -12,6 +12,7 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 
 /**
@@ -32,19 +33,19 @@ class SyncCommandTest extends WebTestCase
         return self::getContainer()->get('doctrine')->getRepository(Job::class);
     }
 
-    public function testShouldOutputHelpForTheCommand()
+    public function testShouldOutputHelpForTheCommand(): void
     {
-        $result = $this->runCommand('oro:cron:integration:sync', ['--help']);
+        $result = self::runCommand('oro:cron:integration:sync', ['--help']);
 
         self::assertStringContainsString('Usage: oro:cron:integration:sync [options]', $result);
     }
 
-    public function testIsActive()
+    public function testIsActive(): void
     {
-        $this->assertTrue(self::getContainer()->get(SyncCommand::class)->isActive());
+        self::assertTrue(self::getContainer()->get(SyncCommand::class)->isActive());
     }
 
-    public function testIsActiveAllDisabled()
+    public function testIsActiveAllDisabled(): void
     {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManager(Channel::class);
@@ -54,10 +55,10 @@ class SyncCommandTest extends WebTestCase
             ->getQuery()
             ->execute(['enabled' => false]);
 
-        $this->assertFalse(self::getContainer()->get(SyncCommand::class)->isActive());
+        self::assertFalse(self::getContainer()->get(SyncCommand::class)->isActive());
     }
 
-    public function testIsActiveNoConnectors()
+    public function testIsActiveNoConnectors(): void
     {
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get('oro_entity.doctrine_helper')->getEntityManager(Channel::class);
@@ -68,62 +69,67 @@ class SyncCommandTest extends WebTestCase
             ->getQuery()
             ->execute();
 
-        $this->assertFalse(self::getContainer()->get(SyncCommand::class)->isActive());
+        self::assertFalse(self::getContainer()->get(SyncCommand::class)->isActive());
     }
 
-    public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions()
+    public function testShouldSendSyncIntegrationWithoutAnyAdditionalOptions(): void
     {
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
-        $result = $this->runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
+        $result = self::runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
-        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-
-        $this->assertCount(1, $traces);
-
-        $this->assertEquals([
-            'integration_id' => $integration->getId(),
-            'connector_parameters' => [],
-            'connector' => null,
-            'transport_batch_size' => 100,
-        ], $traces[0]['message']->getBody());
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
+        self::assertMessageSent(
+            SyncIntegrationTopic::getName(),
+            new Message(
+                [
+                    'integration_id' => $integration->getId(),
+                    'connector_parameters' => [],
+                    'connector' => null,
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
+        );
     }
 
-    public function testShouldSendSyncIntegrationWithCustomConnectorAndOptions()
+    public function testShouldSendSyncIntegrationWithCustomConnectorAndOptions(): void
     {
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
 
-        $result = $this->runCommand('oro:cron:integration:sync', [
-            '--integration='.$integration->getId(),
-            '--connector' => 'theConnector',
-            'fooConnectorOption=fooValue',
-            'barConnectorOption=barValue',
-        ]);
+        $result = self::runCommand(
+            'oro:cron:integration:sync',
+            [
+                '--integration='.$integration->getId(),
+                '--connector' => 'theConnector',
+                'fooConnectorOption=fooValue',
+                'barConnectorOption=barValue',
+            ]
+        );
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
-        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-
-        $this->assertCount(1, $traces);
-
-        $this->assertEquals([
-            'integration_id' => $integration->getId(),
-            'connector_parameters' => [
-                'fooConnectorOption' => 'fooValue',
-                'barConnectorOption' => 'barValue',
-            ],
-            'connector' => 'theConnector',
-            'transport_batch_size' => 100,
-        ], $traces[0]['message']->getBody());
-        $this->assertEquals(MessagePriority::VERY_LOW, $traces[0]['message']->getPriority());
+        self::assertMessageSent(
+            SyncIntegrationTopic::getName(),
+            new Message(
+                [
+                    'integration_id' => $integration->getId(),
+                    'connector_parameters' => [
+                        'fooConnectorOption' => 'fooValue',
+                        'barConnectorOption' => 'barValue',
+                    ],
+                    'connector' => 'theConnector',
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
+        );
     }
 
-    public function testShouldSendSyncIntegrationWithStaleJob()
+    public function testShouldSendSyncIntegrationWithStaleJob(): void
     {
         /** @var Channel $integration */
         $integration = $this->getReference('oro_integration:foo_integration');
@@ -138,30 +144,35 @@ class SyncCommandTest extends WebTestCase
         $jobHandler = $this->getContainer()->get('oro_message_queue.job.manager');
         $jobHandler->saveJob($entity);
 
-        $this->assertNull($this->getJobRepository()->findRootJobByJobNameAndStatuses(
-            'oro_integration:sync_integration:'.$integration->getId(),
-            [Job::STATUS_STALE]
-        ));
+        self::assertNull(
+            $this->getJobRepository()->findRootJobByJobNameAndStatuses(
+                'oro_integration:sync_integration:'.$integration->getId(),
+                [Job::STATUS_STALE]
+            )
+        );
 
-        $result = $this->runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
+        $result = self::runCommand('oro:cron:integration:sync', ['--integration='.$integration->getId()]);
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
-        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-        $this->assertCount(1, $traces);
-        $this->assertEquals(
-            [
-                'integration_id' => $integration->getId(),
-                'connector_parameters' => [],
-                'connector' => null,
-                'transport_batch_size' => 100,
-            ],
-            $traces[0]['message']->getBody()
+        self::assertMessageSent(
+            SyncIntegrationTopic::getName(),
+            new Message(
+                [
+                    'integration_id' => $integration->getId(),
+                    'connector_parameters' => [],
+                    'connector' => null,
+                    'transport_batch_size' => 100,
+                ],
+                MessagePriority::VERY_LOW
+            )
         );
 
-        $this->assertNotEmpty($this->getJobRepository()->findRootJobByJobNameAndStatuses(
-            'oro_integration:sync_integration:'.$integration->getId(),
-            [Job::STATUS_STALE]
-        ));
+        self::assertNotEmpty(
+            $this->getJobRepository()->findRootJobByJobNameAndStatuses(
+                'oro_integration:sync_integration:'.$integration->getId(),
+                [Job::STATUS_STALE]
+            )
+        );
     }
 }
