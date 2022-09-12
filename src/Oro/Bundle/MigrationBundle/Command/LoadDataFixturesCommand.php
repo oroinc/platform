@@ -11,6 +11,7 @@ use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -156,8 +157,25 @@ HELP
                 $this->dataFixturesLoader->loadFromDirectory($path);
             }
         }
+        $this->loadAppFixtures($fixtureRelativePath);
 
         return $this->dataFixturesLoader->getFixtures();
+    }
+
+    protected function loadAppFixtures(string $relativeFixturePath): void
+    {
+        $appFixturesDirectory = $this->kernel->getProjectDir() . '/migrations';
+        if (!is_dir($appFixturesDirectory)) {
+            return;
+        }
+        $finder = (new Finder())->directories()->in($appFixturesDirectory);
+        $relativeFixturePath = str_replace('/Migrations', '', $relativeFixturePath);
+        foreach ($finder as $directory) {
+            $fixtureItemDirectory = $directory . $relativeFixturePath;
+            if (is_dir($fixtureItemDirectory)) {
+                $this->dataFixturesLoader->loadFromDirectory($fixtureItemDirectory);
+            }
+        }
     }
 
     protected function outputFixtures(InputInterface $input, OutputInterface $output, array $fixtures): void

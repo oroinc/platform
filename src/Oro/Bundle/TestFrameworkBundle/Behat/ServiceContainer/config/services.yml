@@ -195,3 +195,6 @@ services:
     Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient:
         arguments:
             - !service { class: GuzzleHttp\Client }
+
+    oro_test.storage.failed_features:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Storage\FailedFeatures

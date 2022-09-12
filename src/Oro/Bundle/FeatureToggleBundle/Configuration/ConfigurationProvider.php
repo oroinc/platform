@@ -3,9 +3,9 @@
 namespace Oro\Bundle\FeatureToggleBundle\Configuration;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -27,19 +27,16 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     private const TOGGLES = 'toggles';
     private const TOGGLE = 'toggle';
 
-    private array $bundles;
     private FeatureToggleConfiguration $configuration;
     private ConfigurationExtension $configurationExtension;
 
     public function __construct(
         string $cacheFile,
         bool $debug,
-        array $bundles,
         FeatureToggleConfiguration $configuration,
         ConfigurationExtension $configurationExtension
     ) {
         parent::__construct($cacheFile, $debug);
-        $this->bundles = $bundles;
         $this->configuration = $configuration;
         $this->configurationExtension = $configurationExtension;
     }
@@ -84,18 +81,14 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_features',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_features', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (!empty($resource->data[FeatureToggleConfiguration::ROOT_NODE])) {
                 $configs[$resource->bundleClass] = $resource->data[FeatureToggleConfiguration::ROOT_NODE];
             }
         }
-
-        $merger = new ConfigurationMerger($this->bundles);
+        $merger = new ConfigurationMerger($this->getBundles());
         $mergedConfig = $merger->mergeConfiguration($configs);
 
         $processedConfig = CumulativeConfigProcessorUtil::processConfiguration(
@@ -105,6 +98,11 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         );
 
         return $this->resolveConfiguration($processedConfig);
+    }
+
+    protected function getBundles(): array
+    {
+        return CumulativeResourceManager::getInstance()->getBundles();
     }
 
     private function getConfiguration(string $sectionName): array

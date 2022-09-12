@@ -50,15 +50,20 @@ class WorkflowConfigFinderFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->finderFactory->expects($this->exactly(2))
             ->method('create')
-            ->withConsecutive(['subDir1', 'fileName1'], ['subDir2', 'fileName2'])
+            ->withConsecutive(
+                ['subDir1', 'appSubDir1', 'fileName1'],
+                ['subDir2', 'appSubDir2', 'fileName2']
+            )
             ->willReturnOnConsecutiveCalls($finder1, $finder2);
 
         $this->workflowConfigFinderBuilder->setSubDirectory('subDir1');
         $this->workflowConfigFinderBuilder->setFileName('fileName1');
+        $this->workflowConfigFinderBuilder->setAppSubDirectory('appSubDir1');
         $this->assertSame($finder1, $this->workflowConfigFinderBuilder->create());
 
         $this->workflowConfigFinderBuilder->setSubDirectory('subDir2');
         $this->workflowConfigFinderBuilder->setFileName('fileName2');
+        $this->workflowConfigFinderBuilder->setAppSubDirectory('appSubDir2');
 
         $this->assertSame($finder2, $this->workflowConfigFinderBuilder->create());
     }

@@ -42,8 +42,6 @@ define(function(require) {
             this._createManagedCollection();
             this.defaultState = tools.deepClone(this.grid.collection.state);
 
-            this._onDatagridSettingsHide = _.debounce(this._onDatagridSettingsHide, 100);
-
             DatagridManageColumnView.__super__.initialize.call(this, options);
 
             this._applyState(this.grid.collection, this.grid.collection.state);

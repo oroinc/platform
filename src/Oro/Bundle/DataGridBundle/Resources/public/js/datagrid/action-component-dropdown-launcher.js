@@ -81,10 +81,11 @@ define(function(require) {
             if (this.allowDialog) {
                 this.$('.dropdown-toggle').dropdown('dispose');
                 this.$('.dropdown-toggle').on('click' + this.eventNamespace(), this.openDialogWidget.bind(this));
+            } else {
+                this.componentOptions._sourceElement = this.$('.dropdown-menu');
+                const Component = this.componentConstructor;
+                this.component = new Component(this.componentOptions);
             }
-            this.componentOptions._sourceElement = this.$('.dropdown-menu');
-            const Component = this.componentConstructor;
-            this.component = new Component(this.componentOptions);
             return this;
         },
 

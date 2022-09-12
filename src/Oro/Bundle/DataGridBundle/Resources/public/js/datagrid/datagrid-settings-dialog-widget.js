@@ -76,9 +76,9 @@ define(function(require) {
         render: function() {
             this.viewOptions._sourceElement = this.$el;
             this.viewOptions.title = '';
-            this.view = new this.View(this.viewOptions);
-            if (_.isFunction(this.view.beforeOpen)) {
-                this.view.beforeOpen();
+            this.subview('datagridSettingsView', new this.View(this.viewOptions));
+            if (_.isFunction(this.subview('datagridSettingsView').beforeOpen)) {
+                this.subview('datagridSettingsView').beforeOpen();
             }
             this.$el.append(this.actionsTemplate());
 
@@ -89,8 +89,8 @@ define(function(require) {
          * @instance
          */
         onContentUpdated: function() {
-            if (_.isFunction(this.view.updateViews)) {
-                this.view.updateViews();
+            if (_.isFunction(this.subview('datagridSettingsView').updateViews)) {
+                this.subview('datagridSettingsView').updateViews();
             }
             this.$el.focusFirstInput();
         },

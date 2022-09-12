@@ -19,7 +19,6 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/features.php'
             - '%kernel.debug%'
-            - '%kernel.bundles%'
             - '@oro_featuretoggle.configuration'
             - '@oro_featuretoggle.configuration_extension'
 

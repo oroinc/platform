@@ -131,14 +131,14 @@ class ThemesRelativePathGeneratorExtensionTest extends \PHPUnit\Framework\TestCa
         $source = [
             'actions' => [
                 [
-                    '@setBlockTheme' => ['themes' => [null, 'sub/update.html.twig']]
+                    '@setBlockTheme' => ['themes' => [null, 'sub/templates/update.html.twig']]
                 ]
             ]
         ];
         $expectedSource = [
             'actions' => [
                 [
-                    '@setBlockTheme' => ['themes' => [null, __DIR__.'/data/sub/update.html.twig']]
+                    '@setBlockTheme' => ['themes' => [null, '/data/sub/update.html.twig']]
                 ]
             ]
         ];

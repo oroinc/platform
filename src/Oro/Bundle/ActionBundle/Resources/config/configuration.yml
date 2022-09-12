@@ -7,7 +7,6 @@ services:
             - '%kernel.cache_dir%/oro/actions.php'
             - '%kernel.debug%'
             - '@service_container'
-            - '%kernel.bundles%'
 
     oro_action.configuration.validator.action_group:
         class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator

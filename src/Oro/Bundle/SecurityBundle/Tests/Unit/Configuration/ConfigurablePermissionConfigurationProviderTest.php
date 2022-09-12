@@ -33,7 +33,6 @@ class ConfigurablePermissionConfigurationProviderTest extends \PHPUnit\Framework
         $provider = new ConfigurablePermissionConfigurationProvider(
             $this->getTempFile('ConfigurablePermissionConfigurationProvider'),
             false,
-            $resourceBundles
         );
 
         $this->assertEquals($expected, $provider->getConfiguration());

@@ -3,8 +3,7 @@
 namespace Oro\Bundle\BatchBundle\DependencyInjection;
 
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -12,15 +11,14 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroBatchExtension extends Extension
 {
+    protected const CONFIG_PATH = 'Resources/config/batch_jobs.yml';
+
     /**
      * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
-        $configLoader = new CumulativeConfigLoader(
-            'oro_batch_jobs',
-            new YamlCumulativeFileLoader('Resources/config/batch_jobs.yml')
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_batch_jobs', self::CONFIG_PATH);
         $configLoader->registerResources(new ContainerBuilderAdapter($container));
 
         $config = $this->processConfiguration(new Configuration(), $configs);

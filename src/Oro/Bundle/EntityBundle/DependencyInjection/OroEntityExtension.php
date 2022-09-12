@@ -3,8 +3,7 @@
 namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
 use Oro\Component\Config\Loader\ContainerBuilderAdapter;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -13,6 +12,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 class OroEntityExtension extends Extension
 {
     public const DEFAULT_QUERY_CACHE_LIFETIME_PARAM_NAME = 'oro_entity.default_query_cache_lifetime';
+    private const CONFIG_FILE_PATH = 'Resources/config/oro/entity_hidden_fields.yml';
 
     /**
      * {@inheritdoc}
@@ -52,10 +52,7 @@ class OroEntityExtension extends Extension
     {
         $hiddenFieldConfigs = [];
 
-        $configLoader = new CumulativeConfigLoader(
-            'oro_entity_hidden_fields',
-            new YamlCumulativeFileLoader('Resources/config/oro/entity_hidden_fields.yml')
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_entity_hidden_fields', self::CONFIG_FILE_PATH);
         $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
             $hiddenFieldConfigs = array_merge(

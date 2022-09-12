@@ -49,11 +49,10 @@ class OroThemeExtension extends Extension
 
         $configLoader = new CumulativeConfigLoader(
             'oro_theme',
-            new FolderingCumulativeFileLoader(
-                '{folder}',
-                '\w+',
-                new YamlCumulativeFileLoader('Resources/public/themes/{folder}/settings.yml')
-            )
+            [
+                $this->getFolderingCumulativeFileLoaderForPath('Resources/public/themes/{folder}/settings.yml'),
+                $this->getFolderingCumulativeFileLoaderForPath('../public/themes/admin/{folder}/settings.yml')
+            ]
         );
         $resources = $configLoader->load(new ContainerBuilderAdapter($container));
         foreach ($resources as $resource) {
@@ -62,5 +61,24 @@ class OroThemeExtension extends Extension
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $path
+     * @param string $folderPlaceholder
+     * @param string $folderPattern
+     *
+     * @return FolderingCumulativeFileLoader
+     */
+    private function getFolderingCumulativeFileLoaderForPath(
+        $path,
+        $folderPlaceholder = '{folder}',
+        $folderPattern = '\w+'
+    ) {
+        return new FolderingCumulativeFileLoader(
+            $folderPlaceholder,
+            $folderPattern,
+            new YamlCumulativeFileLoader($path)
+        );
     }
 }

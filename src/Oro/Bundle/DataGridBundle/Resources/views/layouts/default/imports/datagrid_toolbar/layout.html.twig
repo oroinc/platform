@@ -1,6 +1,6 @@
 {% block __datagrid_toolbar__datagrid_toolbar_actions_container_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " grid-toolbar-mass-actions pull-left"
+        class: attr.class|default('') ~ " grid-toolbar-mass-actions"
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
@@ -22,14 +22,14 @@
 
 {% block __datagrid_toolbar__datagrid_toolbar_tools_container_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " grid-toolbar-tools pull-right"
+        class: attr.class|default('') ~ " grid-toolbar-tools"
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
 {% endblock %}
 
 {% block __datagrid_toolbar__datagrid_toolbar_actions_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " actions-panel pull-right form-horizontal",
+        class: attr.class|default('') ~ " actions-panel",
         'data-grid-actions-panel': ''
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
@@ -37,7 +37,7 @@
 
 {% block __datagrid_toolbar__datagrid_toolbar_page_size_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " page-size pull-right form-horizontal",
+        class: attr.class|default('') ~ " page-size",
         'data-grid-pagesize': ''
     }) %}
     <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
@@ -45,7 +45,7 @@
 
 {% block __datagrid_toolbar__datagrid_items_counter_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " pull-left form-horizontal",
+        class: attr.class|default('') ~ " datagrid-tool oro-items-counter",
         'data-grid-items-counter': ''
     }) %}
     {% set toolbarPosition = attr['data-grid-toolbar']|default('') %}
@@ -74,7 +74,7 @@
 
 {% block __datagrid_toolbar__datagrid_toolbar_sorting_widget %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ " sorting pull-left form-horizontal",
+        class: attr.class|default('') ~ " sorting form-horizontal",
         'data-grid-sorting': ''
     }) %}
 

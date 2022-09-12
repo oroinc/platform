@@ -116,7 +116,6 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         return new ConfigurationProvider(
             $this->cacheFile,
             false,
-            $bundles,
             new FeatureToggleConfiguration($this->configurationExtension),
             $this->configurationExtension
         );

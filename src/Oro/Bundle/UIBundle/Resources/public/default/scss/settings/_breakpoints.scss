@@ -25,6 +25,8 @@ $oro-breakpoints: (
         '(max-width: #{$breakpoint-mobile})',
     'print': 'print',
     // Custom breakpoints
+    'product-datagrid-toolbar-narrow':
+        '(max-width: 1280px)',
     'popup-gallery-tablet':
         '(max-height: 730px), (max-width: #{$breakpoint-tablet-small})'
 );

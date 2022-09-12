@@ -88,14 +88,28 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_layout',
-            new FolderingCumulativeFileLoader(
-                '{folder}',
-                $this->folderPattern,
-                new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
-            )
+            [
+                $this->getFolderingCumulativeFileLoaderForPath('Resources/views/layouts/{folder}/theme.yml'),
+                $this->getFolderingCumulativeFileLoaderForPath('../templates/layouts/{folder}/theme.yml')
+            ]
         );
 
         return $configLoader->load($resourcesContainer);
+    }
+
+    /**
+     * @param string $path
+     * @param string $folderPlaceholder
+     *
+     * @return FolderingCumulativeFileLoader
+     */
+    private function getFolderingCumulativeFileLoaderForPath($path, $folderPlaceholder = '{folder}')
+    {
+        return new FolderingCumulativeFileLoader(
+            $folderPlaceholder,
+            $this->folderPattern,
+            new YamlCumulativeFileLoader($path)
+        );
     }
 
     /**
@@ -108,6 +122,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
         $loaders = [];
         foreach ($this->configuration->getAdditionalConfigFileNames() as $fileName) {
             $loaders[] = new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/config/' . $fileName);
+            $loaders[] = new YamlCumulativeFileLoader('../templates/layouts/{folder}/config/' . $fileName);
         }
         $configLoader = new CumulativeConfigLoader(
             'oro_layout',

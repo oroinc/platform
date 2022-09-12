@@ -1,0 +1,5 @@
+oro:
+    reminder:
+        dismiss.label: dismiss
+        reminder_template:
+            due_message: '{{ subject }} is starting at {{ expireAt }}'

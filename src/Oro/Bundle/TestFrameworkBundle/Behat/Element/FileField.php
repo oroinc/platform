@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Element;
 
 use Behat\Testwork\Suite\Suite;
+use Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroGenericSuite;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SymfonyBundleSuite;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
@@ -43,14 +44,22 @@ class FileField extends Element implements SuiteAwareInterface
     protected function getFilePath($filename)
     {
         $suitePaths = $this->suite->getSetting('paths');
-
         if (SymfonyBundleSuite::class === get_class($this->suite)) {
             /** @var BundleInterface $bundle */
             $bundle = $this->suite->getBundle();
-            $suitePaths[] = sprintf('%s%sTests%2$sBehat%2$sFeatures', $bundle->getPath(), DIRECTORY_SEPARATOR);
+            $suitePaths[] = sprintf(
+                '%s%sTests%2$sBehat%2$sFeatures',
+                $bundle->getPath(),
+                DIRECTORY_SEPARATOR
+            );
+        } elseif (OroGenericSuite::class === get_class($this->suite)) {
+            $suitePaths[] = sprintf(
+                '%s%ssrc%2$sTests%2$sBehat%2$sFeatures',
+                $this->suite->getProjectDir(),
+                DIRECTORY_SEPARATOR
+            );
         }
-        $suitePaths[] = dirname(__DIR__, 2).'/Tests/Behat/';
-
+        $suitePaths[] = dirname(__DIR__, 2) . '/Tests/Behat/';
         foreach ($suitePaths as $suitePath) {
             $suitePath = is_dir($suitePath) ? $suitePath : dirname($suitePath);
             $path = $suitePath.DIRECTORY_SEPARATOR.'Fixtures'.DIRECTORY_SEPARATOR.$filename;

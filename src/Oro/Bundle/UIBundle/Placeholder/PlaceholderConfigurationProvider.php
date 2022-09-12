@@ -4,9 +4,8 @@ namespace Oro\Bundle\UIBundle\Placeholder;
 
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderConfiguration as Config;
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainerInterface;
 
 /**
@@ -48,10 +47,7 @@ class PlaceholderConfigurationProvider extends PhpArrayConfigProvider
     {
         $placeholders = [];
         $items = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_placeholders',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_placeholders', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (!empty($resource->data[Config::ROOT_NODE])) {

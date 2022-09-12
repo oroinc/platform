@@ -79,7 +79,6 @@ class PermissionConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new PermissionConfigurationProvider(
             $this->cacheFile,
             false,
-            CumulativeResourceManager::getInstance()->getBundles()
         );
     }
 

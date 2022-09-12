@@ -5,9 +5,8 @@ namespace Oro\Bundle\DashboardBundle\Model;
 use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -111,10 +110,7 @@ class ConfigProvider extends PhpArrayConfigProvider
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_dashboard',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_dashboard', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (!empty($resource->data[Configuration::ROOT_NODE_NAME])) {

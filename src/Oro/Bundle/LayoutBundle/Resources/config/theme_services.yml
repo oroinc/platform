@@ -87,6 +87,7 @@ services:
             - '@oro_layout.loader'
             - '@oro_layout.cache.block_view_cache'
             - [] # exclude patterns; they are set by Oro\Bundle\LayoutBundle\DependencyInjection\OroLayoutExtension
+            - ['../templates/layouts']
 
     oro_layout.theme_extension.resource_provider.theme.warmer:
         class: Oro\Component\Config\Cache\ConfigCacheWarmer

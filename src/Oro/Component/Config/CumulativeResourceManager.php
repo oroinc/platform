@@ -59,7 +59,7 @@ class CumulativeResourceManager
     }
 
     /**
-     * Gets a list of available bundles.
+     * Gets a list of available bundles with Application like a virtual bundle.
      *
      * @return array [bundle name => bundle class, ...]
      */

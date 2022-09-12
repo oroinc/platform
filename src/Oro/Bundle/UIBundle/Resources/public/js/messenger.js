@@ -49,7 +49,7 @@ define(function(require) {
         $el.data('_message', {type, message, options});
 
         if (opt.onClose) {
-            $el.find('button.close').click(opt.onClose);
+            $el.on('close.bs.alert', opt.onClose);
         }
 
         if (opt.hideCloseButton) {
@@ -98,6 +98,7 @@ define(function(require) {
          * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
          * @param {string=} options.namespace slot for a massage,
          *     other existing message with the same namespace will be removed
+         * @param {Function?} options.onClose handler that is executed once user close the alert
          *
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
@@ -142,6 +143,7 @@ define(function(require) {
          * @param {boolean?} options.afterReload whether the message should be shown after a page is reloaded
          * @param {string=} options.namespace slot for a massage,
          *     other existing message with the same namespace will be removed
+         * @param {Function?} options.onClose handler that is executed once user close the alert
          *
          * @return {Object} collection of methods - actions over message element,
          *      at the moment there's only one method 'close', allows to close the message
@@ -217,15 +219,22 @@ define(function(require) {
         },
 
         /**
-         * Clears all messages within namespace
+         * Clears all messages within namespace or by selector
          *
-         * @param {string} namespace
+         * @param {string?} namespace
          * @param {Object=} options
+         * @param {string} options.clearSelector selector for messages to remove
          */
-        clear: function(namespace, options) {
-            const opt = _.extend({}, defaults, options || {});
-            $(opt.container).add(opt.temporaryContainer)
-                .find('[data-messenger-namespace=' + namespace + ']').remove();
+        clear: function(namespace, options = {}) {
+            const opt = _.extend({}, defaults, options);
+            const selectors = [];
+            if (namespace) {
+                selectors.push(`[data-messenger-namespace="${namespace}"]`);
+            }
+            if (options.clearSelector) {
+                selectors.push(options.clearSelector);
+            }
+            $(opt.container).add(opt.temporaryContainer).find(selectors.join(',')).remove();
         },
 
         removeTemporaryContainer: function() {
