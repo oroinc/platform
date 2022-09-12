@@ -7,7 +7,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\IntegrationBundle\Async\ReversSyncIntegrationProcessor;
-use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Async\Topic\ReverseSyncIntegrationTopic;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
@@ -21,7 +21,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -35,27 +34,30 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     use ClassExtensionTrait;
     use IntegrationTokenAwareTestTrait;
 
-    public function testShouldImplementMessageProcessorInterface()
+    public function testShouldImplementMessageProcessorInterface(): void
     {
         $this->assertClassImplements(MessageProcessorInterface::class, ReversSyncIntegrationProcessor::class);
     }
 
-    public function testShouldImplementTopicSubscriberInterface()
+    public function testShouldImplementTopicSubscriberInterface(): void
     {
         $this->assertClassImplements(TopicSubscriberInterface::class, ReversSyncIntegrationProcessor::class);
     }
 
-    public function testShouldImplementContainerAwareInterface()
+    public function testShouldImplementContainerAwareInterface(): void
     {
         $this->assertClassImplements(ContainerAwareInterface::class, ReversSyncIntegrationProcessor::class);
     }
 
-    public function testShouldSubscribeOnReversSyncIntegrationTopic()
+    public function testShouldSubscribeOnReversSyncIntegrationTopic(): void
     {
-        $this->assertEquals([Topics::REVERS_SYNC_INTEGRATION], ReversSyncIntegrationProcessor::getSubscribedTopics());
+        self::assertEquals(
+            [ReverseSyncIntegrationTopic::getName()],
+            ReversSyncIntegrationProcessor::getSubscribedTopics()
+        );
     }
 
-    public function testCouldBeConstructedWithExpectedArguments()
+    public function testCouldBeConstructedWithExpectedArguments(): void
     {
         new ReversSyncIntegrationProcessor(
             $this->createDoctrineHelper(),
@@ -67,84 +69,14 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRejectAndLogIfMessageBodyMissIntegrationId()
+    public function testShouldRejectAndLogIfIntegrationNotExist(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with('Invalid message: integration_id and connector should not be empty');
-        $processor = new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelper(),
-            $this->createReversSyncProcessor(),
-            $this->createMock(TypesRegistry::class),
-            new JobRunner(),
-            $this->createMock(TokenStorageInterface::class),
-            $logger
-        );
-
-        $message = new Message();
-        $message->setBody('[]');
-
-        $session = $this->createMock(SessionInterface::class);
-        $status = $processor->process($message, $session);
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $status);
-    }
-
-    public function testThrowIfMessageBodyInvalidJson()
-    {
-        $this->expectException(\JsonException::class);
-
-        $processor = new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelper(),
-            $this->createReversSyncProcessor(),
-            $this->createMock(TypesRegistry::class),
-            new JobRunner(),
-            $this->createMock(TokenStorageInterface::class),
-            $this->createMock(LoggerInterface::class)
-        );
-
-        $message = new Message();
-        $message->setBody('[}');
-
-        $session = $this->createMock(SessionInterface::class);
-        $processor->process($message, $session);
-    }
-
-    public function testRejectAndLogIfMessageBodyMissConnector()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with(
-                'Invalid message: integration_id and connector should not be empty'
-            );
-        $processor = new ReversSyncIntegrationProcessor(
-            $this->createDoctrineHelper(),
-            $this->createReversSyncProcessor(),
-            $this->createMock(TypesRegistry::class),
-            new JobRunner(),
-            $this->createMock(TokenStorageInterface::class),
-            $logger
-        );
-
-        $message = new Message();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId']));
-
-        $session = $this->createMock(SessionInterface::class);
-        $status = $processor->process($message, $session);
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $status);
-    }
-
-    public function testShouldRejectAndLogIfIntegrationNotExist()
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
+        $logger->expects(self::once())
             ->method('critical')
             ->with('Integration should exist and be enabled');
         $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn(null);
@@ -159,25 +91,25 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'connector']));
+        $message->setBody(['integration_id' => 'theIntegrationId', 'connector' => 'connector']);
 
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $status);
+        self::assertEquals(MessageProcessorInterface::REJECT, $status);
     }
 
-    public function testShouldRejectAndLogIfIntegrationIsNotEnabled()
+    public function testShouldRejectAndLogIfIntegrationIsNotEnabled(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
+        $logger->expects(self::once())
             ->method('critical')
             ->with('Integration should exist and be enabled');
         $integration = new Integration();
         $integration->setEnabled(false);
 
         $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
@@ -192,22 +124,22 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'connector']));
+        $message->setBody(['integration_id' => 'theIntegrationId', 'connector' => 'connector']);
 
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $status);
+        self::assertEquals(MessageProcessorInterface::REJECT, $status);
     }
 
-    public function testRejectIfConnectionIsNotInstanceOfTwoWaySyncConnector()
+    public function testRejectIfConnectionIsNotInstanceOfTwoWaySyncConnector(): void
     {
         $integration = new Integration();
         $integration->setEnabled(true);
         $integration->setType('theIntegrationType');
 
         $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
@@ -232,12 +164,12 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
+        $message->setBody(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']);
 
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
-        $this->assertEquals(MessageProcessorInterface::REJECT, $status);
+        self::assertEquals(MessageProcessorInterface::REJECT, $status);
     }
 
     public function testShouldRunSyncAsUniqueJobEmptyToken(): void
@@ -258,7 +190,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration->setOrganization(new Organization());
 
         $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
@@ -280,7 +212,11 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
+        $message->setBody([
+            'integration_id' => 'theIntegrationId',
+            'connector' => 'theConnector',
+            'connector_parameters' => [],
+        ]);
         $message->setMessageId('theMessageId');
 
         $session = $this->createMock(SessionInterface::class);
@@ -292,7 +228,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('theMessageId', $uniqueJobs[0]['ownerId']);
     }
 
-    public function testShouldPerformReversSyncIfConnectorIsInstanceOfTwoWaySyncInterface()
+    public function testShouldPerformReversSyncIfConnectorIsInstanceOfTwoWaySyncInterface(): void
     {
         $integration = new Integration();
         $integration->setEnabled(true);
@@ -300,7 +236,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         $integration->setOrganization(new Organization());
 
         $entityManager = $this->createEntityManager();
-        $entityManager->expects($this->once())
+        $entityManager->expects(self::once())
             ->method('find')
             ->with(Integration::class, 'theIntegrationId')
             ->willReturn($integration);
@@ -321,41 +257,39 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         );
 
         $message = new Message();
-        $message->setBody(JSON::encode(['integration_id' => 'theIntegrationId', 'connector' => 'theConnector']));
+        $message->setBody([
+            'integration_id' => 'theIntegrationId',
+            'connector' => 'theConnector',
+            'connector_parameters' => [],
+        ]);
 
         $session = $this->createMock(SessionInterface::class);
         $status = $processor->process($message, $session);
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $status);
+        self::assertEquals(MessageProcessorInterface::ACK, $status);
     }
 
-    /**
-     * @return ReverseSyncProcessor|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createReversSyncProcessor()
+    private function createReversSyncProcessor(): ReverseSyncProcessor|\PHPUnit\Framework\MockObject\MockObject
     {
         $reverseSyncProcessor = $this->createMock(ReverseSyncProcessor::class);
-        $reverseSyncProcessor->expects($this->any())
+        $reverseSyncProcessor->expects(self::any())
             ->method('getLoggerStrategy')
             ->willReturn(new LoggerStrategy());
 
         return $reverseSyncProcessor;
     }
 
-    /**
-     * @return EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function createEntityManager()
+    private function createEntityManager(): EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject
     {
         $configuration = new Configuration();
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->any())
+        $connection->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
 
         $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects($this->any())
+        $entityManager->expects(self::any())
             ->method('getConnection')
             ->willReturn($connection);
 
@@ -365,7 +299,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     private function createDoctrineHelper(EntityManagerInterface $entityManager = null): DoctrineHelper
     {
         $helper = $this->createMock(DoctrineHelper::class);
-        $helper->expects($this->any())
+        $helper->expects(self::any())
             ->method('getEntityManagerForClass')
             ->willReturn($entityManager);
 
