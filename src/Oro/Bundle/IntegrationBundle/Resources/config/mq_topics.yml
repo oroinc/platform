@@ -1,0 +1,7 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic: ~
+    Oro\Bundle\IntegrationBundle\Async\Topic\ReverseSyncIntegrationTopic: ~

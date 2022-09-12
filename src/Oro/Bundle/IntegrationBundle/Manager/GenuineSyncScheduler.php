@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -28,7 +28,7 @@ class GenuineSyncScheduler
     public function schedule($integrationId, $connector = null, array $connectorParameters = [])
     {
         $this->producer->send(
-            Topics::SYNC_INTEGRATION,
+            SyncIntegrationTopic::getName(),
             new Message(
                 [
                     'integration_id'       => $integrationId,
