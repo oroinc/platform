@@ -9,7 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProviderInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -47,30 +46,25 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $messageData = JSON::decode($message->getBody());
-        if (!isset($messageData['attributeFamilyId'])) {
-            $this->logger->critical('Invalid message: key "attributeFamilyId" is missing.');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         $attributeFamilyRepository = $this->doctrineHelper->getEntityRepositoryForClass(AttributeFamily::class);
         /** @var AttributeFamily $attributeFamily */
-        $attributeFamily = $attributeFamilyRepository->find($messageData['attributeFamilyId']);
+        $attributeFamily = $attributeFamilyRepository->find($messageBody['attributeFamilyId']);
 
         $manager = $this->doctrineHelper->getEntityManagerForClass($attributeFamily->getEntityClass());
         $manager->beginTransaction();
         try {
             $this->deletedAttributeProvider->removeAttributeValues(
                 $attributeFamily,
-                $messageData['attributeNames']
+                $messageBody['attributeNames']
             );
 
             $manager->commit();
         } catch (\Exception $e) {
             $manager->rollback();
             $this->logger->error(
-                'Unexpected exception occurred during Deleting attribute relation',
+                'Unexpected exception occurred during deleting attribute relation',
                 ['exception' => $e]
             );
 

@@ -33,5 +33,6 @@ class OroIntegrationExtension extends Extension
         $loader->load('factories.yml');
         $loader->load('action_handler.yml');
         $loader->load('commands.yml');
+        $loader->load('mq_topics.yml');
     }
 }
