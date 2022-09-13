@@ -172,87 +172,79 @@ class IncludeMapManager
             return new IncludedData($this->itemKeyBuilder, $includeAccessor, $this->fileLockManager);
         }
 
-        $indexFileName = $this->fileNameProvider->getIncludeIndexFileName($operationId);
-        $indexLockFileName = $this->acquireReadLock($indexFileName);
-        if (!$indexLockFileName) {
-            $this->logger->warning(sprintf(
-                'Not possible to get included items now because the lock cannot be acquired for the "%s" file.',
-                $indexFileName
-            ));
+        return $this->doWithLock(
+            $this->fileNameProvider->getIncludeIndexFileName($operationId),
+            function () use ($fileManager, $operationId, $includeAccessor, $relationships) {
+                $loadedItems = [];
+                $processedRelationships = [];
+                $indexData = $this->loadIndexData($fileManager, $operationId);
+                $processedIndexData = $this->loadProcessedIndexData($fileManager, $operationId);
+                $includedItemIndexes = $this->loadIncludedItems(
+                    $fileManager,
+                    $includeAccessor,
+                    $indexData,
+                    $relationships,
+                    $processedRelationships,
+                    $loadedItems
+                );
 
-            return null;
-        }
+                $chunkFileNames = [];
+                $includedItems = [];
+                foreach ($includedItemIndexes as $fileIndex => $itemIndexes) {
+                    [$fileName, $sectionName, $firstItemOffset] = $indexData[self::FILES][$fileIndex];
+                    $chunkFileNames[] = $fileName;
+                    foreach ($itemIndexes as $itemIndex) {
+                        if (isset($loadedItems[$fileIndex][$itemIndex])) {
+                            $item = $loadedItems[$fileIndex][$itemIndex];
 
-        try {
-            $loadedItems = [];
-            $processedRelationships = [];
-            $indexData = $this->loadIndexData($fileManager, $operationId);
-            $processedIndexData = $this->loadProcessedIndexData($fileManager, $operationId);
-            $includedItemIndexes = $this->loadIncludedItems(
-                $fileManager,
-                $includeAccessor,
-                $indexData,
-                $relationships,
-                $processedRelationships,
-                $loadedItems
-            );
-        } catch (\Throwable $e) {
-            $this->fileLockManager->releaseLock($indexLockFileName);
-            throw $e;
-        }
-
-        $chunkFileNames = [];
-        $includedItems = [];
-        foreach ($includedItemIndexes as $fileIndex => $itemIndexes) {
-            [$fileName, $sectionName, $firstItemOffset] = $indexData[self::FILES][$fileIndex];
-            $chunkFileNames[] = $fileName;
-            foreach ($itemIndexes as $itemIndex) {
-                if (isset($loadedItems[$fileIndex][$itemIndex])) {
-                    $item = $loadedItems[$fileIndex][$itemIndex];
-                    [$itemType, $itemId] = $includeAccessor->getItemIdentifier($item);
-                    $itemKey = $this->itemKeyBuilder->buildItemKey($itemType, $itemId);
-                    $includedItems[$itemKey] = [$item, $firstItemOffset + $itemIndex, $sectionName];
+                            [$itemType, $itemId] = $includeAccessor->getItemIdentifier($item);
+                            $itemKey = $this->itemKeyBuilder->buildItemKey($itemType, $itemId);
+                            $includedItems[$itemKey] = [$item, $firstItemOffset + $itemIndex, $sectionName];
+                        }
+                    }
                 }
+
+                $processedItems = [];
+                foreach ($processedRelationships as $itemKey => $val) {
+                    if (!isset($includedItems[$itemKey]) && isset($processedIndexData[$itemKey])) {
+                        $processedItems[$itemKey] = $processedIndexData[$itemKey];
+                    }
+                }
+
+                if (!$includedItems) {
+                    return new IncludedData(
+                        $this->itemKeyBuilder,
+                        $includeAccessor,
+                        $this->fileLockManager,
+                        null,
+                        [],
+                        $processedItems
+                    );
+                }
+
+                $this->markAsLinked($fileManager, $operationId, array_keys($includedItems));
+                $lockFileNames = $this->acquireLockForChunkFiles($chunkFileNames);
+                if (null === $lockFileNames) {
+                    return null;
+                }
+
+                return new IncludedData(
+                    $this->itemKeyBuilder,
+                    $includeAccessor,
+                    $this->fileLockManager,
+                    $lockFileNames,
+                    $includedItems,
+                    $processedItems
+                );
+            },
+            function ($indexFileName) {
+                $this->logger->warning(sprintf(
+                    'Not possible to get included items now because the lock cannot be acquired for the "%s" file.',
+                    $indexFileName
+                ));
+
+                return null;
             }
-        }
-
-        $processedItems = [];
-        foreach ($processedRelationships as $itemKey => $val) {
-            if (!isset($includedItems[$itemKey]) && isset($processedIndexData[$itemKey])) {
-                $processedItems[$itemKey] = $processedIndexData[$itemKey];
-            }
-        }
-
-        if (!$includedItems) {
-            $this->fileLockManager->releaseLock($indexLockFileName);
-
-            return new IncludedData(
-                $this->itemKeyBuilder,
-                $includeAccessor,
-                $this->fileLockManager,
-                null,
-                [],
-                $processedItems
-            );
-        }
-
-        try {
-            $this->markAsLinked($fileManager, $operationId, array_keys($includedItems));
-            $lockFileNames = $this->acquireLockForChunkFiles($chunkFileNames);
-        } finally {
-            $this->fileLockManager->releaseLock($indexLockFileName);
-        }
-        if (null === $lockFileNames) {
-            return null;
-        }
-
-        return new IncludedData(
-            $this->itemKeyBuilder,
-            $includeAccessor,
-            $this->fileLockManager,
-            $lockFileNames,
-            $includedItems,
-            $processedItems
         );
     }
 
@@ -265,51 +257,52 @@ class IncludeMapManager
      */
     public function moveToProcessed(FileManager $fileManager, int $operationId, array $dataToMove): void
     {
-        $indexFileName = $this->fileNameProvider->getIncludeIndexFileName($operationId);
-        $indexLockFileName = $this->acquireMoveToProcessedLock($indexFileName);
-        if (!$indexLockFileName) {
-            throw new RuntimeException(sprintf(
-                'Not possible to move included items to processed'
-                . ' because the lock cannot be acquired for the "%s" file.',
-                $indexFileName
-            ));
-        }
+        $this->doWithLock(
+            $this->fileNameProvider->getIncludeIndexFileName($operationId),
+            function () use ($fileManager, $operationId, $dataToMove) {
+                $indexData = $this->loadIndexData($fileManager, $operationId);
+                $processedIndexData = $this->loadProcessedIndexData($fileManager, $operationId);
 
-        try {
-            $indexData = $this->loadIndexData($fileManager, $operationId);
-            $processedIndexData = $this->loadProcessedIndexData($fileManager, $operationId);
-
-            $itemsToRemove = [];
-            foreach ($dataToMove as [$type, $id, $newId]) {
-                $itemKey = $this->itemKeyBuilder->buildItemKey($type, $id);
-                $processedIndexData[$itemKey] = $newId;
-                $item = $indexData[self::ITEMS][$itemKey] ?? null;
-                if (null !== $item) {
-                    unset($indexData[self::ITEMS][$itemKey]);
-                    [$fileIndex, $itemIndex] = $item;
-                    $itemsToRemove[$fileIndex][] = $itemIndex;
+                $itemsToRemove = [];
+                foreach ($dataToMove as [$type, $id, $newId]) {
+                    $itemKey = $this->itemKeyBuilder->buildItemKey($type, $id);
+                    $processedIndexData[$itemKey] = $newId;
+                    $item = $indexData[self::ITEMS][$itemKey] ?? null;
+                    if (null !== $item) {
+                        unset($indexData[self::ITEMS][$itemKey]);
+                        [$fileIndex, $itemIndex] = $item;
+                        $itemsToRemove[$fileIndex][] = $itemIndex;
+                    }
                 }
-            }
-            foreach ($itemsToRemove as $fileIndex => $itemIndexes) {
-                $file = $indexData[self::FILES][$fileIndex];
-                $fileName = $file[self::FILE_NAME];
-                $sectionName = $file[self::FILE_SECTION_NAME];
-                $fileData = JsonUtil::decode($fileManager->getFileContent($fileName));
-                foreach ($itemIndexes as $itemIndex) {
-                    $fileData[$sectionName][$itemIndex] = null;
+                foreach ($itemsToRemove as $fileIndex => $itemIndexes) {
+                    $file = $indexData[self::FILES][$fileIndex];
+                    $fileName = $file[self::FILE_NAME];
+                    $sectionName = $file[self::FILE_SECTION_NAME];
+                    $fileData = JsonUtil::decode($fileManager->getFileContent($fileName));
+                    foreach ($itemIndexes as $itemIndex) {
+                        $fileData[$sectionName][$itemIndex] = null;
+                    }
+                    if ($this->isChunkFileEmpty($fileData)) {
+                        $fileManager->deleteFile($fileName);
+                        $indexData[self::FILES][$fileIndex][self::FILE_NAME] = '';
+                    } else {
+                        $fileManager->writeToStorage(JsonUtil::encode($fileData), $fileName);
+                    }
                 }
-                if ($this->isChunkFileEmpty($fileData)) {
-                    $fileManager->deleteFile($fileName);
-                    $indexData[self::FILES][$fileIndex][self::FILE_NAME] = '';
-                } else {
-                    $fileManager->writeToStorage(JsonUtil::encode($fileData), $fileName);
-                }
-            }
-            $this->saveProcessedIndexData($fileManager, $operationId, $processedIndexData);
-            $this->saveIndexData($fileManager, $operationId, $indexData);
-        } finally {
-            $this->fileLockManager->releaseLock($indexLockFileName);
-        }
+                $this->saveProcessedIndexData($fileManager, $operationId, $processedIndexData);
+                $this->saveIndexData($fileManager, $operationId, $indexData);
+            },
+            function ($indexFileName) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Not possible to move included items to processed'
+                            . ' because the lock cannot be acquired for the "%s" file.',
+                        $indexFileName
+                    )
+                );
+            },
+            false
+        );
     }
 
     /**
@@ -631,5 +624,25 @@ class IncludeMapManager
         }
 
         return $lockFileNames;
+    }
+
+    private function doWithLock(
+        string $indexFileName,
+        callable $closure,
+        callable $failLockClosure,
+        bool $readLock = true
+    ) {
+        $lockFileName = $readLock
+            ? $this->acquireReadLock($indexFileName)
+            : $this->acquireMoveToProcessedLock($indexFileName);
+        if (!$lockFileName) {
+            return $failLockClosure($indexFileName);
+        }
+
+        try {
+            return $closure();
+        } finally {
+            $this->fileLockManager->releaseLock($lockFileName);
+        }
     }
 }
