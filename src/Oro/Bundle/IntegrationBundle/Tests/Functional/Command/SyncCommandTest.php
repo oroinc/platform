@@ -12,7 +12,6 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\Testing\Unit\EntityTrait;
 
@@ -78,18 +77,13 @@ class SyncCommandTest extends WebTestCase
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
-        self::assertMessageSent(
-            SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => $integration->getId(),
-                    'connector_parameters' => [],
-                    'connector' => null,
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
-        );
+        self::assertMessageSent(SyncIntegrationTopic::getName(), [
+            'integration_id' => $integration->getId(),
+            'connector_parameters' => [],
+            'connector' => null,
+            'transport_batch_size' => 100,
+        ]);
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
     }
 
     public function testShouldSendSyncIntegrationWithCustomConnectorAndOptions(): void
@@ -109,21 +103,16 @@ class SyncCommandTest extends WebTestCase
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
-        self::assertMessageSent(
-            SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => $integration->getId(),
-                    'connector_parameters' => [
-                        'fooConnectorOption' => 'fooValue',
-                        'barConnectorOption' => 'barValue',
-                    ],
-                    'connector' => 'theConnector',
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
-        );
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
+        self::assertMessageSent(SyncIntegrationTopic::getName(), [
+            'integration_id' => $integration->getId(),
+            'connector_parameters' => [
+                'fooConnectorOption' => 'fooValue',
+                'barConnectorOption' => 'barValue',
+            ],
+            'connector' => 'theConnector',
+            'transport_batch_size' => 100,
+        ]);
     }
 
     public function testShouldSendSyncIntegrationWithStaleJob(): void
@@ -154,18 +143,13 @@ class SyncCommandTest extends WebTestCase
 
         self::assertStringContainsString('Schedule sync for "Foo Integration" integration.', $result);
 
-        self::assertMessageSent(
-            SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => $integration->getId(),
-                    'connector_parameters' => [],
-                    'connector' => null,
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
-        );
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
+        self::assertMessageSent(SyncIntegrationTopic::getName(), [
+            'integration_id' => $integration->getId(),
+            'connector_parameters' => [],
+            'connector' => null,
+            'transport_batch_size' => 100,
+        ]);
 
         self::assertNotEmpty(
             $this->getJobRepository()->findRootJobByJobNameAndStatuses(

@@ -79,7 +79,7 @@ trait SendChangedEntitiesToMessageQueueExtensionTrait
 
     private function getFirstEntitiesChangedMessage(): Message
     {
-        $messages = self::getSentMessages();
+        $messages = self::getSentMessages(false);
 
         //guard
         $this->assertGreaterThanOrEqual(1, count($messages));

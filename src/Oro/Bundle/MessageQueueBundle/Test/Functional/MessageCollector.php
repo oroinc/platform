@@ -10,8 +10,33 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
  */
 class MessageCollector extends BaseMessageCollector
 {
-    public function __construct(MessageProducerInterface $messageProducer)
-    {
+    private DriverMessageCollector $driverMessageCollector;
+
+    public function __construct(
+        MessageProducerInterface $messageProducer,
+        DriverMessageCollector $driverMessageCollector
+    ) {
         parent::__construct($messageProducer);
+
+        $this->driverMessageCollector = $driverMessageCollector;
+    }
+
+    public function getSentMessages(): array
+    {
+        return array_values($this->driverMessageCollector->getSentMessages());
+    }
+
+    public function clearTopicMessages($topic): self
+    {
+        $this->driverMessageCollector->clearTopicMessages($topic);
+
+        return $this;
+    }
+
+    public function clear(): self
+    {
+        $this->driverMessageCollector->clear();
+
+        return $this;
     }
 }

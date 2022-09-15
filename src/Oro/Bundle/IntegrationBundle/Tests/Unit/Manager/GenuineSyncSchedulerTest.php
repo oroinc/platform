@@ -5,7 +5,6 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 use Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -28,16 +27,14 @@ class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
 
         self::assertMessageSent(
             SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => 'theIntegrationId',
-                    'connector' => null,
-                    'connector_parameters' => [],
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
+            [
+                'integration_id' => 'theIntegrationId',
+                'connector' => null,
+                'connector_parameters' => [],
+                'transport_batch_size' => 100,
+            ]
         );
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
     }
 
     public function testShouldAllowPassConnectorNameAndOptions(): void
@@ -50,15 +47,13 @@ class GenuineSyncSchedulerTest extends \PHPUnit\Framework\TestCase
 
         self::assertMessageSent(
             SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => 'theIntegrationId',
-                    'connector' => 'theConnectorName',
-                    'connector_parameters' => ['theOption' => 'theValue'],
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
+            [
+                'integration_id' => 'theIntegrationId',
+                'connector' => 'theConnectorName',
+                'connector_parameters' => ['theOption' => 'theValue'],
+                'transport_batch_size' => 100,
+            ]
         );
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
     }
 }
