@@ -20,6 +20,9 @@ The current file describes significant changes in the code that may affect the u
 * Removed `renderWysiwygContentPreview` TWIG macro from EntityConfigBundle, use `renderWysiwygContentPreview` or
   `renderCollapsibleWysiwygContentPreview` from UIBundle instead.
 
+#### InstallerBundle
+* Removed `Oro\Bundle\InstallerBundle\EventListener\AssetsInstallCommandListener`, use JS packages from NPM
+
 ## 5.1.0-alpha.2 (2022-08-01)
 [Show detailed list of changes](incompatibilities-5-1-alpha-2.md)
 
