@@ -2,42 +2,28 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Job;
 
-use Oro\Bundle\MessageQueueBundle\Test\Async\RedeliveryAwareMessageProcessor;
 use Oro\Bundle\MessageQueueBundle\Test\Async\Topic\SampleChildJobTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\MessageProducerInterface;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
-use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Exception\JobCannotBeStartedException;
 use Oro\Component\MessageQueue\Job\Job;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class JobRunnerTest extends WebTestCase
 {
     use JobsAwareTestTrait;
-
-    private MessageProducerInterface $messageProducer;
-
-    private QueueConsumer $consumer;
+    use MessageQueueExtension;
 
     protected function setUp(): void
     {
         $this->initClient();
-        $container = self::getContainer();
-        $this->messageProducer = $container->get('oro_message_queue.message_producer');
-        $this->consumer = $container->get('oro_message_queue.consumption.queue_consumer');
 
-        $this->clearMessages();
-        RedeliveryAwareMessageProcessor::clearProcessedMessages();
+        self::purgeMessageQueue();
     }
 
     protected function tearDown(): void
     {
-        $this->clearMessages();
-        RedeliveryAwareMessageProcessor::clearProcessedMessages();
+        self::purgeMessageQueue();
     }
 
     public function testMessageWithFailedJobIsRejected(): void
@@ -45,7 +31,7 @@ class JobRunnerTest extends WebTestCase
         $childJob = $this->createDelayedJob();
         $this->getJobProcessor()->failChildJob($childJob);
 
-        $this->messageProducer->send(SampleChildJobTopic::getName(), ['jobId' => $childJob->getId()]);
+        self::sendMessage(SampleChildJobTopic::getName(), ['jobId' => $childJob->getId()]);
 
         $this->expectException(JobCannotBeStartedException::class);
         $this->expectErrorMessage(
@@ -56,22 +42,6 @@ class JobRunnerTest extends WebTestCase
             )
         );
 
-        $this->consumer->bind('oro.default');
-        $this->consumer->consume(
-            new ChainExtension([
-                new LimitConsumedMessagesExtension(1)
-            ])
-        );
-    }
-
-    private function clearMessages(): void
-    {
-        $connection = self::getContainer()->get(
-            'oro_message_queue.transport.dbal.connection',
-            ContainerInterface::NULL_ON_INVALID_REFERENCE
-        );
-        if ($connection instanceof DbalConnection) {
-            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
-        }
+        self::consume();
     }
 }

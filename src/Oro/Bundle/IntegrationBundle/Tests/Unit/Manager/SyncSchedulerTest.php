@@ -1,10 +1,10 @@
 <?php
+
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\IntegrationBundle\Async\Topic\ReverseSyncIntegrationTopic;
 use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
@@ -25,14 +25,13 @@ class SyncSchedulerTest extends \PHPUnit\Framework\TestCase
 
         self::assertMessageSent(
             ReverseSyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => 'theIntegrationId',
-                    'connector_parameters' => ['connectorOption' => 'connectorOptionValue'],
-                    'connector' => 'theConnectorName',
-                ],
-                MessagePriority::VERY_LOW
-            )
+            [
+                'integration_id' => 'theIntegrationId',
+                'connector_parameters' => ['connectorOption' => 'connectorOptionValue'],
+                'connector' => 'theConnectorName',
+
+            ]
         );
+        self::assertMessageSentWithPriority(ReverseSyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
     }
 }

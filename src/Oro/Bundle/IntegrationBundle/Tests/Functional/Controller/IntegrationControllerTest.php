@@ -56,8 +56,7 @@ class IntegrationControllerTest extends WebTestCase
         self::assertTrue($result['successful']);
         self::assertNotEmpty($result['message']);
 
-        $traces = self::getMessageCollector()->getTopicSentMessages(SyncIntegrationTopic::getName());
-        self::assertCount(1, $traces);
+        self::assertCountMessages(SyncIntegrationTopic::getName(), 1);
     }
 
     public function testCreate(): array

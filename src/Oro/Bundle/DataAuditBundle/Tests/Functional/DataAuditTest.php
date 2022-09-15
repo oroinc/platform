@@ -2249,7 +2249,7 @@ class DataAuditTest extends WebTestCase
 
             foreach ($processor::getSubscribedTopics() as $topic) {
                 $message = $this->getSentMessage($topic);
-                $messageModel = $session->createMessage($message->getBody());
+                $messageModel = $session->createMessage($message);
                 $messageModel->setMessageId('oro_owner');
 
                 $processor->process($messageModel, $session);
