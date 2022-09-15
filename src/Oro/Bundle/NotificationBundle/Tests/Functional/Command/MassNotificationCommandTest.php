@@ -16,7 +16,7 @@ class MassNotificationCommandTest extends WebTestCase
         $this->initClient([], self::generateBasicAuthHeader());
 
         self::clearMessageCollector();
-        self::assertCount(0, self::getSentMessagesByTopic(SendMassEmailNotificationTopic::getName()));
+        self::assertMessagesCount(SendMassEmailNotificationTopic::getName(), 0);
 
         $result = self::runCommand(
             MassNotificationCommand::getDefaultName(),
@@ -29,7 +29,7 @@ class MassNotificationCommandTest extends WebTestCase
         );
         self::assertStringContainsString('1 notifications have been added to the queue', $result);
 
-        self::assertCount(1, self::getSentMessagesByTopic(SendMassEmailNotificationTopic::getName()));
+        self::assertMessagesCount(SendMassEmailNotificationTopic::getName(), 1);
         self::clearMessageCollector();
     }
 }

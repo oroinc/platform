@@ -13,7 +13,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
@@ -172,21 +171,19 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
             Topics::EXPORT,
-            new Message(
-                [
-                    'jobName'        => 'test',
-                    'processorAlias' => 'test',
-                    'outputFormat'   => 'csv',
-                    'organizationId' => '22',
-                    'exportType'     => 'export',
-                    'options'        => [],
-                    'processor'      => 'export',
-                    'entity'         => 'Acme',
-                    'jobId'          => 10
-                ],
-                MessagePriority::LOW
-            )
+            [
+                'jobName'        => 'test',
+                'processorAlias' => 'test',
+                'outputFormat'   => 'csv',
+                'organizationId' => '22',
+                'exportType'     => 'export',
+                'options'        => [],
+                'processor'      => 'export',
+                'entity'         => 'Acme',
+                'jobId'          => 10
+            ]
         );
+        self::assertMessageSentWithPriority(Topics::EXPORT, MessagePriority::LOW);
     }
 
     private function createJob(int $id, Job $rootJob = null): Job

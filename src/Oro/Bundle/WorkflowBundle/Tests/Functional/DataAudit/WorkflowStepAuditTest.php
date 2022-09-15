@@ -136,7 +136,7 @@ class WorkflowStepAuditTest extends WebTestCase
                 ]
             ]
         ];
-        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName())->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         self::assertThat(
             $messageBody['entities_updated'],
             new ArrayContainsConstraint($expectedChanges)
@@ -175,7 +175,7 @@ class WorkflowStepAuditTest extends WebTestCase
                 ]
             ]
         ];
-        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName())->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         self::assertThat(
             $messageBody['entities_updated'],
             new ArrayContainsConstraint($expectedChanges)
@@ -218,7 +218,7 @@ class WorkflowStepAuditTest extends WebTestCase
                 ]
             ]
         ];
-        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName())->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
         self::assertThat(
             $messageBody['entities_updated'],
             new ArrayContainsConstraint($expectedChanges)

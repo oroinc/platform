@@ -14,7 +14,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
@@ -65,16 +64,15 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
     private static function assertSentChanges(array $expectedChanges): void
     {
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
+
         self::assertEquals(
             $expectedChanges,
             [
-                'entities_inserted'   => $body['entities_inserted'],
-                'entities_deleted'    => $body['entities_deleted'],
-                'entities_updated'    => $body['entities_updated'],
-                'collections_updated' => $body['collections_updated']
+                'entities_inserted'   => $messageBody['entities_inserted'],
+                'entities_deleted'    => $messageBody['entities_deleted'],
+                'entities_updated'    => $messageBody['entities_updated'],
+                'collections_updated' => $messageBody['collections_updated']
             ]
         );
     }
@@ -137,27 +135,22 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        $this->assertInstanceOf(Message::class, $message);
+        $this->assertArrayHasKey('timestamp', $messageBody);
+        $this->assertArrayHasKey('transaction_id', $messageBody);
 
-        $body = $message->getBody();
+        $this->assertArrayHasKey('entities_updated', $messageBody);
+        $this->assertIsArray($messageBody['entities_updated']);
 
-        $this->assertArrayHasKey('timestamp', $body);
-        $this->assertArrayHasKey('transaction_id', $body);
+        $this->assertArrayHasKey('entities_deleted', $messageBody);
+        $this->assertIsArray($messageBody['entities_deleted']);
 
-        $this->assertArrayHasKey('entities_updated', $body);
-        $this->assertIsArray($body['entities_updated']);
+        $this->assertArrayHasKey('entities_inserted', $messageBody);
+        $this->assertIsArray($messageBody['entities_inserted']);
 
-        $this->assertArrayHasKey('entities_deleted', $body);
-        $this->assertIsArray($body['entities_deleted']);
-
-        $this->assertArrayHasKey('entities_inserted', $body);
-        $this->assertIsArray($body['entities_inserted']);
-
-        $this->assertArrayHasKey('collections_updated', $body);
-        $this->assertIsArray($body['collections_updated']);
+        $this->assertArrayHasKey('collections_updated', $messageBody);
+        $this->assertIsArray($messageBody['collections_updated']);
     }
 
     public function testShouldSendMessageWithVeryLowPriority()
@@ -170,9 +163,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        self::assertEquals(MessagePriority::VERY_LOW, $message->getPriority());
+        self::assertMessageSentWithPriority(AuditChangedEntitiesTopic::getName(), MessagePriority::VERY_LOW);
     }
 
     public function testShouldSetTimestampToMessage()
@@ -189,15 +180,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('timestamp', $body);
-        self::assertNotEmpty($body['timestamp']);
+        self::assertArrayHasKey('timestamp', $messageBody);
+        self::assertNotEmpty($messageBody['timestamp']);
 
-        self::assertGreaterThan(time() - 10, $body['timestamp']);
-        self::assertLessThan(time() + 10, $body['timestamp']);
+        self::assertGreaterThan(time() - 10, $messageBody['timestamp']);
+        self::assertLessThan(time() + 10, $messageBody['timestamp']);
     }
 
     public function testShouldSetTransactionIdToMessage()
@@ -214,12 +203,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('transaction_id', $body);
-        self::assertNotEmpty($body['transaction_id']);
+        self::assertArrayHasKey('transaction_id', $messageBody);
+        self::assertNotEmpty($messageBody['transaction_id']);
     }
 
     public function testShouldSendInsertedEntity()
@@ -836,9 +823,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 
         $em->flush();
 
-        $sentMessages = self::getSentMessagesByTopic(AuditChangedEntitiesTopic::getName());
-
-        self::assertCount(2, $sentMessages);
+        self::assertMessagesCount(AuditChangedEntitiesTopic::getName(), 2);
     }
 
     public function testShouldNotSendLoggedInUserInfoIfPresentButNotUserInstance()
@@ -855,12 +840,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayNotHasKey('user_id', $body);
-        self::assertArrayNotHasKey('user_class', $body);
+        self::assertArrayNotHasKey('user_id', $messageBody);
+        self::assertArrayNotHasKey('user_class', $messageBody);
     }
 
     public function testShouldSendLoggedInUserInfoIfPresent()
@@ -880,15 +863,13 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('user_id', $body);
-        self::assertSame(123, $body['user_id']);
+        self::assertArrayHasKey('user_id', $messageBody);
+        self::assertSame(123, $messageBody['user_id']);
 
-        self::assertArrayHasKey('user_class', $body);
-        self::assertSame(User::class, $body['user_class']);
+        self::assertArrayHasKey('user_class', $messageBody);
+        self::assertSame(User::class, $messageBody['user_class']);
     }
 
     public function testShouldSendOwnerDescriptionIfPresent()
@@ -908,12 +889,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('owner_description', $body);
-        self::assertSame('Test Description', $body['owner_description']);
+        self::assertArrayHasKey('owner_description', $messageBody);
+        self::assertSame('Test Description', $messageBody['owner_description']);
     }
 
     public function testShouldSendOrganizationInfoIfPresent()
@@ -933,12 +912,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('organization_id', $body);
-        self::assertSame(123, $body['organization_id']);
+        self::assertArrayHasKey('organization_id', $messageBody);
+        self::assertSame(123, $messageBody['organization_id']);
     }
 
     public function testShouldSendImpersonationInfoIfPresent()
@@ -959,12 +936,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('impersonation_id', $body);
-        self::assertSame(69, $body['impersonation_id']);
+        self::assertArrayHasKey('impersonation_id', $messageBody);
+        self::assertSame(69, $messageBody['impersonation_id']);
     }
 
     public function testShouldSendAdditionalUpdates()
@@ -995,7 +970,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                 'change_set' => $additionalChanges,
             ]
         ];
-        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
+        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']['entities_updated']);
     }
 
     public function testShouldSendCollectionUpdatesWithDifferentAssociation(): void
@@ -1096,7 +1071,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                 'change_set' => array_merge(['stringProperty' => ['string', 'new string']], $additionalChanges),
             ]
         ];
-        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']->getBody()['entities_updated']);
+        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']['entities_updated']);
     }
 
     public function testShouldSendUpdatedEntityWithIdFromUnitOfWorkInsteadOfIdFromEntityObject()
@@ -1233,12 +1208,10 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('owner_description', $body);
-        self::assertSame('Integration: #1', $body['owner_description']);
+        self::assertArrayHasKey('owner_description', $messageBody);
+        self::assertSame('Integration: #1', $messageBody['owner_description']);
     }
 
     public function testShouldSendOwnerDescriptionUsingAuthorName()
@@ -1256,11 +1229,9 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
         $em->persist($entity);
         $em->flush();
 
-        /** @var Message $message */
-        $message = self::getSentMessage(AuditChangedEntitiesTopic::getName());
-        $body = $message->getBody();
+        $messageBody = self::getSentMessage(AuditChangedEntitiesTopic::getName());
 
-        self::assertArrayHasKey('owner_description', $body);
-        self::assertSame('John Doe - admin@example.com', $body['owner_description']);
+        self::assertArrayHasKey('owner_description', $messageBody);
+        self::assertSame('John Doe - admin@example.com', $messageBody['owner_description']);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Test\Assert;
 
+use Oro\Component\MessageQueue\Client\Message;
+
 /**
  * Constraint that checks if exactly given messages were sent.
  */
@@ -24,6 +26,14 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
     {
         $comparatorFactory = \SebastianBergmann\Comparator\Factory::getInstance();
         try {
+            $other = array_map(function (array $array) {
+                if ($array['message'] instanceof Message) {
+                    $array['message'] = $array['message']->getBody();
+                }
+
+                return $array;
+            }, $other);
+
             $comparator = $comparatorFactory->getComparatorFor($this->messages, $other);
             $comparator->assertEquals($this->messages, $other);
         } catch (\SebastianBergmann\Comparator\ComparisonFailure $f) {
