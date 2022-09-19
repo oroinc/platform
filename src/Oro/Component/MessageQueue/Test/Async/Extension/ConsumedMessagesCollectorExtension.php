@@ -2,12 +2,14 @@
 
 namespace Oro\Component\MessageQueue\Test\Async\Extension;
 
-use Monolog\Handler\TestHandler;
 use Monolog\Logger;
+use Oro\Bundle\TestFrameworkBundle\Monolog\Handler\TestHandler;
 use Oro\Component\MessageQueue\Client\Config as MessageQueueConfig;
+use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Consumption\AbstractExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,10 +22,13 @@ class ConsumedMessagesCollectorExtension extends AbstractExtension
 
     private LoggerInterface $logger;
 
+    private MessageProcessorRegistryInterface $messageProcessorRegistry;
+
     private TestHandler $loggerTestHandler;
 
-    public function __construct(Logger $logger)
+    public function __construct(MessageProcessorRegistryInterface $messageProcessorRegistry, Logger $logger)
     {
+        $this->messageProcessorRegistry = $messageProcessorRegistry;
         $this->logger = $logger;
         $this->loggerTestHandler = new TestHandler();
     }
@@ -35,6 +40,20 @@ class ConsumedMessagesCollectorExtension extends AbstractExtension
         }
 
         $context->setLogger($this->logger);
+    }
+
+    /**
+     * Sets the common logger to message processors so their log records can be checked in tests.
+     */
+    public function onPreReceived(Context $context): void
+    {
+        $messageProcessor = $context->getMessageProcessorName();
+        if ($messageProcessor && $this->messageProcessorRegistry->has($messageProcessor)) {
+            $messageProcessor = $this->messageProcessorRegistry->get($messageProcessor);
+            if ($messageProcessor instanceof LoggerAwareInterface) {
+                $messageProcessor->setLogger($this->logger);
+            }
+        }
     }
 
     public function onPostReceived(Context $context): void

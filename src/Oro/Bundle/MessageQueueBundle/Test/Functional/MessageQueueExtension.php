@@ -24,6 +24,7 @@ trait MessageQueueExtension
     public function setUpMessageCollector()
     {
         self::clearMessageCollector();
+        self::purgeMessageQueue();
     }
 
     /**
@@ -35,7 +36,9 @@ trait MessageQueueExtension
      */
     protected static function tearDownMessageCollector(): void
     {
+        self::purgeMessageQueue();
         self::clearMessageCollector();
+        self::clearProcessedMessages();
         self::disableMessageBuffering();
     }
 
