@@ -3,6 +3,7 @@ define(function(require, exports, module) {
 
     const $ = require('jquery');
     const _ = require('underscore');
+    const tools = require('oroui/js/tools');
     let config = require('module-config').default(module.id);
 
     const Popper = require('popper');
@@ -14,6 +15,7 @@ define(function(require, exports, module) {
     const DATA_KEY = 'bs.dropdown';
     const EVENT_KEY = '.' + DATA_KEY;
     const DATA_API_KEY = '.data-api';
+    const SHOWN_EVENT = 'shown' + EVENT_KEY;
     const HIDE_EVENT = 'hide' + EVENT_KEY;
     const TO_HIDE_EVENT = 'tohide' + EVENT_KEY;
     const HIDING_EVENT = 'hiding' + EVENT_KEY;
@@ -60,14 +62,6 @@ define(function(require, exports, module) {
             this.syncAriaExpanded();
 
             if (Dropdown._isShowing) {
-                let focusTabbable = null;
-
-                // Prevent to show the keyboard on mobile devices if the first element is input
-                if (_.isMobile()) {
-                    focusTabbable = $(this._menu).find(':tabbable:not("input")').eq(0);
-                }
-
-                manageFocus.focusTabbable($(this._menu), focusTabbable);
                 this.bindKeepFocusInside();
             } else {
                 this.unbindKeepFocusInside();
@@ -164,6 +158,7 @@ define(function(require, exports, module) {
                 }
             }.bind(this));
 
+            $(parent).on(SHOWN_EVENT, this._onShown.bind(this));
             $(parent).on(HIDE_EVENT, this._onHide.bind(this));
             $(parent).on(HIDDEN_EVENT, this._onHidden.bind(this));
 
@@ -183,6 +178,35 @@ define(function(require, exports, module) {
                 // To emulate similar effect for custom scroll just call `scheduleUpdate` twice
                 this._popper.scheduleUpdate();
                 this._popper.scheduleUpdate();
+            }
+        },
+
+        /**
+         * Handles 'shown' event
+         *
+         * @param event
+         * @protected
+         */
+        _onShown: function(event) {
+            let focusTabbable = null;
+
+            if (_.isMobile()) {
+                focusTabbable = $(this._menu).find(':tabbable:not("input")').eq(0);
+            }
+
+            // If it's an iOS safari need to fix issue with
+            // focused field when dropdown is position: fixed;
+            if (tools.isIOS()) {
+                if (this._delayedFocusTabbable) {
+                    clearTimeout(this._delayedFocusTabbable);
+                    this._delayedFocusTabbable = null;
+                }
+
+                this._delayedFocusTabbable = _.delay(() => {
+                    manageFocus.focusTabbable($(this._menu), focusTabbable);
+                }, 20);
+            } else {
+                manageFocus.focusTabbable($(this._menu), focusTabbable);
             }
         },
 
@@ -221,8 +245,13 @@ define(function(require, exports, module) {
         },
 
         _onHidden: function(event) {
-            //  removing popper scroll listeners when dropdown is hidden.
+            // removing popper scroll listeners when dropdown is hidden.
             this._popperDestroy();
+            // unassign delayed method
+            if (this._delayedFocusTabbable) {
+                clearTimeout(this._delayedFocusTabbable);
+                this._delayedFocusTabbable = null;
+            }
         },
 
         _popperDestroy: function() {
