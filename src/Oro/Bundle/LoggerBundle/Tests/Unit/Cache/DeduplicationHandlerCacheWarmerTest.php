@@ -8,10 +8,10 @@ use Oro\Bundle\LoggerBundle\Cache\DeduplicationHandlerCacheWarmer;
 class DeduplicationHandlerCacheWarmerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DeduplicationHandlerCacheWarmer */
-    protected $warmer;
+    private $warmer;
 
     /** @var DeduplicationHandler */
-    protected $deduplicationHandler;
+    private $deduplicationHandler;
 
     protected function setUp(): void
     {

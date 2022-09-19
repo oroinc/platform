@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchFieldResolver;
 
 /**
@@ -113,7 +114,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveFieldNameForFieldWithPlaceholderButNotDefinedInSearchFieldMappings()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "another_item" is not supported.');
 
         $this->fieldResolver->resolveFieldName('another_item');
@@ -121,7 +122,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveFieldTypeForFieldWithPlaceholderButNotDefinedInSearchFieldMappings()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "another_item" is not supported.');
 
         $this->fieldResolver->resolveFieldType('another_item');
@@ -129,7 +130,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveFieldNameForUndefinedField()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "someField" is not supported.');
 
         $this->fieldResolver->resolveFieldName('someField');
@@ -137,7 +138,7 @@ class SearchFieldResolverTest extends \PHPUnit\Framework\TestCase
 
     public function testResolveFieldTypeForUndefinedField()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The field "someField" is not supported.');
 
         $this->fieldResolver->resolveFieldType('someField');

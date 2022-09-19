@@ -22,7 +22,7 @@ class CronCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:cron';
 
-    private ManagerRegistry $registry;
+    private ManagerRegistry $doctrine;
     private Mode $maintenanceMode;
     private CronHelper $cronHelper;
     private CommandRunnerInterface $commandRunner;
@@ -31,7 +31,7 @@ class CronCommand extends Command
     private string $environment;
 
     public function __construct(
-        ManagerRegistry $registry,
+        ManagerRegistry $doctrine,
         Mode $maintenanceMode,
         CronHelper $cronHelper,
         CommandRunnerInterface $commandRunner,
@@ -40,7 +40,7 @@ class CronCommand extends Command
         string $environment
     ) {
         parent::__construct();
-        $this->registry = $registry;
+        $this->doctrine = $doctrine;
         $this->maintenanceMode = $maintenanceMode;
         $this->cronHelper = $cronHelper;
         $this->commandRunner = $commandRunner;
@@ -88,7 +88,8 @@ HELP
             return 1;
         }
 
-        $schedules = $this->getAllSchedules();
+        $schedules = $this->doctrine->getRepository(Schedule::class)->findAll();
+        /** @var Schedule $schedule */
         foreach ($schedules as $schedule) {
             if (!$this->commandFeatureChecker->isFeatureEnabled($schedule->getCommand())) {
                 $output->writeln(
@@ -108,7 +109,9 @@ HELP
             }
 
             $command = $this->getApplication()->get($schedule->getCommand());
-            if ($command instanceof CronCommandInterface && !$command->isActive()) {
+            if (($command instanceof CronCommandActivationInterface && !$command->isActive())
+                || !$command->isEnabled()
+            ) {
                 $output->writeln(
                     'Skipping not enabled command ' . $schedule->getCommand(),
                     OutputInterface::VERBOSITY_DEBUG
@@ -161,13 +164,5 @@ HELP
         }
 
         return $options;
-    }
-
-    /**
-     * @return Schedule[]
-     */
-    private function getAllSchedules(): array
-    {
-        return $this->registry->getRepository(Schedule::class)->findAll();
     }
 }

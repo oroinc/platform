@@ -123,7 +123,6 @@ class DictionaryFilterTest extends OrmTestCase
         ];
         $this->filter->init('test', $params);
 
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
             ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])
@@ -161,7 +160,6 @@ class DictionaryFilterTest extends OrmTestCase
         ];
         $this->filter->init('test', $params);
 
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
             ->onlyMethods(['generateParameterName'])
             ->setConstructorArgs([$qb])

@@ -7,6 +7,8 @@ use Oro\Bundle\CommentBundle\Model\ExtendComment;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 
 /**
+ * Represents the written remarks related to specific entity records.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\CommentBundle\Entity\Repository\CommentRepository")
  * @ORM\Table(name="oro_comment")
  * @ORM\HasLifecycleCallbacks()
@@ -35,5 +37,4 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  */
 class Comment extends ExtendComment
 {
-    const ENTITY_NAME = 'Oro\Bundle\CommentBundle\Entity\Comment';
 }

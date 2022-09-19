@@ -39,3 +39,8 @@ oro:
             saved_message: Form has been saved successfully
         css:
             description: Only CSS is allowed.
+
+        feature:
+            manage:
+                label: Embedded Form Management
+                description: Enables the creation and management of embedded forms, which are added to a third-party website to enable communication between the third-party website users and the Oro application.

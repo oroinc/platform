@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Api\Filter;
 
 use Doctrine\Common\Collections\Criteria;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterException;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\SearchBundle\Api\Filter\SearchAggregationFilter;
@@ -19,26 +20,16 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SearchFieldResolver */
-    private $searchFieldResolver;
-
     /** @var SearchAggregationFilter */
     private $filter;
 
     protected function setUp(): void
     {
-        $this->searchFieldResolver = $this->createMock(SearchFieldResolver::class);
-
         $fieldMappings = ['field1' => 'field_1'];
         $fieldTypes = ['field1' => 'integer'];
 
-        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
-        $searchFieldResolverFactory->expects(self::any())
-            ->method('createFieldResolver')
-            ->with(self::ENTITY_CLASS, $fieldMappings)
-            ->willReturn($this->searchFieldResolver);
-
-        $this->searchFieldResolver->expects(self::any())
+        $searchFieldResolver = $this->createMock(SearchFieldResolver::class);
+        $searchFieldResolver->expects(self::any())
             ->method('resolveFieldName')
             ->willReturnCallback(function ($fieldName) use ($fieldMappings) {
                 if (isset($fieldMappings[$fieldName])) {
@@ -47,11 +38,17 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
                 return $fieldName;
             });
-        $this->searchFieldResolver->expects(self::any())
+        $searchFieldResolver->expects(self::any())
             ->method('resolveFieldType')
             ->willReturnCallback(function ($fieldName) use ($fieldTypes) {
                 return $fieldTypes[$fieldName] ?? 'text';
             });
+
+        $searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
+        $searchFieldResolverFactory->expects(self::any())
+            ->method('createFieldResolver')
+            ->with(self::ENTITY_CLASS, $fieldMappings)
+            ->willReturn($searchFieldResolver);
 
         $this->filter = new SearchAggregationFilter(DataType::STRING);
         $this->filter->setArrayAllowed(true);
@@ -73,7 +70,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validFilterDataProvider
      */
-    public function testValidFilter($filterValue, $expectedAggregations)
+    public function testValidFilter(?FilterValue $filterValue, array $expectedAggregations)
     {
         $query = new IndexerQuery($this->createMock(Indexer::class), new SearchQuery());
         $this->filter->apply(new Criteria(), $filterValue);
@@ -82,7 +79,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedAggregations, $query->getAggregations());
     }
 
-    public function validFilterDataProvider()
+    public function validFilterDataProvider(): array
     {
         return [
             'no filter value'       => [
@@ -113,7 +110,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testNoFunction()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
             'The value "field1" must match one of the following patterns:'
             . ' "fieldName functionName" or "fieldName functionName resultName".'
@@ -125,7 +122,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testNotSupportedFunction()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The aggregating function "someFunction" is not supported.');
 
         $value = 'field1 someFunction';
@@ -134,7 +131,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testNotSupportedFunctionForDataType()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('The aggregating function "sum" is not supported for the field type "text".');
 
         $value = 'field2 sum';
@@ -143,7 +140,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testExtraElement()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
             'The value "field1 count alias someOther" must match one of the following patterns:'
             . ' "fieldName functionName" or "fieldName functionName resultName".'
@@ -155,7 +152,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyDefinition()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
             'The value "" must match one of the following patterns:'
             . ' "fieldName functionName" or "fieldName functionName resultName".'
@@ -167,7 +164,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyField()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
             'The value " " must match one of the following patterns:'
             . ' "fieldName functionName" or "fieldName functionName resultName".'
@@ -179,7 +176,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyFunction()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
             'The value "field1 " must match one of the following patterns:'
             . ' "fieldName functionName" or "fieldName functionName resultName".'
@@ -191,7 +188,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
 
     public function testEmptyAlias()
     {
-        $this->expectException(\Oro\Bundle\ApiBundle\Exception\InvalidFilterException::class);
+        $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage(
             'The value "field1 count " must match one of the following patterns:'
             . ' "fieldName functionName" or "fieldName functionName resultName".'

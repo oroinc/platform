@@ -28,7 +28,7 @@ function loadModule(name, ...values) {
  * @param {Object=} context
  * @return {Promise}
  */
-module.exports = function loadModules(modules, callback, context) {
+function loadModules(modules, callback, context) {
     let requirements;
     let processModules;
     const isModulesArray = Array.isArray(modules);
@@ -59,4 +59,21 @@ module.exports = function loadModules(modules, callback, context) {
             // promise can't be resolved a with multiple values
             return modules;
         });
+}
+
+/**
+ * Loads module from object's property
+ *
+ * @param {Object} obj
+ * @param {string} prop name with a module name
+ * @return {Promise}
+ */
+loadModules.fromObjectProp = function(obj, prop) {
+    if (typeof obj[prop] !== 'string') {
+        return new Promise(resolve => resolve(obj[prop]));
+    }
+    return loadModules(obj[prop])
+        .then(module => obj[prop] = module);
 };
+
+module.exports = loadModules;

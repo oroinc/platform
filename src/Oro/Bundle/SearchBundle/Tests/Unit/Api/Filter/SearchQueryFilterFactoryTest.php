@@ -19,23 +19,14 @@ class SearchQueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionVisitor */
     private $searchQueryCriteriaVisitor;
 
-    /** @var SearchQueryFilterFactory */
-    private $factory;
-
     protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);
         $this->searchFieldResolverFactory = $this->createMock(SearchFieldResolverFactory::class);
         $this->searchQueryCriteriaVisitor = $this->createMock(ExpressionVisitor::class);
-
-        $this->factory = new SearchQueryFilterFactory(
-            $this->searchMappingProvider,
-            $this->searchFieldResolverFactory,
-            $this->searchQueryCriteriaVisitor
-        );
     }
 
-    public function testCreateFilter()
+    public function testCreateFilter(): void
     {
         $dataType = 'string';
 
@@ -44,9 +35,28 @@ class SearchQueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
         $expectedFilter->setSearchFieldResolverFactory($this->searchFieldResolverFactory);
         $expectedFilter->setSearchQueryCriteriaVisitor($this->searchQueryCriteriaVisitor);
 
-        self::assertEquals(
-            $expectedFilter,
-            $this->factory->createFilter($dataType)
+        $factory = new SearchQueryFilterFactory(
+            $this->searchMappingProvider,
+            $this->searchFieldResolverFactory,
+            $this->searchQueryCriteriaVisitor
         );
+
+        self::assertEquals($expectedFilter, $factory->createFilter($dataType));
+    }
+
+    public function testCreateFilterWithoutSearchQueryCriteriaVisitor(): void
+    {
+        $dataType = 'string';
+
+        $expectedFilter = new SearchQueryFilter($dataType);
+        $expectedFilter->setSearchMappingProvider($this->searchMappingProvider);
+        $expectedFilter->setSearchFieldResolverFactory($this->searchFieldResolverFactory);
+
+        $factory = new SearchQueryFilterFactory(
+            $this->searchMappingProvider,
+            $this->searchFieldResolverFactory
+        );
+
+        self::assertEquals($expectedFilter, $factory->createFilter($dataType));
     }
 }

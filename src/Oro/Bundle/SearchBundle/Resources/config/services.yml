@@ -424,3 +424,6 @@ services:
         class: Oro\Bundle\SearchBundle\Datagrid\FilteredEntityReader\SearchSourceFilteredEntityIdentityReader
         tags:
             - { name: oro_datagrid.filtered_entity_identity_reader}
+
+    oro_search.formatter.decimal_flat_value_formatter:
+        class: 'Oro\Bundle\SearchBundle\Formatter\DecimalFlatValueFormatter'

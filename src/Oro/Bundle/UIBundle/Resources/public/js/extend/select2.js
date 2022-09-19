@@ -499,6 +499,71 @@ define(function(require) {
             return open.call(this);
         };
 
+        /**
+         * The method is fully overridden due to adjust select2 mask by CSS only.
+         * Performs the opening of the dropdown.
+         * @override
+         */
+        prototype.opening = function() {
+            this.container.addClass('select2-dropdown-open select2-container-active');
+            this.clearDropdownAlignmentPreference();
+
+            if (this.dropdown[0] !== this.body().children().last()[0]) {
+                this.dropdown.detach().appendTo(this.body());
+            }
+
+            // create the dropdown mask if doesnt already exist
+            let mask = $('#select2-drop-mask');
+
+            if (mask.length === 0) {
+                mask = $(document.createElement('div'));
+                mask
+                    .attr({
+                        'id': 'select2-drop-mask',
+                        'class': 'select2-drop-mask'
+                    })
+                    .hide()
+                    .appendTo(this.body())
+                    .on('mousedown touchstart click', function(e) {
+                        const dropdown = $('#select2-drop');
+
+                        if (dropdown.length > 0) {
+                            const select2 = dropdown.data('select2');
+                            if (select2.opts.selectOnBlur) {
+                                select2.selectHighlighted({noFocus: true});
+                            }
+                            select2.close();
+                            e.preventDefault();
+                            e.stopPropagation();
+                        }
+                    });
+            }
+
+            // ensure the mask is always right before the dropdown
+            if (this.dropdown.prev()[0] !== mask[0]) {
+                this.dropdown.before(mask);
+            }
+
+            // move the global id to the correct dropdown
+            $('#select2-drop').removeAttr('id');
+            this.dropdown.attr('id', 'select2-drop');
+            // show the elements
+            mask.show();
+            this.dropdown.show();
+            this.positionDropdown();
+            this.dropdown.addClass('select2-drop-active');
+
+            // attach listeners to events that can change the position of the container and thus require
+            // the position of the dropdown to be updated as well so it does not come unglued from the container
+            const cid = this.containerId;
+
+            this.container.parents().add(window).each((i, el) => {
+                $(el).on(`scroll.${cid} resize.${cid} orientationchange.${cid}`, e => {
+                    this.positionDropdown();
+                });
+            });
+        };
+
         prototype.close = function() {
             close.call(this);
             this.container.parent().removeClass(select2DropBelowClassName);

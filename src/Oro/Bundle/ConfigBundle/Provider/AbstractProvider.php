@@ -171,8 +171,10 @@ abstract class AbstractProvider implements ProviderInterface
                 throw new ItemNotFoundException(sprintf('Tree "%s" is not defined.', $treeName));
             }
 
+            $nodes = $this->filterDisabledNodes($treeRoot);
+            $nodes = $this->removeEmptyNodes($nodes);
             $this->processedJsTrees[$treeName] = $this->buildJsTree(
-                $this->filterDisabledNodes($treeRoot),
+                $nodes,
                 $correctMenuLevel
             );
         }
@@ -193,6 +195,28 @@ abstract class AbstractProvider implements ProviderInterface
                 } else {
                     unset($definition[$key]);
                 }
+            }
+        }
+
+        return $definition;
+    }
+
+    private function removeEmptyNodes(array $definition): array
+    {
+        if (isset($definition['priority'], $definition['children'])) {
+            $definition = [
+                'children' => $definition['children'],
+                'priority' => $definition['priority']
+            ];
+        }
+
+        foreach ($definition as $key => $value) {
+            if (is_array($value)) {
+                $definition[$key] = $this->removeEmptyNodes($value);
+            }
+
+            if (empty($definition[$key]) || ('priority' === $key && 1 === count($definition))) {
+                unset($definition[$key]);
             }
         }
 

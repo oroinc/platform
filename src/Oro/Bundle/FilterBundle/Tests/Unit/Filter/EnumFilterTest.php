@@ -110,7 +110,6 @@ class EnumFilterTest extends OrmTestCase
             ->select('o.id')
             ->from('Stub:TestOrder', 'o');
 
-        /** @var OrmFilterDatasourceAdapter|\PHPUnit\Framework\MockObject\MockObject $ds */
         $ds = $this->getMockBuilder(OrmFilterDatasourceAdapter::class)
             ->onlyMethods([])
             ->setConstructorArgs([$qb])

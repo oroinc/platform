@@ -1,6 +1,5 @@
 services:
     oro_layout.twig.extension.layout:
-        public: false
         class: Oro\Bundle\LayoutBundle\Twig\LayoutExtension
         arguments:
             - '@oro_platform.twig.service_locator'
@@ -14,12 +13,14 @@ services:
             - '@oro_layout.twig.renderer.engine'
             - '@oro_layout.cache.render_cache'
             - '@oro_layout.cache.placeholder_renderer'
-            - '@logger'
+            - '@twig'
+        calls:
+            - [setLogger, ['@logger']]
         tags:
             - { name: twig.runtime }
+            - { name: monolog.logger, channel: oro_layout }
 
     oro_layout.twig.renderer.engine:
-        public: false
         class: Oro\Bundle\LayoutBundle\Form\TwigRendererEngine
         arguments:
             - '%oro_layout.twig.resources%'
@@ -28,7 +29,6 @@ services:
             - [setConfigManager, ['@oro_config.user']]
 
     oro_layout.twig.layout_renderer:
-        public: false
         class: Oro\Bundle\LayoutBundle\Layout\TwigLayoutRenderer
         arguments:
             - '@oro_layout.twig.renderer'

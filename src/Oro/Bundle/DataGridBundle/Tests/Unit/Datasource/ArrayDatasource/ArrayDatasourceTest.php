@@ -8,10 +8,7 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 
 class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ArrayDatasource */
-    protected $arrayDatasource;
-
-    protected $arraySource = [
+    private $arraySource = [
         [
             'priceListId' => 1,
             'priceListName' => 'PriceList 1',
@@ -45,6 +42,9 @@ class ArrayDatasourceTest extends \PHPUnit\Framework\TestCase
             'currency' => 'EURO',
         ],
     ];
+
+    /** @var ArrayDatasource */
+    private $arrayDatasource;
 
     protected function setUp(): void
     {

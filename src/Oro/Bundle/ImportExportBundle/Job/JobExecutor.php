@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Job;
 
+use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
+use Doctrine\DBAL\Exception\RetryableException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -32,8 +34,6 @@ class JobExecutor
 {
     const CONNECTOR_NAME = 'oro_importexport';
 
-    /** @deprecated since 2.1, please use JOB_IMPORT_VALIDATION_FROM_CSV instead */
-    const JOB_VALIDATE_IMPORT_FROM_CSV   = 'entity_import_validation_from_csv';
     const JOB_EXPORT_TO_CSV              = 'entity_export_to_csv';
     const JOB_EXPORT_TEMPLATE_TO_CSV     = 'entity_export_template_to_csv';
     const JOB_IMPORT_FROM_CSV            = 'entity_import_from_csv';
@@ -172,7 +172,7 @@ class JobExecutor
         foreach ($jobExecution->getAllFailureExceptions() as $failureException) {
             // in most cases this occurs in a race condition issue when couple of consumers try to process data
             // in which we have a UNIQUE constraint. workaround is to requeue a message with this job
-            if ($failureException['class'] === UniqueConstraintViolationException::class) {
+            if ($this->isRedeliveryException($failureException['class'])) {
                 $jobResult->setNeedRedelivery(true);
                 return false;
             }
@@ -442,5 +442,12 @@ class JobExecutor
         }
 
         return $this->contextAggregatorRegistry->getAggregator($aggregatorType);
+    }
+
+    private function isRedeliveryException(string $exceptionClass): bool
+    {
+        return UniqueConstraintViolationException::class === $exceptionClass
+            || ForeignKeyConstraintViolationException::class === $exceptionClass
+            || is_a($exceptionClass, RetryableException::class, true);
     }
 }

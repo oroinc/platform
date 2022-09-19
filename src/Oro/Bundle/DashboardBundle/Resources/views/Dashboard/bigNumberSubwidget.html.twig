@@ -7,7 +7,7 @@
         {% if item.value.deviation is empty %}
             {{ 'oro.dashboard.widget.big_number.no_changes'|trans }}
         {% else %}
-            {{ item.value.deviation }}
+            {{ item.value.deviation|oro_html_sanitize|raw }}
         {% endif %}
     </span>
 </div>

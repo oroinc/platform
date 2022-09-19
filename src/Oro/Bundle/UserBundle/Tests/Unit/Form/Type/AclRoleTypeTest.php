@@ -4,6 +4,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 use Oro\Bundle\UserBundle\Form\Type\AclRoleType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -32,7 +33,7 @@ class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
                     'appendUsers',
                     EntityIdentifierType::class,
                     [
-                        'class'    => 'OroUserBundle:User',
+                        'class'    => User::class,
                         'required' => false,
                         'mapped'   => false,
                         'multiple' => true
@@ -42,7 +43,7 @@ class AclRoleTypeTest extends \PHPUnit\Framework\TestCase
                     'removeUsers',
                     EntityIdentifierType::class,
                     [
-                        'class'    => 'OroUserBundle:User',
+                        'class'    => User::class,
                         'required' => false,
                         'mapped'   => false,
                         'multiple' => true

@@ -1,8 +1,0 @@
-/* @theme: blank; */
-
-// Check devices on server, if device is mobile added class to body (.mobile-version)
-@mixin only-mobile {
-    .mobile-version {
-        @content;
-    }
-}

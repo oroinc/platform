@@ -53,14 +53,14 @@ class FixSkipNullValuesArrayNormalizerTest extends \PHPUnit\Framework\TestCase
                 ['key1' => 0, 'key3' => $formattedDt]
             ],
             [
-                [['key1' => 0, 'key2' => null, 'key3' => $dt]],
+                [['key1' => 0, 'key2' => null, 'key3' => $dt], $dt],
                 ['skip_null_values' => true],
-                [['key1' => 0, 'key3' => $formattedDt]]
+                [['key1' => 0, 'key3' => $formattedDt], $formattedDt]
             ],
             [
-                [['key1' => 0, 'key2' => null, 'key3' => [['key1' => 0, 'key2' => null, 'key3' => $dt]]]],
+                [['key1' => 0, 'key2' => null, 'key3' => [['key1' => 0, 'key2' => null, 'key3' => $dt], $dt]]],
                 ['skip_null_values' => true],
-                [['key1' => 0, 'key3' => [['key1' => 0, 'key3' => $formattedDt]]]]
+                [['key1' => 0, 'key3' => [['key1' => 0, 'key3' => $formattedDt], $formattedDt]]]
             ],
         ];
     }

@@ -9,7 +9,7 @@ use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
 class AuditFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
     /** @var AuditFieldTypeProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {

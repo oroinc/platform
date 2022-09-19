@@ -10,10 +10,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class WidgetContextConfiguratorTest extends \PHPUnit\Framework\TestCase
 {
     /** @var WidgetContextConfigurator */
-    protected $contextConfigurator;
+    private $contextConfigurator;
 
     /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    protected $requestStack;
+    private $requestStack;
 
     protected function setUp(): void
     {

@@ -40,7 +40,6 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit\Framework\TestCase
                         'exclude_definitions'   => ['minimum_definition'],
                         'actions_configuration' => ['key' => 'value'],
                         'preconditions' => ['test' => []],
-                        'pre_conditions' => ['test2' => []]
                     ],
                 ],
                 'expected' => [
@@ -60,7 +59,7 @@ class ProcessDefinitionListConfigurationTest extends \PHPUnit\Framework\TestCase
                         'order' => 10,
                         'exclude_definitions'   => ['minimum_definition'],
                         'actions_configuration' => ['key' => 'value'],
-                        'preconditions' => ['test' => [], 'test2' => []],
+                        'preconditions' => ['test' => []],
                     ]
                 ],
             ]

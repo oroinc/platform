@@ -78,10 +78,6 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this->template;
     }
 
-    /**
-     * @param EmailTemplate|null $template
-     * @return EmailTemplateTranslation
-     */
     public function setTemplate(?EmailTemplate $template): self
     {
         $this->template = $template;
@@ -93,28 +89,17 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this->localization;
     }
 
-    /**
-     * @param Localization|null $localization
-     * @return EmailTemplateTranslation
-     */
     public function setLocalization(?Localization $localization): self
     {
         $this->localization = $localization;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getSubject(): ?string
     {
         return $this->subject;
     }
 
-    /**
-     * @param string|null $subject
-     * @return EmailTemplateTranslation
-     */
     public function setSubject(?string $subject): self
     {
         $this->subject = $subject;
@@ -126,28 +111,17 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this->subjectFallback;
     }
 
-    /**
-     * @param bool $subjectFallback
-     * @return EmailTemplateTranslation
-     */
     public function setSubjectFallback(bool $subjectFallback): self
     {
         $this->subjectFallback = $subjectFallback;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getContent(): ?string
     {
         return $this->content;
     }
 
-    /**
-     * @param string|null $content
-     * @return EmailTemplateTranslation
-     */
     public function setContent(?string $content): self
     {
         $this->content = $content;
@@ -159,10 +133,6 @@ class EmailTemplateTranslation extends ExtendEmailTemplateTranslation
         return $this->contentFallback;
     }
 
-    /**
-     * @param bool $contentFallback
-     * @return EmailTemplateTranslation
-     */
     public function setContentFallback(bool $contentFallback): self
     {
         $this->contentFallback = $contentFallback;

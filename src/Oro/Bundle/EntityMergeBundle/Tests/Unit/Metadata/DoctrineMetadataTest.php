@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Metadata;
 
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 
 class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
@@ -26,7 +27,7 @@ class DoctrineMetadataTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldNameFails()
     {
-        $this->expectException(\Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "fieldName" not exists');
 
         $this->doctrineMetadata->getFieldName();

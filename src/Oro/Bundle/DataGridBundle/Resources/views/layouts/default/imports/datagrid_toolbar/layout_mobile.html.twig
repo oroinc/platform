@@ -1,0 +1,30 @@
+{% block __datagrid_toolbar__datagrid_toolbar_actions_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " actions-panel",
+        'data-grid-actions-panel': ''
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block __datagrid_toolbar__datagrid_toolbar_page_size_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " page-size",
+        'data-grid-pagesize': ''
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block __datagrid_toolbar__datagrid_toolbar_pagination_container_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pagination-container"
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block __datagrid_toolbar__datagrid_toolbar_pagination_widget %}
+    {% set attr = attr|merge({
+        class: attr.class|default('') ~ " pagination",
+        'data-grid-pagination': ''
+    }) %}
+    <div{{ block('block_attributes') }}>{{ block_widget(block) }}</div>
+{% endblock %}

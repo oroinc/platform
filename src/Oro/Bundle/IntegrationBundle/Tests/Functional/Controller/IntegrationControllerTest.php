@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Async\Topic\SyncIntegrationTopic;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -18,30 +18,31 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
     }
 
     private function getEntityManager(): EntityManagerInterface
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass(Channel::class);
+        return self::getContainer()->get('doctrine')->getManagerForClass(Channel::class);
     }
 
     private function getOrganization(): Organization
     {
-        return $this->getContainer()->get('doctrine')->getRepository(Organization::class)
+        return self::getContainer()->get('doctrine')->getRepository(Organization::class)
             ->findOneBy(['name' => LoadOrganizationAndBusinessUnitData::MAIN_ORGANIZATION]);
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_index'));
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('Integrations - System', $crawler->html());
     }
 
-    public function testShouldScheduleSyncJobForActiveIntegration()
+    public function testShouldScheduleSyncJobForActiveIntegration(): void
     {
         $channel = $this->createChannel();
         $entityManager = $this->getEntityManager();
@@ -49,14 +50,13 @@ class IntegrationControllerTest extends WebTestCase
         $entityManager->flush();
         $this->ajaxRequest('POST', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertNotEmpty($result);
-        $this->assertTrue($result['successful']);
-        $this->assertNotEmpty($result['message']);
+        self::assertNotEmpty($result);
+        self::assertTrue($result['successful']);
+        self::assertNotEmpty($result['message']);
 
-        $traces = self::getMessageCollector()->getTopicSentMessages(Topics::SYNC_INTEGRATION);
-        $this->assertCount(1, $traces);
+        self::assertCountMessages(SyncIntegrationTopic::getName(), 1);
     }
 
     public function testCreate(): array
@@ -64,7 +64,7 @@ class IntegrationControllerTest extends WebTestCase
         $this->markTestIncomplete('Skipped due to issue with dynamic form loading');
 
         /** @var User $user */
-        $user = $this->getContainer()->get('security.token_storage')->getToken()->getUser();
+        $user = self::getContainer()->get('security.token_storage')->getToken()->getUser();
         $newUser = clone $user;
         $newUser->setUsername('new username');
         $newUser->setEmail(mt_rand() . $user->getEmail());
@@ -77,19 +77,19 @@ class IntegrationControllerTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_integration_create'));
         $form = $crawler->selectButton('Save and Close')->form();
 
-        $this->assertEquals(
+        self::assertEquals(
             $user->getId(),
             $form['oro_integration_channel_form[defaultUserOwner]']->getValue(),
             'Should contain predefined default owner - current user'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $organization->getId(),
             $form['oro_integration_channel_form[organization]']->getValue(),
             'Should contain predefined organization'
         );
 
-        $name = 'name' . $this->generateRandomString();
+        $name = 'name' . self::generateRandomString();
         $form['oro_integration_channel_form[name]'] = 'Simple channel';
         $form['oro_integration_channel_form[organization]'] = $organization->getId();
         $form['oro_integration_channel_form[type]'] = 'simple';
@@ -99,7 +99,7 @@ class IntegrationControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        self::assertHtmlResponseStatusCodeEquals($result, 200);
         self::assertStringContainsString('Integration saved', $crawler->html());
 
         return compact('name', 'newUser', 'organization');
@@ -115,7 +115,7 @@ class IntegrationControllerTest extends WebTestCase
             ['channels[_filter][name][value]' => $data['name']]
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
         $result = reset($result['data']);
 
         $integration = $result;
@@ -126,33 +126,34 @@ class IntegrationControllerTest extends WebTestCase
 
         $form = $crawler->selectButton('Save and Close')->form();
 
-        $this->assertEquals(
+        self::assertEquals(
             $data['newUser']->getId(),
             $form['oro_integration_channel_form[defaultUserOwner]']->getValue(),
             'Should save default user owner'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $data['organization']->getId(),
             $form['oro_integration_channel_form[organization]']->getValue(),
             'Should save organization'
         );
 
-        $name = 'name' . $this->generateRandomString();
+        $name = 'name' . self::generateRandomString();
         $form['oro_integration_channel_form[name]'] = $name;
 
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);
 
         $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200, 'text/html; charset=UTF-8');
+        self::assertHtmlResponseStatusCodeEquals($result, 200, 'text/html; charset=UTF-8');
         self::assertStringContainsString('Integration saved', $crawler->html());
 
         $integration['name'] = $name;
+
         return $integration;
     }
 
-    public function testShouldNotScheduleSyncJobIfIntegrationNotActive()
+    public function testShouldNotScheduleSyncJobIfIntegrationNotActive(): void
     {
         $channel = $this->createChannel();
         $channel->setEnabled(false);
@@ -163,17 +164,17 @@ class IntegrationControllerTest extends WebTestCase
 
         $this->ajaxRequest('POST', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
-        $this->assertNotEmpty($result);
-        $this->assertNotEmpty($result['message']);
-        $this->assertFalse($result['successful']);
+        self::assertNotEmpty($result);
+        self::assertNotEmpty($result['message']);
+        self::assertFalse($result['successful']);
     }
 
     /**
      * @depends testUpdate
      */
-    public function testDelete(array $integration)
+    public function testDelete(array $integration): void
     {
         $this->client->request(
             'DELETE',
@@ -181,17 +182,17 @@ class IntegrationControllerTest extends WebTestCase
         );
 
         $response = $this->client->getResponse();
-        $this->assertEmptyResponseStatusCodeEquals($response, 204);
+        self::assertEmptyResponseStatusCodeEquals($response, 204);
 
         $response = $this->client->requestGrid(
             'oro-integration-grid',
             ['channels[_filter][name][value]' => $integration['name']]
         );
 
-        $result = $this->getJsonResponseContent($response, 200);
+        $result = self::getJsonResponseContent($response, 200);
 
-        $this->assertEmpty($result['data']);
-        $this->assertEmpty($result['options']['totalRecords']);
+        self::assertEmpty($result['data']);
+        self::assertEmpty($result['options']['totalRecords']);
     }
 
     private function createChannel(): Channel

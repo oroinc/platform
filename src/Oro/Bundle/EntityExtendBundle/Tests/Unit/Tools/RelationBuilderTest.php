@@ -802,49 +802,4 @@ class RelationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedExtendFieldConfig, $extendFieldConfig);
         $this->assertEquals($expectedTestFieldConfig, $testFieldConfig);
     }
-
-    public function testAddManyToOneRelationTargetSide()
-    {
-        $relationName = 'testRelation';
-        $relationKey = 'manyToOne|Test\SourceEntity|Test\TargetEntity|testRelation';
-
-        $extendConfig = new Config(new EntityConfigId('extend', self::TARGET_CLASS));
-
-        $expectedExtendConfig = new Config(new EntityConfigId('extend', self::TARGET_CLASS));
-        $expectedExtendConfig->set(
-            'relation',
-            [
-                $relationKey => [
-                    'target_field_id' => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
-                    'owner'           => false,
-                    'target_entity'   => self::SOURCE_CLASS,
-                    'field_id'        => false
-                ]
-            ]
-        );
-
-        $extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $extendConfigProvider->expects($this->once())
-            ->method('getConfig')
-            ->with(self::TARGET_CLASS)
-            ->willReturn($extendConfig);
-
-        $this->configManager->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($extendConfig));
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->willReturnMap([
-                ['extend', $extendConfigProvider]
-            ]);
-
-        $this->builder->addManyToOneRelationTargetSide(
-            self::TARGET_CLASS,
-            self::SOURCE_CLASS,
-            $relationName,
-            $relationKey
-        );
-
-        $this->assertEquals($expectedExtendConfig, $extendConfig);
-    }
 }

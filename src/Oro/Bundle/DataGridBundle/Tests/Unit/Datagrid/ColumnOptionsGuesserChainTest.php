@@ -5,12 +5,13 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid;
 use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserChain;
 use Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
+use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 
 class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorWithInvalidGuesser()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
             . ', "stdClass" given'
@@ -20,7 +21,7 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructorWithInvalidGuesserScalar()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
             . ', "string" given'
@@ -30,7 +31,7 @@ class ColumnOptionsGuesserChainTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructorWithInvalidGuesserNull()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException::class);
+        $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(
             'Expected argument of type "Oro\Bundle\DataGridBundle\Datagrid\ColumnOptionsGuesserInterface"'
             . ', "NULL" given'

@@ -65,7 +65,7 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
 
             /** @var QueryBuilder $activityListBuilder */
             $queryBuilder = $manager
-                ->getRepository('OroActivityListBundle:ActivityList')
+                ->getRepository(ActivityList::class)
                 ->createQueryBuilder('e');
 
             $iterator = new BufferedIdentityQueryResultIterator($queryBuilder);

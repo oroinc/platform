@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Assert;
 
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessagePriority;
 
 /**
  * Provides useful assertion methods for the message queue related tests.
@@ -34,6 +35,16 @@ trait AbstractMessageQueueAssertTrait
         }
 
         self::assertThat(self::getSentMessages(), new SentMessageConstraint($message, $isSubJobMessage, $canonicalize));
+    }
+
+    protected static function assertMessageSentWithPriority(string $topic, string $expectedPriority): void
+    {
+        $sentMessages = self::getSentMessagesByTopic($topic, false);
+        self::assertEquals(
+            $expectedPriority,
+            array_pop($sentMessages)?->getPriority() ?? MessagePriority::NORMAL,
+            'Failed asserting priority ' . $expectedPriority
+        );
     }
 
     /**
@@ -145,9 +156,32 @@ trait AbstractMessageQueueAssertTrait
      *
      * @return array [['topic' => topic name, 'message' => message (string|array|Message)], ...]
      */
-    protected static function getSentMessages()
+    protected static function getSentMessages(bool $extractBodies = true): array
     {
-        return self::getMessageCollector()->getSentMessages();
+        $sentMessages = self::getMessageCollector()->getSentMessages();
+        if ($extractBodies) {
+            $sentMessages = array_map(static function (array $sentMessage) {
+                if ($sentMessage['message'] instanceof Message) {
+                    $sentMessage['message'] = $sentMessage['message']->getBody();
+                }
+
+                return $sentMessage;
+            }, $sentMessages);
+        }
+
+        return $sentMessages;
+    }
+
+    protected static function getTopicSentMessages(string $topic, bool $extractBodies = true): array
+    {
+        $sentMessages = [];
+        foreach (self::getSentMessages($extractBodies) as $sentMessage) {
+            if ($topic === $sentMessage['topic']) {
+                $sentMessages[] = $sentMessage;
+            }
+        }
+
+        return $sentMessages;
     }
 
     /**
@@ -155,7 +189,7 @@ trait AbstractMessageQueueAssertTrait
      */
     protected static function clearMessageCollector()
     {
-        return self::getMessageCollector()->clearMessageCollector();
+        return self::getMessageCollector()->clear();
     }
 
     /**
@@ -165,27 +199,27 @@ trait AbstractMessageQueueAssertTrait
      *
      * @return string|array|Message
      */
-    protected static function getSentMessage($topic)
+    protected static function getSentMessage(string $topic, bool $extractBody = true)
     {
         self::assertMessagesCount($topic, 1);
-        $messages = self::getSentMessages();
+        $messages = self::getSentMessages(false);
         foreach ($messages as $message) {
             if ($message['topic'] === $topic) {
-                return $message['message'];
+                return $extractBody && $message['message'] instanceof Message
+                    ? $message['message']->getBody()
+                    : $message['message'];
             }
         }
         self::fail(sprintf('A message was not sent to "%s" topic.', $topic));
     }
 
     /**
-     * @param string $expectedTopic
-     * @param bool $extractBodies
-     * @return mixed[]
+     * @return array|string[]|Message[]
      */
-    protected static function getSentMessagesByTopic($expectedTopic, $extractBodies = false)
+    protected static function getSentMessagesByTopic(string $expectedTopic, bool $extractBodies = true): array
     {
         $topicMessages = [];
-        $sentMessages = self::getSentMessages();
+        $sentMessages = self::getSentMessages(false);
         foreach ($sentMessages as $sentMessage) {
             if ($sentMessage['topic'] === $expectedTopic) {
                 $message = $sentMessage['message'];

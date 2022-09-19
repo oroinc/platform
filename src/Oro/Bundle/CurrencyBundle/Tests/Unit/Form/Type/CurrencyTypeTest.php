@@ -9,7 +9,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CurrencyTypeTest extends \PHPUnit\Framework\TestCase
 {
     /** @var CurrencyType */
-    protected $formType;
+    private $formType;
 
     protected function setUp(): void
     {

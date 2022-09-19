@@ -125,7 +125,8 @@
         "myclabs/deep-copy": "1.10.*",
         "oro/redis-config": "5.1.*",
         "symfony/requirements-checker": "^2.0.0",
-        "gedmo/doctrine-extensions": "3.5.0"
+        "gedmo/doctrine-extensions": "3.5.0",
+        "symfony/flex": "2.2.0"
     },
     "require-dev": {
         "behat/behat": "~3.10.0",

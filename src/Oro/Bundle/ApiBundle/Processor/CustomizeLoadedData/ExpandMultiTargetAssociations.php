@@ -7,18 +7,13 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
-use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Loader\MultiTargetAssociationDataLoader;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Component\EntitySerializer\EntitySerializer;
-use Oro\Component\EntitySerializer\SerializationHelper;
 
 /**
  * Checks if expanding of a multi-target association was requested,
@@ -28,39 +23,17 @@ use Oro\Component\EntitySerializer\SerializationHelper;
  */
 class ExpandMultiTargetAssociations implements ProcessorInterface
 {
-    /** @var ConfigProvider */
-    private $configProvider;
+    private MultiTargetAssociationDataLoader $dataLoader;
 
-    /** @var EntitySerializer */
-    private $entitySerializer;
-
-    /** @var SerializationHelper */
-    private $serializationHelper;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
-
-    public function __construct(
-        ConfigProvider $configProvider,
-        EntitySerializer $entitySerializer,
-        SerializationHelper $serializationHelper,
-        DoctrineHelper $doctrineHelper,
-        ResourcesProvider $resourcesProvider
-    ) {
-        $this->configProvider = $configProvider;
-        $this->entitySerializer = $entitySerializer;
-        $this->serializationHelper = $serializationHelper;
-        $this->doctrineHelper = $doctrineHelper;
-        $this->resourcesProvider = $resourcesProvider;
+    public function __construct(MultiTargetAssociationDataLoader $dataLoader)
+    {
+        $this->dataLoader = $dataLoader;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function process(ContextInterface $context)
+    public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */
 
@@ -141,9 +114,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig     $config
-     * @param CustomizeLoadedDataContext $context
-     *
      * @return EntityDefinitionFieldConfig[] [association name => EntityDefinitionFieldConfig, ...]
      */
     private function getAssociationsToExpand(
@@ -171,9 +141,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     }
 
     /**
-     * @param EntityDefinitionConfig     $config
-     * @param CustomizeLoadedDataContext $context
-     *
      * @return EntityDefinitionFieldConfig[] [association name => EntityDefinitionFieldConfig, ...]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
@@ -216,9 +183,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     }
 
     /**
-     * @param array  $data
-     * @param string $entityIdFieldName
-     *
      * @return array [entity class => [entity id, ...], ...]
      */
     private function getEntityIds(array $data, string $entityIdFieldName): array
@@ -272,13 +236,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $result;
     }
 
-    /**
-     * @param array                      $data
-     * @param string                     $entityIdFieldName
-     * @param CustomizeLoadedDataContext $context
-     *
-     * @return array
-     */
     private function loadExpandedEntities(
         array $data,
         string $entityIdFieldName,
@@ -307,7 +264,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
      * @param CustomizeLoadedDataContext    $context
      * @param EntityDefinitionFieldConfig[] $associations [association name => EntityDefinitionFieldConfig, ...]
      *
-     * @return array
+     * @return array|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function loadExpandedEntitiesForAssociations(
@@ -359,7 +316,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
      * @param string                     $entityIdFieldName
      * @param CustomizeLoadedDataContext $context
      *
-     * @return array [association name => [entity class => [entity id => entity data, ...], ...], ...]
+     * @return array|null [association name => [entity class => [entity id => entity data, ...], ...], ...]
      */
     private function loadExpandedEntityDataByIds(
         array $ids,
@@ -373,7 +330,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
                 ? $pathPrefix . $associationName
                 : $associationName;
             foreach ($associationIds as $entityClass => $entityIds) {
-                $expandedEntityData = $this->loadExpandedEntityData(
+                $expandedEntityData = $this->dataLoader->loadExpandedEntityData(
                     $entityClass,
                     $entityIds,
                     $entityIdFieldName,
@@ -387,124 +344,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         }
 
         return $result;
-    }
-
-    /**
-     * @param string                     $entityClass
-     * @param array                      $entityIds
-     * @param string                     $entityIdFieldName
-     * @param CustomizeLoadedDataContext $context
-     * @param string|null                $associationPath
-     *
-     * @return array|null [entity id => entity data, ...]
-     */
-    private function loadExpandedEntityData(
-        string $entityClass,
-        array $entityIds,
-        string $entityIdFieldName,
-        CustomizeLoadedDataContext $context,
-        ?string $associationPath
-    ): ?array {
-        $version = $context->getVersion();
-        $requestType = $context->getRequestType();
-        if (!$this->resourcesProvider->isResourceAccessibleAsAssociation($entityClass, $version, $requestType)) {
-            return null;
-        }
-
-        $configExtras = TargetConfigExtraBuilder::buildConfigExtras(
-            $context->getConfigExtras(),
-            $associationPath
-        );
-        $entityConfig = $this->configProvider
-            ->getConfig($entityClass, $version, $requestType, $configExtras)
-            ->getDefinition();
-        if (null === $entityConfig) {
-            return null;
-        }
-
-        $normalizationContext = $context->getNormalizationContext();
-        if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            $items = $this->loadExpandedDataForManageableEntities(
-                $entityClass,
-                $entityIds,
-                $entityConfig,
-                $normalizationContext
-            );
-        } else {
-            $items = $this->loadExpandedDataForNotManageableEntities(
-                $entityClass,
-                $entityIds,
-                $entityConfig,
-                $normalizationContext
-            );
-        }
-
-        $result = [];
-        foreach ($items as $item) {
-            if (!isset($item[ConfigUtil::CLASS_NAME])) {
-                $item[ConfigUtil::CLASS_NAME] = $entityClass;
-            }
-            $result[$item[$entityIdFieldName]] = $item;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param string                 $entityClass
-     * @param array                  $entityIds
-     * @param EntityDefinitionConfig $entityConfig
-     * @param array                  $normalizationContext
-     *
-     * @return array [entity data, ...]
-     */
-    private function loadExpandedDataForManageableEntities(
-        string $entityClass,
-        array $entityIds,
-        EntityDefinitionConfig $entityConfig,
-        array $normalizationContext
-    ): array {
-        $qb = $this->doctrineHelper->createQueryBuilder($entityClass, 'e')
-            ->where('e IN (:ids)')
-            ->setParameter('ids', $entityIds);
-
-        return $this->entitySerializer->serialize($qb, $entityConfig, $normalizationContext);
-    }
-
-    /**
-     * @param string                 $entityClass
-     * @param array                  $entityIds
-     * @param EntityDefinitionConfig $entityConfig
-     * @param array                  $normalizationContext
-     *
-     * @return array [entity data, ...]
-     */
-    private function loadExpandedDataForNotManageableEntities(
-        string $entityClass,
-        array $entityIds,
-        EntityDefinitionConfig $entityConfig,
-        array $normalizationContext
-    ): array {
-        $idFieldNames = $entityConfig->getIdentifierFieldNames();
-        if (!$idFieldNames) {
-            return [];
-        }
-
-        $items = [];
-        $idFieldName = reset($idFieldNames);
-        foreach ($entityIds as $entityId) {
-            $items[] = $this->serializationHelper->postSerializeItem(
-                [ConfigUtil::CLASS_NAME => $entityClass, $idFieldName => $entityId],
-                $entityConfig,
-                $normalizationContext
-            );
-        }
-
-        return $this->serializationHelper->postSerializeCollection(
-            $items,
-            $entityConfig,
-            $normalizationContext
-        );
     }
 
     /**

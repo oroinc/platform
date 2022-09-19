@@ -82,7 +82,6 @@ class DumpTranslationToFilesCommandTest extends WebTestCase
         $domains = $dumpedCatalogue->getDomains();
         self::assertCount(6, $domains);
         self::assertContains('config', $domains);
-        self::assertContains('tooltips', $domains);
         self::assertContains('validators', $domains);
         self::assertContains('security', $domains);
         self::assertContains('messages', $domains);

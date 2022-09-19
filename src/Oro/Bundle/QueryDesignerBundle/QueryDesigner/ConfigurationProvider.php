@@ -15,6 +15,7 @@ use Oro\Component\Config\ResourcesContainerInterface;
 class ConfigurationProvider extends PhpArrayConfigProvider
 {
     private const CONFIG_FILE = 'Resources/config/oro/query_designer.yml';
+    private const APP_CONFIG_PATH = '../config/oro/query_designer';
 
     /** @var Configuration */
     private $configuration;
@@ -44,7 +45,10 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         $configs = [];
         $configLoader = new CumulativeConfigLoader(
             'oro_query_designer',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
+            [
+                new YamlCumulativeFileLoader(self::CONFIG_FILE),
+                new YamlCumulativeFileLoader(self::APP_CONFIG_PATH),
+            ]
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
@@ -56,7 +60,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
         }
 
         return CumulativeConfigProcessorUtil::processConfiguration(
-            self::CONFIG_FILE,
+            implode(', ', [self::CONFIG_FILE, self::APP_CONFIG_PATH]),
             $this->configuration,
             $configs
         );

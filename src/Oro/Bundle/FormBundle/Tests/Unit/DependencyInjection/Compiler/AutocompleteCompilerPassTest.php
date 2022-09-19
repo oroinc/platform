@@ -5,7 +5,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -14,15 +13,15 @@ class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
     public function testProcess(): void
     {
         $container = new ContainerBuilder();
-        $registry = $container->setDefinition('oro_form.autocomplete.search_registry', new Definition());
-        $security = $container->setDefinition('oro_form.autocomplete.security', new Definition());
+        $registry = $container->register('oro_form.autocomplete.search_registry');
+        $security = $container->register('oro_form.autocomplete.security');
 
-        $container->setDefinition('handler_1', new Definition())
+        $container->register('handler_1')
             ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag1'])
             ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag2']);
-        $container->setDefinition('handler_2', new Definition())
+        $container->register('handler_2')
             ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag1', 'acl_resource' => 'acl_resource_2']);
-        $container->setDefinition('handler_3', new Definition())
+        $container->register('handler_3')
             ->addTag('oro_form.autocomplete.search_handler', ['alias' => 'tag3', 'acl_resource' => 'acl_resource_3']);
 
         $compiler = new AutocompleteCompilerPass();

@@ -16,9 +16,9 @@ oro:
                     client_secret.label: Client secret
                     google_api_key.label: Google API Key
                     enable_sso.label: Enable
-                    enable_sso.tooltip: Google Integration Settings must be provided for the SSO button to appear on the login form
+                    enable_sso.tooltip: Select the option to enable Google single sign-on. Make sure that you fill the Google Integration settings to display the SSO button on the login form.
                     sso_domains.label: Domains
-                    sso_domains.tooltip: Comma separated list of allowed domains
+                    sso_domains.tooltip: A comma separated list of allowed domains. Leave the field empty to set no limitations.
                     redirect_uri.label: Redirect URI
-                    redirect_uri.tooltip: Copy this value and add it to your Google Application trusted redirect URIs
+                    redirect_uri.tooltip: Copy this value and add it to the trusted redirect URIs of your Google application.
 

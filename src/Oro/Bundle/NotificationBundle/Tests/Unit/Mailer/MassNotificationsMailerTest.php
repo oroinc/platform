@@ -11,7 +11,12 @@ use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Address as SymfonyAddress;
+use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Header\MailboxListHeader;
+use Symfony\Component\Mime\Message;
+use Symfony\Component\Mime\Part\MessagePart;
 use Symfony\Component\Mime\RawMessage;
 
 class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
@@ -120,5 +125,31 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
             ->with($event);
 
         $this->mailer->send($message, $envelope);
+    }
+
+    public function testSendWithMessageObjectShouldHaveRealMessageId(): void
+    {
+        $messageId = 'c9c159856ded379eb75222de5d246041@example.com';
+
+        $toHeader = new MailboxListHeader('To', [new Address('test@test.com', 'test')]);
+        $fromHeader = new MailboxListHeader('From', [new Address('test@test.com', 'test')]);
+        $headers = new Headers($toHeader, $fromHeader);
+        $message = new Message($headers, new MessagePart(new RawMessage('sample body')));
+        $envelope = new Envelope(new SymfonyAddress('from@example.com'), [new SymfonyAddress('to@example.com')]);
+
+        $sentMessage = new SentMessage($message, $envelope);
+        $sentMessage->setMessageId($messageId);
+
+        $this->transport->expects(self::once())
+            ->method('send')
+            ->with($message, $envelope)
+            ->willReturn($sentMessage);
+
+        $this->mailer->send($message, $envelope);
+
+        self::assertEquals(
+            '<' . $messageId . '>',
+            $message->getHeaders()->get('Message-ID')->getBodyAsString()
+        );
     }
 }

@@ -9,7 +9,7 @@ use Oro\Bundle\FilterBundle\Grid\DefaultColumnFilteringOptionsGuesser;
 class DefaultColumnFilteringOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 {
     /** @var DefaultColumnFilteringOptionsGuesser */
-    protected $guesser;
+    private $guesser;
 
     protected function setUp(): void
     {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\MigrationBundle\Migration;
 
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * This ORM executor prevents hiding an exception that is happened during executing a data fixture
@@ -10,6 +11,9 @@ use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
  */
 class DataFixturesORMExecutor extends ORMExecutor
 {
+    /** @var callable|null */
+    private $progressCallback = null;
+
     /**
      * {@inheritDoc}
      */
@@ -18,13 +22,26 @@ class DataFixturesORMExecutor extends ORMExecutor
         $em = $this->getObjectManager();
         $connection = $em->getConnection();
         $connection->beginTransaction();
+        $stopwatch = null;
         try {
             if ($append === false) {
                 $this->purge();
             }
 
             foreach ($fixtures as $fixture) {
+                $name = \get_class($fixture);
+                if (null !== $this->progressCallback) {
+                    $stopwatch = new Stopwatch();
+                    $stopwatch->start($name);
+                }
                 $this->load($em, $fixture);
+                if (null !== $this->progressCallback) {
+                    $stopwatch->stop($name);
+                    ($this->progressCallback)(
+                        $stopwatch->getEvent($name)->getMemory(),
+                        $stopwatch->getEvent($name)->getDuration()
+                    );
+                }
             }
 
             $em->flush();
@@ -39,5 +56,16 @@ class DataFixturesORMExecutor extends ORMExecutor
 
             throw $e;
         }
+    }
+
+    /**
+     * @param ?callable $progressCallback
+     *
+     * @return $this
+     */
+    public function setProgressCallback(?callable $progressCallback): self
+    {
+        $this->progressCallback = $progressCallback;
+        return $this;
     }
 }

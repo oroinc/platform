@@ -83,4 +83,24 @@ class WysiwygContext extends OroFeatureContext implements OroPageObjectAware
 
         $this->getDriver()->switchToWindow();
     }
+
+    /**
+     * Example: When I click on "WysiwygTextTypeBlock" in WYSIWYG editor
+     *
+     * @When /^(?:|I )click on "(?P<selector>[^"]+)" in WYSIWYG editor$/
+     */
+    public function iClickOnElementInWysiwygEditor(string $selector)
+    {
+        // Switch to WYSIWYG editor iframe.
+        $this->getDriver()->switchToIFrame(0);
+
+        $element = $this->createElement($selector);
+        self::assertTrue(
+            $element->isValid(),
+            sprintf('Element "%s" not found in WYSIWYG editor', $selector)
+        );
+        $element->click();
+
+        $this->getDriver()->switchToWindow();
+    }
 }

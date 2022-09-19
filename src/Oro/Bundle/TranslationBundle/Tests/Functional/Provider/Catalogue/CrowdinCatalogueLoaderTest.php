@@ -30,7 +30,6 @@ class CrowdinCatalogueLoaderTest extends WebTestCase
         $domains = $catalogue->getDomains();
         self::assertCount(6, $domains);
         self::assertContains('config', $domains);
-        self::assertContains('tooltips', $domains);
         self::assertContains('validators', $domains);
         self::assertContains('security', $domains);
         self::assertContains('messages', $domains);
@@ -49,7 +48,6 @@ class CrowdinCatalogueLoaderTest extends WebTestCase
         $domains = $catalogue->getDomains();
         self::assertCount(6, $domains);
         self::assertContains('config', $domains);
-        self::assertContains('tooltips', $domains);
         self::assertContains('validators', $domains);
         self::assertContains('security', $domains);
         self::assertContains('messages', $domains);

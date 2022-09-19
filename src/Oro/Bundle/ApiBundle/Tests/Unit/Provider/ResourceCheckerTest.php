@@ -23,7 +23,7 @@ class ResourceCheckerTest extends \PHPUnit\Framework\TestCase
         $this->featureChecker = $this->createMock(FeatureChecker::class);
         $this->configProvider = $this->createMock(ResourceCheckerConfigProvider::class);
 
-        $this->resourceChecker = new ResourceChecker($this->featureChecker, $this->configProvider);
+        $this->resourceChecker = new ResourceChecker($this->featureChecker, $this->configProvider, 'api_resources');
     }
 
     public function testIsResourceDisabledForAllActions(): void

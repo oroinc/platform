@@ -9,17 +9,9 @@ placeholders:
             items:
                oro_reminder_show_script: ~
 
-        oro_reminder_reminder_templates:
-            items:
-               default_template:
-                  order: 10
-
     items:
         oro_reminder_subscribe_script:
             template: '@@OroReminder/Reminder/subscribeScript.html.twig'
 
         oro_reminder_show_script:
             template: '@@OroReminder/Reminder/showScript.html.twig'
-
-        default_template:
-            template: '@@OroReminder/Reminder/reminderDefault.html.twig'

@@ -9,15 +9,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
     /** @var ActionMetadataFactory */
-    protected $actionMetadataFactory;
+    private $actionMetadataFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

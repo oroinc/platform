@@ -354,9 +354,7 @@ class NumberFilterTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadata()
     {
         $form = $this->createMock(FormInterface::class);
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $view */
         $view = $this->createMock(FormView::class);
-        /** @var FormView|\PHPUnit\Framework\MockObject\MockObject $typeView */
         $typeView = $this->createMock(FormView::class);
         $typeView->vars['choices'] = [];
         $view->vars['formatter_options'] = ['decimals' => 0, 'grouping' => false];

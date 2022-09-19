@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Form\Type\ActivityListFilterType;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\ActivityListBundle\Tools\ActivityListEntityConfigDumperExtension;
@@ -156,7 +157,7 @@ class ActivityListFilter extends EntityFilter
             ExtendHelper::buildAssociationName($entityClass, ActivityListEntityConfigDumperExtension::ASSOCIATION_KIND)
         );
 
-        $activityListRepository = $em->getRepository('OroActivityListBundle:ActivityList');
+        $activityListRepository = $em->getRepository(ActivityList::class);
 
         $activityQb = $activityListRepository
             ->createQueryBuilder($this->activityListAlias)

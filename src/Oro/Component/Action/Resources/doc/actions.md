@@ -369,7 +369,7 @@ Create Date Time
 **Configuration Example**
 ```
 - '@create_datetime':
-    attribute: $sales_funnel_start_datetime
+    attribute: $action_start_datetime
 
 OR
 
@@ -377,7 +377,7 @@ OR
     conditions:
             # optional condition configuration
     parameters:
-        attribute: $sales_funnel_start_date
+        attribute: $action_start_date
         time: '2014-04-01 12:12:00' # must use quotes because time parameter requires string value
         timezone: Europe/Kiev
 ```

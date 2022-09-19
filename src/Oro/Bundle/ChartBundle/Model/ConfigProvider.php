@@ -4,9 +4,8 @@ namespace Oro\Bundle\ChartBundle\Model;
 
 use Oro\Bundle\ChartBundle\Exception\InvalidConfigurationException;
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainerInterface;
 
 /**
@@ -51,10 +50,7 @@ class ConfigProvider extends PhpArrayConfigProvider
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_chart',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_chart', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (!empty($resource->data[Configuration::ROOT_NODE_NAME])) {

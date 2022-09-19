@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\Configuration;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
+use Oro\Component\Config\CumulativeResourceManager;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\Merger\ConfigurationMerger;
 use Oro\Component\Config\ResourcesContainerInterface;
 
@@ -17,18 +17,13 @@ class ConfigurablePermissionConfigurationProvider extends PhpArrayConfigProvider
 {
     private const CONFIG_FILE = 'Resources/config/oro/configurable_permissions.yml';
 
-    /** @var string[] */
-    private $bundles;
-
     /**
      * @param string   $cacheFile
      * @param bool     $debug
-     * @param string[] $bundles
      */
-    public function __construct(string $cacheFile, bool $debug, array $bundles)
+    public function __construct(string $cacheFile, bool $debug)
     {
         parent::__construct($cacheFile, $debug);
-        $this->bundles = $bundles;
     }
 
     /**
@@ -45,18 +40,14 @@ class ConfigurablePermissionConfigurationProvider extends PhpArrayConfigProvider
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_security_permissions',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_security_permissions', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (\array_key_exists(ConfigurablePermissionConfiguration::ROOT_NODE, $resource->data)) {
                 $configs[$resource->bundleClass] = $resource->data;
             }
         }
-
-        $merger = new ConfigurationMerger($this->bundles);
+        $merger = new ConfigurationMerger($this->getBundles());
         $mergedConfig = $merger->mergeConfiguration($configs);
 
         return CumulativeConfigProcessorUtil::processConfiguration(
@@ -64,5 +55,10 @@ class ConfigurablePermissionConfigurationProvider extends PhpArrayConfigProvider
             new ConfigurablePermissionConfiguration(),
             $mergedConfig
         );
+    }
+
+    protected function getBundles(): array
+    {
+        return CumulativeResourceManager::getInstance()->getBundles();
     }
 }

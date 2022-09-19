@@ -19,7 +19,6 @@ services:
         arguments:
             - '%kernel.cache_dir%/oro/features.php'
             - '%kernel.debug%'
-            - '%kernel.bundles%'
             - '@oro_featuretoggle.configuration'
             - '@oro_featuretoggle.configuration_extension'
 
@@ -50,8 +49,9 @@ services:
         class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker
         public: true
         arguments:
-            - '@oro_featuretoggle.configuration.manager'
             - '@oro_featuretoggle.feature_decision_manager'
+            - '@oro_featuretoggle.feature_resource_decision_manager'
+            - '@oro_featuretoggle.configuration.manager'
 
     Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker:
         alias: oro_featuretoggle.checker.feature_checker
@@ -64,6 +64,12 @@ services:
             - !abstract '$strategy defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
             - !abstract '$allowIfAllAbstainDecisions defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
             - !abstract '$allowIfEqualGrantedDeniedDecisions defined in Oro\Bundle\FeatureToggleBundle\DependencyInjection\OroFeatureToggleExtension'
+
+    oro_featuretoggle.feature_resource_decision_manager:
+        class: Oro\Bundle\FeatureToggleBundle\Checker\FeatureResourceDecisionManager
+        arguments:
+            - '@oro_featuretoggle.feature_decision_manager'
+            - '@oro_featuretoggle.configuration.manager'
 
     oro_featuretoggle.layout.data_provider.feature_provider:
         class: Oro\Bundle\FeatureToggleBundle\Layout\DataProvider\FeatureProvider

@@ -11,4 +11,4 @@ oro:
                     client_secret.label: Client Secret
                     tenant.label: Directory (tenant) ID
                     redirect_uri.label: Redirect URI
-                    redirect_uri.tooltip: Copy this value and add it to your Azure Application trusted redirect URIs
+                    redirect_uri.tooltip: Copy this value and add it to the trusted redirect URIs of your Azure application.

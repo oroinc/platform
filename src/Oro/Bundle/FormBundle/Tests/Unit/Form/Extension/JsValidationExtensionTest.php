@@ -152,7 +152,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @SuppressWarnings(PHPMD)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function finishViewAddDataValidationAttributeDataProvider(): array
     {
@@ -278,15 +278,19 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
                     ]
                 ),
                 'form' => $this->createForm(),
-                'expectedConstraints' => [
-                    new Constraints\NotBlank()
-                ],
+                'expectedConstraints' => [new Constraints\NotBlank()],
                 'expectedAttributes' => [
                     'data-validation' =>
                         '{"NotBlank":{"payload":null,"message":"This value should not be blank.","allowNull":false,' .
                         '"normalizer":null}}',
                     'data-required'   => true
                 ]
+            ],
+            'not_blank_with_allow_null' => [
+                'view' => $this->createView(),
+                'form' => $this->createForm(),
+                'expectedConstraints' => [new Constraints\NotBlank(['allowNull' => true])],
+                'expectedAttributes' => []
             ],
         ];
     }

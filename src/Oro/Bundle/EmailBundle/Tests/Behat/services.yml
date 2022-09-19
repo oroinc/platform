@@ -3,3 +3,6 @@ services:
         public: true
         arguments:
             - '@Oro\Bundle\TestFrameworkBundle\Behat\Client\EmailClient'
+
+    Oro\Bundle\EmailBundle\Tests\Behat\ReferenceRepositoryInitializer:
+        tags: [ oro_behat.reference_repository_initializer ]

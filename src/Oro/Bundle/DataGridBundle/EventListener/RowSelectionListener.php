@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\EventListener;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderAwareInterface;
+use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
@@ -72,7 +72,7 @@ class RowSelectionListener
         $datagrid = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
 
-        if (!$datasource instanceof ParameterBinderAwareInterface) {
+        if (!$datasource instanceof BindParametersInterface) {
             return;
         }
 

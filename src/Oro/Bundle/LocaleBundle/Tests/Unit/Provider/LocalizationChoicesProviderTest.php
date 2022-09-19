@@ -16,50 +16,43 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     use EntityTrait;
 
     /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localizationManager;
+    private $localizationManager;
 
     /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    protected $localeSettings;
-
-    /** @var LanguageCodeFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    protected $languageFormatter;
+    private $localeSettings;
 
     /** @var LanguageProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $languageProvider;
+    private $languageProvider;
 
     /** @var LocalizationChoicesProvider */
-    protected $provider;
+    private $provider;
 
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);
         $this->localeSettings = $this->createMock(LocaleSettings::class);
 
-        $this->languageFormatter = $this->createMock(LanguageCodeFormatter::class);
-        $this->languageFormatter->expects($this->any())
+        $languageFormatter = $this->createMock(LanguageCodeFormatter::class);
+        $languageFormatter->expects($this->any())
             ->method('formatLocale')
-            ->willReturnCallback(
-                function ($code) {
-                    return 'formatted_' . $code;
-                }
-            );
+            ->willReturnCallback(function ($code) {
+                return 'formatted_' . $code;
+            });
 
         $this->languageProvider = $this->createMock(LanguageProvider::class);
 
         $this->provider = new LocalizationChoicesProvider(
             $this->localeSettings,
-            $this->languageFormatter,
+            $languageFormatter,
             $this->languageProvider,
             $this->localizationManager
         );
     }
 
     /**
-     * "@dataProvider getLanguageChoicesDataProvider
-     *
-     * @param bool $onlyEnabled
+     * @dataProvider getLanguageChoicesDataProvider
      */
-    public function testGetLanguageChoices($onlyEnabled)
+    public function testGetLanguageChoices(bool $onlyEnabled)
     {
         $data = [
             $this->getEntity(Language::class, ['id' => 105, 'code' => 'en']),
@@ -121,7 +114,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function assertConfigManagerCalled()
+    private function assertConfigManagerCalled(): void
     {
         $this->localeSettings->expects($this->once())->method('getLanguage')->willReturn('es');
     }

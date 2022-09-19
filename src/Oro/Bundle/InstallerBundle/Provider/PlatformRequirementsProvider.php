@@ -6,8 +6,6 @@ namespace Oro\Bundle\InstallerBundle\Provider;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception\ConnectionException;
-use Oro\Bundle\AssetBundle\NodeJsExecutableFinder;
-use Oro\Bundle\AssetBundle\NodeJsVersionChecker;
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsException;
 use Oro\Bundle\AttachmentBundle\Exception\ProcessorsVersionException;
 use Oro\Bundle\AttachmentBundle\ProcessorHelper;
@@ -32,8 +30,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
     public const REQUIRED_GD_VERSION = '2.0';
 
     public const REQUIRED_CURL_VERSION = '7.0';
-
-    public const REQUIRED_NODEJS_VERSION  = '>=16 <17';
 
     protected Connection $connection;
     protected string $projectDirectory;
@@ -107,8 +103,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
      */
     public function getOroRequirements(): ?RequirementCollection
     {
-        $nodeJsExecutableFinder = new NodeJsExecutableFinder();
-        $nodeJsExecutable = $nodeJsExecutableFinder->findNodeJs();
         $collection = new RequirementCollection();
 
         $this->addPhpVersionRequirement($collection);
@@ -118,9 +112,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addIntlExtRequirement($collection);
         $this->addZipExtRequirement($collection);
         $this->addMbstringExtRequirement($collection);
-        $this->addNodeJsInstalledRequirement($collection, $nodeJsExecutable);
-        $this->addNodeJsVersionRequirement($collection, $nodeJsExecutable);
-        $this->addNpmInstalledRequirement($collection, $nodeJsExecutableFinder->findNpm());
         $this->addConfiguredConnectionRequirement($collection);
 
         $this->addImageProcessorsRequirement($collection, ProcessorHelper::JPEGOPTIM);
@@ -131,9 +122,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
         $this->addPathWritableRequirement($collection, 'var/data');
         $this->addPathWritableRequirement($collection, 'public/js');
 
-        if (is_file($this->projectDirectory . '/config/parameters.yml')) {
-            $this->addPathWritableRequirement($collection, 'config/parameters.yml');
-        }
         if (function_exists('iconv')) {
             $this->addIconvBehaviorRequirement($collection);
         }
@@ -506,34 +494,6 @@ class PlatformRequirementsProvider extends AbstractRequirementsProvider
             extension_loaded('mbstring'),
             'mbstring extension should be installed',
             'Install and enable the <strong>mbstring</strong> extension.'
-        );
-    }
-
-    protected function addNodeJsInstalledRequirement(RequirementCollection $collection, ?string $nodeExecutable): void
-    {
-        $collection->addRequirement(
-            $nodeExecutable !== null,
-            $nodeExecutable !== null ? 'NodeJS is installed' : 'NodeJS must be installed',
-            'Install <strong>NodeJS</strong>.'
-        );
-    }
-
-    protected function addNodeJsVersionRequirement(RequirementCollection $collection, ?string $nodeExecutable): void
-    {
-        $collection->addRequirement(
-            NodeJsVersionChecker::satisfies($nodeExecutable, self::REQUIRED_NODEJS_VERSION),
-            sprintf('NodeJS "%s" version must be installed.', self::REQUIRED_NODEJS_VERSION),
-            sprintf('Upgrade <strong>NodeJS</strong> to "%s" version.', htmlentities(self::REQUIRED_NODEJS_VERSION)),
-            sprintf('Upgrade NodeJS to "%s" version.', self::REQUIRED_NODEJS_VERSION)
-        );
-    }
-
-    protected function addNpmInstalledRequirement(RequirementCollection $collection, ?string $npmExecutable): void
-    {
-        $collection->addRequirement(
-            $npmExecutable !== null,
-            $npmExecutable !== null ? 'NPM is installed' : 'NPM must be installed',
-            'Install <strong>NPM</strong>.'
         );
     }
 

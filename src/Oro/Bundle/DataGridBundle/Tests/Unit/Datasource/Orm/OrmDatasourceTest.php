@@ -9,8 +9,8 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\Configs\YamlProcessor;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\ParameterBinder;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\QueryExecutorInterface;
-use Oro\Bundle\DataGridBundle\Datasource\ParameterBinderInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Event\OrmResultAfter;
 use Oro\Bundle\DataGridBundle\Event\OrmResultBefore;
@@ -22,29 +22,23 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var YamlProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
+    private YamlProcessor|\PHPUnit\Framework\MockObject\MockObject $processor;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
+    private EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject $eventDispatcher;
 
-    /** @var ParameterBinderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $parameterBinder;
+    private ParameterBinder|\PHPUnit\Framework\MockObject\MockObject $parameterBinder;
 
-    /** @var QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryHintResolver;
+    private QueryHintResolver|\PHPUnit\Framework\MockObject\MockObject $queryHintResolver;
 
-    /** @var QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryExecutor;
+    private QueryExecutorInterface|\PHPUnit\Framework\MockObject\MockObject $queryExecutor;
 
-    /** @var OrmDatasource */
-    private $datasource;
+    private OrmDatasource $datasource;
 
     protected function setUp(): void
     {
         $this->processor = $this->createMock(YamlProcessor::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->parameterBinder = $this->createMock(ParameterBinderInterface::class);
+        $this->parameterBinder = $this->createMock(ParameterBinder::class);
         $this->queryHintResolver = $this->createMock(QueryHintResolver::class);
         $this->queryExecutor = $this->createMock(QueryExecutorInterface::class);
 
@@ -62,10 +56,10 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         return [
             'query' => [
                 'select' => ['t'],
-                'from'   => [
-                    ['table' => 'Test', 'alias' => 't']
-                ]
-            ]
+                'from' => [
+                    ['table' => 'Test', 'alias' => 't'],
+                ],
+            ],
         ];
     }
 
@@ -289,5 +283,66 @@ class OrmDatasourceTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($qb, $this->datasource->getQueryBuilder());
 
         self::assertNull($this->datasource->getCountQb());
+    }
+
+    public function testGetResultsQuery(): void
+    {
+        $config = $this->getConfig();
+        $config['hints'] = ['some_hint'];
+
+        $datagrid = $this->createMock(DatagridInterface::class);
+        $query = $this->getQuery();
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $this->processor->expects(self::once())
+            ->method('processQuery')
+            ->with($config)
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $this->queryHintResolver->expects(self::once())
+            ->method('resolveHints')
+            ->with(self::identicalTo($query), $config['hints']);
+
+        $this->eventDispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [self::isInstanceOf(OrmResultBeforeQuery::class), OrmResultBeforeQuery::NAME],
+                [self::isInstanceOf(OrmResultBefore::class), OrmResultBefore::NAME],
+            )
+            ->willReturnOnConsecutiveCalls(
+                new ReturnCallback(static fn (OrmResultBeforeQuery $event) => $event),
+                new ReturnCallback(static fn (OrmResultBefore $event) => $event)
+            );
+
+        $this->datasource->process($datagrid, $config);
+
+        self::assertSame($query, $this->datasource->getResultsQuery());
+    }
+
+    public function testGetRootEntityName(): void
+    {
+        $config = $this->getConfig();
+        $config['hints'] = ['some_hint'];
+
+        $datagrid = $this->createMock(DatagridInterface::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+
+        $this->processor->expects(self::once())
+            ->method('processQuery')
+            ->with($config)
+            ->willReturn($queryBuilder);
+
+        $entityAliases = [\stdClass::class, 'AcmeEntity'];
+        $queryBuilder
+            ->expects(self::once())
+            ->method('getRootEntities')
+            ->willReturn($entityAliases);
+
+        $this->datasource->process($datagrid, $config);
+
+        self::assertSame($entityAliases[0], $this->datasource->getRootEntityName());
     }
 }

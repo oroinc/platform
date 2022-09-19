@@ -1,7 +1,0 @@
-/* @theme: blank; */
-
-@mixin placeholder {
-    &::placeholder {
-        @content;
-    }
-}

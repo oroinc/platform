@@ -27,6 +27,9 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
     /** @var string[] */
     private $excludeFilePathPatterns;
 
+    /** @var string[] */
+    private $additionalResourcePaths;
+
     /**
      * @param string                       $cacheFile
      * @param bool                         $debug
@@ -34,6 +37,7 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
      * @param LayoutUpdateLoaderInterface  $loader
      * @param BlockViewCache               $blockViewCache
      * @param string[]                     $excludeFilePathPatterns
+     * @param string[]                     $additionalResourcePaths
      */
     public function __construct(
         string $cacheFile,
@@ -41,13 +45,15 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
         LastModificationDateProvider $lastModificationDateProvider,
         LayoutUpdateLoaderInterface $loader,
         BlockViewCache $blockViewCache,
-        array $excludeFilePathPatterns = []
+        array $excludeFilePathPatterns = [],
+        array $additionalResourcePaths = []
     ) {
         parent::__construct($cacheFile, $debug);
         $this->lastModificationDateProvider = $lastModificationDateProvider;
         $this->loader = $loader;
         $this->blockViewCache = $blockViewCache;
         $this->excludeFilePathPatterns = $excludeFilePathPatterns;
+        $this->additionalResourcePaths = $additionalResourcePaths;
     }
 
     /**
@@ -112,15 +118,7 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
         $themeLayoutUpdates = [];
         $configLoader = new CumulativeConfigLoader(
             'oro_layout_updates_list',
-            new FolderContentCumulativeLoader(
-                'Resources/views/layouts/',
-                -1,
-                false,
-                new LayoutUpdateFileMatcher(
-                    $this->loader->getUpdateFileNamePatterns(),
-                    $this->excludeFilePathPatterns
-                )
-            )
+            $this->getThemeLayoutUpdatesPathsLoaders()
         );
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
@@ -128,6 +126,28 @@ class ThemeResourceProvider extends PhpArrayConfigProvider implements ResourcePr
         }
 
         return \array_merge_recursive(...$themeLayoutUpdates);
+    }
+
+    /**
+     * @return FolderContentCumulativeLoader[]
+     */
+    private function getThemeLayoutUpdatesPathsLoaders()
+    {
+        $paths = array_merge(['Resources/views/layouts/'], $this->additionalResourcePaths);
+        $loaders = [];
+        foreach ($paths as $path) {
+            $loaders[] = new FolderContentCumulativeLoader(
+                $path,
+                -1,
+                false,
+                new LayoutUpdateFileMatcher(
+                    $this->loader->getUpdateFileNamePatterns(),
+                    $this->excludeFilePathPatterns
+                )
+            );
+        }
+
+        return $loaders;
     }
 
     /**

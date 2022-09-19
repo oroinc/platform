@@ -9,20 +9,14 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 
 class FieldDataTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $entityData;
+    /** @var EntityData|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityData;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $fieldMetadata;
+    /** @var FieldMetadata|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldMetadata;
 
-    /**
-     * @var FieldData
-     */
-    protected $fieldData;
+    /** @var FieldData */
+    private $fieldData;
 
     protected function setUp(): void
     {
@@ -30,6 +24,14 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
         $this->fieldMetadata = $this->createMock(FieldMetadata::class);
 
         $this->fieldData = new FieldData($this->entityData, $this->fieldMetadata);
+    }
+
+    private function createTestEntity(int $id): \stdClass
+    {
+        $result = new \stdClass();
+        $result->id = $id;
+
+        return $result;
     }
 
     public function testGetMetadata()
@@ -65,12 +67,5 @@ class FieldDataTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fieldName);
 
         $this->assertEquals($fieldName, $this->fieldData->getFieldName());
-    }
-
-    protected function createTestEntity($id)
-    {
-        $result = new \stdClass();
-        $result->id = $id;
-        return $result;
     }
 }

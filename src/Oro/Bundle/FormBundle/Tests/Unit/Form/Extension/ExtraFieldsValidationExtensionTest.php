@@ -7,10 +7,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var ExtraFieldsValidationExtension
-     */
-    protected $extension;
+    /** @var ExtraFieldsValidationExtension */
+    private $extension;
 
     protected function setUp(): void
     {

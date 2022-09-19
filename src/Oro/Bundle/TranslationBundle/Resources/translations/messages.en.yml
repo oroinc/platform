@@ -68,6 +68,10 @@ oro.translation:
         permission:
             translate:
                 label: Translate
+        feature:
+            manage:
+                label: Language Management
+                description: Enables adding languages to the Oro application, installing or importing their translation updates, activating and deactivating the selected languages.
     translation:
         entity_label: 'Translation'
         entity_plural_label: 'Translations'
@@ -79,6 +83,11 @@ oro.translation:
         context.label: 'Context'
         status.label: 'Translated'
         current.label: 'Current Value'
+
+        feature:
+            manage:
+                label: Translation Management
+                description: Enables managing the existing translations for labels, information massages, notifications, alerts, workflow statuses, and other UI system elements.
 
     translation_key:
         entity_label: 'Translation Key'

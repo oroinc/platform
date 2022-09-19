@@ -25,4 +25,8 @@ class ConfigDefaultLocalizationProvider implements LocalizationProviderInterface
     {
         return $this->localizationManager->getDefaultLocalization();
     }
+
+    public function setCurrentLocalization(?Localization $localization): void
+    {
+    }
 }

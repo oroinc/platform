@@ -7,12 +7,21 @@ namespace Oro\Component\MessageQueue\Job;
  */
 class DependentJobService
 {
-    /** @var JobManagerInterface */
-    private $jobManager;
+    private JobManagerInterface $jobManager;
 
     public function __construct(JobManagerInterface $jobManager)
     {
         $this->jobManager = $jobManager;
+    }
+
+    public function addDependentMessages(Job $job, array $messages): void
+    {
+        $context = $this->createDependentJobContext($job);
+        foreach ($messages as $topic => $message) {
+            $context->addDependentJob($topic, $message);
+        }
+
+        $this->saveDependentJob($context);
     }
 
     public function createDependentJobContext(Job $job): DependentJobContext

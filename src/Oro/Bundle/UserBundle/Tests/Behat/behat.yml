@@ -84,6 +84,9 @@ oro_behat_extension:
       class: Oro\Bundle\DataGridBundle\Tests\Behat\Element\Grid
       selector: 'div[data-page-component-name="users-grid"]'
 
+    Generate Key:
+      selector: '#btn-apigen'
+
   pages:
     Login:
       class: Oro\Bundle\UserBundle\Tests\Behat\Page\Login
@@ -145,5 +148,6 @@ oro_behat_extension:
         - Oro\Bundle\DataGridBundle\Tests\Behat\Context\GridContext
         - Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext
         - Oro\Bundle\SearchBundle\Tests\Behat\Context\SearchContext
+        - Oro\Bundle\ApiBundle\Tests\Behat\Context\ApiContext
       paths:
         - '@OroUserBundle/Tests/Behat/Features'

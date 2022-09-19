@@ -22,7 +22,7 @@ class AclConfigurationPass implements CompilerPassInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->substituteSecurityIdentityStrategy($container);
         $this->configureAclExtensionSelector($container);
@@ -46,7 +46,10 @@ class AclConfigurationPass implements CompilerPassInterface
         foreach ($taggedServices as $id => $tags) {
             $extensions[$this->getPriorityAttribute($tags[0])][$id] = new Reference($id);
         }
-        $extensions = $this->inverseSortByPriorityAndFlatten($extensions);
+        if ($extensions) {
+            ksort($extensions);
+            $extensions = array_merge(...array_values($extensions));
+        }
 
         $container->getDefinition('oro_security.acl.extension_selector')
             ->setArgument('$extensionNames', array_keys($extensions))

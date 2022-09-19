@@ -119,16 +119,17 @@ define(['underscore', 'asap'], function(_, asap) {
          * @return {Object<string, function(Object): string>|function(Object): string|undefined}
          */
         macros: _.extend(function macros(NS, templates) {
+            const {registry} = _.macros;
             let matches;
             let result;
             if (arguments.length === 2) {
                 // setter
-                _.macros.registry[NS] = templates;
+                registry[NS] = Object.assign(registry[NS] || {}, templates);
             } else {
                 // getter
-                result = _.macros.registry[NS];
+                result = registry[NS];
                 if (!result && (matches = NS.match(/^(\w+)::(\w+)$/))) {
-                    result = _.macros.registry[matches[1]][matches[2]];
+                    result = registry[matches[1]][matches[2]];
                 }
                 if (!result) {
                     throw new Error('NS or macro "' + NS + '" is not found');

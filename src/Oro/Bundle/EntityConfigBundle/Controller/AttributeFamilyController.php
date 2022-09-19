@@ -12,7 +12,7 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\AttributeFamilyType;
 use Oro\Bundle\EntityConfigBundle\Manager\AttributeManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\FormBundle\Model\UpdateHandler;
+use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,10 +31,8 @@ class AttributeFamilyController extends AbstractController
     /**
      * @Route("/create/{alias}", name="oro_attribute_family_create")
      * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
-     * @param string $alias
-     * @return array|RedirectResponse
      */
-    public function createAction($alias)
+    public function createAction(string $alias): array|RedirectResponse
     {
         $entityConfigModel = $this->getEntityByAlias($alias);
         $attributeManager = $this->get(AttributeManager::class);
@@ -76,16 +74,14 @@ class AttributeFamilyController extends AbstractController
     /**
      * @Route("/update/{id}", name="oro_attribute_family_update")
      * @Template("@OroEntityConfig/AttributeFamily/update.html.twig")
-     * @param AttributeFamily $attributeFamily
-     * @return array|RedirectResponse
      */
-    public function updateAction(AttributeFamily $attributeFamily)
+    public function updateAction(AttributeFamily $attributeFamily): array|RedirectResponse
     {
         $translator = $this->getTranslator();
         $successMsg = $translator->trans('oro.entity_config.attribute_family.message.updated');
         $response = $this->update($attributeFamily, $successMsg);
 
-        if (is_array($response)) {
+        if (\is_array($response)) {
             $alias = $this->get(EntityAliasResolver::class)->getAlias($attributeFamily->getEntityClass());
             $response['entityAlias'] = $alias;
         }
@@ -93,28 +89,20 @@ class AttributeFamilyController extends AbstractController
         return $response;
     }
 
-    /**
-     * @param AttributeFamily $attributeFamily
-     * @param string $message
-     * @return array|RedirectResponse
-     */
-    protected function update(AttributeFamily $attributeFamily, $message)
+    protected function update(AttributeFamily $attributeFamily, string $message): array|RedirectResponse
     {
         $options['attributeEntityClass'] = $attributeFamily->getEntityClass();
         $form = $this->createForm(AttributeFamilyType::class, $attributeFamily, $options);
 
-        $handler = $this->get(UpdateHandler::class);
-
-        return $handler->update($attributeFamily, $form, $message);
+        return $this->get(UpdateHandlerFacade::class)
+            ->update($attributeFamily, $form, $message);
     }
 
     /**
      * @Route("/index/{alias}", name="oro_attribute_family_index")
      * @Template()
-     * @param string $alias
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function indexAction($alias)
+    public function indexAction(string $alias): array|RedirectResponse
     {
         $entityClass = $this->get(EntityAliasResolver::class)->getClassByAlias($alias);
 
@@ -131,11 +119,8 @@ class AttributeFamilyController extends AbstractController
     /**
      * @Route("/delete/{id}", name="oro_attribute_family_delete", methods={"DELETE"})
      * @CsrfProtection()
-     * @param AttributeFamily $attributeFamily
-     *
-     * @return JsonResponse
      */
-    public function deleteAction(AttributeFamily $attributeFamily)
+    public function deleteAction(AttributeFamily $attributeFamily): JsonResponse
     {
         $translator = $this->getTranslator();
         if ($this->isGranted('delete', $attributeFamily)) {
@@ -156,10 +141,8 @@ class AttributeFamilyController extends AbstractController
     /**
      * @Route("/view/{id}", name="oro_attribute_family_view", requirements={"id"="\d+"})
      * @Template()
-     * @param \Oro\Bundle\EntityConfigBundle\Attribute\Entity\AttributeFamily $attributeFamily
-     * @return array
      */
-    public function viewAction(AttributeFamily $attributeFamily)
+    public function viewAction(AttributeFamily $attributeFamily): array
     {
         $aliasResolver = $this->get(EntityAliasResolver::class);
 
@@ -169,11 +152,7 @@ class AttributeFamilyController extends AbstractController
         ];
     }
 
-    /**
-     * @param string $alias
-     * @return EntityConfigModel
-     */
-    private function getEntityByAlias($alias)
+    private function getEntityByAlias(string $alias): EntityConfigModel
     {
         $aliasResolver = $this->get(EntityAliasResolver::class);
         $entityClass = $aliasResolver->getClassByAlias($alias);
@@ -187,7 +166,7 @@ class AttributeFamilyController extends AbstractController
     /**
      * @throws BadRequestHttpException
      */
-    private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel)
+    private function ensureEntityConfigSupported(EntityConfigModel $entityConfigModel): void
     {
         /** @var ConfigProvider $extendConfigProvider */
         $extendConfigProvider = $this->get('oro_entity_config.provider.extend');
@@ -209,7 +188,7 @@ class AttributeFamilyController extends AbstractController
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public static function getSubscribedServices()
     {
@@ -217,12 +196,12 @@ class AttributeFamilyController extends AbstractController
             parent::getSubscribedServices(),
             [
                 TranslatorInterface::class,
-                UpdateHandler::class,
                 EntityAliasResolver::class,
                 AttributeManager::class,
                 DoctrineHelper::class,
                 'oro_entity_config.provider.extend' => ConfigProvider::class,
                 'oro_entity_config.provider.attribute' => ConfigProvider::class,
+                UpdateHandlerFacade::class
             ]
         );
     }

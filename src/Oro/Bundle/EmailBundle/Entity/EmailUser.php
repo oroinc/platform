@@ -45,8 +45,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUser
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
-
     /**
      * @var integer
      *
@@ -74,7 +72,7 @@ class EmailUser
      * @var OrganizationInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $organization;
 

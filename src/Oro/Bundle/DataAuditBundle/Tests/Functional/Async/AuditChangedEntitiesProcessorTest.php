@@ -114,11 +114,19 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
         $this->assertMessageSent(
             AuditChangedEntitiesRelationsTopic::getName(),
-            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+            $expectedBody
+        );
+        self::assertMessageSentWithPriority(
+            AuditChangedEntitiesRelationsTopic::getName(),
+            MessagePriority::VERY_LOW
         );
         $this->assertMessageSent(
             AuditChangedEntitiesInverseRelationsTopic::getName(),
-            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+            $expectedBody
+        );
+        self::assertMessageSentWithPriority(
+            AuditChangedEntitiesInverseRelationsTopic::getName(),
+            MessagePriority::VERY_LOW
         );
     }
 
@@ -136,9 +144,10 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
 
         $this->processor->process($message, $this->getConnection()->createSession());
 
-        $this->assertMessageSent(
+        self::assertMessageSent(AuditChangedEntitiesInverseRelationsTopic::getName(), $expectedBody);
+        self::assertMessageSentWithPriority(
             AuditChangedEntitiesInverseRelationsTopic::getName(),
-            $this->createExpectedMessage($expectedBody, MessagePriority::VERY_LOW)
+            MessagePriority::VERY_LOW
         );
     }
 
@@ -793,15 +802,6 @@ class AuditChangedEntitiesProcessorTest extends WebTestCase
     {
         $message = new TransportMessage();
         $message->setBody($body);
-
-        return $message;
-    }
-
-    private function createExpectedMessage(mixed $body, string $priority): Message
-    {
-        $message = new Message();
-        $message->setBody($body);
-        $message->setPriority($priority);
 
         return $message;
     }

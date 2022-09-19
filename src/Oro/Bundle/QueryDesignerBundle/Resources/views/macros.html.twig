@@ -47,7 +47,7 @@
     {% import _self as queryDesignerMacros %}
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
-        <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
+        <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="display: table;">
             <thead>
             <tr>
                 {% if ('column' in showItems) %}
@@ -79,7 +79,7 @@
     {% set attr = attr|default({})|merge({'class': (attr.class|default('') ~ ' grid-container query-designer-grid-container query-designer-columns-grid-container')|trim}) %}
     <div{{ UI.attributes(attr) }}>
         <div class="grid-container query-designer-grid-container query-designer-columns-grid-container">
-            <table class="grid table-hover table table-bordered table-condensed" style="display: table;">
+            <table class="grid grid-main-container table-hover table table-bordered table-condensed" style="display: table;">
                 <thead>
                 <tr>
                     <th class="name-column"><span>{{ 'oro.query_designer.datagrid.column.column'|trans }}</span></th>

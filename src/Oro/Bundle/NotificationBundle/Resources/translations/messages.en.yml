@@ -48,6 +48,10 @@ oro:
             datagrid:
                 entity_hint: transactional emails
 
+            feature:
+                label: Email Notification Rules
+                description: Enables setting the rules, such as a sender name and email, to be applied to notifications generated in the application.
+
         massnotification:
             entity_label:         Maintenance Notification
             entity_plural_label:  Maintenance Notifications
@@ -65,6 +69,10 @@ oro:
             processed_at.label:   Sent At
             action:               View Maintenance Notifications
             block.info:           Notification Details
+
+            feature:
+                label: Maintenance Notifications
+                description: Enables setting and managing maintenance notifications, selecting email templates and recipients.
 
         notificationalert:
             entity_label:                   Notification Alert
@@ -85,6 +93,9 @@ oro:
             message.label:                  Message
             organization.label:             Organization
             additional_info.label:          Additional information
+            feature:
+                label: Notification Alerts
+                description: Enables access to view notification alerts generated to report system and data synchronization errors.
 
         system_configuration:
             email_notification_sender_email: Sender Email

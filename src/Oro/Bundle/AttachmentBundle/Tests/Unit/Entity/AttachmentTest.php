@@ -10,7 +10,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 class AttachmentTest extends \PHPUnit\Framework\TestCase
 {
     /** @var Attachment */
-    protected $entity;
+    private $entity;
 
     protected function setUp(): void
     {

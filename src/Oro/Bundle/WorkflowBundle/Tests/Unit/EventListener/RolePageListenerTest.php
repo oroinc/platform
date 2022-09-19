@@ -100,7 +100,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             [
                 'dataBlocks' => [
                     ['first block'],
-                    ['second block'],
+                    'second' => ['second block'],
                     ['third block']
                 ]
             ],
@@ -126,7 +126,8 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 
         $data = $event->getFormData();
         $this->assertCount(4, $data['dataBlocks']);
-        $workflowBlock = $data['dataBlocks'][3];
+        $this->assertEquals([0 => 0, 1 => 'second', 2 => 1, 3 => 2], array_keys($data['dataBlocks']));
+        $workflowBlock = $data['dataBlocks'][2];
         $this->assertEquals(
             'translated: oro.workflow.workflowdefinition.entity_plural_label',
             $workflowBlock['title']
@@ -151,7 +152,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
             [
                 'dataBlocks' => [
                     ['first block'],
-                    ['second block'],
+                    'second' => ['second block'],
                     ['third block']
                 ]
             ],
@@ -177,7 +178,8 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 
         $data = $event->getFormData();
         $this->assertCount(4, $data['dataBlocks']);
-        $workflowBlock = $data['dataBlocks'][3];
+        $this->assertEquals([0 => 0, 1 => 'second', 2 => 1, 3 => 2], array_keys($data['dataBlocks']));
+        $workflowBlock = $data['dataBlocks'][2];
         $this->assertEquals(
             'translated: oro.workflow.workflowdefinition.entity_plural_label',
             $workflowBlock['title']
@@ -259,6 +261,7 @@ class RolePageListenerTest extends \PHPUnit\Framework\TestCase
 
         $data = $event->getData();
         $this->assertCount(4, $data['dataBlocks']);
+        $this->assertEquals([0, 1, 2, 3], array_keys($data['dataBlocks']));
         $workflowBlock = $data['dataBlocks'][3];
         $this->assertEquals(
             'translated: oro.workflow.workflowdefinition.entity_plural_label',

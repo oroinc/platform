@@ -8,14 +8,9 @@ use Oro\Bundle\LocaleBundle\Datagrid\Formatter\Property\LocalizedValueProperty;
 
 class LocalizedValuePropertyTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var LocalizedValueProperty
-     */
-    protected $property;
+    /** @var LocalizedValueProperty */
+    private $property;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->property = new LocalizedValueProperty();

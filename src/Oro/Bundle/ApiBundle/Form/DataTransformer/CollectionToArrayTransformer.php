@@ -5,14 +5,18 @@ namespace Oro\Bundle\ApiBundle\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transforms each element in a collection via a specific data transformer.
+ */
 class CollectionToArrayTransformer implements DataTransformerInterface
 {
-    /** @var DataTransformerInterface */
-    protected $elementTransformer;
+    private DataTransformerInterface $elementTransformer;
+    private bool $useCollection;
 
-    public function __construct(DataTransformerInterface $elementTransformer)
+    public function __construct(DataTransformerInterface $elementTransformer, bool $useCollection = true)
     {
         $this->elementTransformer = $elementTransformer;
+        $this->useCollection = $useCollection;
     }
 
     /**
@@ -32,13 +36,13 @@ class CollectionToArrayTransformer implements DataTransformerInterface
             ? []
             : (array)$value;
 
-        return new ArrayCollection(
-            array_map(
-                function ($element) {
-                    return $this->elementTransformer->reverseTransform($element);
-                },
-                $value
-            )
-        );
+        $transformedValues = [];
+        foreach ($value as $val) {
+            $transformedValues[] = $this->elementTransformer->reverseTransform($val);
+        }
+
+        return $this->useCollection
+            ? new ArrayCollection($transformedValues)
+            : $transformedValues;
     }
 }

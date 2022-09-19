@@ -211,7 +211,7 @@
 
     {{ emailMacros.renderEmailAddressLink(
         label|oro_html_strip_tags|default(emailMacros.email_address_text(emailAddress)),
-        emailAddress.owner.class,
+        oro_class_name(emailAddress.owner),
         emailAddress.owner.id) }}
 {%- endmacro -%}
 
@@ -238,7 +238,7 @@
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
     {% set label = label|oro_html_strip_tags|default(emailAddressName|default('N/A')) %}
-    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% set route = oro_entity_route(oro_class_name(emailAddress.owner)) %}
     {% if route is not null %}
         <a href="{{ path(route, {id: emailAddress.owner.id}) }}" dir="ltr">
             {{ label }}</a>
@@ -603,32 +603,38 @@
         <div class="navigation navbar-extra navbar-extra-right">
             <div class="row">
                 <div class="pull-left pull-left-extra">
-                    {% if pageTitle is iterable %}
-                        {% for title in pageTitle%}
-                            {% if not loop.last %}
-                                <div class="sub-title">
-                                    {% if title is iterable and title.link is defined and title.label is defined %}
-                                        <a href="{{ title.link }}">{{ title.label }}</a>
-                                    {% else %}
-                                        {{ title }}
-                                    {% endif %}
-                                </div>
-                                <span class="separator">/</span>
-                            {% else %}
-                                <h1 class="page-title__entity-title">
-                                    {% if title is iterable and title.link is defined and title.label is defined %}
-                                        <a href="{{ title.link }}">{{ title.label }}</a>
-                                    {% else %}
-                                        {{ title }}
-                                    {% endif %}
-                                </h1>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <h1 class="page-title__entity-title">
-                            {{ pageTitle }}
-                        </h1>
-                    {% endif %}
+                    <div class="page-title__path">
+                        <div class="top-row">
+                            <div class="page-title__entity-title-wrapper">
+                                {% if pageTitle is iterable %}
+                                    {% for title in pageTitle%}
+                                        {% if not loop.last %}
+                                            <div class="sub-title">
+                                                {% if title is iterable and title.link is defined and title.label is defined %}
+                                                    <a href="{{ title.link }}">{{ title.label }}</a>
+                                                {% else %}
+                                                    {{ title }}
+                                                {% endif %}
+                                            </div>
+                                            <span class="separator">/</span>
+                                        {% else %}
+                                            <h1 class="page-title__entity-title">
+                                                {% if title is iterable and title.link is defined and title.label is defined %}
+                                                    <a href="{{ title.link }}">{{ title.label }}</a>
+                                                {% else %}
+                                                    {{ title }}
+                                                {% endif %}
+                                            </h1>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    <h1 class="page-title__entity-title">
+                                        {{ pageTitle }}
+                                    </h1>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="pull-right title-buttons-container">
                     {{ buttons|raw }}

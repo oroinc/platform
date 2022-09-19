@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Form\EventListener;
 
+use Oro\Bundle\EmailBundle\Entity\AutoResponseRule;
 use Oro\Bundle\EmailBundle\Entity\Email;
-use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -11,10 +11,12 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
+/**
+ * Adds "existing_entity" field to {@see \Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType} form type.
+ */
 class AutoResponseRuleSubscriber implements EventSubscriberInterface
 {
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
+    private TokenAccessorInterface $tokenAccessor;
 
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {
@@ -31,13 +33,16 @@ class AutoResponseRuleSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function preSet(FormEvent $event)
+    public function preSet(FormEvent $event): void
     {
-        if (null === $rule = $event->getData()) {
+        /** @var AutoResponseRule|null $rule */
+        $rule = $event->getData();
+        if (null === $rule) {
             return;
         }
 
-        if (null === $template = $rule->getTemplate()) {
+        $template = $rule->getTemplate();
+        if (null === $template) {
             return;
         }
 
@@ -52,33 +57,23 @@ class AutoResponseRuleSubscriber implements EventSubscriberInterface
             $options,
             [
                 'choices' => null,
-                'query_builder' => $this->createExistingEntityQueryBuilder($template),
+                'query_builder' => function (EmailTemplateRepository $repository) use ($template) {
+                    $qb = $repository->createQueryBuilder('e');
+
+                    return $qb
+                        ->orderBy('e.name', 'ASC')
+                        ->andWhere('e.entityName = :entityName OR e.entityName IS NULL')
+                        ->andWhere('e.organization = :organization')
+                        ->andWhere($qb->expr()->orX(
+                            $qb->expr()->eq('e.visible', ':visible'),
+                            $qb->expr()->eq('e.id', ':id')
+                        ))
+                        ->setParameter('entityName', Email::class)
+                        ->setParameter('organization', $this->tokenAccessor->getOrganization())
+                        ->setParameter('id', $template->getId())
+                        ->setParameter('visible', true);
+                }
             ]
         ));
-    }
-
-    /**
-     * @param EmailTemplate $template
-     *
-     * @return \Closure
-     */
-    protected function createExistingEntityQueryBuilder(EmailTemplate $template)
-    {
-        return function (EmailTemplateRepository $repository) use ($template) {
-            $qb = $repository->createQueryBuilder('e');
-
-            return $qb
-                ->orderBy('e.name', 'ASC')
-                ->andWhere('e.entityName = :entityName OR e.entityName IS NULL')
-                ->andWhere("e.organization = :organization")
-                ->andWhere($qb->expr()->orX(
-                    $qb->expr()->eq('e.visible', ':visible'),
-                    $qb->expr()->eq('e.id', ':id')
-                ))
-                ->setParameter('entityName', Email::ENTITY_CLASS)
-                ->setParameter('organization', $this->tokenAccessor->getOrganization())
-                ->setParameter('id', $template->getId())
-                ->setParameter('visible', true);
-        };
     }
 }

@@ -7,7 +7,6 @@ use Oro\Bundle\LayoutBundle\Cache\Metadata\CacheMetadataProvider;
 use Oro\Bundle\LayoutBundle\Cache\Metadata\LayoutCacheMetadata;
 use Oro\Bundle\LayoutBundle\Cache\RenderCache;
 use Oro\Component\Layout\BlockView;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Cache\Adapter\TagAwareAdapterInterface;
@@ -17,29 +16,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RenderCacheTest extends TestCase
 {
-    /**
-     * @var MockObject|TagAwareAdapterInterface
-     */
+    /** @var TagAwareAdapterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $cache;
 
-    /**
-     * @var CacheMetadataProvider|MockObject
-     */
+    /** @var CacheMetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $metadataProvider;
 
-    /**
-     * @var MockObject|RequestStack
-     */
+    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
-    /**
-     * @var RenderCacheExtensionInterface[]
-     */
-    private $extensions;
-
-    /**
-     * @var RenderCache
-     */
+    /** @var RenderCache */
     private $renderCache;
 
     protected function setUp(): void
@@ -47,12 +33,12 @@ class RenderCacheTest extends TestCase
         $this->cache = $this->createMock(TagAwareAdapterInterface::class);
         $this->metadataProvider = $this->createMock(CacheMetadataProvider::class);
         $this->requestStack = new RequestStack();
-        $this->extensions = [$this->createMock(RenderCacheExtensionInterface::class)];
+
         $this->renderCache = new RenderCache(
             $this->cache,
             $this->metadataProvider,
             $this->requestStack,
-            $this->extensions
+            [$this->createMock(RenderCacheExtensionInterface::class)]
         );
     }
 

@@ -89,53 +89,19 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'params' => [
-                    'acl_resource' => false,
-                    'source' => ['acl_resource' => false],
-                ],
+                'params' => [],
                 'expected' => false,
             ],
             [
-                'params' => [
-                    'acl_resource' => false,
-                    'source' => ['acl_resource' => true],
-                ],
+                'params' => ['acl_resource' => false],
                 'expected' => false,
-            ],
-            [
-                'params' => [
-                    'acl_resource' => true,
-                    'source' => ['acl_resource' => false],
-                ],
-                'expected' => true,
-            ],
-            [
-                'params' => [
-                    'acl_resource' => true,
-                    'source' => ['acl_resource' => true],
-                ],
-                'expected' => true,
             ],
             [
                 'params' => ['acl_resource' => true],
                 'expected' => true,
             ],
             [
-                'params' => [
-                    'acl_resource' => false,
-                ],
-                'expected' => false,
-            ],
-            [
-                'params' => [
-                    'source' => ['acl_resource' => false],
-                ],
-                'expected' => false,
-            ],
-            [
-                'params' => [
-                    'source' => ['acl_resource' => true],
-                ],
+                'params' => ['acl_resource' => true],
                 'expected' => true,
             ],
         ];
@@ -154,39 +120,15 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => false,
-                        'skip_acl_check' => false,
-                    ],
-                ],
+                'params' => ['source' => []],
                 'expected' => false,
             ],
             [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => false,
-                        'skip_acl_check' => true,
-                    ],
-                ],
+                'params' => ['source' => ['skip_acl_apply' => false]],
                 'expected' => false,
             ],
             [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => true,
-                        'skip_acl_check' => false,
-                    ],
-                ],
-                'expected' => true,
-            ],
-            [
-                'params' => [
-                    'source' => [
-                        'skip_acl_apply' => true,
-                        'skip_acl_check' => true,
-                    ],
-                ],
+                'params' => ['source' => ['skip_acl_apply' => true]],
                 'expected' => true,
             ],
         ];
@@ -198,7 +140,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
     public function testAddColumn(
         array $expected,
         string $name,
-        array  $definition,
+        array $definition,
         string $select = null,
         array $sorter = [],
         array $filter = []

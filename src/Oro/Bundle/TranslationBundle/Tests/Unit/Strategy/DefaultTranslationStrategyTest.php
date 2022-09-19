@@ -28,7 +28,7 @@ class DefaultTranslationStrategyTest extends \PHPUnit\Framework\TestCase
 
     public function testGetName()
     {
-        $this->assertEquals(DefaultTranslationStrategy::NAME, $this->strategy->getName());
+        $this->assertEquals('default', $this->strategy->getName());
     }
 
     public function testIsApplicable()

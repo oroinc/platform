@@ -9,7 +9,7 @@ use Oro\Bundle\ConfigBundle\Api\Processor\Get\Rest\ExpandConfigurationOptions;
 class ExpandConfigurationOptionsTest extends GetProcessorTestCase
 {
     /** @var ExpandConfigurationOptions */
-    protected $processor;
+    private $processor;
 
     protected function setUp(): void
     {

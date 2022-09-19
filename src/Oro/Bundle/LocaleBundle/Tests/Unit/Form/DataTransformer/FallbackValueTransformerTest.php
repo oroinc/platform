@@ -7,10 +7,8 @@ use Oro\Bundle\LocaleBundle\Model\FallbackType;
 
 class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var FallbackValueTransformer
-     */
-    protected $transformer;
+    /** @var FallbackValueTransformer */
+    private $transformer;
 
     protected function setUp(): void
     {
@@ -18,11 +16,9 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider transformDataProvider
      */
-    public function testTransform($input, $expected): void
+    public function testTransform(FallbackType|string|null $input, array $expected): void
     {
         $this->assertEquals($expected, $this->transformer->transform($input));
     }
@@ -46,11 +42,9 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform($input, $expected): void
+    public function testReverseTransform(?array $input, ?string $expected): void
     {
         $this->assertSame($expected, $this->transformer->reverseTransform($input));
     }
@@ -78,11 +72,9 @@ class FallbackValueTransformerTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param mixed $input
-     * @param mixed $expected
      * @dataProvider reverseTransformWhenFallbackDataProvider
      */
-    public function testReverseTransformWhenFallback($input, $expected): void
+    public function testReverseTransformWhenFallback(array $input, FallbackType|string $expected): void
     {
         $this->assertEquals($expected, $this->transformer->reverseTransform($input));
     }

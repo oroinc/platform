@@ -14,6 +14,8 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
+ * Represents an additional information that a user can leave about an entity record.
+ *
  * @ORM\Entity(repositoryClass="Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository")
  * @ORM\Table(name="oro_note")
  * @Config(
@@ -48,8 +50,6 @@ class Note extends ExtendNote implements DatesAwareInterface, UpdatedByAwareInte
 {
     use DatesAwareTrait;
     use UpdatedByAwareTrait;
-
-    const ENTITY_NAME = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /**
      * @var integer

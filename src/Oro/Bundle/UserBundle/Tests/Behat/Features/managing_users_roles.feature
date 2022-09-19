@@ -1,5 +1,6 @@
 @regression
 @ticket-BAP-13807
+@ticket-BAP-21510
 @automatically-ticket-tagged
 Feature: Managing users roles
   In order to control user permissions
@@ -66,3 +67,11 @@ Feature: Managing users roles
     And I confirm deletion
     Then the number of records decreased by 1
     And I should not see "Edited test role"
+
+  Scenario: Check should see only the following actions
+    Given I go to System/User Management/Roles
+    And I should see only following actions for row #1 on grid:
+      | Clone   |
+      | View    |
+      | Edit    |
+      | Delete  |

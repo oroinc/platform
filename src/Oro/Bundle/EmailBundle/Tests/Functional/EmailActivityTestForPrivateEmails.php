@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
+use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -12,30 +13,22 @@ class EmailActivityTestForPrivateEmails extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());
+        $this->loadFixtures([LoadEmailData::class]);
     }
 
     public function testGetActivityListData(): void
     {
-        $this->loadFixtures(['Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData']);
         $email = $this->getReference('email_1');
         $em = self::getContainer()->get('doctrine.orm.entity_manager');
 
-        $activityList = $em
-            ->getRepository(ActivityList::ENTITY_NAME)
-            ->findOneBy(
-                [
-                    'relatedActivityClass' => 'Oro\Bundle\EmailBundle\Entity\Email',
-                    'relatedActivityId' => $email->getId()
-                ]
-            );
+        $activityList = $em->getRepository(ActivityList::class)
+            ->findOneBy(['relatedActivityClass' => Email::class, 'relatedActivityId' => $email->getId()]);
 
         $this->assertNull($activityList);
     }
 
     public function testGetSimpleUserActivityListByAdmin(): void
     {
-        $this->loadFixtures([LoadEmailData::class]);
-
         $emailOwner = $this->getReference('simple_user');
         $routingHelper = self::getContainer()->get('oro_entity.routing_helper');
         $url = $this->getUrl(
@@ -53,7 +46,6 @@ class EmailActivityTestForPrivateEmails extends WebTestCase
 
     public function testGetAdminActivityListByAdmin(): void
     {
-        $this->loadFixtures([LoadEmailData::class]);
         $this->initClient([], $this->generateWsseAuthHeader('simple_user', 'simple_password'));
 
         $user = $this->getReference('simple_user');

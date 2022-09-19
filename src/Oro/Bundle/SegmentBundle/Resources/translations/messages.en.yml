@@ -38,6 +38,10 @@ oro:
         records_limit:
             label: Records limit
 
+        feature:
+            label: Segments
+            description: Enables creating and managing filtered subsets of data (segments) that are used in reports, web catalog nodes, and marketing lists.
+
         form:
             choose_segment_type:    Choose segment type
             designer:               Designer

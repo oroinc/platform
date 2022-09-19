@@ -9,14 +9,18 @@ services:
         arguments:
             - []
 
+    oro_message_queue.client.security_token_provider:
+        class: Oro\Bundle\MessageQueueBundle\Security\SecurityTokenProvider
+        arguments:
+            - '@security.token_storage'
+
     oro_message_queue.client.security_aware_driver_factory:
-        class: 'Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory'
-        public: false
+        class: Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriverFactory
         decorates: oro_message_queue.client.driver_factory
         arguments:
             - '@.inner'
             - [] # security agnostic topics
-            - '@security.token_storage'
+            - '@oro_message_queue.client.security_token_provider'
             - '@oro_security.token_serializer'
 
     oro_message_queue.platform.optional_listener_driver_factory:

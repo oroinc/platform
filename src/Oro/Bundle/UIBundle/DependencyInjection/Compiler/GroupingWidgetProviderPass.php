@@ -6,6 +6,7 @@ use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * This class provides an algorithm to load prioritized (ksort() function is used to sort by priority)
@@ -15,14 +16,9 @@ class GroupingWidgetProviderPass implements CompilerPassInterface
 {
     use PriorityTaggedLocatorTrait;
 
-    /** @var string */
-    private $serviceId;
-
-    /** @var string */
-    private $tagName;
-
-    /** @var int|null */
-    private $pageType;
+    private string $serviceId;
+    private string $tagName;
+    private ?int $pageType;
 
     public function __construct(string $serviceId, string $tagName, int $pageType = null)
     {
@@ -34,15 +30,21 @@ class GroupingWidgetProviderPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        [$services, $items] = $this->findAndInverseSortTaggedServicesWithHandler(
-            $this->tagName,
-            function (array $attributes, string $serviceId): array {
-                return [$serviceId, $this->getAttribute($attributes, 'group')];
-            },
-            $container
-        );
+        $services = [];
+        $items = [];
+        $taggedServices = $container->findTaggedServiceIds($this->tagName, true);
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $items[$this->getPriorityAttribute($attributes)][] = [$id, $this->getAttribute($attributes, 'group')];
+            }
+        }
+        if ($items) {
+            ksort($items);
+            $items = array_merge(...array_values($items));
+        }
 
         $serviceDef = $container->getDefinition($this->serviceId);
         $serviceDef

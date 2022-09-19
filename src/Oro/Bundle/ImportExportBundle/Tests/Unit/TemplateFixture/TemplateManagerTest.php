@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\TemplateFixture;
 
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRegistry;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateEntityRepositoryInterface;
@@ -152,7 +153,7 @@ class TemplateManagerTest extends \PHPUnit\Framework\TestCase
 
         $anotherRepository = $this->createMock(TemplateEntityRepositoryInterface::class);
 
-        $this->expectException(\Oro\Bundle\ImportExportBundle\Exception\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage(
             sprintf('The repository "%s" cannot be added to the frozen registry.', get_class($anotherRepository))
         );

@@ -326,12 +326,6 @@ class UserTest extends AbstractUserTest
         );
     }
 
-    public function testGetClass(): void
-    {
-        $user = $this->getUser();
-        self::assertInstanceOf($user->getClass(), $user);
-    }
-
     public function testGetEmailFields(): void
     {
         $user = $this->getUser();

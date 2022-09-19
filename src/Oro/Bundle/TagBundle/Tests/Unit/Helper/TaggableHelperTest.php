@@ -2,11 +2,16 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
 use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\TestEntity;
+use Oro\Bundle\TagBundle\Tests\Unit\Stub\NotTaggableEntityStub;
+use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class TaggableHelperTest extends \PHPUnit\Framework\TestCase
 {
@@ -63,6 +68,25 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
             'has no config'       => [new \stdClass(), false, true, false],
             'disabled in config'  => [new \stdClass(), false, true, true, false]
         ];
+    }
+
+    public function testGetTaggableEntities()
+    {
+        $this->configProvider->expects($this->once())
+            ->method('getConfigs')
+            ->willReturn([
+                $this->getEntityConfig(TaggableEntityStub::class, []),
+                $this->getEntityConfig(NotTaggableEntityStub::class, []),
+                $this->getEntityConfig(User::class, ['enabled' => true])
+            ]);
+
+        $this->assertEquals(
+            [
+                TaggableEntityStub::class,
+                User::class
+            ],
+            $this->helper->getTaggableEntities()
+        );
     }
 
     /**
@@ -129,6 +153,14 @@ class TaggableHelperTest extends \PHPUnit\Framework\TestCase
             'from Taggable interface method' => [new Taggable(['id' => 100]), 100],
             'from getId method'              => [new TestEntity(200), 200]
         ];
+    }
+
+    private function getEntityConfig(string $entityClass, array $values): Config
+    {
+        $entityConfig = new Config(new EntityConfigId('tag', $entityClass));
+        $entityConfig->setValues($values);
+
+        return $entityConfig;
     }
 
     private function setConfigProvider(object|string $object, bool $hasConfig, bool $isEnabled)

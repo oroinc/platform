@@ -1,0 +1,38 @@
+features:
+    manage_tags:
+        label: oro.tag.feature.manage.label
+        description: oro.tag.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_tag_index
+            - oro_tag_create
+            - oro_tag_update
+            - oro_api_delete_tag
+            - oro_api_post_taggable
+        entities:
+            - Oro\Bundle\TagBundle\Entity\Tag
+            - Oro\Bundle\TagBundle\Entity\Tagging
+        api_resources:
+            - Oro\Bundle\TagBundle\Entity\Tag
+        navigation_items:
+            - application_menu.system_tab.tags_management.oro_tag_list
+
+    manage_taxonomies:
+        label: oro.taxonomy.feature.manage.label
+        description: oro.taxonomy.feature.manage.description
+        allow_if_all_abstain: true
+        routes:
+            - oro_taxonomy_index
+            - oro_taxonomy_view
+            - oro_taxonomy_create
+            - oro_taxonomy_update
+            - oro_taxonomy_widget_info
+            - oro_api_delete_taxonomy
+        entities:
+            - Oro\Bundle\TagBundle\Entity\Taxonomy
+        api_resources:
+            - Oro\Bundle\TagBundle\Entity\Taxonomy
+        navigation_items:
+            - application_menu.system_tab.tags_management.oro_taxonomy_list
+        configuration:
+            - oro_tag.taxonomy_colors

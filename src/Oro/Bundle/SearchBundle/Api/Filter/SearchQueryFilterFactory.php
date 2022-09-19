@@ -10,14 +10,9 @@ use Oro\Bundle\SearchBundle\Provider\AbstractSearchMappingProvider;
  */
 class SearchQueryFilterFactory
 {
-    /** @var AbstractSearchMappingProvider */
-    private $searchMappingProvider;
-
-    /** @var SearchFieldResolverFactory */
-    private $searchFieldResolverFactory;
-
-    /** @var ExpressionVisitor|null */
-    private $searchQueryCriteriaVisitor;
+    private AbstractSearchMappingProvider $searchMappingProvider;
+    private SearchFieldResolverFactory $searchFieldResolverFactory;
+    private ?ExpressionVisitor $searchQueryCriteriaVisitor;
 
     public function __construct(
         AbstractSearchMappingProvider $searchMappingProvider,
@@ -37,7 +32,9 @@ class SearchQueryFilterFactory
         $filter = new SearchQueryFilter($dataType);
         $filter->setSearchMappingProvider($this->searchMappingProvider);
         $filter->setSearchFieldResolverFactory($this->searchFieldResolverFactory);
-        $filter->setSearchQueryCriteriaVisitor($this->searchQueryCriteriaVisitor);
+        if (null !== $this->searchQueryCriteriaVisitor) {
+            $filter->setSearchQueryCriteriaVisitor($this->searchQueryCriteriaVisitor);
+        }
 
         return $filter;
     }

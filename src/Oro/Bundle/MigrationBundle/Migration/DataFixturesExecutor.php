@@ -30,12 +30,13 @@ class DataFixturesExecutor implements DataFixturesExecutorInterface
     /**
      * {@inheritdoc}
      */
-    public function execute(array $fixtures, $fixturesType)
+    public function execute(array $fixtures, string $fixturesType, ?callable $progressCallback = null): void
     {
         $event = new MigrationDataFixturesEvent($this->em, $fixturesType, $this->logger);
         $this->eventDispatcher->dispatch($event, MigrationEvents::DATA_FIXTURES_PRE_LOAD);
 
         $executor = new DataFixturesORMExecutor($this->em);
+        $executor->setProgressCallback($progressCallback);
         if (null !== $this->logger) {
             $executor->setLogger($this->logger);
         }

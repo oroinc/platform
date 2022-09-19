@@ -18,12 +18,6 @@ class Configuration implements ConfigurationInterface
     const KEY_CURRENCY_DISPLAY = 'currency_display';
 
     /**
-     * @deprecated
-     * @var array
-     */
-    public static $defaultCurrencies = [self::DEFAULT_CURRENCY];
-
-    /**
      * Returns full key name by it's last part
      *
      * @param $name string last part of the key name (one of the class cons can be used)

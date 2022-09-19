@@ -18,7 +18,7 @@ services:
 
     Oro\Bundle\AssetBundle\Command\OroAssetsBuildCommand:
         arguments:
-            - '@oro_asset.node_process_factory'
+            - '@oro_asset.asset_command_process_factory'
             - '@oro_asset_bundle.asset_config.cache'
             - '%oro_asset.npm_path%'
             - '%oro_asset.build_timeout%'
@@ -33,10 +33,10 @@ services:
         tags:
             - { name: console.command, command: 'oro:assets:install' }
 
-    oro_asset.node_process_factory:
-        class: Oro\Bundle\AssetBundle\NodeProcessFactory
+    oro_asset.asset_command_process_factory:
+        class: Oro\Bundle\AssetBundle\AssetCommandProcessFactory
         arguments:
-            - '%oro_asset.nodejs_path%'
+            - '%oro_asset.npm_path%'
 
     oro_asset.webpack_server:
         class: Oro\Bundle\AssetBundle\Webpack\WebpackServer

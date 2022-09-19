@@ -6,7 +6,7 @@ namespace Oro\Bundle\MessageQueueBundle\Command;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Job\Job as JobComponent;
@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Clears old records from message_queue_job table.
  */
-class CleanupCommand extends Command implements CronCommandInterface
+class CleanupCommand extends Command implements CronCommandScheduleDefinitionInterface
 {
     public const INTERVAL_FOR_SUCCESSES = '-2 weeks';
     public const INTERVAL_FOR_FAILED = '-1 month';
@@ -34,12 +34,10 @@ class CleanupCommand extends Command implements CronCommandInterface
         parent::__construct();
     }
 
-    public function isActive()
-    {
-        return true;
-    }
-
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return '0 1 * * *';
     }

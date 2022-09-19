@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
+use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -70,7 +71,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
 
         $associationName = ExtendHelper::buildAssociationName($entityClass);
         $associationConfig = new Config(
-            new FieldConfigId('extend', AttachmentAssociationHelper::ATTACHMENT_ENTITY, $associationName)
+            new FieldConfigId('extend', Attachment::class, $associationName)
         );
         $associationConfig->set('is_extend', true);
         $associationConfig->set('state', ExtendScope::STATE_ACTIVE);
@@ -79,7 +80,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
             ->method('hasConfig')
             ->willReturnMap([
                 [$entityClass, null, true],
-                [AttachmentAssociationHelper::ATTACHMENT_ENTITY, $associationName, true],
+                [Attachment::class, $associationName, true],
             ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
@@ -87,7 +88,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
-            ->with('extend', AttachmentAssociationHelper::ATTACHMENT_ENTITY, $associationName)
+            ->with('extend', Attachment::class, $associationName)
             ->willReturn($associationConfig);
 
         $this->assertTrue(
@@ -104,7 +105,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
 
         $associationName = ExtendHelper::buildAssociationName($entityClass);
         $associationConfig = new Config(
-            new FieldConfigId('extend', AttachmentAssociationHelper::ATTACHMENT_ENTITY, $associationName)
+            new FieldConfigId('extend', Attachment::class, $associationName)
         );
         $associationConfig->set('is_extend', true);
         $associationConfig->set('state', ExtendScope::STATE_NEW);
@@ -113,7 +114,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
             ->method('hasConfig')
             ->willReturnMap([
                 [$entityClass, null, true],
-                [AttachmentAssociationHelper::ATTACHMENT_ENTITY, $associationName, true],
+                [Attachment::class, $associationName, true],
             ]);
         $this->configManager->expects($this->once())
             ->method('getEntityConfig')
@@ -121,7 +122,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
         $this->configManager->expects($this->once())
             ->method('getFieldConfig')
-            ->with('extend', AttachmentAssociationHelper::ATTACHMENT_ENTITY, $associationName)
+            ->with('extend', Attachment::class, $associationName)
             ->willReturn($associationConfig);
 
         $this->assertFalse(

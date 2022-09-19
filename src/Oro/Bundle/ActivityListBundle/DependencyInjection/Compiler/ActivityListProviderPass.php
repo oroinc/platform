@@ -6,6 +6,7 @@ use Oro\Component\DependencyInjection\Compiler\PriorityTaggedLocatorTrait;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Registers all activity list providers.
@@ -17,24 +18,31 @@ class ActivityListProviderPass implements CompilerPassInterface
     /**
      * {@inheritdoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        list($services, $items) = $this->findAndInverseSortTaggedServicesWithHandler(
-            'oro_activity_list.provider',
-            function (array $attributes, string $serviceId, string $tagName): array {
-                return [
-                    $serviceId,
-                    $this->getRequiredAttribute($attributes, 'class', $serviceId, $tagName),
+        $tagName = 'oro_activity_list.provider';
+        $services = [];
+        $items = [];
+        $taggedServices = $container->findTaggedServiceIds($tagName, true);
+        foreach ($taggedServices as $id => $tags) {
+            $services[$id] = new Reference($id);
+            foreach ($tags as $attributes) {
+                $items[$this->getPriorityAttribute($attributes)][] = [
+                    $id,
+                    $this->getRequiredAttribute($attributes, 'class', $id, $tagName),
                     $this->getAttribute($attributes, 'acl_class')
                 ];
-            },
-            $container
-        );
+            }
+        }
+        if ($items) {
+            ksort($items);
+            $items = array_merge(...array_values($items));
+        }
 
         $activityClasses = [];
         $activityAclClasses = [];
         $activityProviders = [];
-        foreach ($items as list($id, $class, $aclClass)) {
+        foreach ($items as [$id, $class, $aclClass]) {
             if (!isset($activityClasses[$class])) {
                 $activityProviders[$class] = $services[$id];
                 $activityClasses[$class] = $id;

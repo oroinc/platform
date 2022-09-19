@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\DBAL\Connection;
-use Gedmo\Tool\Logging\DBAL\QueryAnalyzer;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizationRepository;
 use Oro\Bundle\LocaleBundle\Tests\Functional\DataFixtures\LoadLocalizationData;
@@ -20,46 +18,6 @@ class LocalizationRepositoryTest extends WebTestCase
     private function getRepository(): LocalizationRepository
     {
         return self::getContainer()->get('doctrine')->getRepository(Localization::class);
-    }
-
-    private function getConnection(): Connection
-    {
-        return self::getContainer()->get('doctrine')->getManagerForClass(Localization::class)->getConnection();
-    }
-
-    public function testFindRootsWithChildren()
-    {
-        $localizations = [
-            $this->getReference(LoadLocalizationData::DEFAULT_LOCALIZATION_CODE),
-            $this->getReference('es')
-        ];
-        $queryAnalyzer = new QueryAnalyzer($this->getConnection()->getDatabasePlatform());
-
-        $prevLogger = $this->getConnection()->getConfiguration()->getSQLLogger();
-        $this->getConnection()->getConfiguration()->setSQLLogger($queryAnalyzer);
-
-        /** @var Localization[] $result */
-        $result = $this->getRepository()->findRootsWithChildren();
-
-        $this->assertEquals(array_values($localizations), array_values($result));
-
-        foreach ($result as $root) {
-            $this->visitChildren($root);
-        }
-
-        $queries = $queryAnalyzer->getExecutedQueries();
-
-        $this->assertCount(count($localizations) + 2, $queries);
-
-        $this->getConnection()->getConfiguration()->setSQLLogger($prevLogger);
-    }
-
-    private function visitChildren(Localization $localization)
-    {
-        $localization->getLanguageCode();
-        foreach ($localization->getChildLocalizations() as $child) {
-            $this->visitChildren($child);
-        }
     }
 
     public function testGetLocalizationsCount()
@@ -95,10 +53,7 @@ class LocalizationRepositoryTest extends WebTestCase
         $this->assertEquals('English (Canada)', $localization->getDefaultTitle());
     }
 
-    /**
-     * @return object|Localization
-     */
-    private function getDefaultLocalization()
+    private function getDefaultLocalization(): Localization
     {
         $localeSettings = $this->getContainer()->get('oro_locale.settings');
         $locale = $localeSettings->getLocale();

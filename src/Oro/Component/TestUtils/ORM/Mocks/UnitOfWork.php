@@ -4,12 +4,17 @@ namespace Oro\Component\TestUtils\ORM\Mocks;
 
 use Doctrine\ORM\UnitOfWork as BaseUnitOfWork;
 
+/**
+ * Special UnitOfWork mock used for testing purposes.
+ */
 class UnitOfWork extends BaseUnitOfWork
 {
     protected $insertions = [];
     protected $deletions = [];
     protected $updates = [];
     protected $changeSets = [];
+    protected $collectionUpdates = [];
+    protected $collectionDeletions = [];
 
     public function __construct()
     {
@@ -94,5 +99,25 @@ class UnitOfWork extends BaseUnitOfWork
     protected function addChangeSet($entity, $changeSet)
     {
         $this->changeSets[spl_object_hash($entity)] = $changeSet;
+    }
+
+    public function addCollectionUpdates($coll)
+    {
+        $this->collectionUpdates[] = $coll;
+    }
+
+    public function addCollectionDeletions($coll)
+    {
+        $this->collectionDeletions[] = $coll;
+    }
+
+    public function getScheduledCollectionUpdates()
+    {
+        return $this->collectionUpdates;
+    }
+
+    public function getScheduledCollectionDeletions()
+    {
+        return $this->collectionDeletions;
     }
 }

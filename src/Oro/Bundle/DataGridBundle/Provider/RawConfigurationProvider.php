@@ -5,8 +5,7 @@ namespace Oro\Bundle\DataGridBundle\Provider;
 use Oro\Component\Config\Cache\ConfigCache;
 use Oro\Component\Config\Cache\PhpConfigCacheAccessor;
 use Oro\Component\Config\Cache\WarmableConfigCacheInterface;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainer;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -22,8 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 class RawConfigurationProvider implements WarmableConfigCacheInterface
 {
     private const CONFIG_FILE = 'Resources/config/oro/datagrids.yml';
-
-    private const ROOT_SECTION   = 'datagrids';
+    private const ROOT_SECTION = 'datagrids';
     private const MIXINS_SECTION = 'mixins';
 
     /** @var string */
@@ -117,11 +115,8 @@ class RawConfigurationProvider implements WarmableConfigCacheInterface
     private function loadConfiguration(ResourcesContainerInterface $resourcesContainer): array
     {
         $configs = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_datagrid',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
-        $resources = $configLoader->load($resourcesContainer);
+        $cumulativeConfigLoader = CumulativeConfigLoaderFactory::create('oro_datagrid', self::CONFIG_FILE);
+        $resources = $cumulativeConfigLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (isset($resource->data[self::ROOT_SECTION])) {
                 $grids = $resource->data[self::ROOT_SECTION];

@@ -3,21 +3,19 @@
 namespace Oro\Bundle\ReportBundle\Provider;
 
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
+use Oro\Bundle\ReportBundle\Entity\Report;
 
 /**
- * Report entity title provider
- * Will return report's 'name' or 'id' as fallback
+ * Provides a text representation of Report entity.
  */
 class ReportEntityNameProvider implements EntityNameProviderInterface
 {
-    const CLASS_NAME = 'Oro\Bundle\ReportBundle\Entity\Report';
-
     /**
      * {@inheritdoc}
      */
     public function getName($format, $locale, $entity)
     {
-        if (!in_array($format, [self::SHORT, self::FULL]) || !is_a($entity, static::CLASS_NAME)) {
+        if (!$entity instanceof Report || !\in_array($format, [self::SHORT, self::FULL], true)) {
             return false;
         }
 
@@ -29,7 +27,7 @@ class ReportEntityNameProvider implements EntityNameProviderInterface
      */
     public function getNameDQL($format, $locale, $className, $alias)
     {
-        if (!in_array($format, [self::SHORT, self::FULL]) || $className !== self::CLASS_NAME) {
+        if (!is_a($className, Report::class, true) || !\in_array($format, [self::SHORT, self::FULL], true)) {
             return false;
         }
 

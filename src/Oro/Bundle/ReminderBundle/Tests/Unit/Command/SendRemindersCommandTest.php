@@ -38,7 +38,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 
         $doctrine->expects($this->any())
             ->method('getRepository')
-            ->with('OroReminderBundle:Reminder')
+            ->with(Reminder::class)
             ->willReturn($this->repository);
 
         $this->command = new SendRemindersCommand($doctrine, $this->sender);
@@ -51,7 +51,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecute()
     {
-        $input  = $this->createMock(InputInterface::class);
+        $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
         $reminders = [
@@ -148,7 +148,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteNoRemindersToSend()
     {
-        $input  = $this->createMock(InputInterface::class);
+        $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
         $this->repository->expects($this->once())
@@ -164,7 +164,7 @@ class SendRemindersCommandTest extends \PHPUnit\Framework\TestCase
 
     public function testExecuteRollbackTransaction()
     {
-        $input  = $this->createMock(InputInterface::class);
+        $input = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
         $reminder = $this->createMock(Reminder::class);

@@ -14,6 +14,7 @@ use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class Form extends Element
 {
@@ -154,7 +155,7 @@ class Form extends Element
      *
      * @param string $actionLocator
      */
-    protected function pressActionButton($actionLocator)
+    public function pressActionButton($actionLocator)
     {
         $button = $this->findButton($actionLocator);
 

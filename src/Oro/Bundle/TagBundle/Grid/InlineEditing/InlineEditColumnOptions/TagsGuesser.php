@@ -6,7 +6,6 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\Configuration;
 use Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\GuesserInterface;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\TagBundle\Entity\TagManager;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -30,7 +29,7 @@ class TagsGuesser implements GuesserInterface
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $result = [];
-        if (array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
+        if (\array_key_exists(PropertyInterface::FRONTEND_TYPE_KEY, $column)
             && $column[PropertyInterface::FRONTEND_TYPE_KEY] === self::SUPPORTED_TYPE
         ) {
             $result[Configuration::BASE_CONFIG_KEY] = $this->getInlineOptions($entityName, $isEnabledInline);
@@ -42,15 +41,12 @@ class TagsGuesser implements GuesserInterface
     protected function getInlineOptions(string $entityName, bool $isEnabledInline): array
     {
         return [
-            'enable' => $isEnabledInline && $this->authorizationChecker->isGranted(
-                TagManager::ACL_RESOURCE_ASSIGN_ID_KEY
-            ),
+            'enable' => $isEnabledInline && $this->authorizationChecker->isGranted('oro_tag_assign_unassign'),
             'editor' => [
                 'view' => 'orotag/js/app/views/editor/tags-editor-view',
                 'view_options' => [
                     'permissions' => [
-                        'oro_tag_create' => $this->authorizationChecker
-                            ->isGranted(TagManager::ACL_RESOURCE_CREATE_ID_KEY)
+                        'oro_tag_create' => $this->authorizationChecker->isGranted('oro_tag_create')
                     ]
                 ]
             ],

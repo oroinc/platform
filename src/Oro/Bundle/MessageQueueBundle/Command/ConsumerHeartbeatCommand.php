@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\MessageQueueBundle\Command;
 
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Oro\Bundle\CronBundle\Command\SynchronousCommandInterface;
 use Oro\Bundle\MessageQueueBundle\Consumption\ConsumerHeartbeat;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Pushes a websocket notification if there are no available MQ consumers.
  */
 class ConsumerHeartbeatCommand extends Command implements
-    CronCommandInterface,
+    CronCommandScheduleDefinitionInterface,
     SynchronousCommandInterface
 {
     /** @var string */
@@ -41,17 +41,15 @@ class ConsumerHeartbeatCommand extends Command implements
         parent::__construct();
     }
 
-    public function getDefaultDefinition()
+    /**
+     * {@inheritDoc}
+     */
+    public function getDefaultDefinition(): string
     {
         return \sprintf(
             '*/%u * * * *',
             $this->heartBeatUpdatePeriod
         );
-    }
-
-    public function isActive()
-    {
-        return true;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */

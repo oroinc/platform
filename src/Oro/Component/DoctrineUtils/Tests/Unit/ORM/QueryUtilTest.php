@@ -3,16 +3,17 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
 use Oro\Component\DoctrineUtils\ORM\QueryUtil;
+use Oro\Component\DoctrineUtils\Tests\Unit\Fixtures\Entity\Item;
+use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 
 class QueryUtilTest extends OrmTestCase
 {
-    /** @var EntityManager */
-    private $em;
+    private EntityManagerMock $em;
 
     protected function setUp(): void
     {
@@ -20,7 +21,7 @@ class QueryUtilTest extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl(new AnnotationDriver(new AnnotationReader()));
     }
 
-    public function testCloneQuery()
+    public function testCloneQuery(): void
     {
         $query = new Query($this->em);
         $query->setDQL('SELECT e FROM Test:Item e WHERE e.id = :id');
@@ -32,7 +33,7 @@ class QueryUtilTest extends OrmTestCase
         self::assertEquals($query, $clonedQuery);
     }
 
-    public function testAddTreeWalkerWhenQueryDoesNotHaveHints()
+    public function testAddTreeWalkerWhenQueryDoesNotHaveHints(): void
     {
         $query = new Query($this->em);
 
@@ -41,13 +42,13 @@ class QueryUtilTest extends OrmTestCase
         );
         self::assertEquals(
             [
-                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker']
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker'],
             ],
             $query->getHints()
         );
     }
 
-    public function testAddTreeWalkerWhenQueryHasOtherHints()
+    public function testAddTreeWalkerWhenQueryHasOtherHints(): void
     {
         $query = new Query($this->em);
         $query->setHint('test', 'value');
@@ -57,14 +58,14 @@ class QueryUtilTest extends OrmTestCase
         );
         self::assertEquals(
             [
-                'test'                          => 'value',
-                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker']
+                'test' => 'value',
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker'],
             ],
             $query->getHints()
         );
     }
 
-    public function testAddTreeWalkerWhenQueryHasOtherTreeWalkers()
+    public function testAddTreeWalkerWhenQueryHasOtherTreeWalkers(): void
     {
         $query = new Query($this->em);
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['Test\OtherWalker']);
@@ -74,13 +75,13 @@ class QueryUtilTest extends OrmTestCase
         );
         self::assertEquals(
             [
-                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\OtherWalker', 'Test\Walker']
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\OtherWalker', 'Test\Walker'],
             ],
             $query->getHints()
         );
     }
 
-    public function testAddTreeWalkerWhenQueryAlreadyHasTreeWalker()
+    public function testAddTreeWalkerWhenQueryAlreadyHasTreeWalker(): void
     {
         $query = new Query($this->em);
         $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, ['Test\Walker']);
@@ -90,9 +91,44 @@ class QueryUtilTest extends OrmTestCase
         );
         self::assertEquals(
             [
-                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker']
+                Query::HINT_CUSTOM_TREE_WALKERS => ['Test\Walker'],
             ],
             $query->getHints()
         );
+    }
+
+    public function testResetParameters(): void
+    {
+        $query = $this->em->createQuery('SELECT e FROM ' . Item::class . ' e WHERE e.id = :id');
+        $query->setParameter('id', 42, Types::INTEGER);
+
+        $parserResult = QueryUtil::parseQuery($query);
+
+        self::assertNotEmpty($query->getParameters()->toArray());
+        self::assertNotEmpty($parserResult->getParameterMappings());
+
+        QueryUtil::resetParameters($query);
+
+        self::assertEmpty($query->getParameters()->toArray());
+        self::assertEmpty($parserResult->getParameterMappings());
+    }
+
+    public function testResetParametersWhenParserResult(): void
+    {
+        $query = $this->em->createQuery('SELECT e FROM ' . Item::class . ' e WHERE e.id = :id');
+        $query->setParameter('id', 42, Types::INTEGER);
+
+        $parserResult = QueryUtil::parseQuery($query);
+        $anotherParserResult = clone $parserResult;
+
+        self::assertNotEmpty($query->getParameters()->toArray());
+        self::assertNotEmpty($parserResult->getParameterMappings());
+        self::assertNotEmpty($anotherParserResult->getParameterMappings());
+
+        QueryUtil::resetParameters($query, $anotherParserResult);
+
+        self::assertEmpty($query->getParameters()->toArray());
+        self::assertNotEmpty($parserResult->getParameterMappings());
+        self::assertEmpty($anotherParserResult->getParameterMappings());
     }
 }

@@ -1,0 +1,7 @@
+/* @theme: default; */
+
+@mixin placeholder {
+    &::placeholder {
+        @content;
+    }
+}

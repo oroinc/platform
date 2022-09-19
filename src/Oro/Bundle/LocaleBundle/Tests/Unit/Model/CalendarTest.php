@@ -8,15 +8,11 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class CalendarTest extends TestCase
 {
-    /**
-     * @var Calendar
-     */
-    protected $calendar;
+    /** @var Calendar */
+    private $calendar;
 
-    /**
-     * @var string
-     */
-    protected $defaultLocale;
+    /** @var string */
+    private $defaultLocale;
 
     protected function setUp(): void
     {
@@ -36,13 +32,13 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getFirstDayOfWeekDataProvider
      */
-    public function testGetFirstDayOfWeek($locale, $expected, $defaultLocale = null)
+    public function testGetFirstDayOfWeek(?string $locale, int $expected, string $defaultLocale = null)
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
             \Locale::setDefault($defaultLocale);
         }
-        $this->assertEquals($expected, $this->calendar->getFirstDayOfWeek($locale));
+        $this->assertEquals($expected, $this->calendar->getFirstDayOfWeek());
     }
 
     public function getFirstDayOfWeekDataProvider(): array
@@ -73,13 +69,13 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getMonthNamesDataProvider
      */
-    public function testGetMonthNames($width, $locale, array $expected, $defaultLocale = null)
+    public function testGetMonthNames(?string $width, ?string $locale, array $expected, $defaultLocale = null)
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {
             \Locale::setDefault($defaultLocale);
         }
-        $this->assertEquals($expected, $this->calendar->getMonthNames($width), '', 0.0, 10, false, true);
+        $this->assertEquals($expected, $this->calendar->getMonthNames($width), '');
     }
 
     public function getMonthNamesDataProvider(): array
@@ -139,7 +135,7 @@ class CalendarTest extends TestCase
     /**
      * @dataProvider getDayOfWeekNamesDataProvider
      */
-    public function testGetDayOfWeekNames($width, $locale, $defaultLocale = null)
+    public function testGetDayOfWeekNames(?string $width, ?string $locale, string $defaultLocale = null)
     {
         $this->calendar->setLocale($locale);
         if (null !== $defaultLocale) {

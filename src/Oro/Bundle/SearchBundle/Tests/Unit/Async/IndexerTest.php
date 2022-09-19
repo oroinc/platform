@@ -61,7 +61,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->never())
-            ->method('getEntityIdentifier');
+            ->method($this->anything());
 
         $indexer = new Indexer(
             self::getMessageProducer(),
@@ -78,7 +78,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $doctrineHelper->expects($this->never())
-            ->method('getEntityIdentifier');
+            ->method($this->anything());
 
         $indexer = new Indexer(
             self::getMessageProducer(),

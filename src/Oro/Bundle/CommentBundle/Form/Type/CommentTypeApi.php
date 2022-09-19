@@ -18,8 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CommentTypeApi extends AbstractType
 {
-    const FORM_NAME = 'oro_comment_api';
-
     /** @var  ConfigManager $configManager */
     protected $configManager;
 
@@ -67,7 +65,7 @@ class CommentTypeApi extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'      => Comment::ENTITY_NAME,
+                'data_class'      => Comment::class,
                 'csrf_token_id'   => 'comment',
                 'csrf_protection' => false,
             ]
@@ -84,6 +82,6 @@ class CommentTypeApi extends AbstractType
      */
     public function getBlockPrefix()
     {
-        return self::FORM_NAME;
+        return 'oro_comment_api';
     }
 }

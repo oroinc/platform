@@ -3,25 +3,14 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query\Result;
 
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 class ItemTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var Item|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $item;
-
-    /**
-     * @var Product
-     */
-    protected $product;
+    /** @var Item|\PHPUnit\Framework\MockObject\MockObject */
+    private $item;
 
     protected function setUp(): void
     {
-        $this->product = new Product();
-        $this->product->setName('test product');
-
         $this->item = new Item(
             'OroTestBundle:test',
             1,

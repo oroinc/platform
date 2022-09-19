@@ -78,8 +78,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $this->configurationProvider = new ConfigurationProvider(
             $this->cacheFile,
             false,
-            $container,
-            CumulativeResourceManager::getInstance()->getBundles()
+            $container
         );
     }
 

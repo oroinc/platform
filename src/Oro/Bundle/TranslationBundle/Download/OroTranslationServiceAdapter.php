@@ -12,6 +12,8 @@ use Oro\Bundle\TranslationBundle\Exception\TranslationServiceAdapterException;
 use Oro\Bundle\TranslationBundle\Exception\TranslationServiceInvalidResponseException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Yaml\Parser as YamlParser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Adapter to download translations from Oro's translations server.
@@ -123,9 +125,15 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
      * {@inheritDoc}
      *
      * @throws TranslationServiceAdapterException if cannot extract data from the archive
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function extractTranslationsFromArchive(string $pathToArchive, string $directoryPathToExtractTo): void
-    {
+    public function extractTranslationsFromArchive(
+        string $pathToArchive,
+        string $directoryPathToExtractTo,
+        string $languageCode
+    ): void {
         if (!\extension_loaded('zip')) {
             throw new TranslationServiceAdapterException(
                 'PHP zip extension is required - https://php.net/manual/zip.installation.php'
@@ -143,10 +151,52 @@ final class OroTranslationServiceAdapter implements TranslationServiceAdapterInt
             );
         }
 
+        $yamlParser = new YamlParser();
+        $allMessages = [];
+
         $isExtractFailed = false;
         try {
-            if (false === $zip->extractTo($directoryPathToExtractTo)) {
-                $isExtractFailed = true;
+            for ($i = 0; $i < $zip->count(); $i++) {
+                $filename = $zip->getNameIndex($i);
+                if (\str_starts_with($filename, '/')) {
+                    continue;
+                }
+
+                // "OroAuthorizeNetBundle/translations/jsmessages.es_ES.yml"
+                $pathParts = \pathinfo(\substr($filename, 0, -1 * \strlen('.yml')));
+
+                $localeCode = $pathParts['extension'];
+                if ($localeCode !== $languageCode) {
+                    continue;
+                }
+
+                $domain = $pathParts['filename'];
+                if (\in_array($domain, ['OroFilterBundle', '_undefined'])) {
+                    continue;
+                }
+
+                $messages = $yamlParser->parse($zip->getFromIndex($i), Yaml::PARSE_CONSTANT);
+                if (\is_array($messages)) {
+                    foreach ($messages as $key => $value) {
+                        $allMessages[$localeCode][$domain][$key] = $value;
+                    }
+                }
+            }
+
+            $csvDelimiter = ';';
+            $csvEnclosure = '"';
+            $csvEscape = '\\';
+
+            foreach ($allMessages as $locale => $domainMessages) {
+                foreach ($domainMessages as $domain => $messages) {
+                    $csvFile = new \SplFileObject(
+                        $directoryPathToExtractTo . DIRECTORY_SEPARATOR . $domain . '.' . $locale . '.csv',
+                        'w'
+                    );
+                    foreach ($messages as $key => $value) {
+                        $csvFile->fputcsv([$key, $value], $csvDelimiter, $csvEnclosure, $csvEscape);
+                    }
+                }
             }
         } catch (\Throwable $e) {
             throw self::createExtractException($actualFilePath, $directoryPathToExtractTo, $e);

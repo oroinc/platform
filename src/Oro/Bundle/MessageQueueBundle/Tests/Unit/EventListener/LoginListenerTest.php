@@ -15,19 +15,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class LoginListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var LoginListener */
-    protected $listener;
+    private $listener;
 
     /** @var ConsumerHeartbeat|\PHPUnit\Framework\MockObject\MockObject */
-    protected $consumerHeartbeat;
+    private $consumerHeartbeat;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    private $translator;
 
     /** @var FlashBag */
-    protected $flashBag;
+    private $flashBag;
 
     /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    protected $request;
+    private $request;
 
     protected function setUp(): void
     {
@@ -36,11 +36,9 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->translator->expects($this->any())
             ->method('trans')
-            ->willReturnCallback(
-                function ($string) {
-                    return $string . '|translated';
-                }
-            );
+            ->willReturnCallback(function ($string) {
+                return $string . '|translated';
+            });
 
         $this->flashBag = new FlashBag();
         $session = $this->createMock(Session::class);

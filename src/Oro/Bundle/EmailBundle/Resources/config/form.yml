@@ -198,9 +198,6 @@ services:
         tags:
             - { name: form.type, alias: oro_email_mailbox }
 
-    Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler:
-        alias: oro_email.form.handler.mailbox
-
     oro_email.form.handler.mailbox:
         class: Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
         public: true

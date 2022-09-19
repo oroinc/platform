@@ -19,25 +19,25 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetParent()
     {
-        $this->assertIsString($this->type->getParent());
+        self::assertIsString($this->type->getParent());
     }
 
     public function testConfigureOptions()
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setRequired')
-            ->with($this->isType('array'))
+            ->with(self::isType('array'))
             ->willReturnSelf();
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setDefined')
-            ->with($this->isType('array'))
+            ->with(self::isType('array'))
             ->willReturnSelf();
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setDefaults')
-            ->with($this->isType('array'))
+            ->with(self::isType('array'))
             ->willReturnSelf();
-        $resolver->expects($this->exactly(3))
+        $resolver->expects(self::exactly(3))
             ->method('setAllowedTypes')
             ->willReturnSelf();
 
@@ -53,7 +53,8 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
         $form = $this->createMock(Form::class);
 
         $this->type->finishView($formView, $form, $options);
-        $this->assertEquals($expected, $formView->vars);
+
+        self::assertEquals($expected, $formView->vars);
     }
 
     public function optionsProvider(): array
@@ -64,9 +65,7 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
                     'route'           => 'route',
                     'acl'             => 'acl',
                     'title'           => 'title',
-                    'routeParameters' => [],
-                    'isPath'          => false,
-                    'class'           => ''
+                    'routeParameters' => []
                 ],
                 [
                     'value'           => null,
@@ -74,9 +73,7 @@ class LinkTypeTest extends \PHPUnit\Framework\TestCase
                     'route'           => 'route',
                     'acl'             => 'acl',
                     'title'           => 'title',
-                    'routeParameters' => [],
-                    'isPath'          => false,
-                    'class'           => ''
+                    'routeParameters' => []
                 ]
             ]
         ];

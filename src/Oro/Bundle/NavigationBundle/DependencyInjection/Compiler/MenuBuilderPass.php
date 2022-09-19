@@ -19,7 +19,7 @@ class MenuBuilderPass implements CompilerPassInterface
     /**
      * {@inheritDoc}
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $this->processMenu($container);
         $this->processItems($container);
@@ -34,7 +34,7 @@ class MenuBuilderPass implements CompilerPassInterface
             $container,
             BuilderChainProvider::COMMON_BUILDER_ALIAS
         );
-        foreach ($items as list($alias, $id)) {
+        foreach ($items as [$alias, $id]) {
             $builders[$alias][] = $id;
             if (!isset($services[$alias])) {
                 $services[$id] = new Reference($id);
@@ -50,7 +50,7 @@ class MenuBuilderPass implements CompilerPassInterface
     {
         $services = [];
         $items = $this->findAndInverseSortTaggedServices('oro_navigation.item.builder', $container);
-        foreach ($items as list($alias, $id)) {
+        foreach ($items as [$alias, $id]) {
             if (!isset($services[$alias])) {
                 $container->getDefinition($id)->addArgument($alias);
                 $services[$alias] = new Reference($id);
@@ -61,13 +61,6 @@ class MenuBuilderPass implements CompilerPassInterface
             ->setArgument('$builders', ServiceLocatorTagPass::register($container, $services));
     }
 
-    /**
-     * @param string           $tagName
-     * @param ContainerBuilder $container
-     * @param string|null      $defaultAlias
-     *
-     * @return array [[alias, service id], ...]
-     */
     private function findAndInverseSortTaggedServices(
         string $tagName,
         ContainerBuilder $container,
@@ -83,8 +76,10 @@ class MenuBuilderPass implements CompilerPassInterface
                 ];
             }
         }
-
-        $items = $this->inverseSortByPriorityAndFlatten($items);
+        if ($items) {
+            ksort($items);
+            $items = array_merge(...array_values($items));
+        }
 
         return $items;
     }

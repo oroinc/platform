@@ -459,7 +459,7 @@ services:
             - '@oro_entity_config.provider.deleted_attribute'
             - '@Doctrine\Inflector\Inflector'
         calls:
-            - [setTopic, ['oro_entity_config.attribute_was_removed_from_family']]
+            - [setTopic, [!php/const Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeRemovedFromFamilyTopic::NAME]]
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -471,7 +471,7 @@ services:
             - '@logger'
             - '@oro_entity_config.provider.deleted_attribute'
         tags:
-            - { name: oro_message_queue.client.message_processor, topicName: 'oro_entity_config.attribute_was_removed_from_family' }
+            - { name: oro_message_queue.client.message_processor, topicName: !php/const Oro\Bundle\EntityConfigBundle\Async\Topic\AttributeRemovedFromFamilyTopic::NAME }
 
     oro_entity_config.provider.deleted_attribute:
         class: Oro\Bundle\EntityConfigBundle\Provider\DeletedAttributeProvider

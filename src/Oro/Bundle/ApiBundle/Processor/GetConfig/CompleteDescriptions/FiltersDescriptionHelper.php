@@ -15,17 +15,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class FiltersDescriptionHelper
 {
-    private const FIELD_FILTER_DESCRIPTION       = 'Filter records by \'%s\' field.';
+    private const FIELD_FILTER_DESCRIPTION = 'Filter records by \'%s\' field.';
     private const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
-    /** @var TranslatorInterface */
-    private $translator;
-
-    /** @var ResourceDocParserProvider */
-    private $resourceDocParserProvider;
-
-    /** @var DescriptionProcessor */
-    private $descriptionProcessor;
+    private TranslatorInterface $translator;
+    private ResourceDocParserProvider $resourceDocParserProvider;
+    private DescriptionProcessor $descriptionProcessor;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -57,7 +52,7 @@ class FiltersDescriptionHelper
                         );
                     }
                     $field->setDescription($description);
-                } else {
+                } elseif (!$field->getDescription()) {
                     $field->setDescription(
                         $this->getFilterDefaultDescription($fieldName, $definition->getField($fieldName))
                     );
@@ -79,10 +74,10 @@ class FiltersDescriptionHelper
     private function getFilterDefaultDescription(string $fieldName, ?EntityDefinitionFieldConfig $fieldConfig): string
     {
         if (null !== $fieldConfig && $fieldConfig->hasTargetEntity()) {
-            return \sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName);
+            return sprintf(self::ASSOCIATION_FILTER_DESCRIPTION, $fieldName);
         }
 
-        return \sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName);
+        return sprintf(self::FIELD_FILTER_DESCRIPTION, $fieldName);
     }
 
     private function trans(Label $label): ?string

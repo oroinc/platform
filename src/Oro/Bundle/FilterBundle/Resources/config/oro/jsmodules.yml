@@ -41,5 +41,5 @@ dynamic-imports:
         - oro/filter/text-filter
         - orofilter/js/datafilter-builder
 map:
-    "*":
+    '*':
         oro/filter-settings: orofilter/js/filter/filter-settings

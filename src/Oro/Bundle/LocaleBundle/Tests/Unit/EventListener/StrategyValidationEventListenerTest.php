@@ -15,7 +15,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var StrategyValidationEventListener */
-    protected $listener;
+    private $listener;
 
     protected function setUp(): void
     {

@@ -8,15 +8,12 @@ use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionMetadataFactory;
 
 class MassActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    protected $actionMetadataFactory;
+    /** @var ActionMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $actionMetadataFactory;
 
     /** @var MassActionMetadataFactory */
-    protected $massActionMetadataFactory;
+    private $massActionMetadataFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->actionMetadataFactory = $this->createMock(ActionMetadataFactory::class);

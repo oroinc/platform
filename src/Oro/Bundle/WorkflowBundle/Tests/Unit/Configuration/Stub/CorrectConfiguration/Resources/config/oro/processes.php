@@ -15,7 +15,7 @@ return [
             'actions_configuration' => [
                 ['@assign_value' => ['$entity.field', 'value']]
             ],
-            'preconditions' => ['@or' => ['@true', '@false'], '@condition1' => null],
+            'preconditions' => ['@or' => ['@true', '@false']],
         ],
         'another_definition' => [
             'label'                 => 'Another definition',

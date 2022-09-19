@@ -11,12 +11,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @param array $actions
-     *
-     * @return MassActionFactory
-     */
-    private function getActionFactory(array $actions)
+    private function getActionFactory(array $actions): MassActionFactory
     {
         $containerBuilder = TestContainerBuilder::create();
         foreach ($actions as $type => $action) {
@@ -28,7 +23,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateActionWithoutType()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "type" option must be defined. Action: action1.');
 
         $factory = $this->getActionFactory([]);
@@ -37,7 +32,7 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateUnregisteredAction()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Unknown action type "type1". Action: action1.');
 
         $factory = $this->getActionFactory([]);
@@ -46,10 +41,10 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateActionForInvalidActionClass()
     {
-        $this->expectException(\Oro\Bundle\DataGridBundle\Exception\RuntimeException::class);
-        $this->expectExceptionMessage(\sprintf(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(sprintf(
             'An action should be an instance of "%s", got "stdClass".',
-            \Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface::class
+            ActionInterface::class
         ));
 
         $factory = $this->getActionFactory(['type1' => new \stdClass()]);
@@ -62,13 +57,11 @@ class MassActionFactoryTest extends \PHPUnit\Framework\TestCase
         $factory = $this->getActionFactory(['type1' => $action]);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage(
-            sprintf(
-                'An action should be an instance of "%s", got "%s".',
-                MassActionInterface::class,
-                get_class($action)
-            )
-        );
+        $this->expectExceptionMessage(sprintf(
+            'An action should be an instance of "%s", got "%s".',
+            MassActionInterface::class,
+            get_class($action)
+        ));
 
         $factory->createAction('action1', ['type' => 'type1']);
     }

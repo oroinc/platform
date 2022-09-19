@@ -5,40 +5,24 @@ namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Appearance;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
-use Oro\Bundle\DataGridBundle\Entity\Manager\AppearanceTypeManager;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\AppearanceExtension;
 use Oro\Bundle\DataGridBundle\Extension\Appearance\Configuration;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
-     */
-    protected $translator;
+    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $translator;
 
-    /**
-     * @var AppearanceExtension
-     */
-    protected $extension;
+    /** @var AppearanceExtension */
+    private $extension;
 
     protected function setUp(): void
     {
-        $manager = $this->createMock(AppearanceTypeManager::class);
-        $manager->expects($this->any())
-            ->method('getAppearanceTypes')
-            ->willReturn([
-                'grid'  => [
-                    'label' => 'grid',
-                    'icon'  => 'icon'
-                ],
-                'board' => []
-            ]);
-        $configuration = new Configuration($manager);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->extension = new AppearanceExtension(
-            $configuration,
+            new Configuration(),
             $this->translator
         );
         $this->extension->setParameters(new ParameterBag());

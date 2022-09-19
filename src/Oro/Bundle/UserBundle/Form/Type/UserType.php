@@ -7,6 +7,8 @@ use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\FormBundle\Form\Type\OroBirthdayType;
 use Oro\Bundle\OrganizationBundle\Form\Type\OrganizationsSelectType;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use Oro\Bundle\UserBundle\Entity\Group;
+use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\UserSubscriber;
 use Oro\Bundle\UserBundle\Form\Provider\PasswordFieldOptionsProvider;
@@ -26,7 +28,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
- * Form type of User entity
+ * The form type for User entity.
  */
 class UserType extends AbstractType
 {
@@ -50,7 +52,6 @@ class UserType extends AbstractType
     ) {
         $this->authorizationChecker = $authorizationChecker;
         $this->tokenAccessor = $tokenAccessor;
-
         $this->isMyProfilePage = $requestStack->getCurrentRequest()->get('_route') === 'oro_user_profile_update';
         $this->optionsProvider = $optionsProvider;
     }
@@ -68,11 +69,11 @@ class UserType extends AbstractType
      */
     public function addEntityFields(FormBuilderInterface $builder)
     {
-        // user fields
         $builder->addEventSubscriber(new UserSubscriber($builder->getFormFactory(), $this->tokenAccessor));
-        $this->setDefaultUserFields($builder);
-        $attr = [];
 
+        $this->setDefaultUserFields($builder);
+
+        $attr = [];
         if ($this->isMyProfilePage) {
             $attr['readonly'] = true;
         }
@@ -83,13 +84,10 @@ class UserType extends AbstractType
                 EntityType::class,
                 [
                     'label'         => 'oro.user.roles.label',
-                    'class'         => 'OroUserBundle:Role',
+                    'class'         => Role::class,
                     'choice_label'  => 'label',
-                    'query_builder' => function (EntityRepository $er) {
-                        return $er->createQueryBuilder('r')
-                            ->where('r.role <> :anon')
-                            ->setParameter('anon', User::ROLE_ANONYMOUS)
-                            ->orderBy('r.label');
+                    'query_builder' => function (EntityRepository $repo) {
+                        return $repo->createQueryBuilder('r')->orderBy('r.label');
                     },
                     'multiple'      => true,
                     'expanded'      => true,
@@ -106,7 +104,7 @@ class UserType extends AbstractType
                 EntityType::class,
                 [
                     'label'     => 'oro.user.groups.label',
-                    'class'     => 'OroUserBundle:Group',
+                    'class'     => Group::class,
                     'choice_label'  => 'name',
                     'multiple'  => true,
                     'expanded'  => true,
@@ -195,18 +193,16 @@ class UserType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'data_class'           => User::class,
-                'csrf_token_id'        => 'user',
-                'validation_groups'    => ['Roles', 'Default'],
-                'ownership_disabled'   => $this->isMyProfilePage
-            ]
-        );
+        $resolver->setDefaults([
+            'data_class'         => User::class,
+            'csrf_token_id'      => 'user',
+            'validation_groups'  => ['Roles', 'Default'],
+            'ownership_disabled' => $this->isMyProfilePage
+        ]);
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function getName()
     {

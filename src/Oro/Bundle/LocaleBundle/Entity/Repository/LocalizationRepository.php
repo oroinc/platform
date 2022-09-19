@@ -30,22 +30,6 @@ class LocalizationRepository extends EntityRepository implements BatchIteratorIn
     }
 
     /**
-     * @return array
-     */
-    public function findRootsWithChildren()
-    {
-        $localizations = $this->createQueryBuilder('l')
-            ->addSelect('children')
-            ->leftJoin('l.childLocalizations', 'children')
-            ->getQuery()
-            ->execute();
-
-        return array_filter($localizations, function (Localization $localization) {
-            return !$localization->getParentLocalization();
-        });
-    }
-
-    /**
      * @return int
      */
     public function getLocalizationsCount()

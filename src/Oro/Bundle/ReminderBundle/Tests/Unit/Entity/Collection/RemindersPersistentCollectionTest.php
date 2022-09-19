@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ReminderBundle\Tests\Unit\Entity\Collection;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ReminderBundle\Entity\Collection\RemindersPersistentCollection;
 use Oro\Bundle\ReminderBundle\Entity\Reminder;
 use Oro\Bundle\ReminderBundle\Entity\Repository\ReminderRepository;
-use PHPUnit\Framework\MockObject\MockObject;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -17,25 +16,20 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
     private const CLASS_NAME = 'Foo\\Entity';
     private const IDENTIFIER = 101;
 
-    /** @var MockObject|ReminderRepository */
-    protected $repository;
+    /** @var ReminderRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $repository;
 
     /** @var RemindersPersistentCollection */
-    protected $collection;
+    private $collection;
 
     protected function setUp(): void
     {
         $this->repository = $this->createMock(ReminderRepository::class);
-        $this->collection = new class(
+        $this->collection = new RemindersPersistentCollection(
             $this->repository,
             self::CLASS_NAME,
             self::IDENTIFIER
-        ) extends RemindersPersistentCollection {
-            public function xgetCollection(): Collection
-            {
-                return $this->collection;
-            }
-        };
+        );
     }
 
     public function testAdd()
@@ -45,7 +39,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         $this->expectInitialize([$foo]);
         $this->collection->add($bar);
 
-        self::assertCollectionElementsEquals([$foo, $bar]);
+        $this->assertCollectionElementsEquals([$foo, $bar]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -57,7 +51,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         $this->expectInitialize([$foo, $bar]);
         $this->collection->clear();
 
-        self::assertCollectionElementsEquals([]);
+        $this->assertCollectionElementsEquals([]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -69,11 +63,11 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         $this->expectInitialize([$foo, $bar]);
         $this->collection->remove(3);
 
-        self::assertCollectionElementsEquals([$foo, $bar]);
+        $this->assertCollectionElementsEquals([$foo, $bar]);
         self::assertFalse($this->collection->isDirty());
 
         $this->collection->remove(0);
-        self::assertCollectionElementsEquals([1 => $bar]);
+        $this->assertCollectionElementsEquals([1 => $bar]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -86,11 +80,11 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         $this->expectInitialize([$foo, $bar]);
         $this->collection->removeElement($baz);
 
-        self::assertCollectionElementsEquals([$foo, $bar]);
+        $this->assertCollectionElementsEquals([$foo, $bar]);
         self::assertFalse($this->collection->isDirty());
 
         $this->collection->removeElement($foo);
-        self::assertCollectionElementsEquals([1 => $bar]);
+        $this->assertCollectionElementsEquals([1 => $bar]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -102,11 +96,11 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
 
         $this->expectInitialize([$foo]);
         $this->collection->set(0, $bar);
-        self::assertCollectionElementsEquals([$bar]);
+        $this->assertCollectionElementsEquals([$bar]);
         self::assertTrue($this->collection->isDirty());
 
         $this->collection->set(null, $baz);
-        self::assertCollectionElementsEquals([$bar, $baz]);
+        $this->assertCollectionElementsEquals([$bar, $baz]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -155,7 +149,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         $this->expectInitialize([$foo, $bar]);
         $this->collection[0] = $baz;
         self::assertEquals($baz, $this->collection[0]);
-        self::assertCollectionElementsEquals([$baz, $bar]);
+        $this->assertCollectionElementsEquals([$baz, $bar]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -166,7 +160,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
 
         $this->expectInitialize([$foo, $bar]);
         unset($this->collection[0]);
-        self::assertCollectionElementsEquals([1 => $bar]);
+        $this->assertCollectionElementsEquals([1 => $bar]);
         self::assertTrue($this->collection->isDirty());
     }
 
@@ -202,7 +196,7 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([1 => $bar, $baz], $this->collection->getInsertDiff());
     }
 
-    protected function expectInitialize(array $reminders)
+    private function expectInitialize(array $reminders): void
     {
         $this->repository->expects($this->once())
             ->method('findRemindersByEntity')
@@ -210,12 +204,15 @@ class RemindersPersistentCollectionTest extends \PHPUnit\Framework\TestCase
             ->willReturn($reminders);
     }
 
-    protected function assertCollectionElementsEquals(array $elements)
+    private function assertCollectionElementsEquals(array $elements): void
     {
-        self::assertEquals(new ArrayCollection($elements), $this->collection->xgetCollection());
+        self::assertEquals(
+            new ArrayCollection($elements),
+            ReflectionUtil::getPropertyValue($this->collection, 'collection')
+        );
     }
 
-    protected function createReminder($id)
+    private function createReminder(int $id): Reminder
     {
         $result = $this->createMock(Reminder::class);
         $result->expects($this->any())

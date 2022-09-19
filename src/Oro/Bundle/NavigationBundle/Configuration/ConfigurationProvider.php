@@ -3,9 +3,8 @@
 namespace Oro\Bundle\NavigationBundle\Configuration;
 
 use Oro\Component\Config\Cache\PhpArrayConfigProvider;
-use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\CumulativeConfigProcessorUtil;
-use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\Config\Loader\Factory\CumulativeConfigLoaderFactory;
 use Oro\Component\Config\ResourcesContainerInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
 
@@ -92,10 +91,7 @@ class ConfigurationProvider extends PhpArrayConfigProvider
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $config = [];
-        $configLoader = new CumulativeConfigLoader(
-            'oro_navigation',
-            new YamlCumulativeFileLoader(self::CONFIG_FILE)
-        );
+        $configLoader = CumulativeConfigLoaderFactory::create('oro_navigation', self::CONFIG_FILE);
         $resources = $configLoader->load($resourcesContainer);
         foreach ($resources as $resource) {
             if (\array_key_exists(NavigationConfiguration::ROOT_NODE, $resource->data)) {

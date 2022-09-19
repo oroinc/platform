@@ -166,12 +166,6 @@ class AuditController extends RestGetController
         // process relations
         $result['user'] = $entity->getUser() ? $entity->getUser()->getId() : null;
 
-        // prevent BC breaks
-        // @deprecated since 1.4.1
-        $result['object_class'] = $result['objectClass'];
-        $result['object_name']  = $result['objectName'];
-        $result['username']     = $entity->getUser() ? $entity->getUser()->getUsername() : null;
-
         unset($result['fields']);
         $result['data'] = $this->get('oro_dataaudit.model.fields_transformer')->getCollectionData($entity->getFields());
 

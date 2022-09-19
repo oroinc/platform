@@ -37,8 +37,11 @@ class TranslationServiceAdapterStub implements TranslationServiceAdapterInterfac
     /**
      * {@inheritDoc}
      */
-    public function extractTranslationsFromArchive(string $pathToArchive, string $directoryPathToExtractTo): void
-    {
+    public function extractTranslationsFromArchive(
+        string $pathToArchive,
+        string $directoryPathToExtractTo,
+        string $languageCode
+    ): void {
         $zip = new \ZipArchive();
         $zip->open($pathToArchive);
         $zip->extractTo($directoryPathToExtractTo);

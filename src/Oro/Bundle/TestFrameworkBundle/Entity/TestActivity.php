@@ -32,6 +32,9 @@ use Oro\Bundle\UserBundle\Entity\User;
  *              "owner_column_name"="owner_id",
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
+ *          },
+ *          "tag"={
+ *              "enabled"=true
  *          }
  *      }
  * )

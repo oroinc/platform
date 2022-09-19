@@ -8,11 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\DependencyInjection\ExtensionTestCase;
 class OroLoggerExtensionTest extends ExtensionTestCase
 {
     /** @var OroLoggerExtension */
-    protected $extension;
+    private $extension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->extension = new OroLoggerExtension();

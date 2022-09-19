@@ -3,55 +3,71 @@
 namespace Oro\Component\MessageQueue\Job;
 
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
+use Oro\Component\MessageQueue\Exception\JobRuntimeException;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 
-class DelayedJobRunnerDecoratingProcessor implements MessageProcessorInterface
+/**
+ * Wraps a message processor into a delayed job callback.
+ */
+class DelayedJobRunnerDecoratingProcessor implements MessageProcessorInterface, LoggerAwareInterface
 {
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
+    use LoggerAwareTrait;
 
-    /**
-     * @var MessageProcessorInterface
-     */
-    private $processor;
+    public const JOB_ID = 'jobId';
 
-    public function __construct(JobRunner $jobRunner, MessageProcessorInterface $processor)
+    private JobRunner $jobRunner;
+
+    private MessageProcessorInterface $decoratedProcessor;
+
+    public function __construct(JobRunner $jobRunner, MessageProcessorInterface $decoratedProcessor)
     {
         $this->jobRunner = $jobRunner;
-        $this->processor = $processor;
+        $this->decoratedProcessor = $decoratedProcessor;
+
+        $this->logger = new NullLogger();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $data = JSON::decode($message->getBody());
-        if (!array_key_exists('jobId', $data)) {
+        $messageBody = $message->getBody();
+        if (!isset($messageBody[self::JOB_ID])) {
+            $this->logger->error(
+                'Rejecting the message {messageId} because jobId option is missing from the message body',
+                ['messageId' => $message->getMessageId()]
+            );
+
             return self::REJECT;
         }
 
-        $result = $this->jobRunner->runDelayed($data['jobId'], function () use ($data, $message, $session) {
-            $processorMessage = clone $message;
-            unset($data['jobId']);
-            $processorMessage->setBody(JSON::encode($data));
+        $decoratedProcessorMessage = clone $message;
+        $jobId = $messageBody[self::JOB_ID];
+        unset($messageBody[self::JOB_ID]);
+        $decoratedProcessorMessage->setBody($messageBody);
 
-            $result = $this->processor->process($processorMessage, $session);
+        try {
+            $result = $this->jobRunner->runDelayed(
+                $jobId,
+                function () use ($decoratedProcessorMessage, $session, &$status) {
+                    $status = $this->decoratedProcessor->process($decoratedProcessorMessage, $session);
+                    if ($status === self::REQUEUE) {
+                        throw JobRedeliveryException::create();
+                    }
 
-            if ($result === true || $result === self::ACK) {
-                return true;
-            }
-            if ($result === self::REQUEUE) {
-                throw new \Exception('REQUEUE requested');
-            }
+                    return $status === true || $status === self::ACK;
+                }
+            );
+            $status = $result ? self::ACK : self::REJECT;
+        } catch (JobRuntimeException|JobRedeliveryException $exception) {
+            // Delayed job that is interrupted by an exception is always marked for redelivery, so the message should
+            // be re-queued.
+            $status = self::REQUEUE;
+        }
 
-            return false;
-        });
-
-        return $result ? self::ACK : self::REJECT;
+        return $status;
     }
 }

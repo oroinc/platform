@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\ImportExportBundle\Command\Cron;
 
 use Gaufrette\File;
-use Oro\Bundle\CronBundle\Command\CronCommandInterface;
+use Oro\Bundle\CronBundle\Command\CronCommandScheduleDefinitionInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,14 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Basic logic to delete old temporary import/export files.
  */
-abstract class CleanupStorageCommandAbstract extends Command implements CronCommandInterface
+abstract class CleanupStorageCommandAbstract extends Command implements CronCommandScheduleDefinitionInterface
 {
     protected const DEFAULT_PERIOD = 14; // days
-
-    public function isActive()
-    {
-        return true;
-    }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()

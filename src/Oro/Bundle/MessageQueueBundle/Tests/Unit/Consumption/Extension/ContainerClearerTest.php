@@ -4,13 +4,12 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Consumption\Extension;
 
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ContainerClearer;
 use Oro\Bundle\MessageQueueBundle\Consumption\Extension\ResettableExtensionInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
 
 class ContainerClearerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var MockObject|Container */
+    /** @var Container|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
     /** @var ContainerClearer */

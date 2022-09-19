@@ -23,6 +23,7 @@ Feature: Dependent menu item updated with global menu update
     And I follow "More actions"
     And I follow "Edit Menus"
     And I click view application_menu in grid
+    And I should see "Select existing menu item or create new"
     And I click "Test Item"
     And I save form
     Then I should see "Menu item saved successfully." flash message

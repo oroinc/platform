@@ -15,22 +15,22 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class InstallCommandListenerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var RequestStack */
-    protected $requestStack;
+    private $requestStack;
 
     /** @var Command|\PHPUnit\Framework\MockObject\MockObject */
-    protected $command;
+    private $command;
 
     /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
+    private $input;
 
     /** @var OutputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $output;
+    private $output;
 
     /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
-    protected $commandExecutor;
+    private $commandExecutor;
 
     /** @var InstallerEvent */
-    protected $event;
+    private $event;
 
     protected function setUp(): void
     {

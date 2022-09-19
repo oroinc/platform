@@ -59,7 +59,12 @@ interface TranslationServiceAdapterInterface
      *
      * @param string $pathToArchive use the same value that you passed to downloadLanguageTranslationsArchive() before.
      * @param string $directoryPathToExtractTo
+     * @param string $languageCode full language code, including locality, e.g. "fr_FR", "fr_CA".
      * @throws TranslationServiceAdapterException if failed to extract for any reason
      */
-    public function extractTranslationsFromArchive(string $pathToArchive, string $directoryPathToExtractTo): void;
+    public function extractTranslationsFromArchive(
+        string $pathToArchive,
+        string $directoryPathToExtractTo,
+        string $languageCode
+    ): void;
 }

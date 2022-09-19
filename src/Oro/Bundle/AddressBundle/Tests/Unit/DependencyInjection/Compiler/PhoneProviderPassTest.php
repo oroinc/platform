@@ -7,6 +7,7 @@ use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -44,7 +45,7 @@ class PhoneProviderPassTest extends \PHPUnit\Framework\TestCase
 
     public function testProcessNoClass(): void
     {
-        $this->expectException(\Symfony\Component\DependencyInjection\Exception\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
             'The attribute "class" is required for "oro_address.phone_provider" tag. Service: "provider1".'
         );

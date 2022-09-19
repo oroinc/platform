@@ -6,14 +6,9 @@ use Oro\Bundle\CurrencyBundle\Form\DataTransformer\MoneyValueTransformer;
 
 class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
-    /**
-     * @var MoneyValueTransformer
-     */
-    protected $transformer;
+    /** @var MoneyValueTransformer */
+    private $transformer;
 
-    /**
-     * @inheritDoc
-     */
     protected function setUp(): void
     {
         $this->transformer = new MoneyValueTransformer();
@@ -22,7 +17,7 @@ class MoneyValueTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform($rawValue, $expectedValue)
+    public function testReverseTransform(string $rawValue, string $expectedValue)
     {
         $this->assertSame($expectedValue, $this->transformer->reverseTransform($rawValue));
     }

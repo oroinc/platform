@@ -78,7 +78,6 @@ oro:
             plural_label:      Entities
             information.label: Entity Information
             unique.label:      Unique Keys
-            information_message: Current content view is simplified, please check the edit page to see the actual result
 
         entity_config:
             entity_name.label: Name
@@ -109,6 +108,11 @@ oro:
         info:
             new_field.label:     New Field
             records_count.label: 'Number of records: %count%'
+
+        feature:
+            entity_management:
+                label: Entity Management
+                description: Enables creating and managing entities and entity fields.
 
         form:
             default_group_label: General

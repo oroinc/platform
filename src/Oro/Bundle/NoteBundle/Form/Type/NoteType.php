@@ -10,6 +10,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
+/**
+ * The form type for Note entity.
+ */
 class NoteType extends AbstractType
 {
     /**
@@ -43,7 +46,7 @@ class NoteType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'              => Note::ENTITY_NAME,
+                'data_class'              => Note::class,
                 'csrf_token_id'           => 'note',
                 'ownership_disabled'      => true,
                 'dynamic_fields_disabled' => true,

@@ -44,7 +44,7 @@ Retrieve the service records that store the localization titles localized data.
 
 #### get_relationship
 
-Retrieve the ID's of service records that store the localization titles localized data.
+Retrieve the IDs of service records that store the localization titles localized data.
 
 # Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue
 

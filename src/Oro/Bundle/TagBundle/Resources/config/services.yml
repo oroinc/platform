@@ -3,9 +3,7 @@ services:
         class: Oro\Bundle\TagBundle\Entity\TagManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - 'Oro\Bundle\TagBundle\Entity\Tag'
-            - 'Oro\Bundle\TagBundle\Entity\Tagging'
+            - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'
             - '@router'
@@ -254,7 +252,7 @@ services:
         parent: oro_form.autocomplete.search_handler
         arguments:
             - 'Oro\Bundle\TagBundle\Entity\Taxonomy'
-            - ["name"]
+            - ['name']
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: taxonomy, acl_resource: oro_taxonomy_view }
 

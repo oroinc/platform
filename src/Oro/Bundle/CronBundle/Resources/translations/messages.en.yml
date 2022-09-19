@@ -83,3 +83,9 @@ oro:
             will_be_deacitivated: 'Will be deactivated on %date%.'
             active_now: 'Is active now.'
             not_active_now: 'Is not active now.'
+
+        feature:
+            scheduled_tasks:
+                manage:
+                    label: Scheduled Task Management
+                    description: Enables access to view the scheduled cron commands and their definition strings.

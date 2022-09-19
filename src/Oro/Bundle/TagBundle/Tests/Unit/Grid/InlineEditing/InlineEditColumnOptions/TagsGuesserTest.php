@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\Grid\InlineEditing\InlineEditColumnOptions;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Grid\InlineEditing\InlineEditColumnOptions\TagsGuesser;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -33,14 +32,8 @@ class TagsGuesserTest extends \PHPUnit\Framework\TestCase
     {
         $this->authorizationChecker->expects($this->exactly(2))
             ->method('isGranted')
-            ->withConsecutive(
-                [TagManager::ACL_RESOURCE_ASSIGN_ID_KEY],
-                [TagManager::ACL_RESOURCE_CREATE_ID_KEY]
-            )
-            ->willReturnOnConsecutiveCalls(
-                true,
-                true
-            );
+            ->withConsecutive(['oro_tag_assign_unassign'], ['oro_tag_create'])
+            ->willReturn(true);
         $this->entityRoutingHelper->expects($this->once())
             ->method('getUrlSafeClassName')
             ->willReturn('TestSafe');

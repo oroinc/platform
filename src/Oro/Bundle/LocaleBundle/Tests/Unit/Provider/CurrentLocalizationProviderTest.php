@@ -39,8 +39,6 @@ class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $this->assertSame($localization, $provider->getCurrentLocalization());
-        // test that the result is cached
-        $this->assertSame($localization, $provider->getCurrentLocalization());
     }
 
     public function testGetCurrentLocalizationWhenAllExtensionsDidNotReturnLocalization()
@@ -55,8 +53,6 @@ class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
             $extension1
         ]);
 
-        $this->assertNull($provider->getCurrentLocalization());
-        // test that the result is cached
         $this->assertNull($provider->getCurrentLocalization());
     }
 
@@ -78,8 +74,6 @@ class CurrentLocalizationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($localization2, $provider->getCurrentLocalization());
 
         $provider->setCurrentLocalization(null);
-        $this->assertSame($localization1, $provider->getCurrentLocalization());
-        // test that the result is cached
         $this->assertSame($localization1, $provider->getCurrentLocalization());
     }
 }

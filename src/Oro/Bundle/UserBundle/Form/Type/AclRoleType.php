@@ -3,6 +3,8 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
+use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\EventListener\ChangeRoleSubscriber;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -10,10 +12,13 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type for Role entity.
+ */
 class AclRoleType extends AbstractType
 {
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -30,7 +35,7 @@ class AclRoleType extends AbstractType
             'appendUsers',
             EntityIdentifierType::class,
             [
-                'class'    => 'OroUserBundle:User',
+                'class'    => User::class,
                 'required' => false,
                 'mapped'   => false,
                 'multiple' => true,
@@ -41,7 +46,7 @@ class AclRoleType extends AbstractType
             'removeUsers',
             EntityIdentifierType::class,
             [
-                'class'    => 'OroUserBundle:User',
+                'class'    => User::class,
                 'required' => false,
                 'mapped'   => false,
                 'multiple' => true,
@@ -63,12 +68,10 @@ class AclRoleType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'data_class' => 'Oro\Bundle\UserBundle\Entity\Role',
-                'csrf_token_id' => 'role',
-            ]
-        );
+        $resolver->setDefaults([
+            'data_class'    => Role::class,
+            'csrf_token_id' => 'role',
+        ]);
     }
 
     /**
