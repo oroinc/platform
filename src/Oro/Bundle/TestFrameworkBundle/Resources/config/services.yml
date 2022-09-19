@@ -160,3 +160,7 @@ services:
         class: 'Oro\Bundle\TestFrameworkBundle\Layout\TestProvider'
         tags:
             - { name: layout.data_provider, alias: test }
+
+    oro_test.mailer.message_logger_listener:
+        decorates: mailer.message_logger_listener
+        class: Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener

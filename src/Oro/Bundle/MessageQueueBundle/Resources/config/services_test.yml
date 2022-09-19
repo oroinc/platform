@@ -63,9 +63,8 @@ services:
 
     oro_message_queue.test.async.extension.consumed_messages_collector:
         class: 'Oro\Component\MessageQueue\Test\Async\Extension\ConsumedMessagesCollectorExtension'
-        # Must be explicitly public to be persistent during MQ consumption.
-        public: true
         arguments:
+            - '@oro_message_queue.client.message_processor_registry'
             - '@logger'
         tags:
             # Must be definitely the last extension to collect the latest data.

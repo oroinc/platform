@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Unit\Test\Functional;
 
+use Monolog\Logger;
 use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\DriverMessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
@@ -9,7 +10,9 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
+use Oro\Component\MessageQueue\Client\MessageProcessorRegistryInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use Oro\Component\MessageQueue\Test\Async\Extension\ConsumedMessagesCollectorExtension;
 use Oro\Component\MessageQueue\Transport\Queue;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,8 +27,6 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     use MessageQueueExtension;
 
     private static ?ContainerInterface $container = null;
-
-    private static ?DriverMessageCollector $driverMessageCollector = null;
 
     private static ?MessageCollector $messageCollector = null;
 
@@ -77,6 +78,13 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
             self::$container->set('oro_message_queue.test.message_collector', self::$messageCollector);
             self::$bufferedProducer = $this->createMock(BufferedMessageProducer::class);
             self::$container->set('oro_message_queue.client.buffered_message_producer', self::$bufferedProducer);
+            self::$container->set(
+                'oro_message_queue.test.async.extension.consumed_messages_collector',
+                new ConsumedMessagesCollectorExtension(
+                    $this->createMock(MessageProcessorRegistryInterface::class),
+                    $this->createMock(Logger::class)
+                )
+            );
         }
 
         /** @afterInitClient */
