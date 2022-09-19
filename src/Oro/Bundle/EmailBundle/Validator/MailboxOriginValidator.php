@@ -9,6 +9,9 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+/**
+ * Validates that email box have at least one sent folder.
+ */
 class MailboxOriginValidator extends ConstraintValidator
 {
     /** @var TranslatorInterface */
@@ -20,7 +23,7 @@ class MailboxOriginValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -28,11 +31,13 @@ class MailboxOriginValidator extends ConstraintValidator
             return;
         }
 
+        // try to find sent folder at root level
         if ($value->getFolder(FolderType::SENT)) {
             return;
         }
 
-        if ($this->inboxHasSubFolderWithType($value, FolderType::SENT)) {
+        // try to find sent folder in sub folders
+        if ($this->findSentMailFolderInSubFolders($value)) {
             return;
         }
 
@@ -45,10 +50,7 @@ class MailboxOriginValidator extends ConstraintValidator
     }
 
     /**
-     * @param $value
-     * @param $folderType
-     *
-     * @return bool
+     * @deprecated. The search for sent folder should be done not only in sub folders of inbox folder.
      */
     protected function inboxHasSubFolderWithType($value, $folderType)
     {
@@ -63,6 +65,32 @@ class MailboxOriginValidator extends ConstraintValidator
                         return true;
                     }
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private function findSentMailFolderInSubFolders(EmailOrigin $value): bool
+    {
+        $folders = $value->getFolders();
+        foreach ($folders as $folder) {
+            if ($folder->hasSubFolders() && true === $this->findSentMailFolder($folder->getSubFolders())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function findSentMailFolder(iterable $folders): bool
+    {
+        foreach ($folders as $folder) {
+            if ($folder->getType() === FolderType::SENT) {
+                return true;
+            }
+            if ($folder->hasSubFolders() && true === $this->findSentMailFolder($folder->getSubFolders())) {
+                return true;
             }
         }
 
