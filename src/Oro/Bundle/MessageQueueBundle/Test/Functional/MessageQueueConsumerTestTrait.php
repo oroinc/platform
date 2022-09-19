@@ -4,6 +4,7 @@ namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Doctrine\DBAL\Types\Types;
 use Monolog\Handler\TestHandler;
+use Oro\Bundle\TestFrameworkBundle\Mailer\EventListener\MessageLoggerListener;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessageBuilderInterface;
 use Oro\Component\MessageQueue\Consumption\ChainExtension;
@@ -70,14 +71,33 @@ trait MessageQueueConsumerTestTrait
 
     protected static function consume(?int $messagesCount = null, int $timeLimit = 10): void
     {
-        self::getConsumer()
-            ->bind('oro.default')
-            ->consume(
-                new ChainExtension([
-                    new LimitConsumedMessagesExtension($messagesCount ?? count(self::getSentMessages())),
-                    new LimitConsumptionTimeExtension(new \DateTime('+' . $timeLimit . ' sec')),
-                ])
-            );
+        $messageLoggerListener = self::getContainer()
+            ->get('mailer.message_logger_listener');
+        if ($messageLoggerListener instanceof MessageLoggerListener) {
+            // Makes mailer message logger listener ignore reset to keep state during MQ consumption.
+            $messageLoggerListener->setSkipReset(true);
+        }
+
+        self::getLoggerTestHandler()->setSkipReset(true);
+
+        try {
+            self::getConsumer()
+                ->bind('oro.default')
+                ->consume(
+                    new ChainExtension([
+                        new LimitConsumedMessagesExtension($messagesCount ?? count(self::getSentMessages())),
+                        new LimitConsumptionTimeExtension(new \DateTime('+' . $timeLimit . ' sec')),
+                    ])
+                );
+
+            if ($messagesCount === null && count(self::getSentMessages()) > count(self::getProcessedMessages())) {
+                // Consumes messages that were sent during the previous consumption.
+                self::consume($messagesCount, $timeLimit);
+            }
+        } finally {
+            $messageLoggerListener->setSkipReset(false);
+            self::getLoggerTestHandler()->setSkipReset(false);
+        }
     }
 
     protected static function getConsumedMessagesCollector(): ConsumedMessagesCollectorExtension
@@ -100,6 +120,10 @@ trait MessageQueueConsumerTestTrait
 
     protected static function clearProcessedMessages(): void
     {
+        if (null === self::getContainer()) {
+            return;
+        }
+
         self::getConsumedMessagesCollector()->clearProcessedMessages();
     }
 
@@ -127,7 +151,7 @@ trait MessageQueueConsumerTestTrait
             1,
             $messages,
             sprintf(
-                '%d messages with id %s found: %s. Looks like it was consumed multiple times.',
+                '%d messages with id %s found: %s.',
                 count($messages),
                 $messageId,
                 json_encode($messages, JSON_THROW_ON_ERROR)
