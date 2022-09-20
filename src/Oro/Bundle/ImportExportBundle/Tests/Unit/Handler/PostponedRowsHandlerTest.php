@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Handler;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\ImportExportBundle\Writer\WriterChain;
@@ -87,7 +87,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                Topics::IMPORT,
+                ImportTopic::getName(),
                 $expectedMessage
             );
 
@@ -155,7 +155,7 @@ class PostponedRowsHandlerTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->expects($this->once())
             ->method('send')
             ->with(
-                Topics::IMPORT,
+                ImportTopic::getName(),
                 $expectedMessage
             );
 

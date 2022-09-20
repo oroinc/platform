@@ -16,7 +16,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -47,7 +46,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $this->emailNotificationSenderName = self::getConfigManager('user')
             ->get('oro_notification.email_notification_sender_name');
 
-        $logPath = $this->getContainer()->get('router')->generate(
+        $logPath = self::getContainer()->get('router')->generate(
             'oro_importexport_job_error_log',
             ['jobId' => '_jobId_']
         );
@@ -55,16 +54,15 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $this->url = self::getConfigManager('user')->get('oro_ui.application_url') . $logPath;
     }
 
-    public function testCouldBeConstructedByContainer()
+    public function testCouldBeConstructedByContainer(): void
     {
         $instance = $this->getSendImportNotificationMessageProcessor();
 
-        $this->assertInstanceOf(SendImportNotificationMessageProcessor::class, $instance);
-        $this->assertInstanceOf(MessageProcessorInterface::class, $instance);
-        $this->assertInstanceOf(TopicSubscriberInterface::class, $instance);
+        self::assertInstanceOf(MessageProcessorInterface::class, $instance);
+        self::assertInstanceOf(TopicSubscriberInterface::class, $instance);
     }
 
-    public function testImportAllEntitiesFound()
+    public function testImportAllEntitiesFound(): void
     {
         $this->shouldProcessImportSendNotificationProcess(
             [
@@ -121,7 +119,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         );
     }
 
-    public function testImportEntitiesNotFound()
+    public function testImportEntitiesNotFound(): void
     {
         $this->shouldProcessImportSendNotificationProcess(
             [
@@ -210,7 +208,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
         $childJob1->setData($resultOfImportJob1);
         $childJob2->setData($resultOfImportJob2);
 
-        $em = $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(Job::class);
         $em->refresh($rootJob);
         $messageData = [
             'rootImportJobId' => $rootJob->getId(),
@@ -221,7 +219,7 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('test_import_message');
-        $message->setBody(JSON::encode($messageData));
+        $message->setBody($messageData);
 
         $processor = $this->getSendImportNotificationMessageProcessor();
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
@@ -230,22 +228,22 @@ class SendImportNotificationMessageProcessorTest extends WebTestCase
             $this->getRouter()->generate('oro_importexport_job_error_log', ['jobId' => $rootJob->getId()]);
         $notificationExpectedMessage['templateParams']['data']['downloadLogUrl'] = $url;
 
-        $this->assertMessageSent(SendEmailNotificationTemplateTopic::getName(), $notificationExpectedMessage);
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertMessageSent(SendEmailNotificationTemplateTopic::getName(), $notificationExpectedMessage);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
     private function getSendImportNotificationMessageProcessor(): SendImportNotificationMessageProcessor
     {
-        return $this->getContainer()->get('oro_importexport.async.send_import_notification');
+        return self::getContainer()->get('oro_importexport.async.send_import_notification');
     }
 
     private function getJobProcessor(): JobProcessor
     {
-        return $this->getContainer()->get('oro_message_queue.job.processor');
+        return self::getContainer()->get('oro_message_queue.job.processor');
     }
 
     private function getRouter(): RouterInterface
     {
-        return $this->getContainer()->get('router');
+        return self::getContainer()->get('router');
     }
 }

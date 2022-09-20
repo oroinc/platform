@@ -5,31 +5,27 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Export;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
-use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
  */
 class ExportMessageProcessorTest extends WebTestCase
 {
-    use MessageQueueExtension;
-
     protected function setUp(): void
     {
         $this->initClient();
     }
 
-    public function testCouldBeConstructedByContainer()
+    public function testCouldBeConstructedByContainer(): void
     {
-        $instance = $this->getContainer()->get('oro_importexport.async.export');
+        $instance = self::getContainer()->get('oro_importexport.async.export');
 
-        $this->assertInstanceOf(ExportMessageProcessor::class, $instance);
+        self::assertInstanceOf(ExportMessageProcessor::class, $instance);
     }
 
     /**
@@ -40,7 +36,7 @@ class ExportMessageProcessorTest extends WebTestCase
         int $resultReadsCount,
         int $resultErrorsCount,
         string $expectedResult
-    ) {
+    ): void {
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
             'oro:import:oro_test.add_or_replace:test_import_message'
@@ -52,11 +48,15 @@ class ExportMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('abc');
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'jobId' => $childJob->getId(),
             'jobName' => 'job_name',
             'processorAlias' => 'alias',
-        ]));
+            'exportType' => ProcessorRegistry::TYPE_EXPORT,
+            'outputFormat' => 'csv',
+            'outputFilePrefix' => null,
+            'options' => [],
+        ]);
 
         $exportResult = [
             'success' => $resultSuccess,
@@ -67,7 +67,7 @@ class ExportMessageProcessorTest extends WebTestCase
         ];
 
         $exportHandler = $this->createMock(ExportHandler::class);
-        $exportHandler->expects($this->once())
+        $exportHandler->expects(self::once())
             ->method('getExportResult')
             ->with(
                 $this->equalTo('job_name'),
@@ -79,14 +79,14 @@ class ExportMessageProcessorTest extends WebTestCase
             )
             ->willReturn($exportResult);
 
-        $this->getContainer()->set('oro_importexport.handler.export.stub', $exportHandler);
+        self::getContainer()->set('oro_importexport.handler.export.stub', $exportHandler);
 
-        $processor = $this->getContainer()->get('oro_importexport.async.export');
+        $processor = self::getContainer()->get('oro_importexport.async.export');
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
-        $this->assertEquals($expectedResult, $result);
-        $this->assertCount(5, $childJob->getData());
-        $this->assertEquals($exportResult, $childJob->getData());
+        self::assertEquals($expectedResult, $result);
+        self::assertCount(5, $childJob->getData());
+        self::assertEquals($exportResult, $childJob->getData());
     }
 
     public function exportProcessDataProvider(): array
@@ -113,6 +113,6 @@ class ExportMessageProcessorTest extends WebTestCase
 
     private function getJobProcessor(): JobProcessor
     {
-        return $this->getContainer()->get('oro_message_queue.job.processor');
+        return self::getContainer()->get('oro_message_queue.job.processor');
     }
 }

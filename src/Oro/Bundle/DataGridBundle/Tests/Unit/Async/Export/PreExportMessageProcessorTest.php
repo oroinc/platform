@@ -7,7 +7,7 @@ use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
-use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
@@ -126,7 +126,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                ImportExportTopics::POST_EXPORT,
+                PostExportTopic::getName(),
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,
@@ -225,7 +225,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                ImportExportTopics::POST_EXPORT,
+                PostExportTopic::getName(),
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,
@@ -318,7 +318,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                ImportExportTopics::POST_EXPORT,
+                PostExportTopic::getName(),
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,

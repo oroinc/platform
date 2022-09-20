@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export\Stub\PreExportMessageProcessorStub;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -254,7 +254,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                Topics::POST_EXPORT,
+                PostExportTopic::getName(),
                 $this->callback(function ($message) {
                     self::assertArrayHasKey('entity', $message);
                     self::assertEquals('Acme', $message['entity']);
@@ -324,7 +324,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                Topics::POST_EXPORT,
+                PostExportTopic::getName(),
                 self::callback(function ($message) {
                     self::assertArrayHasKey('entity', $message);
                     self::assertEquals('Acme', $message['entity']);
