@@ -6,7 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Model\From;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
 use Oro\Bundle\ImportExportBundle\Async\SendImportNotificationMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
@@ -20,7 +20,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\TestCase
@@ -41,31 +40,10 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
 
     public function testSendImportNotificationProcessShouldReturnSubscribedTopics(): void
     {
-        $expectedSubscribedTopics = [Topics::SEND_IMPORT_NOTIFICATION,];
-        self::assertEquals($expectedSubscribedTopics, SendImportNotificationMessageProcessor::getSubscribedTopics());
-    }
-
-    public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid(): void
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(self::once())
-            ->method('critical')
-            ->with('Invalid message');
-
-        $processor = new SendImportNotificationMessageProcessor(
-            $this->createMock(MessageProducerInterface::class),
-            $logger,
-            $this->createMock(ImportExportResultSummarizer::class),
-            $this->createMock(NotificationSettings::class),
-            $this->createMock(ManagerRegistry::class)
+        self::assertEquals(
+            [SendImportNotificationTopic::getName()],
+            SendImportNotificationMessageProcessor::getSubscribedTopics()
         );
-
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn('[]');
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
     public function testShouldLogErrorAndRejectMessageIfUserNotFound(): void
@@ -103,13 +81,12 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
         $message = $this->createMock(MessageInterface::class);
         $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(JSON::encode([
+            ->willReturn([
                 'rootImportJobId' => 1,
-                'filePath' => 'filePath',
                 'originFileName' => 'originFileName',
                 'userId' => 1,
                 'process' => ProcessorRegistry::TYPE_IMPORT,
-            ]));
+            ]);
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
@@ -177,13 +154,12 @@ class SendImportNotificationMessageProcessorTest extends \PHPUnit\Framework\Test
             $doctrine
         );
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'rootImportJobId' => 1,
-            'filePath' => 'filePath',
             'originFileName' => 'import.csv',
             'userId' => 1,
             'process' => ProcessorRegistry::TYPE_IMPORT,
-        ]));
+        ]);
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 

@@ -1,0 +1,19 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+            - { name: oro_message_queue.consumption.extension.topic }
+
+    Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic:
+        arguments:
+            - '%oro_importexport.export.size_of_batch%'
+    Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic:
+        arguments:
+            - '%oro_importexport.export.size_of_batch%'
+    Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic: ~
+    Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic: ~
+    Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic: ~
+    Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic: ~
+    Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic:
+        arguments:
+            - '@oro_user.manager'

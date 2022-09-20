@@ -81,7 +81,7 @@ abstract class ExportMessageProcessorAbstract implements MessageProcessorInterfa
         };
     }
 
-    protected function saveJobResult(Job $job, array $data)
+    protected function saveJobResult(Job $job, array $data): void
     {
         if (!empty($data['errors'])) {
             $errorLogFile = $this->saveToStorageErrorLog($data['errors']);

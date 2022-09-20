@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 class AttributeRemovedFromFamilyTopicTest extends AbstractTopicTestCase
 {
@@ -39,16 +38,6 @@ class AttributeRemovedFromFamilyTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required options "attributeFamilyId", "attributeNames" are missing./',
-            ],
-            'extra option' => [
-                'body' => [
-                    'attributeFamilyId' => 1,
-                    'attributeNames' => [],
-                    'foo' => 'bar',
-                ],
-                'exceptionClass' => UndefinedOptionsException::class,
-                'exceptionMessage' =>
-                    '/The option "foo" does not exist. Defined options are: "attributeFamilyId", "attributeNames"./'
             ],
             'wrong attributeFamilyId type' => [
                 'body' => [
