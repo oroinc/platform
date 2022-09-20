@@ -29,8 +29,7 @@ class OroAssetsInstallCommand extends AbstractCommand
             ->setDescription('Installs and builds application assets.')
             ->setHelp(
                 <<<HELP
-The <info>%command.name%</info> command installs and builds assets,
-dumps JavaScript routes, JavaScript translations, etc.
+The <info>%command.name%</info> command installs and builds assets.
 
   <info>php %command.full_name%</info>
 
@@ -46,7 +45,6 @@ of absolute:
 
 You may run individual steps if necessary as follows:
 
-  <info>php {$_SERVER['PHP_SELF']} fos:js-routing:dump</info>
   <info>php {$_SERVER['PHP_SELF']} oro:localization:dump</info>
   <info>php {$_SERVER['PHP_SELF']} assets:install [--symlink][--relative-symlink]</info>
   <info>php {$_SERVER['PHP_SELF']} oro:assets:build --npm-install</info>
@@ -78,7 +76,6 @@ HELP
 
         $commandExecutor = $this->getCommandExecutor($input, $output);
         $commandExecutor
-            ->runCommand('fos:js-routing:dump', ['--process-isolation' => true])
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install', $assetsOptions)
             ->runCommand('oro:assets:build');

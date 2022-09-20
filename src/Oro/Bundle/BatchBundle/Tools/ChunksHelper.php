@@ -29,8 +29,6 @@ class ChunksHelper
         if ($chunk) {
             yield ((int) ceil($counter / $chunkSize)) => $chunk;
         }
-
-        return [];
     }
 
     /**
@@ -57,8 +55,6 @@ class ChunksHelper
         if ($chunk) {
             yield ((int) ceil($counter / $chunkSize)) => $chunk;
         }
-
-        return [];
     }
 
     /**
@@ -84,7 +80,5 @@ class ChunksHelper
         if ($chunk) {
             yield ((int) ceil($counter / $chunkSize)) => $chunk;
         }
-
-        return [];
     }
 }

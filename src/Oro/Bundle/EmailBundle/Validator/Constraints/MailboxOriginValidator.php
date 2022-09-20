@@ -22,7 +22,7 @@ class MailboxOriginValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function validate($value, Constraint $constraint)
     {
@@ -34,11 +34,13 @@ class MailboxOriginValidator extends ConstraintValidator
             return;
         }
 
+        // try to find sent folder at root level
         if ($value->getFolder(FolderType::SENT)) {
             return;
         }
 
-        if ($this->inboxHasSubFolderWithType($value, FolderType::SENT)) {
+        // try to find sent folder in sub folders
+        if ($this->findSentMailFolderInSubFolders($value)) {
             return;
         }
 
@@ -50,17 +52,26 @@ class MailboxOriginValidator extends ConstraintValidator
         );
     }
 
-    private function inboxHasSubFolderWithType(EmailOrigin $value, string $folderType): bool
+    private function findSentMailFolderInSubFolders(EmailOrigin $value): bool
     {
-        $folder = $value->getFolder(FolderType::INBOX);
-        if ($folder) {
-            $subFolders = $folder->getSubFolders();
-            if ($subFolders->count() > 0) {
-                foreach ($subFolders as $subFolder) {
-                    if ($subFolder->getType() === $folderType) {
-                        return true;
-                    }
-                }
+        $folders = $value->getFolders();
+        foreach ($folders as $folder) {
+            if ($folder->hasSubFolders() && true === $this->findSentMailFolder($folder->getSubFolders())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function findSentMailFolder(iterable $folders): bool
+    {
+        foreach ($folders as $folder) {
+            if ($folder->getType() === FolderType::SENT) {
+                return true;
+            }
+            if ($folder->hasSubFolders() && true === $this->findSentMailFolder($folder->getSubFolders())) {
+                return true;
             }
         }
 
