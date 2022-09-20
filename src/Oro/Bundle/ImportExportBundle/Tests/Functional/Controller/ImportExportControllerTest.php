@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfiguration;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationProviderInterface;
@@ -35,7 +36,7 @@ class ImportExportControllerTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
 
         $this->loadFixtures([
@@ -55,7 +56,7 @@ class ImportExportControllerTest extends WebTestCase
         }
     }
 
-    public function testShouldSendExportMessageOnInstantExportActionWithDefaultParameters()
+    public function testShouldSendExportMessageOnInstantExportActionWithDefaultParameters(): void
     {
         $this->ajaxRequest(
             'POST',
@@ -65,19 +66,18 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccessOnExport();
 
         $organization = $this->getTokenAccessor()->getOrganization();
-        $organizationId = $organization ? $organization->getId() : null;
 
-        $this->assertMessageSent(Topics::PRE_EXPORT, [
+        self::assertMessageSent(PreExportTopic::getName(), [
             'jobName' => JobExecutor::JOB_EXPORT_TO_CSV,
             'processorAlias' => 'oro_account',
             'outputFilePrefix' => null,
             'options' => [],
             'userId' => $this->getCurrentUser()->getId(),
-            'organizationId' => $organizationId,
+            'organizationId' => $organization?->getId(),
         ]);
     }
 
-    public function testShouldSendExportMessageOnInstantExportActionWithPassedParameters()
+    public function testShouldSendExportMessageOnInstantExportActionWithPassedParameters(): void
     {
         $this->ajaxRequest(
             'POST',
@@ -95,9 +95,8 @@ class ImportExportControllerTest extends WebTestCase
         $this->assertJsonResponseSuccessOnExport();
 
         $organization = $this->getTokenAccessor()->getOrganization();
-        $organizationId = $organization ? $organization->getId() : null;
 
-        $this->assertMessageSent(Topics::PRE_EXPORT, [
+        self::assertMessageSent(PreExportTopic::getName(), [
             'jobName' => JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV,
             'processorAlias' => 'oro_account',
             'outputFilePrefix' => 'prefix',
@@ -106,11 +105,11 @@ class ImportExportControllerTest extends WebTestCase
                 'second' => 'second value',
             ],
             'userId' => $this->getCurrentUser()->getId(),
-            'organizationId' => $organizationId,
+            'organizationId' => $organization?->getId(),
         ]);
     }
 
-    public function testDownloadFileReturns404IfFileDoesntExist()
+    public function testDownloadFileReturns404IfFileDoesntExist(): void
     {
         $undefinedJobId = 999;
         $this->client->followRedirects(true);
@@ -122,10 +121,10 @@ class ImportExportControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 404);
     }
 
-    public function testImportProcessAction()
+    public function testImportProcessAction(): void
     {
         $options = [
             'first' => 'first value',
@@ -147,8 +146,8 @@ class ImportExportControllerTest extends WebTestCase
 
         $this->assertJsonResponseSuccess();
 
-        $this->assertMessageSent(
-            Topics::PRE_IMPORT,
+        self::assertMessageSent(
+            PreImportTopic::getName(),
             [
                 'jobName' => JobExecutor::JOB_IMPORT_FROM_CSV,
                 'process' => 'import',
@@ -161,7 +160,7 @@ class ImportExportControllerTest extends WebTestCase
         );
     }
 
-    public function testImportValidateAction()
+    public function testImportValidateAction(): void
     {
         $options = [
             'first' => 'first value',
@@ -183,8 +182,8 @@ class ImportExportControllerTest extends WebTestCase
 
         $this->assertJsonResponseSuccess();
 
-        $this->assertMessageSent(
-            Topics::PRE_IMPORT,
+        self::assertMessageSent(
+            PreImportTopic::getName(),
             [
                 'jobName' => JobExecutor::JOB_IMPORT_VALIDATION_FROM_CSV,
                 'processorAlias' => 'oro_account',
@@ -197,10 +196,9 @@ class ImportExportControllerTest extends WebTestCase
         );
     }
 
-    public function testImportForm()
+    public function testImportForm(): void
     {
         $fileName = 'oro_testLineEndings.csv';
-        $importedFilePath = null;
 
         $file = $this->copyToTempDir('import_export', __DIR__ . '/Import/fixtures')
             . DIRECTORY_SEPARATOR
@@ -230,7 +228,7 @@ class ImportExportControllerTest extends WebTestCase
                 ]
             )
         );
-        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
+        self::assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         $uploadFileNode = $crawler->selectButton('Submit');
         $uploadFileForm = $uploadFileNode->form();
@@ -259,7 +257,7 @@ class ImportExportControllerTest extends WebTestCase
             $files
         );
         $this->assertJsonResponseSuccess();
-        $message = $this->getSentMessage(Topics::PRE_IMPORT);
+        $message = self::getSentMessage(PreImportTopic::getName());
 
         $importedFileContent = $this->getImportExportFileManager()->getContent($message['fileName']);
         self::assertEquals(
@@ -268,7 +266,7 @@ class ImportExportControllerTest extends WebTestCase
         );
     }
 
-    public function testImportValidateExportTemplateFormNoAlias()
+    public function testImportValidateExportTemplateFormNoAlias(): void
     {
         $this->client->request(
             'GET',
@@ -278,7 +276,7 @@ class ImportExportControllerTest extends WebTestCase
         self::assertResponseStatusCodeEquals($this->client->getResponse(), 400);
     }
 
-    public function testImportValidateExportTemplateFormGetRequest()
+    public function testImportValidateExportTemplateFormGetRequest(): void
     {
         $this->client->request(
             'GET',
@@ -299,7 +297,7 @@ class ImportExportControllerTest extends WebTestCase
 
     public function testImportValidateExportTemplateFormAction(): void
     {
-        $registry = $this->getContainer()->get('oro_importexport.configuration.registry');
+        $registry = self::getContainer()->get('oro_importexport.configuration.registry');
         $registry->addConfiguration(
             new class() implements ImportExportConfigurationProviderInterface {
                 /**
@@ -315,7 +313,7 @@ class ImportExportControllerTest extends WebTestCase
             'oro_test'
         );
 
-        $controller = $this->getContainer()->get(ImportExportController::class);
+        $controller = self::getContainer()->get(ImportExportController::class);
 
         $this->assertEquals(
             [
@@ -345,7 +343,7 @@ class ImportExportControllerTest extends WebTestCase
             'oro_test'
         );
 
-        $formFactory = $this->getContainer()->get('form.factory');
+        $formFactory = self::getContainer()->get('form.factory');
 
         $this->assertEquals(
             [
@@ -368,7 +366,7 @@ class ImportExportControllerTest extends WebTestCase
         );
     }
 
-    public function testDownloadExportResultActionExpiredResult()
+    public function testDownloadExportResultActionExpiredResult(): void
     {
         /** @var ImportExportResult $expiredImportExportResult */
         $expiredImportExportResult = $this->getReference('expiredImportExportResult');
@@ -380,10 +378,10 @@ class ImportExportControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
+        self::assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
     }
 
-    public function testImportExportJobErrorLogActionExpiredResult()
+    public function testImportExportJobErrorLogActionExpiredResult(): void
     {
         /** @var ImportExportResult $expiredImportExportResult */
         $expiredImportExportResult = $this->getReference('expiredImportExportResult');
@@ -395,12 +393,12 @@ class ImportExportControllerTest extends WebTestCase
             ])
         );
 
-        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
+        self::assertJsonResponseStatusCodeEquals($this->client->getResponse(), 410);
     }
 
     private function getImportExportFileManager(): FileManager
     {
-        return $this->getContainer()->get('oro_importexport.file.file_manager');
+        return self::getContainer()->get('oro_importexport.file.file_manager');
     }
 
     /**
@@ -408,7 +406,7 @@ class ImportExportControllerTest extends WebTestCase
      */
     private function getTokenAccessor()
     {
-        return $this->getContainer()->get('oro_security.token_accessor');
+        return self::getContainer()->get('oro_security.token_accessor');
     }
 
     /**
@@ -416,12 +414,12 @@ class ImportExportControllerTest extends WebTestCase
      */
     private function getCurrentUser()
     {
-        return $this->getContainer()->get('security.token_storage')->getToken()->getUser();
+        return self::getContainer()->get('security.token_storage')->getToken()->getUser();
     }
 
     private function assertJsonResponseSuccessOnExport()
     {
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
         $this->assertCount(1, $result);
@@ -430,7 +428,7 @@ class ImportExportControllerTest extends WebTestCase
 
     private function assertJsonResponseSuccess()
     {
-        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $result = self::getJsonResponseContent($this->client->getResponse(), 200);
 
         self::assertNotEmpty($result);
         self::assertCount(2, $result);

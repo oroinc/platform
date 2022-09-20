@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\ImportExportBundle\Command;
 
 use Oro\Bundle\BatchBundle\Connector\ConnectorRegistry;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -122,14 +122,17 @@ HELP
 
         $jobName = $this->handleJobName($input, $output, $processor);
 
-        $this->messageProducer->send(Topics::PRE_IMPORT, [
-            'fileName' => $fileName,
-            'originFileName' => $originFileName,
-            'userId' => $importOwner->getId(),
-            'jobName' =>  $jobName,
-            'processorAlias' => $processorAlias,
-            'process' => $processor,
-        ]);
+        $this->messageProducer->send(
+            PreImportTopic::getName(),
+            [
+                'fileName' => $fileName,
+                'originFileName' => $originFileName,
+                'userId' => $importOwner->getId(),
+                'jobName' =>  $jobName,
+                'processorAlias' => $processorAlias,
+                'process' => $processor,
+            ]
+        );
 
         if ($email) {
             $output->writeln('Scheduled successfully. The result will be sent to the email');

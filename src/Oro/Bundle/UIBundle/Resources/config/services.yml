@@ -362,6 +362,7 @@ services:
         arguments:
             - '@router.request_context'
             - '@oro_config.manager'
+            - !tagged_iterator { tag: 'app.handler', default_index_method: 'getIndex' }
         tags:
             - { name: oro_message_queue.consumption.extension }
 

@@ -159,6 +159,7 @@ HELP
     ): self {
         $this->processTranslations($input, $commandExecutor);
 
+        $commandExecutor->runCommand('fos:js-routing:dump', ['--process-isolation' => true]);
         $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
 
         return $this;
