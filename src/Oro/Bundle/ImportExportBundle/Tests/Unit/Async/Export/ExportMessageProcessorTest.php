@@ -4,9 +4,10 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ExportTopic;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
+use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\OrganizationRepository;
@@ -14,66 +15,23 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
-        $this->assertEquals([Topics::EXPORT], ExportMessageProcessor::getSubscribedTopics());
+        self::assertEquals([ExportTopic::getName()], ExportMessageProcessor::getSubscribedTopics());
     }
 
-    public function invalidMessageProvider(): array
-    {
-        return [
-            [
-                'Got invalid message',
-                ['jobName' => 'name', 'processorAlias' => 'alias'],
-            ],
-            [
-                'Got invalid message',
-                ['jobId' => 1, 'processorAlias' => 'alias'],
-            ],
-            [
-                'Got invalid message',
-                ['jobId' => 1, 'jobName' => 'name'],
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider invalidMessageProvider
-     */
-    public function testShouldRejectMessageAndLogCriticalIfInvalidMessage(string $loggerMessage, array $messageBody)
-    {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('critical')
-            ->with($this->equalTo($loggerMessage));
-
-        $message = new Message();
-        $message->setBody(JSON::encode($messageBody));
-
-        $processor = new ExportMessageProcessor(
-            $this->createMock(JobRunner::class),
-            $this->createMock(FileManager::class),
-            $logger
-        );
-
-        $result = $processor->process($message, $this->createMock(SessionInterface::class));
-
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldSetOrganizationAndDoExport()
+    public function testShouldSetOrganizationAndDoExport(): void
     {
         $exportResult = ['success' => true, 'readsCount' => 10, 'errorsCount' => 0];
 
         $job = new Job();
 
         $jobRunner = $this->createMock(JobRunner::class);
-        $jobRunner->expects($this->once())
+        $jobRunner->expects(self::once())
             ->method('runDelayed')
             ->with($this->equalTo(1))
             ->willReturnCallback(function ($jobId, $callback) use ($jobRunner, $job) {
@@ -81,22 +39,22 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
+        $logger->expects(self::once())
             ->method('info')
             ->with($this->equalTo('Export result. Success: Yes. ReadsCount: 10. ErrorsCount: 0'));
 
         $organizationRepository = $this->createMock(OrganizationRepository::class);
-        $organizationRepository->expects($this->once())
+        $organizationRepository->expects(self::once())
             ->method('find');
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper->expects($this->once())
+        $doctrineHelper->expects(self::once())
             ->method('getEntityRepository')
             ->with($this->equalTo(Organization::class))
             ->willReturn($organizationRepository);
 
         $exportHandler = $this->createMock(ExportHandler::class);
-        $exportHandler->expects($this->once())
+        $exportHandler->expects(self::once())
             ->method('getExportResult')
             ->willReturn($exportResult);
 
@@ -109,15 +67,18 @@ class ExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $processor->setExportHandler($exportHandler);
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'jobId' => 1,
             'jobName' => 'name',
             'processorAlias' => 'alias',
             'organizationId' => 2,
-        ]));
+            'exportType' => ProcessorRegistry::TYPE_EXPORT,
+            'outputFormat' => 'csv',
+            'outputFilePrefix' => null,
+        ]);
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 }

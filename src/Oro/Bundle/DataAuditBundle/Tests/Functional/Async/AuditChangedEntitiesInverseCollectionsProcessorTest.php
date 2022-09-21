@@ -16,7 +16,6 @@ use Oro\Bundle\MessageQueueBundle\Test\Functional\JobsAwareTestTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueAssertTrait;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Client\Message as ClientMessage;
 use Oro\Component\MessageQueue\Transport\ConnectionInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -147,9 +146,7 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
     {
         $session = $this->getConnection()->createSession();
         foreach (self::getSentMessages() as $sentMessage) {
-            /** @var ClientMessage $message */
-            $message = $sentMessage['message'];
-            $this->chunkProcessor->process($session->createMessage($message->getBody()), $session);
+            $this->chunkProcessor->process($session->createMessage($sentMessage['message']), $session);
         }
     }
 
@@ -157,12 +154,9 @@ class AuditChangedEntitiesInverseCollectionsProcessorTest extends WebTestCase
     {
         foreach (self::getSentMessages() as $sentMessage) {
             $topic = $sentMessage['topic'];
-            /** @var ClientMessage $message */
-            $message = $sentMessage['message'];
-            $body = $message->getBody();
-            $countIds = count($body['entityData']['fields']['childrenOneToMany']['entity_ids']);
+            $messageBody = $sentMessage['message'];
 
-            $this->assertEquals($batchSize, $countIds);
+            $this->assertCount($batchSize, $messageBody['entityData']['fields']['childrenOneToMany']['entity_ids']);
             $this->assertEquals(AuditChangedEntitiesInverseCollectionsChunkTopic::getName(), $topic);
         }
     }

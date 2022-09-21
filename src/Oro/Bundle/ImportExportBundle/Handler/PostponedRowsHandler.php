@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Handler;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
 use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
@@ -133,7 +133,7 @@ class PostponedRowsHandler
                     $message->setDelay($delay);
                 }
                 $message->setBody($body);
-                $this->messageProducer->send(Topics::IMPORT, $message);
+                $this->messageProducer->send(ImportTopic::getName(), $message);
             }
         );
     }

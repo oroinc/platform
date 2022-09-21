@@ -3,7 +3,7 @@
 namespace Oro\Bundle\MessageQueueBundle\Test\Functional;
 
 use Oro\Bundle\ImportExportBundle\Async\Export\ExportMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
 use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
 use Oro\Bundle\TestFrameworkBundle\Test\Client;
 use Oro\Component\MessageQueue\Transport\Message;
@@ -19,8 +19,8 @@ trait MessageProcessTrait
 
     protected function processExportMessage(ContainerInterface $container, Client $client): string
     {
-        $sentMessage = $this->getSentMessage(ImportExportTopics::PRE_EXPORT);
-        $this->clearMessageCollector();
+        $sentMessage = self::getSentMessage(PreExportTopic::getName());
+        self::clearMessageCollector();
 
         $message = new Message();
         $message->setMessageId('abc');
@@ -34,7 +34,7 @@ trait MessageProcessTrait
 
         $this->assertEquals(ExportMessageProcessor::ACK, $processorResult);
 
-        $sentMessages = $this->getSentMessages();
+        $sentMessages = self::getSentMessages();
         foreach ($sentMessages as $messageData) {
             if (SendEmailNotificationTemplateTopic::getName() === $messageData['topic']) {
                 break;
@@ -50,14 +50,14 @@ trait MessageProcessTrait
             $this->getUrl('oro_importexport_export_download', ['fileName' => $filename]),
             [],
             [],
-            $this->generateNoHashNavigationHeader()
+            self::generateNoHashNavigationHeader()
         );
 
         $result = $client->getResponse();
 
-        $this->assertResponseStatusCodeEquals($result, 200);
-        $this->assertResponseContentTypeEquals($result, 'text/csv');
-        $this->assertStringStartsWith(
+        self::assertResponseStatusCodeEquals($result, 200);
+        self::assertResponseContentTypeEquals($result, 'text/csv');
+        self::assertStringStartsWith(
             'attachment; filename="' . $filename,
             $result->headers->get('Content-Disposition')
         );

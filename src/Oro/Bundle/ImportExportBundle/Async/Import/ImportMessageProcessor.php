@@ -12,7 +12,6 @@ use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -71,24 +70,20 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if (!$body = $this->getNormalizeBody($message)) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         try {
             $result = $this->jobRunner->runDelayed(
-                $body['jobId'],
-                function (JobRunner $jobRunner, Job $job) use ($body) {
-                    return $this->handleImport($body, $job, $jobRunner);
+                $messageBody['jobId'],
+                function (JobRunner $jobRunner, Job $job) use ($messageBody) {
+                    return $this->handleImport($messageBody, $job, $jobRunner);
                 }
             );
         } catch (JobRedeliveryException $exception) {
             return self::REQUEUE;
         }
 
-        $this->fileManager->deleteFile($body['fileName']);
+        $this->fileManager->deleteFile($messageBody['fileName']);
 
         return $result ? self::ACK : self::REJECT;
     }
@@ -99,23 +94,7 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected function getNormalizeBody(MessageInterface $message)
     {
-        $body = JSON::decode($message->getBody());
-
-        if (!isset(
-            $body['fileName'],
-            $body['jobName'],
-            $body['processorAlias'],
-            $body['jobId'],
-            $body['process'],
-            $body['originFileName'],
-            $body['userId']
-        )) {
-            return null;
-        }
-
-        return array_replace_recursive([
-            'options' => []
-        ], $body);
+        return $message->getBody();
     }
 
     /**
@@ -179,7 +158,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected function saveToStorageErrorLog(array &$errors)
     {
-        /** @var FileManager $fileManager */
         $fileManager = $this->fileManager;
         $errorAsJson = json_encode($errors);
 

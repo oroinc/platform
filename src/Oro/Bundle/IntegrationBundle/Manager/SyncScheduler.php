@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\IntegrationBundle\Manager;
 
-use Oro\Bundle\IntegrationBundle\Async\Topics;
+use Oro\Bundle\IntegrationBundle\Async\Topic\ReverseSyncIntegrationTopic;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 
 /**
- * This class is responsible for job scheduling needed for two way data sync.
+ * This class is responsible for job scheduling needed for two-way data sync.
  */
 class SyncScheduler
 {
@@ -32,13 +32,12 @@ class SyncScheduler
     public function schedule($integrationId, $connector, array $connectorParameters = [])
     {
         $this->producer->send(
-            Topics::REVERS_SYNC_INTEGRATION,
+            ReverseSyncIntegrationTopic::getName(),
             new Message(
                 [
                     'integration_id'       => $integrationId,
                     'connector_parameters' => $connectorParameters,
                     'connector'            => $connector,
-                    'transport_batch_size' => 100,
                 ],
                 MessagePriority::VERY_LOW
             )

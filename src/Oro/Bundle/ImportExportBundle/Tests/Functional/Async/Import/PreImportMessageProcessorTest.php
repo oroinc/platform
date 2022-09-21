@@ -3,14 +3,15 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\Import\PreImportMessageProcessor;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 class PreImportMessageProcessorTest extends WebTestCase
 {
@@ -30,10 +31,10 @@ class PreImportMessageProcessorTest extends WebTestCase
         $this->initClient();
         $this->fixturePath =  __DIR__. DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR;
 
-        $this->processor = $this->getContainer()->get('oro_importexport.async.pre_import');
+        $this->processor = self::getContainer()->get('oro_importexport.async.pre_import');
     }
 
-    public function testShouldProcessPreparingHttpImportMessageAndSendMessageToProducerForImport()
+    public function testShouldProcessPreparingHttpImportMessageAndSendMessageToProducerForImport(): void
     {
         $messageData = [
             'filePath' => $this->fixturePath . 'import.csv',
@@ -48,37 +49,37 @@ class PreImportMessageProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('test_import_message');
-        $message->setBody(JSON::encode($messageData));
+        $message->setBody($messageData);
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         $rootJob = $this->getJobProcessor()->findOrCreateRootJob(
             'test_import_message',
-            'oro:import:http:oro_test.add_or_replace:test_import_message'
+            'oro:import:oro_test.add_or_replace:test_import_message'
         );
         $childJob = $this->getJobProcessor()->findOrCreateChildJob(
-            'oro:import:http:oro_test.add_or_replace:test_import_message:chunk.1',
+            'oro:import:oro_test.add_or_replace:test_import_message:chunk.1',
             $rootJob
         );
-        $this->assertMessageSent(
-            Topics::IMPORT,
+        self::assertMessageSent(
+            ImportTopic::getName(),
             array_merge($messageData, ['jobId' => $childJob->getId()])
         );
 
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
         $dataRootJob = $rootJob->getData();
-        $this->assertArrayHasKey('dependentJobs', $dataRootJob);
+        self::assertArrayHasKey('dependentJobs', $dataRootJob);
         $dependentJob = current($dataRootJob['dependentJobs']);
-        $this->assertArrayHasKey('topic', $dependentJob);
-        $this->assertArrayHasKey('message', $dependentJob);
-        $this->assertEquals(Topics::SEND_IMPORT_NOTIFICATION, $dependentJob['topic']);
-        $this->assertEquals($rootJob->getId(), $dependentJob['message']['rootImportJobId']);
-        $this->assertEquals([Topics::PRE_IMPORT], $dependentJob['message']['subscribedTopic']);
-        $this->assertArrayHasKey('filePath', $dependentJob['message']);
-        $this->assertArrayHasKey('originFileName', $dependentJob['message']);
+        self::assertArrayHasKey('topic', $dependentJob);
+        self::assertArrayHasKey('message', $dependentJob);
+        self::assertEquals(SendImportNotificationTopic::getName(), $dependentJob['topic']);
+        self::assertEquals($rootJob->getId(), $dependentJob['message']['rootImportJobId']);
+        self::assertEquals([PreImportTopic::getName()], $dependentJob['message']['subscribedTopic']);
+        self::assertArrayHasKey('filePath', $dependentJob['message']);
+        self::assertArrayHasKey('originFileName', $dependentJob['message']);
     }
 
     private function getJobProcessor(): JobProcessor
     {
-        return $this->getContainer()->get('oro_message_queue.job.processor');
+        return self::getContainer()->get('oro_message_queue.job.processor');
     }
 }

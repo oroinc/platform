@@ -628,10 +628,8 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 
         $this->extension->process($this->entityManager);
 
-        self::assertMessageSent(
-            Topics::EXECUTE_PROCESS_JOB,
-            new Message(['process_job_id' => null], MessagePriority::NORMAL)
-        );
+        self::assertMessageSent(Topics::EXECUTE_PROCESS_JOB, ['process_job_id' => null]);
+        self::assertMessageSentWithPriority(Topics::EXECUTE_PROCESS_JOB, MessagePriority::NORMAL);
     }
 
     public function testShouldSendQueuedJobOnlyAfterFlushFinished()
@@ -694,8 +692,12 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
         $this->extension->process($this->entityManager);
 
         self::assertEquals($changeSet, $createdProcessJob->getData()->get('changeSet'));
-        self::assertMessagesCount(Topics::EXECUTE_PROCESS_JOB, 1);
-        self::assertMessageSent(Topics::EXECUTE_PROCESS_JOB, $expectedMessage);
+
+        self::assertMessageSent(Topics::EXECUTE_PROCESS_JOB, $expectedMessage->getBody());
+        self::assertMessageSentWithPriority(Topics::EXECUTE_PROCESS_JOB, $expectedMessage->getPriority());
+
+        $message = self::getSentMessage(Topics::EXECUTE_PROCESS_JOB, false);
+        self::assertEquals($expectedMessage->getDelay(), $message->getDelay());
     }
 
     public function testProcessRemovedEntityHashes()

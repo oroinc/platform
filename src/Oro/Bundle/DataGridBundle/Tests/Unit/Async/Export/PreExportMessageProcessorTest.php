@@ -7,14 +7,13 @@ use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
 use Oro\Bundle\DataGridBundle\Async\Topic\DatagridPreExportTopic;
 use Oro\Bundle\DataGridBundle\Handler\ExportHandler;
 use Oro\Bundle\DataGridBundle\ImportExport\DatagridExportIdFetcher;
-use Oro\Bundle\ImportExportBundle\Async\Topics as ImportExportTopics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler as DefaultExportHandler;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\MessageQueue\Client\Message as ClientMessage;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\DependentJobContext;
@@ -127,7 +126,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                ImportExportTopics::POST_EXPORT,
+                PostExportTopic::getName(),
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,
@@ -156,24 +155,22 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
             DatagridExportTopic::getName(),
-            new ClientMessage(
-                [
-                    'format' => $format,
-                    'batchSize' => self::BATCH_SIZE,
-                    'parameters' => [
-                        'gridName' => $gridName,
-                        'gridParameters' => [],
-                        'format_type' => 'excel',
-                    ],
-                    'exportType' => 'export',
-                    'entity' => self::ENTITY_NAME,
-                    'jobName' => $gridName,
-                    'outputFormat' => $format,
-                    'jobId' => 10,
+            [
+                'format' => $format,
+                'batchSize' => self::BATCH_SIZE,
+                'parameters' => [
+                    'gridName' => $gridName,
+                    'gridParameters' => [],
+                    'format_type' => 'excel',
                 ],
-                MessagePriority::LOW
-            )
+                'exportType' => 'export',
+                'entity' => self::ENTITY_NAME,
+                'jobName' => $gridName,
+                'outputFormat' => $format,
+                'jobId' => 10,
+            ]
         );
+        self::assertMessageSentWithPriority(DatagridExportTopic::getName(), MessagePriority::LOW);
     }
 
     private function createJob(int $id, Job $rootJob = null): Job
@@ -228,7 +225,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                ImportExportTopics::POST_EXPORT,
+                PostExportTopic::getName(),
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,
@@ -257,25 +254,23 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
         self::assertMessageSent(
             DatagridExportTopic::getName(),
-            new ClientMessage(
-                [
-                    'format' => $format,
-                    'batchSize' => $pageSize,
-                    'parameters' => [
-                        'gridName' => $gridName,
-                        'gridParameters' => [],
-                        'pageSize' => $pageSize,
-                        'format_type' => 'excel',
-                    ],
-                    'exportType' => 'export',
-                    'entity' => $entityName,
-                    'jobName' => $gridName,
-                    'outputFormat' => $format,
-                    'jobId' => 10,
+            [
+                'format' => $format,
+                'batchSize' => $pageSize,
+                'parameters' => [
+                    'gridName' => $gridName,
+                    'gridParameters' => [],
+                    'pageSize' => $pageSize,
+                    'format_type' => 'excel',
                 ],
-                MessagePriority::LOW
-            )
+                'exportType' => 'export',
+                'entity' => $entityName,
+                'jobName' => $gridName,
+                'outputFormat' => $format,
+                'jobId' => 10,
+            ]
         );
+        self::assertMessageSentWithPriority(DatagridExportTopic::getName(), MessagePriority::LOW);
     }
 
     /**
@@ -323,7 +318,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $dependentJobContext->expects(self::once())
             ->method('addDependentJob')
             ->with(
-                ImportExportTopics::POST_EXPORT,
+                PostExportTopic::getName(),
                 [
                     'jobId' => 1,
                     'recipientUserId' => 1,
@@ -371,16 +366,11 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'outputFormat' => $format,
             'jobId' => 10,
         ];
-        self::assertMessageSent(
-            DatagridExportTopic::getName(),
-            new ClientMessage($expectedMessageBody1, MessagePriority::LOW)
-        );
+        self::assertMessageSent(DatagridExportTopic::getName(), $expectedMessageBody1);
+        self::assertMessageSentWithPriority(DatagridExportTopic::getName(), MessagePriority::LOW);
 
         $expectedMessageBody2 = $expectedMessageBody1;
         $expectedMessageBody2['parameters']['exactPage'] = 2;
-        self::assertMessageSent(
-            DatagridExportTopic::getName(),
-            new ClientMessage($expectedMessageBody2, MessagePriority::LOW)
-        );
+        self::assertMessageSent(DatagridExportTopic::getName(), $expectedMessageBody2);
     }
 }

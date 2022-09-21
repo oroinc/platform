@@ -48,8 +48,7 @@ class CronCommandTest extends WebTestCase
 
         $this->runCommand('oro:cron');
 
-        $messages = self::getMessageCollector()->getTopicSentMessages(RunCommandTopic::getName());
-
+        $messages = self::getTopicSentMessages(RunCommandTopic::getName());
         $this->assertGreaterThan(0, $messages);
 
         $message = $messages[0];

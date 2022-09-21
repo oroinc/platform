@@ -2,34 +2,25 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Async;
 
-use Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension\TestLogger;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessDefinitions;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
-use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ExecuteProcessJobProcessorTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    use MessageQueueExtension;
+
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
-        $this->clearMessages();
-        $this->loadFixtures([
-            LoadProcessDefinitions::class,
-        ]);
+        $this->loadFixtures([LoadProcessDefinitions::class]);
+
+        self::purgeMessageQueue();
     }
 
     public function testProcessJobWithEntityManagerCleanup(): void
     {
-        /** @var UserManager $userManager */
         $userManager = self::getContainer()->get('oro_user.manager');
 
         /** @var User $user */
@@ -37,33 +28,16 @@ class ExecuteProcessJobProcessorTest extends WebTestCase
         $user->setFirstName('New First Name');
         $userManager->updateUser($user);
 
-        $consumer = self::getContainer()->get('oro_message_queue.consumption.queue_consumer');
-        $logger = new TestLogger();
+        $loggerTestHandler = self::getLoggerTestHandler();
 
-        $consumer->bind('oro.default');
-        $consumer->consume(new ChainExtension([
-            new LimitConsumptionTimeExtension(new \DateTime('+5 seconds')),
-            new LoggerExtension($logger)
-        ]));
+        self::consume();
 
         self::assertFalse(
-            $logger->hasErrorRecords(),
+            $loggerTestHandler->hasErrorRecords(),
             sprintf(
                 'Error log records were expected to be empty, got %s',
-                var_export($logger->getLogsByLevel('error'), true)
+                var_export($loggerTestHandler->getRecords() ?? [], true)
             )
         );
-    }
-
-    private function clearMessages(): void
-    {
-        $connection = self::getContainer()->get(
-            'oro_message_queue.transport.dbal.connection',
-            ContainerInterface::NULL_ON_INVALID_REFERENCE
-        );
-
-        if ($connection instanceof DbalConnection) {
-            $connection->getDBALConnection()->executeQuery('DELETE FROM ' . $connection->getTableName());
-        }
     }
 }
