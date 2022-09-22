@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Export;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -80,16 +80,17 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if (! ($body = $this->getMessageBody($message))) {
+        $messageBody = $this->getMessageBody($message);
+        if (!$messageBody) {
             return self::REJECT;
         }
 
-        $jobUniqueName = $this->getJobUniqueName($body);
+        $jobUniqueName = $this->getJobUniqueName($messageBody);
 
         $result = $this->jobRunner->runUnique(
             $message->getMessageId(),
             $jobUniqueName,
-            $this->getRunUniqueJobCallback($jobUniqueName, $body)
+            $this->getRunUniqueJobCallback($jobUniqueName, $messageBody)
         );
 
         return $result ? self::ACK : self::REJECT;
@@ -167,7 +168,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
     {
         $context = $this->dependentJob->createDependentJobContext($rootJob);
 
-        $context->addDependentJob(Topics::POST_EXPORT, [
+        $context->addDependentJob(PostExportTopic::getName(), [
             'jobId' => $rootJob->getId(),
             'recipientUserId' => $this->getUser()->getId(),
             'jobName' => $body['jobName'],
@@ -175,7 +176,7 @@ abstract class PreExportMessageProcessorAbstract implements MessageProcessorInte
             'outputFormat' => $body['outputFormat'],
             'entity' => $body['entity'],
             'notificationTemplate' =>
-                $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
+                    $body['notificationTemplate'] ?? ImportExportResultSummarizer::TEMPLATE_EXPORT_RESULT,
         ]);
 
         $this->dependentJob->saveDependentJob($context);

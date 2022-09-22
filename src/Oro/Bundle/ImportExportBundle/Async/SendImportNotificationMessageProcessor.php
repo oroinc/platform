@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Bundle\NotificationBundle\Async\Topic\SendEmailNotificationTemplateTopic;
@@ -14,7 +15,6 @@ use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -67,30 +67,25 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
+        $messageBody = $message->getBody();
 
-        if (! isset($body['rootImportJobId'], $body['process'], $body['userId'])) {
-            $this->logger->critical('Invalid message');
-
-            return self::REJECT;
-        }
-
-        if (! ($job = $this->doctrine->getRepository(Job::class)->findJobById((int)$body['rootImportJobId']))) {
+        $job = $this->doctrine->getRepository(Job::class)->findJobById($messageBody['rootImportJobId']);
+        if ($job === null) {
             $this->logger->critical('Job not found');
 
             return self::REJECT;
         }
 
-        $user = $this->doctrine->getRepository(User::class)->find($body['userId']);
-        if (! $user instanceof User) {
+        $user = $this->doctrine->getRepository(User::class)->find($messageBody['userId']);
+        if (!$user instanceof User) {
             $this->logger->error(
-                sprintf('User not found. Id: %s', $body['userId'])
+                sprintf('User not found. Id: %s', $messageBody['userId'])
             );
 
             return self::REJECT;
         }
 
-        switch ($body['process']) {
+        switch ($messageBody['process']) {
             case ProcessorRegistry::TYPE_IMPORT_VALIDATION:
                 $template = ImportExportResultSummarizer::TEMPLATE_IMPORT_VALIDATION_RESULT;
                 break;
@@ -99,11 +94,14 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
                 break;
             default:
                 throw new NotSupportedException(
-                    sprintf('Not found template for "%s" process of Import', $body['process'])
+                    sprintf('Not found template for "%s" process of Import', $messageBody['process'])
                 );
         }
 
-        $summary = $this->importJobSummaryResultService->getSummaryResultForNotification($job, $body['originFileName']);
+        $summary = $this->importJobSummaryResultService->getSummaryResultForNotification(
+            $job,
+            $messageBody['originFileName']
+        );
 
         $this->sendNotification($user->getId(), $template, $summary);
 
@@ -129,6 +127,6 @@ class SendImportNotificationMessageProcessor implements MessageProcessorInterfac
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::SEND_IMPORT_NOTIFICATION];
+        return [SendImportNotificationTopic::getName()];
     }
 }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Async\Export;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Async\Export\PostExportMessageProcessor;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
 use Oro\Bundle\ImportExportBundle\Exception\RuntimeException;
 use Oro\Bundle\ImportExportBundle\Handler\ExportHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -17,36 +17,23 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const USER_ID = 132;
 
-    /** @var NotificationSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationSettings;
+    private ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject $importExportResultSummarizer;
 
-    /** @var ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $importExportResultSummarizer;
+    private JobRepository|\PHPUnit\Framework\MockObject\MockObject $jobRepository;
 
-    /** @var JobRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
+    private MessageProducer|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
 
-    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobManager;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var MessageProducer|\PHPUnit\Framework\MockObject\MockObject */
-    private $messageProducer;
+    private ExportHandler|\PHPUnit\Framework\MockObject\MockObject $exportHandler;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ExportHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $exportHandler;
-
-    /** @var PostExportMessageProcessor */
-    private $postExportMessageProcessor;
+    private PostExportMessageProcessor $postExportMessageProcessor;
 
     protected function setUp(): void
     {
@@ -54,12 +41,12 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->exportHandler = $this->createMock(ExportHandler::class);
         $this->messageProducer = $this->createMock(MessageProducer::class);
         $this->jobRepository = $this->createMock(JobRepository::class);
-        $this->jobManager = $this->createMock(JobManagerInterface::class);
+        $jobManager = $this->createMock(JobManagerInterface::class);
         $this->importExportResultSummarizer = $this->createMock(ImportExportResultSummarizer::class);
-        $this->notificationSettings = $this->createMock(NotificationSettings::class);
+        $notificationSettings = $this->createMock(NotificationSettings::class);
 
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper->expects($this->any())
+        $doctrineHelper->expects(self::any())
             ->method('getEntityRepository')
             ->with(Job::class)
             ->willReturn($this->jobRepository);
@@ -69,13 +56,13 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             $this->messageProducer,
             $this->logger,
             $doctrineHelper,
-            $this->jobManager,
+            $jobManager,
             $this->importExportResultSummarizer,
-            $this->notificationSettings
+            $notificationSettings
         );
     }
 
-    public function testProcessExceptionsAreHandledDuringMerge()
+    public function testProcessExceptionsAreHandledDuringMerge(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $message = $this->createMock(MessageInterface::class);
@@ -90,7 +77,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ];
         $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(JSON::encode($messageBody));
+            ->willReturn($messageBody);
 
         $job = new Job();
         $childJob = new Job();
@@ -130,7 +117,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $jobId = 123;
         $session = $this->createMock(SessionInterface::class);
@@ -145,14 +132,14 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         ];
         $message->expects(self::once())
             ->method('getBody')
-            ->willReturn(JSON::encode($messageBody));
+            ->willReturn($messageBody);
 
         $job = $this->createMock(Job::class);
-        $job->expects($this->any())
+        $job->expects(self::any())
             ->method('getId')
             ->willReturn($jobId);
 
-        $job->expects($this->any())
+        $job->expects(self::any())
             ->method('getData')
             ->willReturn(['file' => 'file.csv']);
 
@@ -179,7 +166,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($job, $fileName)
             ->willReturn($summary);
 
-        $this->messageProducer->expects($this->exactly(2))
+        $this->messageProducer->expects(self::exactly(2))
             ->method('send')
             ->withConsecutive(
                 [
@@ -189,7 +176,7 @@ class PostExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
                     })
                 ],
                 [
-                    Topics::SAVE_IMPORT_EXPORT_RESULT,
+                    SaveImportExportResultTopic::getName(),
                     ['jobId' => $job->getId(), 'type' => 'type', 'entity' => 'Acme']
                 ]
             );

@@ -4,12 +4,10 @@ namespace Oro\Bundle\MessageQueueBundle\Tests\Functional;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadStuckRootJobData;
 use Oro\Bundle\MessageQueueBundle\Tests\Functional\DataFixtures\LoadStuckRootJobDependentData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Component\MessageQueue\Consumption\ChainExtension;
-use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
-use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Test\Async\DependentMessageProcessor;
 use Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
@@ -17,24 +15,19 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 {
-    /** @var QueueConsumer */
-    private $consumer;
+    use MessageQueueExtension;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function setUp(): void
     {
         $this->initClient();
         $this->clearMessages();
 
+        self::purgeMessageQueue();
+
         $this->loadFixtures([
             LoadStuckRootJobData::class,
             LoadStuckRootJobDependentData::class
         ]);
-
-        $container = self::getContainer();
-        $this->consumer = $container->get('oro_message_queue.consumption.queue_consumer');
     }
 
     public function testMessageProcessionUpdatesRootJobAfterException(): void
@@ -49,10 +42,8 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
             ->findOneBy(['name' => $dependentJobName, 'jobProgress' => 0]);
         self::assertNotEmpty($stuckRootJobDependent);
 
-        $this->consumer->bind('oro.default');
-        $this->consumer->consume(new ChainExtension([
-            new LimitConsumptionTimeExtension(new \DateTime('+5 seconds'))
-        ]));
+        // oro.message_queue.unique_test_topic + oro.message_queue.job.root_job_stopped + oro.message_queue.test_topic.
+        self::consume(3);
 
         $stuckUniqueRootJob = $this->getEntityManager()->getRepository(Job::class)
             ->findOneBy(['name' => $uniqueJobName, 'jobProgress' => 0]);
@@ -72,7 +63,7 @@ class RootJobStatusUpdatedAfterFailureTest extends WebTestCase
 
     private function getEntityManager(): EntityManager
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);
+        return self::getContainer()->get('doctrine')->getManagerForClass(Job::class);
     }
 
     private function clearMessages(): void

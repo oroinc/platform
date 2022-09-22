@@ -11,7 +11,6 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobProcessor;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 
 /**
  * @dbIsolationPerTest
@@ -27,9 +26,9 @@ class SaveImportExportResultProcessorTest extends WebTestCase
 
     public function testCouldBeConstructedByContainer(): void
     {
-        $instance = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
+        $instance = self::getContainer()->get('oro_importexport.async.save_import_export_result_processor');
 
-        $this->assertInstanceOf(SaveImportExportResultProcessor::class, $instance);
+        self::assertInstanceOf(SaveImportExportResultProcessor::class, $instance);
     }
 
     public function testProcessSaveJobWithValidData(): void
@@ -43,13 +42,15 @@ class SaveImportExportResultProcessorTest extends WebTestCase
 
         $message = new Message();
         $message->setMessageId('abc');
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'jobId' => $rootJob->getId(),
             'type' => ProcessorRegistry::TYPE_EXPORT,
-            'entity' => ImportExportResult::class
-        ]));
+            'entity' => ImportExportResult::class,
+            'owner' => null,
+            'options' => [],
+        ]);
 
-        $processor = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
+        $processor = self::getContainer()->get('oro_importexport.async.save_import_export_result_processor');
         $processorResult = $processor->process($message, $this->createMock(SessionInterface::class));
 
         /** @var ImportExportResult $rootJobResult */
@@ -65,9 +66,11 @@ class SaveImportExportResultProcessorTest extends WebTestCase
     {
         $message = new Message();
         $message->setMessageId('abc');
-        $message->setBody(JSON::encode([]));
+        $message->setBody([
+            'jobId' => PHP_INT_MAX,
+        ]);
 
-        $processor = $this->getContainer()->get('oro_importexport.async.save_import_export_result_processor');
+        $processor = self::getContainer()->get('oro_importexport.async.save_import_export_result_processor');
         $processorResult = $processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REJECT, $processorResult);
@@ -75,6 +78,6 @@ class SaveImportExportResultProcessorTest extends WebTestCase
 
     private function getJobProcessor(): JobProcessor
     {
-        return $this->getContainer()->get('oro_message_queue.job.processor');
+        return self::getContainer()->get('oro_message_queue.job.processor');
     }
 }

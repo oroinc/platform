@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Controller;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\Type\ConfigType;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EntityType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\UniqueKeyCollectionType;
@@ -48,12 +47,13 @@ class ConfigEntityGridController extends AbstractController
     public function uniqueAction(Request $request, EntityConfigModel $entity): RedirectResponse|array
     {
         $className = $entity->getClassName();
-        $entityProvider = $this->getConfigProvider();
-        $entityConfig = $entityProvider->getConfig($className);
+
+        $configManager = $this->getConfigManager();
+        $extendEntityConfig = $configManager->getProvider('extend')->getConfig($className);
 
         $form = $this->createForm(
             UniqueKeyCollectionType::class,
-            $entityConfig->get('unique_key', false, []),
+            $extendEntityConfig->get('unique_key', false, []),
             [
                 'className' => $className
             ]
@@ -63,9 +63,8 @@ class ConfigEntityGridController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $entityConfig->set('unique_key', $form->getData());
-                $configManager = $entityProvider->getConfigManager();
-                $configManager->persist($entityConfig);
+                $extendEntityConfig->set('unique_key', $form->getData());
+                $configManager->persist($extendEntityConfig);
                 $configManager->flush();
 
                 return $this->getRouter()->redirect($entity);
@@ -75,7 +74,7 @@ class ConfigEntityGridController extends AbstractController
         return [
             'form' => $form->createView(),
             'entity_id' => $entity->getId(),
-            'entity_config' => $entityConfig
+            'entity_config' => $configManager->getProvider('entity')->getConfig($className)
         ];
     }
 
@@ -220,17 +219,11 @@ class ConfigEntityGridController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                'oro_entity_config.provider.entity' => ConfigProvider::class,
                 Router::class,
                 ConfigManager::class,
                 TranslatorInterface::class
             ]
         );
-    }
-
-    private function getConfigProvider(): ConfigProvider
-    {
-        return $this->get(ConfigProvider::class);
     }
 
     private function getRouter(): Router

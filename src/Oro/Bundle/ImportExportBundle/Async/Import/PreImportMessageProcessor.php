@@ -4,8 +4,11 @@ namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SaveImportExportResultTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\SendImportNotificationTopic;
 use Oro\Bundle\ImportExportBundle\Async\Topics;
-use Oro\Bundle\ImportExportBundle\Context\Context;
 use Oro\Bundle\ImportExportBundle\Event\BeforeImportChunksEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
@@ -23,7 +26,6 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -130,7 +132,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     {
         // Topic PRE_HTTP_IMPORT subscribed only for possibility to process already existing messages in message queue
         // This is possible after the upgrade to the new application version
-        return [Topics::PRE_IMPORT, Topics::PRE_HTTP_IMPORT];
+        return [PreImportTopic::getName(), Topics::PRE_HTTP_IMPORT];
     }
 
     /**
@@ -140,26 +142,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     protected function validateMessageBody($body)
     {
-        if (! isset(
-            $body['userId'],
-            $body['jobName'],
-            $body['process'],
-            $body['processorAlias'],
-            $body['fileName'],
-            $body['originFileName']
-        )
-        ) {
-            $this->logger->critical('Got invalid message');
-
-            return false;
-        }
-
-        $body = array_replace_recursive([
-            'options' => []
-        ], $body);
-
-        $body['options'][Context::OPTION_BATCH_SIZE] = $this->batchSize;
-
         return $body;
     }
 
@@ -196,7 +178,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                             $body['fileName'] = $file;
                             $body['options']['batch_number'] = $key;
                             $this->producer->send(
-                                Topics::IMPORT,
+                                ImportTopic::getName(),
                                 array_merge($body, ['jobId' => $child->getId()])
                             );
                         }
@@ -215,7 +197,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
     {
         $context = $this->dependentJob->createDependentJobContext($job->getRootJob());
         $context->addDependentJob(
-            Topics::SEND_IMPORT_NOTIFICATION,
+            SendImportNotificationTopic::getName(),
             [
                 'rootImportJobId' => $job->getRootJob()->getId(),
                 'originFileName' => $body['originFileName'],
@@ -223,7 +205,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
                 'process' => $body['process'],
             ]
         );
-        $context->addDependentJob(Topics::SAVE_IMPORT_EXPORT_RESULT, [
+        $context->addDependentJob(SaveImportExportResultTopic::getName(), [
             'jobId' => $job->getRootJob()->getId(),
             'userId' => $body['userId'],
             'type' => $body['process'],
@@ -247,7 +229,6 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
         $this->logger->critical($errorMessage);
 
         $user = $this->managerRegistry
-            ->getManagerForClass(User::class)
             ->getRepository(User::class)
             ->find($body['userId']);
 
@@ -321,15 +302,9 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        $body = JSON::decode($message->getBody());
+        $messageBody = $message->getBody();
 
-        $body = $this->validateMessageBody($body);
-
-        if (! $body) {
-            return self::REJECT;
-        }
-
-        $files = $this->getFiles($body);
+        $files = $this->getFiles($messageBody);
 
         if (!$files) {
             return self::REJECT;
@@ -337,7 +312,7 @@ class PreImportMessageProcessor implements MessageProcessorInterface, TopicSubsc
 
         $parentMessageId = $message->getMessageId();
 
-        $result = $this->processJob($parentMessageId, $body, $files);
+        $result = $this->processJob($parentMessageId, $messageBody, $files);
 
         return $result ? self::ACK : self::REJECT;
     }

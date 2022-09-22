@@ -114,3 +114,6 @@ oro:
                 order:
                     asc.label: Ascending
                     desc.label: Descending
+            option_value:
+                boolean.true: Yes
+                boolean.false: No

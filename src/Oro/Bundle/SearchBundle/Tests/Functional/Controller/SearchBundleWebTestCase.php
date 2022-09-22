@@ -7,7 +7,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class SearchBundleWebTestCase extends WebTestCase
 {
-    use SearchExtensionTrait;
+    use SearchExtensionTrait {
+        reindex as traitReindex;
+    }
 
     /** @var array */
     protected static $entitiesToClear = [];
@@ -73,7 +75,7 @@ class SearchBundleWebTestCase extends WebTestCase
 
         static::clearIndex($entityClass);
 
-        static::getSearchIndexer()->reindex($entityClass);
+        static::traitReindex($entityClass);
 
         $alias = static::getSearchObjectMapper()->getEntityAlias($entityClass);
         static::ensureItemsLoaded($alias, $expectedCount);
