@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\Command;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -64,7 +64,7 @@ class ImportCommandTest extends WebTestCase
 
         self::assertStringContainsString('Scheduled successfully.', $result);
 
-        $sentMessage = self::getSentMessage(Topics::PRE_IMPORT);
+        $sentMessage = self::getSentMessage(PreImportTopic::getName());
 
         // Unset randomly generated fileName for test purposes
         unset($sentMessage['fileName']);

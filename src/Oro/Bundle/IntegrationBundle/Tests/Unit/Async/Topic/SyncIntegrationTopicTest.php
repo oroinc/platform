@@ -7,7 +7,6 @@ use Oro\Component\MessageQueue\Test\AbstractTopicTestCase;
 use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 
 class SyncIntegrationTopicTest extends AbstractTopicTestCase
 {
@@ -54,16 +53,6 @@ class SyncIntegrationTopicTest extends AbstractTopicTestCase
                 'exceptionClass' => MissingOptionsException::class,
                 'exceptionMessage' =>
                     '/The required option "integration_id" is missing./',
-            ],
-            'extra option' => [
-                'body' => [
-                    'integration_id' => 1,
-                    'foo' => 'bar',
-                ],
-                'exceptionClass' => UndefinedOptionsException::class,
-                'exceptionMessage' =>
-                    '/The option "foo" does not exist. Defined options are: "connector", "connector_parameters", '
-                    . '"integration_id", "transport_batch_size"./',
             ],
             'wrong integration_id type' => [
                 'body' => [

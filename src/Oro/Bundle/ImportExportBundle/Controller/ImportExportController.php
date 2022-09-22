@@ -3,7 +3,8 @@
 namespace Oro\Bundle\ImportExportBundle\Controller;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreExportTopic;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PreImportTopic;
 use Oro\Bundle\ImportExportBundle\Configuration\ImportExportConfigurationInterface;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
 use Oro\Bundle\ImportExportBundle\Exception\ImportExportExpiredException;
@@ -246,7 +247,7 @@ class ImportExportController extends AbstractController
         $originFileName = $request->get('originFileName', null);
 
         $this->get(MessageProducerInterface::class)->send(
-            Topics::PRE_IMPORT,
+            PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT_VALIDATION,
@@ -286,7 +287,7 @@ class ImportExportController extends AbstractController
         $originFileName = $request->get('originFileName', null);
 
         $this->get(MessageProducerInterface::class)->send(
-            Topics::PRE_IMPORT,
+            PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
                 'process' => ProcessorRegistry::TYPE_IMPORT,
@@ -320,7 +321,7 @@ class ImportExportController extends AbstractController
         $options = $this->getOptionsFromRequest($request);
         $token = $this->getSecurityToken()->getToken();
 
-        $this->get(MessageProducerInterface::class)->send(Topics::PRE_EXPORT, [
+        $this->get(MessageProducerInterface::class)->send(PreExportTopic::getName(), [
             'jobName' => $jobName,
             'processorAlias' => $processorAlias,
             'outputFilePrefix' => $filePrefix,

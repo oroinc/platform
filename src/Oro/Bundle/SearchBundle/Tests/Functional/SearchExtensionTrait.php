@@ -13,10 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 trait SearchExtensionTrait
 {
-    /**
-     * @return IndexerInterface
-     */
-    protected static function getSearchIndexer()
+    protected static function getSearchIndexer(): IndexerInterface
     {
         return self::getContainer()->get('oro_search.search.engine.indexer');
     }
@@ -30,15 +27,19 @@ trait SearchExtensionTrait
     }
 
     /**
-     * Ensure that items are loaded to search index
-     *
-     * @param string $alias
-     * @param int $itemsCount
-     * @param string $searchService
-     * @throws \LogicException
+     * Ensure that items are loaded to search index.
      */
-    protected static function ensureItemsLoaded($alias, $itemsCount, $searchService = 'oro_search.search.engine')
-    {
+    protected static function ensureItemsLoaded(
+        string $classOrAlias,
+        int $itemsCount,
+        string $searchService = 'oro_search.search.engine'
+    ): void {
+        if (class_exists($classOrAlias)) {
+            $alias = self::getIndexAlias($classOrAlias, []);
+        } else {
+            $alias = $classOrAlias;
+        }
+
         $query = new Query();
         $query->from($alias);
 
@@ -63,6 +64,13 @@ trait SearchExtensionTrait
                 )
             );
         }
+    }
+
+    protected static function getIndexAlias(string $className, array $placeholders): string
+    {
+        return self::getContainer()
+            ->get('oro_search.provider.search_mapping')
+            ->getEntityAlias($className);
     }
 
     /**
@@ -95,5 +103,19 @@ trait SearchExtensionTrait
             ->delete()
             ->getQuery()
             ->execute();
+    }
+
+    protected static function resetIndex(array|string|null $class = null, array $context = []): void
+    {
+        self::getSearchIndexer()->resetIndex($class, $context);
+    }
+
+    /**
+     * @param string[]|string|null $class
+     * @param array $context
+     */
+    protected static function reindex(array|string|null $class = null, array $context = []): void
+    {
+        self::getSearchIndexer()->reindex($class, $context);
     }
 }

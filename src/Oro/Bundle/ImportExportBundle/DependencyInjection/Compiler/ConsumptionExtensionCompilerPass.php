@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Component\MessageQueue\Topic\TopicInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -22,9 +22,10 @@ class ConsumptionExtensionCompilerPass implements CompilerPassInterface
 
         $definition = $container->getDefinition('oro_ui.consumption_extension.request_context');
 
-        $reflection = new \ReflectionClass(Topics::class);
-        foreach ($reflection->getConstants() as $topicName) {
-            $definition->addMethodCall('addTopicName', [$topicName]);
-        };
+        /** @var TopicInterface[] $topics */
+        $topics = $container->findTaggedServiceIds('oro_message_queue.consumption.extension.topic');
+        foreach ($topics as $topicClassName => $topic) {
+            $definition->addMethodCall('addTopicName', [$topicClassName::getName()]);
+        }
     }
 }

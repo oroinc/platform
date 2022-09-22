@@ -3,52 +3,35 @@
 namespace Oro\Bundle\ImportExportBundle\Async\Import;
 
 use Oro\Bundle\ImportExportBundle\Async\ImportExportResultSummarizer;
+use Oro\Bundle\ImportExportBundle\Async\Topic\ImportTopic;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Handler\ImportHandler;
 use Oro\Bundle\ImportExportBundle\Handler\PostponedRowsHandler;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Component\MessageQueue\Client\TopicSubscriberInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
  * Process async import message
  */
-class ImportMessageProcessor implements MessageProcessorInterface
+class ImportMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    /**
-     * @var ImportHandler
-     */
-    protected $importHandler;
+    private ImportHandler $importHandler;
 
-    /**
-     * @var JobRunner
-     */
-    protected $jobRunner;
+    private JobRunner $jobRunner;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    private LoggerInterface $logger;
 
-    /**
-     * @var ImportExportResultSummarizer
-     */
-    protected $importExportResultSummarizer;
+    private ImportExportResultSummarizer $importExportResultSummarizer;
 
-    /**
-     * @var FileManager
-     */
-    protected $fileManager;
+    private FileManager $fileManager;
 
-    /**
-     * @var PostponedRowsHandler
-     */
-    protected $postponedRowsHandler;
+    private PostponedRowsHandler $postponedRowsHandler;
 
     public function __construct(
         JobRunner $jobRunner,
@@ -71,51 +54,22 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     public function process(MessageInterface $message, SessionInterface $session)
     {
-        if (!$body = $this->getNormalizeBody($message)) {
-            $this->logger->critical('Got invalid message');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         try {
             $result = $this->jobRunner->runDelayed(
-                $body['jobId'],
-                function (JobRunner $jobRunner, Job $job) use ($body) {
-                    return $this->handleImport($body, $job, $jobRunner);
+                $messageBody['jobId'],
+                function (JobRunner $jobRunner, Job $job) use ($messageBody) {
+                    return $this->handleImport($messageBody, $job, $jobRunner);
                 }
             );
         } catch (JobRedeliveryException $exception) {
             return self::REQUEUE;
         }
 
-        $this->fileManager->deleteFile($body['fileName']);
+        $this->fileManager->deleteFile($messageBody['fileName']);
 
         return $result ? self::ACK : self::REJECT;
-    }
-
-    /**
-     * @param MessageInterface $message
-     * @return array|null
-     */
-    protected function getNormalizeBody(MessageInterface $message)
-    {
-        $body = JSON::decode($message->getBody());
-
-        if (!isset(
-            $body['fileName'],
-            $body['jobName'],
-            $body['processorAlias'],
-            $body['jobId'],
-            $body['process'],
-            $body['originFileName'],
-            $body['userId']
-        )) {
-            return null;
-        }
-
-        return array_replace_recursive([
-            'options' => []
-        ], $body);
     }
 
     /**
@@ -179,7 +133,6 @@ class ImportMessageProcessor implements MessageProcessorInterface
      */
     protected function saveToStorageErrorLog(array &$errors)
     {
-        /** @var FileManager $fileManager */
         $fileManager = $this->fileManager;
         $errorAsJson = json_encode($errors);
 
@@ -188,5 +141,10 @@ class ImportMessageProcessor implements MessageProcessorInterface
         $fileManager->writeToStorage($errorAsJson, $fileName);
 
         return $fileName;
+    }
+
+    public static function getSubscribedTopics()
+    {
+        return [ImportTopic::getName()];
     }
 }

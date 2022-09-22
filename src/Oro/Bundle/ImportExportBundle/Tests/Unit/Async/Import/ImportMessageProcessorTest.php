@@ -14,33 +14,24 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Exception\JobRedeliveryException;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
-use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ImportHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $importHandler;
+    private ImportHandler|\PHPUnit\Framework\MockObject\MockObject $importHandler;
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
+    private JobRunner|\PHPUnit\Framework\MockObject\MockObject $jobRunner;
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
-    /** @var ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $importExportResultSummarizer;
+    private ImportExportResultSummarizer|\PHPUnit\Framework\MockObject\MockObject $importExportResultSummarizer;
 
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
+    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
 
-    /** @var PostponedRowsHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $postponedRowsHandler;
+    private PostponedRowsHandler|\PHPUnit\Framework\MockObject\MockObject $postponedRowsHandler;
 
-    /** @var ImportMessageProcessor */
-    private $processor;
+    private ImportMessageProcessor $processor;
 
     protected function setUp(): void
     {
@@ -61,25 +52,10 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldLogErrorAndRejectMessageIfMessageWasInvalid()
-    {
-        $this->logger->expects($this->once())
-            ->method('critical')
-            ->with('Got invalid message');
-
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects($this->once())
-            ->method('getBody')
-            ->willReturn('[]');
-
-        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
-        $this->assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRequesIfJobRedeliveryExceptionWasThrown()
+    public function testShouldRequesIfJobRedeliveryExceptionWasThrown(): void
     {
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
@@ -88,7 +64,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'processorAlias' => 'test',
             'process' => 'import',
             'options' => [],
-        ]));
+        ]);
 
         $this->jobRunner->expects($this->once())
             ->method('runDelayed')
@@ -98,7 +74,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REQUEUE, $result);
     }
 
-    public function testShouldRequeueIfDeadlockDetected()
+    public function testShouldRequeueIfDeadlockDetected(): void
     {
         $job = new Job();
         $job->setId(1);
@@ -139,7 +115,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('writeToStorage');
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
@@ -148,14 +124,14 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'processorAlias' => 'test',
             'process' => 'import',
             'options' => [],
-        ]));
+        ]);
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
         self::assertEquals(MessageProcessorInterface::REQUEUE, $result);
     }
 
-    public function testShouldProcessedWithPostponedRows()
+    public function testShouldProcessedWithPostponedRows(): void
     {
         $body = [
             'fileName' => '123456.csv',
@@ -228,7 +204,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($this->jobRunner, $job, 'postpone.csv', $body, $result);
 
         $message = new Message();
-        $message->setBody(JSON::encode($body));
+        $message->setBody($body);
 
         $processResult = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -273,7 +249,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testShouldProcessedDataMessage(array $body, int $writeLog)
+    public function testShouldProcessedDataMessage(array $body, int $writeLog): void
     {
         $job = new Job();
         $job->setId(1);
@@ -321,7 +297,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('writeToStorage');
 
         $message = new Message();
-        $message->setBody(JSON::encode([
+        $message->setBody([
             'fileName' => '123456.csv',
             'originFileName' => 'test.csv',
             'userId' => '1',
@@ -330,7 +306,7 @@ class ImportMessageProcessorTest extends \PHPUnit\Framework\TestCase
             'processorAlias' => 'test',
             'process' => 'import',
             'options' => [],
-        ]));
+        ]);
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 

@@ -560,6 +560,7 @@ HELP
         $this->processInstallerScripts($output, $commandExecutor);
 
         $this->applicationState->setInstalled();
+        $commandExecutor->runCommand('fos:js-routing:dump', ['--process-isolation' => true]);
         $commandExecutor->runCommand('oro:translation:dump', ['--process-isolation' => true]);
         $output->writeln('');
 

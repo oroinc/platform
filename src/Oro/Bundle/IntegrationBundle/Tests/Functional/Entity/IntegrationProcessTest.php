@@ -9,7 +9,6 @@ use Oro\Bundle\IntegrationBundle\Tests\Functional\DataFixtures\LoadChannelData;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
-use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 
 /**
@@ -45,18 +44,13 @@ class IntegrationProcessTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        self::assertMessageSent(
-            SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => $integration->getId(),
-                    'connector_parameters' => [],
-                    'connector' => null,
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
-        );
+        self::assertMessageSent(SyncIntegrationTopic::getName(), [
+            'integration_id' => $integration->getId(),
+            'connector_parameters' => [],
+            'connector' => null,
+            'transport_batch_size' => 100,
+        ]);
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
     }
 
     /**
@@ -75,8 +69,7 @@ class IntegrationProcessTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        $traces = self::getMessageCollector()->getTopicSentMessages(SyncIntegrationTopic::getName());
-        self::assertCount(0, $traces);
+        self::assertMessagesEmpty(SyncIntegrationTopic::getName());
     }
 
     /**
@@ -99,18 +92,13 @@ class IntegrationProcessTest extends WebTestCase
         $this->getEntityManager()->persist($integration);
         $this->getEntityManager()->flush();
 
-        self::assertMessageSent(
-            SyncIntegrationTopic::getName(),
-            new Message(
-                [
-                    'integration_id' => $integration->getId(),
-                    'connector_parameters' => [],
-                    'connector' => null,
-                    'transport_batch_size' => 100,
-                ],
-                MessagePriority::VERY_LOW
-            )
-        );
+        self::assertMessageSent(SyncIntegrationTopic::getName(), [
+            'integration_id' => $integration->getId(),
+            'connector_parameters' => [],
+            'connector' => null,
+            'transport_batch_size' => 100,
+        ]);
+        self::assertMessageSentWithPriority(SyncIntegrationTopic::getName(), MessagePriority::VERY_LOW);
     }
 
     private function getEntityManager(): EntityManagerInterface

@@ -39,6 +39,11 @@
                     {% if value is null %}
                         {% set value = config.value %}
                     {% endif %}
+                    {% if value is same as(true) %}
+                        {% set value = value
+                            ? 'oro.dashboard.widget.option_value.boolean.true'|trans
+                            : 'oro.dashboard.widget.option_value.boolean.false'|trans %}
+                    {% endif %}
                     <div class="widget-config-data"><strong>{{ label|trans }}</strong>: {{ value }}</div>
                 {% endif %}
             {% endif %}
