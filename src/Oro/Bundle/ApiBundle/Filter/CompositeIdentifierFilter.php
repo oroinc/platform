@@ -51,6 +51,21 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         $this->entityIdTransformerRegistry = $registry;
     }
 
+    public function getMetadata(): EntityMetadata
+    {
+        return $this->metadata;
+    }
+
+    public function getEntityIdTransformerRegistry(): EntityIdTransformerRegistry
+    {
+        return $this->entityIdTransformerRegistry;
+    }
+
+    public function getRequestType(): RequestType
+    {
+        return $this->requestType;
+    }
+
     /**
      * {@inheritdoc}
      */

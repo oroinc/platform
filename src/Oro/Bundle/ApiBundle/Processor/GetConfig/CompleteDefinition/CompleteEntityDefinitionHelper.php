@@ -582,16 +582,17 @@ class CompleteEntityDefinitionHelper
             $targetField = $targetDefinition->findField($targetPropertyName, true);
             if (null === $targetField) {
                 $targetFullDefinition = $this->loadFullDefinition($targetClass, $version, $requestType);
-                $targetFieldName = $targetDefinition->findFieldNameByPropertyPath($targetPropertyName);
-                if ($targetFieldName) {
-                    $targetField = $targetDefinition->getField($targetFieldName);
-                } else {
-                    $targetField = $targetDefinition->addField(
-                        $targetPropertyName,
-                        $targetFullDefinition->findField($targetPropertyName, true)
-                    );
-                    $targetField->setExcluded();
-                }
+                $targetFieldName = $targetDefinition->findField($targetPropertyName)
+                    ? $targetFullDefinition->findFieldNameByPropertyPath($targetPropertyName)
+                    : $targetPropertyName;
+
+                $targetField = $targetDefinition->addField(
+                    $targetFieldName,
+                    $targetFullDefinition->findField($targetPropertyName, true)
+                );
+
+                $targetField->setExcluded();
+
                 $targetDependsOn = $targetField->getDependsOn();
                 if (!empty($targetDependsOn)) {
                     $this->resolveDependsOn(
