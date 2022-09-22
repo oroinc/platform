@@ -10,7 +10,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\ArrayDatasource\ArrayDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\MaterializedView\MaterializedViewByDatagridFactory;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\PlatformBundle\Async\Topic\DeleteMaterializedViewTopic;
 use Oro\Bundle\PlatformBundle\Entity\MaterializedView;
@@ -177,7 +177,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('addDependentMessages')
             ->with($rootJob, [
                 DeleteMaterializedViewTopic::getName() => ['materializedViewName' => $materializedView->getName()],
-                Topics::POST_EXPORT => [
+                PostExportTopic::getName() => [
                     'jobId' => $rootJob->getId(),
                     'jobName' => $rootJob->getName(),
                     'recipientUserId' => $this->tokenAccessor->getUserId(),
@@ -284,7 +284,7 @@ class DatagridPreExportOrmExecutorTest extends \PHPUnit\Framework\TestCase
             ->method('addDependentMessages')
             ->with($rootJob, [
                 DeleteMaterializedViewTopic::getName() => ['materializedViewName' => $materializedView->getName()],
-                Topics::POST_EXPORT => [
+                PostExportTopic::getName() => [
                     'jobId' => $rootJob->getId(),
                     'jobName' => $rootJob->getName(),
                     'recipientUserId' => $this->tokenAccessor->getUserId(),

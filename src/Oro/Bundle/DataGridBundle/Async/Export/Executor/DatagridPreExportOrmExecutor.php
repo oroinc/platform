@@ -6,7 +6,7 @@ use Oro\Bundle\DataGridBundle\Async\Topic\DatagridExportTopic;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\MaterializedView\MaterializedViewByDatagridFactory;
-use Oro\Bundle\ImportExportBundle\Async\Topics;
+use Oro\Bundle\ImportExportBundle\Async\Topic\PostExportTopic;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\PlatformBundle\Async\Topic\DeleteMaterializedViewTopic;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager;
@@ -25,8 +25,7 @@ use Psr\Log\NullLogger;
  * Prepares datagrid data export:
  * - creates {@see MaterializedView}
  * - creates child jobs and sends them to MQ within messages {@see DatagridExportTopic}
- * - creates dependent messages: {@see DeleteMaterializedViewTopic} and
- *   Oro\Bundle\ImportExportBundle\Async\Topics::POST_EXPORT
+ * - creates dependent messages: {@see DeleteMaterializedViewTopic} and {@see PostExportTopic}
  */
 class DatagridPreExportOrmExecutor implements DatagridPreExportExecutorInterface, LoggerAwareInterface
 {
@@ -188,7 +187,7 @@ class DatagridPreExportOrmExecutor implements DatagridPreExportExecutorInterface
                 $rootJob,
                 [
                     DeleteMaterializedViewTopic::getName() => ['materializedViewName' => $materializedViewName],
-                    Topics::POST_EXPORT => [
+                    PostExportTopic::getName() => [
                         'jobId' => $rootJob->getId(),
                         'jobName' => $rootJob->getName(),
                         'recipientUserId' => $this->tokenAccessor->getUserId(),

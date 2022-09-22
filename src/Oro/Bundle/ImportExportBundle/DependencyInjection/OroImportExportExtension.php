@@ -7,6 +7,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+/**
+ * This is the class that loads and manages OroImportExportBundle service configuration.
+ */
 class OroImportExportExtension extends Extension
 {
     /**
@@ -35,5 +38,6 @@ class OroImportExportExtension extends Extension
         $loader->load('mq_processor.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('mq_topics.yml');
     }
 }
