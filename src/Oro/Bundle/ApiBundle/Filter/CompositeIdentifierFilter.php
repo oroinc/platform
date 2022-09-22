@@ -25,7 +25,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     private $requestType;
 
     /** @var EntityMetadata */
-    private $metadata;
+    protected $metadata;
 
     /** @var EntityIdTransformerRegistry */
     private $entityIdTransformerRegistry;
@@ -70,7 +70,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
      * @return Expression
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function buildExpression(?string $operator, $value): Expression
+    protected function buildExpression(?string $operator, $value): Expression
     {
         if (null === $value) {
             throw new \InvalidArgumentException('The composite identifier value must not be NULL.');
@@ -127,7 +127,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         return $expr;
     }
 
-    private function buildEqualExpression(array $value): Expression
+    protected function buildEqualExpression(array $value): Expression
     {
         $expressions = [];
         foreach ($value as $fieldName => $fieldValue) {
@@ -140,7 +140,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         return new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
     }
 
-    private function buildNotEqualExpression(array $value): Expression
+    protected function buildNotEqualExpression(array $value): Expression
     {
         $expressions = [];
         foreach ($value as $fieldName => $fieldValue) {

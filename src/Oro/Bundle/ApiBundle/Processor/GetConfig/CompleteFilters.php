@@ -196,7 +196,7 @@ class CompleteFilters extends CompleteSection
         FiltersConfig $filters,
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition
-    ) {
+    ): void {
         $indexedAssociations = $this->doctrineHelper->getIndexedAssociations($metadata);
         foreach ($indexedAssociations as $propertyPath => $dataType) {
             $filter = $filters->findField($propertyPath, true);
@@ -210,6 +210,7 @@ class CompleteFilters extends CompleteSection
                 $targetDefinition = $field->getTargetEntity();
                 if (null !== $targetDefinition) {
                     $targetClass = $field->getTargetClass();
+                    $dataType = $this->getExactType($targetDefinition, $targetClass, $dataType);
                     if ($targetClass && \is_subclass_of($targetClass, AbstractEnumValue::class)) {
                         $enumIdFieldName = $this->getEnumIdentifierFieldName($targetDefinition);
                         if (null !== $enumIdFieldName && !$filter->hasArrayAllowed()) {
@@ -339,5 +340,22 @@ class CompleteFilters extends CompleteSection
         return
             $metadata->hasAssociation($lastFieldName)
             && $metadata->isCollectionValuedAssociation($lastFieldName);
+    }
+
+    private function getExactType(
+        EntityDefinitionConfig $targetDefinition,
+        ?string $targetClass,
+        string $defaultDataType
+    ): string {
+        if (count($targetDefinition->getIdentifierFieldNames()) === 1) {
+            $identifierFieldName = $targetDefinition->getIdentifierFieldNames()[0];
+            $idPropertyPath = $targetDefinition->getField($identifierFieldName)?->getPropertyPath();
+            if ($idPropertyPath && $idPropertyPath !== $identifierFieldName) {
+                $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
+                $defaultDataType = $targetMetadata?->getTypeOfField($idPropertyPath) ?? $defaultDataType;
+            }
+        }  // filter can handle the issue itself when count of id field names > 1.
+
+        return $defaultDataType;
     }
 }
