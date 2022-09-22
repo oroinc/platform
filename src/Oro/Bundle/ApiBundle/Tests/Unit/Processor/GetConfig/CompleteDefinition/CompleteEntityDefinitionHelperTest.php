@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociationHelper;
@@ -3051,6 +3052,138 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
                 'identifier_field_names' => ['id'],
                 'fields'                 => [
                     'id' => null
+                ]
+            ],
+            $config
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testCompleteDefinitionForDependsOnAssociationOfNonConfigurableEntity(): void
+    {
+        $config = $this->createConfigObject([
+            'fields' => [
+                'id' => [
+                    'depends_on' => ['association1.id']
+                ],
+                'association1' => null
+            ]
+        ]);
+        $context = new ConfigContext();
+        $context->setClassName(self::TEST_CLASS_NAME);
+        $context->setVersion(self::TEST_VERSION);
+        $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
+
+        $this->configManager->expects(self::never())
+            ->method('getEntityConfig');
+        $this->configManager->expects(self::never())
+            ->method('getFieldConfig');
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $rootEntityMetadata->expects(self::any())
+            ->method('getIdentifierFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getFieldNames')
+            ->willReturn(['id']);
+        $rootEntityMetadata->expects(self::once())
+            ->method('getAssociationMappings')
+            ->willReturn(
+                [
+                    'association1' => [
+                        'targetEntity' => 'Test\Association1Target',
+                        'type'         => ClassMetadata::MANY_TO_ONE
+                    ]
+                ]
+            );
+        $associationMetadata = new ClassMetadata('Test\Association1Target');
+
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $rootEntityMetadata],
+                ['Test\Association1Target', true, $associationMetadata]
+            ]);
+
+        $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
+        $this->exclusionProviderRegistry->expects(self::exactly(2))
+            ->method('getExclusionProvider')
+            ->with(self::identicalTo($context->getRequestType()))
+            ->willReturn($exclusionProvider);
+        $exclusionProvider->expects(self::once())
+            ->method('isIgnoredRelation')
+            ->with($rootEntityMetadata, 'association1')
+            ->willReturn(false);
+        // field association1 is collapse and the first time call of getConfig will get only identifier field.
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->withConsecutive(
+                [
+                    'Test\Association1Target',
+                    $context->getVersion(),
+                    $context->getRequestType(),
+                    [new FilterIdentifierFieldsConfigExtra(), new EntityDefinitionConfigExtra()]
+                ],
+                [
+                    'Test\Association1Target',
+                    $context->getVersion(),
+                    $context->getRequestType(),
+                    [new EntityDefinitionConfigExtra()],
+                ]
+            )
+            ->willReturnOnConsecutiveCalls(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'property_path' => 'customizedIdentifier'
+                            ]
+                        ]
+                    ]
+                ),
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'property_path' => 'customizedIdentifier'
+                            ],
+                            'renameId' => [
+                                'property_path' => 'id'
+                            ]
+                        ]
+                    ]
+                )
+            );
+
+        $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
+
+        $this->assertConfig(
+            [
+                'identifier_field_names' => ['id'],
+                'fields'                 => [
+                    'id'           => [
+                        'depends_on' => ['association1.id']
+                    ],
+                    'association1' => [
+                        'exclusion_policy'       => 'all',
+                        'target_class'           => 'Test\Association1Target',
+                        'target_type'            => 'to-one',
+                        'collapse'               => true,
+                        'identifier_field_names' => ['id'],
+                        'fields'                 => [
+                            'id' => [
+                                'property_path' => 'customizedIdentifier'
+                            ],
+                            'renameId' => [
+                                'property_path' => 'id',
+                                'exclude' => true
+                            ]
+                        ]
+                    ]
                 ]
             ],
             $config
