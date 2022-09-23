@@ -23,6 +23,9 @@ oro:
             background_color.label:  Color
             no_color: No color available
 
+        form:
+            choose_tag: Choose a tag
+
     taxonomy:
         inline_editing:
             new_taxonomy: "New taxonomy"
