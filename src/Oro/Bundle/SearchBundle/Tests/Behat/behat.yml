@@ -38,6 +38,10 @@ oro_behat_extension:
       class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
       route: 'oro_search_results'
 
+    Tag Search Result:
+      class: Oro\Bundle\SearchBundle\Tests\Behat\Page\SearchResult
+      route: 'oro_tag_search'
+
   suites:
     OroSearchBundle:
       contexts:

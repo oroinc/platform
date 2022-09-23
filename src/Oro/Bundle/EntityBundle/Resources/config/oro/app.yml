@@ -36,6 +36,7 @@ doctrine:
                 replace:        Oro\ORM\Query\AST\Functions\String\Replace
                 cast:           Oro\ORM\Query\AST\Functions\Cast
                 array_contains: Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\ArrayContains
+                json_agg:       Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\JsonAgg
 
 fos_rest:
     exception:
