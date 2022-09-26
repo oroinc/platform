@@ -90,6 +90,7 @@ class DigitalAssetRepositoryTest extends WebTestCase
                 'uuid' => $file->getUuid(),
                 'parentEntityClass' => $file->getParentEntityClass(),
                 'parentEntityId' => $file->getParentEntityId(),
+                'parentEntityFieldName' => $file->getParentEntityFieldName(),
                 'digitalAssetId' => $file->getDigitalAsset() ? $file->getDigitalAsset()->getId() : null,
                 'extension' => $file->getExtension(),
             ],

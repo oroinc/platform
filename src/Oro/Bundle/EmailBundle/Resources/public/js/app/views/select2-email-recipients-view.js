@@ -3,9 +3,9 @@ define(function(require) {
 
     const $ = require('jquery');
     const _ = require('underscore');
-    const BaseView = require('oroform/js/app/views/select2-view');
+    const Select2View = require('oroform/js/app/views/select2-view');
 
-    const Select2EmailRecipientsView = BaseView.extend({
+    const Select2EmailRecipientsView = Select2View.extend({
         $contextEl: null,
 
         clearSearch: null,
