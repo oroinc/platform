@@ -116,6 +116,7 @@ class DigitalAssetRepository extends EntityRepository
                     'file.uuid',
                     'file.parentEntityClass',
                     'file.parentEntityId',
+                    'file.parentEntityFieldName',
                     'IDENTITY(file.digitalAsset) as digitalAssetId',
                     'file.extension',
                 ]

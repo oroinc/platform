@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -14,11 +15,11 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
  */
 class CompleteFiltersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
+    private const TEST_ASSOC_CLASS_NAME = 'test\associationEntity';
 
-    /** @var CompleteFilters */
-    private $processor;
+    private MockObject|DoctrineHelper $doctrineHelper;
+
+    private CompleteFilters $processor;
 
     protected function setUp(): void
     {
@@ -29,7 +30,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         $this->processor = new CompleteFilters($this->doctrineHelper, ['string', 'datetime'], ['string']);
     }
 
-    public function testProcessForAlreadyCompletedFilters()
+    public function testProcessForAlreadyCompletedFilters(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -78,7 +79,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -106,7 +107,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIndexedField()
+    public function testIndexedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -154,7 +155,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIndexedFieldWithConfiguredDataType()
+    public function testIndexedFieldWithConfiguredDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -206,7 +207,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterWithoutDataType()
+    public function testConfiguredFilterWithoutDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -262,7 +263,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterWhenArrayIsNotAllowedForItsDataType()
+    public function testConfiguredFilterWhenArrayIsNotAllowedForItsDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all'
@@ -315,7 +316,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterWhenArrayIsNotAllowedForItsDataTypeButWithConfiguredArrayAllowed()
+    public function testConfiguredFilterWhenArrayIsNotAllowedForItsDataTypeButWithConfiguredArrayAllowed(): void
     {
         $config = [
             'exclusion_policy' => 'all'
@@ -370,7 +371,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterWhenRangeIsNotAllowedForItsDataTypeButWithConfiguredRangeAllowed()
+    public function testConfiguredFilterWhenRangeIsNotAllowedForItsDataTypeButWithConfiguredRangeAllowed(): void
     {
         $config = [
             'exclusion_policy' => 'all'
@@ -424,7 +425,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterWithoutDataTypeButDataTypeExistsInFieldConfig()
+    public function testConfiguredFilterWithoutDataTypeButDataTypeExistsInFieldConfig(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -478,7 +479,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterForNotManageableField()
+    public function testConfiguredFilterForNotManageableField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -530,7 +531,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredFilterForRenamedNotManageableField()
+    public function testConfiguredFilterForRenamedNotManageableField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -586,7 +587,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredCustomFilterForToManyAssociation()
+    public function testConfiguredCustomFilterForToManyAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -641,7 +642,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testConfiguredCustomFilterWithAllAttributesForToManyAssociation()
+    public function testConfiguredCustomFilterWithAllAttributesForToManyAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -703,7 +704,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterWhenArrayIsNotAllowedForItsDataType()
+    public function testFilterWhenArrayIsNotAllowedForItsDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -750,7 +751,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterWhenRangeIsNotAllowedForItsDataType()
+    public function testFilterWhenRangeIsNotAllowedForItsDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -796,7 +797,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterWithConfiguredDataTypeWhenArrayIsNotAllowedForItsDataType()
+    public function testFilterWithConfiguredDataTypeWhenArrayIsNotAllowedForItsDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -849,7 +850,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterWithConfiguredDataTypeWhenRangeIsNotAllowedForItsDataType()
+    public function testFilterWithConfiguredDataTypeWhenRangeIsNotAllowedForItsDataType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -901,7 +902,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterWhenArrayIsNotAllowedForItsDataTypeButWithConfiguredArrayAllowed()
+    public function testFilterWhenArrayIsNotAllowedForItsDataTypeButWithConfiguredArrayAllowed(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -955,7 +956,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterWhenRangeIsNotAllowedForItsDataTypeButWithConfiguredRangeAllowed()
+    public function testFilterWhenRangeIsNotAllowedForItsDataTypeButWithConfiguredRangeAllowed(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1008,7 +1009,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testExcludedField()
+    public function testExcludedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1063,7 +1064,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testNotIndexedField()
+    public function testNotIndexedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1104,7 +1105,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testNotIndexedFieldThatHasConfiguredFilter()
+    public function testNotIndexedFieldThatHasConfiguredFilter(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1152,7 +1153,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedIndexedField()
+    public function testRenamedIndexedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1202,7 +1203,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedNotIndexedField()
+    public function testRenamedNotIndexedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1245,7 +1246,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testToOneAssociation()
+    public function testToOneAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1297,7 +1298,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedToOneAssociation()
+    public function testRenamedToOneAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1351,7 +1352,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testToManyAssociation()
+    public function testToManyAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1404,7 +1405,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedToManyAssociation()
+    public function testRenamedToManyAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1459,7 +1460,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testNestedToManyAssociation()
+    public function testNestedToManyAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1533,7 +1534,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testExtendedAssociations()
+    public function testExtendedAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1630,7 +1631,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testCustomFilterWithSameNameAsExcludedField()
+    public function testCustomFilterWithSameNameAsExcludedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1688,7 +1689,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierField()
+    public function testIdentifierField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -1744,7 +1745,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedIdentifierField()
+    public function testRenamedIdentifierField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -1802,7 +1803,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldWhenFieldDataTypeIsUnknown()
+    public function testIdentifierFieldWhenFieldDataTypeIsUnknown(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -1856,7 +1857,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldWhenFilterIsAlreadyConfigured()
+    public function testIdentifierFieldWhenFilterIsAlreadyConfigured(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -1913,7 +1914,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldWhenNoFieldInConfig()
+    public function testIdentifierFieldWhenNoFieldInConfig(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -1958,7 +1959,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEnumIdentifierField()
+    public function testEnumIdentifierField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -2014,7 +2015,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedEnumIdentifierField()
+    public function testRenamedEnumIdentifierField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -2072,7 +2073,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEnumIdentifierFieldWhenFilterIsAlreadyConfigured()
+    public function testEnumIdentifierFieldWhenFilterIsAlreadyConfigured(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -2130,7 +2131,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEnumAssociation()
+    public function testEnumAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2177,6 +2178,75 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                     'association1' => [
                         'data_type'   => 'string',
                         'allow_array' => true
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testCompleteFiltersForAssociationsWithExactDataType(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'association1' => [
+                    'targetClass' => self::TEST_ASSOC_CLASS_NAME,
+                    'targetEntity' => $this->createConfigObject(
+                        [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id' => [
+                                    'property_path' => 'newIdentifier'
+                                ]
+                            ],
+                            'identifierFieldNames' => ['id']
+                        ]
+                    )
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $assocEntityMetadata = $this->getClassMetadataMock(self::TEST_ASSOC_CLASS_NAME);
+        $rootEntityMetadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('association1')
+            ->willReturn(false);
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->withConsecutive(
+                [self::TEST_CLASS_NAME],
+                [self::TEST_ASSOC_CLASS_NAME]
+            )
+            ->willReturnOnConsecutiveCalls($rootEntityMetadata, $assocEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn(['association1' => 'integer']);
+        $assocEntityMetadata->expects(self::once())
+            ->method('getTypeOfField')
+            ->with('newIdentifier')
+            ->willReturn('string');
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject([], ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'association1' => [
+                        'data_type'   => 'string'
                     ]
                 ]
             ],

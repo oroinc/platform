@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
@@ -69,7 +70,8 @@ class RegisterConfiguredFilters extends RegisterFilters
             $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         }
 
-        $idFieldName = $this->getSingleIdentifierFieldName($context->getConfig());
+        $configs = $context->getConfig();
+        $idFieldName = $this->getSingleIdentifierFieldName($configs);
         $associationNames = $this->getAssociationNames($metadata);
         $filters = $context->getFilters();
         $fields = $configOfFilters->getFields();
@@ -87,6 +89,9 @@ class RegisterConfiguredFilters extends RegisterFilters
                     if (\in_array($propertyPath, $associationNames, true)) {
                         $this->updateAssociationOperators($filter, $field->isCollection());
                     }
+                    if ($configs->hasField($propertyPath) && $configs->getField($propertyPath)?->getTargetEntity()) {
+                        $this->updateAssociationFieldPropertyPath($filter, $configs->getField($propertyPath));
+                    }
                 }
 
                 $filters->add($filterKey, $filter);
@@ -99,7 +104,7 @@ class RegisterConfiguredFilters extends RegisterFilters
      *
      * @return string|null
      */
-    private function getSingleIdentifierFieldName(EntityDefinitionConfig $config = null)
+    private function getSingleIdentifierFieldName(?EntityDefinitionConfig $config = null)
     {
         if (null === $config) {
             return null;
@@ -138,6 +143,24 @@ class RegisterConfiguredFilters extends RegisterFilters
             : self::ASSOCIATION_ALLOWED_OPERATORS;
         if ([] !== \array_diff($filter->getSupportedOperators(), $allowedOperators)) {
             $filter->setSupportedOperators($allowedOperators);
+        }
+    }
+
+    private function updateAssociationFieldPropertyPath(
+        FieldAwareFilterInterface|StandaloneFilter $filter,
+        ?EntityDefinitionFieldConfig $config
+    ): void {
+        if ($config) {
+            $path = $filter->getField();
+            $singleIdName = $this->getSingleIdentifierFieldName($config?->getTargetEntity());
+            if ($singleIdName) {
+                $targetEntityConfig = $config->getTargetEntity();
+                $pathProperty = $targetEntityConfig?->getField($singleIdName)?->getPropertyPath();
+                if ($pathProperty && $pathProperty !== $singleIdName) {
+                    $filter->setField(sprintf("%s.%s", $path, $pathProperty));
+                }
+            }
+            // filter can handle itself when count($idFieldNames) > 1
         }
     }
 }
