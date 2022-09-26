@@ -35,6 +35,7 @@ doctrine:
                 concat_ws:      Oro\ORM\Query\AST\Functions\String\ConcatWs
                 replace:        Oro\ORM\Query\AST\Functions\String\Replace
                 cast:           Oro\ORM\Query\AST\Functions\Cast
+                json_agg:       Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\JsonAgg
 
 fos_rest:
     exception:

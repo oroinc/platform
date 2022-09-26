@@ -162,7 +162,7 @@ define(function(require) {
                 headers: this.getHeaders(headers),
                 type: this.httpMethod,
                 url: this.getUrl(urlParameters),
-                data: JSON.stringify(this.formatBody(body)),
+                data: body ? JSON.stringify(this.formatBody(body)) : {},
                 errorHandlerMessage: this.getErrorHandlerMessage(options)
             });
             const resultPromise = promise.then(this.formatResult.bind(this), this.onAjaxError.bind(this));
