@@ -266,6 +266,30 @@ JS;
         );
     }
 
+    /**
+     * Example: images "cat1.jpg" and "cat2.jpg" have different filenames
+     *
+     * @Then /^images "(?P<firstImage>(?:[^"]|\\")*)" and "(?P<secondImage>(?:[^"]|\\")*)" have different filenames$/
+     */
+    public function imagesHaveDifferentFileNames(string $firstImage, string $secondImage): void
+    {
+        $firstImage = $this->fixStepArgument($firstImage);
+        $firstFilename = $this->getImageFilename($firstImage);
+
+        $secondImage = $this->fixStepArgument($secondImage);
+        $secondFilename = $this->getImageFilename($secondImage);
+
+        self::assertNotEquals(
+            $firstFilename,
+            $secondFilename,
+            sprintf(
+                'Filenames of the images %s and %s was not expected to be equal',
+                $firstImage,
+                $secondImage
+            )
+        );
+    }
+
     private function getImageFilename(string $imageName): string
     {
         $image = $this->createElement($imageName);
