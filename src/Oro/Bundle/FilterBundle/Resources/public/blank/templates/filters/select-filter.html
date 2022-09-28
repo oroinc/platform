@@ -27,10 +27,9 @@
     <select data-skip-input-widgets>
         <% _.each(options, function (option) { %>
         <option value="<%- option.value %>" title="<%- option.label %>"
-        <% if (option.value == selected.value) { %> selected="selected"<% } %>>
-            <%- option.label %> <% if (option.count !== undefined) { %>(<%- option.count %>)
-        <% } %>
-        </option>
+            <% if (option.value == selected.value) { %>selected="selected"<% } %>
+            <% if (option.count !== undefined) { %>data-option-count="<%- option.count %>"<% } %>
+            ><%- option.label %></option>
         <% }); %>
     </select>
 
