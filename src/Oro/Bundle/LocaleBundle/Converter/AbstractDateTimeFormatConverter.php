@@ -215,7 +215,7 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
     {
         $formatMatch = array_merge($this->defaultFormatMatch, $this->formatMatch);
         $quotedNeedles = array_map(static fn (string $key) => preg_quote($key, '/'), array_keys($formatMatch));
-        $pattern = '/(?:\b)+(?<token>' . implode('|', $quotedNeedles) . ')(?:\b)+/u';
+        $pattern = '/(?:\b)+(?<token>' . implode('|', $quotedNeedles) . ')(?:\b)+/';
         preg_match_all($pattern, $format, $matches, PREG_OFFSET_CAPTURE);
 
         $newFormat = $format;
