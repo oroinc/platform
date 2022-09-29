@@ -608,7 +608,7 @@ define(function(require, exports, module) {
 
         appendToContainer() {
             this.$el.prependTo(this.filterContainer);
-            this.trigger('visibility-change', true);
+            this.trigger('visibility-change', this.$el.is(':visible'));
         },
 
         /**

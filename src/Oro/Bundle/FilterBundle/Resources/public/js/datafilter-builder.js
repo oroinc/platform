@@ -98,7 +98,7 @@ define(function(require, exports, module) {
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
-                filtersList.$el.hide();
+                filtersList.hide();
             }
 
             this.grid.trigger('filterManager:connected');
