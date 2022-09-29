@@ -456,23 +456,22 @@ define(function(require) {
          * @private
          */
         _resolveRelatedSiblings(componentName, dependencies) {
-            const deps = _.mapObject(dependencies, (siblingComponentName, dependencyName) => {
+            const deps = Object.create({__initial__: dependencies});
+
+            Object.entries(dependencies).forEach(([dependencyName, siblingComponentName]) => {
+                let siblingComponent;
                 if (this.initPromises[siblingComponentName]) {
-                    if (!this._hasCircularDependency(componentName, siblingComponentName)) {
-                        this.initPromises[componentName].dependsOn.push(siblingComponentName);
-                    } else {
-                        throw new Error('The "' + componentName +
-                            '" component has circular dependency of sibling components');
+                    if (this._hasCircularDependency(componentName, siblingComponentName)) {
+                        throw new Error(`"${componentName}" component has circular dependency of sibling components`);
                     }
-                    return this.initPromises[siblingComponentName].promise
-                        .then(component => {
-                            return (deps[dependencyName] = component);
-                        });
-                } else if (this.get(siblingComponentName)) {
-                    return this.get(siblingComponentName);
+                    this.initPromises[componentName].dependsOn.push(siblingComponentName);
+                    siblingComponent = this.initPromises[siblingComponentName].promise
+                        .then(component => (deps[dependencyName] = component));
                 } else {
-                    return void 0;
+                    siblingComponent = this.get(siblingComponentName) || void 0;
                 }
+
+                deps[dependencyName] = siblingComponent;
             });
 
             return deps;
