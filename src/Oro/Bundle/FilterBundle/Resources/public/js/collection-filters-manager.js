@@ -117,12 +117,12 @@ define([
             const hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
                 if (!this.isVisible) {
-                    this.$el.show();
+                    this.show();
                     this.isVisible = true;
                 }
             } else {
                 if (this.isVisible) {
-                    this.$el.hide();
+                    this.hide();
                     this.isVisible = false;
                 }
             }
