@@ -878,45 +878,54 @@ label .popover-body {
     }
 }
 
-.collapse-block {
-    [data-collapse-container] {
-        position: relative;
+.collapse-overflow {
+    position: relative;
 
-        max-height: round($font-size-base * $line-height-base * 3);
+    max-height: round($font-size-base * $line-height-base * 3);
 
-        overflow: hidden;
-    }
+    overflow: hidden;
 
-    &.overflows [data-collapse-container]::after {
-        position: absolute;
-        bottom: 0;
-
+    &:not(.show) {
         display: block;
-        height: round($font-size-base * $line-height-base);
-        width: 100%;
-
-        background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, .1));
-
-        content: '';
-        pointer-events: none;
     }
 
-    &.expanded [data-collapse-container] {
-        overflow: auto;
-        max-height: none;
+    &.overflow-mode {
+        &::after {
+            position: absolute;
+            bottom: 0;
+
+            display: block;
+            height: round($font-size-base * $line-height-base);
+            width: 100%;
+
+            background-image: linear-gradient(to top, $primary-inverse, rgba($primary-inverse, .1));
+
+            content: '';
+            pointer-events: none;
+        }
+
+        &.show {
+            overflow: initial;
+            max-height: initial;
+
+            &::after {
+                content: none;
+            }
+        }
     }
 
-    .toggle-more,
-    .toggle-less,
-    .toggle-collapse {
-        display: none;
+    &:not(.overflow-mode) {
+        + .collapse-toggle {
+            display: none;
+        }
     }
 
-    &.expanded .toggle-less,
-    &.expanded .toggle-collapse,
-    &.overflows .toggle-more,
-    &.overflows .toggle-collapse {
-        display: block;
+    &.collapsing {
+        transition: none;
+        // Prevent blinking collapse after toggle it.
+        // Bootstrap adds the height property directly to the "style" attribute.
+        // stylelint-disable-next-line declaration-no-important
+        height: initial !important;
     }
 }
 

@@ -4,6 +4,51 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Changed
+
+#### UIBundle
+
+The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` were removed, use the `bootstrap-collapse` instead.
+- As a result, you need to update your `html`:
+
+  **view.twig**
+    ```diff
+    - {% set collapseView = {
+    -   storageKey: 'unique storage key',
+    -   uid: 'unique storage key id',
+    -   animationSpeed: 0,
+    -   closeClass: 'overflows',
+    -   forcedState: false,
+    -   checkOverflow: false,
+    -   open: false,
+    -   keepState: false
+    - } %}
+    - <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
+    -   <div class="control-label" data-collapse-container>
+    -     Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit
+    -   </div>
+    -   <a href="#" class="control-label toggle-more" data-collapse-trigger>{{ 'Show more'|trans }}</a>
+    -   <a href="#" class="control-label toggle-less" data-collapse-trigger>{{ 'Show less'|trans }}</a>
+    - </div>
+    + {% set collapseId = 'collapse-'|uniqid %}
+    + <div class="collapse-block">
+    +   <div id="{{ collapseId }}" class="collapse-overflow collapse no-transition"
+    +        data-collapsed-text="{{ 'Show more'|trans }}"
+    +        data-expanded-text="{{ 'Show less'|trans }}"
+    +        data-check-overflow="true"
+    +        data-toggle="false"
+    +        data-state-id="{{ 'unique storage key id' }}"
+    +   >Neque porro quisquam est qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit...</div>
+    +   <a href="#"
+    +      role="button"
+    +      class="collapse-toggle"
+    +      data-toggle="collapse"
+    +      data-target="{{ '#' ~ collapseId }}"
+    +      aria-expanded="false"
+    +      aria-controls="{{ collapseId }}"><span data-text>{{ 'Show more'|trans }}</span></a>
+    + </div>
+    ```
+
 ### Added
 
 #### UIBundle
