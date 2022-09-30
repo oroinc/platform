@@ -50,6 +50,17 @@ define(function(require) {
             return superResult;
         },
 
+        _makeOption(option) {
+            const $item = this._super(option);
+            const count = option.getAttribute('data-option-count');
+            if (count !== null) {
+                $item
+                    .find('label span')
+                    .text(`${option.label}\xa0(${count})`);
+            }
+            return $item;
+        },
+
         _bindEvents() {
             this._bindButtonEvents();
             this._bindMenuEvents();

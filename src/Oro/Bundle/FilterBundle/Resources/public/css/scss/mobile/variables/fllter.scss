@@ -85,8 +85,23 @@ $mobile-filter-update-display: block !default;
 $mobile-filter-update-width: 100% !default;
 $mobile-filter-update-offset: $mobile-filter-offset-y auto 0 !default;
 
+$mobile-filter-box-ui-dialog-content-z-index: $oro-mobile-header-zindex + 1 !default;
+
 $mobile-filter-box-ui-dialog-content-inner-offset: 60px 16px !default;
 $mobile-filter-box-ui-dialog-content-height: 100vh !default;
+$mobile-filter-box-ui-dialog-content-position: relative !default;
+
+$mobile-filter-box-ui-dialog-content-filter-criteria-width: 100% !default;
+$mobile-filter-box-ui-dialog-content-filter-criteria-height: 100% !default;
+$mobile-filter-box-ui-dialog-content-filter-criteria-top: 42px !important !default;
+
+$mobile-filter-box-ui-dialog-content-filter-criteria-before-width: 100% !default;
+$mobile-filter-box-ui-dialog-content-filter-criteria-before-height: 50px !default;
+$mobile-filter-box-ui-dialog-content-filter-criteria-before-top: 0 !default;
+$mobile-filter-box-ui-dialog-content-filter-criteria-before-left: 0 !default;
+$mobile-filter-box-ui-dialog-content-filter-criteria-before-position: fixed !default;
+// Need to override inline styles
+$mobile-filter-box-ui-dialog-content-filter-criteria-transform: none !important !default;
 
 $mobile-filter-criteria-selector-inner-end-offset: 50px !default;
 $mobile-filter-criteria-selector-hint-inner-end-offset: 40px !default;
