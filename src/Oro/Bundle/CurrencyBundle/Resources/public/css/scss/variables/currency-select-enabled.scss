@@ -15,5 +15,5 @@ $currency-select-enabled-base-currency-field-offset-top: $content-padding-medium
 
 $currency-select-enabled-base-currency-field-add-on-display: inline-block;
 $currency-select-enabled-base-currency-field-add-on-width: 62px;
-$currency-select-enabled-base-currency-field-add-on-inner-offset: ($content-padding-small * .5) $content-padding-small;
+$currency-select-enabled-base-currency-field-add-on-inner-offset: 0 ($content-padding-small + $input-border-width - 1);
 $currency-select-enabled-base-currency-field-add-on-text-align: left;
