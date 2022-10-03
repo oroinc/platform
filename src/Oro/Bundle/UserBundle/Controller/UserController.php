@@ -34,7 +34,7 @@ class UserController extends AbstractController
 {
     /**
      * @Route("/view/{id}", name="oro_user_view", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroUser/User/view.html.twig")
      * @Acl(
      *      id="oro_user_user_view",
      *      type="entity",
@@ -161,7 +161,7 @@ class UserController extends AbstractController
      *      requirements={"_format"="html|json"},
      *      defaults={"_format" = "html"}
      * )
-     * @Template
+     * @Template("@OroUser/User/index.html.twig")
      * @AclAncestor("oro_user_user_view")
      */
     public function indexAction()
@@ -211,7 +211,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/widget/info/{id}", name="oro_user_widget_info", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroUser/User/widget/info.html.twig")
      * @param Request $request
      * @param User $user
      * @return array
@@ -235,7 +235,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/login-attempts", name="oro_user_login_attempts")
-     * @Template
+     * @Template("@OroUser/User/loginAttempts.html.twig")
      * @AclAncestor("oro_view_user_login_attempt")
      */
     public function loginAttemptsAction()

@@ -1353,6 +1353,38 @@ JS;
     }
 
     /**
+     * Example: And I should see the following menu items:
+     *   | System/ User Management/ Login Attempts |
+     *
+     * @Then /^(?:|I )should see the following menu items:$/
+     */
+    public function iShouldSeeMenuItems(TableNode $table): void
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $paths = $table->getColumn(0);
+        foreach ($paths as $path) {
+            self::assertTrue($mainMenu->hasLink($path), sprintf('Cannot find the menu "%s"', $path));
+        }
+    }
+
+    /**
+     * Example: And I should not see the following menu items:
+     *   | System/ User Management/ Login Attempts |
+     *
+     * @Then /^(?:|I )should not see the following menu items:$/
+     */
+    public function iShouldNotSeeMenuItems(TableNode $table): void
+    {
+        /** @var MainMenu $mainMenu */
+        $mainMenu = $this->createElement('MainMenu');
+        $paths = $table->getColumn(0);
+        foreach ($paths as $path) {
+            self::assertFalse($mainMenu->hasLink($path), sprintf('Not expected to see the menu "%s"', $path));
+        }
+    }
+
+    /**
      * Assert current page
      * Example: Then I should be on Search Result page
      * Example: Then I should be on Default Calendar View page
