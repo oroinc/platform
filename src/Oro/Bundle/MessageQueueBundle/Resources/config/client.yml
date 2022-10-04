@@ -193,3 +193,10 @@ services:
         class: Oro\Component\MessageQueue\Client\MessageBodyResolver
         arguments:
             - '@oro_message_queue.topic.registry'
+
+    oro_message_queue.client.extension.child_job_failing:
+        class: 'Oro\Component\MessageQueue\Client\ConsumptionExtension\ChildJobFailingExtension'
+        arguments:
+            - '@oro_message_queue.job.processor'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension' }
