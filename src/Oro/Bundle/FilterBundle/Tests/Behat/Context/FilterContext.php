@@ -101,7 +101,15 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
      */
     private function setFilterCondition($condition)
     {
-        $this->createElement('FilterConditionDropdown')->click();
+        $dropdown = $this->createElement('FilterConditionDropdown');
+        if ($dropdown->isValid() && $dropdown->isVisible()) {
+            $dropdown->click();
+        } else {
+            $button = $this->createElement('FilterConditionDropdownButton');
+            if ($button->isVisible()) {
+                $button->click();
+            }
+        }
         $this->getPage()
              ->find('xpath', "(//span[contains(., '{$condition}')] | //li/a[contains(., '{$condition}')])[last()]")
              ->click();

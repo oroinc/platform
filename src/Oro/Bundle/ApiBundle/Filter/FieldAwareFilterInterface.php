@@ -13,4 +13,9 @@ interface FieldAwareFilterInterface extends FieldFilterInterface
      * @param string $field The field name or property path
      */
     public function setField(string $field): void;
+
+    /**
+     * Get the field by which the data is filtered.
+     */
+    public function getField(): ?string;
 }

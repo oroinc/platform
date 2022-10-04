@@ -257,8 +257,12 @@ define(function(require) {
     });
 
     function highlightSelection(str, selection) {
-        return str && selection && selection.term
-            ? str.replace(tools.safeRegExp(selection.term.trim(), 'ig'), '<span class="select2-match">$&</span>') : str;
+        if (str && selection && selection.term) {
+            // the str is expected to be a safe HTML string, so the term should be escaped as well
+            const term = _.escape(selection.term.trim());
+            str = str.replace(tools.safeRegExp(term, 'ig'), '<span class="select2-match">$&</span>');
+        }
+        return str;
     }
 
     function getTitle(data, properties) {
