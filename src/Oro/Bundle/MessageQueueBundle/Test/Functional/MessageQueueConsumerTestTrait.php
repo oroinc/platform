@@ -85,7 +85,14 @@ trait MessageQueueConsumerTestTrait
         self::getLoggerTestHandler()->setSkipReset(true);
 
         try {
-            self::getConsumer()
+            $queueConsumer = self::getConsumer();
+
+            // Unbinds queue so consumption can start more than 1 time.
+            \Closure::bind(static function (QueueConsumer $queueConsumer) {
+                unset($queueConsumer->boundMessageProcessors['oro.default']);
+            }, null, QueueConsumer::class)($queueConsumer);
+
+            $queueConsumer
                 ->bind('oro.default')
                 ->consume(
                     new ChainExtension([
@@ -102,6 +109,33 @@ trait MessageQueueConsumerTestTrait
             $messageLoggerListener->setSkipReset(false);
             self::getLoggerTestHandler()->setSkipReset(false);
         }
+    }
+
+    protected static function consumeMessage(Message|string $message): void
+    {
+        $messageId = is_object($message) ? $message->getMessageId() : $message;
+
+        $processedMessagesCount = count(self::getProcessedMessages());
+        while (true) {
+            self::consume(1);
+
+            $processedMessages = self::getProcessedMessages();
+
+            if (count($processedMessages) === $processedMessagesCount) {
+                // No messages were processed during consumption.
+                break;
+            }
+
+            $processedMessagesCount = count($processedMessages);
+            foreach ($processedMessages as $processedMessage) {
+                if ($processedMessage['message']->getMessageId() === $messageId) {
+                    // Desired message is processed.
+                    return;
+                }
+            }
+        }
+
+        self::fail(sprintf('The message #%s was not found among processed messages', $messageId));
     }
 
     protected static function getConsumedMessagesCollector(): ConsumedMessagesCollectorExtension
