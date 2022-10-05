@@ -65,4 +65,9 @@ trait JobsAwareTestTrait
     {
         return uniqid(microtime(true), true);
     }
+
+    protected function assertJobStatus(string $status, int $jobId): void
+    {
+        self::assertEquals($status, $this->getJobProcessor()->findJobById($jobId)->getStatus());
+    }
 }
