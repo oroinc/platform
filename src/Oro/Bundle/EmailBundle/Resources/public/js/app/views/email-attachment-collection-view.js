@@ -13,7 +13,8 @@ define(function(require) {
 
         listen: {
             'add collection': 'collectionAdd',
-            'remove collection': 'collectionRemove'
+            'remove collection': 'collectionRemove',
+            'visibilityChange': 'onVisibilityChange'
         },
 
         /**
@@ -26,7 +27,7 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        initialize: function(options) {
+        initialize(options) {
             BaseCollectionView.__super__.initialize.call(this, options);
             this.itemView = this.itemView.extend({// eslint-disable-line oro/named-constructor
                 inputName: options.inputName,
@@ -41,7 +42,7 @@ define(function(require) {
             this.showHideAttachmentRow();
         },
 
-        collectionAdd: function(model) {
+        collectionAdd(model) {
             if (!model.get('id') && !model.get('fileName')) {
                 const itemView = this.getItemView(model);
                 if (typeof itemView !== 'undefined') {
@@ -52,7 +53,7 @@ define(function(require) {
             }
         },
 
-        collectionRemove: function() {
+        collectionRemove() {
             const self = this;
             this.collection.each(function(model) {
                 if (model && !model.get('type') && !model.get('id')) {
@@ -62,7 +63,7 @@ define(function(require) {
             this.showHideAttachmentRow();
         },
 
-        showHideAttachmentRow: function() {
+        showHideAttachmentRow() {
             if (this.collection.isEmpty()) {
                 this.hide();
             } else {
@@ -70,12 +71,16 @@ define(function(require) {
             }
         },
 
-        show: function() {
+        show() {
             this.$el.show();
         },
 
-        hide: function() {
+        hide() {
             this.$el.hide();
+        },
+
+        onVisibilityChange() {
+            this.$el.trigger('content:changed');
         }
     });
 
