@@ -129,13 +129,10 @@ define(function(require) {
                 return partMock;
             });
 
-            beforeEach(function(done) {
-                EntityStructureDataProvider.createDataProvider({
-                    rootEntity: initialRootEntityClassName
-                }, applicant1).then(function(provider) {
-                    dataProvider = provider;
-                    done();
-                });
+            beforeEach(async function() {
+                return EntityStructureDataProvider
+                    .createDataProvider({rootEntity: initialRootEntityClassName}, applicant1)
+                    .then(provider => dataProvider = provider);
             });
 
             it('data provider is instance of `EntityStructureDataProvider`', function() {
@@ -210,11 +207,10 @@ define(function(require) {
             describe('compare two data providers', function() {
                 let dataProvider2;
 
-                beforeEach(function(done) {
-                    EntityStructureDataProvider.createDataProvider({}, applicant2).then(function(provider) {
-                        dataProvider2 = provider;
-                        done();
-                    });
+                beforeEach(async function() {
+                    return EntityStructureDataProvider
+                        .createDataProvider({}, applicant2)
+                        .then(provider => dataProvider2 = provider);
                 });
 
                 it('create each time a new data provider', function() {
@@ -238,16 +234,13 @@ define(function(require) {
             let dataProvider;
             const initialRootEntityClassName = 'Oro\\Bundle\\UserBundle\\Entity\\User';
 
-            beforeEach(function(done) {
-                EntityStructureDataProvider.createDataProvider({
+            beforeEach(async function() {
+                return EntityStructureDataProvider.createDataProvider({
                     rootEntity: initialRootEntityClassName,
                     optionsFilter: {configurable: true},
                     exclude: [{name: 'createdAt'}],
                     include: ['type']
-                }, applicant1).then(function(provider) {
-                    dataProvider = provider;
-                    done();
-                });
+                }, applicant1).then(provider => dataProvider = provider);
             });
 
             it('root entity is defined over initial options', function() {
@@ -314,13 +307,10 @@ define(function(require) {
         describe('filter fields in data provider with advanced options', function() {
             let dataProvider;
 
-            beforeEach(function(done) {
-                EntityStructureDataProvider.createDataProvider({
+            beforeEach(async function() {
+                return EntityStructureDataProvider.createDataProvider({
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group'
-                }, applicant1).then(function(provider) {
-                    dataProvider = provider;
-                    done();
-                });
+                }, applicant1).then(provider => dataProvider = provider);
             });
 
             it('filter by unidirectional option', function() {
@@ -387,7 +377,7 @@ define(function(require) {
         describe('filter configuration preset is used in provider', function() {
             let dataProvider;
 
-            beforeEach(function(done) {
+            beforeEach(async function() {
                 EntityStructureDataProvider.defineFilterPreset('first-custom-fields-set', {
                     optionsFilter: {configurable: true},
                     include: [{relationType: 'manyToMany'}],
@@ -398,13 +388,10 @@ define(function(require) {
                     include: [],
                     exclude: [{relationType: 'manyToMany'}]
                 });
-                EntityStructureDataProvider.createDataProvider({
+                return EntityStructureDataProvider.createDataProvider({
                     rootEntity: 'Oro\\Bundle\\UserBundle\\Entity\\Group',
                     filterPreset: 'first-custom-fields-set'
-                }, applicant1).then(function(provider) {
-                    dataProvider = provider;
-                    done();
-                });
+                }, applicant1).then(provider => dataProvider = provider);
             });
 
             afterEach(function() {
@@ -433,15 +420,12 @@ define(function(require) {
             let dataProvider;
             const initialRootEntityClassName = 'Oro\\Bundle\\UserBundle\\Entity\\User';
 
-            beforeEach(function(done) {
+            beforeEach(async function() {
                 errorHandler = jasmine.createSpyObj('errorHandler', ['handle']);
-                EntityStructureDataProvider.createDataProvider({
+                return EntityStructureDataProvider.createDataProvider({
                     rootEntity: initialRootEntityClassName,
                     errorHandler: errorHandler
-                }, applicant1).then(function(provider) {
-                    dataProvider = provider;
-                    done();
-                });
+                }, applicant1).then(provider => dataProvider = provider);
             });
 
             it('error on invalid path to entity chain', function() {
