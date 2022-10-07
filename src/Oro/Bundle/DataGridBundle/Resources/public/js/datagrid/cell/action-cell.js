@@ -81,7 +81,7 @@ define(function(require, exports, module) {
             '<% if (withIcons) { %>' +
                 '<li><ul class="launchers-list"></ul></li>' +
             '<% } else { %>' +
-                '<li class="well-small"><ul class="unstyled launchers-list"></ul></li>' +
+                '<li class="well-small"><ul class="list-unstyled launchers-list"></ul></li>' +
             '<% } %>'
         ),
 
