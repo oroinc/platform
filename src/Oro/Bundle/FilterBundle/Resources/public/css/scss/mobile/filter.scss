@@ -430,9 +430,12 @@
             }
 
             .filter-update {
-                display: $mobile-filter-update-display;
-                width: $mobile-filter-update-width;
                 margin: $mobile-filter-update-offset;
+
+                &:not(.filter-update-empty) {
+                    display: $mobile-filter-update-display;
+                    width: $mobile-filter-update-width;
+                }
             }
 
             .oro-action {
