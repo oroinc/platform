@@ -36,6 +36,19 @@ class Category
     public $parent = [];
 
     /**
+     * Set id
+     *
+     * @param int $id
+     * @return Category
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer

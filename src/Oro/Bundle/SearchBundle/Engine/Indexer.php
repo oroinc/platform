@@ -23,6 +23,7 @@ class Indexer
 {
     const TEXT_ALL_DATA_FIELD   = 'all_text';
     const NAME_FIELD            = 'system_entity_name';
+    const ID_FIELD              = 'system_entity_id';
 
     const RELATION_ONE_TO_ONE   = 'one-to-one';
     const RELATION_MANY_TO_MANY = 'many-to-many';

@@ -1,9 +1,15 @@
-{% if oro_action_has_buttons(params) %}
-    <div class="pull-left">
-        {{ oro_widget_render({
+{%- if oro_action_has_buttons(params) -%}
+    {%- set action -%}
+        {{- oro_widget_render({
             'widgetType': 'block',
             'url': path(oro_action_widget_route(), params),
             'alias': 'action_buttons_widget',
-        }) }}
-    </div>
-{% endif %}
+        }) -}}
+    {%- endset -%}
+
+    {%- if action|trim|length -%}
+        <div class="pull-left">
+            {{- action -}}
+        </div>
+    {%- endif -%}
+{%- endif -%}

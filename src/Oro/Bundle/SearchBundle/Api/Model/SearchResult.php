@@ -98,8 +98,8 @@ class SearchResult
         } catch (\Exception $e) {
             if ($e instanceof DriverException
                 || (
-                    class_exists('Elasticsearch\Common\Exceptions\BadRequest400Exception')
-                    && $e instanceof \Elasticsearch\Common\Exceptions\BadRequest400Exception
+                    class_exists('Elastic\Elasticsearch\Exception\ClientResponseException')
+                    && $e instanceof \Elastic\Elasticsearch\Exception\ClientResponseException
                 )
             ) {
                 throw new InvalidSearchQueryException('Invalid search query.', $e->getCode(), $e);

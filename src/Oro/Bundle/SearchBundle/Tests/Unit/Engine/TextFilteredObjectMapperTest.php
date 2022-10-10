@@ -21,6 +21,7 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->nameResolver,
+            $this->doctrineHelper,
             $this->dispatcher,
             $this->htmlTagHelper,
             new DateTimeFormatter()
@@ -62,7 +63,8 @@ class TextFilteredObjectMapperTest extends ObjectMapperTest
                 'price' => $this->product->getPrice()
             ],
             'integer' => [
-                'count' => $this->product->getCount()
+                'system_entity_id' => $this->product->getId(),
+                'count'            => $this->product->getCount()
             ],
             'datetime' => [
                 'createDate' => $this->product->getCreateDate()

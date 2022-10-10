@@ -14,7 +14,7 @@ parameters:
 
 services:
     oro_platform.psr7.http_factory:
-        class: Oro\Bundle\PlatformBundle\Psr7\HttpFactory
+        class: GuzzleHttp\Psr7\HttpFactory
     # provide default implementations for PSR-17 based on guzzlehttp/psr7
     Psr\Http\Message\ServerRequestFactoryInterface:
         alias: oro_platform.psr7.http_factory

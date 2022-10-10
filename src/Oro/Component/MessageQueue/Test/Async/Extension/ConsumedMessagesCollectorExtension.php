@@ -35,11 +35,14 @@ class ConsumedMessagesCollectorExtension extends AbstractExtension
 
     public function onStart(Context $context): void
     {
-        if (!in_array($this->loggerTestHandler, $this->logger->getHandlers(), true)) {
-            $this->logger->pushHandler($this->loggerTestHandler);
+        if (!$context->getLogger()) {
+            if (!in_array($this->loggerTestHandler, $this->logger->getHandlers(), true)) {
+                $this->logger->pushHandler($this->loggerTestHandler);
+            }
+            $context->setLogger($this->logger);
+        } elseif (!in_array($this->loggerTestHandler, $context->getLogger()->getHandlers(), true)) {
+            $context->getLogger()->pushHandler($this->loggerTestHandler);
         }
-
-        $context->setLogger($this->logger);
     }
 
     /**

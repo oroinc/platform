@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Engine;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Configuration\MappingConfigurationProvider;
 use Oro\Bundle\SearchBundle\Engine\EngineInterface;
@@ -86,6 +87,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
             PropertyAccess::createPropertyAccessor(),
             $this->getTypeCastingHandlerRegistry(),
             $this->createMock(EntityNameResolver::class),
+            $this->createMock(DoctrineHelper::class),
             $this->createMock(EventDispatcherInterface::class),
             $this->createMock(HtmlTagHelper::class),
             new DateTimeFormatter()

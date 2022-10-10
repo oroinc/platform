@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
 use Oro\Bundle\SearchBundle\Exception\InvalidConfigurationException;
@@ -21,27 +22,17 @@ use Symfony\Component\Security\Acl\Util\ClassUtils;
  */
 class ObjectMapper extends AbstractMapper
 {
-    protected EventDispatcherInterface $dispatcher;
-    
-    protected HtmlTagHelper $htmlTagHelper;
-
-    /** @var DateTimeFormatter */
-    protected $dateTimeFormatter;
-
     public function __construct(
-        SearchMappingProvider $mappingProvider,
-        PropertyAccessorInterface $propertyAccessor,
-        TypeCastingHandlerRegistry $handlerRegistry,
-        EntityNameResolver $nameResolver,
-        EventDispatcherInterface $dispatcher,
-        HtmlTagHelper $htmlTagHelper,
-        DateTimeFormatter $dateTimeFormatter
+        protected SearchMappingProvider $mappingProvider,
+        protected PropertyAccessorInterface $propertyAccessor,
+        protected TypeCastingHandlerRegistry $handlerRegistry,
+        protected EntityNameResolver $nameResolver,
+        protected DoctrineHelper $doctrineHelper,
+        protected EventDispatcherInterface $dispatcher,
+        protected HtmlTagHelper $htmlTagHelper,
+        protected DateTimeFormatter $dateTimeFormatter
     ) {
-        parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry, $nameResolver);
-        
-        $this->dispatcher = $dispatcher;
-        $this->htmlTagHelper = $htmlTagHelper;
-        $this->dateTimeFormatter = $dateTimeFormatter;
+        parent::__construct($mappingProvider, $propertyAccessor, $handlerRegistry, $nameResolver, $doctrineHelper);
     }
 
     /**
@@ -130,7 +121,8 @@ class ObjectMapper extends AbstractMapper
         $objectData  = [];
         $objectClass = ClassUtils::getRealClass($object);
         if (is_object($object) && $this->mappingProvider->hasFieldsMapping($objectClass)) {
-            // generate system entity name
+            // generate system entity values
+            $objectData[Query::TYPE_INTEGER][Indexer::ID_FIELD] = $this->getEntityId($object);
             $objectData[Query::TYPE_TEXT][Indexer::NAME_FIELD] = $this->getEntityName($object);
 
             // add field data

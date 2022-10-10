@@ -218,6 +218,8 @@ class Product
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
     }
 
     public function setRecordId($id)
