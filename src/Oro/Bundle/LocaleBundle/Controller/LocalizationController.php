@@ -20,7 +20,7 @@ class LocalizationController extends AbstractController
 {
     /**
      * @Route("/view/{id}", name="oro_locale_localization_view", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroLocale/Localization/view.html.twig")
      * @Acl(
      *      id="oro_locale_localization_view",
      *      type="entity",
@@ -37,7 +37,7 @@ class LocalizationController extends AbstractController
 
     /**
      * @Route("/", name="oro_locale_localization_index")
-     * @Template
+     * @Template("@OroLocale/Localization/index.html.twig")
      * @AclAncestor("oro_locale_localization_view")
      */
     public function indexAction(): array
@@ -64,7 +64,7 @@ class LocalizationController extends AbstractController
 
     /**
      * @Route("/update/{id}", name="oro_locale_localization_update", requirements={"id"="\d+"})
-     * @Template
+     * @Template("@OroLocale/Localization/update.html.twig")
      * @Acl(
      *     id="oro_locale_localization_update",
      *     type="entity",

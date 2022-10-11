@@ -120,7 +120,6 @@ HELP
         $language = new Language();
         $language->setCode($languageCode)
             ->setEnabled(true)
-            ->setOwner($defaultLanguage->getOwner())
             ->setOrganization($defaultLanguage->getOrganization());
 
         $em->persist($language);
