@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\WorkflowBundle\Async;
 
-use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionTriggerHandlerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 
-class TransitionTriggerProcessor implements MessageProcessorInterface
+/**
+ * Processes the workflow transition trigger.
+ */
+class TransitionTriggerProcessor implements MessageProcessorInterface, LoggerAwareInterface
 {
-    const CRON_TOPIC_NAME = 'oro_message_queue.transition_trigger_cron_message';
-    const EVENT_TOPIC_NAME = 'oro_message_queue.transition_trigger_event_message';
+    use LoggerAwareTrait;
 
     /** @var ManagerRegistry */
     protected $registry;
@@ -35,35 +38,31 @@ class TransitionTriggerProcessor implements MessageProcessorInterface
         $this->handler = $handler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
-        $result = self::ACK;
-
-        try {
-            $triggerMessage = $this->createTransitionTriggerMessage($message);
-            $trigger = $this->resolveTrigger($triggerMessage->getTriggerId());
-
-            if (!$this->handler->process($trigger, $triggerMessage)) {
-                $this->logger->warning(
-                    'Transition not allowed.',
-                    ['trigger' => $trigger]
-                );
-
-                $result = self::REJECT;
-            }
-        } catch (\Exception $e) {
+        $triggerMessage = TransitionTriggerMessage::createFromArray($message->getBody());
+        $trigger = $this->registry
+            ->getManagerForClass(BaseTransitionTrigger::class)
+            ->find(BaseTransitionTrigger::class, $triggerMessage->getTriggerId());
+        if (!$trigger) {
             $this->logger->error(
-                'Queue message could not be processed.',
-                ['exception' => $e]
+                'Transition trigger #{id} is not found',
+                ['id' => $triggerMessage->getTriggerId()]
             );
 
-            $result = self::REJECT;
+            return self::REJECT;
         }
 
-        return $result;
+        if (!$this->handler->process($trigger, $triggerMessage)) {
+            $this->logger->warning(
+                'Transition not allowed',
+                ['trigger' => $trigger]
+            );
+
+            return self::REJECT;
+        }
+
+        return self::ACK;
     }
 
     /**

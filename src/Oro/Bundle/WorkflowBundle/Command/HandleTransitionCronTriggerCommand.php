@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Command;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionCronTriggerTopic;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
-use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Handler\TransitionCronTriggerHandler;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
@@ -84,7 +84,7 @@ HELP
             $message = TransitionTriggerMessage::create($trigger);
 
             if ($trigger->isQueued()) {
-                $this->producer->send(TransitionTriggerProcessor::CRON_TOPIC_NAME, $message->toArray());
+                $this->producer->send(WorkflowTransitionCronTriggerTopic::getName(), $message->toArray());
             } else {
                 $this->triggerHandler->process($trigger, $message);
             }

@@ -5,8 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionEventTriggerTopic;
 use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerMessage;
-use Oro\Bundle\WorkflowBundle\Async\TransitionTriggerProcessor;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\TransitionEventTriggerRepository;
@@ -123,7 +123,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
         $message = TransitionTriggerMessage::create($trigger, $entityId);
 
         if ($trigger->isQueued() || $this->forceQueued) {
-            $this->producer->send(TransitionTriggerProcessor::EVENT_TOPIC_NAME, $message->toArray());
+            $this->producer->send(WorkflowTransitionEventTriggerTopic::getName(), $message->toArray());
         } else {
             $this->handler->process($trigger, $message);
         }
