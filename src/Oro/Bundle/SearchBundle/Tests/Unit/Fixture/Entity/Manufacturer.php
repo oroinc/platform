@@ -36,6 +36,19 @@ class Manufacturer
     public $parent = [];
 
     /**
+     * Set id
+     *
+     * @param int $id
+     * @return Manufacturer
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
      * Get id
      *
      * @return integer

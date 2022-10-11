@@ -80,7 +80,7 @@ define(function(require) {
         describe('required sibling components', function() {
             describe('simple dependency', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-c" ' +
@@ -90,7 +90,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('reference is established', function() {
@@ -105,7 +105,7 @@ define(function(require) {
 
             describe('override required componentName with options', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-c" ' +
@@ -121,7 +121,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('compare components', function() {
@@ -131,7 +131,7 @@ define(function(require) {
 
             describe('remove dependency over component extend', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-d" ' +
@@ -139,7 +139,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('compare components', function() {
@@ -149,7 +149,7 @@ define(function(require) {
 
             describe('complex dependencies', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -163,7 +163,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('compare components', function() {
@@ -175,7 +175,7 @@ define(function(require) {
 
             describe('missing required sibling component', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -183,7 +183,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('has to be undefined', function() {
@@ -193,7 +193,7 @@ define(function(require) {
 
             describe('options parameter is not able to remove dependency', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -208,7 +208,7 @@ define(function(require) {
                         '</div>'
                     ].join(''));
                     manager = new ComponentManager($('#container'));
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('reference on sibling component nevertheless established', function() {
@@ -218,7 +218,7 @@ define(function(require) {
 
             describe('circular dependency', function() {
                 let manager;
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     window.setFixtures([
                         '<div id="container" data-layout="separate">',
                         '<div data-page-component-name="component-a" ' +
@@ -233,7 +233,7 @@ define(function(require) {
                     ].join(''));
                     manager = new ComponentManager($('#container'));
                     spyOn(manager, '_handleError');
-                    manager.init().then(done);
+                    return manager.init();
                 });
 
                 it('check error', function() {
@@ -245,7 +245,7 @@ define(function(require) {
 
         describe('delays component\'s initialization until UI event,', () => {
             let manager;
-            beforeEach(function(done) {
+            beforeEach(async function() {
                 window.setFixtures(`
                     <div id="container" data-layout="separate">
                         <div id="init-on" data-page-component-init-on="click">
@@ -256,7 +256,7 @@ define(function(require) {
                 `);
 
                 manager = new ComponentManager($('#container'));
-                manager.init().then(done);
+                return manager.init();
             });
 
             it('component initially not initialized', () => {
@@ -264,9 +264,9 @@ define(function(require) {
             });
 
             describe('after click event', () => {
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     $('#init-on').click();
-                    $.when(...Object.values(manager.initPromises).map(({promise}) => promise)).then(done);
+                    return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
                 });
 
                 it('component gets initialized', () => {
@@ -277,7 +277,7 @@ define(function(require) {
 
         describe('`init-on-asap` component within `init-on` element', () => {
             let manager;
-            beforeEach(function(done) {
+            beforeEach(async function() {
                 window.setFixtures(`
                     <div id="container" data-layout="separate">
                         <div id="init-on" data-page-component-init-on="click">
@@ -290,7 +290,7 @@ define(function(require) {
                 `);
 
                 manager = new ComponentManager($('#container'));
-                manager.init().then(done);
+                return manager.init();
             });
 
             it('initially initialized', () => {
@@ -301,7 +301,7 @@ define(function(require) {
         describe('`init-on` rule applies only on component within same layout,', () => {
             let managerA;
             let managerB;
-            beforeEach(function(done) {
+            beforeEach(async function() {
                 window.setFixtures(`
                     <div id="container-a" data-layout="separate">
                         <div id="init-on" data-page-component-init-on="click">
@@ -319,10 +319,10 @@ define(function(require) {
 
                 managerA = new ComponentManager($('#container-a'));
                 managerB = new ComponentManager($('#container-b'));
-                $.when(
+                return $.when(
                     managerA.init(),
                     managerB.init()
-                ).then(done);
+                );
             });
 
             it('component im outer layout is not initially initialized`', () => {
@@ -336,7 +336,7 @@ define(function(require) {
 
         describe('delegated `init-on` event handler to third party element`', () => {
             let manager;
-            beforeEach(function(done) {
+            beforeEach(async function() {
                 window.setFixtures(`
                     <div id="container" data-layout="separate">
                         <div id="init-on"></div>
@@ -348,7 +348,7 @@ define(function(require) {
                 `);
 
                 manager = new ComponentManager($('#container'));
-                manager.init().then(done);
+                return manager.init();
             });
 
             it('component initially not initialized', () => {
@@ -356,9 +356,9 @@ define(function(require) {
             });
 
             describe('after click event', () => {
-                beforeEach(function(done) {
+                beforeEach(async function() {
                     $('#init-on').click();
-                    $.when(...Object.values(manager.initPromises).map(({promise}) => promise)).then(done);
+                    return $.when(...Object.values(manager.initPromises).map(({promise}) => promise));
                 });
 
                 it('component gets initialized', () => {

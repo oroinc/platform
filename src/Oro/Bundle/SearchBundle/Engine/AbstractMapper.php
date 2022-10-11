@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Engine;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
@@ -16,26 +17,15 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 abstract class AbstractMapper
 {
-    protected SearchMappingProvider $mappingProvider;
-
-    protected PropertyAccessorInterface $propertyAccessor;
-
-    protected TypeCastingHandlerRegistry $handlerRegistry;
-
-    protected EntityNameResolver $nameResolver;
-
     protected array $mappingErrors = [];
 
     public function __construct(
-        SearchMappingProvider $mappingProvider,
-        PropertyAccessorInterface $propertyAccessor,
-        TypeCastingHandlerRegistry $handlerRegistry,
-        EntityNameResolver $nameResolver
+        protected SearchMappingProvider $mappingProvider,
+        protected PropertyAccessorInterface $propertyAccessor,
+        protected TypeCastingHandlerRegistry $handlerRegistry,
+        protected EntityNameResolver $nameResolver,
+        protected DoctrineHelper $doctrineHelper
     ) {
-        $this->mappingProvider = $mappingProvider;
-        $this->propertyAccessor = $propertyAccessor;
-        $this->handlerRegistry = $handlerRegistry;
-        $this->nameResolver = $nameResolver;
     }
 
     /**
@@ -202,6 +192,11 @@ abstract class AbstractMapper
         $objectData[Query::TYPE_TEXT][Indexer::TEXT_ALL_DATA_FIELD] = $textAllDataField;
 
         return $objectData;
+    }
+
+    protected function getEntityId(object $entity): int
+    {
+        return (int)$this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
     protected function getEntityName(object $entity): string

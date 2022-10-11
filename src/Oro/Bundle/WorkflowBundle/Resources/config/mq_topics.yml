@@ -1,0 +1,9 @@
+services:
+    _instanceof:
+        Oro\Component\MessageQueue\Topic\TopicInterface:
+            tags:
+                - { name: oro_message_queue.topic }
+
+    Oro\Bundle\WorkflowBundle\Async\Topic\ExecuteProcessJobTopic: ~
+    Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionEventTriggerTopic: ~
+    Oro\Bundle\WorkflowBundle\Async\Topic\WorkflowTransitionCronTriggerTopic: ~

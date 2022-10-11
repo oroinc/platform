@@ -5,7 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\EventListener\Extension;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\WorkflowBundle\Async\Topics;
+use Oro\Bundle\WorkflowBundle\Async\Topic\ExecuteProcessJobTopic;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessPriority;
 use Oro\Bundle\WorkflowBundle\Entity\EventTriggerInterface;
@@ -243,7 +243,7 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
                         $message->setDelay($timeShift);
                     }
 
-                    $this->messageProducer->send(Topics::EXECUTE_PROCESS_JOB, $message);
+                    $this->messageProducer->send(ExecuteProcessJobTopic::getName(), $message);
                     $this->logger->debug('Process queued', $processJob->getProcessTrigger(), $processJob->getData());
                 }
             }
