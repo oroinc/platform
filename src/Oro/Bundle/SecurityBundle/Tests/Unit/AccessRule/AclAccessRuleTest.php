@@ -33,49 +33,49 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
         $this->accessRule = new AclAccessRule($this->builder, $this->ownershipMetadataProvider);
     }
 
-    public function testIsApplicableIfCriteriaShouldBeProtected()
+    public function testIsApplicableIfCriteriaShouldBeProtected(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
-        $this->assertTrue($this->accessRule->isApplicable($criteria));
+        self::assertTrue($this->accessRule->isApplicable($criteria));
     }
 
-    public function testProcessOnEntityWithFullAccess()
+    public function testProcessOnEntityWithFullAccess(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getAclConditionData')
             ->with(CmsUser::class, 'VIEW')
             ->willReturn([]);
 
         $this->accessRule->process($criteria);
-        $this->assertNull($criteria->getExpression());
+        self::assertNull($criteria->getExpression());
     }
 
-    public function testProcessOnEntityWithNoAccess()
+    public function testProcessOnEntityWithNoAccess(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getAclConditionData')
             ->with(CmsUser::class, 'VIEW')
             ->willReturn([null, null, null, null, null]);
 
         $this->accessRule->process($criteria);
-        $this->assertInstanceOf(AccessDenied::class, $criteria->getExpression());
+        self::assertInstanceOf(AccessDenied::class, $criteria->getExpression());
     }
 
-    public function testProcessOnEntityWithSingleOwnerRestriction()
+    public function testProcessOnEntityWithSingleOwnerRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getAclConditionData')
             ->with(CmsUser::class, 'VIEW')
             ->willReturn(['owner', 130, null, null, null]);
 
         $this->accessRule->process($criteria);
-        $this->assertEquals(
+        self::assertEquals(
             new Comparison(
                 new Path('owner', 'cmsUser'),
                 '=',
@@ -85,17 +85,17 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithArrayOwnerRestriction()
+    public function testProcessOnEntityWithArrayOwnerRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getAclConditionData')
             ->with(CmsUser::class, 'VIEW')
             ->willReturn(['owner', [5,7,6], null, null, null]);
 
         $this->accessRule->process($criteria);
-        $this->assertEquals(
+        self::assertEquals(
             new Comparison(
                 new Path('owner', 'cmsUser'),
                 'IN',
@@ -105,17 +105,17 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithOrganizationRestriction()
+    public function testProcessOnEntityWithOrganizationRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getAclConditionData')
             ->with(CmsUser::class, 'VIEW')
             ->willReturn([null, null, 'organization', 1, true]);
 
         $this->accessRule->process($criteria);
-        $this->assertEquals(
+        self::assertEquals(
             new Comparison(
                 new Path('organization', 'cmsUser'),
                 '=',
@@ -125,17 +125,17 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEntityWithOwnerAndOrganizationRestriction()
+    public function testProcessOnEntityWithOwnerAndOrganizationRestriction(): void
     {
         $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
 
-        $this->builder->expects($this->once())
+        $this->builder->expects(self::once())
             ->method('getAclConditionData')
             ->with(CmsUser::class, 'VIEW')
             ->willReturn(['owner', [5,7,6], 'organization', 1, false]);
 
         $this->accessRule->process($criteria);
-        $this->assertEquals(
+        self::assertEquals(
             new CompositeExpression(
                 'AND',
                 [
@@ -150,6 +150,26 @@ class AclAccessRuleTest extends \PHPUnit\Framework\TestCase
                         new Value(1)
                     )
                 ]
+            ),
+            $criteria->getExpression()
+        );
+    }
+
+    public function testProcessOnEntityWithOrganizationArrayRestriction(): void
+    {
+        $criteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, CmsUser::class, 'cmsUser');
+
+        $this->builder->expects(self::once())
+            ->method('getAclConditionData')
+            ->with(CmsUser::class, 'VIEW')
+            ->willReturn([null, null, 'organization', [1, 2, 3], true]);
+
+        $this->accessRule->process($criteria);
+        self::assertEquals(
+            new Comparison(
+                new Path('organization', 'cmsUser'),
+                'IN',
+                new Value([1, 2, 3])
             ),
             $criteria->getExpression()
         );

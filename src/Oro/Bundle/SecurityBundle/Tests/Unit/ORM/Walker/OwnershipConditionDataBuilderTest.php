@@ -21,8 +21,6 @@ use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
@@ -245,18 +243,6 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->builder->getAclConditionData($targetEntityClassName);
         $this->assertEquals($expectedConstraint, $result);
-    }
-
-    public function testGetUserIdWithNonLoginUser(): void
-    {
-        $token = $this->createMock(TokenInterface::class);
-        $token->expects($this->any())
-            ->method('getUser')
-            ->willReturn('anon');
-        $this->tokenStorage->expects($this->any())
-            ->method('getToken')
-            ->willReturn($token);
-        $this->assertNull($this->builder->getUserId());
     }
 
     /**
@@ -565,25 +551,5 @@ class OwnershipConditionDataBuilderTest extends \PHPUnit\Framework\TestCase
                 [null, null, null, null, false]
             ],
         ];
-    }
-
-    public function testGetUserInCaseOfDifferentUsersInToken(): void
-    {
-        $user1 = new User(1);
-        $user2 = new User(2);
-
-        $this->tokenStorage->expects($this->exactly(2))
-            ->method('getToken')
-            ->willReturnOnConsecutiveCalls(
-                new UsernamePasswordToken($user1, null, 'main', []),
-                new UsernamePasswordToken($user2, null, 'main', [])
-            );
-
-        $user = $this->builder->getUser();
-        $this->assertSame($user1, $user);
-
-        // at the second call should be the second user in token
-        $user = $this->builder->getUser();
-        $this->assertSame($user2, $user);
     }
 }
