@@ -7,7 +7,6 @@
                 <% if (!fields.length) { %>
                     tabindex="-1"
                 <% } %>
-                data-collapsed-title="<%- _.__('Expand') %>" data-expanded-title="<%- _.__('Collapse') %>"
                 data-toggle="collapse" data-target="#<%- regionId %>"
                 aria-controls="<%- regionId %>" aria-expanded="false"
                 aria-label="<%- _.__('Expand') + '/' + _.__('Collapse') %>"></a>
@@ -21,7 +20,7 @@
         <% } %>
     </div>
     <% if (obj.fields && fields.length) { %>
-    <div id="<%- regionId %>" class="collapse fields-list" data-name="fields-list"
+    <div id="<%- regionId %>" class="collapse fields-list" data-name="fields-list" data-toggle="false" data-collapsed-title="<%- _.__('Expand') %>" data-expanded-title="<%- _.__('Collapse') %>"
          role="region" aria-labelledby="<%- labelId %>"></div>
     <% } %>
 </td>

@@ -10,7 +10,7 @@
     }|merge(data.actionsOptions|default({}))
 }) %}
 
-<div class="jstree-wrapper collapse-view expanded" data-role="jstree-wrapper">
+<div class="jstree-wrapper" data-role="jstree-wrapper">
     <div class="jstree-wrapper__inner" data-page-component-view="{{ data.treeOptions|json_encode }}">
         <div class="jstree-wrapper__title">
             {% block header %}
@@ -33,7 +33,7 @@
                 {% endblock actions %}
             {% endblock header %}
         </div>
-        <div class="jstree-wrapper__content" data-collapse-container>
+        <div class="jstree-wrapper__content">
             {% block content %}
                 {% block search %}
                     {% if not data.disableSearch %}

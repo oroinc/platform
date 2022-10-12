@@ -4,13 +4,12 @@
 <div class="widget-content workflow-widget-content">
     {% for workflow in workflows %}
         {% if loop.index == 2 %}
-        <div class="collapse show" id="{{ collapseContainerId }}">
+        <div class="collapse show" id="{{ collapseContainerId }}" data-collapsed-title="Expand" data-expanded-title="Collapse" aria-label="Expand / Collapse">
         {% endif %}
         {% if workflows|length > 1 and loop.first %}
             <div class="workflow-collapse">
                 <button class="btn-light" data-toggle="collapse"
                         data-target="#{{ collapseContainerId }}" data-collapse-state-id="{{ collapseContainerId }}"
-                        data-collapsed-title="Expand" data-expanded-title="Collapse" aria-label="Expand / Collapse"
                         aria-expanded="true" title="Expand">
                     <span class="fa-icon oro-collapse-icon" aria-hidden="true"></span>
                 </button>

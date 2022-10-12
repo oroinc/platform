@@ -1,21 +1,19 @@
 {% if value %}
-    {% set collapseView = {
-        storageKey: 'collapseBlock[' ~ record.getValue('id') ~ ']',
-        uid: record.getValue('id'),
-        animationSpeed: 0,
-        closeClass: 'overflows',
-        forcedState: false,
-        checkOverflow: false,
-        rowsCount: 5,
-        visibleRows: 1,
-        open: false,
-        keepState: false
-    } %}
-    <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}" style="width:250px">
-        <div class="control-label" data-collapse-container>
-            {{ value }}
-        </div>
-        <a href="#" class="control-label toggle-more" data-collapse-trigger>{{ 'Show more'|trans }}</a>
-        <a href="#" class="control-label toggle-less" data-collapse-trigger>{{ 'Show less'|trans }}</a>
+    {% set collapseId = 'collapse-'|uniqid %}
+    <div class="collapse-block" style="width:250px">
+        <div id="{{ collapseId }}" class="collapse-overflow collapse no-transition"
+             data-collapsed-text="{{ 'Show more'|trans }}"
+             data-expanded-text="{{ 'Show less'|trans }}"
+             data-check-overflow="true"
+             data-toggle="false"
+             data-state-id="{{ 'collapseBlock[' ~ record.getValue('id') ~ ']' ~ record.getValue('id') }}"
+        >{{ value }}</div>
+        <a href="#"
+           role="button"
+           class="collapse-toggle"
+           data-toggle="collapse"
+           data-target="{{ '#' ~ collapseId }}"
+           aria-expanded="false"
+           aria-controls="{{ collapseId }}"><span data-text>{{ 'Show more'|trans }}</span></a>
     </div>
 {% endif %}

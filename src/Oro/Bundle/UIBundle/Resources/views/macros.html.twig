@@ -203,23 +203,18 @@
 #}
 {% macro renderCollapsibleHtmlProperty(title, data, entity, fieldName, moreText = 'Show more', lessText = 'Show less') %}
     {% if is_granted('VIEW', entity, fieldName) %}
-        {% set collapseView = {
-            storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
-            uid: '[' ~ title ~ '][' ~ entity.id ~ ']',
-            animationSpeed: 0,
-            closeClass: 'overflows',
-            checkOverflow: true,
-            open: false
-        } %}
-        <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
+        {% set collapseId = 'collapse-'|uniqid %}
+        {% set collapseKey = 'collapseBlock[' ~ oro_class_name(entity) ~ '][' ~ title ~ '][' ~ entity.id ~ ']' %}
+        <div class="collapse-block">
             {% import _self as UIMacro %}
 
             {{ UIMacro.renderAttribute(title,
-                '<div class="control-label" data-collapse-container>' ~
+                '<div class="control-label collapse-overflow collapse no-transition" data-toggle="false" data-check-overflow="true"' ~
+                      'id="'~ collapseId ~'" data-state-id="'~ collapseKey ~'" data-collapsed-text="'~ moreText|trans ~ '" data-expanded-text="'~ lessText|trans ~'">' ~
                     data|default('oro.ui.empty'|trans) ~
                 '</div>' ~
-                '<a href="#" class="control-label toggle-more" data-collapse-trigger>' ~ moreText|trans ~ '</a>' ~
-                '<a href="#" class="control-label toggle-less" data-collapse-trigger>' ~ lessText|trans ~ '</a>'
+                '<a href="#" role=button class="control-label collapse-toggle" data-toggle="collapse"' ~
+                   'data-target="#'~ collapseId ~'" aria-expanded="false" aria-controls="'~ collapseId ~'"><span data-text>' ~ moreText|trans ~ '</span></a>'
             ) }}
         </div>
     {% endif %}
@@ -234,24 +229,25 @@
 #}
 {% macro renderCollapsibleHtml(data, entity = null, fieldName = null, moreText = 'Show more', lessText = 'Show less') %}
     {% if data is not empty and (entity is empty or fieldName is empty or is_granted('VIEW', entity, fieldName)) %}
-        {% set collapseView = {
-            animationSpeed: 0,
-            closeClass: 'overflows',
-            checkOverflow: true,
-            open: false
-        } %}
-        {%- if entity is not empty and fieldName is not empty -%}
-            {%- set collapseView = collapseView|merge({
-                storageKey: 'collapseBlock[' ~ oro_class_name(entity) ~ ']',
-                uid: '[' ~ fieldName ~ '][' ~ entity.id|default(0) ~ ']'
-            }) -%}
-        {%- endif -%}
-        <div class="collapse-block" data-page-component-collapse="{{ collapseView|json_encode }}">
-            <div class="control-label" data-collapse-container>
-                {{ data|raw }}
-            </div>
-            <a href="#" class="control-label toggle-more" data-collapse-trigger>{{ moreText|trans }}</a>
-            <a href="#" class="control-label toggle-less" data-collapse-trigger>{{ lessText|trans }}</a>
+        <div class="collapse-block">
+            {% set collapseId = 'collapse-'|uniqid %}
+            <div id="{{ collapseId }}" class="control-label collapse-overflow collapse no-transition"
+                 data-collapsed-text="{{ moreText|trans }}"
+                 data-expanded-text="{{ lessText|trans }}"
+                 data-check-overflow="true"
+                 data-toggle="false"
+            {%- if entity is not empty and fieldName is not empty -%}
+                 data-state-id="{{ 'collapseBlock[' ~ oro_class_name(entity) ~ '][' ~ fieldName ~ '][' ~ entity.id|default(0) ~ ']'}}"
+            {%- endif -%}
+            >{{ data|raw }}</div>
+            <a href="#"
+               role="button"
+               class="control-label collapse-toggle"
+               data-toggle="collapse"
+               data-target="{{ '#' ~ collapseId }}"
+               aria-expanded="false"
+               aria-controls="{{ collapseId }}"
+            ><span data-text>{{ moreText|trans }}</span></a>
         </div>
     {% endif %}
 {% endmacro %}
