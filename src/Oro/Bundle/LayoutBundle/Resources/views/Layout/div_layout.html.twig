@@ -150,6 +150,12 @@
         }) %}
     {% endif %}
 
+    {% if name is defined %}
+        {% set attr = attr|merge({
+            name: name
+        }) %}
+    {% endif %}
+
     {% if content is defined %}
         {% set attr = attr|merge({
             content: content
@@ -159,12 +165,6 @@
     {% if http_equiv is defined %}
         {% set attr = attr|merge({
             http_equiv: http_equiv
-        }) %}
-    {% endif %}
-
-    {% if name is defined %}
-        {% set attr = attr|merge({
-            name: name
         }) %}
     {% endif %}
 
