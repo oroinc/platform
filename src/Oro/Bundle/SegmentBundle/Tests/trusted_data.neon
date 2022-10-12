@@ -10,8 +10,6 @@ trusted_data:
                 dbQuery: true
             executeInsertValues:
                 selectSql: true
-            run:
-                dbQuery: true
         Oro\Bundle\SegmentBundle\Entity\Manager\SegmentManager:
             getFilterSubQuery:
                 tableAlias: true

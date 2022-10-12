@@ -115,10 +115,7 @@ class StaticSegmentManagerTest extends WebTestCase
         self::assertNotNull($segment->getLastRun());
     }
 
-    /**
-     * @param int $expectedNumber
-     */
-    private function assertSnapshotsCount($expectedNumber)
+    private function assertSnapshotsCount(int $expectedNumber): void
     {
         $resultNumber = $this->getSegmentSnapshotRepository()->createQueryBuilder('s')
             ->select('COUNT(s)')
