@@ -40,7 +40,7 @@ class FormattingCodeFormatterTest extends TestCase
             ->with('N/A')
             ->willReturn('N/A');
 
-        $this->localeSettings->expects($value ? $this->once() : $this->never())
+        $this->localeSettings->expects($value ? $this->any() : $this->never())
             ->method('getLanguage')
             ->willReturn('en');
 
