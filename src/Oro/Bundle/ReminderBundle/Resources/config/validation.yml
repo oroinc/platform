@@ -13,5 +13,6 @@ Oro\Bundle\ReminderBundle\Model\ReminderInterval:
                 type: integer
             - Range:
                 min: 1
+                max: 2147483647
         unit:
             - NotBlank: ~

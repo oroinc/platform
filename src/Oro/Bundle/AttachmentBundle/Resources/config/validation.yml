@@ -13,6 +13,7 @@ Oro\Bundle\AttachmentBundle\Entity\FileItem:
             - NotBlank: ~
             - Range:
                 min: 0
+                max: 2147483647
         file:
             - Valid: ~
 

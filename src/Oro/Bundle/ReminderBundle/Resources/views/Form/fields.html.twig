@@ -23,6 +23,7 @@
         {{ form_errors(form.interval.number) }}
         {{ form_errors(form.interval.unit) }}
         {{ form_errors(form) }}
+            <input type="hidden" name="{{ form.vars.full_name }}" disabled data-validate-element>
         </div>
     </div>
 {% endblock %}
