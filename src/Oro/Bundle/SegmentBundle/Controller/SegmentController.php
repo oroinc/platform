@@ -190,7 +190,7 @@ class SegmentController extends AbstractController
         return [
             'entity'   => $entity,
             'form'     => $form->createView(),
-            'entities' => $this->get('oro_segment.entity_provider')->getEntities(),
+            'entities' => $this->get(EntityProvider::class)->getEntities(),
             'metadata' => $this->get(Manager::class)->getMetadata('segment')
         ];
     }
@@ -198,18 +198,10 @@ class SegmentController extends AbstractController
     protected function checkSegment(Segment $segment)
     {
         if ($segment->getEntity() &&
-            !$this->getFeatureChecker()->isResourceEnabled($segment->getEntity(), 'entities')
+            !$this->get(FeatureChecker::class)->isResourceEnabled($segment->getEntity(), 'entities')
         ) {
             throw $this->createNotFoundException();
         }
-    }
-
-    /**
-     * @return FeatureChecker
-     */
-    protected function getFeatureChecker()
-    {
-        return $this->get(FeatureChecker::class);
     }
 
     /**
@@ -220,7 +212,7 @@ class SegmentController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
-                'oro_segment.entity_provider' => EntityProvider::class,
+                EntityProvider::class,
                 ConfigManager::class,
                 FeatureChecker::class,
                 ConfigurationProvider::class,

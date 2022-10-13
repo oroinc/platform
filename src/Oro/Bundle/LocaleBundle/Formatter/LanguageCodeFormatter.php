@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Symfony\Component\Intl\Exception\MissingResourceException;
 use Symfony\Component\Intl\Languages;
 use Symfony\Component\Intl\Locales;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -34,9 +35,11 @@ class LanguageCodeFormatter
             return $this->translator->trans('N/A');
         }
 
-        $lang = $this->localeSettings->getLanguage();
-
-        return Languages::exists($code) ? Languages::getName($code, $lang) : $code;
+        try {
+            return Languages::getName($code, $this->localeSettings->getLanguage());
+        } catch (MissingResourceException $e) {
+            return $code;
+        }
     }
 
     /**

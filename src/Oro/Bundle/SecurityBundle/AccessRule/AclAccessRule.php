@@ -31,11 +31,8 @@ class AclAccessRule implements AccessRuleInterface
      */
     public const PARENT_FIELD = 'aclParentField';
 
-    /** @var AclConditionDataBuilderInterface */
-    private $builder;
-
-    /** @var OwnershipMetadataProviderInterface */
-    private $ownershipMetadataProvider;
+    private AclConditionDataBuilderInterface $builder;
+    private OwnershipMetadataProviderInterface $ownershipMetadataProvider;
 
     public function __construct(
         AclConditionDataBuilderInterface $builder,
@@ -46,7 +43,7 @@ class AclAccessRule implements AccessRuleInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function isApplicable(Criteria $criteria): bool
     {
@@ -66,7 +63,7 @@ class AclAccessRule implements AccessRuleInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function process(Criteria $criteria): void
     {
@@ -98,7 +95,11 @@ class AclAccessRule implements AccessRuleInterface
 
         if (null !== $organizationField && null !== $organizationValue) {
             $criteria->andExpression(
-                new Comparison(new Path($organizationField, $alias), Comparison::EQ, $organizationValue)
+                new Comparison(
+                    new Path($organizationField, $alias),
+                    is_array($organizationValue) ? Comparison::IN : Comparison::EQ,
+                    $organizationValue
+                )
             );
         }
     }

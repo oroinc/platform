@@ -39,7 +39,7 @@
             {%- for item in fieldValue -%}
                 {%- set result = result|merge([AuditMacro.renderFieldValue(item)]) -%}
             {%- endfor -%}
-            {{- result|join(', ') -}}
+            {{- result|join(', ')|raw -}}
         {%- else -%}
             {%- if field.translationDomain is defined -%}
                 {{- fieldValue|trans({}, field.translationDomain)|default('') -}}

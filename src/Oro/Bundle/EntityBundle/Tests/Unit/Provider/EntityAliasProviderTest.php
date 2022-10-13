@@ -82,40 +82,40 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
                 'expectedAlias' => false
             ],
             'bap_entity_eq_bundle_name'             => [
-                'entityClass'   => 'Oro\Bundle\ProductBundle\Entity\Product',
-                'expectedAlias' => new EntityAlias('product', 'products')
+                'entityClass'   => 'Oro\Bundle\BarBundle\Entity\Bar',
+                'expectedAlias' => new EntityAlias('bar', 'bars')
             ],
             'bap_entity_starts_with_bundle_name'    => [
-                'entityClass'   => 'Oro\Bundle\ProductBundle\Entity\ProductType',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'Oro\Bundle\BarBundle\Entity\BarType',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'bap_entity'                            => [
-                'entityClass'   => 'Oro\Bundle\ProductBundle\Entity\Type',
+                'entityClass'   => 'Oro\Bundle\BarBundle\Entity\Type',
                 'expectedAlias' => new EntityAlias('type', 'types')
             ],
             'oro_entity_eq_bundle_name'             => [
-                'entityClass'   => 'OroAPP\Bundle\ProductBundle\Entity\Product',
-                'expectedAlias' => new EntityAlias('product', 'products')
+                'entityClass'   => 'OroAPP\Bundle\BarBundle\Entity\Bar',
+                'expectedAlias' => new EntityAlias('bar', 'bars')
             ],
             'oro_entity_starts_with_bundle_name'    => [
-                'entityClass'   => 'OroAPP\Bundle\ProductBundle\Entity\ProductType',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'OroAPP\Bundle\BarBundle\Entity\BarType',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'oro_entity'                            => [
-                'entityClass'   => 'OroAPP\Bundle\ProductBundle\Entity\Type',
+                'entityClass'   => 'OroAPP\Bundle\BarBundle\Entity\Type',
                 'expectedAlias' => new EntityAlias('type', 'types')
             ],
             'vendor_entity_eq_bundle_name'          => [
-                'entityClass'   => 'Acme\Bundle\ProductBundle\Entity\Product',
-                'expectedAlias' => new EntityAlias('product', 'products')
+                'entityClass'   => 'Acme\Bundle\BarBundle\Entity\Bar',
+                'expectedAlias' => new EntityAlias('bar', 'bars')
             ],
             'vendor_entity_starts_with_bundle_name' => [
-                'entityClass'   => 'Acme\Bundle\ProductBundle\Entity\ProductType',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'Acme\Bundle\BarBundle\Entity\BarType',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'vendor_entity'                         => [
-                'entityClass'   => 'Acme\Bundle\ProductBundle\Entity\Type',
-                'expectedAlias' => new EntityAlias('producttype', 'producttypes')
+                'entityClass'   => 'Acme\Bundle\BarBundle\Entity\Type',
+                'expectedAlias' => new EntityAlias('bartype', 'bartypes')
             ],
             'other_entity'                          => [
                 'entityClass'   => 'Test\Entity',

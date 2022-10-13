@@ -54,6 +54,14 @@ Feature: Multiple Files entity field without DAM
     Then I should see "User Form With Multiple Files" validation errors:
       | Custom File 1 | The MIME type of the file is invalid ("text/plain"). Allowed MIME types are "application/pdf", "image/png". |
 
+  Scenario: Validate sort order of files
+    When I fill "User Form With Multiple Files" with:
+      | Custom File Sort Order 1 | 9999999999 |
+    Then I should see validation errors:
+      | Custom File Sort Order 1 | This value should be between 0 and 2,147,483,647. |
+    And I fill "User Form With Multiple Files" with:
+      | Custom File Sort Order 1 | 1 |
+
   Scenario: Check maximum number of files
     Given I fill "User Form With Multiple Files" with:
       | Custom File 1 | example.pdf |

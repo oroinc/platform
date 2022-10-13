@@ -3,83 +3,47 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Acl\AccessRule;
 
 use Oro\Bundle\OrganizationBundle\Acl\AccessRule\OrganizationAwareAccessRule;
+use Oro\Bundle\OrganizationBundle\Provider\OrganizationRestrictionProviderInterface;
 use Oro\Bundle\SecurityBundle\AccessRule\Criteria;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Comparison;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\CompositeExpression;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\NullComparison;
-use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 
 class OrganizationAwareAccessRuleTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
+    /** @var OrganizationRestrictionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $organizationRestrictionProvider;
 
     protected function setUp(): void
     {
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->organizationRestrictionProvider = $this->createMock(OrganizationRestrictionProviderInterface::class);
     }
 
-    public function testIsApplicableWithoutOrganization(): void
+    public function testIsApplicable(): void
+    {
+        $accessRule = new OrganizationAwareAccessRule($this->organizationRestrictionProvider);
+        $this->assertTrue($accessRule->isApplicable($this->createMock(Criteria::class)));
+    }
+
+    public function testProcess(): void
     {
         $criteria = $this->createMock(Criteria::class);
 
-        $this->tokenAccessor->expects($this->once())
-            ->method('getOrganizationId')
-            ->willReturn(null);
+        $this->organizationRestrictionProvider->expects($this->once())
+            ->method('applyOrganizationRestrictionsToAccessRuleCriteria')
+            ->with(self::identicalTo($criteria), self::isNull(), 'organization');
 
-        $accessRule = new OrganizationAwareAccessRule($this->tokenAccessor);
-        $this->assertFalse($accessRule->isApplicable($criteria));
-    }
-
-    public function testIsApplicableWithOrganization(): void
-    {
-        $criteria = $this->createMock(Criteria::class);
-
-        $this->tokenAccessor->expects($this->once())
-            ->method('getOrganizationId')
-            ->willReturn(1);
-
-        $accessRule = new OrganizationAwareAccessRule($this->tokenAccessor);
-        $this->assertTrue($accessRule->isApplicable($criteria));
-    }
-
-    public function testProcessWhenOrganizationIsRequired(): void
-    {
-        $this->tokenAccessor->expects($this->once())
-            ->method('getOrganizationId')
-            ->willReturn(1);
-
-        $criteria = $this->createMock(Criteria::class);
-        $criteria->expects($this->once())
-            ->method('andExpression')
-            ->with(new Comparison(new Path('organization', $criteria->getAlias()), Comparison::EQ, 1))
-            ->willReturnSelf();
-
-        $accessRule = new OrganizationAwareAccessRule($this->tokenAccessor);
+        $accessRule = new OrganizationAwareAccessRule($this->organizationRestrictionProvider);
         $accessRule->process($criteria);
     }
 
-    public function testProcessWhenOrganizationIsOptional(): void
+    public function testProcessWithCustomOrganizationFieldName(): void
     {
-        $this->tokenAccessor->expects($this->once())
-            ->method('getOrganizationId')
-            ->willReturn(1);
-
+        $organizationFieldName = 'testOrganization';
         $criteria = $this->createMock(Criteria::class);
-        $criteria->expects($this->once())
-            ->method('andExpression')
-            ->with(new CompositeExpression(
-                CompositeExpression::TYPE_OR,
-                [
-                    new Comparison(new Path('organization', $criteria->getAlias()), Comparison::EQ, 1),
-                    new NullComparison(new Path('organization', $criteria->getAlias()))
-                ]
-            ))
-            ->willReturnSelf();
 
-        $accessRule = new OrganizationAwareAccessRule($this->tokenAccessor);
-        $accessRule->setOrganizationOptional(true);
+        $this->organizationRestrictionProvider->expects($this->once())
+            ->method('applyOrganizationRestrictionsToAccessRuleCriteria')
+            ->with(self::identicalTo($criteria), self::isNull(), $organizationFieldName);
+
+        $accessRule = new OrganizationAwareAccessRule($this->organizationRestrictionProvider, $organizationFieldName);
         $accessRule->process($criteria);
     }
 }

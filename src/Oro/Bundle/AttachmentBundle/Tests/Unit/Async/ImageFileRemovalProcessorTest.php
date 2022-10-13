@@ -5,7 +5,6 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Async;
 use Oro\Bundle\AttachmentBundle\Async\ImageFileRemovalProcessor;
 use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManagerInterface;
 use Oro\Bundle\AttachmentBundle\Model\FileModel;
-use Oro\Bundle\ProductBundle\Entity\ProductImage;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
@@ -52,7 +51,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
                 'id' => 1,
                 'fileName' => '12345.jpg',
                 'originalFileName' => 'orig_name.jpg',
-                'parentEntityClass' => ProductImage::class
+                'parentEntityClass' => 'Test\Entity'
             ]
         ]));
 
@@ -60,7 +59,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setId(1);
         $file->setFilename('12345.jpg');
         $file->setOriginalFilename('orig_name.jpg');
-        $file->setParentEntityClass(ProductImage::class);
+        $file->setParentEntityClass('Test\Entity');
         $file->setExtension('jpg');
 
         $this->imageRemovalManager->expects($this->once())
@@ -81,7 +80,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
                 'id' => 2,
                 'fileName' => '12345.jpg',
                 'originalFileName' => 'orig_name.jpg',
-                'parentEntityClass' => ProductImage::class
+                'parentEntityClass' => 'Test\Entity'
             ]
         ]));
 
@@ -89,7 +88,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setId(2);
         $file->setFilename('12345.jpg');
         $file->setOriginalFilename('orig_name.jpg');
-        $file->setParentEntityClass(ProductImage::class);
+        $file->setParentEntityClass('Test\Entity');
         $file->setExtension('jpg');
 
         $exception = new \RuntimeException('Error');
@@ -118,7 +117,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
                 'id' => 2,
                 'fileName' => $fileName,
                 'originalFileName' => null,
-                'parentEntityClass' => ProductImage::class
+                'parentEntityClass' => 'Test\Entity'
             ]
         ]));
 
@@ -126,7 +125,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
         $file->setId(2);
         $file->setFilename($fileName);
         $file->setOriginalFilename($fileName);
-        $file->setParentEntityClass(ProductImage::class);
+        $file->setParentEntityClass('Test\Entity');
         $file->setExtension('jpg');
 
         $this->imageRemovalManager->expects($this->once())
@@ -149,7 +148,7 @@ class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
                 'id' => 2,
                 'fileName' => null,
                 'originalFileName' => null,
-                'parentEntityClass' => ProductImage::class
+                'parentEntityClass' => 'Test\Entity'
             ]
         ]));
 
