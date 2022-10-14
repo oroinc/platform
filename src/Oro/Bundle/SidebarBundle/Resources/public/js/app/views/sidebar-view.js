@@ -101,6 +101,8 @@ define(function(require) {
                 forceHelperSize: true,
                 forcePlaceholderSize: true,
                 scrollSensitivity: 50,
+                // allows to trigger touch events on all siblings of 'handle' element
+                touchElements: '*',
                 sort: function() {
                     this.updatedWidgetsPosition();
                 }.bind(this),
