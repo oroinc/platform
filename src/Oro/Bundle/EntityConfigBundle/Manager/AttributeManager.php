@@ -280,7 +280,7 @@ class AttributeManager
         /** @var AttributeGroup $group */
         foreach ($groups as $group) {
             $item = ['group' => $group, 'attributes' => []];
-            /** @var AttributeGroupRelation$attributeRelation */
+            /** @var AttributeGroupRelation $attributeRelation */
             foreach ($group->getAttributeRelations() as $attributeRelation) {
                 $item['attributes'][] = $attributes[$attributeRelation->getEntityConfigFieldId()];
             }
