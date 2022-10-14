@@ -14,6 +14,7 @@ define(function(require) {
     const _ = require('underscore');
     const __ = require('orotranslation/js/translator');
     const BaseView = require('oroui/js/app/views/base/view');
+    const tools = require('oroui/js/tools');
 
     const ActionsView = BaseView.extend({
 
@@ -78,11 +79,18 @@ define(function(require) {
         ),
 
         /** @property */
-        events: {
-            'click': '_showDropdown',
-            'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropleft.show': '_hideDropdown',
-            'click .dropdown-close .fa-close': '_hideDropdown'
+        events: function() {
+            const events = {
+                'click': '_showDropdown',
+                'click .dropdown-close .fa-close': '_hideDropdown'
+            };
+
+            if (!tools.isTouchDevice()) {
+                events['mouseover .dropdown-toggle'] = '_showDropdown';
+                events['mouseleave .dropleft.show'] = '_hideDropdown';
+            }
+
+            return events;
         },
 
         /**
