@@ -27,7 +27,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransform(int|array $id, string $expectedResult)
     {
-        $result = $this->entityIdTransformer->transform($id, new EntityMetadata());
+        $result = $this->entityIdTransformer->transform($id, new EntityMetadata('Test\Entity'));
         self::assertSame($expectedResult, $result);
     }
 
@@ -45,8 +45,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = '123';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
 
@@ -64,8 +63,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = '123';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('string');
 
@@ -81,8 +79,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2=456';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
@@ -104,8 +101,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2=456';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('string');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
@@ -125,8 +121,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = http_build_query(['id1' => 'key 1', 'id2' => 'key&1\'1'], '', ';');
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('string');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('string');
@@ -152,8 +147,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123;anotherId=456';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
@@ -177,8 +171,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');
@@ -201,8 +194,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2';
 
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $metadata->addField(new FieldMetadata('id1'))->setDataType('integer');
         $metadata->addField(new FieldMetadata('id2'))->setDataType('integer');

@@ -2,32 +2,26 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig;
 
-use Oro\Bundle\ApiBundle\Config\ConfigBagInterface;
-use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Config\FieldConfigInterface;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\EntityConfigInterface;
+use Oro\Component\EntitySerializer\FieldConfigInterface;
 
 /**
  * Provides a method to merge entity configuration with configuration of parent entity.
  */
 class MergeParentResourceHelper
 {
-    /** @var ConfigProvider */
-    private $configProvider;
+    private ConfigProvider $configProvider;
 
     public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * @param ConfigContext $context
-     * @param string        $parentResourceClass
-     */
-    public function mergeParentResourceConfig(ConfigContext $context, $parentResourceClass)
+    public function mergeParentResourceConfig(ConfigContext $context, string $parentResourceClass): void
     {
         $parentConfig = $this->configProvider->getConfig(
             $parentResourceClass,
@@ -56,7 +50,7 @@ class MergeParentResourceHelper
         }
     }
 
-    protected function mergeDefinition(EntityDefinitionConfig $config, EntityDefinitionConfig $configToMerge)
+    private function mergeDefinition(EntityDefinitionConfig $config, EntityDefinitionConfig $configToMerge): void
     {
         $config->setKey($configToMerge->getKey());
         $this->mergeEntityConfigAttributes($config, $configToMerge);
@@ -81,7 +75,7 @@ class MergeParentResourceHelper
         }
     }
 
-    protected function mergeConfigSection(EntityConfigInterface $config, EntityConfigInterface $configToMerge)
+    private function mergeConfigSection(EntityConfigInterface $config, EntityConfigInterface $configToMerge): void
     {
         $this->mergeEntityConfigAttributes($config, $configToMerge);
         $fieldsToMerge = $configToMerge->getFields();
@@ -94,27 +88,29 @@ class MergeParentResourceHelper
         }
     }
 
-    protected function mergeEntityConfigAttributes(EntityConfigInterface $config, EntityConfigInterface $configToMerge)
-    {
-        $this->mergeConfigAttributes($config, $configToMerge);
+    private function mergeEntityConfigAttributes(
+        EntityConfigInterface $config,
+        EntityConfigInterface $configToMerge
+    ): void {
+        $keysToMerge = $configToMerge->keys();
+        foreach ($keysToMerge as $key) {
+            $config->set($key, $configToMerge->get($key));
+        }
         if ($configToMerge->hasExclusionPolicy()) {
             $config->setExclusionPolicy($configToMerge->getExclusionPolicy());
         }
     }
 
-    protected function mergeFieldConfigAttributes(FieldConfigInterface $config, FieldConfigInterface $configToMerge)
-    {
-        $this->mergeConfigAttributes($config, $configToMerge);
-        if ($configToMerge->hasExcluded()) {
-            $config->setExcluded($configToMerge->isExcluded());
-        }
-    }
-
-    protected function mergeConfigAttributes(ConfigBagInterface $config, ConfigBagInterface $configToMerge)
-    {
+    private function mergeFieldConfigAttributes(
+        FieldConfigInterface $config,
+        FieldConfigInterface $configToMerge
+    ): void {
         $keysToMerge = $configToMerge->keys();
         foreach ($keysToMerge as $key) {
             $config->set($key, $configToMerge->get($key));
+        }
+        if ($configToMerge->hasExcluded()) {
+            $config->setExcluded($configToMerge->isExcluded());
         }
     }
 }

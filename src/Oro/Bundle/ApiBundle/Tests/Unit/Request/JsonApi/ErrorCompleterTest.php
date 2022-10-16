@@ -269,7 +269,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForIdentifier()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $idField = new FieldMetadata();
         $idField->setName('id');
@@ -289,7 +289,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $firstNameField = new FieldMetadata();
         $firstNameField->setName('firstName');
@@ -309,7 +309,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForToOneAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $userAssociation = new AssociationMetadata();
         $userAssociation->setName('user');
@@ -329,7 +329,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForToManyAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -350,7 +350,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForChildOfToManyAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -378,13 +378,13 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $expectedError = new Error();
         $expectedError->setDetail('test detail. Source: notMappedPointer.');
 
-        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata());
+        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata('Test\Entity'));
         self::assertEquals($expectedError, $error);
     }
 
     public function testCompleteErrorForCollapsedArrayAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -407,7 +407,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForChildOfCollapsedArrayAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -430,7 +430,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForChildFieldOfCollapsedArrayAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -453,7 +453,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForNotCollapsedArrayAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -475,7 +475,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForChildOfNotCollapsedArrayAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -497,7 +497,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForChildFieldOfNotCollapsedArrayAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $groupsAssociation = new AssociationMetadata();
         $groupsAssociation->setName('groups');
@@ -519,7 +519,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForFieldOfEntityWithoutIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $firstNameField = new FieldMetadata();
         $firstNameField->setName('firstName');
         $metadata->addField($firstNameField);
@@ -538,7 +538,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForAssociationOfEntityWithoutIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $userAssociation = new AssociationMetadata();
         $userAssociation->setName('user');
         $metadata->addAssociation($userAssociation);
@@ -557,7 +557,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForMetaProperty()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addMetaProperty(new MetaPropertyMetadata('test'));
 
@@ -575,7 +575,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForMetaPropertyOfEntityWithoutIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addMetaProperty(new MetaPropertyMetadata('test'));
 
         $error = new Error();
@@ -671,7 +671,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForIdentifierInCollection()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $idField = new FieldMetadata();
         $idField->setName('id');
@@ -691,7 +691,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForFieldInCollection()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $firstNameField = new FieldMetadata();
         $firstNameField->setName('firstName');
@@ -711,7 +711,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testCompleteErrorForAssociationInCollection()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $userAssociation = new AssociationMetadata();
         $userAssociation->setName('user');
@@ -738,13 +738,13 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         $expectedError = new Error();
         $expectedError->setDetail('test detail. Source: 1.notMappedPointer.');
 
-        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata());
+        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata('Test\Entity'));
         self::assertEquals($expectedError, $error);
     }
 
     public function testFixIncludedEntityPathForErrorWithPropertyPathToOwnField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $association1 = new AssociationMetadata();
         $association1->setName('association1');
@@ -766,7 +766,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testFixIncludedEntityPathForErrorWithPropertyPathToNestedField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $association1 = new AssociationMetadata();
         $association1->setName('association1');
@@ -788,7 +788,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testFixIncludedEntityPathForErrorWithPropertyPathToUnknownField()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $error = new Error();
@@ -805,7 +805,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testFixIncludedEntityPathForErrorWithoutSource()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $association1 = new AssociationMetadata();
         $association1->setName('association1');
@@ -824,7 +824,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
     public function testFixIncludedEntityPathForErrorWithPointerStartsWithData()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $association1 = new AssociationMetadata();
         $association1->setName('association1');

@@ -52,8 +52,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $associationMetadata->setName($associationName);
         $associationMetadata->setTargetClassName($targetClass);
         $associationMetadata->setIsCollection($isCollection);
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName($targetClass);
+        $associationTargetMetadata = new EntityMetadata($targetClass);
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         return $associationMetadata;
@@ -70,7 +69,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'emptyToManyRelation' => []
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('firstName'));
         $metadata->addField($this->createFieldMetadata('lastName'));
         $metadata->addAssociation(
@@ -132,7 +131,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'toManyRelation' => ['val1', 'val2']
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
         );
@@ -190,7 +189,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             'toManyRelation' => ['val1', 'val2']
         ];
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(
             $this->createAssociationMetadata('toOneRelation', 'Test\User', false)
         );

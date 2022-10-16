@@ -262,7 +262,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
 
         $config = new EntityDefinitionConfig();
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $filters = new FilterCollection();
@@ -337,7 +337,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $statusCodes->addCode('200');
         $config->setStatusCodes($statusCodes);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $filters = new FilterCollection();
@@ -424,7 +424,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $statusCodes->addCode('200');
         $config->setStatusCodes($statusCodes);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filters = new FilterCollection();
 
@@ -507,7 +507,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $statusCodes->addCode('200');
         $config->setStatusCodes($statusCodes);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $filters = new FilterCollection();
@@ -524,7 +524,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($filters);
 
         $getConfig = new EntityDefinitionConfig();
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->setIdentifierFieldNames(['id']);
         $getContext = $this->createMock(Context::class);
 
@@ -616,7 +616,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $statusCodes->addCode('204');
         $config->setStatusCodes($statusCodes);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $filters = new FilterCollection();
@@ -701,7 +701,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $statusCodes->addCode('200');
         $config->setStatusCodes($statusCodes);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $filters = new FilterCollection();
@@ -711,7 +711,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $parentStatusCodes = new StatusCodesConfig();
         $parentStatusCodes->addCode('200');
         $parentConfig->setStatusCodes($parentStatusCodes);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
 
         $context = $this->createMock(SubresourceContext::class);
@@ -811,7 +811,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($config);
 
         $asyncOperationConfig = new EntityDefinitionConfig();
-        $asyncOperationMetadata = new EntityMetadata();
+        $asyncOperationMetadata = new EntityMetadata('Test\Entity');
         $asyncOperationContext = $this->createMock(Context::class);
 
         $this->docViewDetector->expects(self::atLeastOnce())
@@ -889,7 +889,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         $statusCodes->addCode('200');
         $config->setStatusCodes($statusCodes);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $filters = new FilterCollection();

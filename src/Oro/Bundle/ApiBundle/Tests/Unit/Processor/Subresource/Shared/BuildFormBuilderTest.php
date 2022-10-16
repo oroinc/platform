@@ -88,7 +88,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
             ->method('createNamedBuilder');
 
         $this->context->setParentConfig(new EntityDefinitionConfig());
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
     }
 
@@ -100,7 +100,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -145,7 +145,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->setParentResourceClass($parentBaseEntityClass);
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -191,7 +191,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->setParentResourceClass($parentBaseEntityClass);
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -238,7 +238,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $associationConfig->setFormType('customType');
         $associationConfig->setFormOptions(['trim' => false]);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME))
             ->setPropertyPath('realAssociationName');
 
@@ -281,7 +281,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
@@ -328,7 +328,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
         $parentConfig->setFormEventSubscribers([$eventSubscriberServiceId]);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -377,7 +377,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
         $parentConfig->setFormEventSubscribers([$eventSubscriber]);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())
@@ -420,7 +420,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $parentConfig->setFormType('test_form');
         $parentConfig->setFormEventSubscribers(['test_event_subscriber']);
 
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
 
         $this->formFactory->expects(self::once())

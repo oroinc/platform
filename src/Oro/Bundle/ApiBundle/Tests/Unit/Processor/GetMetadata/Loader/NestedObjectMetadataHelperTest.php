@@ -42,7 +42,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -51,7 +51,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         $targetConfig = $field->createAndSetTargetEntity();
         $targetClass = 'Test\TargetClass';
         $field->setFormOptions(['data_class' => $targetClass]);
-        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata = new EntityMetadata('Test\Entity');
 
         $associationMetadata = new AssociationMetadata();
 
@@ -88,7 +88,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -96,7 +96,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
         $targetConfig = $field->createAndSetTargetEntity();
         $field->setFormOptions(['inherit_data' => true]);
-        $targetEntityMetadata = new EntityMetadata();
+        $targetEntityMetadata = new EntityMetadata('Test\Entity');
 
         $associationMetadata = new AssociationMetadata();
 
@@ -139,7 +139,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -170,7 +170,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
 
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();

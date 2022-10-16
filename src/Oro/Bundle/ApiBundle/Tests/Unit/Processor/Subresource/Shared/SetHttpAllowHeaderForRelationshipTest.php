@@ -36,7 +36,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenResponseStatusCodeIsNot405()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
@@ -54,7 +54,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenAllowResponseHeaderAlreadySet()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
@@ -73,7 +73,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenAllActionsDisabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -103,7 +103,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenAllActionsEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $subresource = new ApiSubresource();
@@ -129,7 +129,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToOneAssociationWhenAtLeastOneAllowedHttpMethodExists()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -157,7 +157,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToManyAssociationWhenAtLeastOneAllowedHttpMethodExists()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -181,7 +181,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToOneAssociationWhenNoAllowedHttpMethods()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -211,7 +211,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessToManyAssociationWhenNoAllowedHttpMethods()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -241,7 +241,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenEntityDoesNotHaveIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
@@ -264,7 +264,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
 
     public function testProcessWhenActionDisabledForParticularAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $subresource = new ApiSubresource();

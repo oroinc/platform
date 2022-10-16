@@ -431,7 +431,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $associationName = 'test';
 
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
@@ -486,7 +486,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $associationName = 'test';
 
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
@@ -602,7 +602,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
     public function testMetadataWhenItIsSetExplicitly()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setClassName('Test\Class');
 

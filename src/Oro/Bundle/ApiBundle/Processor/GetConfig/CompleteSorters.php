@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\EntitySerializer\EntityConfigInterface;
 
 /**
  * Makes sure that the sorters configuration contains all supported sorters

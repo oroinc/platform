@@ -19,8 +19,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        $this->entityMetadata = new EntityMetadata();
-        $this->entityMetadata->setClassName('entityClassName');
+        $this->entityMetadata = new EntityMetadata('entityClassName');
         $this->entityMetadata->setInheritedType(true);
     }
 
@@ -36,8 +35,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed(true);
-        $targetEntityMetadata = new EntityMetadata();
-        $targetEntityMetadata->setClassName('TargetEntityClassName');
+        $targetEntityMetadata = new EntityMetadata('TargetEntityClassName');
         $associationMetadata->setTargetMetadata($targetEntityMetadata);
         $associationMetadata->addMetaProperty(new MetaAttributeMetadata('metaProperty1', 'string'));
         $associationMetadata->addRelationshipMetaProperty(new MetaAttributeMetadata('metaProperty2', 'string'));

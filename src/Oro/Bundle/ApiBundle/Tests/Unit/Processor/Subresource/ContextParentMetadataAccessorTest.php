@@ -27,7 +27,7 @@ class ContextParentMetadataAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadataForContextParentClass()
     {
         $className = User::class;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->expects(self::once())
             ->method('getParentClassName')
@@ -42,7 +42,7 @@ class ContextParentMetadataAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetMetadataForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity()
     {
         $className = User::class;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->expects(self::once())
             ->method('getParentClassName')

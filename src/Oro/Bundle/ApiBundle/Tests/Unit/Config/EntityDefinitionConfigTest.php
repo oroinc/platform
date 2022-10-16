@@ -558,7 +558,7 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['name' => 'ASC'], $config->getOrderBy());
         self::assertEquals(['order_by' => ['name' => 'ASC']], $config->toArray());
 
-        $config->setOrderBy();
+        $config->setOrderBy([]);
         self::assertFalse($config->hasOrderBy());
         self::assertSame([], $config->getOrderBy());
         self::assertSame([], $config->toArray());
@@ -719,7 +719,7 @@ class EntityDefinitionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['hint1'], $config->getHints());
         self::assertEquals(['hints' => ['hint1']], $config->toArray());
 
-        $config->setHints();
+        $config->setHints(null);
         self::assertSame([], $config->getHints());
         self::assertSame([], $config->toArray());
 

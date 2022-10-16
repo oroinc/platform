@@ -34,7 +34,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     public function testApplyFilterForNullFilterValue()
     {
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->filter->setRequestType($requestType);
         $this->filter->setMetadata($metadata);
@@ -52,7 +52,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 
         $filterValue = new FilterValue('id', null);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->filter->setRequestType($requestType);
         $this->filter->setMetadata($metadata);
@@ -68,7 +68,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', '>');
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->filter->setRequestType($requestType);
         $this->filter->setMetadata($metadata);
@@ -81,7 +81,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     {
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2');
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -118,7 +118,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     {
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -155,7 +155,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     {
         $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4']);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -206,7 +206,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
     {
         $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4'], FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');

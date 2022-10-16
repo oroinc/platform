@@ -13,50 +13,26 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class AssociationMetadata extends PropertyMetadata
 {
-    /** @var string */
-    private $targetClass;
-
-    /** @var string|null */
-    private $baseTargetClass;
-
+    private ?string $targetClass = null;
+    private ?string $baseTargetClass = null;
     /** @var string[] */
-    private $acceptableTargetClasses = [];
-
-    /** @var bool */
-    private $allowEmptyAcceptableTargets = true;
-
-    /** @var string */
-    private $associationPath;
-
-    /** @var string */
-    private $associationType;
-
-    /** @var bool */
-    private $collection = false;
-
-    /** @var bool */
-    private $nullable = false;
-
-    /** @var bool */
-    private $collapsed = false;
-
-    /** @var EntityMetadata|null */
-    private $targetMetadata;
-
-    /** @var TargetMetadataAccessorInterface|null */
-    private $targetMetadataAccessor;
-
+    private array $acceptableTargetClasses = [];
+    private bool $allowEmptyAcceptableTargets = true;
+    private ?string $associationPath = null;
+    private ?string $associationType = null;
+    private bool $collection = false;
+    private bool $nullable = false;
+    private bool $collapsed = false;
+    private ?EntityMetadata $targetMetadata = null;
+    private ?TargetMetadataAccessorInterface $targetMetadataAccessor = null;
     /** @var MetaAttributeMetadata[] */
-    private $metaProperties = [];
-
+    private array $metaProperties = [];
     /** @var LinkMetadataInterface[] */
-    private $links = [];
-
+    private array $links = [];
     /** @var MetaAttributeMetadata[] */
-    private $relationshipMetaProperties = [];
-
+    private array $relationshipMetaProperties = [];
     /** @var LinkMetadataInterface[] */
-    private $relationshipLinks = [];
+    private array $relationshipLinks = [];
 
     /**
      * Makes a deep copy of the object.
@@ -73,11 +49,11 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = array_merge(
             parent::toArray(),
@@ -127,7 +103,7 @@ class AssociationMetadata extends PropertyMetadata
      * It is used for multi-target associations.
      * @see \Oro\Bundle\ApiBundle\Model\EntityIdentifier
      */
-    public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor)
+    public function setTargetMetadataAccessor(?TargetMetadataAccessorInterface $targetMetadataAccessor): void
     {
         $this->targetMetadataAccessor = $targetMetadataAccessor;
     }
@@ -135,19 +111,15 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Sets the path from a root entity to the association.
      */
-    public function setAssociationPath(?string $associationPath)
+    public function setAssociationPath(?string $associationPath): void
     {
         $this->associationPath = $associationPath;
     }
 
     /**
      * Gets metadata for the given association target class.
-     *
-     * @param string|null $targetClassName
-     *
-     * @return EntityMetadata|null
      */
-    public function getTargetMetadata(string $targetClassName = null)
+    public function getTargetMetadata(string $targetClassName = null): ?EntityMetadata
     {
         if (null === $this->targetMetadataAccessor
             || !$this->associationPath
@@ -168,27 +140,23 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Sets metadata of the association target.
      */
-    public function setTargetMetadata(EntityMetadata $targetMetadata)
+    public function setTargetMetadata(EntityMetadata $targetMetadata): void
     {
         $this->targetMetadata = $targetMetadata;
     }
 
     /**
      * Gets FQCN of the association target.
-     *
-     * @return string
      */
-    public function getTargetClassName()
+    public function getTargetClassName(): ?string
     {
         return $this->targetClass;
     }
 
     /**
      * Sets FQCN of the association target.
-     *
-     * @param string $className
      */
-    public function setTargetClassName($className)
+    public function setTargetClassName(?string $className): void
     {
         $this->targetClass = $className;
     }
@@ -199,20 +167,16 @@ class AssociationMetadata extends PropertyMetadata
      * the target class will be Oro\Bundle\ApiBundle\Model\EntityIdentifier
      * and the base target class will be a mapped superclass
      * or a parent class for table inheritance association.
-     *
-     * @return string|null
      */
-    public function getBaseTargetClassName()
+    public function getBaseTargetClassName(): ?string
     {
         return $this->baseTargetClass;
     }
 
     /**
      * Sets FQCN of the association target.
-     *
-     * @param string $className
      */
-    public function setBaseTargetClassName($className)
+    public function setBaseTargetClassName(?string $className): void
     {
         $this->baseTargetClass = $className;
     }
@@ -222,7 +186,7 @@ class AssociationMetadata extends PropertyMetadata
      *
      * @return string[]
      */
-    public function getAcceptableTargetClassNames()
+    public function getAcceptableTargetClassNames(): array
     {
         return $this->acceptableTargetClasses;
     }
@@ -232,29 +196,25 @@ class AssociationMetadata extends PropertyMetadata
      *
      * @param string[] $classNames
      */
-    public function setAcceptableTargetClassNames(array $classNames)
+    public function setAcceptableTargetClassNames(array $classNames): void
     {
         $this->acceptableTargetClasses = $classNames;
     }
 
     /**
      * Adds new acceptable association target.
-     *
-     * @param string $className
      */
-    public function addAcceptableTargetClassName($className)
+    public function addAcceptableTargetClassName(string $className): void
     {
-        if (!in_array($className, $this->acceptableTargetClasses, true)) {
+        if (!\in_array($className, $this->acceptableTargetClasses, true)) {
             $this->acceptableTargetClasses[] = $className;
         }
     }
 
     /**
      * Removes acceptable association target.
-     *
-     * @param string $className
      */
-    public function removeAcceptableTargetClassName($className)
+    public function removeAcceptableTargetClassName(string $className): void
     {
         $key = array_search($className, $this->acceptableTargetClasses, true);
         if (false !== $key) {
@@ -267,10 +227,8 @@ class AssociationMetadata extends PropertyMetadata
      * Gets a flag indicates how to treat empty acceptable target classes.
      * TRUE means that any entity type should be accepted.
      * FALSE means that any entity type should be rejected.
-     *
-     * @return bool
      */
-    public function isEmptyAcceptableTargetsAllowed()
+    public function isEmptyAcceptableTargetsAllowed(): bool
     {
         return $this->allowEmptyAcceptableTargets;
     }
@@ -279,10 +237,8 @@ class AssociationMetadata extends PropertyMetadata
      * Sets a flag indicates how to treat empty acceptable target classes.
      * TRUE means that any entity type should be accepted.
      * FALSE means that any entity type should be rejected.
-     *
-     * @param bool $value
      */
-    public function setEmptyAcceptableTargetsAllowed($value)
+    public function setEmptyAcceptableTargetsAllowed(bool $value): void
     {
         $this->allowEmptyAcceptableTargets = $value;
     }
@@ -291,10 +247,8 @@ class AssociationMetadata extends PropertyMetadata
      * Gets the type of the association.
      * For example "manyToOne" or "manyToMany".
      * @see \Oro\Bundle\EntityExtendBundle\Extend\RelationType
-     *
-     * @return string
      */
-    public function getAssociationType()
+    public function getAssociationType(): ?string
     {
         return $this->associationType;
     }
@@ -303,70 +257,56 @@ class AssociationMetadata extends PropertyMetadata
      * Sets the type of the association.
      * For example "manyToOne" or "manyToMany".
      * @see \Oro\Bundle\EntityExtendBundle\Extend\RelationType
-     *
-     * @param string $associationType
      */
-    public function setAssociationType($associationType)
+    public function setAssociationType(?string $associationType): void
     {
         $this->associationType = $associationType;
     }
 
     /**
      * Whether the association represents "to-many" or "to-one" relationship.
-     *
-     * @return bool
      */
-    public function isCollection()
+    public function isCollection(): bool
     {
         return $this->collection;
     }
 
     /**
      * Sets a flag indicates whether the association represents "to-many" or "to-one" relationship.
-     *
-     * @param bool $value TRUE for "to-many" relationship, FALSE for "to-one" relationship
      */
-    public function setIsCollection($value)
+    public function setIsCollection(bool $value): void
     {
         $this->collection = $value;
     }
 
     /**
-     * Whether a value of the association can be NULL.
-     *
-     * @return bool
+     * Indicates whether a value of the association can be NULL.
      */
-    public function isNullable()
+    public function isNullable(): bool
     {
         return $this->nullable;
     }
 
     /**
      * Sets a flag indicates whether a value of the association can be NULL.
-     *
-     * @param bool $value
      */
-    public function setIsNullable($value)
+    public function setIsNullable(bool $value): void
     {
         $this->nullable = $value;
     }
 
     /**
      * Indicates whether the association should be collapsed to a scalar.
-     *
-     * @return bool
      */
-    public function isCollapsed()
+    public function isCollapsed(): bool
     {
         return $this->collapsed;
     }
 
     /**
      * Sets a flag indicates whether the association should be collapsed to a scalar.
-     *
-     * @param bool $collapsed
      */
-    public function setCollapsed($collapsed = true)
+    public function setCollapsed(bool $collapsed = true): void
     {
         $this->collapsed = $collapsed;
     }
@@ -377,7 +317,7 @@ class AssociationMetadata extends PropertyMetadata
      *
      * @return MetaAttributeMetadata[] [meta property name => MetaAttributeMetadata, ...]
      */
-    public function getMetaProperties()
+    public function getMetaProperties(): array
     {
         return $this->metaProperties;
     }
@@ -385,12 +325,8 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Checks whether metadata of the given meta property that applicable
      * for the association value or each value of collection valued association exists.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return bool
      */
-    public function hasMetaProperty($metaPropertyName)
+    public function hasMetaProperty(string $metaPropertyName): bool
     {
         return isset($this->metaProperties[$metaPropertyName]);
     }
@@ -398,29 +334,17 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Gets metadata of a meta property that applicable
      * for the association value or each value of collection valued association.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return MetaAttributeMetadata|null
      */
-    public function getMetaProperty($metaPropertyName)
+    public function getMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata
     {
-        if (!isset($this->metaProperties[$metaPropertyName])) {
-            return null;
-        }
-
-        return $this->metaProperties[$metaPropertyName];
+        return $this->metaProperties[$metaPropertyName] ?? null;
     }
 
     /**
      * Adds metadata of a meta property that applicable
      * for the association value or each value of collection valued association.
-     *
-     * @param MetaAttributeMetadata $metaProperty
-     *
-     * @return MetaAttributeMetadata
      */
-    public function addMetaProperty(MetaAttributeMetadata $metaProperty)
+    public function addMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata
     {
         $this->metaProperties[$metaProperty->getName()] = $metaProperty;
 
@@ -430,10 +354,8 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Removes metadata of a meta property that applicable
      * for the association value or each value of collection valued association.
-     *
-     * @param string $metaPropertyName
      */
-    public function removeMetaProperty($metaPropertyName)
+    public function removeMetaProperty(string $metaPropertyName): void
     {
         unset($this->metaProperties[$metaPropertyName]);
     }
@@ -444,7 +366,7 @@ class AssociationMetadata extends PropertyMetadata
      *
      * @return LinkMetadataInterface[] [link name => LinkMetadataInterface, ...]
      */
-    public function getLinks()
+    public function getLinks(): array
     {
         return $this->links;
     }
@@ -452,12 +374,8 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Checks whether metadata of the given link that applicable
      * for the association value or each value of collection valued association exists.
-     *
-     * @param string $linkName
-     *
-     * @return bool
      */
-    public function hasLink($linkName)
+    public function hasLink(string $linkName): bool
     {
         return isset($this->links[$linkName]);
     }
@@ -465,30 +383,17 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Gets metadata of a link that applicable
      * for the association value or each value of collection valued association.
-     *
-     * @param string $linkName
-     *
-     * @return LinkMetadataInterface|null
      */
-    public function getLink($linkName)
+    public function getLink(string $linkName): ?LinkMetadataInterface
     {
-        if (!isset($this->links[$linkName])) {
-            return null;
-        }
-
-        return $this->links[$linkName];
+        return $this->links[$linkName] ?? null;
     }
 
     /**
      * Adds metadata of a link that applicable
      * for the association value or each value of collection valued association.
-     *
-     * @param string                $name
-     * @param LinkMetadataInterface $link
-     *
-     * @return LinkMetadataInterface
      */
-    public function addLink(string $name, LinkMetadataInterface $link)
+    public function addLink(string $name, LinkMetadataInterface $link): LinkMetadataInterface
     {
         $this->links[$name] = $link;
 
@@ -498,10 +403,8 @@ class AssociationMetadata extends PropertyMetadata
     /**
      * Removes metadata of a link that applicable
      * for the association value or each value of collection valued association.
-     *
-     * @param string $linkName
      */
-    public function removeLink($linkName)
+    public function removeLink(string $linkName): void
     {
         unset($this->links[$linkName]);
     }
@@ -511,47 +414,31 @@ class AssociationMetadata extends PropertyMetadata
      *
      * @return MetaAttributeMetadata[] [meta property name => MetaAttributeMetadata, ...]
      */
-    public function getRelationshipMetaProperties()
+    public function getRelationshipMetaProperties(): array
     {
         return $this->relationshipMetaProperties;
     }
 
     /**
      * Checks whether metadata of the given meta property that applicable for a whole association exists.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return bool
      */
-    public function hasRelationshipMetaProperty($metaPropertyName)
+    public function hasRelationshipMetaProperty(string $metaPropertyName): bool
     {
         return isset($this->relationshipMetaProperties[$metaPropertyName]);
     }
 
     /**
      * Gets metadata of a meta property that applicable for a whole association.
-     *
-     * @param string $metaPropertyName
-     *
-     * @return MetaAttributeMetadata|null
      */
-    public function getRelationshipMetaProperty($metaPropertyName)
+    public function getRelationshipMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata
     {
-        if (!isset($this->relationshipMetaProperties[$metaPropertyName])) {
-            return null;
-        }
-
-        return $this->relationshipMetaProperties[$metaPropertyName];
+        return $this->relationshipMetaProperties[$metaPropertyName] ?? null;
     }
 
     /**
      * Adds metadata of a meta property that applicable for a whole association.
-     *
-     * @param MetaAttributeMetadata $metaProperty
-     *
-     * @return MetaAttributeMetadata
      */
-    public function addRelationshipMetaProperty(MetaAttributeMetadata $metaProperty)
+    public function addRelationshipMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata
     {
         $this->relationshipMetaProperties[$metaProperty->getName()] = $metaProperty;
 
@@ -560,10 +447,8 @@ class AssociationMetadata extends PropertyMetadata
 
     /**
      * Removes metadata of a meta property that applicable for a whole association.
-     *
-     * @param string $metaPropertyName
      */
-    public function removeRelationshipMetaProperty($metaPropertyName)
+    public function removeRelationshipMetaProperty(string $metaPropertyName): void
     {
         unset($this->relationshipMetaProperties[$metaPropertyName]);
     }
@@ -573,48 +458,31 @@ class AssociationMetadata extends PropertyMetadata
      *
      * @return LinkMetadataInterface[] [link name => LinkMetadataInterface, ...]
      */
-    public function getRelationshipLinks()
+    public function getRelationshipLinks(): array
     {
         return $this->relationshipLinks;
     }
 
     /**
      * Checks whether metadata of the given link that applicable for a whole association exists.
-     *
-     * @param string $linkName
-     *
-     * @return bool
      */
-    public function hasRelationshipLink($linkName)
+    public function hasRelationshipLink(string $linkName): bool
     {
         return isset($this->relationshipLinks[$linkName]);
     }
 
     /**
      * Gets metadata of a link that applicable for a whole association.
-     *
-     * @param string $linkName
-     *
-     * @return LinkMetadataInterface|null
      */
-    public function getRelationshipLink($linkName)
+    public function getRelationshipLink(string $linkName): ?LinkMetadataInterface
     {
-        if (!isset($this->relationshipLinks[$linkName])) {
-            return null;
-        }
-
-        return $this->relationshipLinks[$linkName];
+        return $this->relationshipLinks[$linkName] ?? null;
     }
 
     /**
      * Adds metadata of a link that applicable for a whole association.
-     *
-     * @param string                $name
-     * @param LinkMetadataInterface $link
-     *
-     * @return LinkMetadataInterface
      */
-    public function addRelationshipLink(string $name, LinkMetadataInterface $link)
+    public function addRelationshipLink(string $name, LinkMetadataInterface $link): LinkMetadataInterface
     {
         $this->relationshipLinks[$name] = $link;
 
@@ -623,10 +491,8 @@ class AssociationMetadata extends PropertyMetadata
 
     /**
      * Removes metadata of a link that applicable for a whole association.
-     *
-     * @param string $linkName
      */
-    public function removeRelationshipLink($linkName)
+    public function removeRelationshipLink(string $linkName): void
     {
         unset($this->relationshipLinks[$linkName]);
     }

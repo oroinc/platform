@@ -78,7 +78,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('nestedAssociation');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -122,7 +122,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('nestedAssociation');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -163,7 +163,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('nestedAssociation');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;

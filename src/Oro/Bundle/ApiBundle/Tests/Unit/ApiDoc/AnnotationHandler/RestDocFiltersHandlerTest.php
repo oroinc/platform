@@ -69,7 +69,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->filtersHandler->handle($annotation, $filters, $metadata);
 
@@ -80,7 +80,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $annotation->addFilter('firstName', ['type' => 'string']);
         $annotation->addFilter('lastName', ['type' => 'string']);
@@ -102,7 +102,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filters->add('filter1', $this->createMock(FilterInterface::class));
 
@@ -115,7 +115,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new StandaloneFilter('int', 'A filter');
         $filters->add('filter1', $filter1);
@@ -142,7 +142,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new StandaloneFilterWithDefaultValue('int', 'A filter', 123);
         $filters->add('filter1', $filter1);
@@ -170,7 +170,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');
@@ -205,7 +205,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');
@@ -239,7 +239,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');
@@ -273,7 +273,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');
@@ -307,7 +307,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');
@@ -342,7 +342,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');
@@ -384,7 +384,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $annotation = new ApiDoc([]);
         $filters = new FilterCollection();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $filter1 = new ComparisonFilter('int', 'A filter');
         $filter1->setField('field1');

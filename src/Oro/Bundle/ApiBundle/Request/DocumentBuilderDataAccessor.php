@@ -11,20 +11,13 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
  */
 class DocumentBuilderDataAccessor implements DataAccessorInterface
 {
-    /** @var int|null */
-    private $rootIndex;
-
-    /** @var int */
-    private $lastIndex = -1;
-
+    private ?int $rootIndex = null;
+    private int $lastIndex = -1;
     /** @var array [entity data or [common data, data, name, collection index] for association, ...] */
-    private $stack;
-
-    /** @var string|null */
-    private $path;
-
+    private array $stack = [];
+    private ?string $path = null;
     /** @var array [data item path => [key => value, ...], ...] */
-    private $metadata = [];
+    private array $metadata = [];
 
     /**
      * Sets a flag indicates whether the primary data is a collection.
@@ -159,7 +152,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function tryGetValue(string $propertyPath, &$value): bool
+    public function tryGetValue(string $propertyPath, mixed &$value): bool
     {
         if (self::PATH === $propertyPath) {
             $value = $this->getPath();
@@ -171,13 +164,9 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
     }
 
     /**
-     * @param string[] $path
-     * @param mixed    $value
-     *
-     * @return bool
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function doTryGetValue(array $path, &$value): bool
+    private function doTryGetValue(array $path, mixed &$value): bool
     {
         $value = null;
 
@@ -196,7 +185,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
 
         $commonData = null;
         if ($isAssociationData) {
-            list($commonData, $data) = $data;
+            [$commonData, $data] = $data;
         }
 
         $hasValue = true;
@@ -227,19 +216,9 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
         return $hasValue;
     }
 
-    /**
-     * @param string $propertyPath
-     *
-     * @return mixed
-     */
-    private function getMetadataValue(string $propertyPath)
+    private function getMetadataValue(string $propertyPath): mixed
     {
-        $itemPath = $this->getPath();
-        if (!isset($this->metadata[$itemPath][$propertyPath])) {
-            return null;
-        }
-
-        return $this->metadata[$itemPath][$propertyPath];
+        return $this->metadata[$this->getPath()][$propertyPath] ?? null;
     }
 
     private function getPath(): string
@@ -257,7 +236,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
                     }
                 }
             }
-            $this->path = \implode('.', $keys);
+            $this->path = implode('.', $keys);
         }
 
         return $this->path;

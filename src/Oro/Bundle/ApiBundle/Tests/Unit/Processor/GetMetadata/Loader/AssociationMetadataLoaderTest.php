@@ -50,11 +50,11 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
-        $association->setTargetMetadata(new EntityMetadata());
+        $association->setTargetMetadata(new EntityMetadata('Test\Entity'));
 
         $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
@@ -72,7 +72,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
@@ -94,7 +94,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $config->addField('association');
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
@@ -116,7 +116,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $config->addField('association')->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
@@ -141,7 +141,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
@@ -175,12 +175,12 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
 
-        $targetMetadata = new EntityMetadata();
+        $targetMetadata = new EntityMetadata('Test\Entity');
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
@@ -211,13 +211,13 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass('Test\TargetClassFromConfig');
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setDataType(DataType::INTEGER);
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
         $association->addAcceptableTargetClassName(self::TEST_TARGET_CLASS_NAME);
 
-        $targetMetadata = new EntityMetadata();
+        $targetMetadata = new EntityMetadata('Test\Entity');
 
         $this->metadataProvider->expects(self::once())
             ->method('getMetadata')
@@ -250,11 +250,11 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
 
-        $targetMetadata = new EntityMetadata();
+        $targetMetadata = new EntityMetadata('Test\Entity');
         $targetMetadata->setIdentifierFieldNames(['id']);
         $targetMetadata->addField(new FieldMetadata('id'))->setDataType(DataType::INTEGER);
 
@@ -287,11 +287,11 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
 
-        $targetMetadata = new EntityMetadata();
+        $targetMetadata = new EntityMetadata('Test\Entity');
         $targetMetadata->setIdentifierFieldNames(['id1', 'id2']);
         $targetMetadata->addField(new FieldMetadata('id1'))->setDataType(DataType::INTEGER);
         $targetMetadata->addField(new FieldMetadata('id2'))->setDataType(DataType::INTEGER);
@@ -325,11 +325,11 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $fieldConfig->setTargetClass(self::TEST_TARGET_CLASS_NAME);
         $targetConfig = $fieldConfig->createAndSetTargetEntity();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $association = $entityMetadata->addAssociation(new AssociationMetadata('association'));
         $association->setTargetClassName(self::TEST_TARGET_CLASS_NAME);
 
-        $targetMetadata = new EntityMetadata();
+        $targetMetadata = new EntityMetadata('Test\Entity');
         $targetMetadata->setIdentifierFieldNames(['id']);
         $targetMetadata->addField(new FieldMetadata('id'));
 

@@ -7,19 +7,15 @@ namespace Oro\Bundle\ApiBundle\Metadata;
  */
 abstract class LinkMetadataDecorator implements LinkMetadataInterface
 {
-    /** @var LinkMetadataInterface */
-    private $link;
+    private LinkMetadataInterface $link;
 
-    /**
-     * @param LinkMetadataInterface $link The link metadata to be decorated
-     */
     public function __construct(LinkMetadataInterface $link)
     {
         $this->link = $link;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
@@ -27,18 +23,18 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = $this->link->toArray();
-        $result['decorator'] = get_class($this);
+        $result['decorator'] = \get_class($this);
 
         return $result;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetaProperties(): array
     {
@@ -46,7 +42,7 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function hasMetaProperty(string $metaPropertyName): bool
     {
@@ -54,7 +50,7 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getMetaProperty(string $metaPropertyName): ?MetaAttributeMetadata
     {
@@ -62,7 +58,7 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function addMetaProperty(MetaAttributeMetadata $metaProperty): MetaAttributeMetadata
     {
@@ -70,7 +66,7 @@ abstract class LinkMetadataDecorator implements LinkMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function removeMetaProperty(string $metaPropertyName): void
     {

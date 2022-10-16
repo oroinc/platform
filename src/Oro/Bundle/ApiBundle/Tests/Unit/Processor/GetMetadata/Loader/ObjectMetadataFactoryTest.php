@@ -36,8 +36,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
 
-        $expected = new EntityMetadata();
-        $expected->setClassName('Test\Class');
+        $expected = new EntityMetadata('Test\Class');
         $expected->setIdentifierFieldNames(['id']);
 
         self::assertEquals(
@@ -51,8 +50,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
 
-        $expected = new EntityMetadata();
-        $expected->setClassName(EntityIdentifier::class);
+        $expected = new EntityMetadata(EntityIdentifier::class);
         $expected->setIdentifierFieldNames(['id']);
         $expected->setInheritedType(true);
 
@@ -64,7 +62,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddMetaPropertyMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setPropertyPath('propertyPath');
@@ -85,7 +83,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddMetaPropertyMetadataWhenResultNameExistsInConfig()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('string');
         $field->setMetaPropertyResultName('resultName');
@@ -106,7 +104,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddFieldMetadata()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityMetadata->setIdentifierFieldNames(['id']);
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -129,7 +127,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddFieldMetadataForIdentifierField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $entityMetadata->setIdentifierFieldNames(['testField']);
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
@@ -153,7 +151,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setPropertyPath('propertyPath');
@@ -185,7 +183,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setTargetClass('Test\TargetClass');
@@ -217,7 +215,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setTargetClass('Test\TargetClass');
@@ -248,7 +246,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('integer');
         $field->setTargetClass('Test\TargetClass');
@@ -279,7 +277,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
 
@@ -308,7 +306,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
         $field->createAndSetTargetEntity();
@@ -338,7 +336,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
         $target = $field->createAndSetTargetEntity();
@@ -369,7 +367,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
         $target = $field->createAndSetTargetEntity();
@@ -400,7 +398,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setTargetClass('Test\TargetClass');
         $target = $field->createAndSetTargetEntity();
@@ -432,7 +430,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
         $field->setDependsOn(['field1']);
@@ -471,7 +469,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToMany');
         $field->setDependsOn(['field1']);
@@ -511,7 +509,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
         $field->setDependsOn(['field1']);
@@ -551,7 +549,7 @@ class ObjectMetadataFactoryTest extends LoaderTestCase
     {
         $config = new EntityDefinitionConfig();
 
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
         $field->setDataType('association:manyToOne');
         $field->setTargetClass(EntityIdentifier::class);

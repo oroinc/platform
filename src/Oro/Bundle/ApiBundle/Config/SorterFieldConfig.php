@@ -3,24 +3,20 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\EntitySerializer\FieldConfigInterface;
 
 /**
  * Represents the configuration of a field that can be used to sort data.
  */
 class SorterFieldConfig implements FieldConfigInterface
 {
-    /** @var bool|null */
-    protected $exclude;
-
-    /** @var array */
-    protected $items = [];
+    private ?bool $exclude = null;
+    private array $items = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ConfigUtil::convertItemsToArray($this->items);
         if (true === $this->exclude) {
@@ -39,17 +35,17 @@ class SorterFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the configuration value.
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -59,9 +55,9 @@ class SorterFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the configuration value.
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -71,43 +67,37 @@ class SorterFieldConfig implements FieldConfigInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes the configuration value.
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 
     /**
      * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExcluded()
+    public function hasExcluded(): bool
     {
         return null !== $this->exclude;
     }
 
     /**
      * Indicates whether the exclusion flag.
-     *
-     * @return bool
      */
-    public function isExcluded()
+    public function isExcluded(): bool
     {
-        if (null === $this->exclude) {
-            return false;
-        }
-
-        return $this->exclude;
+        return $this->exclude ?? false;
     }
 
     /**
@@ -115,29 +105,23 @@ class SorterFieldConfig implements FieldConfigInterface
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true)
+    public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
     }
 
     /**
      * Indicates whether the path of the field value exists.
-     *
-     * @return bool
      */
-    public function hasPropertyPath()
+    public function hasPropertyPath(): bool
     {
         return $this->has(ConfigUtil::PROPERTY_PATH);
     }
 
     /**
      * Gets the path of the field value.
-     *
-     * @param string|null $defaultValue
-     *
-     * @return string|null
      */
-    public function getPropertyPath($defaultValue = null)
+    public function getPropertyPath(string $defaultValue = null): ?string
     {
         if (empty($this->items[ConfigUtil::PROPERTY_PATH])) {
             return $defaultValue;
@@ -148,10 +132,8 @@ class SorterFieldConfig implements FieldConfigInterface
 
     /**
      * Sets the path of the field value.
-     *
-     * @param string|null $propertyPath
      */
-    public function setPropertyPath($propertyPath = null)
+    public function setPropertyPath(string $propertyPath = null): void
     {
         if ($propertyPath) {
             $this->items[ConfigUtil::PROPERTY_PATH] = $propertyPath;

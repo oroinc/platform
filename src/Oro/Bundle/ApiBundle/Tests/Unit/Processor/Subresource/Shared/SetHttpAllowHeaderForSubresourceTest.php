@@ -36,7 +36,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenResponseStatusCodeIsNot405()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
@@ -54,7 +54,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenAllowResponseHeaderAlreadySet()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
@@ -73,7 +73,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenAllActionsDisabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -103,7 +103,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenAllActionsEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $subresource = new ApiSubresource();
@@ -129,7 +129,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenOnlyGetSubresourceEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -157,7 +157,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenOnlyUpdateSubresourceEnabled()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -185,7 +185,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenEntityDoesNotHaveIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')
@@ -212,7 +212,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
 
     public function testProcessWhenActionDisabledForParticularAssociation()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $subresource = new ApiSubresource();

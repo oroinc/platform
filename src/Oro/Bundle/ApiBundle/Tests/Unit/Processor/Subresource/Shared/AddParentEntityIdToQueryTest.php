@@ -72,7 +72,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -105,7 +105,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -145,7 +145,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -186,7 +186,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('title');
         $parentConfig->addField($associationName)
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentMetadata->addField(new FieldMetadata('title'));
@@ -235,7 +235,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('title');
         $parentConfig->addField($associationName)
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentMetadata->addField(new FieldMetadata('title'));
@@ -279,7 +279,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -316,7 +316,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -354,7 +354,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('products');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -391,7 +391,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('users');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -429,7 +429,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -465,7 +465,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -502,7 +502,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('owner');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -538,7 +538,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('user');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -575,7 +575,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -611,7 +611,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName)->setPropertyPath('origin');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -647,7 +647,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['renamedId']);
         $parentConfig->addField('renamedId')->setPropertyPath('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
 
@@ -684,7 +684,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('id');
         $parentConfig->addField('title');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentMetadata->addField(new FieldMetadata('title'));
@@ -727,7 +727,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->addField('renamedId')->setPropertyPath('id');
         $parentConfig->addField('renamedTitle')->setPropertyPath('title');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('renamedId'))->setPropertyPath('id');
         $parentMetadata->addField(new FieldMetadata('renamedTitle'))->setPropertyPath('title');
@@ -773,7 +773,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $ownerFieldConfig->setTargetClass(Entity\Category::class);
         $ownerTargetConfig = $ownerFieldConfig->createAndSetTargetEntity();
         $ownerTargetConfig->addField('category');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 
@@ -814,7 +814,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         $parentConfig->setIdentifierFieldNames(['id']);
         $parentConfig->addField('id');
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
         $parentMetadata->addField(new FieldMetadata('id'));
 

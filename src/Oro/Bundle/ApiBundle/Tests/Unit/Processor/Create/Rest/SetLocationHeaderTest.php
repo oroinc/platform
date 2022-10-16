@@ -90,7 +90,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         $entityType = 'test_entity';
         $entityId = 123;
         $transformedEntityId = 'transformed_123';
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')

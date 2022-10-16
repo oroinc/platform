@@ -62,8 +62,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 
@@ -90,8 +89,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123, 'title' => 'test'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id', 'title']);
         $metadata->addField(new FieldMetadata('id'));
         $metadata->addField(new FieldMetadata('title'));
@@ -125,8 +123,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $parentResourceClass = Entity\User::class;
         $entityId = 123;
         $this->notManageableClassNames = [$entityClass];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 
@@ -157,8 +154,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         $entityClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentClass';
         $this->notManageableClassNames = [$entityClass, $parentResourceClass];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($entityClass);
+        $metadata = new EntityMetadata($entityClass);
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'));
 

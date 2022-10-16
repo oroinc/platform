@@ -39,7 +39,7 @@ class MetadataExtraCollection
     {
         foreach ($extras as $extra) {
             if (!$extra instanceof MetadataExtraInterface) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'Expected an array of "%s".',
                     MetadataExtraInterface::class
                 ));
@@ -84,7 +84,7 @@ class MetadataExtraCollection
     public function addMetadataExtra(MetadataExtraInterface $extra): void
     {
         if ($this->hasMetadataExtra($extra->getName())) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The "%s" metadata extra already exists.',
                 $extra->getName()
             ));

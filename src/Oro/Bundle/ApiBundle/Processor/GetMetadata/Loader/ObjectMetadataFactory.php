@@ -32,8 +32,7 @@ class ObjectMetadataFactory
 
     public function createObjectMetadata(string $entityClass, EntityDefinitionConfig $config): EntityMetadata
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($entityClass);
+        $entityMetadata = new EntityMetadata($entityClass);
         $entityMetadata->setIdentifierFieldNames($config->getIdentifierFieldNames());
         if (\is_a($entityClass, EntityIdentifier::class, true)) {
             $entityMetadata->setInheritedType(true);

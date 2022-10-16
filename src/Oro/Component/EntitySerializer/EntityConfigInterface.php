@@ -1,103 +1,71 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Config;
+namespace Oro\Component\EntitySerializer;
 
 /**
  * An interface for configuration sections that are a container for fields.
  */
-interface EntityConfigInterface extends ConfigBagInterface
+interface EntityConfigInterface
 {
     /**
      * Indicates whether the configuration of at least one field exists.
-     *
-     * @return bool
      */
-    public function hasFields();
+    public function hasFields(): bool;
 
     /**
      * Gets the configuration for all fields.
      *
      * @return FieldConfigInterface[] [field name => config, ...]
      */
-    public function getFields();
+    public function getFields(): array;
 
     /**
      * Indicates whether the field configuration exists.
-     *
-     * @param string $fieldName
-     *
-     * @return bool
      */
-    public function hasField($fieldName);
+    public function hasField(string $fieldName): bool;
 
     /**
      * Gets the configuration of the field.
-     *
-     * @param string $fieldName
-     *
-     * @return FieldConfigInterface|null
      */
-    public function getField($fieldName);
+    public function getField(string $fieldName): ?FieldConfigInterface;
 
     /**
      * Finds a field by its name or property path.
      * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
-     *
-     * @param string $fieldName
-     * @param bool   $findByPropertyPath
-     *
-     * @return FieldConfigInterface|null
      */
-    public function findField($fieldName, $findByPropertyPath = false);
+    public function findField(string $fieldName, bool $findByPropertyPath = false): ?FieldConfigInterface;
 
     /**
      * Finds the name of a field by its property path.
-     *
-     * @param string $propertyPath
-     *
-     * @return string|null
      */
-    public function findFieldNameByPropertyPath($propertyPath);
+    public function findFieldNameByPropertyPath(string $propertyPath): ?string;
 
     /**
      * Gets the configuration of existing field or adds new field with a given name.
-     *
-     * @param string $fieldName
-     *
-     * @return FieldConfigInterface
      */
-    public function getOrAddField($fieldName);
+    public function getOrAddField(string $fieldName): FieldConfigInterface;
 
     /**
      * Adds the configuration of the field.
-     *
-     * @param string                    $fieldName
-     * @param FieldConfigInterface|null $field
-     *
-     * @return FieldConfigInterface
      */
-    public function addField($fieldName, $field = null);
+    public function addField(string $fieldName, FieldConfigInterface $field = null): FieldConfigInterface;
 
     /**
      * Removes the configuration of the field.
-     *
-     * @param string $fieldName
      */
-    public function removeField($fieldName);
+    public function removeField(string $fieldName): void;
 
     /**
      * Indicates whether the exclusion policy is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExclusionPolicy();
+    public function hasExclusionPolicy(): bool;
 
     /**
      * Gets the exclusion strategy that should be used for the entity.
      *
      * @return string An exclusion strategy, e.g. "none" or "all"
      */
-    public function getExclusionPolicy();
+    public function getExclusionPolicy(): string;
 
     /**
      * Sets the exclusion strategy that should be used for the entity.
@@ -105,22 +73,20 @@ interface EntityConfigInterface extends ConfigBagInterface
      * @param string|null $exclusionPolicy An exclusion strategy, e.g. "none" or "all",
      *                                     or NULL to remove this option
      */
-    public function setExclusionPolicy($exclusionPolicy);
+    public function setExclusionPolicy(?string $exclusionPolicy): void;
 
     /**
      * Indicates whether all fields are not configured explicitly should be excluded.
-     *
-     * @return bool
      */
-    public function isExcludeAll();
+    public function isExcludeAll(): bool;
 
     /**
      * Sets the exclusion strategy to exclude all fields are not configured explicitly.
      */
-    public function setExcludeAll();
+    public function setExcludeAll(): void;
 
     /**
      * Sets the exclusion strategy to exclude only fields are marked as excluded.
      */
-    public function setExcludeNone();
+    public function setExcludeNone(): void;
 }

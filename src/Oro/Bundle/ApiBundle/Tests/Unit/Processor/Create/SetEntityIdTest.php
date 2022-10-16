@@ -55,7 +55,7 @@ class SetEntityIdTest extends FormProcessorTestCase
     public function testProcessForEntityUsesIdGenerator()
     {
         $entity = new \stdClass();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
 
         $this->entityIdHelper->expects(self::never())
@@ -72,7 +72,7 @@ class SetEntityIdTest extends FormProcessorTestCase
     {
         $entityId = 123;
         $entity = new \stdClass();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->entityIdHelper->expects(self::once())
             ->method('setEntityIdentifier')

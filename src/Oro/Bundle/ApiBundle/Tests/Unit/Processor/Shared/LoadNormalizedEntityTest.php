@@ -42,7 +42,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNormalizedResult()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $normalizedResult = ['key' => 'value'];
 
         $this->processorBag->expects(self::never())
@@ -58,7 +58,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessForEntityWithoutIdentifierFieldsAndContextContainsNotNormalizedResult()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->processorBag->expects(self::never())
             ->method('getProcessor');
@@ -73,7 +73,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityIdDoesNotExistInContextButEntityHasIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->processorBag->expects(self::never())
@@ -112,7 +112,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $getConfigSections = [
             'test_section' => ['test_section_key' => 'test_section_value']
         ];
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
         $getResponseHeaders = [
             'test-response-header' => 'some response header value'

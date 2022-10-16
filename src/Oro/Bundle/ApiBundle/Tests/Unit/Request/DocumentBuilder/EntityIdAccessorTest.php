@@ -34,9 +34,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityIdForEntityWithSingleId()
     {
-        $entity   = ['id' => 123, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id' => 123, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -57,9 +56,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityIdForEntityWithSingleZeroId()
     {
-        $entity   = ['id' => 0, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id' => 0, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -85,9 +83,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
             'An object of the type "Test\Entity" does not have the identifier property "id".'
         );
 
-        $entity   = ['name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -101,9 +98,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityIdForEntityWithCompositeId()
     {
-        $entity   = ['id1' => 123, 'id2' => 456, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id1' => 123, 'id2' => 456, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -129,9 +125,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
             'An object of the type "Test\Entity" does not have the identifier property "id1".'
         );
 
-        $entity   = ['id2' => 456, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id2' => 456, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'id2']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -148,9 +143,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "Test\Entity" entity does not have an identifier.');
 
-        $entity   = ['id' => 123, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id' => 123, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $requestType = new RequestType([RequestType::REST]);
 
         $this->entityIdTransformerRegistry->expects(self::never())
@@ -166,9 +160,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The identifier value for "Test\Entity" entity must not be empty.');
 
-        $entity   = ['id' => null, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id' => null, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -189,9 +182,8 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The identifier value for "Test\Entity" entity must not be empty.');
 
-        $entity   = ['id' => 123, 'name' => 'val'];
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $entity = ['id' => 123, 'name' => 'val'];
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $requestType = new RequestType([RequestType::REST]);
 
@@ -210,8 +202,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityIdWhenSingleEntityIdIsProvidedInsteadOfEntityObject()
     {
         $entityId = 123;
-        $metadata = new EntityMetadata();
-        $metadata->setClassName('Test\Entity');
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $requestType = new RequestType([RequestType::REST]);
 

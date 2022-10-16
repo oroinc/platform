@@ -54,7 +54,7 @@ class IncludedEntityDataTest extends \PHPUnit\Framework\TestCase
     public function testShouldSetMetadata()
     {
         $data = new IncludedEntityData('path', 123, true);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $data->setMetadata($metadata);
         self::assertSame($metadata, $data->getMetadata());
     }

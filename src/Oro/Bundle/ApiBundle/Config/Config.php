@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class Config implements \IteratorAggregate
 {
-    /** @var array */
-    protected $items = [];
+    private array $items = [];
 
     /**
      * {@inheritdoc}
@@ -22,20 +21,16 @@ class Config implements \IteratorAggregate
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return ConfigUtil::convertItemsToArray($this->items);
     }
 
     /**
      * Indicates whether the configuration does not have any data.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->items);
     }
@@ -50,20 +45,16 @@ class Config implements \IteratorAggregate
 
     /**
      * Indicates whether the configuration of an entity exists.
-     *
-     * @return bool
      */
-    public function hasDefinition()
+    public function hasDefinition(): bool
     {
         return $this->has(ConfigUtil::DEFINITION);
     }
 
     /**
      * Gets the configuration of an entity.
-     *
-     * @return EntityDefinitionConfig|null
      */
-    public function getDefinition()
+    public function getDefinition(): ?EntityDefinitionConfig
     {
         return $this->get(ConfigUtil::DEFINITION);
     }
@@ -71,27 +62,23 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of an entity.
      */
-    public function setDefinition(EntityDefinitionConfig $definition = null)
+    public function setDefinition(EntityDefinitionConfig $definition = null): void
     {
         $this->set(ConfigUtil::DEFINITION, $definition);
     }
 
     /**
      * Indicates whether the configuration of filters exists.
-     *
-     * @return bool
      */
-    public function hasFilters()
+    public function hasFilters(): bool
     {
         return $this->has(ConfigUtil::FILTERS);
     }
 
     /**
      * Gets the configuration of filters.
-     *
-     * @return FiltersConfig|null
      */
-    public function getFilters()
+    public function getFilters(): ?FiltersConfig
     {
         return $this->get(ConfigUtil::FILTERS);
     }
@@ -99,27 +86,23 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of filters.
      */
-    public function setFilters(FiltersConfig $filters = null)
+    public function setFilters(FiltersConfig $filters = null): void
     {
         $this->set(ConfigUtil::FILTERS, $filters);
     }
 
     /**
      * Indicates whether the configuration of sorters exists.
-     *
-     * @return bool
      */
-    public function hasSorters()
+    public function hasSorters(): bool
     {
         return $this->has(ConfigUtil::SORTERS);
     }
 
     /**
      * Gets the configuration of sorters.
-     *
-     * @return SortersConfig|null
      */
-    public function getSorters()
+    public function getSorters(): ?SortersConfig
     {
         return $this->get(ConfigUtil::SORTERS);
     }
@@ -127,27 +110,23 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of sorters.
      */
-    public function setSorters(SortersConfig $sorters = null)
+    public function setSorters(SortersConfig $sorters = null): void
     {
         $this->set(ConfigUtil::SORTERS, $sorters);
     }
 
     /**
      * Indicates whether the configuration of actions.
-     *
-     * @return bool
      */
-    public function hasActions()
+    public function hasActions(): bool
     {
         return $this->has(ConfigUtil::ACTIONS);
     }
 
     /**
      * Gets the configuration of actions.
-     *
-     * @return ActionsConfig|null
      */
-    public function getActions()
+    public function getActions(): ?ActionsConfig
     {
         return $this->get(ConfigUtil::ACTIONS);
     }
@@ -155,27 +134,23 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of actions.
      */
-    public function setActions(ActionsConfig $actions = null)
+    public function setActions(ActionsConfig $actions = null): void
     {
         $this->set(ConfigUtil::ACTIONS, $actions);
     }
 
     /**
      * Indicates whether the configuration of sub-resources.
-     *
-     * @return bool
      */
-    public function hasSubresources()
+    public function hasSubresources(): bool
     {
         return $this->has(ConfigUtil::SUBRESOURCES);
     }
 
     /**
      * Gets the configuration of sub-resources.
-     *
-     * @return SubresourcesConfig|null
      */
-    public function getSubresources()
+    public function getSubresources(): ?SubresourcesConfig
     {
         return $this->get(ConfigUtil::SUBRESOURCES);
     }
@@ -183,32 +158,23 @@ class Config implements \IteratorAggregate
     /**
      * Sets the configuration of sub-resources.
      */
-    public function setSubresources(SubresourcesConfig $subresources = null)
+    public function setSubresources(SubresourcesConfig $subresources = null): void
     {
         $this->set(ConfigUtil::SUBRESOURCES, $subresources);
     }
 
     /**
-     * Checks whether the configuration attribute exists.
-     *
-     * @param string $key
-     *
-     * @return bool
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
      * Gets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $defaultValue
-     *
-     * @return mixed
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -219,11 +185,8 @@ class Config implements \IteratorAggregate
 
     /**
      * Sets the configuration value.
-     *
-     * @param string $key
-     * @param mixed  $value
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -234,10 +197,8 @@ class Config implements \IteratorAggregate
 
     /**
      * Removes the configuration value.
-     *
-     * @param string $key
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
@@ -247,8 +208,8 @@ class Config implements \IteratorAggregate
      *
      * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 }

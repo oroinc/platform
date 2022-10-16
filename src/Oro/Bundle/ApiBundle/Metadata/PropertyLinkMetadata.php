@@ -17,7 +17,7 @@ class PropertyLinkMetadata extends LinkMetadata
     /**
      * {@inheritDoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = parent::toArray();
         $result['property_path'] = $this->propertyPath;
@@ -26,7 +26,7 @@ class PropertyLinkMetadata extends LinkMetadata
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
