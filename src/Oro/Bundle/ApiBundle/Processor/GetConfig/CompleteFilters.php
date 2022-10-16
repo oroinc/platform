@@ -347,14 +347,14 @@ class CompleteFilters extends CompleteSection
         ?string $targetClass,
         string $defaultDataType
     ): string {
-        if (count($targetDefinition->getIdentifierFieldNames()) === 1) {
+        if (\count($targetDefinition->getIdentifierFieldNames()) === 1) {
             $identifierFieldName = $targetDefinition->getIdentifierFieldNames()[0];
             $idPropertyPath = $targetDefinition->getField($identifierFieldName)?->getPropertyPath();
             if ($idPropertyPath && $idPropertyPath !== $identifierFieldName) {
                 $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
                 $defaultDataType = $targetMetadata?->getTypeOfField($idPropertyPath) ?? $defaultDataType;
             }
-        }  // filter can handle the issue itself when count of id field names > 1.
+        }
 
         return $defaultDataType;
     }

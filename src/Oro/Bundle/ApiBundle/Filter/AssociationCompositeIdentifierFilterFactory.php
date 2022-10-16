@@ -5,9 +5,9 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 
 /**
- * The factory to create AssociationCompositeIdFilter.
+ * The factory to create AssociationCompositeIdentifierFilter.
  */
-class AssociationCompositeIdFilterFactory
+class AssociationCompositeIdentifierFilterFactory
 {
     private EntityIdTransformerRegistry $idTransformerRegistry;
 
@@ -17,11 +17,11 @@ class AssociationCompositeIdFilterFactory
     }
 
     /**
-     * Creates a new instance of CompositeIdentifierFilter.
+     * Creates a new instance of AssociationCompositeIdentifierFilter.
      */
-    public function createFilter(string $dataType): CompositeIdentifierFilter
+    public function createFilter(string $dataType): AssociationCompositeIdentifierFilter
     {
-        $filter = new AssociationCompositeIdFilter($dataType);
+        $filter = new AssociationCompositeIdentifierFilter($dataType);
         $filter->setEntityIdTransformerRegistry($this->idTransformerRegistry);
 
         return $filter;

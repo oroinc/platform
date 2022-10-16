@@ -68,19 +68,19 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     private $valueTransformer;
 
     /**
-     * Gets a field by which the data is filtered.
-     */
-    public function getField(): ?string
-    {
-        return $this->field;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setField(string $field): void
     {
         $this->field = $field;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getField(): ?string
+    {
+        return $this->field;
     }
 
     /**
