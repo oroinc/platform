@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
@@ -219,7 +222,7 @@ class UpdateListProcessingHelper
         if (null !== $previousAggregateTime) {
             $body['aggregateTime'] = $previousAggregateTime;
         }
-        $this->producer->send(Topics::UPDATE_LIST_CREATE_CHUNK_JOBS, $body);
+        $this->producer->send(UpdateListCreateChunkJobsTopic::getName(), $body);
     }
 
     public function sendMessageToStartChunkJobs(
@@ -237,7 +240,7 @@ class UpdateListProcessingHelper
         if (null !== $previousAggregateTime) {
             $body['aggregateTime'] = $previousAggregateTime;
         }
-        $this->producer->send(Topics::UPDATE_LIST_START_CHUNK_JOBS, $body);
+        $this->producer->send(UpdateListStartChunkJobsTopic::getName(), $body);
     }
 
     public function sendProcessChunkMessage(
@@ -256,6 +259,6 @@ class UpdateListProcessingHelper
         if ($extraChunk) {
             $body['extra_chunk'] = true;
         }
-        $this->producer->send(Topics::UPDATE_LIST_PROCESS_CHUNK, $body);
+        $this->producer->send(UpdateListProcessChunkTopic::getName(), $body);
     }
 }

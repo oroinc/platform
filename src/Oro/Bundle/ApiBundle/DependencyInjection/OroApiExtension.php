@@ -79,6 +79,7 @@ class OroApiExtension extends Extension implements PrependExtensionInterface
         $loader->load('processors.unhandled_error.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('mq_topics.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');

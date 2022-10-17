@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
 use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderRegistry;
 use Oro\Bundle\ApiBundle\Batch\FileLockManager;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
@@ -19,7 +20,6 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -81,7 +81,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_LIST_PROCESS_CHUNK];
+        return [UpdateListProcessChunkTopic::getName()];
     }
 
     /**
@@ -90,33 +90,18 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $startTimestamp = microtime(true);
-        $body = JSON::decode($message->getBody());
-        if (!isset(
-            $body['operationId'],
-            $body['entityClass'],
-            $body['requestType'],
-            $body['version'],
-            $body['jobId'],
-            $body['fileName'],
-            $body['fileIndex'],
-            $body['firstRecordOffset'],
-            $body['sectionName']
-        )) {
-            $this->logger->critical('Got invalid message.');
-
-            return self::REJECT;
-        }
+        $messageBody = $message->getBody();
 
         $deleteChunkFile = true;
         $result = $this->jobRunner->runDelayed(
-            $body['jobId'],
-            function (JobRunner $jobRunner, Job $job) use ($body, $startTimestamp, &$deleteChunkFile) {
-                return $this->processJob($jobRunner, $job, $body, $startTimestamp, $deleteChunkFile);
+            $messageBody['jobId'],
+            function (JobRunner $jobRunner, Job $job) use ($messageBody, $startTimestamp, &$deleteChunkFile) {
+                return $this->processJob($jobRunner, $job, $messageBody, $startTimestamp, $deleteChunkFile);
             }
         );
 
         if ($deleteChunkFile) {
-            $this->processingHelper->safeDeleteFile($body['fileName']);
+            $this->processingHelper->safeDeleteFile($messageBody['fileName']);
         }
 
         return $result ? self::ACK : self::REJECT;
@@ -154,7 +139,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $response = $this->handler->handle($request);
 
         $jobData = $job->getData();
-        if ($body['extra_chunk'] ?? false) {
+        if ($body['extra_chunk']) {
             $jobData['extra_chunk'] = true;
         }
         $previousAggregateTime = $jobData['summary']['aggregateTime'] ?? 0;
@@ -232,7 +217,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
                     $body,
                     $job,
                     $chunkFile,
-                    $body['extra_chunk'] ?? false
+                    $body['extra_chunk']
                 );
 
                 return true;

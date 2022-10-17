@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\UpdateList;
 
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -51,7 +51,7 @@ class StartAsyncOperation implements ProcessorInterface
 
         $entityClass = $context->getClassName();
         $this->producer->send(
-            Topics::UPDATE_LIST,
+            UpdateListTopic::getName(),
             [
                 'operationId'           => $operationId,
                 'entityClass'           => $entityClass,
