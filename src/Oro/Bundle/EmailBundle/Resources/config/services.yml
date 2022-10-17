@@ -1398,6 +1398,7 @@ services:
             - '@oro_email.provider.localized_template'
             - '@oro_email.tools.email_origin_helper'
             - '@oro_email.sender.email_model_sender'
+            - '@oro_security.owner.entity_owner_accessor'
         calls:
             - [setLogger, ['@logger']]
 
