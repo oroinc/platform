@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Batch\Async;
 
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\IncludeAccessor\IncludeAccessorRegistry;
 use Oro\Bundle\ApiBundle\Batch\IncludeMapManager;
@@ -26,7 +28,6 @@ use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -120,7 +121,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
      */
     public static function getSubscribedTopics()
     {
-        return [Topics::UPDATE_LIST];
+        return [UpdateListTopic::getName()];
     }
 
     /**
@@ -142,30 +143,17 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $startTimestamp = microtime(true);
-        $body = JSON::decode($message->getBody());
-        if (!isset(
-            $body['operationId'],
-            $body['entityClass'],
-            $body['requestType'],
-            $body['version'],
-            $body['fileName'],
-            $body['chunkSize'],
-            $body['includedDataChunkSize']
-        )) {
-            $this->logger->critical('Got invalid message.');
+        $messageBody = $message->getBody();
 
-            return self::REJECT;
-        }
-
-        $operationId = $body['operationId'];
-        $splitterState = $this->getSplitterState($body);
+        $operationId = $messageBody['operationId'];
+        $splitterState = $this->getSplitterState($messageBody);
         if (!$splitterState) {
             // the first iteration - mark the asynchronous operation as running
             $this->operationManager->markAsRunning($operationId);
         }
 
-        $dataFileName = $body['fileName'];
-        $requestType = new RequestType($body['requestType']);
+        $dataFileName = $messageBody['fileName'];
+        $requestType = new RequestType($messageBody['requestType']);
 
         $splitter = $this->splitterRegistry->getSplitter($requestType);
         if (null === $splitter) {
@@ -191,7 +179,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             return self::REJECT;
         }
 
-        $files = $this->splitFile($splitter, $splitterState, $operationId, $dataFileName, $body, $message);
+        $files = $this->splitFile($splitter, $splitterState, $operationId, $dataFileName, $messageBody);
         if (null === $files) {
             return self::ACK;
         }
@@ -220,7 +208,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             }
             $errors = $this->includeMapManager->updateIncludedChunkIndex(
                 $this->fileManager,
-                $body['operationId'],
+                $messageBody['operationId'],
                 $includeAccessor,
                 $includedChunkFiles
             );
@@ -237,7 +225,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             $splitter,
             $chunkFiles,
             $message->getMessageId(),
-            $body,
+            $messageBody,
             $startTimestamp
         );
 
@@ -259,7 +247,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         float $startTimestamp
     ): void {
         $operationId = $body['operationId'];
-        $previousSplitAggregateTime = $body['aggregateTime'] ?? 0;
+        $previousSplitAggregateTime = $body['aggregateTime'];
         if ($splitter instanceof PartialFileSplitterInterface && !$splitter->isCompleted()) {
             // do the next iteration
             if ($chunkFiles) {
@@ -298,7 +286,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     {
         $body['splitterState'] = $splitterState;
         $body['aggregateTime'] = $aggregateTime;
-        $this->producer->send(Topics::UPDATE_LIST, $body);
+        $this->producer->send(UpdateListTopic::getName(), $body);
     }
 
     /**
@@ -407,7 +395,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
     {
         $context = $this->dependentJob->createDependentJobContext($rootJob);
         $context->addDependentJob(
-            Topics::UPDATE_LIST_FINISH,
+            UpdateListFinishTopic::getName(),
             array_merge($this->processingHelper->getCommonBody($body), [
                 'fileName' => $body['fileName']
             ])
@@ -431,7 +419,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
      * @param int                   $operationId
      * @param string                $dataFileName
      * @param array                 $body
-     * @param MessageInterface      $message
      *
      * @return ChunkFile[]|null
      */
@@ -441,7 +428,6 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         int $operationId,
         string $dataFileName,
         array $body,
-        MessageInterface $message
     ): ?array {
         $splitter->setChunkFileNameTemplate($this->fileNameProvider->getChunkFileNameTemplate($operationId));
         if ($splitter instanceof PartialFileSplitterInterface) {
@@ -460,7 +446,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         try {
             return $splitter->splitFile($dataFileName, $this->sourceDataFileManager, $this->fileManager);
         } catch (\Exception $e) {
-            $this->handleSplitterException($e, $body, $message);
+            $this->handleSplitterException($e, $body);
 
             return null;
         } finally {
@@ -469,7 +455,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         }
     }
 
-    private function handleSplitterException(\Exception $exception, array $body, MessageInterface $message): void
+    private function handleSplitterException(\Exception $exception, array $body): void
     {
         $operationId = $body['operationId'];
         $dataFileName = $body['fileName'];

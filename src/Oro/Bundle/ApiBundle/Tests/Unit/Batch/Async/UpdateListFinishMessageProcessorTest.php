@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListFinishMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
@@ -13,30 +13,24 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper */
-    private $processingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager */
-    private $operationManager;
+    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
+    private \PHPUnit\Framework\MockObject\MockObject|FileManager $fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager */
-    private $includeMapManager;
+    private \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager $includeMapManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
 
-    /** @var UpdateListFinishMessageProcessor */
-    private $processor;
+    private UpdateListFinishMessageProcessor $processor;
 
     protected function setUp(): void
     {
@@ -58,13 +52,9 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn(JSON::encode($body));
-        $message->expects(self::any())
-            ->method('getMessageId')
-            ->willReturn($messageId);
+        $message = new Message();
+        $message->setBody($body);
+        $message->setMessageId($messageId);
 
         return $message;
     }
@@ -81,28 +71,15 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         return $error;
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
         self::assertEquals(
-            [Topics::UPDATE_LIST_FINISH],
+            [UpdateListFinishTopic::getName()],
             UpdateListFinishMessageProcessor::getSubscribedTopics()
         );
     }
 
-    public function testShouldRejectInvalidMessage()
-    {
-        $message = $this->getMessage(['key' => 'value']);
-
-        $this->logger->expects(self::once())
-            ->method('critical')
-            ->with('Got invalid message.');
-
-        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testProcessWhenNoUnlinkedIncludedData()
+    public function testProcessWhenNoUnlinkedIncludedData(): void
     {
         $operationId = 123;
         $dataFileName = 'testFile';
@@ -144,7 +121,7 @@ class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessWhenHasUnlinkedIncludedData()
+    public function testProcessWhenHasUnlinkedIncludedData(): void
     {
         $operationId = 123;
         $dataFileName = 'testFile';

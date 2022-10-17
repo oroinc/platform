@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListCreateChunkJobsMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -12,32 +12,26 @@ use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const BATCH_SIZE = 2000;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRunner */
-    private $jobRunner;
+    private \PHPUnit\Framework\MockObject\MockObject|JobRunner $jobRunner;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRepository */
-    private $jobRepository;
+    private \PHPUnit\Framework\MockObject\MockObject|JobRepository $jobRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager */
-    private $operationManager;
+    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper */
-    private $processingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
 
-    /** @var UpdateListCreateChunkJobsMessageProcessor */
-    private $processor;
+    private UpdateListCreateChunkJobsMessageProcessor $processor;
 
     protected function setUp(): void
     {
@@ -47,7 +41,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         $this->processingHelper = $this->createMock(UpdateListProcessingHelper::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper->expects($this->any())
+        $doctrineHelper->expects(self::any())
             ->method('getEntityRepository')
             ->with(JobEntity::class)
             ->willReturn($this->jobRepository);
@@ -63,39 +57,22 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
 
     private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn(JSON::encode($body));
-        $message->expects(self::any())
-            ->method('getMessageId')
-            ->willReturn($messageId);
+        $message = new Message();
+        $message->setBody($body);
+        $message->setMessageId($messageId);
 
         return $message;
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
         self::assertEquals(
-            [Topics::UPDATE_LIST_CREATE_CHUNK_JOBS],
+            [UpdateListCreateChunkJobsTopic::getName()],
             UpdateListCreateChunkJobsMessageProcessor::getSubscribedTopics()
         );
     }
 
-    public function testShouldRejectInvalidMessage()
-    {
-        $message = $this->getMessage(['key' => 'value']);
-
-        $this->logger->expects(self::once())
-            ->method('critical')
-            ->with('Got invalid message.');
-
-        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectNotExistingRootJobId()
+    public function testShouldRejectNotExistingRootJobId(): void
     {
         $rootJobId = 100;
         $message = $this->getMessage([
@@ -121,7 +98,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testProcessNextIteration()
+    public function testProcessNextIteration(): void
     {
         $operationId = 123;
         $rootJobId = 100;
@@ -135,7 +112,9 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
             'requestType'          => ['testRequest'],
             'version'              => '1.1',
             'rootJobId'            => $rootJobId,
-            'chunkJobNameTemplate' => $chunkJobNameTemplate
+            'chunkJobNameTemplate' => $chunkJobNameTemplate,
+            'firstChunkFileIndex' => 0,
+            'aggregateTime' => 0,
         ];
         $message = $this->getMessage($body);
         $rootJob = $this->createMock(Job::class);
@@ -182,7 +161,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessLastIteration()
+    public function testProcessLastIteration(): void
     {
         $operationId = 123;
         $rootJobId = 100;
@@ -242,7 +221,7 @@ class UpdateListCreateChunkJobsMessageProcessorTest extends \PHPUnit\Framework\T
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessLastIterationWhenOnlyOneNotProcessedChunkRemains()
+    public function testProcessLastIterationWhenOnlyOneNotProcessedChunkRemains(): void
     {
         $operationId = 123;
         $rootJobId = 100;

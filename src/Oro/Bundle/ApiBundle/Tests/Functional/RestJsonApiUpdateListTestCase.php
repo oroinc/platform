@@ -2,7 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic;
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
 use Oro\Bundle\ApiBundle\Batch\ErrorManager;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
@@ -16,6 +20,7 @@ use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Authentication\TokenSerializerInterface;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use Oro\Component\MessageQueue\Client\MessageBodyResolverInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobProcessor;
@@ -63,6 +68,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     protected function getJob(int $jobId): Job
     {
         return $this->getJobProcessor()->findJobById($jobId);
+    }
+
+    protected function getMessageBodyResolver(): MessageBodyResolverInterface
+    {
+        return self::getContainer()->get('oro_message_queue.client.message_body_resolver');
     }
 
     private function getTokenStorage(): TokenStorageInterface
@@ -175,15 +185,20 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
                 ->getIncludedDataChunkSize($operation->getEntityClass());
         }
 
-        return $this->createMessage([
-            'operationId'           => $operation->getId(),
-            'entityClass'           => $operation->getEntityClass(),
-            'requestType'           => $this->getRequestType()->toArray(),
-            'version'               => Version::LATEST,
-            'fileName'              => $operation->getDataFileName(),
-            'chunkSize'             => $chunkSize,
-            'includedDataChunkSize' => $includedDataChunkSize
-        ]);
+        $messageBody = $this->getMessageBodyResolver()->resolveBody(
+            UpdateListTopic::getName(),
+            [
+                'operationId'           => $operation->getId(),
+                'entityClass'           => $operation->getEntityClass(),
+                'requestType'           => $this->getRequestType()->toArray(),
+                'version'               => Version::LATEST,
+                'fileName'              => $operation->getDataFileName(),
+                'chunkSize'             => $chunkSize,
+                'includedDataChunkSize' => $includedDataChunkSize,
+            ]
+        );
+
+        return $this->createMessage($messageBody);
     }
 
     protected function assertAsyncOperationStatus(int $operationId, array $attributes): void
@@ -322,18 +337,21 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     {
         $result = [];
         self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_PROCESS_CHUNK, true);
+        $messages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
+        $messageBodyResolver = $this->getMessageBodyResolver();
         while ($messages) {
-            self::getMessageCollector()->clearTopicMessages(Topics::UPDATE_LIST_PROCESS_CHUNK);
+            self::getMessageCollector()->clearTopicMessages(UpdateListProcessChunkTopic::getName());
             foreach ($messages as $body) {
-                $message = $this->createMessage($body);
+                $message = $this->createMessage(
+                    $messageBodyResolver->resolveBody(UpdateListProcessChunkTopic::getName(), $body)
+                );
                 $result[] = [
                     $message,
                     $this->processMessage('oro_api.batch.async.update_list.process_chunk', $message)
                 ];
             }
             self::flushMessagesBuffer();
-            $messages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_PROCESS_CHUNK, true);
+            $messages = self::getSentMessagesByTopic(UpdateListProcessChunkTopic::getName());
         }
 
         self::flushMessagesBuffer();
@@ -345,9 +363,9 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         }
 
         self::flushMessagesBuffer();
-        $messages = self::getSentMessagesByTopic(Topics::UPDATE_LIST_FINISH, true);
-        self::getMessageCollector()->clearTopicMessages(Topics::UPDATE_LIST_FINISH);
-        self::assertCount(1, $messages, Topics::UPDATE_LIST_FINISH);
+        $messages = self::getSentMessagesByTopic(UpdateListFinishTopic::getName());
+        self::getMessageCollector()->clearTopicMessages(UpdateListFinishTopic::getName());
+        self::assertCount(1, $messages, UpdateListFinishTopic::getName());
         foreach ($messages as $body) {
             self::assertEquals(
                 MessageProcessorInterface::ACK,
@@ -378,7 +396,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 
         $processedUpdateListChunkMessages = $this->processUpdateListChunkMessages();
-        self::assertCount(count($expectedJobs), $processedUpdateListChunkMessages, Topics::UPDATE_LIST_PROCESS_CHUNK);
+        self::assertCount(
+            count($expectedJobs),
+            $processedUpdateListChunkMessages,
+            UpdateListProcessChunkTopic::getName()
+        );
 
         $messages = [];
         $i = 0;
@@ -403,5 +425,73 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         }
 
         return $operationId;
+    }
+
+    protected function processUpdateListDelayedCreationOfChunkJobs(
+        string $entityClass,
+        array|string $data,
+        bool $assertNoErrors = true
+    ): int {
+        $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
+        $operationId = $this->extractOperationIdFromContentLocationHeader($response);
+        self::clearMessageCollector();
+
+        // Creates chunk index before processing UpdateListMessage in order to delay creation of chunk jobs
+        $processingHelper = self::getContainer()->get('oro_api.batch.async.update_list_processing_helper');
+        $processingHelper->updateChunkIndex($operationId, []);
+
+        /** @var AsyncOperation $operation */
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $updateListMessage = $this->createUpdateListMessage($operation);
+        $this->processUpdateListMessage($updateListMessage);
+
+        $this->processUpdateListCreateChunkJobMessages();
+
+        if ($assertNoErrors) {
+            $this->assertAsyncOperationErrors([], $operationId);
+        }
+
+        return $operationId;
+    }
+
+    /**
+     * @return array [[update list create chunk message, update list create chunk message processing result], ...]
+     */
+    protected function processUpdateListCreateChunkJobMessages(): array
+    {
+        $result = [];
+        $messageBodyResolver = $this->getMessageBodyResolver();
+
+        self::flushMessagesBuffer();
+        $messages = self::getSentMessagesByTopic(UpdateListCreateChunkJobsTopic::getName());
+
+        while ($messages) {
+            self::getMessageCollector()->clearTopicMessages(UpdateListCreateChunkJobsTopic::getName());
+            foreach ($messages as $body) {
+                $message = $this->createMessage(
+                    $messageBodyResolver->resolveBody(UpdateListCreateChunkJobsTopic::getName(), $body)
+                );
+                $result[] = [
+                    $message,
+                    $this->processMessage('oro_api.batch.async.update_list.create_chunk_jobs', $message)
+                ];
+            }
+            self::flushMessagesBuffer();
+            $messages = self::getSentMessagesByTopic(UpdateListCreateChunkJobsTopic::getName());
+        }
+
+        self::flushMessagesBuffer();
+        $message = self::getSentMessage(UpdateListStartChunkJobsTopic::getName());
+        self::getMessageCollector()->clearTopicMessages(UpdateListStartChunkJobsTopic::getName());
+        $this->processMessage(
+            'oro_api.batch.async.update_list.start_chunk_jobs',
+            $this->createMessage(
+                $messageBodyResolver->resolveBody(UpdateListStartChunkJobsTopic::getName(), $message)
+            )
+        );
+
+        $this->processUpdateListChunkMessages();
+
+        return $result;
     }
 }

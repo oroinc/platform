@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
 use Gaufrette\File;
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
@@ -20,17 +22,13 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
+    private \PHPUnit\Framework\MockObject\MockObject|FileManager$fileManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface */
-    private $producer;
+    private \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface $producer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
 
-    /** @var UpdateListProcessingHelper */
-    private $helper;
+    private UpdateListProcessingHelper $helper;
 
     protected function setUp(): void
     {
@@ -46,7 +44,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCommonBody()
+    public function testGetCommonBody(): void
     {
         self::assertEquals(
             [
@@ -65,7 +63,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCalculateAggregateTime()
+    public function testCalculateAggregateTime(): void
     {
         $startTimestamp = microtime(true);
         usleep(10000);
@@ -76,7 +74,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         self::assertLessThan(30, $calculatedAggregateTime);
     }
 
-    public function testSafeDeleteFile()
+    public function testSafeDeleteFile(): void
     {
         $fileName = 'test';
 
@@ -89,7 +87,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->safeDeleteFile($fileName);
     }
 
-    public function testSafeDeleteFileWhenExceptionOccurred()
+    public function testSafeDeleteFileWhenExceptionOccurred(): void
     {
         $fileName = 'test';
         $exception = new \Exception('some error');
@@ -108,7 +106,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->safeDeleteFile($fileName);
     }
 
-    public function testSafeDeleteChunkFiles()
+    public function testSafeDeleteChunkFiles(): void
     {
         $operationId = 123;
         $chunkFileNameTemplate = 'api_chunk_test_%s';
@@ -127,7 +125,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->safeDeleteChunkFiles($operationId, $chunkFileNameTemplate);
     }
 
-    public function testSafeDeleteChunkFilesWhenExceptionOccurredInFindFiles()
+    public function testSafeDeleteChunkFilesWhenExceptionOccurredInFindFiles(): void
     {
         $operationId = 123;
         $chunkFileNameTemplate = 'api_chunk_test_%s';
@@ -149,7 +147,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->safeDeleteChunkFiles($operationId, $chunkFileNameTemplate);
     }
 
-    public function testSafeDeleteChunkFilesWhenExceptionOccurredInDeleteFile()
+    public function testSafeDeleteChunkFilesWhenExceptionOccurredInDeleteFile(): void
     {
         $operationId = 123;
         $chunkFileNameTemplate = 'api_chunk_test_%s';
@@ -184,7 +182,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->safeDeleteChunkFiles($operationId, $chunkFileNameTemplate);
     }
 
-    public function testHasChunkIndex()
+    public function testHasChunkIndex(): void
     {
         $this->fileManager->expects(self::once())
             ->method('hasFile')
@@ -194,7 +192,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->helper->hasChunkIndex(123));
     }
 
-    public function testGetChunkIndexCount()
+    public function testGetChunkIndexCount(): void
     {
         $this->fileManager->expects(self::once())
             ->method('getFileContent')
@@ -204,7 +202,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame(2, $this->helper->getChunkIndexCount(123));
     }
 
-    public function testLoadChunkIndex()
+    public function testLoadChunkIndex(): void
     {
         $this->fileManager->expects(self::once())
             ->method('getFileContent')
@@ -217,7 +215,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUpdateChunkIndexWhenChunkIndexFileDoesNotExist()
+    public function testUpdateChunkIndexWhenChunkIndexFileDoesNotExist(): void
     {
         $this->fileManager->expects(self::once())
             ->method('getFile')
@@ -233,7 +231,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->updateChunkIndex(123, [new ChunkFile('chunk1', 0, 0, 'data')]);
     }
 
-    public function testUpdateChunkIndexWhenChunkIndexFileExists()
+    public function testUpdateChunkIndexWhenChunkIndexFileExists(): void
     {
         $indexFile = $this->createMock(File::class);
         $indexFile->expects(self::once())
@@ -254,7 +252,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->updateChunkIndex(123, [new ChunkFile('chunk3', 2, 2, 'data')]);
     }
 
-    public function testDeleteChunkIndex()
+    public function testDeleteChunkIndex(): void
     {
         $this->fileManager->expects(self::once())
             ->method('deleteFile')
@@ -265,7 +263,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->deleteChunkIndex(123);
     }
 
-    public function testDeleteChunkIndexWhenExceptionOccurred()
+    public function testDeleteChunkIndexWhenExceptionOccurred(): void
     {
         $exception = new \Exception('some error');
         $this->fileManager->expects(self::once())
@@ -282,7 +280,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->deleteChunkIndex(123);
     }
 
-    public function testLoadChunkJobIndex()
+    public function testLoadChunkJobIndex(): void
     {
         $this->fileManager->expects(self::once())
             ->method('getFileContent')
@@ -295,7 +293,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUpdateChunkJobIndexWhenChunkJobIndexFileDoesNotExist()
+    public function testUpdateChunkJobIndexWhenChunkJobIndexFileDoesNotExist(): void
     {
         $this->fileManager->expects(self::once())
             ->method('getFile')
@@ -308,7 +306,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->updateChunkJobIndex(123, [0 => 10]);
     }
 
-    public function testUpdateChunkJobIndexWhenChunkJobIndexFileExists()
+    public function testUpdateChunkJobIndexWhenChunkJobIndexFileExists(): void
     {
         $indexFile = $this->createMock(File::class);
         $indexFile->expects(self::once())
@@ -326,7 +324,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->updateChunkJobIndex(123, [2 => 12]);
     }
 
-    public function testDeleteChunkJobIndex()
+    public function testDeleteChunkJobIndex(): void
     {
         $this->fileManager->expects(self::once())
             ->method('deleteFile')
@@ -337,7 +335,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->deleteChunkJobIndex(123);
     }
 
-    public function testDeleteChunkJobIndexWhenExceptionOccurred()
+    public function testDeleteChunkJobIndexWhenExceptionOccurred(): void
     {
         $exception = new \Exception('some error');
         $this->fileManager->expects(self::once())
@@ -354,7 +352,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->deleteChunkJobIndex(123);
     }
 
-    public function testCreateChunkJobs()
+    public function testCreateChunkJobs(): void
     {
         $jobRunner = $this->createMock(JobRunner::class);
         $operationId = 123;
@@ -407,7 +405,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendMessageToCreateChunkJobsForFirstChunkJob()
+    public function testSendMessageToCreateChunkJobsForFirstChunkJob(): void
     {
         $rootJobId = 100;
         $rootJob = new Job();
@@ -425,7 +423,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST_CREATE_CHUNK_JOBS,
+                UpdateListCreateChunkJobsTopic::getName(),
                 [
                     'operationId'          => 123,
                     'entityClass'          => 'Test\Entity',
@@ -443,7 +441,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendMessageToCreateChunkJobsForNotFirstChunkJob()
+    public function testSendMessageToCreateChunkJobsForNotFirstChunkJob(): void
     {
         $rootJobId = 100;
         $rootJob = new Job();
@@ -463,7 +461,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST_CREATE_CHUNK_JOBS,
+                UpdateListCreateChunkJobsTopic::getName(),
                 [
                     'operationId'          => 123,
                     'entityClass'          => 'Test\Entity',
@@ -485,7 +483,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendMessageToStartChunkJobsForFirstChunkJob()
+    public function testSendMessageToStartChunkJobsForFirstChunkJob(): void
     {
         $rootJobId = 100;
         $rootJob = new Job();
@@ -502,7 +500,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST_START_CHUNK_JOBS,
+                UpdateListStartChunkJobsTopic::getName(),
                 [
                     'operationId' => 123,
                     'entityClass' => 'Test\Entity',
@@ -518,7 +516,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendMessageToStartChunkJobsForNotFirstChunkJob()
+    public function testSendMessageToStartChunkJobsForNotFirstChunkJob(): void
     {
         $rootJobId = 100;
         $rootJob = new Job();
@@ -537,7 +535,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST_START_CHUNK_JOBS,
+                UpdateListStartChunkJobsTopic::getName(),
                 [
                     'operationId'         => 123,
                     'entityClass'         => 'Test\Entity',
@@ -557,7 +555,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSendProcessChunkMessage()
+    public function testSendProcessChunkMessage(): void
     {
         $jobId = 100;
         $job = new Job();
@@ -573,7 +571,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST_PROCESS_CHUNK,
+                UpdateListProcessChunkTopic::getName(),
                 [
                     'operationId'       => 123,
                     'entityClass'       => 'Test\Entity',
@@ -590,7 +588,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->sendProcessChunkMessage($parentBody, $job, $chunkFile);
     }
 
-    public function testSendProcessChunkMessageForExtraChunk()
+    public function testSendProcessChunkMessageForExtraChunk(): void
     {
         $jobId = 100;
         $job = new Job();
@@ -606,7 +604,7 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
         $this->producer->expects(self::once())
             ->method('send')
             ->with(
-                Topics::UPDATE_LIST_PROCESS_CHUNK,
+                UpdateListProcessChunkTopic::getName(),
                 [
                     'operationId'       => 123,
                     'entityClass'       => 'Test\Entity',

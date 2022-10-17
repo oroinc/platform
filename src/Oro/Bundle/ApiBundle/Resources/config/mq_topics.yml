@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        tags:
+            - { name: oro_message_queue.topic }
+
+    Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListTopic: ~
+    Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic: ~
+    Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic: ~
+    Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic: ~
+    Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListFinishTopic: ~
