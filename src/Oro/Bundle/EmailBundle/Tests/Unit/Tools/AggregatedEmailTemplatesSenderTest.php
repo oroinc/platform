@@ -19,6 +19,8 @@ use Oro\Bundle\EmailBundle\Tools\AggregatedEmailTemplatesSender;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\NotificationBundle\Tests\Unit\Event\Handler\Stub\EmailHolderStub;
+use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 
 class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
@@ -37,6 +39,8 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
 
     private EmailTemplate|\PHPUnit\Framework\MockObject\MockObject $emailTemplate;
 
+    private EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject $entityOwnerAccessor;
+
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -44,6 +48,7 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
         $this->emailOriginHelper = $this->createMock(EmailOriginHelper::class);
         $this->emailModelSender = $this->createMock(EmailModelSender::class);
         $this->emailTemplate = $this->createMock(EmailTemplate::class);
+        $this->entityOwnerAccessor = $this->createMock(EntityOwnerAccessor::class);
 
         $this->sender = new AggregatedEmailTemplatesSender(
             $this->doctrineHelper,
@@ -51,6 +56,7 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             $this->emailOriginHelper,
             $this->emailModelSender
         );
+        $this->sender->setEntityOwnerAccessor($this->entityOwnerAccessor);
 
         $this->setUpLoggerMock($this->sender);
     }
@@ -137,6 +143,18 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
             $recipient = new Recipient($recipient);
         }
 
+        $organization = null;
+
+        if ($organizationId = $options['organization_id']) {
+            $organization = new Organization();
+            $organization->setId($organizationId);
+
+            $this->entityOwnerAccessor->expects($this->once())
+                ->method('getOrganization')
+                ->with($options['entity'])
+                ->willReturn($organization);
+        }
+
         $dto = new LocalizedTemplateDTO($this->emailTemplate);
         $dto->addRecipient(is_object($recipient) ? $recipient : new Recipient($recipient));
 
@@ -169,20 +187,23 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
         $emailOrigin = new TestEmailOrigin();
         $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
-            ->with($expected['from'], null)
+            ->with($expected['from'], $organization)
             ->willReturn($emailOrigin);
+
+        $sendEmail = (new Email())
+            ->setFrom($expected['from'])
+            ->setSubject($expected['subject'])
+            ->setBody($expected['body'])
+            ->setTo($expected['to'])
+            ->setType('text');
+
+        if ($organization) {
+            $sendEmail->setOrganization($organization);
+        }
 
         $this->emailModelSender->expects(self::once())
             ->method('send')
-            ->with(
-                (new Email())
-                    ->setFrom($expected['from'])
-                    ->setSubject($expected['subject'])
-                    ->setBody($expected['body'])
-                    ->setTo($expected['to'])
-                    ->setType('text'),
-                $emailOrigin
-            )
+            ->with($sendEmail, $emailOrigin)
             ->willReturn($emailUserEntity);
 
         $this->sender->send(
@@ -206,6 +227,7 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
                     'to' => 'test@test.com',
                     'template' => 'test',
                     'entity' => new \stdClass(),
+                    'organization_id' => null,
                 ],
                 'recipient' => 'test@test.com',
                 'expected' => [
@@ -221,6 +243,39 @@ class AggregatedEmailTemplatesSenderTest extends \PHPUnit\Framework\TestCase
                     'to' => '"Test" <test@test.com>',
                     'template' => 'test',
                     'entity' => new \stdClass(),
+                    'organization_id' => null,
+                ],
+                'recipient' => '"Test" <test@test.com>',
+                'expected' => [
+                    'from' => '"Test" <test@test.com>',
+                    'to' => ['"Test" <test@test.com>'],
+                    'subject' => 'Test subject',
+                    'body' => 'Test body',
+                ],
+            ],
+            'simple with organization' => [
+                'options' => [
+                    'from' => From::emailAddress('test@test.com'),
+                    'to' => 'test@test.com',
+                    'template' => 'test',
+                    'entity' => new \stdClass(),
+                    'organization_id' => 1,
+                ],
+                'recipient' => 'test@test.com',
+                'expected' => [
+                    'from' => 'test@test.com',
+                    'to' => ['test@test.com'],
+                    'subject' => 'Test subject',
+                    'body' => 'Test body',
+                ],
+            ],
+            'simple with name and organization' => [
+                'options' => [
+                    'from' => From::emailAddress('"Test" <test@test.com>'),
+                    'to' => '"Test" <test@test.com>',
+                    'template' => 'test',
+                    'entity' => new \stdClass(),
+                    'organization_id' => 2,
                 ],
                 'recipient' => '"Test" <test@test.com>',
                 'expected' => [

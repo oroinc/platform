@@ -1404,6 +1404,7 @@ services:
             - '@oro_email.sender.email_model_sender'
         calls:
             - [setLogger, ['@logger']]
+            - [setEntityOwnerAccessor, ['@oro_security.owner.entity_owner_accessor']]
 
     oro_email.async.send_email_template:
         class: 'Oro\Bundle\EmailBundle\Async\SendEmailTemplateProcessor'
