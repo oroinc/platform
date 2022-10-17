@@ -191,11 +191,11 @@ oro_api:
         lt:  '<'  # less than
         gte: '>=' # greater than or equal to
         lte: '<=' # less than or equal to
-        exists: '*' # exists (IS NOT NULL for fields and to-one associations and check whether a collection
-                    # is not empty for to-many associations)
-                    # and not exists (IS NULL for fields and to-one associations and check whether a collection
-                    # is empty for to-many associations),
-                    # value is true = exists, value is false = not exists
+        exists:           '*' # exists (IS NOT NULL for fields and to-one associations
+                              # and check whether a collection is not empty for to-many associations)
+                              # and not exists (IS NULL for fields and to-one associations
+                              # and check whether a collection is empty for to-many associations),
+                              # value is true = exists, value is false = not exists
         neq_or_null:     '!*' # not equal to or IS NULL for fields and to-one associations
                               # for to-many associations checks whether a collection
                               # does not contain any of specific values or a collection is empty
@@ -255,6 +255,10 @@ oro_api:
             supported_operators: ['=', '!=', '<', '<=', '>', '>=', '*', '!*']
         composite_identifier:
             factory: ['@oro_api.filter_factory.composite_identifier', 'createFilter']
+            supported_operators: ['=', '!=']
+        association_composite_identifier:
+            factory: ['@oro_api.filter_factory.association_composite_identifier', 'createFilter']
+            supported_operators: ['=', '!=']
         association:
             factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
         primaryField:
@@ -262,8 +266,6 @@ oro_api:
         nestedTree:
             class: Oro\Bundle\ApiBundle\Filter\NestedTreeFilter
             supported_operators: ['>', '>=']
-        association_composite_identifier:
-            factory: ['@oro_api.filter_factory.association_composite_identifier', 'createFilter']
 
     error_title_overrides:
         'percent range constraint': 'range constraint'

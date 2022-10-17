@@ -54,7 +54,7 @@ class AssociationConfigUtil
      *
      * @return string|string[]|null
      */
-    public static function getEntityIdentifierFieldName(EntityDefinitionConfig $config)
+    public static function getEntityIdentifierFieldName(EntityDefinitionConfig $config): string|array|null
     {
         $fieldNames = $config->getIdentifierFieldNames();
         $numberOfFields = \count($fieldNames);

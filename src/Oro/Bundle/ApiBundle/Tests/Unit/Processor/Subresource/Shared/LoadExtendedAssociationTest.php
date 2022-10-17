@@ -95,7 +95,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -139,7 +139,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -180,7 +180,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToMany:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -221,7 +221,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:multipleManyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -262,7 +262,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -301,7 +301,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:manyToMany:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;
@@ -340,7 +340,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName)->setDataType('association:multipleManyToOne:kind');
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->setIdentifierFieldNames(['id']);
         $parentMetadata->addField(new FieldMetadata('id'));
         $parentClassName = Entity\Product::class;

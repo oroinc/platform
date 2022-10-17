@@ -157,10 +157,9 @@ class RegisterConfiguredFilters extends RegisterFilters
                 $targetEntityConfig = $config->getTargetEntity();
                 $pathProperty = $targetEntityConfig?->getField($singleIdName)?->getPropertyPath();
                 if ($pathProperty && $pathProperty !== $singleIdName) {
-                    $filter->setField(sprintf("%s.%s", $path, $pathProperty));
+                    $filter->setField(sprintf('%s.%s', $path, $pathProperty));
                 }
             }
-            // filter can handle itself when count($idFieldNames) > 1
         }
     }
 }

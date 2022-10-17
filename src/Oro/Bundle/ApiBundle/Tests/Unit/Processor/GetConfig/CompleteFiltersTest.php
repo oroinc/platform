@@ -6,7 +6,6 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteFilters;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -17,9 +16,11 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
 {
     private const TEST_ASSOC_CLASS_NAME = 'test\associationEntity';
 
-    private MockObject|DoctrineHelper $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $doctrineHelper;
 
-    private CompleteFilters $processor;
+    /** @var CompleteFilters */
+    private $processor;
 
     protected function setUp(): void
     {

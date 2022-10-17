@@ -52,8 +52,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
     {
         $existingSelfLinkMetadata = new ExternalLinkMetadata('url1');
         $existingRelatedLinkMetadata = new ExternalLinkMetadata('url2');
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($this->context->getClassName());
+        $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
         $associationMetadata->addRelationshipLink('self', $existingSelfLinkMetadata);
         $associationMetadata->addRelationshipLink('related', $existingRelatedLinkMetadata);
@@ -76,8 +75,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
     public function testProcessWhenLinksDoNotExistInAssociationMetadata()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($this->context->getClassName());
+        $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $subresources = new ApiResourceSubresources($this->context->getClassName());
@@ -118,8 +116,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
     public function testProcessWhenGetSubresourceActionIsDisabledForAssociation()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($this->context->getClassName());
+        $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $subresources = new ApiResourceSubresources($this->context->getClassName());
@@ -150,8 +147,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
     public function testProcessWhenGetRelationshipActionIsDisabledForAssociation()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($this->context->getClassName());
+        $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $subresources = new ApiResourceSubresources($this->context->getClassName());
@@ -182,8 +178,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
     public function testProcessWhenAssociationDoesNotHaveSubresources()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($this->context->getClassName());
+        $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $subresources = new ApiResourceSubresources($this->context->getClassName());
@@ -201,8 +196,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 
     public function testProcessWhenEntityDoesNotHaveSubresources()
     {
-        $entityMetadata = new EntityMetadata();
-        $entityMetadata->setClassName($this->context->getClassName());
+        $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
 
         $this->subresourcesProvider->expects(self::once())

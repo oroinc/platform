@@ -9,11 +9,8 @@ use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
  */
 class EntityIdMetadataAdapter implements EntityIdMetadataInterface
 {
-    /** @var string */
-    private $className;
-
-    /** @var EntityDefinitionConfig */
-    private $config;
+    private string $className;
+    private EntityDefinitionConfig $config;
 
     public function __construct(string $className, EntityDefinitionConfig $config)
     {
@@ -22,25 +19,25 @@ class EntityIdMetadataAdapter implements EntityIdMetadataInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getIdentifierFieldNames()
+    public function getIdentifierFieldNames(): array
     {
         return $this->config->getIdentifierFieldNames();
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
-    public function getPropertyPath($propertyName)
+    public function getPropertyPath(string $propertyName): ?string
     {
         $field = $this->config->getField($propertyName);
         if (null === $field) {

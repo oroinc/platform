@@ -330,8 +330,7 @@ class FormTest extends WebTestCase
 
     private function getEntityMetadata(): EntityMetadata
     {
-        $metadata = new EntityMetadata();
-        $metadata->setClassName(TestObject::class);
+        $metadata = new EntityMetadata(TestObject::class);
         $metadata->setIdentifierFieldNames(['id']);
         $idField = new FieldMetadata();
         $idField->setName('id');

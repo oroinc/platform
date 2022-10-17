@@ -39,7 +39,7 @@ class ConfigExtraCollection
     {
         foreach ($extras as $extra) {
             if (!$extra instanceof ConfigExtraInterface) {
-                throw new \InvalidArgumentException(\sprintf(
+                throw new \InvalidArgumentException(sprintf(
                     'Expected an array of "%s".',
                     ConfigExtraInterface::class
                 ));
@@ -84,7 +84,7 @@ class ConfigExtraCollection
     public function addConfigExtra(ConfigExtraInterface $extra): void
     {
         if ($this->hasConfigExtra($extra->getName())) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The "%s" config extra already exists.',
                 $extra->getName()
             ));

@@ -275,7 +275,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $error = Error::createValidationError(
             Constraint::VALUE,
@@ -333,7 +333,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
         $includedEntity = new \stdClass();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->doctrineHelper->expects(self::once())
             ->method('resolveManageableEntityClass')
@@ -393,7 +393,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         ];
         $normalizedType = 'Test\Class';
         $normalizedId = 123;
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $error = Error::createValidationError(
             Constraint::ENTITY,
             'The entity does not exist.'
@@ -506,7 +506,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $exception = new \Exception('some error');
         $error = Error::createValidationError(Constraint::ENTITY_ID)
             ->setSource(ErrorSource::createByPointer('/included/0/id'))

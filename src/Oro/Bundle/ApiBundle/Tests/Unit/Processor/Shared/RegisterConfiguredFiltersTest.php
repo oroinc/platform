@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
-use Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdFilter;
+use Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdentifierFilter;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
@@ -20,7 +20,6 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -28,9 +27,11 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
-    private MockObject|FilterFactoryInterface $filterFactory;
+    /** @var FilterFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $filterFactory;
 
-    private RegisterConfiguredFilters $processor;
+    /** @var RegisterConfiguredFilters */
+    private $processor;
 
     protected function setUp(): void
     {
@@ -600,7 +601,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
     public function testProcessForMetadataFieldAwareFilterForToManyAssociationField(): void
     {
         $filtersConfig = $this->createFiltersConfig($this->createFilterConfig(DataType::STRING, 'groups', false));
-        $filter = new AssociationCompositeIdFilter(DataType::STRING);
+        $filter = new AssociationCompositeIdentifierFilter(DataType::STRING);
         $registry = $this->createMock(EntityIdTransformerRegistry::class);
         $filter->setEntityIdTransformerRegistry($registry);
         $this->filterFactory->expects(self::once())
@@ -629,7 +630,7 @@ class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $expectedFilter = new AssociationCompositeIdFilter(DataType::STRING);
+        $expectedFilter = new AssociationCompositeIdentifierFilter(DataType::STRING);
         $expectedFilter->setEntityIdTransformerRegistry($registry);
         $expectedFilter->setField('groups');
         $expectedFilter->setMetadata($targetMetadata);

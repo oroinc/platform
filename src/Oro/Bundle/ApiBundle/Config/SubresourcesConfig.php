@@ -10,24 +10,20 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class SubresourcesConfig
 {
     /** @var SubresourceConfig[] [association name => SubresourceConfig, ...] */
-    protected $subresources = [];
+    private array $subresources = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return ConfigUtil::convertObjectsToArray($this->subresources);
     }
 
     /**
      * Indicates whether there is a configuration at least one subresource.
-     *
-     * @return bool
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return empty($this->subresources);
     }
@@ -45,36 +41,23 @@ class SubresourcesConfig
      *
      * @return SubresourceConfig[] [association name => SubresourceConfig, ...]
      */
-    public function getSubresources()
+    public function getSubresources(): array
     {
         return $this->subresources;
     }
 
     /**
      * Gets the configuration of the subresource.
-     *
-     * @param string $associationName
-     *
-     * @return SubresourceConfig|null
      */
-    public function getSubresource($associationName)
+    public function getSubresource(string $associationName): ?SubresourceConfig
     {
-        if (!isset($this->subresources[$associationName])) {
-            return null;
-        }
-
-        return $this->subresources[$associationName];
+        return $this->subresources[$associationName] ?? null;
     }
 
     /**
      * Adds the configuration of the subresource.
-     *
-     * @param string                 $associationName
-     * @param SubresourceConfig|null $subresource
-     *
-     * @return SubresourceConfig
      */
-    public function addSubresource($associationName, SubresourceConfig $subresource = null)
+    public function addSubresource(string $associationName, SubresourceConfig $subresource = null): SubresourceConfig
     {
         if (null === $subresource) {
             $subresource = new SubresourceConfig();
@@ -87,10 +70,8 @@ class SubresourcesConfig
 
     /**
      * Removes the configuration of the subresource.
-     *
-     * @param string $associationName
      */
-    public function removeSubresource($associationName)
+    public function removeSubresource(string $associationName): void
     {
         unset($this->subresources[$associationName]);
     }

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\ApiBundle\Config\EntityConfigInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
@@ -12,6 +11,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\EntitySerializer\EntityConfigInterface;
 
 /**
  * Makes sure that the filters configuration contains all supported filters
@@ -259,7 +259,7 @@ class CompleteFilters extends CompleteSection
             $this->setFilterArrayAllowed($filter);
             $this->setFilterRangeAllowed($filter);
             $options = $filter->getOptions() ?? [];
-            list($associationType, $associationKind) = DataType::parseExtendedAssociation($dataType);
+            [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
             $options['associationOwnerClass'] = $metadata->name;
             $options['associationType'] = $associationType;
             if ($associationKind) {
@@ -347,14 +347,14 @@ class CompleteFilters extends CompleteSection
         ?string $targetClass,
         string $defaultDataType
     ): string {
-        if (count($targetDefinition->getIdentifierFieldNames()) === 1) {
+        if (\count($targetDefinition->getIdentifierFieldNames()) === 1) {
             $identifierFieldName = $targetDefinition->getIdentifierFieldNames()[0];
             $idPropertyPath = $targetDefinition->getField($identifierFieldName)?->getPropertyPath();
             if ($idPropertyPath && $idPropertyPath !== $identifierFieldName) {
                 $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
                 $defaultDataType = $targetMetadata?->getTypeOfField($idPropertyPath) ?? $defaultDataType;
             }
-        }  // filter can handle the issue itself when count of id field names > 1.
+        }
 
         return $defaultDataType;
     }

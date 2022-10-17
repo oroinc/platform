@@ -1065,10 +1065,8 @@ services:
             - '@oro_api.batch.file_manager'
             - '@oro_api.batch.include_map_manager'
             - '@oro_api.batch.file_name_provider'
-            - '@logger'
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
-            - { name: monolog.logger, channel: api }
 
     oro_api.batch.job_event_listener:
         class: Oro\Bundle\ApiBundle\Batch\EventListener\JobListener

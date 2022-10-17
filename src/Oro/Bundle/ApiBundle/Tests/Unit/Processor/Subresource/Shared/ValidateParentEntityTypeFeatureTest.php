@@ -34,7 +34,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $parentClassName = 'Test\Class';
         $associationName = 'testAssociation';
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata($associationName);
         $parentMetadata->addAssociation($associationMetadata);
 
@@ -58,7 +58,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
     {
         $parentClassName = 'Test\Class';
         $associationName = 'testAssociation';
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata($associationName);
         $parentMetadata->addAssociation($associationMetadata);
 
@@ -110,7 +110,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
     {
         $parentClassName = 'Test\Class';
         $associationName = 'testAssociation';
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata = new AssociationMetadata($associationName);
         $parentMetadata->addAssociation($associationMetadata);
 
@@ -150,7 +150,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->context->setParentClassName($parentClassName);
         $this->context->setAssociationName('testAssociation');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
     }
 
@@ -170,7 +170,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->context->setParentClassName($parentClassName);
         $this->context->setAssociationName('testAssociation');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setParentConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
     }
@@ -194,7 +194,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->context->setParentClassName($parentClassName);
         $this->context->setAssociationName($associationName);
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setParentConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
     }
@@ -220,7 +220,7 @@ class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCas
 
         $this->context->setParentClassName($parentClassName);
         $this->context->setAssociationName($associationName);
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setParentConfig($parentConfig);
         $this->processor->process($this->context);
     }

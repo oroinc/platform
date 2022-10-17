@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
-use Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdFilter;
+use Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdentifierFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
@@ -14,30 +14,30 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 
-class AssociationCompositeIdFilterTest extends TestCase
+class AssociationCompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
 {
-    private MockObject|EntityIdTransformerRegistry $idTransformerRegistry;
+    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $idTransformerRegistry;
 
-    private AssociationCompositeIdFilter $filter;
+    /** @var AssociationCompositeIdentifierFilter */
+    private $filter;
 
     protected function setUp(): void
     {
         $this->idTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
 
-        $this->filter = new AssociationCompositeIdFilter(DataType::STRING);
+        $this->filter = new AssociationCompositeIdentifierFilter(DataType::STRING);
         $this->filter->setEntityIdTransformerRegistry($this->idTransformerRegistry);
         $this->filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
-        $this->filter->setField('testentity');
+        $this->filter->setField('testField');
     }
 
     public function testApplyFilterForEqualOperatorAndOneId(): void
     {
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2');
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -62,8 +62,8 @@ class AssociationCompositeIdFilterTest extends TestCase
             new CompositeExpression(
                 CompositeExpression::TYPE_AND,
                 [
-                    new Comparison('testentity.id1', Comparison::EQ, 1),
-                    new Comparison('testentity.id2', Comparison::EQ, 2)
+                    new Comparison('testField.id1', Comparison::EQ, 1),
+                    new Comparison('testField.id2', Comparison::EQ, 2)
                 ]
             ),
             $criteria->getWhereExpression()
@@ -74,7 +74,7 @@ class AssociationCompositeIdFilterTest extends TestCase
     {
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -99,8 +99,8 @@ class AssociationCompositeIdFilterTest extends TestCase
             new CompositeExpression(
                 CompositeExpression::TYPE_OR,
                 [
-                    new Comparison('testentity.id1', Comparison::NEQ, 1),
-                    new Comparison('testentity.id2', Comparison::NEQ, 2)
+                    new Comparison('testField.id1', Comparison::NEQ, 1),
+                    new Comparison('testField.id2', Comparison::NEQ, 2)
                 ]
             ),
             $criteria->getWhereExpression()
@@ -111,7 +111,7 @@ class AssociationCompositeIdFilterTest extends TestCase
     {
         $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4']);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -141,15 +141,15 @@ class AssociationCompositeIdFilterTest extends TestCase
                     new CompositeExpression(
                         CompositeExpression::TYPE_AND,
                         [
-                            new Comparison('testentity.id1', Comparison::EQ, 1),
-                            new Comparison('testentity.id2', Comparison::EQ, 2)
+                            new Comparison('testField.id1', Comparison::EQ, 1),
+                            new Comparison('testField.id2', Comparison::EQ, 2)
                         ]
                     ),
                     new CompositeExpression(
                         CompositeExpression::TYPE_AND,
                         [
-                            new Comparison('testentity.id1', Comparison::EQ, 3),
-                            new Comparison('testentity.id2', Comparison::EQ, 4)
+                            new Comparison('testField.id1', Comparison::EQ, 3),
+                            new Comparison('testField.id2', Comparison::EQ, 4)
                         ]
                     )
                 ]
@@ -162,7 +162,7 @@ class AssociationCompositeIdFilterTest extends TestCase
     {
         $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4'], FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id1', 'renamedId2']);
         $metadata->addField(new FieldMetadata('id1'));
         $metadata->addField(new FieldMetadata('renamedId2'))->setPropertyPath('id2');
@@ -192,15 +192,15 @@ class AssociationCompositeIdFilterTest extends TestCase
                     new CompositeExpression(
                         CompositeExpression::TYPE_OR,
                         [
-                            new Comparison('testentity.id1', Comparison::NEQ, 1),
-                            new Comparison('testentity.id2', Comparison::NEQ, 2)
+                            new Comparison('testField.id1', Comparison::NEQ, 1),
+                            new Comparison('testField.id2', Comparison::NEQ, 2)
                         ]
                     ),
                     new CompositeExpression(
                         CompositeExpression::TYPE_OR,
                         [
-                            new Comparison('testentity.id1', Comparison::NEQ, 3),
-                            new Comparison('testentity.id2', Comparison::NEQ, 4)
+                            new Comparison('testField.id1', Comparison::NEQ, 3),
+                            new Comparison('testField.id2', Comparison::NEQ, 4)
                         ]
                     )
                 ]

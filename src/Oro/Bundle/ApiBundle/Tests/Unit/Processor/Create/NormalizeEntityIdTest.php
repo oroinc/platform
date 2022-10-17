@@ -55,7 +55,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
     public function testProcessWhenEntityHasIdentifierGenerator()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
 
         $this->context->setClassName('Test\Class');
@@ -70,7 +70,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
     public function testProcess()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->context->setClassName('Test\Class');
@@ -90,7 +90,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
     public function testProcessForInvalidId()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->context->setClassName('Test\Class');
@@ -117,7 +117,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
 
     public function testProcessForNotResolvedId()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
 
         $this->context->setClassName('Test\Class');

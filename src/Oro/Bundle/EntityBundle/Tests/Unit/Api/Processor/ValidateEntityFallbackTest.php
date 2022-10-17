@@ -272,7 +272,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
@@ -313,7 +313,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
@@ -349,7 +349,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
@@ -386,7 +386,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
@@ -423,7 +423,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
@@ -458,7 +458,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
@@ -493,7 +493,7 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity($fallbackValue);
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(\stdClass::class);
 
@@ -526,14 +526,14 @@ class ValidateEntityFallbackTest extends CustomizeFormDataProcessorTestCase
         self::assertFormSubmittedAndValid($form);
 
         $primaryEntity = new FallbackContainingEntity();
-        $primaryEntityMetadata = new EntityMetadata();
+        $primaryEntityMetadata = new EntityMetadata('Test\Entity');
         $primaryEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
 
         $includedEntities = $this->getIncludedEntityCollection($primaryEntity, $primaryEntityMetadata, $fallbackValue);
 
         $anotherIncludedEntity = new FallbackContainingEntity($fallbackValue);
-        $anotherIncludedEntityMetadata = new EntityMetadata();
+        $anotherIncludedEntityMetadata = new EntityMetadata('Test\Entity');
         $anotherIncludedEntityMetadata->addAssociation(new AssociationMetadata('testProperty'))
             ->setTargetClassName(EntityFieldFallbackValue::class);
         $anotherIncludedEntityData = new IncludedEntityData('/included/1', 1);

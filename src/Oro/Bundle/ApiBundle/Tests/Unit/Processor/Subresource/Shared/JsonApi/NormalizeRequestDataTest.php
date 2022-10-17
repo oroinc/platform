@@ -49,8 +49,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -82,8 +82,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeEmptyDataForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -108,9 +108,9 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForToOneAssociationWithMetaSection()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addMetaProperty(new MetaPropertyMetadata('meta1'));
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -146,8 +146,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -196,8 +196,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeEmptyDataForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -222,9 +222,9 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testNormalizeDataForToManyAssociationWithMetaSection()
     {
-        $parentMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addMetaProperty(new MetaPropertyMetadata('meta1'));
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -275,8 +275,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithInvalidEntityTypeForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -313,8 +313,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithInvalidIdentifierForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -353,8 +353,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithInvalidEntityTypesForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -407,8 +407,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithInvalidIdentifiersForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -465,9 +465,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithNotResolvedIdentifierForToOneAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('Test\Class');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Class');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 
@@ -503,9 +502,8 @@ class NormalizeRequestDataTest extends ChangeRelationshipProcessorTestCase
 
     public function testProcessWithNotResolvedIdentifiersForToManyAssociation()
     {
-        $parentMetadata = new EntityMetadata();
-        $associationTargetMetadata = new EntityMetadata();
-        $associationTargetMetadata->setClassName('Test\Class');
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $associationTargetMetadata = new EntityMetadata('Test\Class');
         $parentMetadata->addAssociation(new AssociationMetadata(self::ASSOCIATION_NAME))
             ->setTargetMetadata($associationTargetMetadata);
 

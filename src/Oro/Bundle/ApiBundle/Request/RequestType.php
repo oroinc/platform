@@ -26,10 +26,8 @@ class RequestType implements ToArrayInterface
     public const BATCH = 'batch';
 
     /** @var string[] */
-    private $aspects;
-
-    /** @var string */
-    private $str;
+    private array $aspects;
+    private ?string $str = null;
 
     /**
      * @param string[] $aspects
@@ -98,7 +96,7 @@ class RequestType implements ToArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function toArray(): array
     {
@@ -106,14 +104,14 @@ class RequestType implements ToArrayInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function __toString()
     {
         if (null === $this->str) {
             $aspects = $this->aspects;
-            \rsort($aspects, SORT_STRING);
-            $this->str = \implode(',', $aspects);
+            rsort($aspects, SORT_STRING);
+            $this->str = implode(',', $aspects);
         }
 
         return $this->str;

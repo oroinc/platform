@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
-use Oro\Bundle\ApiBundle\Config\Definition\TargetEntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
@@ -17,11 +16,8 @@ use Symfony\Component\Config\Definition\Processor;
  */
 class EntityConfigMerger
 {
-    /** @var ConfigExtensionRegistry */
-    private $configExtensionRegistry;
-
-    /** @var NodeInterface */
-    private $configurationTree;
+    private ConfigExtensionRegistry $configExtensionRegistry;
+    private ?NodeInterface $configurationTree = null;
 
     public function __construct(ConfigExtensionRegistry $configExtensionRegistry)
     {
@@ -30,42 +26,16 @@ class EntityConfigMerger
 
     /**
      * Merges the given configs.
-     *
-     * @param array $config
-     * @param array $parentConfig
-     *
-     * @return array
      */
-    public function merge(array $config, array $parentConfig)
+    public function merge(array $config, array $parentConfig): array
     {
-        $processor = new Processor();
-
-        return $processor->process(
+        return (new Processor())->process(
             $this->getConfigurationTree(),
             [$parentConfig, $config]
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getConfigurationSectionName()
-    {
-        return ApiConfiguration::ENTITIES_SECTION;
-    }
-
-    /**
-     * @return TargetEntityDefinitionConfiguration
-     */
-    protected function getConfigurationSection()
-    {
-        return new EntityDefinitionConfiguration();
-    }
-
-    /**
-     * @return NodeInterface
-     */
-    private function getConfigurationTree()
+    private function getConfigurationTree(): NodeInterface
     {
         if (null === $this->configurationTree) {
             $this->configurationTree = $this->createConfigurationTree();
@@ -74,15 +44,12 @@ class EntityConfigMerger
         return $this->configurationTree;
     }
 
-    /**
-     * @return NodeInterface
-     */
-    private function createConfigurationTree()
+    private function createConfigurationTree(): NodeInterface
     {
         $configTreeBuilder = new TreeBuilder('root');
         $configuration = new EntityConfiguration(
-            $this->getConfigurationSectionName(),
-            $this->getConfigurationSection(),
+            ApiConfiguration::ENTITIES_SECTION,
+            new EntityDefinitionConfiguration(),
             $this->configExtensionRegistry->getConfigurationSettings(),
             $this->configExtensionRegistry->getMaxNestingLevel()
         );

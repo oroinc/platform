@@ -106,7 +106,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
-        $actionMetadata = new EntityMetadata();
+        $actionMetadata = new EntityMetadata('Test\Entity');
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -166,7 +166,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
-        $actionMetadata = new EntityMetadata();
+        $actionMetadata = new EntityMetadata('Test\Entity');
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -234,7 +234,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
-        $actionMetadata = new EntityMetadata();
+        $actionMetadata = new EntityMetadata('Test\Entity');
 
         $actionContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -299,7 +299,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
-        $actionMetadata = new EntityMetadata();
+        $actionMetadata = new EntityMetadata('Test\Entity');
 
         $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);
@@ -364,7 +364,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext->setLastGroup(ApiActionGroup::TRANSFORM_DATA);
         $expectedContext->setSoftErrorsHandling(true);
 
-        $actionMetadata = new EntityMetadata();
+        $actionMetadata = new EntityMetadata('Test\Entity');
 
         $actionContext = new UpdateContext($this->configProvider, $this->metadataProvider);
         $actionProcessor = $this->createMock(ActionProcessorInterface::class);

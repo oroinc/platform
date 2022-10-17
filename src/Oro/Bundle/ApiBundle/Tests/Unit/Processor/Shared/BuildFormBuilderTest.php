@@ -116,7 +116,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setConfig(new EntityDefinitionConfig());
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
     }
 
@@ -182,7 +182,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $configAssociation3->setFormType('text');
         $configAssociation3->setFormOptions(['trim' => false]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1'));
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty2'))
             ->setPropertyPath('realMetaProperty2');
@@ -245,7 +245,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->addField(ConfigUtil::CLASS_NAME);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addMetaProperty($this->createMetaPropertyMetadata(ConfigUtil::CLASS_NAME));
 
         $this->formFactory->expects(self::once())
@@ -273,7 +273,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config = new EntityDefinitionConfig();
         $config->addField('renamedClassName')->setPropertyPath(ConfigUtil::CLASS_NAME);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addMetaProperty($this->createMetaPropertyMetadata('renamedClassName'))
             ->setPropertyPath(ConfigUtil::CLASS_NAME);
 
@@ -306,7 +306,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->setParentResourceClass($parentEntityClass);
         $config->addField('field1');
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'));
 
         $this->doctrineHelper->expects(self::once())
@@ -357,7 +357,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->setParentResourceClass($parentEntityClass);
         $config->addField('field1');
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'));
 
         $this->formFactory->expects(self::once())
@@ -402,7 +402,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->addField('field1')
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
@@ -448,7 +448,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->addField('field1')
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'));
 
         $this->formFactory->expects(self::once())
@@ -493,7 +493,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->addField('association1')
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation($this->createAssociationMetadata('association1'))
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
@@ -539,7 +539,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->addField('association1')
             ->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation($this->createAssociationMetadata('association1'));
 
         $this->formFactory->expects(self::once())
@@ -614,7 +614,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
@@ -654,7 +654,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
@@ -670,7 +670,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->addField('field1')
             ->setDirection('output-only');
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField($this->createFieldMetadata('field1'))
             ->setDirection(false, true);
 
@@ -715,7 +715,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $config->addField('association1')
             ->setDirection('output-only');
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation($this->createAssociationMetadata('association1'))
             ->setDirection(false, true);
 
@@ -775,7 +775,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig(new EntityDefinitionConfig());
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResult($data);
         $this->processor = new BuildFormBuilder(
             new FormHelper(
@@ -819,7 +819,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
 
         $this->context->setClassName($entityClass);
         $this->context->setConfig(new EntityDefinitionConfig());
-        $this->context->setMetadata(new EntityMetadata());
+        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResult($data);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
@@ -836,7 +836,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $configAssociation->setDataType('object');
         $configAssociation->setFormOptions(['trim' => false]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation($this->createAssociationMetadata('association'));
 
         $this->formFactory->expects(self::once())
@@ -885,7 +885,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $configAssociation->setFormType('text');
         $configAssociation->setFormOptions(['trim' => false]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation($this->createAssociationMetadata('association'));
 
         $this->formFactory->expects(self::once())
@@ -933,7 +933,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $configAssociation->setDataType('object');
         $configAssociation->setFormOptions(['trim' => false, 'mapped' => false]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation($this->createAssociationMetadata('association'));
 
         $this->formFactory->expects(self::once())

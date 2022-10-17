@@ -912,7 +912,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         ];
 
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
@@ -964,7 +964,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         ];
 
         $config = new EntityDefinitionConfig();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
@@ -1122,7 +1122,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testMetadataWhenItIsSetExplicitly()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setClassName('Test\Class');
 
@@ -1255,7 +1255,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     public function testHasIdentifierFieldsShouldCauseMetadataLoading()
     {
         $entityClass = 'Test\Class';
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->context->setVersion('1.1');
@@ -1280,7 +1280,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsWithoutIdInMetadata()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->context->setMetadata($metadata);
 
@@ -1289,7 +1289,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
     public function testHasIdentifierFieldsWithIdInMetadata()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->context->setMetadata($metadata);

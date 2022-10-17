@@ -36,5 +36,5 @@ interface DataAccessorInterface
      *
      * @return bool TRUE if a value is got; otherwise, FALSE.
      */
-    public function tryGetValue(string $propertyPath, &$value): bool;
+    public function tryGetValue(string $propertyPath, mixed &$value): bool;
 }

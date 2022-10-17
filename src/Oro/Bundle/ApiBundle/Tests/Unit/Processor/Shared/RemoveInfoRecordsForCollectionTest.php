@@ -30,7 +30,7 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName($associationName);
         $associationMetadata->setIsCollection($isCollection);
-        $targetMetadata = new EntityMetadata();
+        $targetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($targetMetadata);
         $associationMetadata->getTargetMetadata()->addField(new FieldMetadata('id'));
 
@@ -58,7 +58,7 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
 
     public function testProcess()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('id'));
         $user = $metadata->addAssociation($this->createAssociationMetadata('user'))
             ->getTargetMetadata();
@@ -127,7 +127,7 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
 
     public function testProcessWhenInfoRecordsAlreadyContainData()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('id'));
 
         $data = [
@@ -152,18 +152,17 @@ class RemoveInfoRecordsForCollectionTest extends GetListProcessorTestCase
     public function testProcessForMultiTargetAssociation()
     {
         $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata(EntityIdentifier::class);
         $metadata->setTargetMetadataAccessor($targetMetadataAccessor);
-        $metadata->setClassName(EntityIdentifier::class);
         $metadata->addField(new FieldMetadata('id'));
-        $typedMetadata = new EntityMetadata();
+        $typedMetadata = new EntityMetadata('Test\Entity');
         $typedMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
         $typedMetadata->addField(new FieldMetadata('id'));
         $usersAssociation = $typedMetadata->addAssociation($this->createAssociationMetadata('users', true));
         $usersAssociation->setTargetMetadataAccessor($targetMetadataAccessor);
         $usersAssociation->setAssociationPath('users');
         $usersAssociation->setTargetClassName(EntityIdentifier::class);
-        $user = new EntityMetadata();
+        $user = new EntityMetadata('Test\Entity');
         $user->setTargetMetadataAccessor($targetMetadataAccessor);
         $user->addField(new FieldMetadata('id'));
         $rolesAssociation = $user->addAssociation($this->createAssociationMetadata('roles', true));

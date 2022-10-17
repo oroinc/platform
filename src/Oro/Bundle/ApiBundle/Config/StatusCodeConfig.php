@@ -8,20 +8,15 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 /**
  * Represents the response status code.
  */
-class StatusCodeConfig implements ConfigBagInterface
+class StatusCodeConfig
 {
-    /** @var bool|null */
-    protected $exclude;
-
-    /** @var array */
-    protected $items = [];
+    private ?bool $exclude = null;
+    private array $items = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $result = ConfigUtil::convertItemsToArray($this->items);
         if (true === $this->exclude) {
@@ -40,17 +35,17 @@ class StatusCodeConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Indicates whether the configuration attribute exists.
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return \array_key_exists($key, $this->items);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets the configuration value.
      */
-    public function get($key, $defaultValue = null)
+    public function get(string $key, mixed $defaultValue = null): mixed
     {
         if (!\array_key_exists($key, $this->items)) {
             return $defaultValue;
@@ -60,9 +55,9 @@ class StatusCodeConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Sets the configuration value.
      */
-    public function set($key, $value)
+    public function set(string $key, mixed $value): void
     {
         if (null !== $value) {
             $this->items[$key] = $value;
@@ -72,43 +67,37 @@ class StatusCodeConfig implements ConfigBagInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Removes the configuration value.
      */
-    public function remove($key)
+    public function remove(string $key): void
     {
         unset($this->items[$key]);
     }
 
     /**
-     * {@inheritdoc}
+     * Gets names of all configuration attributes.
+     *
+     * @return string[]
      */
-    public function keys()
+    public function keys(): array
     {
-        return \array_keys($this->items);
+        return array_keys($this->items);
     }
 
     /**
      * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
      */
-    public function hasExcluded()
+    public function hasExcluded(): bool
     {
         return null !== $this->exclude;
     }
 
     /**
      * Indicates whether the exclusion flag.
-     *
-     * @return bool
      */
-    public function isExcluded()
+    public function isExcluded(): bool
     {
-        if (null === $this->exclude) {
-            return false;
-        }
-
-        return $this->exclude;
+        return $this->exclude ?? false;
     }
 
     /**
@@ -116,37 +105,31 @@ class StatusCodeConfig implements ConfigBagInterface
      *
      * @param bool|null $exclude The exclude flag or NULL to remove this option
      */
-    public function setExcluded($exclude = true)
+    public function setExcluded(?bool $exclude = true): void
     {
         $this->exclude = $exclude;
     }
 
     /**
      * Indicates whether the description attribute exists.
-     *
-     * @return bool
      */
-    public function hasDescription()
+    public function hasDescription(): bool
     {
         return $this->has(ConfigUtil::DESCRIPTION);
     }
 
     /**
      * Gets the value of the description attribute.
-     *
-     * @return string|Label|null
      */
-    public function getDescription()
+    public function getDescription(): string|Label|null
     {
         return $this->get(ConfigUtil::DESCRIPTION);
     }
 
     /**
      * Sets the value of the description attribute.
-     *
-     * @param string|Label|null $description
      */
-    public function setDescription($description)
+    public function setDescription(string|Label|null $description): void
     {
         if ($description) {
             $this->items[ConfigUtil::DESCRIPTION] = $description;

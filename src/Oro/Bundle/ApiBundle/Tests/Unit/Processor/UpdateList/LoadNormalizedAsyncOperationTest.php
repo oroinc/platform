@@ -56,7 +56,7 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
         $getResult = ['key' => 'value'];
         $getConfig = new EntityDefinitionConfig();
         $getConfig->set('config_key', 'config_value');
-        $getMetadata = new EntityMetadata();
+        $getMetadata = new EntityMetadata('Test\Entity');
         $getMetadata->set('metadata_key', 'metadata_value');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);

@@ -65,8 +65,7 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
 
     protected function getEntityMetadata(string $class, array $idFieldNames): EntityMetadata
     {
-        $metadata = new EntityMetadata();
-        $metadata->setClassName($class);
+        $metadata = new EntityMetadata($class);
         $metadata->setIdentifierFieldNames($idFieldNames);
 
         return $metadata;

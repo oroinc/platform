@@ -59,7 +59,7 @@ class AddPaginationLinksForRelationshipTest extends GetSubresourceProcessorTestC
         $this->context->setParentClassName('Test\Entity');
         $this->context->setParentId(123);
         $this->context->setAssociationName('testAssociation');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResponseStatusCode(Response::HTTP_OK);
         $this->processor->process($this->context);
     }
@@ -78,7 +78,7 @@ class AddPaginationLinksForRelationshipTest extends GetSubresourceProcessorTestC
         $this->context->setParentClassName('Test\Entity');
         $this->context->setParentId(123);
         $this->context->setAssociationName('testAssociation');
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->context->setResponseStatusCode(Response::HTTP_BAD_REQUEST);
         $this->processor->process($this->context);
@@ -135,7 +135,7 @@ class AddPaginationLinksForRelationshipTest extends GetSubresourceProcessorTestC
         $this->context->setParentClassName($parentClassName);
         $this->context->setParentId(123);
         $this->context->setAssociationName($associationName);
-        $this->context->setParentMetadata(new EntityMetadata());
+        $this->context->setParentMetadata(new EntityMetadata('Test\Entity'));
         $this->context->setResponseDocumentBuilder($documentBuilder);
         $this->context->setResponseStatusCode(Response::HTTP_OK);
         $this->processor->process($this->context);

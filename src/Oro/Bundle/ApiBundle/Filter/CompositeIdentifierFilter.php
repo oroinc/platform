@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
@@ -21,17 +22,12 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     RequestAwareFilterInterface,
     MetadataAwareFilterInterface
 {
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var EntityMetadata */
-    protected $metadata;
-
-    /** @var EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
+    private RequestType $requestType;
+    private EntityMetadata $metadata;
+    private EntityIdTransformerRegistry $entityIdTransformerRegistry;
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setRequestType(RequestType $requestType): void
     {
@@ -39,7 +35,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function setMetadata(EntityMetadata $metadata): void
     {
@@ -52,7 +48,7 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
@@ -63,14 +59,53 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
         }
     }
 
-    /**
-     * @param string|null $operator
-     * @param mixed       $value
-     *
-     * @return Expression
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    protected function buildExpression(?string $operator, $value): Expression
+    protected function getFieldPath(string $fieldName): string
+    {
+        return $this->metadata->getProperty($fieldName)->getPropertyPath();
+    }
+
+    protected function buildExpressionForSingleIdentifier(
+        EntityIdTransformerInterface $entityIdTransformer,
+        ?string $operator,
+        mixed $value
+    ): Expression {
+        if (FilterOperator::EQ === $operator) {
+            // expression: field1 = value1 AND field2 = value2 AND ...
+            return $this->buildEqualExpression($entityIdTransformer->reverseTransform($value, $this->metadata));
+        }
+        if (FilterOperator::NEQ === $operator) {
+            // expression: field1 != value1 OR field2 != value2 OR ...
+            // this expression equals to NOT (field1 = value1 AND field2 = value2 AND ...),
+            // but Criteria object does not support NOT expression
+            return $this->buildNotEqualExpression($entityIdTransformer->reverseTransform($value, $this->metadata));
+        }
+        throw new InvalidFilterOperatorException($operator);
+    }
+
+    protected function buildExpressionForListOfIdentifiers(
+        EntityIdTransformerInterface $entityIdTransformer,
+        ?string $operator,
+        array $value
+    ): Expression {
+        $expressions = [];
+        foreach ($value as $val) {
+            $expressions[] = $this->buildExpressionForSingleIdentifier($entityIdTransformer, $operator, $val);
+        }
+
+        if (FilterOperator::EQ === $operator) {
+            // expression: (field1 = value1 AND field2 = value2 AND ...) OR (...)
+            return new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
+        }
+        if (FilterOperator::NEQ === $operator) {
+            // expression: (field1 != value1 OR field2 != value2 OR ...) AND (...)
+            // this expression equals to NOT ((field1 = value1 AND field2 = value2 AND ...) OR (...)),
+            // but Criteria object does not support NOT expression
+            return new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
+        }
+        throw new InvalidFilterOperatorException($operator);
+    }
+
+    private function buildExpression(?string $operator, mixed $value): Expression
     {
         if (null === $value) {
             throw new \InvalidArgumentException('The composite identifier value must not be NULL.');
@@ -80,81 +115,37 @@ class CompositeIdentifierFilter extends StandaloneFilter implements
             $operator = FilterOperator::EQ;
         }
         if (!\in_array($operator, $this->getSupportedOperators(), true)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new \InvalidArgumentException(sprintf(
                 'The operator "%s" is not supported for composite identifier.',
                 $operator
             ));
         }
 
-        $entityIdTransformer = $this->getEntityIdTransformer();
+        $entityIdTransformer = $this->entityIdTransformerRegistry->getEntityIdTransformer($this->requestType);
         if (\is_array($value) && !ArrayUtil::isAssoc($value)) {
-            // a list of identifiers
-            if (FilterOperator::NEQ === $operator) {
-                // expression: (field1 != value1 OR field2 != value2 OR ...) AND (...)
-                // this expression equals to NOT ((field1 = value1 AND field2 = value2 AND ...) OR (...)),
-                // but Criteria object does not support NOT expression
-                $expressions = [];
-                foreach ($value as $val) {
-                    $expressions[] = $this->buildNotEqualExpression(
-                        $entityIdTransformer->reverseTransform($val, $this->metadata)
-                    );
-                }
-                $expr = new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
-            } else {
-                // expression: (field1 = value1 AND field2 = value2 AND ...) OR (...)
-                $expressions = [];
-                foreach ($value as $val) {
-                    $expressions[] = $this->buildEqualExpression(
-                        $entityIdTransformer->reverseTransform($val, $this->metadata)
-                    );
-                }
-                $expr = new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
-            }
-        } else {
-            // single identifier
-            $value = $entityIdTransformer->reverseTransform($value, $this->metadata);
-            if (FilterOperator::NEQ === $operator) {
-                // expression: field1 != value1 OR field2 != value2 OR ...
-                // this expression equals to NOT (field1 = value1 AND field2 = value2 AND ...),
-                // but Criteria object does not support NOT expression
-                $expr = $this->buildNotEqualExpression($value);
-            } else {
-                // expression: field1 = value1 AND field2 = value2 AND ...
-                $expr = $this->buildEqualExpression($value);
-            }
+            return $this->buildExpressionForListOfIdentifiers($entityIdTransformer, $operator, $value);
         }
 
-        return $expr;
+        return $this->buildExpressionForSingleIdentifier($entityIdTransformer, $operator, $value);
     }
 
-    protected function buildEqualExpression(array $value): Expression
+    private function buildEqualExpression(array $value): Expression
     {
         $expressions = [];
         foreach ($value as $fieldName => $fieldValue) {
-            $expressions[] = Criteria::expr()->eq(
-                $this->metadata->getProperty($fieldName)->getPropertyPath(),
-                $fieldValue
-            );
+            $expressions[] = Criteria::expr()->eq($this->getFieldPath($fieldName), $fieldValue);
         }
 
         return new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
     }
 
-    protected function buildNotEqualExpression(array $value): Expression
+    private function buildNotEqualExpression(array $value): Expression
     {
         $expressions = [];
         foreach ($value as $fieldName => $fieldValue) {
-            $expressions[] = Criteria::expr()->neq(
-                $this->metadata->getProperty($fieldName)->getPropertyPath(),
-                $fieldValue
-            );
+            $expressions[] = Criteria::expr()->neq($this->getFieldPath($fieldName), $fieldValue);
         }
 
         return new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
-    }
-
-    private function getEntityIdTransformer(): EntityIdTransformerInterface
-    {
-        return $this->entityIdTransformerRegistry->getEntityIdTransformer($this->requestType);
     }
 }

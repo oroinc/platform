@@ -52,7 +52,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn('test_extra_key');
 
         $context = new MetadataContext();
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->processor->expects(self::once())
             ->method('createContext')

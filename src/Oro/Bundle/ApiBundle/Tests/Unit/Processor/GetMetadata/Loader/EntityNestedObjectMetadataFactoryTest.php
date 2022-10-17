@@ -36,7 +36,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedObjectMetadataForExcludedTargetField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -52,7 +52,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
         $targetField->setExcluded();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
 
         $this->nestedObjectMetadataHelper->expects(self::once())
@@ -88,7 +88,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedObjectMetadataForExcludedTargetFieldWhenExcludedPropertiesShouldNotBeIgnored()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -106,7 +106,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
         $linkedField = new EntityDefinitionFieldConfig();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -165,7 +165,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedObjectMetadataForField()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -182,7 +182,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
         $linkedField = new EntityDefinitionFieldConfig();
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new FieldMetadata();
 
@@ -241,7 +241,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
 
     public function testCreateAndAddNestedObjectMetadataForMetaProperty()
     {
-        $entityMetadata = new EntityMetadata();
+        $entityMetadata = new EntityMetadata('Test\Entity');
         $config = new EntityDefinitionConfig();
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -259,7 +259,7 @@ class EntityNestedObjectMetadataFactoryTest extends LoaderTestCase
         $linkedField->setMetaProperty(true);
 
         $associationMetadata = new AssociationMetadata();
-        $associationTargetMetadata = new EntityMetadata();
+        $associationTargetMetadata = new EntityMetadata('Test\Entity');
         $associationMetadata->setTargetMetadata($associationTargetMetadata);
         $targetPropertyMetadata = new MetaPropertyMetadata();
 

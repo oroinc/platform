@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Batch\Async\AsyncOperationManager;
-use Oro\Bundle\ApiBundle\Batch\Async\Topics;
+use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListStartChunkJobsMessageProcessor;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
@@ -12,29 +12,24 @@ use Oro\Bundle\MessageQueueBundle\Entity\Job as JobEntity;
 use Oro\Bundle\MessageQueueBundle\Entity\Repository\JobRepository;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
-use Oro\Component\MessageQueue\Util\JSON;
 use Psr\Log\LoggerInterface;
 
 class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
     private const BATCH_SIZE = 3000;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRepository */
-    private $jobRepository;
+    private \PHPUnit\Framework\MockObject\MockObject|JobRepository $jobRepository;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager */
-    private $operationManager;
+    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper */
-    private $processingHelper;
+    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
+    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
 
-    /** @var UpdateListStartChunkJobsMessageProcessor */
-    private $processor;
+    private UpdateListStartChunkJobsMessageProcessor $processor;
 
     protected function setUp(): void
     {
@@ -59,39 +54,22 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 
     private function getMessage(array $body, string $messageId = ''): MessageInterface
     {
-        $message = $this->createMock(MessageInterface::class);
-        $message->expects(self::once())
-            ->method('getBody')
-            ->willReturn(JSON::encode($body));
-        $message->expects(self::any())
-            ->method('getMessageId')
-            ->willReturn($messageId);
+        $message = new Message();
+        $message->setBody($body);
+        $message->setMessageId($messageId);
 
         return $message;
     }
 
-    public function testGetSubscribedTopics()
+    public function testGetSubscribedTopics(): void
     {
         self::assertEquals(
-            [Topics::UPDATE_LIST_START_CHUNK_JOBS],
+            [UpdateListStartChunkJobsTopic::getName()],
             UpdateListStartChunkJobsMessageProcessor::getSubscribedTopics()
         );
     }
 
-    public function testShouldRejectInvalidMessage()
-    {
-        $message = $this->getMessage(['key' => 'value']);
-
-        $this->logger->expects(self::once())
-            ->method('critical')
-            ->with('Got invalid message.');
-
-        $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
-
-        self::assertEquals(MessageProcessorInterface::REJECT, $result);
-    }
-
-    public function testShouldRejectNotExistingRootJobId()
+    public function testShouldRejectNotExistingRootJobId(): void
     {
         $rootJobId = 100;
         $message = $this->getMessage([
@@ -116,7 +94,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
         self::assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testProcessNextIteration()
+    public function testProcessNextIteration(): void
     {
         $operationId = 123;
         $rootJobId = 100;
@@ -128,7 +106,9 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             'entityClass' => 'Test\Entity',
             'requestType' => ['testRequest'],
             'version'     => '1.1',
-            'rootJobId'   => $rootJobId
+            'rootJobId'   => $rootJobId,
+            'firstChunkFileIndex' => 0,
+            'aggregateTime' => 0,
         ];
         $message = $this->getMessage($body);
         $rootJob = $this->createMock(Job::class);
@@ -179,7 +159,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessLastIteration()
+    public function testProcessLastIteration(): void
     {
         $operationId = 123;
         $rootJobId = 100;
@@ -245,7 +225,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testProcessLastIterationWhenOnlyOneNotProcessedChunkRemains()
+    public function testProcessLastIterationWhenOnlyOneNotProcessedChunkRemains(): void
     {
         $operationId = 123;
         $rootJobId = 100;
@@ -311,7 +291,7 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldRejectIfJobForChunkNotFound()
+    public function testShouldRejectIfJobForChunkNotFound(): void
     {
         $operationId = 123;
         $rootJobId = 100;
@@ -321,7 +301,8 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
             'entityClass' => 'Test\Entity',
             'requestType' => ['testRequest'],
             'version'     => '1.1',
-            'rootJobId'   => $rootJobId
+            'rootJobId'   => $rootJobId,
+            'firstChunkFileIndex' => 0,
         ];
         $message = $this->getMessage($body);
         $rootJob = $this->createMock(Job::class);

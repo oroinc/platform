@@ -110,7 +110,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->setHasIdentifierGenerator(true);
         $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
@@ -143,7 +143,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
 
@@ -174,7 +174,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
         $metadata->setHasIdentifierGenerator(true);
         $metadata->addField(new FieldMetadata('id'))->setDataType('integer');
@@ -206,7 +206,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addMetaProperty(new MetaPropertyMetadata('property1'));
@@ -239,7 +239,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addMetaProperty(new MetaPropertyMetadata(ConfigUtil::CLASS_NAME));
@@ -262,7 +262,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addMetaProperty(new MetaPropertyMetadata('renamedClassName'));
@@ -286,7 +286,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addField(new FieldMetadata('field1'));
@@ -320,7 +320,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $field = $metadata->addField(new FieldMetadata('field1'));
@@ -353,7 +353,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
@@ -394,7 +394,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
@@ -434,7 +434,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
@@ -475,7 +475,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
@@ -514,7 +514,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id', 'association1']);
         $metadata->setHasIdentifierGenerator(true);
 
@@ -556,7 +556,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
         $field->setDataType('string');
         $field->setDirection(true, false);
@@ -588,7 +588,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
         $field->setDataType('string');
         $field->setDirection(true, false);
@@ -610,7 +610,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
         $field->setDataType('string');
         $field->setDirection(false, true);
@@ -642,7 +642,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $field = $metadata->addField(new FieldMetadata('field1'));
         $field->setDataType('string');
         $field->setDirection(false, true);
@@ -664,7 +664,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
         $association->setDataType('integer');
         $association->setTargetClassName('Test\TargetClass');
@@ -703,7 +703,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
         $association->setDataType('integer');
         $association->setTargetClassName('Test\TargetClass');
@@ -729,7 +729,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
         $association->setDataType('integer');
         $association->setTargetClassName('Test\TargetClass');
@@ -768,7 +768,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
     {
         $requestType = new RequestType([]);
 
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $association = $metadata->addAssociation(new AssociationMetadata('association1'));
         $association->setDataType('integer');
         $association->setTargetClassName('Test\TargetClass');

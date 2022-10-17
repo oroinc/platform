@@ -27,7 +27,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 
     public function testProcessWhenResponseStatusCodeIsNot405()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
@@ -43,7 +43,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 
     public function testProcessWhenAllowResponseHeaderAlreadySet()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::never())
@@ -60,7 +60,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 
     public function testProcessWhenAtLeastOneAllowedHttpMethodExists()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -78,7 +78,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 
     public function testProcessWhenNoAllowedHttpMethods()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
 
         $this->resourcesProvider->expects(self::once())
@@ -102,7 +102,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 
     public function testProcessWhenEntityDoesNotHaveIdentifierFields()
     {
-        $metadata = new EntityMetadata();
+        $metadata = new EntityMetadata('Test\Entity');
 
         $this->resourcesProvider->expects(self::once())
             ->method('getResourceExcludeActions')

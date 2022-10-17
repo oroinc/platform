@@ -63,6 +63,11 @@ services:
         arguments:
             - '@oro_api.entity_id_transformer_registry'
 
+    oro_api.filter_factory.association_composite_identifier:
+        class: Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdentifierFilterFactory
+        arguments:
+            - '@oro_api.entity_id_transformer_registry'
+
     oro_api.filter_factory.extended_association:
         class: Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory
         arguments:
@@ -215,8 +220,3 @@ services:
             - true
         tags:
           - { name: oro.api.query.comparison_expression, operator: 'NESTED_TREE_WITH_ROOT' }
-
-    oro_api.filter_factory.association_composite_identifier:
-        class: 'Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdFilterFactory'
-        arguments:
-            - '@oro_api.entity_id_transformer_registry'

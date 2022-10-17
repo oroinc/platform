@@ -11,11 +11,8 @@ use Oro\Component\PhpUtils\QueryStringUtil;
  */
 class PrevPageLinkMetadata extends LinkMetadataDecorator
 {
-    /** @var string */
-    private $pageNumberFilterName;
-
-    /** @var QueryStringAccessorInterface|null */
-    private $queryStringAccessor;
+    private string $pageNumberFilterName;
+    private ?QueryStringAccessorInterface $queryStringAccessor;
 
     public function __construct(
         LinkMetadataInterface $link,
@@ -28,7 +25,7 @@ class PrevPageLinkMetadata extends LinkMetadataDecorator
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
