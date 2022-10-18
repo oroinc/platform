@@ -67,6 +67,14 @@ class LanguageCodeFormatterTest extends TestCase
                 'value' => '',
                 'expected' => 'N/A',
             ],
+            [
+                'value' => 'en_plastimo',
+                'expected' => 'English Plastimo',
+            ],
+            [
+                'value' => 'en_CA_plastimo',
+                'expected' => 'Canadian English Plastimo',
+            ]
         ];
     }
 
@@ -105,6 +113,14 @@ class LanguageCodeFormatterTest extends TestCase
                 'value' => '',
                 'expected' => 'N/A',
             ],
+            [
+                'value' => 'en_plastimo',
+                'expected' => 'English Plastimo',
+            ],
+            [
+                'value' => 'en_CA_plastimo',
+                'expected' => 'English (Canada) Plastimo',
+            ]
         ];
     }
 }

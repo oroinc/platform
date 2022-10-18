@@ -9,7 +9,6 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\TranslationBundle\Entity\Language;
 use Oro\Bundle\TranslationBundle\Entity\Repository\LanguageRepository;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Symfony\Component\Intl\Locales;
 
 /**
  * Provides various utility methods to get information about installed languages.
@@ -32,12 +31,7 @@ class LanguageProvider
      */
     public function getAvailableLanguageCodes(bool $onlyEnabled = false): array
     {
-        return \array_keys(
-            \array_intersect_key(
-                Locales::getNames($this->localeSettings->getLanguage()),
-                $this->getRepository()->getAvailableLanguageCodesAsArrayKeys($onlyEnabled)
-            )
-        );
+        return \array_keys($this->getRepository()->getAvailableLanguageCodesAsArrayKeys($onlyEnabled));
     }
 
     /**
