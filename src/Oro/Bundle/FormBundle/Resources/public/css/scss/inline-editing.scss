@@ -167,6 +167,7 @@
         .inline-editor__fields {
             textarea {
                 height: $inline-editor-inner-fields-height;
+                max-height: $inline-editor-inner-textarea-max-height;
                 padding: $inline-editor-inner-textarea-offset;
             }
         }

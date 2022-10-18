@@ -1,6 +1,8 @@
 define(function(require) {
     'use strict';
 
+    const _ = require('underscore');
+    const mediator = require('oroui/js/mediator');
     const BaseView = require('oroform/js/app/views/editor/text-editor-view');
 
     // TODO: will be removed after https://magecore.atlassian.net/browse/BAP-11905
@@ -25,6 +27,7 @@ define(function(require) {
          */
         focus: function(atEnd) {
             this.$('[name=value]').setCursorToEnd().focus();
+            this.updateButtonsOffset();
         },
 
         /**
@@ -68,6 +71,29 @@ define(function(require) {
 
                 e.stopImmediatePropagation();
                 e.preventDefault();
+            }
+        },
+
+        onChange: function() {
+            this.updateButtonsOffset();
+
+            TextEditorView.__super__.onChange.call(this);
+        },
+
+        onKeyUp: function() {
+            this.updateButtonsOffset();
+
+            TextEditorView.__super__.onKeyUp.call(this);
+        },
+
+        updateButtonsOffset: function() {
+            const $field = this.$('[name=value]');
+
+            if ($field.is('textarea')) {
+                this.$('[data-role="actions"]').css(
+                    `margin${_.isRTL() ? 'Left' : 'Right'}`, $field[0].clientHeight < $field[0].scrollHeight
+                        ? `${mediator.execute('layout:scrollbarWidth')}px` : ''
+                );
             }
         }
     });

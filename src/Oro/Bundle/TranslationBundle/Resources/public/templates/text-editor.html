@@ -2,9 +2,9 @@
     <div class="inline-editor__fields">
         <textarea name="value"
                class="form-control" placeholder="<%- placeholder %>"
-               autocomplete="off"><%= value %></textarea>
+               autocomplete="off" data-autoresize><%= value %></textarea>
     </div>
-    <div class="inline-editor__actions">
+    <div class="inline-editor__actions" data-role="actions">
         <button class="btn btn-icon btn-square-light inline-editor__action-item" type="submit"
                 title="<%- _.__('oro.form.inlineEditing.action.save') %>">
             <span class="fa-check" aria-hidden="true"></span>
