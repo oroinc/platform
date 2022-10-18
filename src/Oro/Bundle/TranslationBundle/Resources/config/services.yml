@@ -152,6 +152,8 @@ services:
         arguments:
             - '@oro_translation.provider.language'
             - '%installed%'
+        calls:
+            - [setStrategy, ['@oro_locale.translation.strategy.localization_fallback_strategy']]
         tags:
             - { name: oro_translation.extension.translation_strategy }
 
