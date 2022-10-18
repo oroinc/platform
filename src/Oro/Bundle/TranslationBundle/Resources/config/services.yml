@@ -157,7 +157,7 @@ services:
         class: Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy
         public: false
         arguments:
-            - '@oro_translation.provider.language'
+            - '@oro_locale.translation.strategy.localization_fallback_strategy'
             - '@oro_distribution.handler.application_status'
         tags:
             - { name: oro_translation.extension.translation_strategy }
