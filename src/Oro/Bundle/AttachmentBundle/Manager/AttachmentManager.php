@@ -25,6 +25,7 @@ class AttachmentManager
     public const SMALL_IMAGE_HEIGHT = 32;
     public const THUMBNAIL_WIDTH = 110;
     public const THUMBNAIL_HEIGHT = 80;
+    public const DEFAULT_FORMAT = '';
 
     private FileUrlProviderInterface $fileUrlProvider;
 
@@ -72,7 +73,7 @@ class AttachmentManager
         File $file,
         int $width = self::DEFAULT_IMAGE_WIDTH,
         int $height = self::DEFAULT_IMAGE_HEIGHT,
-        string $format = '',
+        string $format = self::DEFAULT_FORMAT,
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         return $this->fileUrlProvider->getResizedImageUrl($file, $width, $height, $format, $referenceType);
@@ -84,7 +85,7 @@ class AttachmentManager
     public function getFilteredImageUrl(
         File $file,
         string $filterName,
-        string $format = '',
+        string $format = self::DEFAULT_FORMAT,
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         return $this->fileUrlProvider->getFilteredImageUrl($file, $filterName, $format, $referenceType);
@@ -109,7 +110,7 @@ class AttachmentManager
         int $fileId,
         string $filename,
         string $filterName,
-        string $format = '',
+        string $format = self::DEFAULT_FORMAT,
         int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH
     ): string {
         $file = $this->getFileByIdAndFilename($fileId, $filename);

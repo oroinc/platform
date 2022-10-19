@@ -2,109 +2,249 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\DriverException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Doctrine\Persistence\ManagerRegistry;
-use Gaufrette\Util\Checksum;
 use Oro\Bundle\ApiBundle\Batch\FileLockManager;
-use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\Exception\ExceptionInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 
 class FileLockManagerTest extends \PHPUnit\Framework\TestCase
 {
-    private const CONNECTION_NAME = 'message_queue';
+    /** @var LockFactory|\PHPUnit\Framework\MockObject\MockObject */
+    private $lockFactory;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    private $doctrine;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
     /** @var FileLockManager */
     private $fileLockManager;
 
     protected function setUp(): void
     {
-        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->lockFactory = $this->createMock(LockFactory::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->fileLockManager = new FileLockManager($this->doctrine, self::CONNECTION_NAME);
+        $this->fileLockManager = new FileLockManager($this->lockFactory, $this->logger);
     }
 
-    private function expectGetConnection(): Connection|\PHPUnit\Framework\MockObject\MockObject
-    {
-        $connection = $this->createMock(Connection::class);
-        $this->doctrine->expects(self::once())
-            ->method('getConnection')
-            ->with(self::CONNECTION_NAME)
-            ->willReturn($connection);
-
-        return $connection;
-    }
-
-    public function testAcquireWhenLockDoesNotAcquireYet()
+    public function testAcquire(): void
     {
         $lockFileName = 'test.lock';
-        $connection = $this->expectGetConnection();
-        $connection->expects(self::once())
-            ->method('insert')
-            ->with('oro_api_async_data')
-            ->willReturnCallback(function (string $tableExpression, array $data) use ($lockFileName) {
-                self::assertSame($lockFileName, $data['name']);
-                self::assertSame('', $data['content']);
-                self::assertIsInt($data['updated_at']);
-                self::assertSame(Checksum::fromContent(''), $data['checksum']);
-            });
+        $lock = $this->createMock(LockInterface::class);
+
+        $this->lockFactory->expects(self::once())
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::once())
+            ->method('acquire')
+            ->willReturn(true);
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
 
         self::assertTrue($this->fileLockManager->acquireLock($lockFileName, 10, 1));
     }
 
-    public function testAcquireWhenLockAlreadyAcquiredAndAttemptLimitExceeded()
+    public function testAcquireWhenLockAlreadyAcquiredAndAttemptLimitExceeded(): void
     {
         $lockFileName = 'test.lock';
-        $connection = $this->expectGetConnection();
-        $connection->expects(self::exactly(10))
-            ->method('insert')
-            ->with('oro_api_async_data')
-            ->willThrowException(new UniqueConstraintViolationException(
-                'already exist',
-                $this->createMock(DriverException::class)
-            ));
+        $lock = $this->createMock(LockInterface::class);
+
+        $this->lockFactory->expects(self::exactly(10))
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::exactly(10))
+            ->method('acquire')
+            ->willReturn(false);
+
+        $this->logger->expects(self::exactly(10))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 1, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 2, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 3, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 4, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 5, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 6, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 7, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 8, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 9, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 10, 'maxAttempts' => 10]
+                ]
+            );
 
         self::assertFalse($this->fileLockManager->acquireLock($lockFileName, 10, 1));
     }
 
-    public function testAcquireWhenLockAlreadyAcquireButItWasDeletedDuringAllowedAcquireAttempts()
+    public function testAcquireWhenSomeAttemptsCannotBeAcquired(): void
     {
         $lockFileName = 'test.lock';
-        $connection = $this->expectGetConnection();
-        $connection->expects(self::exactly(3))
-            ->method('insert')
-            ->with('oro_api_async_data')
-            ->willReturnOnConsecutiveCalls(
-                new ReturnCallback(function () {
-                    throw new UniqueConstraintViolationException(
-                        'already exist',
-                        $this->createMock(DriverException::class)
-                    );
-                }),
-                new ReturnCallback(function () {
-                    throw new UniqueConstraintViolationException(
-                        'already exist',
-                        $this->createMock(DriverException::class)
-                    );
-                }),
-                new ReturnCallback(function () {
-                })
+        $lock = $this->createMock(LockInterface::class);
+
+        $this->lockFactory->expects(self::exactly(3))
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::exactly(3))
+            ->method('acquire')
+            ->willReturnOnConsecutiveCalls(false, false, true);
+
+        $this->logger->expects(self::exactly(2))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 1, 'maxAttempts' => 10]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 2, 'maxAttempts' => 10]
+                ]
             );
 
         self::assertTrue($this->fileLockManager->acquireLock($lockFileName, 10, 1));
     }
 
-    public function testRelease()
+    public function testAcquireWhenSomeAcquireAttemptsFailed(): void
     {
         $lockFileName = 'test.lock';
-        $connection = $this->expectGetConnection();
-        $connection->expects(self::once())
-            ->method('delete')
-            ->with('oro_api_async_data', ['name' => $lockFileName]);
+        $lock = $this->createMock(LockInterface::class);
+        $e = $this->createMock(ExceptionInterface::class);
+        $attemptNumber = 0;
 
+        $this->lockFactory->expects(self::exactly(3))
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::exactly(3))
+            ->method('acquire')
+            ->willReturnCallback(function () use (&$attemptNumber, $e) {
+                $attemptNumber++;
+                if ($attemptNumber <= 2) {
+                    throw $e;
+                }
+
+                return true;
+            });
+
+        $this->logger->expects(self::exactly(2))
+            ->method('info')
+            ->withConsecutive(
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 1, 'maxAttempts' => 10, 'exception' => $e]
+                ],
+                [
+                    'The lock cannot be acquired.',
+                    ['lockFileName' => $lockFileName, 'attempt' => 2, 'maxAttempts' => 10, 'exception' => $e]
+                ]
+            );
+
+        self::assertTrue($this->fileLockManager->acquireLock($lockFileName, 10, 1));
+    }
+
+    public function testRelease(): void
+    {
+        $lockFileName = 'test.lock';
+        $lock = $this->createMock(LockInterface::class);
+
+        $this->lockFactory->expects(self::once())
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::once())
+            ->method('acquire')
+            ->willReturn(true);
+        $lock->expects(self::once())
+            ->method('release')
+            ->willReturn(true);
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
+
+        self::assertTrue($this->fileLockManager->acquireLock($lockFileName));
+        $this->fileLockManager->releaseLock($lockFileName);
+    }
+
+    public function testReleaseWhenLockAlreadyReleased(): void
+    {
+        $lockFileName = 'test.lock';
+        $lock = $this->createMock(LockInterface::class);
+
+        $this->lockFactory->expects(self::once())
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::once())
+            ->method('acquire')
+            ->willReturn(true);
+        $lock->expects(self::once())
+            ->method('release')
+            ->willReturn(true);
+
+        $this->logger->expects(self::never())
+            ->method(self::anything());
+
+        self::assertTrue($this->fileLockManager->acquireLock($lockFileName));
+        $this->fileLockManager->releaseLock($lockFileName);
+
+        // do release already released lock
+        $this->fileLockManager->releaseLock($lockFileName);
+    }
+
+    public function testReleaseWhenReleaseFailed(): void
+    {
+        $lockFileName = 'test.lock';
+        $lock = $this->createMock(LockInterface::class);
+        $e = $this->createMock(ExceptionInterface::class);
+
+        $this->lockFactory->expects(self::once())
+            ->method('createLock')
+            ->with($lockFileName, self::isNull(), self::isFalse())
+            ->willReturn($lock);
+        $lock->expects(self::once())
+            ->method('acquire')
+            ->willReturn(true);
+        $lock->expects(self::once())
+            ->method('release')
+            ->willThrowException($e);
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with('Not possible to release the lock.', ['lockFileName' => $lockFileName, 'exception' => $e]);
+
+        self::assertTrue($this->fileLockManager->acquireLock($lockFileName));
         $this->fileLockManager->releaseLock($lockFileName);
     }
 }

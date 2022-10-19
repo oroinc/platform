@@ -21,15 +21,20 @@ class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\Te
 {
     private const BATCH_SIZE = 3000;
 
-    private \PHPUnit\Framework\MockObject\MockObject|JobRepository $jobRepository;
+    /** @var JobRepository|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRepository;
 
-    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
+    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $operationManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
+    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $processingHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private UpdateListStartChunkJobsMessageProcessor $processor;
+    /** @var UpdateListStartChunkJobsMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
