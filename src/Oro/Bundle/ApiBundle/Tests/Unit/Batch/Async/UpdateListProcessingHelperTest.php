@@ -22,13 +22,17 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|FileManager$fileManager;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|MessageProducerInterface $producer;
+    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $producer;
 
-    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private UpdateListProcessingHelper $helper;
+    /** @var UpdateListProcessingHelper */
+    private $helper;
 
     protected function setUp(): void
     {

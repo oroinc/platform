@@ -11,42 +11,25 @@ use Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder;
  */
 class IncludedData
 {
-    private const ITEM_DATA           = 0;
+    private const ITEM_DATA = 0;
     private const ITEM_INCLUDED_INDEX = 1;
-    private const ITEM_SECTION_NAME   = 2;
+    private const ITEM_SECTION_NAME = 2;
 
-    /** @var ItemKeyBuilder */
-    private $itemKeyBuilder;
-
-    /** @var IncludeAccessorInterface */
-    private $includeAccessor;
-
-    /** @var FileLockManager */
-    private $fileLockManager;
+    private ItemKeyBuilder $itemKeyBuilder;
+    private IncludeAccessorInterface $includeAccessor;
+    private FileLockManager $fileLockManager;
 
     /** @var string[]|null */
-    private $lockFileNames;
-
+    private ?array $lockFileNames;
     /** @var array [item key => [item, included item index, section name], ...] */
-    private $items;
-
+    private array $items;
     /** @var array [item key => new id, ...] */
-    private $processedItems;
-
+    private array $processedItems;
     /** @var array|null [included item index => item index, ...] */
-    private $includedIndexMap;
-
+    private ?array $includedIndexMap = null;
     /** @var string[]|null */
-    private $sectionNames;
+    private ?array $sectionNames = null;
 
-    /**
-     * @param ItemKeyBuilder           $itemKeyBuilder
-     * @param IncludeAccessorInterface $includeAccessor
-     * @param FileLockManager          $fileLockManager
-     * @param string[]|null            $lockFileNames
-     * @param array                    $items          [item key => [item, included item index, section name], ...]
-     * @param array                    $processedItems [item key => new id, ...]
-     */
     public function __construct(
         ItemKeyBuilder $itemKeyBuilder,
         IncludeAccessorInterface $includeAccessor,
@@ -119,7 +102,7 @@ class IncludedData
             $sectionNames = [];
             foreach ($this->items as $item) {
                 $sectionName = $item[self::ITEM_SECTION_NAME];
-                if (!array_key_exists($sectionName, $sectionNames)) {
+                if (!\array_key_exists($sectionName, $sectionNames)) {
                     $sectionNames[$sectionName] = true;
                 }
             }
@@ -138,20 +121,15 @@ class IncludedData
     }
 
     /**
-     * Gets the identifier od already processed included item.
-     *
-     * @param string $itemType
-     * @param string $itemId
-     *
-     * @return mixed|null
+     * Gets the identifier of already processed included item.
      */
-    public function getProcessedIncludedItemId(string $itemType, string $itemId)
+    public function getProcessedIncludedItemId(string $itemType, string $itemId): mixed
     {
         return $this->processedItems[$this->itemKeyBuilder->buildItemKey($itemType, $itemId)] ?? null;
     }
 
     /**
-     * Unlocks the include index to allow to use it by other batch operations.
+     * Unlocks chunk files with included data to allow to use them by other batch operations.
      */
     public function unlock(): void
     {

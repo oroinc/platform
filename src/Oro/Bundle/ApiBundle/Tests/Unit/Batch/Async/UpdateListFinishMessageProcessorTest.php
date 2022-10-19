@@ -19,15 +19,20 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 
 class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
+    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $processingHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
+    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $operationManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|FileManager $fileManager;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager $includeMapManager;
+    /** @var IncludeMapManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $includeMapManager;
 
-    private UpdateListFinishMessageProcessor $processor;
+    /** @var UpdateListFinishMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {

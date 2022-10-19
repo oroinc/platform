@@ -1045,6 +1045,7 @@ services:
         class: Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessChunkMessageProcessor
         arguments:
             - '@oro_message_queue.job.runner'
+            - '@oro_message_queue.job.manager'
             - '@oro_api.batch.file_manager'
             - '@oro_api.batch.update_handler'
             - '@oro_api.batch.data_encoder_registry'
@@ -1092,8 +1093,10 @@ services:
     oro_api.batch.file_lock_manager:
         class: Oro\Bundle\ApiBundle\Batch\FileLockManager
         arguments:
-            - '@doctrine'
-            - 'message_queue'
+            - '@lock.batch_api.factory'
+            - '@logger'
+        tags:
+            - { name: monolog.logger, channel: api }
 
     oro_api.batch.include_map_manager:
         class: Oro\Bundle\ApiBundle\Batch\IncludeMapManager

@@ -17,9 +17,11 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
  */
 class QueryDefinitionValidatorTest extends ConstraintValidatorTestCase
 {
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $entityConfigProvider;
+    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $entityConfigProvider;
 
-    private \PHPUnit\Framework\MockObject\MockObject|EntityFieldProvider $fieldProvider;
+    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldProvider;
 
     protected function createValidator(): QueryDefinitionValidator
     {

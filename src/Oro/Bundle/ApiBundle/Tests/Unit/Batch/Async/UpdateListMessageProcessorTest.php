@@ -45,31 +45,44 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private const SPLIT_FILE_TIMEOUT = 30000;
 
-    private \PHPUnit\Framework\MockObject\MockObject|JobRunner $jobRunner;
+    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobRunner;
 
-    private \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface $jobManager;
+    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $jobManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|DependentJobService $dependentJob;
+    /** @var DependentJobService|\PHPUnit\Framework\MockObject\MockObject */
+    private $dependentJob;
 
-    private \PHPUnit\Framework\MockObject\MockObject|FileSplitterRegistry $splitterRegistry;
+    /** @var FileSplitterRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $splitterRegistry;
 
-    private \PHPUnit\Framework\MockObject\MockObject|ChunkFileClassifierRegistry $chunkFileClassifierRegistry;
+    /** @var ChunkFileClassifierRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $chunkFileClassifierRegistry;
 
-    private \PHPUnit\Framework\MockObject\MockObject|IncludeAccessorRegistry $includeAccessorRegistry;
+    /** @var IncludeAccessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    private $includeAccessorRegistry;
 
-    private \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager $includeMapManager;
+    /** @var IncludeMapManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $includeMapManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|FileManager $sourceDataFileManager;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $sourceDataFileManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|FileManager $fileManager;
+    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $fileManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|AsyncOperationManager $operationManager;
+    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $operationManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
+    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
+    private $processingHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
 
-    private UpdateListMessageProcessor $processor;
+    /** @var UpdateListMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
