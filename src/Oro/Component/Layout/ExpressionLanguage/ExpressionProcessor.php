@@ -158,8 +158,9 @@ class ExpressionProcessor
     ): void {
         switch ($this->checkStringValue($value)) {
             case self::STRING_IS_EXPRESSION:
-                $expr = $this->parseExpression($value);
-                $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
+                if ($expr = $this->parseExpression($value)) {
+                    $value = $this->processExpression($expr, $context, $data, $evaluate, $encoding);
+                }
                 break;
             case self::STRING_IS_EXPRESSION_STARTED_WITH_BACKSLASH:
                 // the backslash (\) at the begin of the array key should be removed
@@ -259,11 +260,11 @@ class ExpressionProcessor
         return array_merge($deps, ...$notProcessedDeps);
     }
 
-    protected function parseExpression(string $value): ParsedExpression
+    protected function parseExpression(string $value): ?ParsedExpression
     {
         $names = array_merge(['context', 'data'], array_keys($this->values));
 
-        return $this->expressionLanguage->parse(substr($value, 1), $names);
+        return $this->expressionLanguage->parse(substr($value, 1), $names) ?: null;
     }
 
     protected function worksWithDataVariable(Node $node): bool
