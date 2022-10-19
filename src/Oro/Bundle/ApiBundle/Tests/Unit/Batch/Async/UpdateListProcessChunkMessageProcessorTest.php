@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\Job;
+use Oro\Component\MessageQueue\Job\JobManagerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
@@ -33,25 +34,37 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\TestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|JobRunner $jobRunner;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobRunner */
+    private $jobRunner;
 
-    private \PHPUnit\Framework\MockObject\MockObject|FileManager $fileManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|JobManagerInterface */
+    private $jobManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|BatchUpdateHandler $handler;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
+    private $fileManager;
 
-    private \PHPUnit\Framework\MockObject\MockObject|DataEncoderRegistry $dataEncoderRegistry;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|BatchUpdateHandler */
+    private $handler;
 
-    private \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper $processingHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|DataEncoderRegistry */
+    private $dataEncoderRegistry;
 
-    private \PHPUnit\Framework\MockObject\MockObject|FileLockManager $fileLockManager;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|UpdateListProcessingHelper */
+    private $processingHelper;
 
-    private \PHPUnit\Framework\MockObject\MockObject|LoggerInterface $logger;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
+    private $fileLockManager;
 
-    private UpdateListProcessChunkMessageProcessor $processor;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
+    private $logger;
+
+    /** @var UpdateListProcessChunkMessageProcessor */
+    private $processor;
 
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);
+        $this->jobManager = $this->createMock(JobManagerInterface::class);
         $this->fileManager = $this->createMock(FileManager::class);
         $this->handler = $this->createMock(BatchUpdateHandler::class);
         $this->dataEncoderRegistry = $this->createMock(DataEncoderRegistry::class);
@@ -70,6 +83,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             $this->fileLockManager,
             $this->logger
         );
+        $this->processor->setJobManager($this->jobManager);
     }
 
     private function getMessage(array $body, string $messageId = ''): MessageInterface
@@ -979,6 +993,11 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
                 $job->setId(111);
 
                 return $startCallback($this->jobRunner, $job);
+            });
+        $this->jobManager->expects(self::once())
+            ->method('saveJob')
+            ->willReturnCallback(function (Job $job) {
+                self::assertEquals(['retryReason' => 'test retry reason'], $job->getData());
             });
         $this->processingHelper->expects(self::once())
             ->method('sendProcessChunkMessage')
