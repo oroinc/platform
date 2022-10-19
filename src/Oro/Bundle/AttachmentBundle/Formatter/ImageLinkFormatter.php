@@ -15,6 +15,7 @@ class ImageLinkFormatter implements FormatterInterface
     private const WIDTH_ATTRIBUTE  = 'width';
     private const HEIGHT_ATTRIBUTE = 'height';
     private const TITLE_ATTRIBUTE  = 'title';
+    private const FORMAT_ATTRIBUTE = 'format';
 
     /** @var AttachmentManager */
     private $manager;
@@ -48,9 +49,14 @@ class ImageLinkFormatter implements FormatterInterface
             $title = $formatterArguments[self::TITLE_ATTRIBUTE];
         }
 
+        $format = AttachmentManager::DEFAULT_FORMAT;
+        if (array_key_exists(self::FORMAT_ATTRIBUTE, $formatterArguments)) {
+            $format = (string)$formatterArguments[self::FORMAT_ATTRIBUTE];
+        }
+
         return sprintf(
             '<a href="%s">%s</a>',
-            $this->manager->getResizedImageUrl($value, $width, $height, UrlGeneratorInterface::ABSOLUTE_URL),
+            $this->manager->getResizedImageUrl($value, $width, $height, $format, UrlGeneratorInterface::ABSOLUTE_URL),
             $title
         );
     }
