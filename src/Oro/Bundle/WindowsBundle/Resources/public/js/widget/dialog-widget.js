@@ -63,7 +63,7 @@ define(function(require, exports, module) {
             'widgetRender': 'onWidgetRender',
             'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange',
-            'layout:reposition mediator': 'resetDialogPosition'
+            'layout:reposition mediator': 'onLayoutReposition'
         },
 
         $messengerContainer: null,
@@ -366,6 +366,19 @@ define(function(require, exports, module) {
             }
         },
 
+        /**
+         * @param {HTMLElement} [context]
+         */
+        onLayoutReposition(context) {
+            // there's no context of layout reposition (whole page is updated)
+            // or context of reposition is within dialog
+            const doReposition = context === void 0 || $.contains(this.widget.dialog('widget')[0], context);
+
+            if (doReposition) {
+                this.resetDialogPosition();
+            }
+        },
+
         _onAdoptedFormResetClick: function() {
             this.remove();
         },
@@ -491,8 +504,11 @@ define(function(require, exports, module) {
 
         _renderHandler: function() {
             this.resetDialogPosition();
-            this.widget.closest('.invisible').removeClass('invisible');
             this.trigger('widgetReady', this);
+            // Waiting a little bite while the dialog will be positioned correctly and its content rendered
+            _.delay(() => {
+                this.widget.dialog('widget').removeClass('invisible');
+            }, 50);
         },
 
         _initAdjustHeight: function(content) {
@@ -568,6 +584,7 @@ define(function(require, exports, module) {
                 // widget is not initialized -- where's nothing to position yet
                 return;
             }
+
             this._clearScrollableHeight();
 
             if (this.options.position) {
