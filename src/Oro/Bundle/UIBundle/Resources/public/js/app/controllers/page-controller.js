@@ -8,6 +8,7 @@ define(function(require, exports, module) {
     const BaseController = require('oroui/js/app/controllers/base/controller');
     const PageModel = require('oroui/js/app/models/page-model');
     const errorHandler = require('oroui/js/error');
+    const tools = require('oroui/js/tools');
     let config = require('module-config').default(module.id);
 
     const document = window.document;
@@ -305,7 +306,8 @@ define(function(require, exports, module) {
                 fullRedirect: this.fullRedirect
             });
             if (options.target === '_blank') {
-                window.open(getUrl(pathname, query), '_blank');
+                // Solution with `window.open(getUrl(pathname, query), '_blank');` does not work in iOS Safari
+                tools.windowOpen(getUrl(pathname, query), '_blank');
                 return;
             }
             if (options.fullRedirect) {

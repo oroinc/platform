@@ -331,6 +331,26 @@ define(function(require) {
         },
 
         /**
+         * Wrapper over `window.open()` method
+         * @param url
+         * @param target?
+         */
+        windowOpen(url, target = undefined) {
+            if (!target) {
+                window.open(url);
+            } else {
+                // Solution with `window.open(url, '_blank');` does not work in iOS Safari
+                const a = document.createElement('a');
+                a.style = 'display: none';
+                a.href = url;
+                a.target = target;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }
+        },
+
+        /**
          * Creates safe regexp expression from string
          *
          * @param {string} str
