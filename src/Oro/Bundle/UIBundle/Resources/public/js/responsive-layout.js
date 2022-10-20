@@ -192,7 +192,7 @@ define(function(require) {
             checkMinimalWidthThreshold($(context || window.document));
 
             if (isChanged) {
-                mediator.trigger('layout:reposition');
+                mediator.trigger('layout:reposition', context);
             }
         }
     };
