@@ -891,7 +891,7 @@ define(function(require) {
         _triggerContentLoadEvents: function(content) {
             this.trigger('contentLoad', content, this);
             mediator.trigger('widget:contentLoad', this.widget);
-            mediator.trigger('layout:adjustHeight');
+            mediator.trigger('layout:adjustHeight', this.el);
         },
 
         /**
