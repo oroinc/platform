@@ -68,6 +68,10 @@ class LanguageCodeFormatterTest extends TestCase
             [
                 'value' => 'en_CA_plastimo',
                 'expected' => 'Canadian English Plastimo',
+            ],
+            [
+                'value' => 'fr_plastimo_FR',
+                'expected' => 'French Plastimo FR',
             ]
         ];
     }
