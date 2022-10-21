@@ -37,10 +37,28 @@ class LanguageCodeFormatter
 
         $lang = $this->localeSettings->getLanguage();
         try {
-            return Languages::getName($code, $lang);
+            return $this->postProcessLanguageName(Languages::getName($code, $lang), $code);
         } catch (MissingResourceException $e) {
-            return $this->formatNotExistsCode(Languages::class, $code, $lang);
+            return $code;
         }
+    }
+
+    /**
+     * If its custom language code we should append custom code suffix
+     *
+     * en_plastimo    -> English Plastimo
+     * en_CA_plastimo -> Canadian English Plastimo
+     */
+    private function postProcessLanguageName(string $languageName, string $code): string
+    {
+        $codePieces = explode('_', $code);
+        $diff = \count($codePieces) - \count(explode(' ', $languageName));
+
+        if ($diff > 0) {
+            $languageName .= ' '.ucwords(implode(' ', array_slice($codePieces, -$diff)));
+        }
+
+        return $languageName;
     }
 
     /**
@@ -57,16 +75,16 @@ class LanguageCodeFormatter
 
         return Locales::exists($code) ?
             Locales::getName($code, $lang) :
-            $this->formatNotExistsCode(Locales::class, $code, $lang);
+            $this->formatNotExistsLocaleCode($code, $lang);
     }
 
     /**
-     * Format partially intl supported locales/languages to the human readable format
+     * Format partially intl supported locale to the human readable format
      *
      * en_plastimo => English Plastimo
      * en_CA_plastimo => English (Canada) Plastimo
      */
-    private function formatNotExistsCode(string $resource, string $code, string $lang): string
+    private function formatNotExistsLocaleCode(string $code, string $lang): string
     {
         $pieces = explode('_', $code);
         $piecesAmount = \count($pieces);
@@ -78,8 +96,8 @@ class LanguageCodeFormatter
         if ($piecesAmount > 1) {
             for ($i = $piecesAmount - 1; $i > 0; --$i) {
                 $partialCode = implode('_', array_slice($pieces, 0, $i));
-                if ($resource::exists($partialCode)) {
-                    return $resource::getName($partialCode, $lang)
+                if (Locales::exists($partialCode)) {
+                    return Locales::getName($partialCode, $lang)
                         . ' ' . ucwords(implode(' ', array_slice($pieces, $i)));
                 }
             }
