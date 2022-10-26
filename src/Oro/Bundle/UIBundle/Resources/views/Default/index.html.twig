@@ -47,12 +47,6 @@
         module: 'oroui/js/app/components/app-loading-bar-component',
         options: {viewOptions: {container: '#oroplatform-header'}}
     }) }}></div>
-    {% if isMobileVersion() %}
-        <div {{ UI.renderPageComponentAttributes({
-            view: 'oroui/js/app/views/swipeable-view',
-            options: {_sourceElement: 'body'}
-        }) }}></div>
-    {% endif %}
     {% placeholder after_body_start %}
     <div id="progressbar" class="progress-bar-container">
         <h3 class="progress-title">{{ 'oro.ui.loading'|trans }}</h3>

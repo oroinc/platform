@@ -55,11 +55,26 @@ The widgets `collapse-widget`, `collapse-group-widget`, `rows-collapse-widget` w
 * Added `renderCollapsibleWysiwygContentPreview` and `renderWysiwygContentPreview` TWIG macros to UIBundle for
   rendering WYSIWYG content in backoffice.
 
+* Added `oroui/js/app/modules/swipeable-module` instead of `swipeableView` to
+  dispatch Custom Swipe Events to a document.
+  The provided Swipe Events are:
+  - The `swipestart` event is fired when one or more touch points are placed on the touch surface;
+  - The `swipemove` event is fired when one or more touch points are moved along the touch surface
+    with the detail option that includes the `x` and `y` coordinates of the pointer;
+  - The `swipeend` event fires when one or more touch points are removed from the touch surface
+    with the detail option that includes the `x` and `y` coordinates and `direction` of the pointer;
+  - The `swipeleft` and `swiperight` events are fired when one or more touch points are moved along the touch surface
+    with the detail option that includes the `x` and `y` coordinates of the pointer.
+    It is fired only if the elapsed time between the start and end events is less than or equal to `maxAllowedTime`;
+
 #### ImportExportBundle
 * Added `markAsSkipped` and `isFieldSkipped` method to `\Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent`
   to mark certain field as skipped during denormalization process to avoid possible type conflicts.
 
 ### Removed
+
+#### UIBundle
+* Removed `oroui/js/app/views/swipeable-view`, use `oroui/js/app/modules/swipeable-module` instead.
 
 #### EntityConfigBundle
 * Removed `renderWysiwygContentPreview` TWIG macro from EntityConfigBundle, use `renderWysiwygContentPreview` or

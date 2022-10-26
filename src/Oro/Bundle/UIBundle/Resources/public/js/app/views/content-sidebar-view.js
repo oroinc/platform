@@ -50,6 +50,8 @@ define(function(require, exports, module) {
             return {
                 'click [data-role="sidebar-minimize"]': 'minimize',
                 'click [data-role="sidebar-maximize"]': 'maximize',
+                'swipeleft': 'minimize',
+                'swiperight': 'maximize',
                 [`transitionend ${this.sidebar}`]: '_calculateContentWidth'
             };
         },
@@ -69,9 +71,6 @@ define(function(require, exports, module) {
                 this.initResizableSidebar();
             }
             ContentSidebarView.__super__.initialize.call(this, options);
-
-            mediator.on('swipe-action-left', this.minimize, this);
-            mediator.on('swipe-action-right', this.maximize, this);
         },
 
         /**
