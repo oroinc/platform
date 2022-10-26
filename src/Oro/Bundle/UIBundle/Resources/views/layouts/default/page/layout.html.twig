@@ -28,10 +28,6 @@
         <div {{ UI.renderPageComponentAttributes({
             module: 'oroui/js/app/components/app-loading-bar-component'
         }) }}></div>
-        <div {{ UI.renderPageComponentAttributes({
-            view: 'oroui/js/app/views/swipeable-view',
-            options: {_sourceElement: 'body'}
-        }) }}></div>
         <div id="container" data-layout="separate"
              {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/content-view'}) }}>
             {{ block_widget(block) }}
