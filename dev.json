@@ -73,7 +73,7 @@
         "symfony/polyfill-php80": "~1.25.0",
         "symfony/security-acl": "~3.1.0",
         "symfony/acl-bundle": "~2.1.0",
-        "twig/twig": "2.14.*",
+        "twig/twig": "~2.15.3",
         "doctrine/orm": "2.8.1",
         "doctrine/doctrine-bundle": "2.2.*",
         "doctrine/dbal": "2.12.*",
