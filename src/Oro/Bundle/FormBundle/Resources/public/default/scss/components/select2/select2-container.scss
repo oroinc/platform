@@ -284,6 +284,10 @@
         display: list-item;
         cursor: default;
     }
+
+    .select2-selected {
+        display: $select2-results-selected-disabled-display;
+    }
 }
 
 .select2-more-results {
