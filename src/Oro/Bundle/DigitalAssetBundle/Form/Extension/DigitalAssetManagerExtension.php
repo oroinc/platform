@@ -181,18 +181,18 @@ class DigitalAssetManagerExtension extends AbstractTypeExtension
 
                 $file = $form->getData();
 
+                $widgetParameters = $options['dam_widget_parameters'] ?? [
+                    'parentEntityClass' => $this->entityClassNameHelper->getUrlSafeClassName($configId->getClassName()),
+                    'parentEntityFieldName' => $configId->getFieldName(),
+                ];
+
                 $view->vars['dam_widget'] = [
                     'is_valid_digital_asset' => $form->isSubmitted() ? $form->get('digitalAsset')->isValid() : true,
                     'preview_metadata' => $file
                         ? $this->previewMetadataProvider->getMetadata($file) : [],
                     'is_image_type' => FieldConfigHelper::isImageField($configId),
                     'route' => $options['dam_widget_route'],
-                    'parameters' => $options['dam_widget_parameters'] ?? [
-                            'parentEntityClass' => $this->entityClassNameHelper->getUrlSafeClassName(
-                                $configId->getClassName()
-                            ),
-                            'parentEntityFieldName' => $configId->getFieldName(),
-                        ],
+                    'parameters' => array_merge($view->vars['dam_widget_parameters'] ?? [], $widgetParameters),
                 ];
             }
         }
