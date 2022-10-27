@@ -1362,6 +1362,28 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $filterItem->checkItemsInFilter($filterItems);
     }
 
+    /**
+     * Check checkboxes in multiple select filter strictly (case-sensitive)
+     * Example: When I check "Active, Inactive" strictly in Activity Type filter
+     *
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in (?P<filterName>[\w\s]+) filter$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in (?P<filterName>[\w\s]+) filter in
+     * "(?P<filterGridName>[\w\s]+)"$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in "(?P<filterName>.+)" filter$/
+     * @When /^(?:|I )check "(?P<filterItems>.+)" strictly in "(?P<filterName>.+)" filter in
+     * "(?P<filterGridName>[\w\s]+)"$/
+     *
+     * @param string $filterName
+     * @param string $filterItems
+     * @param string $filterGridName
+     */
+    public function iCheckCheckboxesStrictlyInFilter($filterName, $filterItems, $filterGridName = 'Grid')
+    {
+        /** @var MultipleChoice $filterItem */
+        $filterItem = $this->getGridFilters($filterGridName)->getFilterItem('MultipleChoice', $filterName);
+        $filterItem->checkItemsInFilterStrict($filterItems);
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * Select value in select filter
